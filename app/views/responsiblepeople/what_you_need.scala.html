@@ -16,7 +16,8 @@
 
 @import include._
 @import forms2._
-@(index: Int, flow: Option[String] = None)(implicit request: Request[_],m:Messages)
+@import config.{ ApplicationConfig}
+@(index: Int, flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
@@ -27,6 +28,8 @@
     title = Messages("title.wyn") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
+
+    @components.user_attention_saving()
 
     <p>@Messages("responsiblepeople.whatyouneed.requiredinfo")</p>
 

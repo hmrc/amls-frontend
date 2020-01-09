@@ -18,7 +18,7 @@ package views.supervision
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import models.supervision.ProfessionalBodies$
@@ -26,10 +26,10 @@ import play.api.i18n.Messages
 import views.Fixture
 
 
-class which_professional_bodySpec extends AmlsSpec with MustMatchers  {
+class which_professional_bodySpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "which_professional_body view" must {

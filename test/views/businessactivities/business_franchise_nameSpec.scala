@@ -19,17 +19,17 @@ package views.businessactivities
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessFranchise, BusinessFranchiseNo, BusinessFranchiseYes}
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class business_franchise_nameSpec extends AmlsSpec with MustMatchers  {
+class business_franchise_nameSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "business_franchise_name view" must {

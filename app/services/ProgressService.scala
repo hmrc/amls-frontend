@@ -18,7 +18,7 @@ package services
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.Inject
 import models.businessmatching.BusinessType.Partnership
@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ProgressService @Inject()(
                                  val cacheConnector: DataCacheConnector,
                                  val statusService: StatusService,
-                                 config: AppConfig
+                                 config: ApplicationConfig
                                ){
 
   def getSubmitRedirect (amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)

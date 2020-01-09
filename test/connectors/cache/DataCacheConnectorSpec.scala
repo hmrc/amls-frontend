@@ -16,16 +16,12 @@
 
 package connectors.cache
 
-import config.AppConfig
-import connectors.Authority
-import org.mockito.Matchers.any
+import config.ApplicationConfig
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.prop.PropertyChecks
 import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
-import uk.gov.hmrc.play.frontend.auth.LoggedInUser
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import utils.AmlsSpec
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,7 +40,6 @@ class DataCacheConnectorSpec
 
   trait Fixture {
 
-    implicit val user = mock[LoggedInUser]
     val key = "key"
     val oId = "oldId"
     val credId = "12345678"
@@ -54,11 +49,10 @@ class DataCacheConnectorSpec
 
     val factory = mock[MongoCacheClientFactory]
     val client = mock[MongoCacheClient]
-    val authority = Authority("", Accounts(), "/user-details", "/ids", credId)
 
     when(factory.createClient) thenReturn client
 
-    val appConfig = mock[AppConfig]
+    val appConfig = mock[ApplicationConfig]
 
     val dataCacheConnector = new MongoCacheConnector(factory) {
       override lazy val mongoCache: MongoCacheClient =  mock[MongoCacheClient]

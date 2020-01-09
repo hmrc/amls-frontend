@@ -26,7 +26,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.http.Status.SEE_OTHER
 import play.api.test.Helpers._
 import services.StatusService
@@ -43,7 +43,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
   with IntegrationPatience
   with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -54,9 +54,9 @@ class MoneySourcesControllerSpec extends AmlsSpec
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
     val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
-      serviceFlow = mockServiceFlow)
+      serviceFlow = mockServiceFlow, cc = mockMcc)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
@@ -77,7 +77,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
     val request = addToken(authRequest)
 
-    val newRequest = request.withFormUrlEncodedBody(
+    val newRequest = requestWithUrlEncodedBody(
       "bankMoneySource" -> "Yes",
       "bankNames" -> "Bank names",
       "wholesalerMoneySource" -> "Yes",
@@ -93,9 +93,10 @@ class MoneySourcesControllerSpec extends AmlsSpec
       .thenReturn(Future.successful(cacheMap))
 
     val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
-      serviceFlow = mock[ServiceFlow])
+      serviceFlow = mock[ServiceFlow],
+      cc = mockMcc)
 
     val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
 
@@ -172,7 +173,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
       "data is invalid" should {
         "return bad request" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             ("IncorrectData1", "IncorrectData2")
           )
 

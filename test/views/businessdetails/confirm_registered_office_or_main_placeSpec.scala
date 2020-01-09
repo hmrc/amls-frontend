@@ -19,17 +19,17 @@ package views.businessdetails
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{ConfirmRegisteredOffice, RegisteredOfficeUK}
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class confirm_registered_office_or_main_placeSpec extends AmlsSpec with MustMatchers {
+class confirm_registered_office_or_main_placeSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "confirm_registered_office_or_main_place view" must {

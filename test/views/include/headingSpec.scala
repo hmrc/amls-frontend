@@ -20,10 +20,10 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatestplus.play.PlaySpec
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.html.include.heading
 
-class headingSpec extends PlaySpec with AmlsSpec {
+class headingSpec extends PlaySpec with AmlsViewSpec {
 
   trait Fixture {
   }

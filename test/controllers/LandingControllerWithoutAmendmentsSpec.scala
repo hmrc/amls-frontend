@@ -25,6 +25,7 @@ import generators.StatusGenerator
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.BusinessDetails
 import models.businessmatching._
+import models.estateagentbusiness.EstateAgentBusiness
 import models.responsiblepeople.TimeAtAddress.OneToThreeYears
 import models.responsiblepeople._
 import models.status._
@@ -32,7 +33,7 @@ import models.{status => _, _}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import play.api.mvc.Result
+import play.api.mvc.{BodyParsers, MessagesActionBuilder, Result}
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -45,8 +46,10 @@ import scala.concurrent.Future
 
 class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
+
+    val mockApplicationConfig = mock[ApplicationConfig]
 
     val request = addToken(authRequest)
 
@@ -56,7 +59,11 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       authAction = SuccessfulAuthActionNoAmlsRefNo,
       auditConnector = mock[AuditConnector],
       cacheConnector = mock[DataCacheConnector],
-      statusService = mock[StatusService])
+      statusService = mock[StatusService],
+      ds = commonDependencies,
+      mcc = mockMcc,
+      messagesApi = messagesApi,
+      parser = mock[BodyParsers.Default])
 
     val controllerNoUserRole = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -64,7 +71,11 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       authAction = SuccessfulAuthActionNoUserRole,
       auditConnector = mock[AuditConnector],
       cacheConnector = mock[DataCacheConnector],
-      statusService = mock[StatusService])
+      statusService = mock[StatusService],
+      ds = commonDependencies,
+      mcc = mockMcc,
+      messagesApi = messagesApi,
+      parser = mock[BodyParsers.Default])
 
     when {
       controllerNoAmlsNumber.landingService.setAltCorrespondenceAddress(any(), any[String])(any(), any())
@@ -125,33 +136,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       }
     }
 
-    "redirect to login event page" when {
-      "responsible persons is not complete" in new Fixture {
-        val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
-          dateOfBirth = None
-        )
-        val cacheMap: CacheMap = mock[CacheMap]
-
-        val complete: BusinessMatching = mock[BusinessMatching]
-
-        when(complete.isComplete) thenReturn true
-        when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-        when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
-        when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
-        when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
-
-        when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
-        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-          .thenReturn(Future.successful(activeStatusGen.sample.get, None))
-
-        val result: Future[Result] = controllerNoAmlsNumber.get()(request)
-
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(controllers.routes.LoginEventController.get().url)
-      }
-    }
-
     "load the correct view after calling get" when {
 
       "the landing service has a saved form and " when {
@@ -166,7 +150,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           when(complete.isComplete) thenReturn true
           when(emptyCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
           when(emptyCacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
-          when(emptyCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
+          when(emptyCacheMap.getEntry[EstateAgentBusiness](meq(EstateAgentBusiness.key))(any())).thenReturn(None)
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
@@ -181,7 +165,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           when(complete.isComplete) thenReturn true
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
           when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
-          when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
+          when(cacheMap.getEntry[EstateAgentBusiness](meq(EstateAgentBusiness.key))(any())).thenReturn(None)
           when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
             .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
@@ -195,7 +179,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       }
 
       "redirect to the sign-out page when the user role is not USER" in new Fixture {
-        val expectedLocation = s"${ApplicationConfig.logoutUrl}?continue=${
+        val expectedLocation = s"${appConfig.logoutUrl}?continue=${
           URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role).absoluteUrl, "utf-8")}"
 
         val result = controllerNoUserRole.get()(request)
@@ -246,7 +230,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(ApplicationConfig.businessCustomerUrl)
+          redirectLocation(result) mustBe Some(appConfig.businessCustomerUrl)
         }
       }
 

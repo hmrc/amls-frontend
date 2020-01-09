@@ -18,17 +18,20 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection}
 import views.html.responsiblepeople.person_name
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class PersonNameController @Inject () ( val dataCacheConnector: DataCacheConnector,
-                                        authAction: AuthAction
-                                      ) extends RepeatingSection with DefaultBaseController {
+                                        authAction: AuthAction,
+                                        val ds: CommonPlayDependencies,
+                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

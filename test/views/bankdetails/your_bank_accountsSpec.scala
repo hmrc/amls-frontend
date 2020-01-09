@@ -18,29 +18,34 @@ package views.bankdetails
 
 import forms.EmptyForm
 import models.bankdetails._
-import org.scalatest.MustMatchers
 import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
-import utils.AmlsSpec
-import views.{Fixture, HtmlAssertions}
+import play.api.test.FakeRequest
+import utils.AmlsSummaryViewSpec
+import views.Fixture
 
-class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChecks with HtmlAssertions {
+class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView(FakeRequest())
+
+    val ukAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12341234", "000000")))
+    val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some( NonUKIBANNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
+    val nonUkAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some( NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
 
     val completedModel1 = BankDetails(
       Some(PersonalAccount),
       Some("Completed First Account Name"),
-      Some(UKAccount("12341234", "000000")),
+      Some(ukAccount),
       false,
       false,
       None,
       true)
+
     val completedModel2 = BankDetails(
       Some(BelongsToBusiness),
       Some("Completed Second Account Name"),
-      Some(UKAccount("12341234", "000000")),
+      Some(ukAccount),
       false,
       false,
       None,
@@ -49,7 +54,7 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
     val completedModel3 = BankDetails(
       Some(BelongsToOtherBusiness),
       Some("Completed Third Account Name"),
-      Some(UKAccount("12341234", "000000")),
+      Some(ukAccount),
       false,
       false,
       None,
@@ -59,7 +64,7 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
     val completedModel4 = BankDetails(
       Some(BelongsToOtherBusiness),
       Some("Completed Fourth Account Name"),
-      Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")),
+      Some(nonUkAccount),
       false,
       false,
       None,
@@ -69,8 +74,9 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
     val inCompleteModel1 = BankDetails(
       Some(PersonalAccount),
       None,
-      Some(UKAccount("12341234", "000000"))
+      Some(ukAccount)
     )
+
     val inCompleteModel2 = BankDetails(
     Some(BelongsToBusiness),
     Some("Incomplete Second Account Name"))
@@ -78,13 +84,13 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
     val inCompleteModel3 = BankDetails(
     None,
     Some("Incomplete Third Account Name"))
-  }
 
-  val inCompleteModel4 = BankDetails(
-    Some(PersonalAccount),
-    None,
-    Some(NonUKIBANNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD"))
-  )
+    val inCompleteModel4 = BankDetails(
+      Some(PersonalAccount),
+      None,
+      bankAccount = Some(nonUkIban)
+    )
+  }
 
   "The your bank accounts view " must {
     "have correct title" in new ViewFixture {

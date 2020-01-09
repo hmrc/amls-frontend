@@ -105,6 +105,9 @@ object BusinessDetails {
 
   val key = "about-the-business"
 
+  import play.api.libs.json.JodaWrites._
+  import play.api.libs.json.JodaReads._
+
   implicit val format = Json.writes[BusinessDetails]
 
   implicit val jsonReads: Reads[BusinessDetails] = {

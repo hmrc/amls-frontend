@@ -20,14 +20,14 @@ import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import models.businessmatching.{BusinessActivities, EstateAgentBusinessService, HighValueDealing}
 
-class deregistration_reasonSpec extends AmlsSpec with MustMatchers  {
+class deregistration_reasonSpec extends AmlsViewSpec with MustMatchers  {
 
   trait TestFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "withdrawal_reasons view" must {

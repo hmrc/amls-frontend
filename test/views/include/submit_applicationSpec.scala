@@ -18,13 +18,13 @@ package views.include
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class submit_applicationSpec extends AmlsSpec with MustMatchers{
+class submit_applicationSpec extends AmlsViewSpec with MustMatchers{
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "submit application html" must {

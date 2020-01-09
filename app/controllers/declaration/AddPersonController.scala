@@ -18,23 +18,26 @@ package controllers.declaration
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.declaration.AddPerson
 import models.declaration.release7._
 import models.status._
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.i18n.Messages
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.StatusService
 import utils.{AuthAction, ControllerHelper}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector,
-                                       val statusService: StatusService,
-                                       authAction: AuthAction
-                                     ) extends DefaultBaseController {
+                                      val statusService: StatusService,
+                                      authAction: AuthAction,
+                                      val ds: CommonPlayDependencies,
+                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
 
   def get() = authAction.async {
@@ -70,7 +73,7 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
     }
   }
 
-  def updateFormErrors(f: InvalidForm, businessType: Option[BusinessType]): InvalidForm = {
+  def updateFormErrors(f: InvalidForm, businessType: Option[BusinessType])(implicit messages: Messages): InvalidForm = {
     val message = businessType match {
       case Some(bt) => BusinessType.errorMessageFor(bt)
       case _ => throw new IllegalArgumentException("[Controllers][AddPersonController] business type is not known")

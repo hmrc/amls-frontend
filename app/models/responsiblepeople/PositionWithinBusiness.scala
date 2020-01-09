@@ -105,7 +105,7 @@ object PositionWithinBusiness
       case JsString("06") => JsSuccess(SoleProprietor)
       case JsString("07") => JsSuccess(DesignatedMember)
       case JsObject(m) if m.contains("other") => JsSuccess(Other(m("other").as[String]))
-      case _ => JsError((JsPath \ "positions") -> play.api.data.validation.ValidationError("error.invalid"))
+      case _ => JsError((JsPath \ "positions") -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
 
   private[responsiblepeople] val atLeastOneRule = minLengthR[Set[String]](1).withMessage("error.required.positionWithinBusiness")

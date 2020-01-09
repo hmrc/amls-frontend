@@ -18,13 +18,13 @@ package views.confirmation
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class BacsConfirmationTransitionalRenewalViewSpec extends AmlsSpec with MustMatchers {
+class BacsConfirmationTransitionalRenewalViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     override def view = views.html.confirmation.confirmation_bacs_transitional_renewal(
       "businessName"

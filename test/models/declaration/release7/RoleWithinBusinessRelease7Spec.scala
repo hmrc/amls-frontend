@@ -175,12 +175,12 @@ class RoleWithinBusinessRelease7Spec extends AmlsSpec {
       "fail when path is missing" in {
         Json.fromJson[RoleWithinBusinessRelease7](Json.obj(
           "roleWithinBusinessOther" -> "other text")) must
-          be(JsError((JsPath \ "roleWithinBusiness") -> play.api.data.validation.ValidationError("error.path.missing")))
+          be(JsError((JsPath \ "roleWithinBusiness") -> play.api.libs.json.JsonValidationError("error.path.missing")))
       }
 
       "fail when on invalid data" in {
         Json.fromJson[RoleWithinBusinessRelease7](Json.obj("roleWithinBusiness" -> Set("hello"))) must
-          be(JsError((JsPath \ "roleWithinBusiness") -> play.api.data.validation.ValidationError("error.invalid")))
+          be(JsError((JsPath \ "roleWithinBusiness") -> play.api.libs.json.JsonValidationError("error.invalid")))
       }
 
       "write valid data in using json write" in {

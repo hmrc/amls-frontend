@@ -20,16 +20,16 @@ import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{VATRegistered, VATRegisteredNo, VATRegisteredYes}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import jto.validation.Path
 import jto.validation.ValidationError
 
 
-class vat_registeredSpec extends AmlsSpec with MustMatchers {
+class vat_registeredSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "vat_registered view" must {

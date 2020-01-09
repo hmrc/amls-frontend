@@ -18,14 +18,14 @@ package views.hvd
 
 import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
-import  utils.AmlsSpec
+import  utils.AmlsViewSpec
 import play.api.i18n.Messages
 import views.Fixture
 
-class what_you_needSpec extends AmlsSpec with MustMatchers {
+class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "What you need View" must {

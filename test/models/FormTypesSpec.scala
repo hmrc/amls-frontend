@@ -626,7 +626,7 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
 
     "not allow characters from other sets" in {
       FormTypes.accountNameType.validate(symbols5.mkString("")) must be (
-        Invalid(Seq(Path -> Seq(ValidationError("err.text.validation"))))
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.char"))))
       )
     }
   }

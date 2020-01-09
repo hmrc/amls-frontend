@@ -18,7 +18,7 @@ package controllers.declaration
 
 import com.google.inject.Inject
 import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.declaration._
@@ -26,21 +26,22 @@ import models.declaration.release7.RoleWithinBusinessRelease7
 import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePerson}
 import models.status._
 import play.api.i18n.Messages
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.declaration.{who_is_registering_this_registration, who_is_registering_this_renewal, who_is_registering_this_update}
 
 import scala.concurrent.Future
 
-class WhoIsRegisteringController @Inject () (
-                                            authAction: AuthAction,
-                                            val dataCacheConnector: DataCacheConnector,
-                                            val statusService: StatusService,
-                                            val renewalService: RenewalService,
-                                            val amlsConnector: AmlsConnector
-                                            ) extends DefaultBaseController {
+class WhoIsRegisteringController @Inject () (authAction: AuthAction,
+                                             val ds: CommonPlayDependencies,
+                                             val dataCacheConnector: DataCacheConnector,
+                                             val statusService: StatusService,
+                                             val renewalService: RenewalService,
+                                             val amlsConnector: AmlsConnector,
+                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>
@@ -110,7 +111,7 @@ class WhoIsRegisteringController @Inject () (
         Future.successful(status(who_is_registering_this_registration(form, rp)))
     }
 
-  def updateFormErrors(f: InvalidForm, status: SubmissionStatus, renewal: Boolean): InvalidForm = {
+  def updateFormErrors(f: InvalidForm, status: SubmissionStatus, renewal: Boolean)(implicit messages: Messages): InvalidForm = {
     val common = "error.required.declaration.who.is.declaring.this"
     status match {
       case SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_) =>

@@ -22,16 +22,16 @@ import generators.ResponsiblePersonGenerator
 import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 
-class which_fit_and_properSpec extends AmlsSpec with MustMatchers with ResponsiblePersonGenerator{
+class which_fit_and_properSpec extends AmlsViewSpec with MustMatchers with ResponsiblePersonGenerator{
 
   val rp = responsiblePersonGen.sample.get
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     def view = which_fit_and_proper(EmptyForm, false, Seq((rp, 0)))
   }

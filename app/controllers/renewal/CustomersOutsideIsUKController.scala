@@ -17,13 +17,15 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivity, BusinessMatching, HighValueDealing}
 import models.renewal.{CustomersOutsideIsUK, Renewal}
+import play.api.mvc.MessagesControllerComponents
 import services.{AutoCompleteService, RenewalService}
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.renewal._
 
 import scala.concurrent.Future
@@ -31,9 +33,10 @@ import scala.concurrent.Future
 @Singleton
 class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                val authAction: AuthAction,
+                                               val ds: CommonPlayDependencies,
                                                val renewalService: RenewalService,
-                                               val autoCompleteService: AutoCompleteService
-                                            ) extends DefaultBaseController {
+                                               val autoCompleteService: AutoCompleteService,
+                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

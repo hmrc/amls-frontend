@@ -21,10 +21,10 @@ import jto.validation.{Path, ValidationError}
 import models.autocomplete.NameValuePair
 import org.jsoup.Jsoup
 import org.scalatestplus.play.PlaySpec
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.html.include.forms2.country_autocomplete
 
-class country_autocompleteSpec extends PlaySpec with AmlsSpec {
+class country_autocompleteSpec extends PlaySpec with AmlsViewSpec {
 
   trait Fixture {
     val listData = Seq(

@@ -23,23 +23,19 @@ import models.responsiblepeople._
 import models.{Country, DateOfChange}
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Nino
-import utils.AmlsSpec
-import views.{Fixture, HtmlAssertions}
+import utils.AmlsSummaryViewSpec
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
-class detailed_answersSpec extends AmlsSpec
-  with TableDrivenPropertyChecks
-  with HtmlAssertions
-  with MustMatchers
-  with ResponsiblePeopleValues {
+class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks with ResponsiblePeopleValues {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView(FakeRequest())
 
     val businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))
 

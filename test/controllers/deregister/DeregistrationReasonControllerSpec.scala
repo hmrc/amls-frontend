@@ -25,7 +25,6 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
@@ -33,7 +32,7 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
+class DeregistrationReasonControllerSpec extends AmlsSpec {
 
   trait TestFixture extends AuthorisedFixture {
     self =>
@@ -44,7 +43,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
     val dataCacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
 
-    lazy val controller = new DeregistrationReasonController(SuccessfulAuthAction, dataCacheConnector, amlsConnector, authService, statusService)
+    lazy val controller = new DeregistrationReasonController(SuccessfulAuthAction, ds = commonDependencies, dataCacheConnector, amlsConnector, authService, statusService, mockMcc)
 
     val amlsRegistrationNumber = "XA1234567890L"
 
@@ -124,7 +123,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
           "follows sending a deregistration to amls" when {
             "deregistrationReason is selection without other reason" in new TestFixture {
 
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "deregistrationReason" -> "01"
               )
 
@@ -141,7 +140,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
             }
             "DeregistrationReason is selection with other reason" in new TestFixture {
 
-              val newRequest = request.withFormUrlEncodedBody(
+              val newRequest = requestWithUrlEncodedBody(
                 "deregistrationReason" -> "06",
                 "specifyOtherReason" -> "reason"
               )
@@ -165,7 +164,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
       "given invalid data" must {
         "return with BAD_REQUEST" in new TestFixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "deregistrationReason" -> "20"
           )
 
@@ -182,7 +181,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
             authService.amlsRegistrationNumber(Some(any()), Some(any()))(any(), any())
           } thenReturn Future.successful(None)
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "deregistrationReason" -> "01"
           )
 

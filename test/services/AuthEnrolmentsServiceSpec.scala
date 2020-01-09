@@ -16,7 +16,7 @@
 
 package services
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.{EnrolmentStubConnector, TaxEnrolmentsConnector}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentIdentifier, GovernmentGatewayEnrolment, TaxEnrolment}
@@ -40,7 +40,7 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
   trait Fixture {
     val enrolmentStore = mock[TaxEnrolmentsConnector]
     val enrolmentStubConnector = mock[EnrolmentStubConnector]
-    val config = mock[AppConfig]
+    val config = mock[ApplicationConfig]
 
     val groupId = stringOfLengthGen(10).sample.get
 

@@ -18,14 +18,14 @@ package views.responsiblepeople
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class who_must_registerSpec extends AmlsSpec with MustMatchers {
+class who_must_registerSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "who_must_register View" must {
@@ -61,8 +61,8 @@ class who_must_registerSpec extends AmlsSpec with MustMatchers {
       html must include(Messages("responsiblepeople.whomustregister.line_4"))
       html must include(Messages("responsiblepeople.whomustregister.line_5"))
 
-      html must include(Messages("main.sidebar.title"))
-      html must include(Messages("main.sidebar.information"))
+      html must include(Messages("whatYouNeed.attention.title"))
+      html must include(Messages("whatYouNeed.attention.information"))
     }
   }
 }

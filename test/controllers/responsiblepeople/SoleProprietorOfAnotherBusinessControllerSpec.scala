@@ -25,7 +25,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
@@ -45,8 +45,9 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
     val controller = new SoleProprietorOfAnotherBusinessController(
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
-      statusService = mock[StatusService])
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      statusService = mock[StatusService],
+      cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -227,7 +228,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
         "go to VATRegisteredController" in new Fixture {
 
           val mockCacheMap = mock[CacheMap]
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "soleProprietorOfAnotherBusiness" -> "true",
             "personName" -> "Person Name")
 
@@ -256,7 +257,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
         "edit is true" must {
           "go to DetailedAnswersController" in new Fixture {
             val mockCacheMap = mock[CacheMap]
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "soleProprietorOfAnotherBusiness" -> "false",
               "personName" -> "Person Name")
 
@@ -275,7 +276,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
         "edit is false" must {
           "go to RegisteredForSelfAssessmentController" in new Fixture {
             val mockCacheMap = mock[CacheMap]
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "soleProprietorOfAnotherBusiness" -> "false",
               "personName" -> "Person Name")
 
@@ -300,7 +301,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
       "respond with BAD_REQUEST" when {
         "given an invalid form" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "soleProprietorOfAnotherBusiness" -> "",
             "personName" -> "Person Name")
 
@@ -315,7 +316,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
       "respond with NOT_FOUND" when {
         "ResponsiblePeople model cannot be found with given index" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "soleProprietorOfAnotherBusiness" -> "true",
             "personName" -> "Person Name")
 

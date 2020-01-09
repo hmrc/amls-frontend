@@ -14,10 +14,9 @@
  * limitations under the License.
  *@
 
-@import include.forms2._
 @import models.businessdetails._
 
-@(model: RegisteredOffice)(implicit m:Messages)
+@(model: RegisteredOffice)(implicit m:Messages, lang: Lang)
 
       <p>@model.toLines.map { line =>
           @line<br />

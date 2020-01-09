@@ -25,18 +25,18 @@ import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 
 import scala.concurrent.Future
 
 
 class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val statusService = mock[StatusService]
@@ -44,7 +44,9 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
     val controller = new CurrentAddressDateOfChangeController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
-      statusService = statusService
+      ds = commonDependencies,
+      statusService = statusService,
+      cc = mockMcc
     )
   }
 
@@ -62,7 +64,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
       "given valid data for a current address time ZeroToFiveMonths" must {
         "redirect to the how long at current address page" in new Fixture {
 
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "dateOfChange.year" -> "2010",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"
@@ -91,7 +93,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
       "given valid data for a current address time SixToElevenMonths" must {
         "redirect to the time at current address page" in new Fixture {
 
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "dateOfChange.year" -> "2010",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"
@@ -120,7 +122,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
       "given valid data for a current address with time OneToThreeYears" must {
         "redirect to the details page" in new Fixture {
 
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "dateOfChange.year" -> "2010",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"
@@ -149,7 +151,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
       "given valid data for a current address with time ThreeYearsPlus" must {
         "redirect to the details page" in new Fixture {
 
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "dateOfChange.year" -> "2010",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"
@@ -178,7 +180,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
       "given valid data for a current address time SixToElevenMonths" must {
         "redirect to the details page when in edit mode" in new Fixture {
 
-          val postRequest = request.withFormUrlEncodedBody(
+          val postRequest = requestWithUrlEncodedBody(
             "dateOfChange.year" -> "2010",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"
@@ -208,7 +210,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
     "respond with BAD_REQUEST" when {
       "given invalid data" in new Fixture {
 
-        val invalidPostRequest = request.withFormUrlEncodedBody()
+        val invalidPostRequest = requestWithUrlEncodedBody("invalid" -> "data")
 
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
         val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus))
@@ -230,7 +232,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
       }
       "given a date before the responsible person start date" in new Fixture {
 
-        val postRequest = request.withFormUrlEncodedBody(
+        val postRequest = requestWithUrlEncodedBody(
           "dateOfChange.year" -> "2010",
           "dateOfChange.month" -> "10",
           "dateOfChange.day" -> "01",
@@ -259,7 +261,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
     "respond with NOT_FOUND" when {
       "post is called with an out of bounds index" in new Fixture {
 
-        val postRequest = request.withFormUrlEncodedBody(
+        val postRequest = requestWithUrlEncodedBody(
           "dateOfChange.year" -> "2010",
           "dateOfChange.month" -> "10",
           "dateOfChange.day" -> "01"

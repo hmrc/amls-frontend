@@ -18,7 +18,7 @@ package services
 
 import models.autocomplete.{CountryDataProvider, NameValuePair}
 import org.mockito.Matchers.{eq => eqTo, any}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
 class AutoCompleteServiceSpec extends PlaySpec with MockitoSugar {

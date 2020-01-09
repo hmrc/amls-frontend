@@ -18,18 +18,22 @@ package controllers.changeofficer
 
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.changeofficer.Helpers._
 import controllers.changeofficer.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.changeofficer.{StillEmployed, StillEmployedNo, StillEmployedYes}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
-class StillEmployedController @Inject()(authAction: AuthAction, implicit val dataCacheConnector: DataCacheConnector)
-                              extends DefaultBaseController {
+class StillEmployedController @Inject()(authAction: AuthAction,
+                                        val ds: CommonPlayDependencies,
+                                        implicit val dataCacheConnector: DataCacheConnector,
+                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
      implicit request =>

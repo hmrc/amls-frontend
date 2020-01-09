@@ -18,7 +18,7 @@ package models.responsiblepeople
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, ValidationError}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
 class ConfirmAddressSpec extends PlaySpec with MockitoSugar {

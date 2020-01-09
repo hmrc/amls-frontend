@@ -24,7 +24,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.libs.json.Json
 import play.api.test.Helpers._
@@ -35,13 +35,12 @@ import scala.concurrent.Future
 
 class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new IdentifySuspiciousActivityController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "IdentifySuspiciousActivityController" when {
@@ -82,7 +81,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
     "post is called" must {
       "on post with valid data" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "hasWrittenGuidance" -> "true"
         )
 
@@ -98,7 +97,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
       }
 
       "on post with invalid data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "hasWrittenGuidance" -> "grrrrr"
         )
 
@@ -111,7 +110,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
 
       "on post with valid data in edit mode" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "hasWrittenGuidance" -> "true"
         )
 

@@ -27,15 +27,16 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class NeedMoreInformationControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
 
     val controller = new NeedMoreInformationController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
-      router = createRouter[RemoveBusinessTypeFlowModel]
+      router = createRouter[RemoveBusinessTypeFlowModel],
+      cc = mockMcc
     )
   }
 

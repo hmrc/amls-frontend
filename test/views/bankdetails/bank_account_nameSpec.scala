@@ -18,23 +18,23 @@ package views.bankdetails
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.bankdetails.{Account, NonUKAccountNumber}
+import models.bankdetails.NonUKAccountNumber
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class bank_account_nameSpec extends AmlsSpec with MustMatchers {
+class bank_account_nameSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "bank_account view " must{
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[Account] = Form2(NonUKAccountNumber(""))
+      val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
 
       override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_name(form2, false, Some(0))
@@ -45,7 +45,7 @@ class bank_account_nameSpec extends AmlsSpec with MustMatchers {
 
   "have correct heading" in new ViewFixture {
 
-    val form2: ValidForm[Account] = Form2(NonUKAccountNumber(""))
+    val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
     override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_name(form2, false, Some(0))
 
@@ -54,7 +54,7 @@ class bank_account_nameSpec extends AmlsSpec with MustMatchers {
 
   "have a back link" in new ViewFixture {
 
-    val form2: ValidForm[Account] = Form2(NonUKAccountNumber(""))
+    val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
     override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_name(form2, false, Some(0))
 

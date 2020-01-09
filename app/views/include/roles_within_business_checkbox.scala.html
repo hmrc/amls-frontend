@@ -15,10 +15,9 @@
  *@
 
 @import include._
-@import forms2._
-@import models.businessmatching.{BusinessType, BusinessMatching}
+@import include.forms2._
 
-@(f: forms.Form2[_], id:String)(implicit lang:Lang, m:Messages)
+@(f: forms.Form2[_], id:String)(implicit  m:Messages, lang: Lang)
 
 @checkbox(
     f = f("positions[]"),

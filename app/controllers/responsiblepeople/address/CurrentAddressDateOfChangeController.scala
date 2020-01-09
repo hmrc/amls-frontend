@@ -18,22 +18,25 @@ package controllers.responsiblepeople.address
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.responsiblepeople.ResponsiblePerson
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.StatusService
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                     authAction: AuthAction,
-                                                     statusService: StatusService) extends RepeatingSection with DefaultBaseController with DateOfChangeHelper with FormHelpers {
+class CurrentAddressDateOfChangeController @Inject ()(val dataCacheConnector: DataCacheConnector,
+                                                      authAction: AuthAction,
+                                                      val ds: CommonPlayDependencies,
+                                                      statusService: StatusService,
+                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean) = authAction {
     implicit request =>

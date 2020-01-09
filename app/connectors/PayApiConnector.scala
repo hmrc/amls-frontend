@@ -16,36 +16,34 @@
 
 package connectors
 
-import javax.inject.Inject
 import audit.{CreatePaymentEvent, CreatePaymentFailureEvent}
 import cats.implicits._
-import config.{WSHttp}
+import com.google.inject.Inject
+import config.ApplicationConfig
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
-import play.api.Mode.Mode
-import play.api.{Configuration, Logger, Play}
+import play.api.Logger
 import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.HttpResponseHelper
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnector @Inject()(
-                                 http: WSHttp,
-                                 auditConnector: AuditConnector
-                               ) extends HttpResponseHelper with ServicesConfig {
+                                 val http: HttpClient,
+                                 val auditConnector: DefaultAuditConnector,
+                                 val applicationConfig: ApplicationConfig) extends HttpResponseHelper  {
 
-  lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
   private val logDebug = (msg: String) => Logger.debug(s"[PayApiConnector] $msg")
   private val logError = (msg: String) => Logger.error(s"[PayApiConnector] $msg")
 
   def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
 
     val bodyParser = JsonParsed[CreatePaymentResponse]
-
     logDebug(s"Creating payment: ${Json.toJson(request)}")
-    http.POST[CreatePaymentRequest, HttpResponse](s"$payBaseUrl/amls/journey/start", request) map {
+    http.POST[CreatePaymentRequest, HttpResponse](s"${applicationConfig.payBaseUrl}/amls/journey/start", request) map {
       case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) =>
         auditConnector.sendExtendedEvent(CreatePaymentEvent(request, body))
         body.some
@@ -56,7 +54,4 @@ class PayApiConnector @Inject()(
         None
     }
   }
-
-  override protected def mode: Mode = Play.current.mode
-  override protected def runModeConfiguration: Configuration = Play.current.configuration
 }

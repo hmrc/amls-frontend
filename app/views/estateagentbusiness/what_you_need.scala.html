@@ -16,7 +16,8 @@
 
 @import include._
 @import forms2._
-@()(implicit request: Request[_],m:Messages)
+@import config.{ ApplicationConfig}
+@()(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
@@ -25,9 +26,10 @@
 
 @whatyouneed(
     title = Messages("title.wyn") + " - " + Messages("summary.estateagentbusiness"),
-    heading = header,
-    sidebar = sidebar
+    heading = header
 ) {
+
+    @components.user_attention_saving()
 
     <p>@Messages("estateagentbusiness.whatyouneed.subheading")</p>
 
@@ -45,11 +47,4 @@
         id=Some("eabwhatyouneed-button")
     )
 
-}
-
-@sidebar = {
-    <div class="user-attention">
-        <h2 class="heading-small">@Messages("main.sidebar.title")</h2>
-        <p>@Messages("main.sidebar.information")</p>
-    </div>
 }

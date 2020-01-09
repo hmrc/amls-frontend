@@ -18,21 +18,23 @@ package controllers.declaration
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.declaration.AddPerson
 import models.status.{ReadyForRenewal, SubmissionReadyForReview}
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
+import play.api.libs
 
-class DeclarationController @Inject () (
-                                       val dataCacheConnector: DataCacheConnector,
-                                       val statusService: StatusService,
-                                       authAction: AuthAction
-                                       ) extends DefaultBaseController {
+class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnector,
+                                        val statusService: StatusService,
+                                        authAction: AuthAction,
+                                        val ds: CommonPlayDependencies,
+                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   lazy val defaultView = declarationView("declaration.declaration.title", "submit.registration", isAmendment = false)
 

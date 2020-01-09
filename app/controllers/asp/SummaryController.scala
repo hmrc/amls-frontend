@@ -17,19 +17,24 @@
 package controllers.asp
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.Inject
 import models.asp.Asp
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.asp.summary
 
 class SummaryController @Inject()(val dataCache: DataCacheConnector,
                                   val serviceFlow: ServiceFlow,
                                   val statusService: StatusService,
-                                  authAction: AuthAction) extends DefaultBaseController {
+                                  authAction: AuthAction,
+                                  val ds: CommonPlayDependencies,
+                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+
   def get = authAction.async {
       implicit request =>
         dataCache.fetch[Asp](request.credId, Asp.key) map {

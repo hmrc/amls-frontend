@@ -27,12 +27,11 @@ import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.{AnyContentAsFormUrlEncoded, Result}
+import play.api.mvc.{AnyContentAsFormUrlEncoded, Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
@@ -63,12 +62,12 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
   trait FormSubmissionFixture extends Fixture {
 
-    def formData(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = data match {
+    def formData(data: Option[Request[AnyContentAsFormUrlEncoded]]) = data match {
       case Some(d) => d
-      case None => request.withFormUrlEncodedBody("isOutside" -> "true")
+      case None => requestWithUrlEncodedBody("isOutside" -> "true")
     }
 
-    def formRequest(data: Option[FakeRequest[AnyContentAsFormUrlEncoded]]) = formData(data)
+    def formRequest(data: Option[Request[AnyContentAsFormUrlEncoded]]) = formData(data)
 
     val cache = mock[CacheMap]
 
@@ -95,7 +94,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
     def post(
               edit: Boolean = false,
-              data: Option[FakeRequest[AnyContentAsFormUrlEncoded]] = None,
+              data: Option[Request[AnyContentAsFormUrlEncoded]] = None,
               businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessActivities(Set.empty))),
               renewal: Option[Renewal] = None
             )(block: Result => Unit) = block({
@@ -184,7 +183,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
           "user answers no, not in edit mode and business is an hvd" in new FormSubmissionFixture {
             post(
               businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing)))),
-              data = Some(request.withFormUrlEncodedBody("isOutside" -> "false"))
+              data = Some(addToken(authRequest.withFormUrlEncodedBody("isOutside" -> "false")))
             ) { result =>
               result.header.status mustBe SEE_OTHER
               result.header.headers.get("Location") mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
@@ -205,7 +204,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
     "given invalid data" must {
       "respond with BAD_REQUEST" in new FormSubmissionFixture {
-        post(data = Some(request.withFormUrlEncodedBody("isOutside" -> "abc"))) { result =>
+        post(data = Some(addToken(authRequest.withFormUrlEncodedBody("isOutside" -> "abc")))) { result =>
           result.header.status mustBe BAD_REQUEST
         }
       }

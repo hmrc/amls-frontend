@@ -20,13 +20,13 @@ import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class type_of_bankSpec extends PlaySpec with AmlsSpec{
+class type_of_bankSpec extends PlaySpec with AmlsViewSpec{
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
     "type_of_bank view" must {

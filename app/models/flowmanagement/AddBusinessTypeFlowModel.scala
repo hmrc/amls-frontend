@@ -19,6 +19,7 @@ package models.flowmanagement
 import models.businessmatching._
 import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
 import models.responsiblepeople.ResponsiblePerson
+import play.api.i18n.Lang
 import play.api.libs.json.Json
 
 case class AddBusinessTypeFlowModel(
@@ -140,7 +141,7 @@ case class AddBusinessTypeFlowModel(
     case _ => true
   }
 
-  def activityName = this.activity map { _.getMessage() }
+  def activityName(implicit lang: Lang) = this.activity map { _.getMessage() }
 
 }
 

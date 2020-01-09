@@ -21,15 +21,16 @@ import jto.validation.{Path, ValidationError}
 import models.autocomplete.NameValuePair
 import models.responsiblepeople.{PersonAddressUK, ResponsiblePersonAddress}
 import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
+import jto.validation.Path
 import play.api.i18n.Messages
-import utils.AmlsSpec
 import views.Fixture
 
 
-class additional_extra_address_NonUKSpec extends AmlsSpec with MustMatchers {
+class additional_extra_address_NonUKSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val countries = Some(Seq(
       NameValuePair("Country 1", "country:1")

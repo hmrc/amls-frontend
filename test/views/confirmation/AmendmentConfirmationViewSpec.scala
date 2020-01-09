@@ -20,13 +20,13 @@ import generators.PaymentGenerator
 import models.confirmation.Currency
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class AmendmentConfirmationViewSpec extends AmlsSpec with MustMatchers  with PaymentGenerator {
+class AmendmentConfirmationViewSpec extends AmlsViewSpec with MustMatchers  with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val continueHref = "http://google.co.uk"
 

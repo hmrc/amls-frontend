@@ -21,7 +21,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.renewal.{CETransactionsInLast12Months, Renewal}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
@@ -32,7 +32,7 @@ import scala.concurrent.Future
 
 class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar  {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
@@ -40,8 +40,8 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     val controller = new CETransactionsInLast12MonthsController (
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
-      renewalService = mockRenewalService
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      renewalService = mockRenewalService, cc = mockMcc
     )
   }
 
@@ -73,7 +73,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "Show error message when user has not filled the mandatory fields" in new Fixture  {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "ceTransaction" -> ""
       )
 
@@ -90,7 +90,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
     }
 
     "Successfully save data in mongoCache and navigate to Next page" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "ceTransaction" -> "12345678963"
       )
 
@@ -116,7 +116,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         ), hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "ceTransaction" -> "12345678963"
       )
 

@@ -21,15 +21,15 @@ import jto.validation.{Path, ValidationError}
 import models.renewal.MoneySources
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.money_sources
 
 
-class money_sourcesSpec extends AmlsSpec with MustMatchers {
+class money_sourcesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "money sources view" must {

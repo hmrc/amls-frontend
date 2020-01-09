@@ -19,17 +19,17 @@ package views.hvd
 import forms.{InvalidForm, ValidForm, Form2}
 import models.hvd.ExciseGoods
 import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
+import  utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class excise_goodsSpec extends AmlsSpec with MustMatchers  {
+class excise_goodsSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "excise_goods view" must {

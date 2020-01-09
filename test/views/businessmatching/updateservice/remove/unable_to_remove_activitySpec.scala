@@ -18,14 +18,14 @@ package views.businessmatching.updateservice.remove
 
 
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.remove.unable_to_remove_activity
 
-class unable_to_remove_activitySpec extends AmlsSpec {
+class unable_to_remove_activitySpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     def view = unable_to_remove_activity("test")
   }

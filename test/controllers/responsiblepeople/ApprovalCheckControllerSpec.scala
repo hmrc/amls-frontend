@@ -22,14 +22,14 @@
  import org.jsoup.Jsoup
  import org.jsoup.nodes.Document
  import org.scalatest.concurrent.ScalaFutures
- import org.scalatest.mock.MockitoSugar
+ import org.scalatest.mockito.MockitoSugar
  import play.api.inject.bind
  import play.api.inject.guice.GuiceApplicationBuilder
  import play.api.test.Helpers._
  import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
 
- class ApprovalCheckControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
-   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+ class vApprovalCheckControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
      lazy val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -89,7 +89,7 @@
      "post is called" must {
       "respond with NOT_FOUND" when {
         "the index is out of bounds" in new Fixture {
-           val newRequest = request.withFormUrlEncodedBody(
+           val newRequest = requestWithUrlEncodedBody(
             "hasAlreadyPaidApprovalCheck" -> "true"
           )
            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
@@ -102,7 +102,7 @@
       }
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
-           val newRequest = request.withFormUrlEncodedBody(
+           val newRequest = requestWithUrlEncodedBody(
             "hasAlreadyPaidApprovalCheck" -> "invalid"
           )
            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
@@ -114,7 +114,7 @@
       }
        "respond with SEE_OTHER" when {
         "given valid data and edit = false, and redirect to the DetailedAnswersController" in new Fixture {
-           val newRequest = request.withFormUrlEncodedBody(
+           val newRequest = requestWithUrlEncodedBody(
             "hasAlreadyPaidApprovalCheck" -> "true"
           )
            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
@@ -126,7 +126,7 @@
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
         }
          "given valid data and edit = true, and redirect to the DetailedAnswersController" in new Fixture {
-           val newRequest = request.withFormUrlEncodedBody(
+           val newRequest = requestWithUrlEncodedBody(
             "hasAlreadyPaidApprovalCheck" -> "true"
           )
            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(

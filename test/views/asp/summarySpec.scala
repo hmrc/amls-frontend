@@ -20,23 +20,17 @@ import forms.EmptyForm
 import models.asp._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.MustMatchers
-import utils.AmlsSpec
 import play.api.i18n.Messages
-import views.{Fixture, HtmlAssertions}
+import play.api.test.FakeRequest
+import utils.AmlsSummaryViewSpec
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
-
-
-class summarySpec extends AmlsSpec
-        with MustMatchers
-
-        with HtmlAssertions
-        with TableDrivenPropertyChecks {
+class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 
   "summary view" must {
@@ -55,17 +49,18 @@ class summarySpec extends AmlsSpec
       subHeading.html must include(Messages("summary.asp"))
     }
 
-    val sectionChecks = Table[String, Element=>Boolean](
-      ("title key", "check"),
-      ("asp.services.title", checkListContainsItems(_, Set("asp.service.lbl.01",
-                                                            "asp.service.lbl.02",
-                                                            "asp.service.lbl.03",
-                                                            "asp.service.lbl.04",
-                                                            "asp.service.lbl.05"))),
-      ("asp.other.business.tax.matters.title", checkElementTextIncludes(_, "lbl.yes"))
-    )
-
     "include the provided data" in new ViewFixture {
+
+      val sectionChecks = Table[String, Element=>Boolean](
+        ("title key", "check"),
+        ("asp.services.title", checkListContainsItems(_, Set("asp.service.lbl.01",
+          "asp.service.lbl.02",
+          "asp.service.lbl.03",
+          "asp.service.lbl.04",
+          "asp.service.lbl.05"))),
+        ("asp.other.business.tax.matters.title", checkElementTextIncludes(_, "lbl.yes"))
+      )
+
       def view = {
         val testdata = Asp(
           Some(ServicesOfBusiness(Set(Accountancy, PayrollServices, BookKeeping, Auditing, FinancialOrTaxAdvice))),

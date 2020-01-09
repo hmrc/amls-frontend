@@ -18,18 +18,21 @@ package controllers.responsiblepeople
 
 import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{LegalNameChangeDate, ResponsiblePerson}
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.legal_name_change_date
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class LegalNameChangeDateController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                              authAction: AuthAction
-                                             )extends RepeatingSection with DefaultBaseController {
+                                              authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
+                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

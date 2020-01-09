@@ -38,13 +38,13 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
   val receiveCashPayments = CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))
   val doNotreceiveCashPayments = CashPayments(CashPaymentsCustomerNotMet(false), None)
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new HowCashPaymentsReceivedController (
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
-      renewalService = mockRenewalService
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      renewalService = mockRenewalService, cc = mockMcc
     )
 
     when(mockRenewalService.getRenewal(any())(any(), any()))
@@ -94,7 +94,7 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
 
       "a valid request is made" must {
         "redirect to summary page" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "cashPaymentMethods.courier" -> "true",
             "cashPaymentMethods.direct" -> "true",
             "cashPaymentMethods.other" -> "true",

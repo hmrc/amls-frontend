@@ -17,18 +17,21 @@
 package controllers.estateagentbusiness
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.estateagentbusiness._
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.estateagentbusiness._
 
 import scala.concurrent.Future
 
-class ResidentialRedressSchemeController  @Inject()(
-                                                    val dataCacheConnector: DataCacheConnector,
-                                                    authAction: AuthAction) extends DefaultBaseController {
+class ResidentialRedressSchemeController  @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                    authAction: AuthAction,
+                                                    val ds: CommonPlayDependencies,
+                                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

@@ -16,33 +16,29 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.{BusinessActivities, HowManyEmployees}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
-import play.api.i18n.Messages
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
 class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
     val controller = new HowManyEmployeesController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -80,7 +76,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
     "post is called" must {
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "employeeCount" -> ""
         )
         val result = controller.post()(newRequest)
@@ -89,7 +85,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "redirect to the EmployeeCountAMLSSupervisionController when given valid data and edit is false" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "employeeCount" -> "456"
         )
 
@@ -106,7 +102,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "redirect to the SummaryController when given valid data and edit is true" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "employeeCount" -> "54321"
         )
 

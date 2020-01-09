@@ -116,7 +116,7 @@ class DateOfBirthSpec extends PlaySpec {
       DateOfBirth.format.reads(
         DateOfBirth.format.writes(DateOfBirth(new LocalDate(1990, 2, 24)))
       ) must be(
-        JsSuccess(DateOfBirth(new LocalDate(1990, 2, 24)), JsPath \ "dateOfBirth")
+        JsSuccess(DateOfBirth(new LocalDate(1990, 2, 24)), JsPath)
       )
 
     }

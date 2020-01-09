@@ -17,15 +17,18 @@
 package views.businessmatching.updateservice.add
 
 import forms.EmptyForm
+import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
 import models.businessmatching._
 import models.flowmanagement.AddBusinessTypeFlowModel
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import play.twirl.api.HtmlFormat
+import utils.AmlsViewSpec
+import views.Fixture
 import views.html.businessmatching.updateservice.add._
 import utils.UpdateServicesSummaryFixtures
 
-class update_services_summarySpec  extends AmlsSpec with MustMatchers with UpdateServicesSummaryFixtures {
+class update_services_summarySpec extends UpdateServicesSummaryFixtures {
   "The update_services_summary view" must {
     "have the correct title" in new ViewFixture {
       def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq(), Seq())

@@ -31,7 +31,7 @@ import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -42,15 +42,16 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
     val controller = new WhoIsRegisteringController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       amlsConnector = mock[AmlsConnector],
       statusService = mock[StatusService],
-      renewalService = mock[RenewalService]
+      renewalService = mock[RenewalService],
+      cc = mockMcc
     )
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,
@@ -173,7 +174,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
       "successfully redirect next page when user selects the option 'Someone else'" when {
         "status is pending" in new Fixture {
           run(SubmissionReadyForReview) { _ =>
-            val newRequest = request.withFormUrlEncodedBody("person" -> "-1")
+            val newRequest = requestWithUrlEncodedBody("person" -> "-1")
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
@@ -183,7 +184,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
         "status is pre-submission" in new Fixture {
           run(SubmissionReady) { _ =>
-            val newRequest = request.withFormUrlEncodedBody("person" -> "-1")
+            val newRequest = requestWithUrlEncodedBody("person" -> "-1")
             val result = controller.post()(newRequest)
 
             status(result) must be(SEE_OTHER)
@@ -201,7 +202,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
         } yield (name, Seq(p1, p2))).sample.get
 
         run(NotCompleted, people = people) { _ =>
-          val newRequest = request.withFormUrlEncodedBody("person" -> "person-1")
+          val newRequest = requestWithUrlEncodedBody("person" -> "person-1")
           val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
@@ -215,7 +216,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
       "successfully redirect next page when user selects one of the responsible person from the options" in new Fixture {
         run(NotCompleted) { _ =>
-          val newRequest = request.withFormUrlEncodedBody("person" -> "person-0")
+          val newRequest = requestWithUrlEncodedBody("person" -> "person-0")
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
@@ -227,7 +228,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
       "show error when invalid data is posted" in new Fixture {
         run(SubmissionReady) { _ =>
-          val newRequest = request.withFormUrlEncodedBody()
+          val newRequest = requestWithUrlEncodedBody("" -> "")
           val result = controller.post()(newRequest)
 
           status(result) must be(BAD_REQUEST)
@@ -238,7 +239,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
       "show who is declaring this update error when invalid data is posted for update" in new Fixture {
         run(SubmissionReadyForReview) { _ =>
-          val newRequest = request.withFormUrlEncodedBody()
+          val newRequest = requestWithUrlEncodedBody("" -> "")
           val result = controller.post()(newRequest)
 
           status(result) must be(BAD_REQUEST)
@@ -285,7 +286,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
       "redirect to the declaration page" when {
         "status is pending" in new Fixture {
           run(SubmissionReadyForReview) { _ =>
-            val newRequest = request.withFormUrlEncodedBody("person" -> "person-0")
+            val newRequest = requestWithUrlEncodedBody("person" -> "person-0")
             val result = controller.post()(newRequest)
 
             status(result) must be(SEE_OTHER)
@@ -297,7 +298,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
 
         "status is pre-submission" in new Fixture {
           run(SubmissionReady) { _ =>
-            val newRequest = request.withFormUrlEncodedBody("person" -> "person-0")
+            val newRequest = requestWithUrlEncodedBody("person" -> "person-0")
             val result = controller.post()(newRequest)
 
             status(result) must be(SEE_OTHER)

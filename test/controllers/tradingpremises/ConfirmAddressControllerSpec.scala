@@ -16,6 +16,7 @@
 
 package controllers.tradingpremises
 
+import akka.stream.Materializer
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.actions.SuccessfulAuthAction
 import generators.businessmatching.BusinessMatchingGenerator
@@ -27,8 +28,11 @@ import models.registrationdetails.RegistrationDetails
 import models.tradingpremises.{TradingPremises, YourTradingPremises}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.Helpers._
+import play.api.test.CSRFTokenHelper._
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -37,7 +41,7 @@ import scala.concurrent.Future
 
 class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with TradingPremisesGenerator with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val applicationReference = "SUIYD3274890384"
 
@@ -50,10 +54,11 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
     val controller = new ConfirmAddressController(
       messagesApi,
       self.dataCache,
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       enrolments,
       statusService,
-      amls
+      amls,
+      cc = mockMcc
     )
 
     when {
@@ -154,7 +159,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
             controller.statusService.getSafeIdFromReadStatus(any(), any())(any(), any())
           } thenReturn Future.successful(Some(safeId))
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "confirmAddress" -> "true"
           )
 
@@ -177,7 +182,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
         }
 
         "option is 'No' is selected confirming the mentioned address is the trading premises address" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "confirmAddress" -> "false"
           )
 
@@ -195,7 +200,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
       }
 
       "throw error message on not selecting the option" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody()
+        val newRequest = requestWithUrlEncodedBody("" -> "")
 
         mockCacheFetch[BusinessMatching](Some(bm))
 

@@ -16,7 +16,7 @@
 
 package models.responsiblepeople
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -125,7 +125,7 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("registeredForVAT" -> true)
 
       Json.fromJson[VATRegistered](json) must
-        be(JsError((JsPath \ "vrnNumber") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "vrnNumber") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

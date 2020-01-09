@@ -17,14 +17,12 @@
 package models.responsiblepeople
 
 import cats.data.Validated.{Invalid, Valid}
-import models.Country
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, ValidationError, Write}
+import models.Country
 import models.FormTypes.genericAddressRule
-import play.api.i18n.Messages
-import play.api.Play.current
+import play.api.i18n.{Messages, MessagesProvider}
 import play.api.libs.json.{Reads, Writes}
-import play.api.i18n.Messages.Implicits._
 
 sealed trait PersonAddress {
 
@@ -47,7 +45,7 @@ sealed trait PersonAddress {
       ).flatten
   }
 
-  def isUK: String = this match {
+  def isUK()(implicit provider: MessagesProvider): String = this match {
     case _: PersonAddressUK => Messages("lbl.yes")
     case _: PersonAddressNonUK => Messages("lbl.no")
   }

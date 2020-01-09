@@ -16,7 +16,7 @@
 
 package models.responsiblepeople
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -138,7 +138,7 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("training" -> true)
 
       Json.fromJson[Training](json) must
-        be(JsError((JsPath  \ "information") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath  \ "information") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

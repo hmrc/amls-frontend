@@ -20,7 +20,6 @@ import java.net.URLEncoder
 
 import audit.ServiceEntrantEvent
 import cats.data.Validated.{Invalid, Valid}
-import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models._
@@ -40,7 +39,8 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logger
-import play.api.mvc.{Action, Call, Request, Result}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.http.HeaderCarrier
@@ -48,7 +48,8 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper}
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class LandingController @Inject()(val landingService: LandingService,
@@ -56,20 +57,24 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val auditConnector: AuditConnector,
                                   val cacheConnector: DataCacheConnector,
                                   authAction: AuthAction,
-                                  val statusService: StatusService) extends DefaultBaseController {
+                                  val ds: CommonPlayDependencies,
+                                  val statusService: StatusService,
+                                  val mcc: MessagesControllerComponents,
+                                  implicit override val messagesApi: MessagesApi,
+                                  parser: BodyParsers.Default) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper {
 
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8")
-  def signoutUrl = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
+  def signoutUrl = s"${appConfig.logoutUrl}?continue=$unauthorisedUrl"
 
   private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
-    headerCarrier.authorization.isDefined
+      headerCarrier.authorization.isDefined
 
   /**
     * allowRedirect allows us to configure whether or not the start page is *always* shown,
     * regardless of the user's auth status
     */
-  def start(allowRedirect: Boolean = true) = Action.async {
-    implicit request =>
+  def start(allowRedirect: Boolean = true): Action[AnyContent] = messagesAction(parser).async {
+    implicit request: MessagesRequest[AnyContent] =>
       if (isAuthorised && allowRedirect) {
         Future.successful(Redirect(controllers.routes.LandingController.get()))
       } else {
@@ -83,6 +88,82 @@ class LandingController @Inject()(val landingService: LandingService,
           case Some(User) => getWithAmendments(request.amlsRefNumber, request.credId, request.accountTypeId)
           case _ => Future.successful(Redirect(signoutUrl))
         }
+  }
+
+  def getWithAmendments(amlsRegistrationNumber: Option[String], credId: String, accountTypeId: (String, String))
+                       (implicit request: Request[_]) = {
+
+    amlsRegistrationNumber match {
+      case Some(mlrNumber) => landingService.cacheMap(credId) flatMap {
+        //enrolment exists
+        case Some(c) =>
+          Logger.debug("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
+          lazy val fixEmpties = for {
+            c1 <- fixEmptyRecords[TradingPremises](credId, c, TradingPremises.key)
+            c2 <- fixEmptyRecords[ResponsiblePerson](credId, c1, ResponsiblePerson.key)
+          } yield c2
+
+          //there is data in S4l
+          fixEmpties flatMap { cacheMap =>
+            if (dataHasChanged(cacheMap)) {
+              Logger.debug("Data has changed in getWithAmendments()")
+              cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
+                case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
+              } getOrElse landingService.setAltCorrespondenceAddress(mlrNumber, Some(cacheMap), accountTypeId, credId) flatMap { _=>
+                preFlightChecksAndRedirect(amlsRegistrationNumber, accountTypeId, credId)
+              }
+            } else {
+              Logger.debug("Data has not changed route in getWithAmendments()")
+              refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
+            }
+          }
+        case _ => {
+          Logger.debug("Data with amlsRegistration number route in getWithAmendments()" + amlsRegistrationNumber)
+          refreshAndRedirect(mlrNumber, None, credId, accountTypeId)
+        }
+      }
+
+      case _ => {
+        Logger.debug("No Enrolement exists getWithAmendments()")
+        getWithoutAmendments(amlsRegistrationNumber, credId, accountTypeId)
+      } //no enrolment exists
+    }
+  }
+
+  private def refreshAndRedirect(amlsRegistrationNumber: String, maybeCacheMap: Option[CacheMap], credId: String, accountTypeId: (String, String))
+                                (implicit headerCarrier: HeaderCarrier): Future[Result] = {
+    maybeCacheMap match {
+      case Some(c) if c.getEntry[DataImport](DataImport.key).isDefined =>
+        Logger.debug("[AMLSLandingController][refreshAndRedirect]: dataImport is defined")
+        Future.successful(Redirect(controllers.routes.StatusController.get()))
+
+      case _ =>
+        Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: calling refreshCache with ${amlsRegistrationNumber}")
+        landingService.refreshCache(amlsRegistrationNumber, credId, accountTypeId) flatMap {
+          _ => {
+            preFlightChecksAndRedirect(Option(amlsRegistrationNumber), accountTypeId, credId)
+          }
+        }
+    }
+  }
+
+  private def preFlightChecksAndRedirect(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
+                                        (implicit headerCarrier: HeaderCarrier):  Future[Result] = {
+
+    val loginEvent = for {
+      dupe <- cacheConnector.fetch[SubscriptionResponse](cacheId, SubscriptionResponse.key).recover { case _ => None } map {
+        case Some(x) => x.previouslySubmitted.contains(true)
+        case _ => false
+      }
+      //below to be called logic to decide if the Login Events Page should be displayed or not
+      redirectToEventPage <- hasIncompleteRedressScheme(amlsRegistrationNumber, accountTypeId, cacheId)
+    } yield (redirectToEventPage, dupe)
+
+    loginEvent.map {
+      case (true, false) => Redirect(controllers.routes.LoginEventController.get())
+      case (_, true) => Redirect(controllers.routes.StatusController.get(true))
+      case (_, false) => Redirect(controllers.routes.StatusController.get(false))
+    }
   }
 
   def getWithoutAmendments(amlsRegistrationNumber: Option[String], credId: String, accountTypeId: (String, String))
@@ -110,38 +191,12 @@ class LandingController @Inject()(val landingService: LandingService,
             }
           case (None, None) =>
             Logger.debug("LandingController:getWithoutAmendments - (None, None)")
-            Future.successful(Redirect(Call("GET", ApplicationConfig.businessCustomerUrl)))
+            Future.successful(Redirect(Call("GET", appConfig.businessCustomerUrl)))
           case (_, Some(amlsRef)) =>
             Logger.debug("LandingController:getWithoutAmendments: " + amlsRef)
             Future.successful(Redirect(controllers.routes.StatusController.get()))
         }
       }.flatMap(identity)
-    }
-  }
-
-  private def hasIncompleteResponsiblePeople(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
-                                            (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
-
-    Logger.debug("[AMLSLandingController][hasIncompleteResponsiblePeople]: calling statusService.getDetailedStatus")
-    statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId).flatMap {
-      case (SubmissionDecisionRejected |
-            SubmissionDecisionRevoked |
-            DeRegistered |
-            SubmissionDecisionExpired |
-            SubmissionWithdrawn, _) =>
-        Logger.debug("[AMLSLandingController][hasIncompleteResponsiblePeople]: status is negative, returning false")
-        Future.successful(false)
-      case _ =>
-        Logger.debug("[AMLSLandingController][hasIncompleteResponsiblePeople]: status is positive, will call the landingService.cachMap")
-        landingService.cacheMap(cacheId).map {
-          cache =>
-            Logger.debug("[AMLSLandingController][hasIncompleteResponsiblePeople]: checking cacheMap for InComplete ResponsiblePeople")
-            val hasIncompleteRps: Option[Boolean] = for {
-              rps <- cache.map(_.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
-            } yield ControllerHelper.hasIncompleteResponsiblePerson(rps)
-            Logger.debug(s"[AMLSLandingController][hasIncompleteResponsiblePeople]: Rps.isComplete = ${hasIncompleteRps.contains(true)}")
-            hasIncompleteRps.contains(true)
-        }
     }
   }
 
@@ -159,10 +214,11 @@ class LandingController @Inject()(val landingService: LandingService,
         case (true, Some(abt)) =>
           landingService.setAltCorrespondenceAddress(abt, cacheId) flatMap { _ =>
             Logger.debug(s"[AMLSLandingController][preApplicationComplete]: landingService.setAltCorrespondenceAddress returned")
-            val result: Future[Boolean] = hasIncompleteResponsiblePeople(amlsRegistrationNumber, accountTypeId, cacheId)
-            result.map {
+            //below to be called logic to decide if the Login Events Page should be displayed or not (second place below)
+            val redirectToEventPage: Future[Boolean] = hasIncompleteRedressScheme(amlsRegistrationNumber, accountTypeId, cacheId)
+            redirectToEventPage.map {
               case true =>
-                Logger.debug(s"[AMLSLandingController][preApplicationComplete]: has Incomplete RPs - redirecting to LoginEvent")
+                Logger.debug(s"[AMLSLandingController][preApplicationComplete]: redirecting to LoginEvent")
                 Redirect(controllers.routes.LoginEventController.get())
               case _ =>
                 Logger.debug(s"[AMLSLandingController][preApplicationComplete]: has complete RPs - redirecting to status")
@@ -181,37 +237,28 @@ class LandingController @Inject()(val landingService: LandingService,
     } getOrElse deleteAndRedirect()
   }
 
-  private def preFlightChecksAndRedirect(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
-                                        (implicit headerCarrier: HeaderCarrier):  Future[Result] = {
+  private def hasIncompleteRedressScheme(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
+                                            (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
 
-    val loginEvent = for {
-      dupe <- cacheConnector.fetch[SubscriptionResponse](cacheId, SubscriptionResponse.key).recover { case _ => None } map {
-        case Some(x) => x.previouslySubmitted.contains(true)
-        case _ => false
-      }
-      incomplete <- hasIncompleteResponsiblePeople(amlsRegistrationNumber, accountTypeId, cacheId)
-    } yield (incomplete, dupe)
-
-    loginEvent.map {
-      case (true, false) => Redirect(controllers.routes.LoginEventController.get())
-      case (_, true) => Redirect(controllers.routes.StatusController.get(true))
-      case (_, false) => Redirect(controllers.routes.StatusController.get(false))
-    }
-  }
-
-  private def refreshAndRedirect(amlsRegistrationNumber: String, maybeCacheMap: Option[CacheMap], credId: String, accountTypeId: (String, String))
-                                (implicit headerCarrier: HeaderCarrier): Future[Result] = {
-    maybeCacheMap match {
-      case Some(c) if c.getEntry[DataImport](DataImport.key).isDefined =>
-        Logger.debug("[AMLSLandingController][refreshAndRedirect]: dataImport is defined")
-        Future.successful(Redirect(controllers.routes.StatusController.get()))
-
+    Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: calling statusService.getDetailedStatus")
+    statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId).flatMap {
+      case (SubmissionDecisionRejected |
+            SubmissionDecisionRevoked |
+            DeRegistered |
+            SubmissionDecisionExpired |
+            SubmissionWithdrawn, _) =>
+        Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: status is negative, returning false")
+        Future.successful(false)
       case _ =>
-        Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: calling refreshCache with ${amlsRegistrationNumber}")
-        landingService.refreshCache(amlsRegistrationNumber, credId, accountTypeId) flatMap {
-          _ => {
-            preFlightChecksAndRedirect(Option(amlsRegistrationNumber), accountTypeId, credId)
-          }
+        Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: status is positive, will call the landingService.cachMap")
+        landingService.cacheMap(cacheId).map {
+          cache =>
+            Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: checking cacheMap for incomplete redress scheme")
+            val hasInvalidRedressScheme: Option[Boolean] = for {
+              eab <- cache.map(_.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
+            } yield ControllerHelper.hasInvalidRedressScheme(eab)
+            Logger.debug(s"[AMLSLandingController][hasIncompleteRedressScheme]: eab.isRedressInvalid = ${hasInvalidRedressScheme.contains(true)}")
+            hasInvalidRedressScheme.contains(true)
         }
     }
   }
@@ -261,46 +308,6 @@ class LandingController @Inject()(val landingService: LandingService,
         _.hasChanged
       }
     ).exists(identity)
-  }
-
-  def getWithAmendments(amlsRegistrationNumber: Option[String], credId: String, accountTypeId: (String, String))
-                       (implicit request: Request[_]) = {
-
-    amlsRegistrationNumber match {
-      case Some(mlrNumber) => landingService.cacheMap(credId) flatMap {
-        //enrolment exists
-        case Some(c) =>
-          Logger.debug("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
-          lazy val fixEmpties = for {
-            c1 <- fixEmptyRecords[TradingPremises](credId, c, TradingPremises.key)
-            c2 <- fixEmptyRecords[ResponsiblePerson](credId, c1, ResponsiblePerson.key)
-          } yield c2
-
-          //there is data in S4l
-          fixEmpties flatMap { cacheMap =>
-            if (dataHasChanged(cacheMap)) {
-              Logger.debug("Data has changed in getWithAmendments()")
-              cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
-                case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
-              } getOrElse landingService.setAltCorrespondenceAddress(mlrNumber, Some(cacheMap), accountTypeId, credId) flatMap { _=>
-                preFlightChecksAndRedirect(amlsRegistrationNumber, accountTypeId, credId)
-              }
-            } else {
-              Logger.debug("Data has not changed route in getWithAmendments()")
-              refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
-            }
-          }
-        case _ => {
-          Logger.debug("Data with amlsRegistration number route in getWithAmendments()" + amlsRegistrationNumber)
-          refreshAndRedirect(mlrNumber, None, credId, accountTypeId)
-        }
-      }
-
-      case _ => {
-        Logger.debug("No Enrolement exists getWithAmendments()")
-        getWithoutAmendments(amlsRegistrationNumber, credId, accountTypeId)
-      } //no enrolment exists
-    }
   }
 
   private def fixEmptyRecords[T](credId: String, cache: CacheMap, key: String)

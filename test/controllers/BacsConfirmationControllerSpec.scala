@@ -47,10 +47,10 @@ class BacsConfirmationControllerSpec extends AmlsSpec
   with PaymentGenerator
   with SubscriptionResponseGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val baseUrl = "http://localhost"
-    val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
+    val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
 
     val controller = new BacsConfirmationController(
       authAction = SuccessfulAuthAction,
@@ -58,7 +58,9 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
       authenticator = mock[AuthenticatorConnector],
-      enrolmentService = mock[AuthEnrolmentsService])
+      enrolmentService = mock[AuthEnrolmentsService],
+      ds = commonDependencies,
+      cc = mockMcc)
 
     when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
       .thenReturn(Future.successful(Some(amlsRegistrationNumber)))

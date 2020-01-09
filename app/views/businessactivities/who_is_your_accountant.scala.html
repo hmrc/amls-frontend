@@ -17,9 +17,10 @@
 @import forms.Form2
 @import include._
 @import include.forms2._
+@import config.ApplicationConfig
 @import models.autocomplete._
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
@@ -40,18 +41,17 @@
             f = f("whoisyouraccountant-fieldset"),
             classes = Seq("form-group")
         ) {
-                @input(
-                    field = f("name"),
-                    labelText = "businessactivities.whoisyouraccountant.name"
-                )
+            @input(
+                field = f("name"),
+                labelText = "businessactivities.whoisyouraccountant.name"
+            )
 
-                @input(
-                    field = f("tradingName"),
-                    labelText = "businessactivities.whoisyouraccountant.tradingName"
-                )
+            @input(
+                field = f("tradingName"),
+                labelText = "businessactivities.whoisyouraccountant.tradingName"
+            )
         }
 
         @submit(edit)
-
     }
 }

@@ -52,7 +52,7 @@ class WhoIsRegisteringSpec extends PlaySpec {
     "successfully validate given an model value" in {
       val json = Json.obj("person" -> "PersonName")
       Json.fromJson[WhoIsRegistering](json) must
-        be(JsSuccess(WhoIsRegistering("PersonName"), JsPath \ "person"))
+        be(JsSuccess(WhoIsRegistering("PersonName"), JsPath))
     }
 
     "successfully validate json read write" in {

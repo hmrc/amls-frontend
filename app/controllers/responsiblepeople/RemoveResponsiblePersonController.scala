@@ -18,22 +18,24 @@ package controllers.responsiblepeople
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonEndDate}
 import models.status._
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.responsiblepeople.remove_responsible_person
 
 import scala.concurrent.Future
-
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RemoveResponsiblePersonController @Inject () (
                                                    val dataCacheConnector: DataCacheConnector,
                                                    authAction: AuthAction,
-                                                   val statusService: StatusService
-                                                   ) extends RepeatingSection with DefaultBaseController {
+                                                   val ds: CommonPlayDependencies,
+                                                   val statusService: StatusService,
+                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, flow: Option[String] = None) = authAction.async {
     implicit request =>

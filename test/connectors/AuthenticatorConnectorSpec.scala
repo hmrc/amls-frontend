@@ -16,12 +16,16 @@
 
 package connectors
 
+import config.ApplicationConfig
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
+import play.api.{Configuration, Environment}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.http.{HttpPost, HttpResponse}
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.http.ws.WSHttp
 import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -32,24 +36,17 @@ class AuthenticatorConnectorSpec extends AmlsSpec with ScalaFutures {
 
   trait TestFixture {
 
-    val http = mock[HttpPost]
+    val http = mock[HttpClient]
+    val appConfig = mock[ApplicationConfig]
 
-    val featureToggleSetting: Boolean
-
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .configure("microservice.services.feature-toggle.refresh-profile" -> featureToggleSetting)
-      .overrides(bind[HttpPost].to(http))
-      .build()
-
-    lazy val connector = app.injector.instanceOf(classOf[AuthenticatorConnector])
+    lazy val connector = new AuthenticatorConnector(http, appConfig)
   }
 
   "The Authenticator connector" must {
 
     "connect to the authenticator service to refresh the auth profile" in new TestFixture {
 
-      val featureToggleSetting = true
+      when(appConfig.refreshProfileToggle).thenReturn(true)
 
       when(http.POSTEmpty[HttpResponse](any())(any(), any(), any())) thenReturn Future.successful(HttpResponse(200))
 
@@ -63,7 +60,7 @@ class AuthenticatorConnectorSpec extends AmlsSpec with ScalaFutures {
 
     "return a default successful result when the feature is toggled off" in new TestFixture {
 
-      val featureToggleSetting = false
+      when(appConfig.refreshProfileToggle).thenReturn(false)
 
       val result = Await.result(connector.refreshProfile, 5 seconds)
 

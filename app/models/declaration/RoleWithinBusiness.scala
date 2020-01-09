@@ -98,7 +98,7 @@ object RoleWithinBusiness {
       case "08" => (JsPath \ "roleWithinBusinessOther").read[String] map {
         Other(_)
       }
-      case _ => play.api.data.validation.ValidationError("error.invalid")
+      case _ => play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 

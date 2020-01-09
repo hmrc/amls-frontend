@@ -22,13 +22,13 @@ import models.businessdetails.ActivityStartDate
 import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class activity_start_dateSpec extends AmlsSpec with MustMatchers {
+class activity_start_dateSpec extends AmlsViewSpec with MustMatchers {
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
   "activity_start_date view" must {
     "have correct title" in new ViewFixture {

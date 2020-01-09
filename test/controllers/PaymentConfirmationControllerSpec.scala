@@ -36,6 +36,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
@@ -51,17 +52,21 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
   with PaymentGenerator
   with SubscriptionResponseGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val baseUrl = "http://localhost"
-    val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
+    val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
 
     val controller = new PaymentConfirmationController(
       authAction = SuccessfulAuthAction,
       statusService = mock[StatusService],
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
+      enrolmentService = mock[AuthEnrolmentsService],
+      feeResponseService = mock[FeeResponseService],
       auditConnector = mock[AuditConnector],
+      ds = commonDependencies,
+      cc = mockMcc,
       feeHelper = mock[FeeHelper])
 
     val amlsRegistrationNumber = "amlsRefNumber"
@@ -319,7 +324,8 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
           controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
         } thenReturn Future.successful(paymentStatus)
 
-        val failedRequest = addToken(authRequest).copyFakeRequest(uri = baseUrl + "?paymentStatus=Failed")
+        val failedRequest = addToken(FakeRequest("GET", s"$baseUrl?paymentStatus=Failed"))
+
         val result = controller.paymentConfirmation(payment.reference)(failedRequest)
 
         status(result) mustBe OK
@@ -344,7 +350,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
           controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
         } thenReturn Future.successful(paymentStatus)
 
-        val cancelledRequest = request.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled")
+        val cancelledRequest = addToken(FakeRequest("GET", s"$baseUrl?paymentStatus=Cancelled"))
         val result = controller.paymentConfirmation(payment.reference)(cancelledRequest)
 
         status(result) mustBe OK
@@ -372,7 +378,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
           controller.amlsConnector.getPaymentByAmlsReference(any(), any())(any(), any())
         } thenReturn Future.successful(Some(payment))
 
-        val cancelledRequest = request.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled")
+        val cancelledRequest = addToken(FakeRequest("GET", s"$baseUrl?paymentStatus=Cancelled"))
         val result = controller.paymentConfirmation(payment.reference)(cancelledRequest)
 
         status(result) mustBe OK

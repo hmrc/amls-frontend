@@ -16,9 +16,10 @@
 
 @import include._
 @import forms2._
+@import config.{ ApplicationConfig}
 @import forms.EmptyForm
 
-@(activities: Set[String])(implicit request: Request[_], messages: Messages)
+@(activities: Set[String])(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

@@ -21,16 +21,16 @@ import generators.tradingpremises.TradingPremisesGenerator
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessActivities, HighValueDealing}
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 
-class which_trading_premisesSpec extends AmlsSpec with TradingPremisesGenerator {
+class which_trading_premisesSpec extends AmlsViewSpec with TradingPremisesGenerator {
 
   val tp = tradingPremisesGen.sample.get
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val activityName = BusinessActivities.getValue(HighValueDealing)
 

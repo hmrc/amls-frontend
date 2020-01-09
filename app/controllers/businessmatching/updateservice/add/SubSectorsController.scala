@@ -18,16 +18,18 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, SubSectorsPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.updateservice.add.msb_subservices
 
 import scala.concurrent.Future
@@ -35,11 +37,12 @@ import scala.concurrent.Future
 
 @Singleton
 class SubSectorsController @Inject()(authAction: AuthAction,
+                                     val ds: CommonPlayDependencies,
                                      implicit val dataCacheConnector: DataCacheConnector,
                                      val businessMatchingService: BusinessMatchingService,
                                      val router: Router[AddBusinessTypeFlowModel],
-                                     val config:AppConfig
-                                    ) extends DefaultBaseController {
+                                     val config:ApplicationConfig,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

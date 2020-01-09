@@ -22,7 +22,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -32,10 +32,10 @@ import scala.concurrent.Future
 
 class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks{
+  trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new ProvidedServicesController(mockCacheConnector, authAction = SuccessfulAuthAction)
+    val controller = new ProvidedServicesController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "ProvidedServicesController" must {
@@ -71,7 +71,7 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "successfully navigate to next page when valid data is sent" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "services[]" -> "01"
         )
 
@@ -87,7 +87,7 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "successfully navigate to summary page when valid data is sent and edit mode is on" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "services[]" -> "01"
         )
 
@@ -103,7 +103,7 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "show an error when no option been selected" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody()
+        val newRequest = requestWithUrlEncodedBody("" -> "")
 
         val result = controller.post()(newRequest)
 
@@ -116,7 +116,7 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "show an error when other option been selected and not providing the mandatory data" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "services[]" -> "08",
           "details" -> ""
         )

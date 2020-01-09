@@ -226,7 +226,7 @@ class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
       val json = Json.obj(
         "roleWithinBusiness" -> "10"
       )
-      RoleWithinBusiness.jsonReads.reads(json) must be(JsError((JsPath) -> play.api.data.validation.ValidationError("error.invalid")))
+      RoleWithinBusiness.jsonReads.reads(json) must be(JsError((JsPath) -> play.api.libs.json.JsonValidationError("error.invalid")))
     }
 
 

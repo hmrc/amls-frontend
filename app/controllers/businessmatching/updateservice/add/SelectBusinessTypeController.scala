@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
@@ -29,6 +29,8 @@ import models.FormTypes
 import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.{AddBusinessTypeFlowModel, SelectBusinessTypesPageId}
 import models.responsiblepeople.ResponsiblePerson
+import play.api.i18n.Messages
+import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,15 +39,17 @@ import views.html.businessmatching.updateservice.add.select_activities
 import services.ResponsiblePeopleService.ResponsiblePeopleListHelpers
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class SelectBusinessTypeController @Inject()(
                                             authAction: AuthAction,
+                                            val ds: CommonPlayDependencies,
                                             implicit val dataCacheConnector: DataCacheConnector,
                                             val businessMatchingService: BusinessMatchingService,
                                             val router: Router[AddBusinessTypeFlowModel],
-                                            val addHelper: AddBusinessTypeHelper
-                                          ) extends DefaultBaseController with RepeatingSection {
+                                            val addHelper: AddBusinessTypeHelper,
+                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   implicit val activityReader: Rule[UrlFormEncoded, BusinessActivity] =
     FormTypes.businessActivityRule("error.required.bm.register.service.single") map {
@@ -95,7 +99,7 @@ class SelectBusinessTypeController @Inject()(
         }
   }
 
-  private def getFormData(credId: String)(implicit hc: HeaderCarrier) = for {
+  private def getFormData(credId: String)(implicit hc: HeaderCarrier, messages: Messages) = for {
     model <- businessMatchingService.getModel(credId)
     activities <- OptionT.fromOption[Future](model.activities) map {
       _.businessActivities

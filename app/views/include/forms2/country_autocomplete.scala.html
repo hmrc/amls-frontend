@@ -25,7 +25,7 @@
     classes: Seq[String] = Seq.empty,
     data: Seq[NameValuePair] = Seq.empty,
     placeholder: String = ""
-)(implicit lang:Lang,  m: Messages)
+)(implicit m: Messages, lang: Lang)
 
 <div class="form-group form-field-group @if(field.hasErrors) {form-field--error}">
     <label for="@field.id">

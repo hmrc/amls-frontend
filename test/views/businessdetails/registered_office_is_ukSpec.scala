@@ -19,17 +19,17 @@ package views.businessdetails
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{RegisteredOffice, RegisteredOfficeUK}
 import org.scalatest.MustMatchers
-import utils.{AmlsSpec, AutoCompleteServiceMocks}
+import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class registered_office_is_ukSpec extends AmlsSpec with MustMatchers  {
+class registered_office_is_ukSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "registered_office view" must {

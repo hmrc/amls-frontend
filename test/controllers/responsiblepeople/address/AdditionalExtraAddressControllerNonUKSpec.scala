@@ -55,7 +55,9 @@ class AdditionalExtraAddressControllerNonUKSpec extends AmlsSpec with MockitoSug
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       auditConnector = auditConnector,
-      autoCompleteService = autoCompleteService
+      autoCompleteService = autoCompleteService,
+      ds = commonDependencies,
+      cc = mockMcc
     )
 
     when {
@@ -151,7 +153,7 @@ class AdditionalExtraAddressControllerNonUKSpec extends AmlsSpec with MockitoSug
       "go to TimeAtAdditionalExtraAddressController" when {
         "edit is false" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "Line 1",
             "addressLineNonUK2" -> "Line 2",
@@ -186,7 +188,7 @@ class AdditionalExtraAddressControllerNonUKSpec extends AmlsSpec with MockitoSug
         }
 
         "edit is true and timeAtAddress does not exist" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "Line 1",
             "addressLineNonUK2" -> "Line 2",
@@ -213,7 +215,7 @@ class AdditionalExtraAddressControllerNonUKSpec extends AmlsSpec with MockitoSug
       "go to DetailedAnswersController" when {
         "edit is true" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "New line 1",
             "addressLineNonUK2" -> "New line 2",
@@ -253,7 +255,7 @@ class AdditionalExtraAddressControllerNonUKSpec extends AmlsSpec with MockitoSug
 
     "respond with BAD_REQUEST" when {
       "form is invalid" in new Fixture {
-        val requestWithParams = request.withFormUrlEncodedBody(
+        val requestWithParams = requestWithUrlEncodedBody(
           "isUK" -> "",
           "addressLineNonUK1" -> "",
           "addressLineNonUK2" -> "",
@@ -275,7 +277,7 @@ class AdditionalExtraAddressControllerNonUKSpec extends AmlsSpec with MockitoSug
 
     "respond with NOT_FOUND" when {
       "responsible person is not found for that index" in new Fixture {
-        val requestWithParams = request.withFormUrlEncodedBody(
+        val requestWithParams = requestWithUrlEncodedBody(
           "isUK" -> "false",
           "addressLineNonUK1" -> "Line 1",
           "addressLineNonUK2" -> "Line 2",

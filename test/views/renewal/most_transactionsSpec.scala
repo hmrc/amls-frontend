@@ -22,13 +22,13 @@ import models.Country
 import models.moneyservicebusiness.MostTransactions
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.{AmlsSpec, AutoCompleteServiceMocks}
+import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 
-class most_transactionsSpec extends AmlsSpec with MustMatchers {
+class most_transactionsSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks{
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "most_transactions view" must {

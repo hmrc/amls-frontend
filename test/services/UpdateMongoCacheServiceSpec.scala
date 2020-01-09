@@ -16,16 +16,14 @@
 
 package services
 
-
-import config.WSHttp
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.amp.Amp
-import models.businessdetails._
 import models.asp.{Accountancy, Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
-import models.bankdetails.{BankDetails, PersonalAccount, UKAccount}
+import models.bankdetails.{BankAccount, BankAccountIsUk, BankDetails, PersonalAccount, UKAccount}
 import models.businessactivities._
+import models.businessdetails._
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7.{BeneficialShareholder, RoleWithinBusinessRelease7}
@@ -40,25 +38,23 @@ import models.{DataImport, _}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.verify
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
 import play.api.libs.json.Json
 import play.api.test.Helpers._
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.collection.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
-  with ScalaFutures
+class UpdateMongoCacheServiceSpec extends AmlsSpec
   with BusinessMatchingGenerator
   with TradingPremisesGenerator
   with ResponsiblePersonGenerator {
 
   trait Fixture extends DependencyMocks {
 
-    val http = mock[WSHttp]
-    val updateMongoCacheService = new UpdateMongoCacheService(http, mockCacheConnector)
+    val http = mock[HttpClient]
+    val updateMongoCacheService = new UpdateMongoCacheService(http, mockCacheConnector, appConfig)
 
     val credId = "12341234"
 
@@ -91,6 +87,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
 
     val tradingPremises = Seq(tradingPremisesGen.sample.get, tradingPremisesGen.sample.get)
 
+
     val businessDetails = BusinessDetails(
       previouslyRegistered = Some(PreviouslyRegisteredYes(Some("12345678"))),
       activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))),
@@ -109,7 +106,9 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       hasAccepted = true
     )
 
-    val bankDetails = BankDetails(Some(PersonalAccount), None, Some(UKAccount("123456", "00-00-00")), false)
+    val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "00-00-00")))
+
+    val bankDetails = BankDetails(Some(PersonalAccount), None, Some(ukBankAccount), false)
     val addPerson = AddPerson("FirstName", Some("Middle"), "Last name", RoleWithinBusinessRelease7(Set(BeneficialShareholder)))
 
     val businessActivitiesCompleteModel = BusinessActivities(
@@ -189,7 +188,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
     val ampData = Json.obj(
       "typeOfParticipant"     -> Seq("artGalleryOwner"),
       "soldOverThreshold"     -> true,
-      "dateTransactionOverThreshold"  -> LocalDate.now,
+      "dateTransactionOverThreshold"  -> LocalDate.now.toString,
       "identifyLinkedTransactions"    -> true,
       "percentageExpectedTurnover"    -> "fortyOneToSixty"
     )

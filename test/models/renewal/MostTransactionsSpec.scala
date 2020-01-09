@@ -20,7 +20,7 @@ import jto.validation.{ValidationError, _}
 import jto.validation.forms.UrlFormEncoded
 import models.Country
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class MostTransactionsSpec extends PlaySpec {
 
@@ -34,7 +34,7 @@ class MostTransactionsSpec extends PlaySpec {
       val model: MostTransactions =
         MostTransactions(Seq(Country("United Kingdom", "GB")))
 
-      Json.fromJson[MostTransactions](Json.toJson(model)) mustEqual JsSuccess(model)
+      Json.fromJson[MostTransactions](Json.toJson(model)) mustBe JsSuccess(model, JsPath \ "mostTransactionsCountries")
     }
 
     "roundtrip through forms" in {

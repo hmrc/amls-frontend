@@ -16,25 +16,25 @@
 
 package utils
 
-import cats.implicits._
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import forms.InvalidForm
 import models.businessactivities.{BusinessActivities => BA}
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
+import models.estateagentbusiness.{EstateAgentBusiness, OmbudsmanServices, Other}
 import models.renewal.CustomersOutsideUK
 import models.responsiblepeople.ResponsiblePerson.filter
 import models.responsiblepeople.{NonUKResidence, ResponsiblePerson}
 import models.status._
 import models.supervision.{AnotherBody, AnotherBodyNo, AnotherBodyYes, Supervision}
-import play.api.Play.current
-import play.api.i18n.Messages
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{Lang, Messages}
 import play.api.mvc.Request
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -42,6 +42,14 @@ object ControllerHelper {
 
   def hasIncompleteResponsiblePerson(rps: Option[Seq[ResponsiblePerson]]): Boolean =
     rps.exists((data: Seq[ResponsiblePerson]) => filter(data).exists(_.isComplete equals false))
+
+  def hasInvalidRedressScheme(eabOpt: Option[EstateAgentBusiness]): Boolean =
+    eabOpt.exists(eab =>
+      eab.redressScheme.exists(redressScheme =>
+        redressScheme match {
+          case OmbudsmanServices | Other(_) => true
+          case _  => false
+        }))
 
   def getBusinessType(matching: Option[BusinessMatching]): Option[BusinessType] = {
     matching flatMap { bm =>
@@ -156,7 +164,7 @@ object ControllerHelper {
 
   def rpTitleName(rp:Option[ResponsiblePerson]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 
-  def notFoundView(implicit request: Request[_]) = {
+  def notFoundView(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig) = {
     views.html.error(Messages("error.not-found.title"),
       Messages("error.not-found.heading"),
       Messages("error.not-found.message"))

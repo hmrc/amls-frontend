@@ -19,17 +19,17 @@ package views.businessactivities
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.ExpectedAMLSTurnover
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class expected_amls_turnoverSpec extends AmlsSpec with MustMatchers  {
+class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "expected_amls_turnover view" must {

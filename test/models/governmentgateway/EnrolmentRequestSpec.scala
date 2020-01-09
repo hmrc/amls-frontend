@@ -16,12 +16,13 @@
 
 package models.governmentgateway
 
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 
-class EnrolmentRequestSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
+class EnrolmentRequestSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar {
 
   override implicit lazy val app = new GuiceApplicationBuilder()
     .configure("microservice.services.feature-toggle.gg-knownfacts-postcode" -> true)

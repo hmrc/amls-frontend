@@ -32,12 +32,12 @@ class CustomersOutsideUKSpec extends PlaySpec {
     "round trip through Json correctly" in {
 
       val model: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
-      Json.fromJson[CustomersOutsideUK](Json.toJson(model)) mustBe JsSuccess(model, JsPath)
+      Json.fromJson[CustomersOutsideUK](Json.toJson(model)) mustBe JsSuccess(model, JsPath \ "countries")
     }
 
     "round trip through forms correctly" in {
-
       val model: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"), Country("India", "IN"))))
+
       rule.validate(write.writes(model)) mustBe Valid(model)
     }
 

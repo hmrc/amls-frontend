@@ -61,7 +61,7 @@ object SatisfactionSurvey {
       case "04" => (__ \ "details").readNullable[String] map Fourth.apply
       case "05" => (__ \ "details").readNullable[String] map Fifth.apply
       case _ =>
-        play.api.data.validation.ValidationError("error.invalid")
+        play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 

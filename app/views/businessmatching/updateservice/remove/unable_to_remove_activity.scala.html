@@ -16,8 +16,9 @@
 
 @import include.{heading, main}
 @import include.forms2.anchor
+@import config.{ ApplicationConfig}
 
-@(activity: String)(implicit request: Request[_],messages: Messages)
+@(activity: String)(implicit request: Request[_], messages:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
   @components.back_link()

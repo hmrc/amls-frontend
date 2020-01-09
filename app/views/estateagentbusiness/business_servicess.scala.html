@@ -17,8 +17,9 @@
 @import forms.Form2
 @import include.{main, heading, registered_office_helper}
 @import include.forms2._
+@import config.{ ApplicationConfig}
 
-@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean)(implicit   m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()

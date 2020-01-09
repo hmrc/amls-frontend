@@ -132,7 +132,7 @@ class ActivityStartDateSpec extends PlaySpec {
     "Read and write successfully" in {
 
       ActivityStartDate.format.reads(ActivityStartDate.format.writes(ActivityStartDate(new LocalDate(1990, 2, 24)))) must be(
-        JsSuccess(ActivityStartDate(new LocalDate(1990, 2, 24)), JsPath \ "startDate"))
+        JsSuccess(ActivityStartDate(new LocalDate(1990, 2, 24)), JsPath))
     }
 
     "write successfully" in {

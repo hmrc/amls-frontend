@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SummaryControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
@@ -50,9 +50,10 @@ class SummaryControllerSpec extends AmlsSpec {
 
     val controller = new SummaryController(
       mockCacheConnector,
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       mock[ServiceFlow],
-      mockStatusService
+      mockStatusService,
+      cc = mockMcc
     )
 
     when {

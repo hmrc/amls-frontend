@@ -21,7 +21,7 @@ import models.bankdetails._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -29,13 +29,14 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 
 class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
 
     val controller = new RemoveBankDetailsController (
       dataCacheConnector =  mockCacheConnector,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      mcc = mockMcc)
   }
 
   "Get" must {
@@ -50,7 +51,9 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "show bank account details on the remove bank account page" in new Fixture {
 
-      mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, Some("Account Name"), Some(NonUKAccountNumber("12345678"))))))
+      val bankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("12345678")))
+
+      mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, Some("Account Name"), Some(bankAccount)))))
 
       val result = controller.get(1) (request)
 
@@ -69,16 +72,16 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
       val emptyCache = CacheMap("", Map.empty)
 
       val accountType1 = PersonalAccount
-      val bankAccount1 = UKAccount("111111", "11-11-11")
+      val bankAccount1 = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("111111", "11-11-11")))
 
       val accountType2 = PersonalAccount
-      val bankAccount2 = UKAccount("222222", "22-22-22")
+      val bankAccount2 = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("222222", "22-22-22")))
 
       val accountType3 = PersonalAccount
-      val bankAccount3 = UKAccount("333333", "33-33-33")
+      val bankAccount3 = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("333333", "33-33-33")))
 
       val accountType4 = PersonalAccount
-      val bankAccount4 = UKAccount("444444", "44-44-44")
+      val bankAccount4 = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("444444", "44-44-44")))
 
       val completeModel1 = BankDetails(Some(accountType1), None, Some(bankAccount1), true, false, Some(StatusConstants.Deleted))
       val completeModel2 = BankDetails(Some(accountType2), None, Some(bankAccount2))

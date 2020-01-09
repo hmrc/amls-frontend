@@ -22,7 +22,7 @@ import models.businessmatching.{BusinessMatching, HighValueDealing, MoneyService
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -31,14 +31,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
     val controller = new WhatYouNeedController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockStatusService,
-      mockCacheConnector)
+      mockCacheConnector,
+      cc = mockMcc)
 
     mockCacheFetch[ServiceChangeRegister](None)
     mockCacheFetchAll

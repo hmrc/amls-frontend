@@ -27,7 +27,7 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
@@ -39,13 +39,13 @@ import scala.concurrent.Future
 
 class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val renewalService = mock[RenewalService]
     val request = addToken(authRequest)
     val mockDataCacheConnector = mock[DataCacheConnector]
 
-    lazy val controller = new TransactionsInLast12MonthsController(SuccessfulAuthAction, mockDataCacheConnector, renewalService)
+    lazy val controller = new TransactionsInLast12MonthsController(SuccessfulAuthAction, ds = commonDependencies, mockDataCacheConnector, renewalService, cc = mockMcc)
 
     when {
       renewalService.getRenewal(any())(any(), any())
@@ -57,7 +57,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
   trait FormSubmissionFixture extends Fixture {
     def formData(valid: Boolean) = if (valid) {"txnAmount" -> "1500"} else {"txnAmount" -> "abc"}
-    def formRequest(valid: Boolean) = request.withFormUrlEncodedBody(formData(valid))
+    def formRequest(valid: Boolean) = requestWithUrlEncodedBody(formData(valid))
 
     val cache = mock[CacheMap]
 

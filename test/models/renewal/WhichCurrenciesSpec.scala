@@ -107,9 +107,9 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
 
       "fail when missing all data" in {
         Json.fromJson[WhichCurrencies](Json.obj()) must be
-        JsError((JsPath \ "currencies") -> play.api.data.validation.ValidationError("error.path.missing"))
-        JsError((JsPath \ "customerMoneySource") -> play.api.data.validation.ValidationError("error.path.missing"))
-        JsError((JsPath \ "currencies") -> play.api.data.validation.ValidationError("error.path.missing"))
+        JsError((JsPath \ "currencies") -> play.api.libs.json.JsonValidationError("error.path.missing"))
+        JsError((JsPath \ "customerMoneySource") -> play.api.libs.json.JsonValidationError("error.path.missing"))
+        JsError((JsPath \ "currencies") -> play.api.libs.json.JsonValidationError("error.path.missing"))
       }
     }
 

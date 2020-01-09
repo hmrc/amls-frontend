@@ -299,6 +299,8 @@ object ResponsiblePerson {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
   import utils.MappingUtils._
+  import play.api.libs.json.JodaWrites._
+  import play.api.libs.json.JodaReads._
 
   val flowChangeOfficer = "changeofficer"
   val flowFromDeclaration = "fromDeclaration"

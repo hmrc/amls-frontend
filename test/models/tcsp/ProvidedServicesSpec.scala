@@ -16,7 +16,7 @@
 
 package models.tcsp
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Path, Invalid, Valid}
 import jto.validation.ValidationError
@@ -92,7 +92,7 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
 
       "show an error with an invalid details value" in {
         val form = Map("services[]" -> Seq("08"), "details" -> Seq("$3<>7485/45"))
-        val expectedResult = Invalid(Seq(Path \ "details" -> Seq(ValidationError("err.text.validation"))))
+        val expectedResult = Invalid(Seq(Path \ "details" -> Seq(ValidationError("error.required.tcsp.provided_services.details.punctuation"))))
 
         ProvidedServices.formReads.validate(form) must be(expectedResult)
       }
@@ -101,7 +101,7 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
   }
 
   "Json read and writes" must {
-    import play.api.data.validation.ValidationError
+    import play.api.libs.json.JsonValidationError
     "Serialise single service as expected" in {
       Json.toJson(ProvidedServices(Set(EmailServer))) must be(Json.obj("services" -> Seq("03")))
     }
@@ -140,22 +140,22 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
 
     "fail when invalid data given" in {
       Json.fromJson[ProvidedServices](Json.obj("services" -> Set("99"))) must
-        be(JsError((JsPath \ "services") -> ValidationError("error.invalid")))
+        be(JsError((JsPath \ "services") -> JsonValidationError("error.invalid")))
     }
 
     "fail when on invalid data" in {
       Json.fromJson[ProvidedServices](Json.obj("transactions" -> Set("40"))) must
-        be(JsError((JsPath \ "services") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "services") -> JsonValidationError("error.path.missing")))
     }
 
     "fail when on missing details data" in {
       Json.fromJson[ProvidedServices](Json.obj("transactions" -> Set("08"))) must
-        be(JsError((JsPath \ "services") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "services") -> JsonValidationError("error.path.missing")))
     }
 
     "fail when on missing all data" in {
       Json.fromJson[ProvidedServices](Json.obj()) must
-        be(JsError((JsPath \ "services") -> ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "services") -> JsonValidationError("error.path.missing")))
     }
   }
 }

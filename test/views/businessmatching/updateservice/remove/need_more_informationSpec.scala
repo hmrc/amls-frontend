@@ -19,15 +19,15 @@ package views.businessmatching.updateservice.remove
 import models.businessmatching.{AccountancyServices, MoneyServiceBusiness}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.remove.need_more_information
 
 
-class need_more_informationSpec extends AmlsSpec with MustMatchers {
+class need_more_informationSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
     def view = need_more_information(Set(AccountancyServices.getMessage()))
   }
 

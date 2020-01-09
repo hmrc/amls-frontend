@@ -103,7 +103,7 @@ object Service {
       case JsString("07") => JsSuccess(LandManagement)
       case JsString("08") => JsSuccess(Development)
       case JsString("09") => JsSuccess(SocialHousing)
-      case _ => JsError((JsPath \ "services") -> play.api.data.validation.ValidationError("error.invalid"))
+      case _ => JsError((JsPath \ "services") -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
 
   implicit val jsonServiceWrites =

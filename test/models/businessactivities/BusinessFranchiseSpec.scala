@@ -17,7 +17,7 @@
 package models.businessactivities
 
 import models.FormTypes
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -145,7 +145,7 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
       val json = Json.obj("businessFranchise" -> true)
 
       Json.fromJson[BusinessFranchise](json) must
-        be(JsError((JsPath \ "franchiseName") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "franchiseName") -> play.api.libs.json.JsonValidationError("error.path.missing")))
     }
 
     "write the correct value" in {

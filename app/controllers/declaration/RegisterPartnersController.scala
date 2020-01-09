@@ -20,26 +20,28 @@ import javax.inject.{Inject, Singleton}
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration.BusinessPartners
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{Partner, Positions, ResponsiblePerson}
 import models.status.{RenewalSubmitted, _}
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.{ProgressService, StatusService}
 import utils.DeclarationHelper._
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.declaration.register_partners
 
 import scala.concurrent.Future
 
 @Singleton
 class RegisterPartnersController @Inject()(authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
                                            val dataCacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
-                                           implicit val progressService: ProgressService
-                                          ) extends DefaultBaseController {
+                                           implicit val progressService: ProgressService,
+                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
   def get() = authAction.async {
     implicit request => {
 

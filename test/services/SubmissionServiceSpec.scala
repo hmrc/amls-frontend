@@ -16,7 +16,7 @@
 
 package services
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.AmlsConnector
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import generators.ResponsiblePersonGenerator
@@ -60,7 +60,7 @@ class SubmissionServiceSpec extends AmlsSpec
 
   trait Fixture extends DependencyMocks {
 
-    val config = mock[AppConfig]
+    val config = mock[ApplicationConfig]
 
     val submissionService = new SubmissionService (
       mockCacheConnector,

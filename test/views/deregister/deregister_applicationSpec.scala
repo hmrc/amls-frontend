@@ -20,13 +20,13 @@ import generators.AmlsReferenceNumberGenerator
 import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class deregister_applicationSpec extends AmlsSpec with MustMatchers with AmlsReferenceNumberGenerator {
+class deregister_applicationSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val businessName = "Test Business"
     val currentRegYearEndDate = LocalDate.now()

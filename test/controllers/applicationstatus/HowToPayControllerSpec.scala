@@ -32,7 +32,7 @@ import play.api.i18n.Messages
 
 import scala.concurrent.Future
 
-class HowToPayControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with SubscriptionResponseGenerator {
+class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -40,7 +40,9 @@ class HowToPayControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
     val request = addToken(authRequest)
     val controller = new HowToPayController(
       authAction = SuccessfulAuthAction,
-      feeHelper = mock[FeeHelper]
+      feeHelper = mock[FeeHelper],
+      cc = mockMcc,
+      ds = commonDependencies
     )
   }
 

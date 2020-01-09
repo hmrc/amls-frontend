@@ -16,11 +16,12 @@
 
 @import include._
 @import forms2._
+@import config.{ ApplicationConfig}
 @import models.businessdetails._
 @import utils._
 @import config.ApplicationConfig
 
-@(f: forms.Form2[_], model: BusinessDetails, showRegisteredForMLR: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], model: BusinessDetails, showRegisteredForMLR: Boolean)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("title.cya", "summary.businessdetails")

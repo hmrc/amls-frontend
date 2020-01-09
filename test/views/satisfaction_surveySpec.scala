@@ -22,19 +22,19 @@ import forms.{EmptyForm, InvalidForm}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{BAD_REQUEST, contentAsString, status}
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 
-class satisfaction_surveySpec extends AmlsSpec with MustMatchers with MockitoSugar {
+class satisfaction_surveySpec extends AmlsViewSpec with MustMatchers with MockitoSugar {
 
   trait SatisfactionSurveyFixture {
-    implicit val request : Request[_] = addToken(FakeRequest())
+    implicit val request : Request[_] = addTokenForView()
     val view = views.html.satisfaction_survey(EmptyForm)
     lazy val html = view.body
     lazy val doc = Jsoup.parse(html)

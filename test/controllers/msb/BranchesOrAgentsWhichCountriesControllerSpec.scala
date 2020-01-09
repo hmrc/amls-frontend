@@ -22,7 +22,7 @@ import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountri
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -31,10 +31,10 @@ import scala.concurrent.Future
 
 class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new BranchesOrAgentsWhichCountriesController(mockCacheConnector, authAction = SuccessfulAuthAction, mockAutoComplete)
+    val controller = new BranchesOrAgentsWhichCountriesController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, mockAutoComplete, mockMcc)
   }
 
   val modelBefore = MoneyServiceBusiness(
@@ -72,7 +72,7 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
         .thenReturn(Future.successful(Some(modelBefore)))
 
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "country_1" -> "GBasdadsdas"
       )
 
@@ -84,7 +84,7 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
 
     "return a redirect to the 'Linked Transactions' page on valid submission" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "countries[0]" -> "GB"
       )
 
@@ -102,7 +102,7 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
 
     "return a redirect to the 'Linked Transactions' page when the user has filled the mandatory auto suggested country field" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "countries[0]" -> "GB"
       )
 
@@ -120,7 +120,7 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
 
     "return a redirect to the 'Summary page' page on valid submission when edit flag is set" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "countries[0]" -> "GB"
       )
 

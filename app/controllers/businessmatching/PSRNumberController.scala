@@ -20,24 +20,27 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import javax.inject.Inject
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
 import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.psr_number
 
 class PSRNumberController @Inject()(authAction: AuthAction,
+                                    val ds: CommonPlayDependencies,
                                     val dataCacheConnector: DataCacheConnector,
                                     val statusService: StatusService,
                                     val businessMatchingService: BusinessMatchingService,
                                     val router: Router[ChangeSubSectorFlowModel],
-                                    val helper: ChangeSubSectorHelper
-                                   ) extends DefaultBaseController {
+                                    val helper: ChangeSubSectorHelper,
+                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

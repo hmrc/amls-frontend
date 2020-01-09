@@ -22,7 +22,7 @@ import models.businessmatching._
 import models.renewal.{FXTransactionsInLast12Months, Renewal}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar  {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
@@ -41,8 +41,8 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     val controller = new FXTransactionsInLast12MonthsController (
       dataCacheConnector = mockDataCacheConnector,
-      authAction = SuccessfulAuthAction,
-      renewalService = mockRenewalService
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      renewalService = mockRenewalService, cc = mockMcc
     )
 
     val cacheMap = mock[CacheMap]
@@ -82,7 +82,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "Show error message when user has not filled the mandatory fields" in new Fixture  {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "fxTransaction" -> ""
       )
 
@@ -100,7 +100,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
     }
 
     trait FlowFixture extends Fixture {
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = requestWithUrlEncodedBody(
         "fxTransaction" -> "12345678963"
       )
 

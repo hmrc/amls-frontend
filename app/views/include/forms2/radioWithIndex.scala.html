@@ -22,7 +22,7 @@
     target: String = "",
     inline: Boolean = false,
     spaced: Boolean = false
-)(implicit lang:Lang, m: Messages)
+)(implicit  m: Messages)
 
     <div class="@if(inline){} @if(spaced){spaced} multiple-choice">
         <input type="radio" name="@f.name" id="@{f.id}-@index" value="@value" @if(f.value.contains(value)){ checked="checked"}@if(target.nonEmpty){ data-toggle="@target"} />

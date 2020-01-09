@@ -22,14 +22,14 @@ import models.Country
 import models.moneyservicebusiness.SendTheLargestAmountsOfMoney
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.{AmlsSpec, AutoCompleteServiceMocks}
+import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 
 
-class send_largest_amounts_of_moneySpec extends AmlsSpec with MustMatchers {
+class send_largest_amounts_of_moneySpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "send_largest_amounts_of_money view" must {

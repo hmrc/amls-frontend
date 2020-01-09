@@ -61,7 +61,7 @@ class LinkedCashPaymentsSpec extends PlaySpec {
       "successfully read and write json data" in {
 
         LinkedCashPayments.format.reads(LinkedCashPayments.format.writes(LinkedCashPayments(true))) must be(JsSuccess(LinkedCashPayments(true),
-          JsPath \ "linkedCashPayments"))
+          JsPath))
 
       }
     }

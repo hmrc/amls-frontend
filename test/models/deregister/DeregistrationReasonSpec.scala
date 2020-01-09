@@ -18,7 +18,7 @@ package models.deregister
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -168,15 +168,15 @@ class DeregistrationReasonSpec extends PlaySpec with MustMatchers with MockitoSu
     "throw error" when {
       "enum value is invalid" in {
         Json.fromJson[DeregistrationReason](Json.obj("deregistrationReason" -> "10")) must
-          be(JsError(JsPath -> play.api.data.validation.ValidationError("error.invalid")))
+          be(JsError(JsPath -> play.api.libs.json.JsonValidationError("error.invalid")))
       }
       "enum is missing" in {
         Json.fromJson[DeregistrationReason](Json.obj()) must
-          be(JsError(JsPath \ "deregistrationReason" -> play.api.data.validation.ValidationError("error.path.missing")))
+          be(JsError(JsPath \ "deregistrationReason" -> play.api.libs.json.JsonValidationError("error.path.missing")))
       }
       "other reason is missing" in {
         Json.fromJson[DeregistrationReason](Json.obj("deregistrationReason" -> "Other, please specify")) must
-          be(JsError(JsPath \ "specifyOtherReason" -> play.api.data.validation.ValidationError("error.path.missing")))
+          be(JsError(JsPath \ "specifyOtherReason" -> play.api.libs.json.JsonValidationError("error.path.missing")))
       }
     }
 

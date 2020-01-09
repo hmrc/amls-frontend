@@ -26,14 +26,14 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import services.AutoCompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 
 import scala.concurrent.Future
 
@@ -42,7 +42,7 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
@@ -54,7 +54,9 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       auditConnector = auditConnector,
-      autoCompleteService = autoCompleteService
+      autoCompleteService = autoCompleteService,
+      ds = commonDependencies,
+      cc = mockMcc
     )
 
     when {
@@ -149,7 +151,7 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
       "go to TimeAtAdditionalExtraAddressController" when {
         "edit is false" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
@@ -184,7 +186,7 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
         }
 
         "edit is true and timeAtAddress does not exist" in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
@@ -212,7 +214,7 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
       "go to DetailedAnswersController" when {
         "edit is true" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "New line 1",
             "addressLine2" -> "New line 2",
@@ -253,7 +255,7 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
 
     "respond with BAD_REQUEST" when {
       "form is invalid" in new Fixture {
-        val requestWithParams = request.withFormUrlEncodedBody(
+        val requestWithParams = requestWithUrlEncodedBody(
           "isUK" -> "",
           "addressLineNonUK1" -> "",
           "addressLineNonUK2" -> "",
@@ -275,7 +277,7 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
 
     "respond with NOT_FOUND" when {
       "responsible person is not found for that index" in new Fixture {
-        val requestWithParams = request.withFormUrlEncodedBody(
+        val requestWithParams = requestWithUrlEncodedBody(
           "isUK" -> "true",
           "addressLine1" -> "Line 1",
           "addressLine2" -> "Line 2",

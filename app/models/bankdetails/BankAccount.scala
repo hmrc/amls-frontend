@@ -16,137 +16,53 @@
 
 package models.bankdetails
 
-import jto.validation.forms.Rules._
-import models.FormTypes._
-import jto.validation.ValidationError
+
+import models.bankdetails.Account._
 import play.api.libs.json._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation._
 
-sealed trait Account
+case class BankAccount(isUk: Option[BankAccountIsUk], hasIban: Option[BankAccountHasIban], account: Option[Account]) {
 
-object Account {
-
-  import utils.MappingUtils.Implicits._
-  import models.FormTypes._
-
-  val sortCodeRegex = "^[0-9]{6}".r
-  val ukBankAccountNumberRegex = "^[0-9]{8}$".r
-  val nonUKBankAccountNumberRegex = "^[0-9a-zA-Z_]+$".r
-  val ibanRegex = "^[0-9a-zA-Z_]+$".r
-  val maxNonUKBankAccountNumberLength = 40
-  val maxUKBankAccountNumberLength = 8
-  val maxIBANLength = 34
-
-  val sortCodeType = (removeDashRule andThen removeSpacesRule andThen notEmpty)
-    .withMessage("error.invalid.bankdetails.sortcode")
-    .andThen(pattern(sortCodeRegex).withMessage("error.invalid.bankdetails.sortcode"))
-
-  val ukBankAccountNumberType = notEmpty
-    .withMessage("error.bankdetails.accountnumber")
-    .andThen(maxLength(maxUKBankAccountNumberLength).withMessage("error.max.length.bankdetails.accountnumber"))
-    .andThen(pattern(ukBankAccountNumberRegex).withMessage("error.invalid.bankdetails.accountnumber"))
-
-  val nonUKBankAccountNumberType = notEmpty
-    .andThen(maxLength(maxNonUKBankAccountNumberLength).withMessage("error.invalid.bankdetails.account"))
-    .andThen(pattern(nonUKBankAccountNumberRegex).withMessage("error.invalid.bankdetails.account"))
-
-  val ibanType = notEmpty
-    .andThen(maxLength(maxIBANLength).withMessage("error.invalid.bankdetails.iban"))
-    .andThen(pattern(ibanRegex).withMessage("error.invalid.bankdetails.iban"))
-
-
-  implicit val formRead: Rule[UrlFormEncoded, Account] =
-    From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-
-      (__ \ "isUK").read[Boolean].withMessage("error.bankdetails.ukbankaccount") flatMap {
-        case true =>
-          (
-            (__ \ "accountNumber").read(ukBankAccountNumberType) ~
-              (__ \ "sortCode").read(sortCodeType)
-
-            ) (UKAccount.apply _)
-        case false =>
-          ((__ \ "IBANNumber").read(optionR(ibanType)) ~
-            (__ \ "nonUKAccountNumber").read(optionR(nonUKBankAccountNumberType))).tupled flatMap {
-            case (Some(iban), _) => NonUKIBANNumber(iban)
-            case (_, Some(accountNo)) => NonUKAccountNumber(accountNo)
-            case (_, _) =>
-              (Path \ "IBANNumber") -> Seq(ValidationError("error.required.bankdetails.iban.account"))
-          }
-      }
-    }
-
-  implicit val formWrites: Write[Account, UrlFormEncoded] = Write {
-    case f: UKAccount =>
-      Map(
-        "isUK" -> Seq("true"),
-        "accountNumber" -> f.accountNumber,
-        "sortCode" -> f.sortCode
-      )
-    case nonukacc: NonUKAccountNumber =>
-      Map(
-        "isUK" -> Seq("false"),
-        "nonUKAccountNumber" -> nonukacc.accountNumber)
-    case iban: NonUKIBANNumber =>
-      Map(
-        "isUK" -> Seq("false"),
-        "IBANNumber" -> iban.IBANNumber)
+  def isUk(isUk: BankAccountIsUk): BankAccount = if(changedIsUk(isUk)) {
+    this.copy(isUk = Option(isUk),
+              hasIban = if (isUk.isUk) { None } else { hasIban },
+              account = None)
+  } else {
+    this.copy(isUk = Option(isUk))
   }
 
-  implicit val jsonReads: Reads[Account] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json._
-    (__ \ "isUK").read[Boolean] flatMap {
-      case true => (
-        (__ \ "accountNumber").read[String] and
-          (__ \ "sortCode").read[String]
-        ) (UKAccount.apply _)
-
-      case false =>
-        (__ \ "isIBAN").read[Boolean] flatMap {
-          case true => (__ \ "IBANNumber").read[String] map NonUKIBANNumber.apply
-          case false => (__ \ "nonUKAccountNumber").read[String] map NonUKAccountNumber.apply
-        }
-    }
+  def hasIban(hasIban: BankAccountHasIban): BankAccount = if (changedHasIban(hasIban)) {
+    this.copy(hasIban = Option(hasIban), account = None)
+  } else {
+    this.copy(hasIban = Option(hasIban))
   }
 
-  implicit val jsonWrites = Writes[Account] {
-    case m: UKAccount =>
-      Json.obj(
-        "isUK" -> true,
-        "accountNumber" -> m.accountNumber,
-      "sortCode" -> m.sortCode
-    )
-    case acc: NonUKAccountNumber =>
-      Json.obj(
-        "isUK" -> false,
-        "nonUKAccountNumber" -> acc.accountNumber,
-        "isIBAN" -> false
-      )
-    case iban: NonUKIBANNumber =>
-      Json.obj(
-        "isUK" -> false,
-        "IBANNumber" -> iban.IBANNumber,
-        "isIBAN" -> true
-      )
-  }
+  def account(account: Account): BankAccount = this.copy(account = Option(account))
+
+  private def changedIsUk(newData: BankAccountIsUk): Boolean =
+    isUk.map(acc => acc.isUk).exists(isUk => isUk != newData.isUk)
+
+  private def changedHasIban(newData: BankAccountHasIban): Boolean =
+    hasIban.map(iban => iban.hasIban).exists(hasIban => hasIban != newData.hasIban)
 }
 
-case class UKAccount(accountNumber: String, sortCode: String) extends Account {
-  def displaySortCode: String = {
-    // scalastyle:off magic.number
-    val pair1 = sortCode.substring(0, 2)
-    val pair2 = sortCode.substring(2, 4)
-    val pair3 = sortCode.substring(4, 6)
-    // scalastyle:on magic.number
-    pair1 + "-" + pair2 + "-" + pair3
+object BankAccount {
+
+  import play.api.libs.functional.syntax._
+
+  implicit val jsonReads : Reads[BankAccount] = (
+      __.read(Reads.optionNoError[BankAccountIsUk]) and
+      __.read(Reads.optionNoError[BankAccountHasIban]) and
+      __.read(Reads.optionNoError[Account])
+    )(BankAccount.apply _)
+
+
+  implicit val jsonWrites: Writes[BankAccount] = Writes {
+    model:BankAccount => Seq(
+      Json.toJson(model.isUk).asOpt[JsObject],
+      Json.toJson(model.hasIban).asOpt[JsObject],
+      Json.toJson(model.account).asOpt[JsObject]
+    ).flatten.fold(Json.obj()) {
+      _ ++ _
+    }
   }
 }
-
-sealed trait NonUKAccount extends Account
-
-case class NonUKAccountNumber(accountNumber: String) extends NonUKAccount
-
-case class NonUKIBANNumber(IBANNumber: String) extends NonUKAccount

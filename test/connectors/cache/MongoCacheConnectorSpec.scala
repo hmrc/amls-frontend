@@ -16,20 +16,17 @@
 
 package connectors.cache
 
-import connectors.Authority
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.{reset, when}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FreeSpec, MustMatchers}
 import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.LoggedInUser
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -50,7 +47,6 @@ class MongoCacheConnectorSpec extends FreeSpec
 
   trait Fixture {
     implicit val hc = HeaderCarrier()
-    implicit val user = mock[LoggedInUser]
     implicit val ec = mock[ExecutionContext]
 
     val factory = mock[MongoCacheClientFactory]
@@ -58,7 +54,6 @@ class MongoCacheConnectorSpec extends FreeSpec
     val credId = "12345678"
     val key = arbitrary[String].sample.get
 
-    val authority = Authority("", Accounts(), "/user-details", "/ids", "12345678")
     val cacheMap = CacheMap("12345678", Map("id" -> Json.toJson("12345678")))
 
     when(factory.createClient) thenReturn client

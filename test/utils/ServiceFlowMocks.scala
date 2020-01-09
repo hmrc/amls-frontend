@@ -17,7 +17,7 @@
 package utils
 
 import models.businessmatching.BusinessActivity
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import services.businessmatching.ServiceFlow
 import org.mockito.Mockito.when
 import org.mockito.Matchers.{any, eq => eqTo}

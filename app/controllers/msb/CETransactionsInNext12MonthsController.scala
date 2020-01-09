@@ -17,22 +17,25 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness.{CETransactionsInNext12Months, MoneyServiceBusiness}
+import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.msb.ce_transaction_in_next_12_months
 
 import scala.concurrent.Future
 
 class CETransactionsInNext12MonthsController @Inject() (authAction: AuthAction,
+                                                        val ds: CommonPlayDependencies,
                                                         implicit val dataCacheConnector: DataCacheConnector,
                                                         implicit val statusService: StatusService,
-                                                        implicit val serviceFlow: ServiceFlow
-                                                       ) extends DefaultBaseController {
+                                                        implicit val serviceFlow: ServiceFlow,
+                                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit:Boolean = false) = authAction.async {
    implicit request =>

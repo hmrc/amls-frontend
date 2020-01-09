@@ -25,7 +25,7 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
@@ -36,14 +36,14 @@ import scala.concurrent.Future
 
 class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val renewalService = mock[RenewalService]
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
     val cacheMap = mock[CacheMap]
 
-    lazy val controller = new WhichCurrenciesController(SuccessfulAuthAction, renewalService, dataCacheConnector)
+    lazy val controller = new WhichCurrenciesController(SuccessfulAuthAction, ds = commonDependencies, renewalService, dataCacheConnector, cc = mockMcc)
 
     when {
       renewalService.getRenewal(any())(any(), any())
@@ -54,7 +54,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   trait FormSubmissionFixture extends Fixture {
-    val validFormRequest = request.withFormUrlEncodedBody(
+    val validFormRequest = requestWithUrlEncodedBody(
       "currencies[0]" -> "USD",
       "currencies[1]" -> "GBP",
       "currencies[2]" -> "BOB",
@@ -181,7 +181,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
 
     "return a bad request" when {
       "the form fails validation" in new FormSubmissionFixture {
-        val newRequest = request.withFormUrlEncodedBody("currencies[0]" -> "1dfasdffds")
+        val newRequest = requestWithUrlEncodedBody("currencies[0]" -> "1dfasdffds")
 
         val result = controller.post()(newRequest)
 

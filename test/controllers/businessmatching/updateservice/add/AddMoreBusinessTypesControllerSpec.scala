@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -41,9 +41,10 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new AddMoreBusinessTypesController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
-      router = createRouter[AddBusinessTypeFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel],
+      cc = mockMcc
     )
 
     val BusinessActivitiesModel = BusinessActivities(Set(BillPaymentServices, TelephonePaymentService))
@@ -76,7 +77,7 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
 
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
 
-            val result = controller.post()(request.withFormUrlEncodedBody(
+            val result = controller.post()(requestWithUrlEncodedBody(
               "addmoreactivities" -> "true"
             ))
 
@@ -91,7 +92,7 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
               val flowModel = AddBusinessTypeFlowModel(Some(BillPaymentServices))
               mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), flowModel)
 
-              val result = controller.post()(request.withFormUrlEncodedBody(
+              val result = controller.post()(requestWithUrlEncodedBody(
                 "addmoreactivities" -> "false"
               ))
 
@@ -105,7 +106,7 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
               val flowModel = AddBusinessTypeFlowModel(Some(HighValueDealing))
               mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), flowModel)
 
-              val result = controller.post()(request.withFormUrlEncodedBody(
+              val result = controller.post()(requestWithUrlEncodedBody(
                 "addmoreactivities" -> "false"
               ))
 

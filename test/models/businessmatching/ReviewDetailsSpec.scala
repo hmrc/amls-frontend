@@ -19,7 +19,7 @@ package models.businessmatching
 import models.Country
 import models.businesscustomer.ReviewDetails
 import models.businesscustomer.Address
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
 import org.mockito.Mockito._

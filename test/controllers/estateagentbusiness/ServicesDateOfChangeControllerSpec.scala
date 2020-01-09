@@ -23,7 +23,7 @@ import models.estateagentbusiness._
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -33,13 +33,14 @@ import scala.concurrent.Future
 
 class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new ServicesDateOfChangeController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction
-    )
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -54,7 +55,7 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
 
     "submit with valid data and redirect to CYA for non residential" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "dateOfChange.day" -> "24",
         "dateOfChange.month" -> "2",
         "dateOfChange.year" -> "1990"
@@ -82,7 +83,7 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
 
     "submit and redirect to redress scheme for residential" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "dateOfChange.day" -> "24",
         "dateOfChange.month" -> "2",
         "dateOfChange.year" -> "1990"
@@ -110,7 +111,7 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
 
     "fail submission when invalid date is supplied" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "dateOfChange.day" -> "24",
         "dateOfChange.month" -> "2",
         "dateOfChange.year" -> "199000"
@@ -136,7 +137,7 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
 
     "fail submission when input date is before activity start date" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "dateOfChange.day" -> "24",
         "dateOfChange.month" -> "2",
         "dateOfChange.year" -> "1980"

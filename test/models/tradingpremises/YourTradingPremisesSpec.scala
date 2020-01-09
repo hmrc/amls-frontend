@@ -24,7 +24,7 @@ import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json._
 
-class YourTradingPremisesSpec extends WordSpec with MustMatchers {
+class YourTradingPremisesSpec extends WordSpec with MustMatchers with JodaWrites with JodaReads {
 
   val data = Map(
     "tradingName" -> Seq("foo"),

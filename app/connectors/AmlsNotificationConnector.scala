@@ -16,17 +16,20 @@
 
 package connectors
 
-import config.{AppConfig, WSHttp}
+import config.ApplicationConfig
 import javax.inject.Inject
 import models.notifications.{NotificationDetails, NotificationRow}
 import play.api.Logger
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.http.ws.WSHttp
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmlsNotificationConnector @Inject()(val http: WSHttp,
-                                          val appConfig: AppConfig) {
+class AmlsNotificationConnector @Inject()(val http: HttpClient,
+                                          val appConfig: ApplicationConfig) {
 
   private[connectors] def baseUrl : String = appConfig.allNotificationsUrl
 

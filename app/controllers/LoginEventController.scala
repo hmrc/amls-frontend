@@ -17,13 +17,17 @@
 package controllers
 
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.login_event
+
 import scala.concurrent.Future
 
 @Singleton
-class LoginEventController @Inject()(authAction: AuthAction) extends DefaultBaseController {
+class LoginEventController @Inject()(authAction: AuthAction,
+                                     val ds: CommonPlayDependencies,
+                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get: Action[AnyContent] = authAction.async {
     implicit request => Future(Ok(login_event()))

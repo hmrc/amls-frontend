@@ -21,10 +21,10 @@ import controllers.actions.SuccessfulAuthAction
 import models.businessdetails._
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
-import org.mockito.Mockito._
+import org.mockito.Mockito.{reset, _}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -40,13 +40,14 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
     reset(dataCacheConnector)
   }
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
     val controller = new LettersAddressController (
       dataCache = dataCacheConnector,
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc)
 
     val emptyCache = CacheMap("", Map.empty)
 
@@ -86,7 +87,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
     "Post" must {
       "remove the data for following questions and successfully redirect to the page on selection of 'Yes' [this is letters address]" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "lettersAddress" -> "true"
         )
 
@@ -119,7 +120,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
       }
 
       "keep the data and successfully redirect to the page on selection of Option 'No' [this is not letters address]" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "lettersAddress" -> "false"
         )
 
@@ -148,7 +149,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
       }
 
       "on post invalid data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
         )
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))
@@ -161,7 +162,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
       }
 
       "on post with invalid data show error" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "lettersAddress" -> ""
         )
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))
@@ -174,7 +175,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
       }
 
       "on post with no data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
         )
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))

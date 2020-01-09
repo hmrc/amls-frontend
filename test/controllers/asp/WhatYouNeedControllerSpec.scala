@@ -17,20 +17,17 @@
 package controllers.asp
 
 import controllers.actions.SuccessfulAuthAction
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 
-class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with OneAppPerSuite {
+class WhatYouNeedControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new WhatYouNeedController(SuccessfulAuthAction)
+    val controller = new WhatYouNeedController(SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
 
   }
 

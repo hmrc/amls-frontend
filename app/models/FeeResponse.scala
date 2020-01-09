@@ -41,7 +41,7 @@ object ResponseType {
       case "SubscriptionReponse" => SubscriptionResponseType
       case "AmendOrVariationResponse" => AmendOrVariationResponseType
       case _ =>
-        play.api.data.validation.ValidationError("error.invalid")
+        play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 }

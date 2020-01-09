@@ -25,18 +25,18 @@ import org.joda.time.LocalDate
 import org.scalatest.concurrent.ScalaFutures
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits._
 
 class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks with AutoCompleteServiceMocks { self =>
+  trait Fixture extends DependencyMocks with AutoCompleteServiceMocks { self =>
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AuthConnector].to(authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[StatusService].to(mockStatusService))
       .overrides(bind[AutoCompleteService].to(mockAutoComplete))

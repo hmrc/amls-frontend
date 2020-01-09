@@ -178,7 +178,7 @@ object ProfessionalBodies {
       case "14" =>
         (JsPath \ "specifyOtherBusiness").read[String].map(Other.apply) map identity[BusinessType]
       case _ =>
-        Reads(_ => JsError((JsPath \ "businessType") -> play.api.data.validation.ValidationError("error.invalid")))
+        Reads(_ => JsError((JsPath \ "businessType") -> play.api.libs.json.JsonValidationError("error.invalid")))
     }).foldLeft[Reads[Set[BusinessType]]](
       Reads[Set[BusinessType]](_ => JsSuccess(Set.empty))
     ) {

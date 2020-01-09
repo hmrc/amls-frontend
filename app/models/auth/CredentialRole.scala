@@ -16,7 +16,9 @@
 
 package models.auth
 
+// $COVERAGE-OFF$ Below implementation is obsolete and will be removed with migration to Play 2.6
 object CredentialRole {
   val User = "User"
   val Assistant = "Assistant"
 }
+// $COVERAGE-ON$

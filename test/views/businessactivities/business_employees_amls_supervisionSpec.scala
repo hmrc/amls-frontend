@@ -21,14 +21,14 @@ import jto.validation.{Path, ValidationError}
 import models.businessactivities.HowManyEmployees
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
 
-class business_employees_amls_supervisionSpec extends AmlsSpec with MustMatchers  {
+class business_employees_amls_supervisionSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "business_employees view" must {

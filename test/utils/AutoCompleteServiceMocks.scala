@@ -18,7 +18,7 @@ package utils
 
 import models.autocomplete.NameValuePair
 import org.mockito.Mockito.when
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import services.AutoCompleteService
 
 trait AutoCompleteServiceMocks extends MockitoSugar {

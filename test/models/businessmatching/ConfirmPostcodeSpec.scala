@@ -17,7 +17,7 @@
 package models.businessmatching
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
@@ -57,13 +57,13 @@ class ConfirmPostcodeSpec extends PlaySpec with MockitoSugar {
         val postCode = ConfirmPostcode("AA11AA")
         val jsonConfirmPostcode = Json.obj("postCode" -> "AA11AA")
         val fromJson = Json.fromJson[ConfirmPostcode](jsonConfirmPostcode)
-        fromJson must be(JsSuccess(postCode, JsPath \ "postCode"))
+        fromJson must be(JsSuccess(postCode, JsPath))
       }
 
       "read write json successfully" in {
         val postCode = ConfirmPostcode("AA11AA")
         ConfirmPostcode.format.reads(ConfirmPostcode.format.writes(postCode)) must
-          be(JsSuccess(postCode, JsPath \ "postCode"))
+          be(JsSuccess(postCode, JsPath))
       }
 
     }

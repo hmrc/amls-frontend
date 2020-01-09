@@ -34,7 +34,7 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
   with PrivateMethodTester
   with TradingPremisesGenerator {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -49,12 +49,13 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val controller = new WhichTradingPremisesController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddBusinessTypeFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel],
+      cc = mockMcc
     )
   }
 
@@ -93,7 +94,7 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
             mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
             mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
 
-            val result = controller.post()(request.withFormUrlEncodedBody(
+            val result = controller.post()(requestWithUrlEncodedBody(
               "tradingPremises[]" -> "1"
             ))
 

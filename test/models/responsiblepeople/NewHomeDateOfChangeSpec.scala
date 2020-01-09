@@ -79,7 +79,7 @@ class NewHomeDateOfChangeSpec extends PlaySpec {
 
     "Read and write successfully" in {
       NewHomeDateOfChange.format.reads(NewHomeDateOfChange.format.writes(NewHomeDateOfChange(Some(new LocalDate(1990, 2, 24))))) must be(
-        JsSuccess(NewHomeDateOfChange(Some(new LocalDate(1990, 2, 24))), JsPath \ "dateOfChange"))
+        JsSuccess(NewHomeDateOfChange(Some(new LocalDate(1990, 2, 24))), JsPath))
 
     }
 

@@ -29,7 +29,7 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import uk.gov.hmrc.http.HeaderCarrier

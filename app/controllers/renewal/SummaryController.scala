@@ -19,27 +19,27 @@ package controllers.renewal
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.renewal.Renewal
+import play.api.mvc.MessagesControllerComponents
 import services.{ProgressService, RenewalService, SectionsProvider}
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.renewal.summary
 
 import scala.concurrent.Future
 
-
 @Singleton
-class SummaryController @Inject()
-(
-  val dataCacheConnector: DataCacheConnector,
-  val authAction: AuthAction,
-  val renewalService: RenewalService,
-  val progressService: ProgressService,
-  val sectionsProvider: SectionsProvider
-) extends DefaultBaseController {
+class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                  val authAction: AuthAction,
+                                  val ds: CommonPlayDependencies,
+                                  val renewalService: RenewalService,
+                                  val progressService: ProgressService,
+                                  val sectionsProvider: SectionsProvider,
+                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

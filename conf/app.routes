@@ -96,6 +96,9 @@ GET         /update-information/declaration                                     
 
 GET         /update-information/add-person                                            @controllers.declaration.AddPersonController.getWithAmendment()
 
+GET         /declaration/renew-registration                                           @controllers.declaration.RenewRegistrationController.get()
+POST        /declaration/renew-registration                                           @controllers.declaration.RenewRegistrationController.post()
+
 GET         /update-information/add-or-remove-services                                @controllers.businessmatching.updateservice.ChangeBusinessTypesController.get()
 POST        /update-information/add-or-remove-services                                @controllers.businessmatching.updateservice.ChangeBusinessTypesController.post()
 
@@ -111,4 +114,4 @@ POST        /update-information/new-nominated-officer                           
 GET         /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.get()
 POST        /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.post()
 
-GET         /login-event/update-responsible-people                                    @controllers.LoginEventController.get()
+GET         /login-event/redress-scheme                                               @controllers.LoginEventController.get()

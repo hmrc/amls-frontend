@@ -69,7 +69,7 @@ trait DateOfChangeHelper {
     }
   }
 
-  implicit class TradingPremisesExtensions(tradingPremises: Option[TradingPremises]) extends DateOfChangeHelper {
+  implicit class TradingPremisesExtensions(tradingPremises: Option[TradingPremises])(implicit messages: Messages) extends DateOfChangeHelper {
 
     def startDate = tradingPremises.yourTradingPremises.fold[Option[LocalDate]](None)(ytp => ytp.startDate)
 

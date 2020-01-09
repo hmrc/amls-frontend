@@ -16,7 +16,8 @@
 
 @import include._
 @import forms2._
-@()(implicit request: Request[_],m:Messages)
+@import config.{ ApplicationConfig}
+@()(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 
 @main(
@@ -26,19 +27,19 @@
      <header class="page-header">
          <h1>@Messages("login-event.heading")</h1>
      </header>
+
    <p>@Messages("login-event.event-messages-header")</p>
 
    <ul class="list list-bullet">
-    <li>@Messages("login-event.date-of-birth-message")</li>
-    <li>@Messages("login-event.fit-and-proper-message")</li>
-    <li>@Messages("login-event.approval-check-charge-message")</li>
+    <li>@Messages("login-event.property-redress")</li>
+    <li>@Messages("login-event.property-ombudsman")</li>
    </ul>
 
    @anchor(
-    attrHref = controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().toString,
+    attrHref = controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true).toString,
     attrRole = true,
-    linkText = Messages("login-event.update-responsible-people"),
-    id=Some("update-responsible-people-link")
+    linkText = Messages("login-event.update-now"),
+    id=Some("update-now-link")
    )
 
    <p>

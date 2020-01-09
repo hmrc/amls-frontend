@@ -19,6 +19,8 @@ package models
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.{DateTimeZone, LocalDate, LocalDateTime}
 import play.api.libs.json._
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 case class ReadStatusResponse(
                                processingDate: LocalDateTime,

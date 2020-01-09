@@ -19,13 +19,13 @@ package views.applicationstatus
 import forms.{EmptyForm, Form2}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.{AmlsSpec, AmlsViewSpec}
 import views.Fixture
 
-class how_to_paySpec extends AmlsSpec with MustMatchers {
+class how_to_paySpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "What you need View" must {

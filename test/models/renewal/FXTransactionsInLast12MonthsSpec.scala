@@ -68,7 +68,7 @@ class FXTransactionsInLast12MonthsSpec extends PlaySpec {
 
       "Successfully read/write Json data" in {
         FXTransactionsInLast12Months.format.reads(FXTransactionsInLast12Months.format.writes(
-          FXTransactionsInLast12Months("12345678963"))) must be(JsSuccess(FXTransactionsInLast12Months("12345678963"), JsPath \ "fxTransaction"))
+          FXTransactionsInLast12Months("12345678963"))) must be(JsSuccess(FXTransactionsInLast12Months("12345678963"), JsPath))
       }
     }
   }

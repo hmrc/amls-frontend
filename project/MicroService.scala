@@ -1,4 +1,3 @@
-import play.routes.compiler.StaticRoutesGenerator
 import play.sbt.routes.RoutesKeys._
 import sbt.Keys._
 import sbt.Tests.{Group, SubProcess}
@@ -9,16 +8,13 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 trait MicroService {
 
   import com.typesafe.sbt.digest.Import.digest
-  import com.typesafe.sbt.web.Import.pipelineStages
-  import com.typesafe.sbt.web.Import.Assets
-
+  import com.typesafe.sbt.web.Import.{Assets, pipelineStages}
   import uk.gov.hmrc._
-  import DefaultBuildSettings.{scalaSettings, defaultSettings, addTestReportOption}
+  import DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings}
   import TestPhases._
-  import uk.gov.hmrc.SbtAutoBuildPlugin
+  import uk.gov.hmrc.{SbtArtifactory, SbtAutoBuildPlugin}
   import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
   import uk.gov.hmrc.versioning.SbtGitVersioning
-  import uk.gov.hmrc.SbtArtifactory
   import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
   val appName: String
@@ -33,7 +29,7 @@ trait MicroService {
 
        // Semicolon-separated list of regexs matching classes to exclude
       ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;modgiels/.data/..*;view.*;forms.*;config.*;" +
-        ".*BuildInfo.;.*Routes;controllers.ExampleController;controllers.testonly.TestOnlyController",
+        ".*BuildInfo.;uk.gov.hmrc.BuildInfo;.*Routes;.*RoutesPrefix*;controllers.ExampleController;controllers.testonly.TestOnlyController",
       ScoverageKeys.coverageMinimum := 90,
       ScoverageKeys.coverageFailOnMinimum := true,
       ScoverageKeys.coverageHighlighting := true,
@@ -48,14 +44,14 @@ trait MicroService {
     .settings(scalaSettings: _*)
     .settings(publishingSettings: _*)
     .settings(defaultSettings(): _*)
-    .settings(scalaVersion := "2.11.11")
+    .settings(scalaVersion := "2.11.12")
     .settings(routesImport += "models.notifications.ContactType._")
     .settings(routesImport += "utils.Binders._")
     .settings(
       libraryDependencies ++= appDependencies,
       retrieveManaged := true,
       evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-      routesGenerator := StaticRoutesGenerator,
+      routesGenerator := InjectedRoutesGenerator,
       pipelineStages in Assets := Seq(digest)
     )
     .configs(IntegrationTest)

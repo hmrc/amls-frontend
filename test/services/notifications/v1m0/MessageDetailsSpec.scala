@@ -22,7 +22,7 @@ import models.notifications.{ContactType, IDType, NotificationDetails, Notificat
 import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.MessagesApi
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
@@ -37,7 +37,7 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
 
   implicit val hc = HeaderCarrier()
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
 
     val accountTypeId = ("org", "id")
 

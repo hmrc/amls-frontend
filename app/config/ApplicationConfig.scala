@@ -16,25 +16,22 @@
 
 package config
 
-import javax.inject.Inject
-import play.api.Mode.Mode
-import play.api.{Application, Configuration, Environment, Play}
-import uk.gov.hmrc.play.config.ServicesConfig
+import com.google.inject.{Inject, Singleton}
+import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
-trait ApplicationConfig {
+@Singleton
+class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode, servicesConfig: ServicesConfig) {
 
-  def refreshProfileToggle: Boolean
+  private def baseUrl(serviceName: String) = {
+    val protocol = configuration.getOptional[String](s"microservice.services.$serviceName.protocol").getOrElse("http")
+    val host = configuration.get[String](s"microservice.services.$serviceName.host")
+    val port = configuration.get[String](s"microservice.services.$serviceName.port")
+    s"$protocol://$host:$port"
+  }
 
-  def frontendBaseUrl: String
-}
-
-object ApplicationConfig extends ApplicationConfig with ServicesConfig {
-
-  override protected def mode: Mode = Play.current.mode
-  override protected def runModeConfiguration: Configuration = Play.current.configuration
-
-  private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
-  private def getConfigInt(key: String) = getConfInt(key, throw new Exception(s"Could not find config '$key'"))
+  private def getConfigString(key: String) = servicesConfig.getConfString(key, throw new Exception(s"Could not find config '$key'"))
+  private def getConfigInt(key: String) = servicesConfig.getConfInt(key, throw new Exception(s"Could not find config '$key'"))
 
   val contactFormServiceIdentifier = "AMLS"
 
@@ -51,33 +48,25 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   val betaFeedbackUnauthenticatedUrl = getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 
   lazy val loginUrl = getConfigString("login.url")
-  lazy val logoutUrl = getConfigString("logout.url")
+  def logoutUrl = getConfigString("logout.url")
   lazy val loginContinue = getConfigString("login.continue")
 
-  lazy val amlsUrl = baseUrl("amls")
-  lazy val subscriptionUrl = s"$amlsUrl/amls/subscription"
-
-  lazy val notificationsUrl = baseUrl("amls-notification")
-  lazy val allNotificationsUrl = s"$notificationsUrl/amls-notification"
   lazy val paymentsUrl:String = getConfigString("paymentsUrl")
 
-  lazy val timeout = getInt("timeout.seconds")
-  lazy val timeoutCountdown = getInt("timeout.countdown")
+  lazy val timeout = servicesConfig.getInt("timeout.seconds")
+  lazy val timeoutCountdown = servicesConfig.getInt("timeout.countdown")
 
-  lazy val ampWhatYouNeedUrl = s"${getConfString("amls-art-market-participant-frontend.url", "")}/what-you-need"
-  lazy val ampSummeryUrl     = s"${getConfString("amls-art-market-participant-frontend.url", "")}/check-your-answers"
+  lazy val ampWhatYouNeedUrl = s"${servicesConfig.getConfString("amls-art-market-participant-frontend.url", "")}/what-you-need"
+  lazy val ampSummaryUrl     = s"${servicesConfig.getConfString("amls-art-market-participant-frontend.url", "")}/check-your-answers"
+
+  // TODO: EAB TO BE ADDED TO CONFIG
+  lazy val eabWhatYouNeedUrl = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/what-you-need"
+  lazy val eabSummaryUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/check-your-answers"
+
 
   def businessCustomerUrl = getConfigString("business-customer.url")
-
-  private implicit lazy val app:Application = Play.current
-  lazy val whitelist = Play.configuration.getStringSeq("whitelist") getOrElse Seq.empty
-
-  lazy val ggUrl = baseUrl("government-gateway")
-
-  lazy val enrolUrl = s"$ggUrl/enrol"
   
   lazy val mongoCacheUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.get-file-url")
-  lazy val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
 
   // The following values are used by the Fee Guidance Controller currently toggled off with feature-toggle.show-fees
   lazy val regFee = getConfigInt("amounts.registration")
@@ -85,35 +74,19 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val peopleFeeRate = getConfigInt("amounts.people")
   lazy val approvalCheckPeopleFeeRate = getConfigInt("amounts.approval-check-rate")
 
-  override def refreshProfileToggle = getConfBool("feature-toggle.refresh-profile", false)
-
-  override def frontendBaseUrl = {
-    val secure = getConfBool("amls-frontend.public.secure", defBool = false)
-    val scheme = if (secure) "https" else "http"
-    val host = getConfString("amls-frontend.public.host", "")
-
-    s"$scheme://$host"
-  }
-}
-
-class AppConfig @Inject()(environment: Environment, val runModeConfiguration: Configuration, baseConfig: Configuration)
-  extends ApplicationConfig with ServicesConfig {
-
-  override protected def mode: Mode = environment.mode
-
   def amlsUrl = baseUrl("amls")
 
   def subscriptionUrl = s"$amlsUrl/amls/subscription"
 
-  def enrolmentStoreToggle = getConfBool("feature-toggle.enrolment-store", defBool = false)
+  def enrolmentStoreToggle = servicesConfig.getConfBool("feature-toggle.enrolment-store", false)
 
-  def fxEnabledToggle = getConfBool("feature-toggle.fx-enabled", defBool = false)
+  def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
 
-  def authUrl = baseUrl("auth")
+  lazy val authUrl = baseUrl("auth")
 
   def enrolmentStoreUrl = baseUrl("tax-enrolments")
 
-  def enrolmentStubsEnabled: Boolean = getConfBool("enrolment-stubs.enabled", defBool = false)
+  def enrolmentStubsEnabled: Boolean = servicesConfig.getConfBool("enrolment-stubs.enabled", false)
 
   def enrolmentStubsUrl = baseUrl("enrolment-stubs")
 
@@ -127,17 +100,25 @@ class AppConfig @Inject()(environment: Environment, val runModeConfiguration: Co
 
   def enrolUrl = s"$ggUrl/enrol"
 
-  val mongoEncryptionEnabled = baseConfig.getBoolean("appCache.mongo.encryptionEnabled") getOrElse true
-  val mongoAppCacheEnabled = baseConfig.getBoolean("appCache.mongo.enabled") getOrElse false
-  val cacheExpiryInSeconds = baseConfig.getInt("appCache.expiryInSeconds") getOrElse 60
+  lazy val ggAuthUrl = baseUrl("government-gateway-authentication")
 
-  override def refreshProfileToggle: Boolean = getConfBool("feature-toggle.refresh-profile", false)
+  val mongoEncryptionEnabled = configuration.getOptional[Boolean]("appCache.mongo.encryptionEnabled").getOrElse(true)
+  val mongoAppCacheEnabled = configuration.getOptional[Boolean]("appCache.mongo.enabled").getOrElse(false)
+  val cacheExpiryInSeconds = configuration.getOptional[Int]("appCache.expiryInSeconds").getOrElse(60)
 
-  override def frontendBaseUrl = {
-    val secure = getConfBool("amls-frontend.public.secure", defBool = false)
+  def refreshProfileToggle: Boolean = configuration.getOptional[Boolean]("feature-toggle.refresh-profile").getOrElse(false)
+
+  def frontendBaseUrl = {
+    val secure = servicesConfig.getConfBool("amls-frontend.public.secure", false)
     val scheme = if (secure) "https" else "http"
-    val host = getConfString("amls-frontend.public.host", "")
+    val host = servicesConfig.getConfString("amls-frontend.public.host", "")
 
     s"$scheme://$host"
   }
+
+  val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
+
+  lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
+
+  lazy val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
 }

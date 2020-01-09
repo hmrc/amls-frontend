@@ -60,7 +60,7 @@ object BusinessStructure {
       case "04" => IncorporatedBody
       case "05" => UnincorporatedBody
       case _ =>
-        play.api.data.validation.ValidationError("error.invalid")
+        play.api.libs.json.JsonValidationError("error.invalid")
     }
   }
 

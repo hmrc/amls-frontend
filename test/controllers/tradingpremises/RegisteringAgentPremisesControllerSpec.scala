@@ -24,7 +24,7 @@ import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -34,12 +34,13 @@ import scala.concurrent.Future
 
 class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture  {
+  trait Fixture  {
     self => val request = addToken(authRequest)
     val controller = new RegisteringAgentPremisesController (
       mock[DataCacheConnector],
-      SuccessfulAuthAction,
-      messagesApi)
+      SuccessfulAuthAction, ds = commonDependencies,
+      messagesApi,
+      cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -183,7 +184,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
     "post is called" must {
 
       "on post invalid data show error" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody()
+        val newRequest = requestWithUrlEncodedBody("" -> "")
         val result = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)
 
@@ -197,7 +198,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           )
         )
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "agentPremises" -> "false"
         )
 
@@ -223,7 +224,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           )
         )
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "agentPremises" -> "false"
         )
 
@@ -248,7 +249,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           )
         )
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "agentPremises" -> "true"
         )
 
@@ -269,7 +270,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
       "respond with NOT_FOUND" when {
         "the given index is out of bounds" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentPremises" -> "true"
           )
           when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
@@ -286,7 +287,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
 
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "agentPremises" -> "false"
         )
         when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))

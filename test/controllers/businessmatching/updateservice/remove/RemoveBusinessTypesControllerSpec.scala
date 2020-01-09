@@ -39,7 +39,7 @@ import scala.concurrent.Future
 
 class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
@@ -49,11 +49,12 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
 
     val controller = new RemoveBusinessTypesController(
-      authAction = SuccessfulAuthAction,
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       removeBusinessTypeHelper = mockRemoveBusinessTypeHelper,
-      router = createRouter[RemoveBusinessTypeFlowModel]
+      router = createRouter[RemoveBusinessTypeFlowModel],
+      cc = mockMcc
     )
 
     when {
@@ -83,7 +84,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
     "post" must {
       "return a bad request when no data has been posted" in new Fixture {
 
-        val result = controller.post()(request.withFormUrlEncodedBody())
+        val result = controller.post()(requestWithUrlEncodedBody("" -> ""))
 
         status(result) mustBe BAD_REQUEST
       }
@@ -102,7 +103,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
           "businessActivities[]" -> "04"
         ))
 
@@ -126,7 +127,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
-        val result = await(controller.post()(request.withFormUrlEncodedBody(
+        val result = await(controller.post()(requestWithUrlEncodedBody(
           "businessActivities[]" -> "05"
         )))
 
@@ -146,7 +147,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
-        val result = await(controller.post()(request.withFormUrlEncodedBody(
+        val result = await(controller.post()(requestWithUrlEncodedBody(
           "businessActivities[]" -> "05"
         )))
 
@@ -166,7 +167,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
-        val result = await(controller.post()(request.withFormUrlEncodedBody(
+        val result = await(controller.post()(requestWithUrlEncodedBody(
           "businessActivities[]" -> "05"
         )))
 
@@ -186,7 +187,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
-        val result = await(controller.post()(request.withFormUrlEncodedBody(
+        val result = await(controller.post()(requestWithUrlEncodedBody(
           "businessActivities[]" -> "05"
         )))
 
@@ -218,7 +219,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
           TelephonePaymentService))),
           Some(RemoveBusinessTypeFlowModel.key))
 
-        val result = controller.post()(request.withFormUrlEncodedBody(
+        val result = controller.post()(requestWithUrlEncodedBody(
 
         "businessActivities[]" -> "01",
         "businessActivities[]" -> "03",

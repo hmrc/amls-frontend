@@ -18,8 +18,8 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.{AmlsConnector, DataCacheConnector}
-import controllers.actions.{FailedAuthAction, SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefNo}
+import connectors.AmlsConnector
+import controllers.actions.{SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefNo}
 import generators.AmlsReferenceNumberGenerator
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
@@ -27,21 +27,18 @@ import models.confirmation.Currency
 import models.notifications.ContactType._
 import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
 import models.registrationdetails.RegistrationDetails
-import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected, SubmissionReadyForReview}
+import models.status.{SubmissionDecisionRejected, SubmissionReadyForReview}
 import models.{Country, ReadStatusResponse}
 import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import play.api.Mode
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import services.{AuthEnrolmentsService, NotificationService, StatusService}
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
+import services.{AuthEnrolmentsService, NotificationService}
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -50,9 +47,9 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
   val dateTime = new DateTime(1479730062573L, DateTimeZone.UTC)
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
-    val request = authRequest
+    val request = addToken(authRequest)
 
     val registrationDate = LocalDateTime.now()
     val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false, safeId = Some("X123456789123"))
@@ -101,9 +98,11 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
       amlsNotificationService = mockNotificationService,
       amlsConnector = mockAmlsConnector,
-      dataCacheConnector = mockCacheConnector)
+      dataCacheConnector = mockCacheConnector,
+      cc = mockMcc)
 
     val controllerWithFailedAuthAction = new NotificationController(
       authEnrolmentsService = mockAuthEnrolmentsService,
@@ -112,7 +111,9 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       authAction = SuccessfulAuthActionNoAmlsRefNo,
       amlsNotificationService = mockNotificationService,
       amlsConnector = mockAmlsConnector,
-      dataCacheConnector = mockCacheConnector)
+      dataCacheConnector = mockCacheConnector,
+      ds = commonDependencies,
+      cc = mockMcc)
 
     val mockBusinessMatching = mock[BusinessMatching]
     val mockReviewDetails = mock[ReviewDetails]

@@ -17,7 +17,7 @@
 package models.businessactivities
 
 import cats.data.Validated.{Invalid, Valid}
-import play.api.data.validation.{ValidationError => VE}
+import play.api.libs.json.{JsonValidationError => VE}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Path, Rule, To, ValidationError, Write}
 import models.FormTypes.{basicPunctuationPattern, basicPunctuationRegex, notEmptyStrip, regexWithMsg}
@@ -75,7 +75,7 @@ object TransactionTypes {
           case "03" =>
             (__ \ "digitalSoftwareName").read[String].map (DigitalSoftware.apply  _) map identity[TransactionType]
           case _ =>
-            Reads(_ => JsError((__ \ "transactions") -> play.api.data.validation.ValidationError("error.invalid")))
+            Reads(_ => JsError((__ \ "transactions") -> play.api.libs.json.JsonValidationError("error.invalid")))
         }.foldLeft[Reads[Set[TransactionType]]](
           Reads[Set[TransactionType]](_ => JsSuccess(Set.empty))
         ){

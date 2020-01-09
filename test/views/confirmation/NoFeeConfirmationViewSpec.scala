@@ -18,13 +18,13 @@ package views.confirmation
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class NoFeeConfirmationViewSpec extends AmlsSpec with MustMatchers {
+class NoFeeConfirmationViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val businessName = "Test Business Ltd"
 

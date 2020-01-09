@@ -25,7 +25,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 
-class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite with DependencyMocks with BankDetailsModels {
+class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks with BankDetailsModels {
 
   val emptyBankDetails: Option[BankDetails] = None
 
@@ -34,12 +34,11 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
 
   val bankAccountPartialModel = BankDetails(None, None, Some(bankAccount))
 
-  val bankAccountNew = UKAccount("123456", "00-00-00")
+  val bankAccountNew = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
 
   val incompleteModel = BankDetails(Some(accountType), None)
 
   "BankDetails" must {
-
     "serialise" when {
       "given complete model" in {
         Json.toJson[BankDetails](completeModel) must be(completeJson)
@@ -86,8 +85,8 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
   "isComplete" must {
     "return true" when {
       "given complete model" in {
-        val bankAccount = UKAccount("123456", "00-00-00")
-        val bankDetails = BankDetails(Some(accountType), Some("name"), Some(bankAccount), hasAccepted = true)
+        val bankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "00-00-00")))
+        val bankDetails = BankDetails(Some(accountType), Some("name"), Some( bankAccount), hasAccepted = true)
         bankDetails.isComplete must be(true)
       }
 
@@ -111,9 +110,9 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
   }
 
   "getBankAccountDescription" must {
-    "return the correct uk account descriptions" when {
+    "return the correct uk account descriptions" in {
 
-      val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, Some(UKAccount("05108289", "523011")))
+      val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, Some(bankAccount))
       val bankDetailsBelongstoBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
       val bankDetailsBelongstoOtherBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToOtherBusiness))
       val bankDetailsNoBankAccountUsed = bankDetailsPersonal.copy(bankAccountType = Some(NoBankAccountUsed))
@@ -123,9 +122,9 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
       BankDetails.getBankAccountDescription(bankDetailsBelongstoOtherBusiness) must be(messages("bankdetails.accounttype.uk.lbl.03"))
       BankDetails.getBankAccountDescription(bankDetailsNoBankAccountUsed) must be(messages("bankdetails.accounttype.uk.lbl.04"))
    }
-  "return the correct non-uk account descriptions" when {
+  "return the correct non-uk account descriptions" in {
 
-    val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
+    val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, Some(BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))))
     val bankDetailsBelongstoBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
     val bankDetailsBelongstoOtherBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToOtherBusiness))
     val bankDetailsNoBankAccountUsed = bankDetailsPersonal.copy(bankAccountType = Some(NoBankAccountUsed))
@@ -136,7 +135,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
     BankDetails.getBankAccountDescription(bankDetailsNoBankAccountUsed) must be(messages("bankdetails.accounttype.nonuk.lbl.04"))
  }
 
-  "return the correct description wheere there are no account numbers present" when {
+  "return the correct description wheere there are no account numbers present" in {
 
     val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, None)
     val bankDetailsBelongstoBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
@@ -334,7 +333,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
     "bankAccount value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.bankAccount(bankAccount)
+          val res = completeModel.bankAccount(Some(bankAccount))
           res must be(completeModel)
           res.hasChanged must be(false)
         }
@@ -342,7 +341,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val res = completeModel.bankAccount(bankAccountNew)
+          val res = completeModel.bankAccount(Some(bankAccountNew))
           res.hasChanged must be(true)
           res.bankAccount must be(Some(bankAccountNew))
         }
@@ -364,7 +363,7 @@ trait BankDetailsModels {
     "hasAccepted" -> false
   )
 
-  val bankAccount = UKAccount("111111", "00-00-00")
+  val bankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("111111", "00-00-00")))
   val bankAccountJson = Json.obj(
     "bankAccount" -> Json.obj(
       "isUK" -> true,

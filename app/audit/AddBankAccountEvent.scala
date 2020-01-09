@@ -60,7 +60,7 @@ object AddBankAccountEvent {
     }
   }
 
-  implicit def convert(bankDetails: BankDetails): Option[BankAccountAuditDetail] = (bankDetails.bankAccount, bankDetails.accountName) match {
+  implicit def convert(bankDetails: BankDetails): Option[BankAccountAuditDetail] = bankDetails.bankAccount.flatMap  { ba => ((ba.account, bankDetails.accountName) match {
     case (Some(account: UKAccount), Some(name)) =>
         Some(BankAccountAuditDetail(name, bankDetails.bankAccountType, isUKBankAccount = true, account.sortCode.some, account.accountNumber.some, None))
 
@@ -71,7 +71,7 @@ object AddBankAccountEvent {
       Some(BankAccountAuditDetail(name, bankDetails.bankAccountType, isUKBankAccount = false, None, account.accountNumber.some, None))
 
     case _ => None
-  }
+  })}
 
   def apply(bankAccount: BankDetails)(implicit hc: HeaderCarrier, request: Request[_]) = DataEvent(
     auditSource = AuditHelper.appName,

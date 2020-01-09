@@ -17,7 +17,7 @@
 package models.responsiblepeople
 
 import models.Country
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -108,7 +108,7 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
 
     "fail to validate given an invalid value supplied that is not matching to any nationality" in {
 
-      Nationality.jsonReads.reads(Json.obj("nationality" -> "10")) must be(JsError(List((JsPath, List(play.api.data.validation.ValidationError("error.invalid"))))))
+      Nationality.jsonReads.reads(Json.obj("nationality" -> "10")) must be(JsError(List((JsPath, List(play.api.libs.json.JsonValidationError("error.invalid"))))))
 
     }
   }

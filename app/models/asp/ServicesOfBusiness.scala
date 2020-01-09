@@ -71,7 +71,7 @@ object Service {
       case FinancialOrTaxAdvice => "05"
   }
 
-  import play.api.data.validation.ValidationError
+  import play.api.libs.json.JsonValidationError
   implicit val jsonServiceReads: Reads[Service] =
     Reads {
       case JsString("01") => JsSuccess(Accountancy)
@@ -79,7 +79,7 @@ object Service {
       case JsString("03") => JsSuccess(BookKeeping)
       case JsString("04") => JsSuccess(Auditing)
       case JsString("05") => JsSuccess(FinancialOrTaxAdvice)
-      case _ => JsError((JsPath \ "services") -> ValidationError("error.invalid"))
+      case _ => JsError((JsPath \ "services") -> JsonValidationError("error.invalid"))
     }
 
   implicit val jsonServiceWrites = Writes[Service] {

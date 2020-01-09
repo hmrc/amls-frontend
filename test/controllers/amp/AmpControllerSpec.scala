@@ -17,7 +17,11 @@
 package controllers.amp
 
 import java.time.{LocalDate, LocalDateTime, ZoneOffset}
+
+import akka.stream.Materializer
+import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import models.amp.Amp
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -27,13 +31,15 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import services.amp.AmpCacheService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
-import org.mockito.Matchers._
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, CacheMocks}
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.scalatest.time.Seconds
+import play.api.mvc.DefaultActionBuilder
 import play.api.test.FakeRequest
 
 import scala.concurrent.Future
 
-class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class AmpControllerSpec extends AmlsSpec with CacheMocks {
 
   val dateVal = LocalDateTime.now
 
@@ -57,20 +63,23 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
     self =>
     val request         = addToken(authRequest)
     val ampCacheService = mock[AmpCacheService]
-    val controller      = app.injector.instanceOf[AmpController]
-    val mockCacheMap    = mock[CacheMap]
     val credId          = "someId"
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[AmpCacheService].to(ampCacheService))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .build()
+
+    val controller      = app.injector.instanceOf[AmpController]
   }
 
   "get returns 200" when {
     "no amp section in cache" in new Fixture {
       when(ampCacheService.get(any())(any())).thenReturn(Future.successful(Some(Json.obj())))
+
+
 
       val result = controller.get(credId)(request)
       status(result) must be(OK)
@@ -102,6 +111,25 @@ class AmpControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
       status(result) must be(OK)
       val document = Json.parse(contentAsString(result))
       document mustBe(Json.obj("_id" -> credId))
+    }
+  }
+
+  "accept" must {
+    "set accept flag to true and redirect to RegistrationProgressController" in new Fixture {
+
+      when(mockCacheConnector.fetch[Amp](any(), any())(any(), any()))
+        .thenReturn(Future.successful(Some(completeJson.as[Amp])))
+
+      when(mockCacheConnector.save[Amp](any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
+
+      val result = controller.accept.apply(FakeRequest())
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get().toString
+
+      verify(mockCacheConnector).save[Amp](any(), eqTo(Amp.key),
+        eqTo(completeJson.as[Amp].copy(hasAccepted = true)))(any(), any())
     }
   }
 }

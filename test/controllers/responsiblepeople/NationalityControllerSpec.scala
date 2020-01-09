@@ -26,28 +26,30 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import uk.gov.hmrc.domain.Nino
 import services.AutoCompleteService
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.AmlsSpec
 
 import scala.concurrent.Future
 
 class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture {
+    //self =>
+    val request = addToken(authRequest)
 
     val autoCompleteService = mock[AutoCompleteService]
 
     val controller = new NationalityController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
-      autoCompleteService = autoCompleteService
+      ds = commonDependencies,
+      autoCompleteService = autoCompleteService,
+      cc = mockMcc
     )
 
     when {
@@ -56,13 +58,13 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       NameValuePair("Country 1", "country:1"),
       NameValuePair("Country 2", "country:2")
     ))
+
+    val personName = Some(PersonName("firstname", None, "lastname"))
   }
 
   val emptyCache = CacheMap("", Map.empty)
 
   "NationalityController" must {
-
-    val personName = Some(PersonName("firstname", None, "lastname"))
 
     "load nationality page" in new Fixture {
 
@@ -136,7 +138,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "fail submission on error" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody()
+      val newRequest = requestWithUrlEncodedBody("" -> "")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
@@ -152,7 +154,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "submit with valid nationality data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "nationality" -> "01"
       )
 
@@ -171,7 +173,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "submit with valid nationality data (with other country)" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "nationality" -> "02",
         "otherCountry" -> "GB"
       )
@@ -191,7 +193,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "submit with valid data in edit mode" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "nationality" -> "02",
         "otherCountry" -> "GB"
       )
@@ -218,7 +220,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "load NotFound page on exception" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "nationality" -> "01"
       )
 

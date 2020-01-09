@@ -23,10 +23,10 @@ import org.jsoup.nodes.{Document, Element}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 
-class roles_within_businessSpec extends AmlsSpec with MustMatchers {
+class roles_within_businessSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
@@ -35,7 +35,7 @@ class roles_within_businessSpec extends AmlsSpec with MustMatchers {
     override lazy val html = view.body
     override implicit lazy val doc = Jsoup.parse(html)
 
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     def validateOtherSelection = {
       val (otherCheckbox, otherLabel) = checkboxAndLabel("positions-other")(doc)

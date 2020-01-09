@@ -20,43 +20,37 @@ import forms.EmptyForm
 import models.businessdetails._
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
-import utils.AmlsSpec
-import views.{Fixture, HtmlAssertions}
+import utils.AmlsSummaryViewSpec
+import views.Fixture
 
 import scala.collection.JavaConversions._
 
-class summarySpec extends AmlsSpec
-  with MustMatchers
-  with HtmlAssertions
-  with TableDrivenPropertyChecks {
-
-  trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
-  }
+class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   "summary view" must {
-    "have correct title" in new ViewFixture {
+    "have correct title" in new Fixture {
 
       def view = views.html.businessdetails.summary(EmptyForm, BusinessDetails(), true)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.businessdetails"))
     }
 
-    "have correct headings" in new ViewFixture {
+    "have correct headings" in new Fixture {
       def view = views.html.businessdetails.summary(EmptyForm, BusinessDetails(), true)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.businessdetails"))
     }
 
-    "does not show registered for mlr question when approved" in new ViewFixture {
+    "does not show registered for mlr question when approved" in new Fixture {
       def view = views.html.businessdetails.summary(EmptyForm, BusinessDetails(), false)
 
       html must not include Messages("businessdetails.registeredformlr.title")
     }
+
+    "include the provided data" in new Fixture {
 
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
@@ -70,8 +64,6 @@ class summarySpec extends AmlsSpec
       ("businessdetails.correspondenceaddress.title",
         checkElementTextIncludes(_, "your name", "business name","line1","line2","line3","line4","AB12CD"))
     )
-
-    "include the provided data" in new ViewFixture {
 
       def view = views.html.businessdetails.summary(
         EmptyForm,

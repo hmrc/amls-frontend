@@ -16,9 +16,10 @@
 
 package controllers.responsiblepeople
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import controllers.changeofficer.RoleInBusinessController
 import models.responsiblepeople.{KnownBy, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
@@ -34,16 +35,11 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
     val request = addToken(self.authRequest)
     val RecordId = 1
 
-    val mockAppConfig = mock[AppConfig]
-
-    val injector = new GuiceInjectorBuilder()
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[AppConfig].to(mockAppConfig))
-      .build()
-
-    lazy val controller = injector.instanceOf[KnownByController]
-
+    lazy val controller = new KnownByController(
+      mockCacheConnector,
+      SuccessfulAuthAction,
+      commonDependencies,
+      cc = mockMcc)
   }
 
   "The KnownByController" when {
@@ -101,7 +97,7 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
         "go to DateOfBirthController" when {
           "edit is false" in new TestFixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
+            val requestWithParams = requestWithUrlEncodedBody(
               "hasOtherNames" -> "true",
               "otherNames" -> "otherName"
             )
@@ -118,7 +114,7 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
         "go to DetailedAnswersController" when {
           "edit is true" in new TestFixture {
 
-            val requestWithParams = request.withFormUrlEncodedBody(
+            val requestWithParams = requestWithUrlEncodedBody(
               "hasOtherNames" -> "true",
               "otherNames" -> "otherName"
             )
@@ -135,7 +131,7 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
         "go to DetailedAnswersController" when {
           "edit is true and does not have other names" in new TestFixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
           "hasOtherNames" -> "false"
           )
 
@@ -153,7 +149,7 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
       "form is invalid" must {
         "return BAD_REQUEST" in new TestFixture {
 
-          val NameMissingInRequest = request.withFormUrlEncodedBody(
+          val NameMissingInRequest = requestWithUrlEncodedBody(
             "hasOtherNames" -> "true"
           )
 
@@ -170,7 +166,7 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
       "model cannot be found with given index" must {
         "return NOT_FOUND" in new TestFixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "hasOtherNames" -> "true",
             "otherNames" -> "otherName"
           )

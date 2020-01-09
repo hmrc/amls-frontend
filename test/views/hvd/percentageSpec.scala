@@ -20,17 +20,17 @@ import forms.{InvalidForm, ValidForm, Form2}
 import models.hvd.PercentageOfCashPaymentOver15000
 import models.hvd.PercentageOfCashPaymentOver15000.{Third, Second}
 import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
+import  utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class percentageSpec extends AmlsSpec with MustMatchers  {
+class percentageSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "percentage view" must {

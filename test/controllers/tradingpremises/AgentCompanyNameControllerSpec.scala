@@ -24,23 +24,20 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 
 import scala.concurrent.Future
 
-class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with MockitoSugar with ScalaFutures {
+class AgentCompanyNameControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
-    val controller = new AgentCompanyNameController(mock[DataCacheConnector], SuccessfulAuthAction, messagesApi)
+    val controller = new AgentCompanyNameController(mock[DataCacheConnector], SuccessfulAuthAction, ds = commonDependencies, messagesApi, cc = mockMcc)
   }
 
   "AgentCompanyDetailsController" when {
@@ -87,7 +84,7 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
     "post is called" must {
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentCompanyName" -> "text"
           )
 
@@ -104,7 +101,7 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
       "respond with SEE_OTHER" when {
         "edit is false and given valid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentCompanyName" -> "text"
           )
 
@@ -124,7 +121,7 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
 
         "edit is true and given valid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentCompanyName" -> "text"
           )
 
@@ -147,7 +144,7 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentCompanyName" -> "11111111111" * 40
           )
 
@@ -167,7 +164,7 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
         }
 
         "given missing mandatory field" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "agentCompanyName" -> " "
           )
 
@@ -188,7 +185,7 @@ class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with M
 
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody("agentCompanyName" -> "text")
+        val newRequest = requestWithUrlEncodedBody("agentCompanyName" -> "text")
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))

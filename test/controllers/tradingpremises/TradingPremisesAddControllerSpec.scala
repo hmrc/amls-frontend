@@ -33,10 +33,10 @@ import scala.concurrent.Future
 
 class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with TradingPremisesGenerator{
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self => val request = addToken(authRequest)
 
-    val controller = new TradingPremisesAddController (mock[DataCacheConnector], SuccessfulAuthAction)
+    val controller = new TradingPremisesAddController (mock[DataCacheConnector], SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "TradingPremisesAddController" should {

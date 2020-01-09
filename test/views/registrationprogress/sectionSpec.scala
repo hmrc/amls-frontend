@@ -17,18 +17,18 @@
 package views
 
 import models.registrationprogress.{Completed, NotStarted, Started}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.mvc.Call
 import play.twirl.api.HtmlFormat
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 
-class SectionSpec extends AmlsSpec with MockitoSugar {
+class SectionSpec extends AmlsViewSpec with MockitoSugar {
 
   val sectionPath = "-status a"
   val statusPath = "div span.section-status"
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
   }
 

@@ -18,18 +18,20 @@ package controllers.businessdetails
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessdetails._
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessdetails._
 
 import scala.concurrent.Future
 
-class ContactingYouController @Inject () (
-                                           val dataCache: DataCacheConnector,
-                                           val authAction: AuthAction
-                                         ) extends DefaultBaseController {
+class ContactingYouController @Inject () (val dataCache: DataCacheConnector,
+                                          val authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
+                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def updateData(contactingYou: Option[ContactingYou], data: ContactingYouEmail): ContactingYou = {
     contactingYou.fold[ContactingYou](ContactingYou(email = Some(data.email)))(x => x.copy(email = Some(data.email)))

@@ -19,19 +19,23 @@ package controllers.renewal
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.renewal.{Renewal, WhichCurrencies}
+import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.which_currencies
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class WhichCurrenciesController @Inject()(val authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
                                           renewalService: RenewalService,
-                                          dataCacheConnector: DataCacheConnector) extends DefaultBaseController {
+                                          dataCacheConnector: DataCacheConnector,
+                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

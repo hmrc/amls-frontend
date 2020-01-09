@@ -18,21 +18,22 @@ package controllers.businessdetails
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails._
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership, UnincorporatedBody}
 import models.businessmatching.{BusinessMatching, BusinessType}
-import play.api.mvc.Result
+import play.api.mvc.{MessagesControllerComponents, Result}
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessdetails.activity_start_date
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class ActivityStartDateController @Inject () (
-                                             val dataCache: DataCacheConnector,
-                                             val authAction: AuthAction
-                                             ) extends DefaultBaseController {
+class ActivityStartDateController @Inject () (val dataCache: DataCacheConnector,
+                                              val authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
+                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

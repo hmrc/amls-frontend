@@ -20,14 +20,14 @@ import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
 import connectors.{BusinessMatchingConnector, DataCacheConnector}
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessdetails.{BusinessDetails, CorporationTaxRegistered, CorporationTaxRegisteredYes}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
-import play.api.mvc.{Request, Result}
+import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthAction}
+import utils.AuthAction
 import utils.ControllerHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -36,11 +36,11 @@ import scala.concurrent.Future
 // This controller no longer has a vew or POST method. The UTR is acquired in BM and should be copied
 // to Business Details only once pre-submission. API5 then populates this field from ETMP. The user
 // should have no requirement to update it.
-class CorporationTaxRegisteredController @Inject () (
-                                                      val dataCacheConnector: DataCacheConnector,
-                                                      val businessMatchingConnector: BusinessMatchingConnector,
-                                                      val authAction: AuthAction
-                                                    ) extends DefaultBaseController {
+class CorporationTaxRegisteredController @Inject () (val dataCacheConnector: DataCacheConnector,
+                                                     val businessMatchingConnector: BusinessMatchingConnector,
+                                                     val authAction: AuthAction,
+                                                     val ds: CommonPlayDependencies,
+                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   val failedResult = InternalServerError("Failed to update the business corporation tax number")
 

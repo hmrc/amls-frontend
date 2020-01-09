@@ -21,18 +21,18 @@ import models.supervision._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new AnotherBodyController(mockCacheConnector, authAction = SuccessfulAuthAction)
+    val controller = new AnotherBodyController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   "AnotherBodyControllerController" must {
@@ -85,7 +85,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "on post with valid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+      val newRequest = requestWithUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 
 
 
@@ -101,7 +101,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "on post with valid data for AnotherBodyYes" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+      val newRequest = requestWithUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 
       mockCacheFetch[Supervision](None)
 
@@ -120,7 +120,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
         val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-        val newRequest = request.withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+        val newRequest = requestWithUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 
         mockCacheFetch[Supervision](None)
 
@@ -138,7 +138,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
         val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-        val newRequest = request.withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+        val newRequest = requestWithUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 
         mockCacheFetch[Supervision](None)
 
@@ -155,7 +155,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody()
+      val newRequest = requestWithUrlEncodedBody("" -> "")
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -166,7 +166,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "on post with valid data in edit mode for AnotherBodyNo" in new Fixture with SupervisionValues {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "anotherBody" -> "false"
       )
 
@@ -183,7 +183,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "on post with valid data for AnotherBodyNo" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "anotherBody" -> "false"
       )
 

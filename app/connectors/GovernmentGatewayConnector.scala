@@ -17,7 +17,7 @@
 package connectors
 
 import audit.EnrolEvent
-import config.{AppConfig, WSHttp}
+import config.ApplicationConfig
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import javax.inject.Inject
 import models.governmentgateway.EnrolmentRequest
@@ -26,12 +26,13 @@ import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.Audit
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.AuditHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class GovernmentGatewayConnector @Inject()(val http: WSHttp,
-                                           val appConfig: AppConfig,
+class GovernmentGatewayConnector @Inject()(val http: HttpClient,
+                                           val appConfig: ApplicationConfig,
                                            val auditConnector: AuditConnector) {
 
   val audit: Audit = new Audit(AuditHelper.appName, auditConnector)

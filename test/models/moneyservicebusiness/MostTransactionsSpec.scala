@@ -35,7 +35,7 @@ class MostTransactionsSpec extends PlaySpec {
       val model: MostTransactions =
         MostTransactions(Seq(Country("United Kingdom", "GB")))
 
-      Json.fromJson[MostTransactions](Json.toJson(model)) mustEqual JsSuccess(model)
+      Json.fromJson[MostTransactions](Json.toJson(model)) mustEqual JsSuccess(model, JsPath \ "mostTransactionsCountries")
     }
 
     "roundtrip through forms" in {

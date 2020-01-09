@@ -22,13 +22,13 @@ import models.Country
 import models.moneyservicebusiness.BranchesOrAgentsWhichCountries
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.{AmlsSpec, AutoCompleteServiceMocks}
+import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 
-class branches_or_agents_with_countriesSpec extends AmlsSpec with MustMatchers {
+class branches_or_agents_with_countriesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
 
   "branches_or_agents view" must {

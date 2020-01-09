@@ -25,13 +25,14 @@ import models.responsiblepeople.ResponsiblePerson
 import models.status._
 import models.{FeeResponse, ReadStatusResponse}
 import org.joda.time.LocalDate
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName, ControllerHelper}
 import views.html.status._
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class StatusController @Inject()(val landingService: LandingService,
@@ -44,7 +45,9 @@ class StatusController @Inject()(val landingService: LandingService,
                                  val dataCache: DataCacheConnector,
                                  val authenticator: AuthenticatorConnector,
                                  authAction: AuthAction,
-                                 val feeResponseService: FeeResponseService) extends DefaultBaseController {
+                                 val ds: CommonPlayDependencies,
+                                 val feeResponseService: FeeResponseService,
+                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(fromDuplicateSubmission: Boolean = false) = authAction.async {
       implicit request =>

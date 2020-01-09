@@ -16,14 +16,14 @@
 
 package services.cache
 
-import config.AppConfig
+import config.ApplicationConfig
 import connectors.cache.Conversions
 import javax.inject.Inject
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
-import play.modules.reactivemongo.MongoDbConnection
+import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
@@ -48,7 +48,7 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: DateTime =
     * If the data to be inserted is null then remove the entry by key
     */
   def upsert[T](key: String, data: JsValue, hasValue: Boolean)(implicit ev: Writes[T]) = {
-    val updated = if(hasValue) {
+    val updated = if (hasValue) {
       this.data + (key -> data)
     }
     else {
@@ -75,7 +75,7 @@ object Cache {
   * Implements getEncryptedEntry[T], which will decrypt the entry on retrieval
   * This type itself is a type of Cache.
   *
-  * @param cache The cache to wrap.
+  * @param cache  The cache to wrap.
   * @param crypto The cryptography instance to use to decrypt values
   */
 class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(cache.id, cache.data) with CacheOps {
@@ -86,23 +86,26 @@ class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(
 /**
   * An injectible factory for creating new MongoCacheClients
   */
-class MongoCacheClientFactory @Inject()(config: AppConfig, applicationCrypto: ApplicationCrypto) {
-  class DbConnection extends MongoDbConnection
-  def createClient: MongoCacheClient = new MongoCacheClient(config, new DbConnection().db, applicationCrypto)
+class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCrypto: ApplicationCrypto, component: ReactiveMongoComponent) {
+  def createClient: MongoCacheClient = new MongoCacheClient(config, component.mongoConnector.db, applicationCrypto)
 }
 
 /**
   * Implements a client which utilises the GOV UK cache repository to store cached data in Mongo.
+  *
   * @param appConfig The application configuration
   */
-class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCrypto: ApplicationCrypto)
+class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applicationCrypto: ApplicationCrypto)
   extends ReactiveRepository[Cache, BSONObjectID]("app-cache", db, Cache.format)
     with Conversions
     with CacheOps {
 
   private val logPrefix = "[MongoCacheClient]"
+
   private def debug(msg: String) = Logger.debug(s"$logPrefix $msg")
+
   private def error(msg: String, e: Throwable) = Logger.error(s"$logPrefix $msg", e)
+
   private def error(msg: String) = Logger.error(s"$logPrefix $msg")
 
   implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto
@@ -124,26 +127,26 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
 
     fetchAll(Some(credId)) flatMap { maybeNewCache =>
 
-        val cache: Cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
+      val cache: Cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
 
-        val updatedCache: Cache = cache.copy(
-          id = credId,
-          data = cache.data + (key -> jsonData),
-          lastUpdated = DateTime.now(DateTimeZone.UTC)
-        )
+      val updatedCache: Cache = cache.copy(
+        id = credId,
+        data = cache.data + (key -> jsonData),
+        lastUpdated = DateTime.now(DateTimeZone.UTC)
+      )
 
-        val document = Json.toJson(updatedCache)
-        val modifier = BSONDocument("$set" -> document)
+      val document = Json.toJson(updatedCache)
+      val modifier = BSONDocument("$set" -> document)
 
-        collection.update(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
-      }
+      collection.update(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
     }
+  }
 
 
   /**
     * Removes the item with the specified key from the cache
     */
-  def removeByKey[T](credId: String,  key: String)(implicit writes: Writes[T]): Future[Cache] = {
+  def removeByKey[T](credId: String, key: String)(implicit writes: Writes[T]): Future[Cache] = {
 
     fetchAll(Some(credId)) flatMap { maybeNewCache =>
       val cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
@@ -179,7 +182,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
     */
   def find[T](credId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] =
     fetchAll(credId) map {
-      case Some(cache) => if(appConfig.mongoEncryptionEnabled) {
+      case Some(cache) => if (appConfig.mongoEncryptionEnabled) {
         decryptValue[T](cache, key)(new JsonDecryptor[T](), reads)
       } else {
         getValue[T](cache, key)
@@ -197,7 +200,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
 
   def fetchAll(credId: Option[String]): Future[Option[Cache]] = {
     credId match {
-      case Some(x) =>  collection.find(key(x)).one[Cache] map {
+      case Some(x) => collection.find(key(x)).one[Cache] map {
         case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
         case c => c
       }
@@ -236,7 +239,8 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
 
     collection.update(bsonIdQuery(cache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
   }
-  def saveAll(cache: Cache, credId :String): Future[Boolean] = {
+
+  def saveAll(cache: Cache, credId: String): Future[Boolean] = {
     // Rebuild the cache and decrypt each key if necessary
     val rebuiltCache = Cache(credId, cache.data.foldLeft(Map.empty[String, JsValue]) { (acc, value) =>
       val plainText = tryDecrypt(Crypted(value._2.toString))
@@ -271,6 +275,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
     * Generates a BSON document query for an id
     */
   private def bsonIdQuery(id: String) = BSONDocument("_id" -> id)
+
   private def key(id: String) = bsonIdQuery(id)
 
   /**
@@ -293,7 +298,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCry
     case Failure(e) => throw e
   }
 
-  private def decryptOrGetValue[T](cache: Cache, key: String)(implicit reads: Reads[T] ) =
+  private def decryptOrGetValue[T](cache: Cache, key: String)(implicit reads: Reads[T]) =
     if (appConfig.mongoEncryptionEnabled) {
       decryptValue[T](cache, key)(new JsonDecryptor[T](), reads)
     } else {

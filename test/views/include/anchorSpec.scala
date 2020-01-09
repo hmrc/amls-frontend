@@ -20,13 +20,13 @@ import org.jsoup.Jsoup
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.include.forms2._
 
-class anchorSpec extends AmlsSpec with MustMatchers {
+class anchorSpec extends AmlsViewSpec with MustMatchers {
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
   }
   "button" must {
 

@@ -17,16 +17,21 @@
 package controllers.actions
 
 import play.api.mvc.Results.Redirect
-import play.api.mvc.{Call, Request, Result}
+import play.api.mvc.{AnyContent, BodyParser, Call, Request, Result}
+import play.api.test.Helpers
 import uk.gov.hmrc.auth.core._
 import utils.{AuthAction, AuthorisedRequest}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object SuccessfulAuthAction extends AuthAction {
 
   val affinityGroup = AffinityGroup.Organisation
   val enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
+
+  override def parser: BodyParser[AnyContent] = Helpers.stubControllerComponents().parsers.anyContent
+
+  override protected def executionContext: ExecutionContext = Helpers.stubControllerComponents().executionContext
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
     Future.successful(Right(AuthorisedRequest(request, Some("amlsRefNumber"), "internalId", affinityGroup, enrolments, ("accType", "id"), Some("GROUP_ID"), Some(User))))
@@ -37,6 +42,10 @@ object SuccessfulAuthActionNoAmlsRefNo extends AuthAction {
   val affinityGroup = AffinityGroup.Organisation
   val enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
 
+  override def parser: BodyParser[AnyContent] = Helpers.stubControllerComponents().parsers.anyContent
+
+  override protected def executionContext: ExecutionContext = Helpers.stubControllerComponents().executionContext
+
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
     Future.successful(Right(AuthorisedRequest(request, None, "internalId", affinityGroup, enrolments, ("accType", "id"), Some("GROUP_ID"), Some(User))))
 }
@@ -46,6 +55,10 @@ object SuccessfulAuthActionNoUserRole extends AuthAction {
   val affinityGroup = AffinityGroup.Organisation
   val enrolments = Enrolments(Set(Enrolment("HMRC-MLR-ORG")))
 
+  override def parser: BodyParser[AnyContent] = Helpers.stubControllerComponents().parsers.anyContent
+
+  override protected def executionContext: ExecutionContext = Helpers.stubControllerComponents().executionContext
+
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
     Future.successful(Right(AuthorisedRequest(request, Some("amlsRefNumber"), "internalId", affinityGroup, enrolments, ("accType", "id"), Some("GROUP_ID"), Some(Assistant))))
 }
@@ -53,6 +66,10 @@ object SuccessfulAuthActionNoUserRole extends AuthAction {
 object FailedAuthAction extends AuthAction {
 
   val signoutUrl = "/test/signout"
+
+  override def parser: BodyParser[AnyContent] = Helpers.stubControllerComponents().parsers.anyContent
+
+  override protected def executionContext: ExecutionContext = Helpers.stubControllerComponents().executionContext
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
     Future.successful(Left(Redirect(Call("GET", signoutUrl))))

@@ -18,12 +18,12 @@ package views
 
 import play.api.i18n.Messages
 import play.twirl.api.Html
-import utils.AmlsSpec
+import utils.AmlsViewSpec
 
-class DuplicateSubmissionViewSpec extends AmlsSpec {
+class DuplicateSubmissionViewSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val getHelpView = Html("<p>Get help here</p>")
 

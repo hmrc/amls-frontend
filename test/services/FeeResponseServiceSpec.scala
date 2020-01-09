@@ -32,7 +32,7 @@ import scala.concurrent.Future
 
 class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
 
     val mockFeeConnector = mock[FeeConnector]

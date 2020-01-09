@@ -16,7 +16,7 @@
 
 package models.businessmatching
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -85,7 +85,7 @@ class CompanyRegistrationNumberSpec extends PlaySpec with MockitoSugar {
         val companyRegistrationNumber = CompanyRegistrationNumber("12345678")
         val jsonCompanyRegistrationNumber = Json.obj("companyRegistrationNumber" -> "12345678")
         val fromJson = Json.fromJson[CompanyRegistrationNumber](jsonCompanyRegistrationNumber)
-        fromJson must be(JsSuccess(companyRegistrationNumber, JsPath \ "companyRegistrationNumber"))
+        fromJson must be(JsSuccess(companyRegistrationNumber, JsPath))
       }
 
       "validate model with valid numeric registration number" in {

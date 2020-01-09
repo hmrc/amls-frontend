@@ -56,7 +56,9 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
     val additionalAddressController = new AdditionalAddressController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
-      autoCompleteService = autoCompleteService
+      autoCompleteService = autoCompleteService,
+      ds = commonDependencies,
+      cc = mockMcc
     )
 
     when {
@@ -155,7 +157,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
     "post is called" must {
       "respond with BAD_REQUEST" when {
         "isUK field is not supplied" in new Fixture {
-          val line1MissingRequest = request.withFormUrlEncodedBody()
+          val line1MissingRequest = requestWithUrlEncodedBody()
 
           val responsiblePeople = ResponsiblePerson()
 
@@ -174,7 +176,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
 
       "go to AdditionalAddressUK" when {
         "isUK is true"  in new Fixture {
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true")
 
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -197,7 +199,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
       "go to AdditionalAddressNonUK page" when {
         "isUk is false" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
           "isUK" -> "false")
 
           val responsiblePeople = ResponsiblePerson()
@@ -217,7 +219,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
       "redirect to AdditionalAddressNonUK and wipe old address" when {
         "changed the answer from yes to no" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false")
 
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -246,7 +248,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
       "redirect to AdditionalAddressUkController and wipe old address" when {
         "changed the answer from no to yes" in new Fixture {
 
-          val requestWithParams = request.withFormUrlEncodedBody(
+          val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true")
 
           val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("", ""))

@@ -21,20 +21,21 @@ import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
     val controller = new BankAccountNameController(
-      SuccessfulAuthAction,
+      SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
-      mockStatusService
+      mockStatusService,
+      mockMcc
     )
   }
 
@@ -59,7 +60,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
         "with a name" in new Fixture {
 
-          val ukBankAccount = UKAccount("12345678", "000000")
+          val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12345678", "000000")))
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, Some("my bank account"), Some(ukBankAccount)))), Some(BankDetails.key))
 
@@ -117,7 +118,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with SEE_OTHER" when {
         "given valid data in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "accountName" -> "test"
            )
 
@@ -133,7 +134,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "accountName" -> "test"
           )
 
@@ -152,7 +153,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "accountName" -> "test"
           )
 
@@ -169,7 +170,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "accountName" -> ""
           )
 

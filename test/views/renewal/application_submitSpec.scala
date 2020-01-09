@@ -21,13 +21,13 @@ import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.Strings.TextHelpers
-import utils.{DateHelper, AmlsSpec}
+import utils.{DateHelper, AmlsViewSpec}
 import views.Fixture
 
-class application_submitSpec extends AmlsSpec with MustMatchers{
+class application_submitSpec extends AmlsViewSpec with MustMatchers{
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+    implicit val requestWithToken = addTokenForView()
 
     val renewalDate = LocalDate.now().plusDays(15)
 

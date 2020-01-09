@@ -24,7 +24,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
@@ -33,14 +33,13 @@ import scala.concurrent.Future
 
 class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture {
     self =>
     val request = addToken(authRequest)
 
     val controller = new ContactDetailsController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction
-    )
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -96,7 +95,8 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
     "post is called" when {
       "given a valid form" when {
           "go to CurrentAddressController" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
+
+            val newRequest = requestWithUrlEncodedBody(
               "phoneNumber" -> "07000000000",
               "emailAddress" -> "test@test.com"
             )
@@ -111,10 +111,11 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.CurrentAddressController.get(2).url))
           }
+
         "there is no responsible person for the index" must {
           "respond with NOT_FOUND" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "phoneNumber" -> "07000000000",
               "emailAddress" -> "test@test.com"
             )
@@ -132,7 +133,7 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
         "in edit mode" must {
           "go to DetailedAnswersController" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
+            val newRequest = requestWithUrlEncodedBody(
               "phoneNumber" -> "07000000000",
               "emailAddress" -> "test@test.com"
             )
@@ -153,7 +154,7 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
       "given an invalid form" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
+          val newRequest = requestWithUrlEncodedBody(
             "phoneNumber" -> "<070>00000000",
             "emailAddress" -> "test@test.com"
           )

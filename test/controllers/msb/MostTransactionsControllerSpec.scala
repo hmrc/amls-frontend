@@ -26,7 +26,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -35,18 +35,19 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     val controller = new MostTransactionsController(
       SuccessfulAuthAction,
+      ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
       mockServiceFlow,
-      mockAutoComplete
-    )
+      mockAutoComplete,
+      cc = mockMcc)
 
 
 
@@ -125,7 +126,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "return a Bad request with errors on invalid submission" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody("mostTransactionsCountries[0]" -> "adsadsdsdsaads")
+      val newRequest = requestWithUrlEncodedBody("mostTransactionsCountries[0]" -> "adsadsdsdsaads")
 
       val result = controller.post()(newRequest)
       val document = Jsoup.parse(contentAsString(result))
@@ -158,7 +159,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
           ), hasChanged = true
         )
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "mostTransactionsCountries[]" -> "GB"
         )
 
@@ -185,7 +186,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
           ), hasChanged = true
         )
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "mostTransactionsCountries[]" -> "GB"
         )
 
@@ -217,7 +218,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
           ), hasChanged = true
         )
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "mostTransactionsCountries[]" -> "GB"
         )
 
@@ -252,7 +253,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
           ), hasChanged = true
         )
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "mostTransactionsCountries[]" -> "GB"
         )
 
@@ -278,7 +279,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
           ), hasChanged = true
         )
 
-        val newRequest = request.withFormUrlEncodedBody(
+        val newRequest = requestWithUrlEncodedBody(
           "mostTransactionsCountries[]" -> "GB"
         )
 
@@ -312,7 +313,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         ), hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "mostTransactionsCountries[]" -> "GB"
       )
 
@@ -350,7 +351,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
           )
         )
       )
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "mostTransactionsCountries[]" -> "GB"
       )
 
@@ -392,7 +393,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         ), hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "mostTransactionsCountries[]" -> "GB"
       )
 
@@ -418,7 +419,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         ), hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody(
+      val newRequest = requestWithUrlEncodedBody(
         "mostTransactionsCountries[0]" -> "GB"
       )
 
@@ -466,7 +467,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
   "throw exception when Msb services in Business Matching returns none" in new Fixture {
 
-    val newRequest = request.withFormUrlEncodedBody(
+    val newRequest = requestWithUrlEncodedBody(
       "mostTransactionsCountries[]" -> "GB"
     )
 

@@ -16,8 +16,9 @@
 
 package controllers.applicationstatus
 
-import controllers.DefaultBaseController
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, FeeHelper}
 import views.html.applicationstatus.how_to_pay
 
@@ -25,7 +26,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class HowToPayController @Inject()(authAction: AuthAction,
-                                   val feeHelper: FeeHelper) extends DefaultBaseController {
+                                   val ds: CommonPlayDependencies,
+                                   val cc: MessagesControllerComponents,
+                                   val feeHelper: FeeHelper) extends AmlsBaseController(ds, cc) {
 
   val prefix = "[HowToPayController]"
 
