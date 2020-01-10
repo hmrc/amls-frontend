@@ -17,10 +17,12 @@
 package models.tradingpremises
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
+import org.scalacheck.Gen
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
-class AgentRemovalReasonSpec extends PlaySpec {
+class AgentRemovalReasonSpec extends PlaySpec with GeneratorDrivenPropertyChecks {
 
   import models.tradingpremises.RemovalReasonConstants._
 
@@ -140,6 +142,19 @@ class AgentRemovalReasonSpec extends PlaySpec {
 
       }
 
+    }
+
+    "correctly parse form reason to schema reason and vice versa" in {
+      val formReason = Gen.oneOf(Form.MAJOR_COMPLIANCE_ISSUES,
+        Form.MINOR_COMPLIANCE_ISSUES,
+        Form.LACK_OF_PROFIT,
+        Form.CEASED_TRADING,
+        Form.REQUESTED_BY_AGENT,
+        Form.OTHER)
+
+      forAll(formReason) { reason =>
+        Rules.fromSchemaReason(Rules.toSchemaReason(reason)) mustBe(reason)
+      }
     }
 
   }
