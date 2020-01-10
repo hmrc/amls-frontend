@@ -104,6 +104,52 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
       }
 
+      "display the 'When did this person start their role in the business?' page when no business matching available" in new Fixture {
+        val mockCacheMap = mock[CacheMap]
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+        val businessMatching = BusinessMatching(Some(reviewDtls))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+          .thenReturn(Some(Seq(hasNominatedOfficer)))
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(None)
+
+        val result = controller.get(RecordId)(request)
+
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+
+        document.title must include(pageTitle)
+        document.body().html() must include(pageHeader)
+
+      }
+
+      "display the 'When did this person start their role in the business?' page when no start date" in new Fixture {
+        val mockCacheMap = mock[CacheMap]
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+        val businessMatching = BusinessMatching(Some(reviewDtls))
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+          .thenReturn(Some(Seq(hasNominatedOfficer.copy(positions = Some(hasNominatedOfficer.positions.get.copy(startDate = None))))))
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(None)
+
+        val result = controller.get(RecordId)(request)
+
+        status(result) must be(OK)
+
+        val document = Jsoup.parse(contentAsString(result))
+
+        document.title must include(pageTitle)
+        document.body().html() must include(pageHeader)
+
+      }
+
       "prepopulate form with a single saved data" in new Fixture {
 
         val positions = Positions(Set(BeneficialOwner), startDate)
