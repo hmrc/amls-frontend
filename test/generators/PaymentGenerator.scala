@@ -54,7 +54,7 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
     amlsRefNo,
     safeId,
     ref,
-    desc,
+    Some(desc),
     amountInPence,
     paymentStatus,
     now
