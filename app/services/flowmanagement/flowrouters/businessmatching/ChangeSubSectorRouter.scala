@@ -24,7 +24,7 @@ import services.flowmanagement.pagerouters.businessmatching.subsectors.{MsbSubSe
 import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
-// $COVERAGE_OFF$
+// $COVERAGE-OFF$
 // Individual page routers are tested, plus acceptance tests are
 // testing the flow
 class ChangeSubSectorRouter @Inject()(
@@ -40,4 +40,4 @@ class ChangeSubSectorRouter @Inject()(
     case NoPSRPageId => noPsrRouter.getRoute(credId, model, edit)
   }
 }
-// $COVERAGE_ON$
+// $COVERAGE-ON$
