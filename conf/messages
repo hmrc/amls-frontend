@@ -771,7 +771,7 @@ status.renewalsubmitted.description = Renewal application submitted
 status.renewalsubmitted.description2 = You have 28 days to pay the fees from the date you submitted.
 status.renewalsubmitted.description3 = HMRC will review your application after we have received payment.
 status.renewalsubmitted.description4 = We’ll email you when we have made a decision.
-status.renewalsubmitted.description5 = You’re still registered with HMRC under the Money Laundering Regulations. You can trade and carry out business activities while your application is reviewed.
+status.renewalsubmitted.description5 = You’re still registered with HMRC under the Money Laundering Regulations.
 
 status.renewalincomplete.description = Renewal incomplete
 status.renewalincomplete.description2 = You have started the renewal application but you have not finished it.
@@ -1016,7 +1016,7 @@ confirmation.payment.bacs.header = You have submitted
 confirmation.payment.renewal.lede = You have submitted your renewal and paid
 confirmation.payment.renewal.title = You have submitted your renewal and paid
 
-confirmation.payment.info.transitional.renewal.hmrc_review = HM Revenue and Customs (HMRC) will review your application when we receive your payment. It can take more than 45 days to review your application or request further information. You can continue to trade whilst your renewal is being reviewed.
+confirmation.payment.info.transitional.renewal.hmrc_review = HM Revenue and Customs (HMRC) will review your application when we receive your payment. It can take more than 45 days to review your application or request further information.
 confirmation.payment.info.transitional.renewal.hmrc_review2 = You can sign into this service at any time to see the status of your application. We’ll send you an email when the decision has been made. You’ll need to sign in to see the decision.
 
 confirmation.payment.failed.title = Something went wrong with your payment
