@@ -45,10 +45,16 @@ case class EstateAgentBusiness(
     this.copy(penalisedUnderEstateAgentsAct = Some(p), hasChanged = hasChanged || !this.penalisedUnderEstateAgentsAct.contains(p),
       hasAccepted = hasAccepted && this.penalisedUnderEstateAgentsAct.contains(p))
 
+  def isCompleteRedress: Boolean = {
+    redressScheme.contains(ThePropertyOmbudsman) ||
+      redressScheme.contains(PropertyRedressScheme) ||
+      redressScheme.contains(RedressSchemedNo)
+  }
+
   def isComplete: Boolean =
     this match {
       case EstateAgentBusiness(Some(x), _, Some(_), Some(_), _, accepted) if !x.services.contains(Residential) => accepted
-      case EstateAgentBusiness(Some(_), Some(_), Some(_), Some(_), _, accepted) => accepted
+      case EstateAgentBusiness(Some(_), Some(_), Some(_), Some(_), _, accepted) if isCompleteRedress => accepted
       case _ => false
     }
 }
