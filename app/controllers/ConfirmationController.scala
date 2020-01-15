@@ -51,7 +51,9 @@ class ConfirmationController @Inject()(authAction: AuthAction,
 
   def get() = authAction.async {
       implicit request =>
+        // $COVERAGE-OFF$
         Logger.debug(s"[$prefix] - begin get()...")
+        // $COVERAGE-ON$
         for {
           _ <- authenticator.refreshProfile
           status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
@@ -105,14 +107,20 @@ class ConfirmationController @Inject()(authAction: AuthAction,
                                amlsRegistrationNumber: Option[String], accountTypeId: (String, String), credId: String, groupIdentifier: Option[String])
                               (implicit hc: HeaderCarrier, request: Request[AnyContent], statusService: StatusService): Future[Result] = {
 
+    // $COVERAGE-OFF$
     Logger.debug(s"[$prefix][resultFromStatus] - Begin get fee response...)")
+    // $COVERAGE-ON$
 
     OptionT.liftF(feeHelper.retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier, prefix)) flatMap {
       case Some(fees) if fees.paymentReference.isDefined && fees.toPay(status, submissionRequestStatus) > 0 =>
+        // $COVERAGE-OFF$
         Logger.debug(s"[$prefix][resultFromStatus] - Fee found)")
+        // $COVERAGE-ON$
         lazy val breakdownRows = confirmationService.getBreakdownRows(credId, status, fees)
 
+        // $COVERAGE-OFF$
         Logger.debug(s"[$prefix][resultFromStatus] - fees: $fees")
+        // $COVERAGE-ON$
 
         status match {
           case SubmissionReadyForReview | SubmissionDecisionApproved if fees.responseType equals AmendOrVariationResponseType =>
@@ -126,7 +134,9 @@ class ConfirmationController @Inject()(authAction: AuthAction,
         }
 
       case _ =>
+        // $COVERAGE-OFF$
         Logger.debug(s"[$prefix][resultFromStatus] - No fee found)")
+        // $COVERAGE-ON$
         for {
           name <- BusinessName.getBusinessNameFromAmls(amlsRegistrationNumber, accountTypeId, credId)
       } yield {

@@ -159,8 +159,6 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
         ).subject must be("notifications.fail.title")
       }
 
-
-
       "default" in {
         notificationRow.subject must be("notifications.fail.title")
       }
@@ -214,4 +212,15 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
     }
   }
 
+  "IDType" must {
+    "read json successfully" in {
+
+      IDType.read.reads(Json.parse("""{"$oid":"someId"}""")) must be(JsSuccess(IDType("someId"), JsPath \ "$oid"))
+    }
+
+    "write json successfully" in {
+
+      IDType.write.writes(IDType("someId")) must be(Json.parse("""{"$oid":"someId"}"""))
+    }
+  }
 }

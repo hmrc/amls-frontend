@@ -213,4 +213,42 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       }
     }
   }
+
+  "getDetailedStatus" must {
+    "return post-submission status if mlrRegNumber is defined" in {
+
+      val result = service.getDetailedStatus(Some("regNo"), ("", ""), "credId")
+
+      whenReady(result) {
+        _._1 mustBe SubmissionReadyForReview
+      }
+    }
+
+    "return pre-submission status if mlrRegNumber is not defined" in {
+
+      val result = service.getDetailedStatus(None, ("", ""), "credId")
+
+      whenReady(result) {
+        _._1 mustBe SubmissionReady
+      }
+    }
+  }
+
+  "getReadStatus" must {
+    "return etmpReadStatus if mlrRegNumber is defined" in {
+
+      val result = service.getReadStatus(Some("regNo"), ("", ""))
+
+      whenReady(result) {
+        _.isInstanceOf[ReadStatusResponse]
+      }
+    }
+
+    "throw an exception with message if mlrRegNumber is not defined" in {
+      val ex = intercept[RuntimeException] {
+        service.getReadStatus(None, ("", ""))
+      }
+      assert(ex.getMessage == "ETMP returned no read status")
+    }
+  }
 }

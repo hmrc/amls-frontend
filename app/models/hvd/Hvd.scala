@@ -80,7 +80,9 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
   def dateOfChange(v: DateOfChange): Hvd = this.copy(dateOfChange = Some(v))
 
   def isComplete: Boolean = {
+    // $COVERAGE-OFF$
     Logger.debug(s"[Hvd][isComplete] $this")
+    // $COVERAGE-ON$
     this match {
         case Hvd(Some(cp), Some(pr), _, Some(_), Some(_), Some(true), Some(_), Some(_), _, _, true)
           if pr.items.forall(item => item != Alcohol && item != Tobacco) && cp.isCashPaymentsComplete => true

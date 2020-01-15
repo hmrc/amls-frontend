@@ -51,7 +51,9 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
   }
 
   private def getETMPStatus(response: ReadStatusResponse) = {
+    // $COVERAGE-OFF$
     Logger.debug("StatusService:getETMPStatus:formBundleStatus:" + response.formBundleStatus)
+    // $COVERAGE-ON$
     response.formBundleStatus match {
       case `Pending` => SubmissionReadyForReview
       case `Approved` => getApprovedStatus(response)
@@ -68,7 +70,9 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
   def getSafeIdFromReadStatus(mlrRegNumber: String, accountTypeId: (String, String))(implicit hc: HeaderCarrier,  ec: ExecutionContext) = {
     amlsConnector.status(mlrRegNumber, accountTypeId) map {
       response =>
+        // $COVERAGE-OFF$
         Logger.debug("StatusService:etmpStatusInformation:response:" + response)
+        // $COVERAGE-ON$
         Option(response.safeId.getOrElse(""))
     }
   }
@@ -79,7 +83,9 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     amlsConnector.status(mlrRegNumber, accountTypeId) map {
       response =>
         val status = getETMPStatus(response)
+        // $COVERAGE-OFF$
         Logger.debug("StatusService:etmpStatusInformation:status:" + status)
+        // $COVERAGE-ON$
         (status, Some(response))
     }
   }
@@ -88,10 +94,14 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
     amlsRegistrationNumber match {
       case Some(mlrRegNumber) =>
+        // $COVERAGE-OFF$
         Logger.debug("StatusService:getDetailedStatus:mlrRegNumber:" + mlrRegNumber)
+        // $COVERAGE-ON$
         etmpStatusInformation(mlrRegNumber, accountTypeId)(hc, ec)
       case None =>
+        // $COVERAGE-OFF$
         Logger.debug("StatusService:getDetailedStatus: No mlrRegNumber")
+        // $COVERAGE-ON$
         notYetSubmitted(cacheId)(hc, ec) map { status =>
           (status, None)
         }
@@ -102,10 +112,14 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmissionStatus] = {
     amlsRegistrationNo match {
         case Some(mlrRegNumber) =>
+          // $COVERAGE-OFF$
           Logger.debug("StatusService:getStatus:mlrRegNumber:" + mlrRegNumber)
+          // $COVERAGE-ON$
           etmpStatus(mlrRegNumber, accountTypeId)(hc, ec)
         case None =>
+          // $COVERAGE-OFF$
           Logger.debug("StatusService:getStatus: No mlrRegNumber")
+          // $COVERAGE-ON$
           notYetSubmitted(credId)(hc, ec)
       }
   }
@@ -118,7 +132,9 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ReadStatusResponse] = {
     amlsRegistrationNumber match {
       case Some(mlrRegNumber) =>
+        // $COVERAGE-OFF$
         Logger.debug("StatusService:getReadStatus:mlrRegNumber:" + mlrRegNumber)
+        // $COVERAGE-ON$
         etmpReadStatus(mlrRegNumber, accountTypeId)(hc, ec)
       case _ => throw new RuntimeException("ETMP returned no read status")
     }
@@ -137,10 +153,14 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     sectionsProvider.sections(cacheId) map {
       sections =>
         if (isComplete(sections)) {
+          // $COVERAGE-OFF$
           Logger.debug("StatusService:notYetSubmitted: SubmissionReady")
+          // $COVERAGE-ON$
           SubmissionReady
         } else {
+          // $COVERAGE-OFF$
           Logger.debug("StatusService:notYetSubmitted: NotCompleted")
+          // $COVERAGE-ON$
           NotCompleted
         }
     }
@@ -160,7 +180,9 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ReadStatusResponse] = {
     {
       val status = amlsConnector.status(amlsRefNumber, accountTypeId)
+      // $COVERAGE-OFF$
       Logger.debug("StatusService:etmpReadStatus:status:" + status)
+      // $COVERAGE-ON$
       status
     }
   }
