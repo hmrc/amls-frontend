@@ -88,7 +88,7 @@ class AmlsConnector @Inject()(val http: HttpClient,
     val prefix = "[AmlsConnector][view]"
     // $COVERAGE-OFF$
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
-    // $COVERAGE-OFF$
+    // $COVERAGE-ON$
 
     http.GET[ViewResponse](getUrl) map {
       response =>
