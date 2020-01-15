@@ -22,7 +22,6 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.responsiblepeople.ResponsiblePerson
-import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
@@ -33,11 +32,11 @@ import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class CurrentAddressDateOfChangeController @Inject ()(val dataCacheConnector: DataCacheConnector,
-                                                      authAction: AuthAction,
-                                                      val ds: CommonPlayDependencies,
-                                                      statusService: StatusService,
-                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                     authAction: AuthAction,
+                                                     val ds: CommonPlayDependencies,
+                                                     statusService: StatusService,
+                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean) = authAction {
     implicit request =>
@@ -78,42 +77,15 @@ class CurrentAddressDateOfChangeController @Inject ()(val dataCacheConnector: Da
               ))
             }
             case ValidForm(_, dateOfChange) => {
-//              val timeAtCurrentO = responsiblePeople flatMap { rp =>
-//                for {
-//                  addHist <- rp.addressHistory
-//                  rpCurr <- addHist.currentAddress
-//                  timeAtAddress <- rpCurr.timeAtAddress
-//                } yield timeAtAddress
-//              }
-
               doUpdate(request.credId, index, dateOfChange).map { cache: CacheMap =>
                 if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
                   Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
                 } else {
                   Redirect(routes.TimeAtCurrentAddressController.get(index, edit))
                 }
-
-
-
-
-
-
-//                timeAtCurrentO match {
-//                  case Some(_) if !cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)
-//                  => Redirect(routes.TimeAtCurrentAddressController.get(index, edit))
-//                  case _
-//                  => Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
-//                }
               }
-
-
-
-
-
-
             }
           }
-
         }
         case _ => Future.successful(NotFound(notFoundView))
       }
