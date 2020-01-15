@@ -18,6 +18,7 @@ package controllers.declaration
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import models.registrationprogress.{Completed, Section, Started}
 import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
@@ -27,8 +28,9 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.{ProgressService, StatusService}
+import services.{ProgressService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils._
@@ -44,6 +46,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
     val dataCacheConnector = mock[DataCacheConnector]
     val statusService = mockStatusService
     val progressService = mock[ProgressService]
+    val mockSectionsProvider = mock[SectionsProvider]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -51,6 +54,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[ProgressService].to(progressService))
+      .overrides(bind[SectionsProvider].to(mockSectionsProvider))
       .build()
 
     val controller = app.injector.instanceOf[RegisterPartnersController]
@@ -81,18 +85,50 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
   "The RegisterPartnersController" when {
     "get is called" must {
-      "respond with OK" in new Fixture {
+      "with completed sections" must {
+        val completedSections = Seq(
+          Section("s1", Completed, true, mock[Call]),
+          Section("s2", Completed, true, mock[Call])
+        )
+        "respond with OK" in new Fixture {
+          when {
+            mockSectionsProvider.sections(any[String])(any(), any())
+          }.thenReturn(Future.successful(completedSections))
 
-        when {
-          dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(),any())
-        } thenReturn Future.successful(Some(Seq(ResponsiblePerson())))
+          when {
+            dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any())
+          } thenReturn Future.successful(Some(Seq(ResponsiblePerson())))
 
-        mockApplicationStatus(SubmissionDecisionApproved)
+          mockApplicationStatus(SubmissionDecisionApproved)
 
-        val result = controller.get()(request)
+          val result = controller.get()(request)
 
-        status(result) mustBe OK
+          status(result) mustBe OK
 
+        }
+      }
+
+      "with incomplete sections" must {
+        val incompleteSections = Seq(
+          Section("s1", Completed, true, mock[Call]),
+          Section("s2", Started, true, mock[Call])
+        )
+
+        "redirect to the RegistrationProgressController" in new Fixture {
+          when {
+            mockSectionsProvider.sections(any[String])(any(), any())
+          }.thenReturn(Future.successful(incompleteSections))
+
+          when {
+            dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any())
+          } thenReturn Future.successful(Some(Seq(ResponsiblePerson())))
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          val result = controller.get()(request)
+
+          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+        }
       }
     }
 

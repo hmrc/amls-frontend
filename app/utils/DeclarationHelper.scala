@@ -18,10 +18,11 @@ package utils
 
 import cats.data.OptionT
 import controllers.declaration
+import models.registrationprogress.{Completed, Section}
 import models.responsiblepeople.{Partner, ResponsiblePerson}
 import models.status._
 import org.joda.time.LocalDate
-import services.{RenewalService, StatusService}
+import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -119,4 +120,18 @@ object DeclarationHelper {
       case _ => Future.successful(false)
     }
   }
+
+  def sectionsComplete(cacheId: String, sectionsProvider: SectionsProvider)
+                      (implicit hc: HeaderCarrier, ec: ExecutionContext) = {
+
+    sectionsProvider.sections(cacheId) map {
+      sections =>
+        isSectionComplete(sections)
+    }
+  }
+
+  private def isSectionComplete(seq: Seq[Section]): Boolean =
+    seq forall {
+      _.status == Completed
+    }
 }

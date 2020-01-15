@@ -166,7 +166,6 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
-
   private def etmpStatus(amlsRefNumber: String, accountTypeId: (String, String))
                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmissionStatus] = {
     {

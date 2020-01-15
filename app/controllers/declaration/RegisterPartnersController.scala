@@ -27,9 +27,10 @@ import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{Partner, Positions, ResponsiblePerson}
 import models.status.{RenewalSubmitted, _}
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
-import services.{ProgressService, StatusService}
+import services.{ProgressService, SectionsProvider, StatusService}
 import utils.DeclarationHelper._
-import utils.AuthAction
+import utils.{AuthAction, DeclarationHelper}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.declaration.register_partners
 
@@ -41,22 +42,27 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
                                            val dataCacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
                                            implicit val progressService: ProgressService,
-                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                           val cc: MessagesControllerComponents,
+                                           val sectionsProvider: SectionsProvider) extends AmlsBaseController(ds, cc) {
+
   def get() = authAction.async {
     implicit request => {
-
-      val result = for {
-        subtitle <- OptionT.liftF(statusSubtitle(request.amlsRefNumber, request.accountTypeId, request.credId))
-        responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key))
-      } yield {
-        Ok(views.html.declaration.register_partners(
-          subtitle,
-          EmptyForm,
-          nonPartners(responsiblePeople),
-          currentPartnersNames(responsiblePeople)
-        ))
+      DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
+        case true =>
+          val result = for {
+          subtitle <- OptionT.liftF(statusSubtitle(request.amlsRefNumber, request.accountTypeId, request.credId))
+          responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key))
+        } yield {
+          Ok(views.html.declaration.register_partners(
+            subtitle,
+            EmptyForm,
+            nonPartners(responsiblePeople),
+            currentPartnersNames(responsiblePeople)
+          ))
+        }
+          result getOrElse InternalServerError("failure getting status")
+        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }
-      result getOrElse InternalServerError("failure getting status")
     }
   }
 

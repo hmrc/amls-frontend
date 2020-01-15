@@ -22,11 +22,11 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.declaration.AddPerson
 import models.status.{ReadyForRenewal, SubmissionReadyForReview}
 import play.api.mvc.{MessagesControllerComponents, Result}
-import services.StatusService
+import services.{SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+import utils.{AuthAction, DeclarationHelper}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import play.api.libs
 
@@ -34,27 +34,31 @@ class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnect
                                         val statusService: StatusService,
                                         authAction: AuthAction,
                                         val ds: CommonPlayDependencies,
-                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                        val cc: MessagesControllerComponents,
+                                        val sectionsProvider: SectionsProvider) extends AmlsBaseController(ds, cc) {
 
   lazy val defaultView = declarationView("declaration.declaration.title", "submit.registration", isAmendment = false)
 
   def get() = authAction.async {
     implicit request => {
-      dataCacheConnector.fetch[AddPerson](request.credId, AddPerson.key) flatMap {
-        case Some(addPerson) => {
-          val name = s"${addPerson.firstName} ${addPerson.middleName getOrElse ""} ${addPerson.lastName}"
-          for{
-            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-          } yield status match {
-            case ReadyForRenewal(_) => Ok(
-              views.html.declaration.declare("declaration.declaration.amendment.title", "submit.renewal.application", name, false))
-            case SubmissionReadyForReview => Ok(
-              views.html.declaration.declare("declaration.declaration.amendment.title", "submit.amendment.application", name, true))
-            case _ => Ok(
-              views.html.declaration.declare("declaration.declaration.amendment.title", "submit.registration", name, false))
+      DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
+        case true => dataCacheConnector.fetch[AddPerson](request.credId, AddPerson.key) flatMap {
+          case Some(addPerson) => {
+            val name = s"${addPerson.firstName} ${addPerson.middleName getOrElse ""} ${addPerson.lastName}"
+            for{
+              status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+            } yield status match {
+              case ReadyForRenewal(_) => Ok(
+                views.html.declaration.declare("declaration.declaration.amendment.title", "submit.renewal.application", name, false))
+              case SubmissionReadyForReview => Ok(
+                views.html.declaration.declare("declaration.declaration.amendment.title", "submit.amendment.application", name, true))
+              case _ => Ok(
+                views.html.declaration.declare("declaration.declaration.amendment.title", "submit.registration", name, false))
+            }
           }
+          case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
         }
-        case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
+        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }
     }
   }
@@ -63,11 +67,14 @@ class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnect
 
   private def declarationView(title: String, subtitle: String, isAmendment: Boolean) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[AddPerson](request.credId, AddPerson.key) flatMap {
-        case Some(addPerson) =>
-          val name = s"${addPerson.firstName} ${addPerson.middleName getOrElse ""} ${addPerson.lastName}"
-          Future.successful(Ok(views.html.declaration.declare(title, subtitle, name, isAmendment)))
-        case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
+      DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
+        case true =>   dataCacheConnector.fetch[AddPerson](request.credId, AddPerson.key) flatMap {
+          case Some(addPerson) =>
+            val name = s"${addPerson.firstName} ${addPerson.middleName getOrElse ""} ${addPerson.lastName}"
+            Future.successful(Ok(views.html.declaration.declare(title, subtitle, name, isAmendment)))
+          case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
+        }
+        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }
   }
 

@@ -35,8 +35,9 @@ import org.scalatest.mockito.MockitoSugar
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{RenewalService, StatusService}
+import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
+
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -51,7 +52,8 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
       amlsConnector = mock[AmlsConnector],
       statusService = mock[StatusService],
       renewalService = mock[RenewalService],
-      cc = mockMcc
+      cc = mockMcc,
+      sectionsProvider = mock[SectionsProvider]
     )
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,
