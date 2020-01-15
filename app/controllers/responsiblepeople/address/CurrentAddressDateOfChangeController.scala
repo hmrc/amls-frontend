@@ -27,6 +27,7 @@ import org.joda.time.LocalDate
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.StatusService
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -77,21 +78,39 @@ class CurrentAddressDateOfChangeController @Inject ()(val dataCacheConnector: Da
               ))
             }
             case ValidForm(_, dateOfChange) => {
-              val timeAtCurrentO = responsiblePeople flatMap { rp =>
-                for {
-                  addHist <- rp.addressHistory
-                  rpCurr <- addHist.currentAddress
-                  timeAtAddress <- rpCurr.timeAtAddress
-                } yield timeAtAddress
+//              val timeAtCurrentO = responsiblePeople flatMap { rp =>
+//                for {
+//                  addHist <- rp.addressHistory
+//                  rpCurr <- addHist.currentAddress
+//                  timeAtAddress <- rpCurr.timeAtAddress
+//                } yield timeAtAddress
+//              }
+
+              doUpdate(request.credId, index, dateOfChange).map { cache: CacheMap =>
+                if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
+                  Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
+                } else {
+                  Redirect(routes.TimeAtCurrentAddressController.get(index, edit))
+                }
+
+
+
+
+
+
+//                timeAtCurrentO match {
+//                  case Some(_) if !cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)
+//                  => Redirect(routes.TimeAtCurrentAddressController.get(index, edit))
+//                  case _
+//                  => Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
+//                }
               }
 
-              doUpdate(request.credId, index, dateOfChange).map { _ =>
-                timeAtCurrentO match {
-                  case (Some(ZeroToFiveMonths) | Some(SixToElevenMonths)) if !edit =>
-                    Redirect(routes.TimeAtCurrentAddressController.get(index, edit))
-                  case Some(_) => Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
-                }
-              }
+
+
+
+
+
             }
           }
 
