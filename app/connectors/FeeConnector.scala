@@ -39,10 +39,14 @@ class FeeConnector @Inject()(
 
     val getUrl = s"$feePaymentUrl/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[FeeConnector]"
+    // $COVERAGE-OFF$
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
+    // $COVERAGE-ON$
     http.GET[FeeResponse](getUrl) map {
       response =>
+        // $COVERAGE-OFF$
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        // $COVERAGE-ON$
         response
     }
   }

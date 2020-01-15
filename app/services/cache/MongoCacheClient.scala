@@ -102,11 +102,13 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
 
   private val logPrefix = "[MongoCacheClient]"
 
+  // $COVERAGE-OFF$
   private def debug(msg: String) = Logger.debug(s"$logPrefix $msg")
 
   private def error(msg: String, e: Throwable) = Logger.error(s"$logPrefix $msg", e)
 
   private def error(msg: String) = Logger.error(s"$logPrefix $msg")
+  // $COVERAGE-ON$
 
   implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto
 

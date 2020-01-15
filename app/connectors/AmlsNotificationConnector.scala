@@ -40,10 +40,14 @@ class AmlsNotificationConnector @Inject()(val http: HttpClient,
 
     val getUrl = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[AmlsNotificationConnector][fetchAllByAmlsRegNo]"
+    // $COVERAGE-OFF$
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
+    // $COVERAGE-ON$
     http.GET[Seq[NotificationRow]](getUrl) map {
       response =>
+        // $COVERAGE-OFF$
         Logger.debug(s"$prefix - Response Body: $response")
+        // $COVERAGE-ON$
         response
     }
   }
@@ -55,10 +59,14 @@ class AmlsNotificationConnector @Inject()(val http: HttpClient,
 
     val getUrl = s"$baseUrl/$accountType/$accountId/safeId/$safeId"
     val prefix = "[AmlsNotificationConnector][fetchAllBySafeId]"
+    // $COVERAGE-OFF$
     Logger.debug(s"$prefix - Request : $safeId")
+    // $COVERAGE-ON$
     http.GET[Seq[NotificationRow]](getUrl) map {
       response =>
+        // $COVERAGE-OFF$
         Logger.debug(s"$prefix - Response Body: $response")
+        // $COVERAGE-ON$
         response
     }
   }

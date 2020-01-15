@@ -97,7 +97,9 @@ class LandingController @Inject()(val landingService: LandingService,
       case Some(mlrNumber) => landingService.cacheMap(credId) flatMap {
         //enrolment exists
         case Some(c) =>
+          // $COVERAGE-OFF$
           Logger.debug("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
+          // $COVERAGE-ON$
           lazy val fixEmpties = for {
             c1 <- fixEmptyRecords[TradingPremises](credId, c, TradingPremises.key)
             c2 <- fixEmptyRecords[ResponsiblePerson](credId, c1, ResponsiblePerson.key)
@@ -106,25 +108,33 @@ class LandingController @Inject()(val landingService: LandingService,
           //there is data in S4l
           fixEmpties flatMap { cacheMap =>
             if (dataHasChanged(cacheMap)) {
+              // $COVERAGE-OFF$
               Logger.debug("Data has changed in getWithAmendments()")
+              // $COVERAGE-ON$
               cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
                 case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
               } getOrElse landingService.setAltCorrespondenceAddress(mlrNumber, Some(cacheMap), accountTypeId, credId) flatMap { _=>
                 preFlightChecksAndRedirect(amlsRegistrationNumber, accountTypeId, credId)
               }
             } else {
+              // $COVERAGE-OFF$
               Logger.debug("Data has not changed route in getWithAmendments()")
+              // $COVERAGE-ON$
               refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
             }
           }
         case _ => {
+          // $COVERAGE-OFF$
           Logger.debug("Data with amlsRegistration number route in getWithAmendments()" + amlsRegistrationNumber)
+          // $COVERAGE-ON$
           refreshAndRedirect(mlrNumber, None, credId, accountTypeId)
         }
       }
 
       case _ => {
+        // $COVERAGE-OFF$
         Logger.debug("No Enrolement exists getWithAmendments()")
+        // $COVERAGE-ON$
         getWithoutAmendments(amlsRegistrationNumber, credId, accountTypeId)
       } //no enrolment exists
     }
@@ -134,11 +144,15 @@ class LandingController @Inject()(val landingService: LandingService,
                                 (implicit headerCarrier: HeaderCarrier): Future[Result] = {
     maybeCacheMap match {
       case Some(c) if c.getEntry[DataImport](DataImport.key).isDefined =>
+        // $COVERAGE-OFF$
         Logger.debug("[AMLSLandingController][refreshAndRedirect]: dataImport is defined")
+        // $COVERAGE-ON$
         Future.successful(Redirect(controllers.routes.StatusController.get()))
 
       case _ =>
+        // $COVERAGE-OFF$
         Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: calling refreshCache with ${amlsRegistrationNumber}")
+        // $COVERAGE-ON$
         landingService.refreshCache(amlsRegistrationNumber, credId, accountTypeId) flatMap {
           _ => {
             preFlightChecksAndRedirect(Option(amlsRegistrationNumber), accountTypeId, credId)
@@ -169,7 +183,9 @@ class LandingController @Inject()(val landingService: LandingService,
   def getWithoutAmendments(amlsRegistrationNumber: Option[String], credId: String, accountTypeId: (String, String))
                           (implicit request: Request[_]) = {
 
+    // $COVERAGE-OFF$
     Logger.debug("getWithoutAmendments:AMLSReference:" + amlsRegistrationNumber.getOrElse("Amls registration number not available"))
+    // $COVERAGE-ON$
 
     landingService.cacheMap(credId) flatMap {
       case Some(cache) =>
@@ -179,7 +195,9 @@ class LandingController @Inject()(val landingService: LandingService,
           reviewDetails <- landingService.reviewDetails
         } yield (reviewDetails, amlsRegistrationNumber) match {
           case (Some(rd), None) =>
+            // $COVERAGE-OFF$
             Logger.debug("LandingController:getWithoutAmendments: " + rd)
+            // $COVERAGE-ON$
             landingService.updateReviewDetails(rd, credId) map { _ => {
               auditConnector.sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
 
@@ -190,10 +208,14 @@ class LandingController @Inject()(val landingService: LandingService,
             }
             }
           case (None, None) =>
+            // $COVERAGE-OFF$
             Logger.debug("LandingController:getWithoutAmendments - (None, None)")
+            // $COVERAGE-ON$
             Future.successful(Redirect(Call("GET", appConfig.businessCustomerUrl)))
           case (_, Some(amlsRef)) =>
+            // $COVERAGE-OFF$
             Logger.debug("LandingController:getWithoutAmendments: " + amlsRef)
+            // $COVERAGE-ON$
             Future.successful(Redirect(controllers.routes.StatusController.get()))
         }
       }.flatMap(identity)
@@ -204,34 +226,48 @@ class LandingController @Inject()(val landingService: LandingService,
                                     (implicit headerCarrier: HeaderCarrier): Future[Result] = {
 
     val deleteAndRedirect = () => cacheConnector.remove(cacheId) map { _ =>
+      // $COVERAGE-OFF$
       Logger.debug(s"[AMLSLandingController][preApplicationComplete]: removed cache and redirect to landingController.get")
+      // $COVERAGE-ON$
       Redirect(controllers.routes.LandingController.get())
     }
 
     cache.getEntry[BusinessMatching](BusinessMatching.key) map { bm =>
+      // $COVERAGE-OFF$
       Logger.debug(s"[AMLSLandingController][preApplicationComplete]: found BusinessMatching key")
+      // $COVERAGE-ON$
       (bm.isComplete, cache.getEntry[BusinessDetails](BusinessDetails.key)) match {
         case (true, Some(abt)) =>
           landingService.setAltCorrespondenceAddress(abt, cacheId) flatMap { _ =>
+            // $COVERAGE-OFF$
             Logger.debug(s"[AMLSLandingController][preApplicationComplete]: landingService.setAltCorrespondenceAddress returned")
+            // $COVERAGE-ON$
             //below to be called logic to decide if the Login Events Page should be displayed or not (second place below)
             val redirectToEventPage: Future[Boolean] = hasIncompleteRedressScheme(amlsRegistrationNumber, accountTypeId, cacheId)
             redirectToEventPage.map {
               case true =>
+                // $COVERAGE-OFF$
                 Logger.debug(s"[AMLSLandingController][preApplicationComplete]: redirecting to LoginEvent")
+                // $COVERAGE-ON$
                 Redirect(controllers.routes.LoginEventController.get())
               case _ =>
+                // $COVERAGE-OFF$
                 Logger.debug(s"[AMLSLandingController][preApplicationComplete]: has complete RPs - redirecting to status")
+                // $COVERAGE-ON$
                 Redirect(controllers.routes.StatusController.get())
             }
           }
 
         case (true, _) =>
+          // $COVERAGE-OFF$
           Logger.debug(s"[AMLSLandingController][preApplicationComplete]: bm.isComplete is true but no cache Entry for BusinessDetails - redirecting to status")
+          // $COVERAGE-ON$
           Future.successful(Redirect(controllers.routes.StatusController.get()))
 
         case (false, _) =>
+          // $COVERAGE-OFF$
           Logger.debug(s"[AMLSLandingController][preApplicationComplete]: bm.isComplete is false")
+          // $COVERAGE-ON$
           deleteAndRedirect()
       }
     } getOrElse deleteAndRedirect()
@@ -240,24 +276,34 @@ class LandingController @Inject()(val landingService: LandingService,
   private def hasIncompleteRedressScheme(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
                                             (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
 
+    // $COVERAGE-OFF$
     Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: calling statusService.getDetailedStatus")
+    // $COVERAGE-ON$
     statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId).flatMap {
       case (SubmissionDecisionRejected |
             SubmissionDecisionRevoked |
             DeRegistered |
             SubmissionDecisionExpired |
             SubmissionWithdrawn, _) =>
+        // $COVERAGE-OFF$
         Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: status is negative, returning false")
+        // $COVERAGE-ON$
         Future.successful(false)
       case _ =>
+        // $COVERAGE-OFF$
         Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: status is positive, will call the landingService.cachMap")
+        // $COVERAGE-ON$
         landingService.cacheMap(cacheId).map {
           cache =>
+            // $COVERAGE-OFF$
             Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: checking cacheMap for incomplete redress scheme")
+            // $COVERAGE-ON$
             val hasInvalidRedressScheme: Option[Boolean] = for {
               eab <- cache.map(_.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
             } yield ControllerHelper.hasInvalidRedressScheme(eab)
+            // $COVERAGE-OFF$
             Logger.debug(s"[AMLSLandingController][hasIncompleteRedressScheme]: eab.isRedressInvalid = ${hasInvalidRedressScheme.contains(true)}")
+            // $COVERAGE-ON$
             hasInvalidRedressScheme.contains(true)
         }
     }

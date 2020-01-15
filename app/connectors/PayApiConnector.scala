@@ -36,13 +36,17 @@ class PayApiConnector @Inject()(
                                  val auditConnector: DefaultAuditConnector,
                                  val applicationConfig: ApplicationConfig) extends HttpResponseHelper  {
 
+  // $COVERAGE-OFF$
   private val logDebug = (msg: String) => Logger.debug(s"[PayApiConnector] $msg")
   private val logError = (msg: String) => Logger.error(s"[PayApiConnector] $msg")
+  // $COVERAGE-ON$
 
   def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
 
     val bodyParser = JsonParsed[CreatePaymentResponse]
+    // $COVERAGE-OFF$
     logDebug(s"Creating payment: ${Json.toJson(request)}")
+    // $COVERAGE-ON$
     http.POST[CreatePaymentRequest, HttpResponse](s"${applicationConfig.payBaseUrl}/amls/journey/start", request) map {
       case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) =>
         auditConnector.sendExtendedEvent(CreatePaymentEvent(request, body))
@@ -50,7 +54,9 @@ class PayApiConnector @Inject()(
 
       case response: HttpResponse =>
         auditConnector.sendExtendedEvent(CreatePaymentFailureEvent(request.reference, response.status, response.body, request))
+        // $COVERAGE-OFF$
         logError(s"${request.reference}, status: ${response.status}: Failed to create payment using pay-api, reverting to old payments page")
+        // $COVERAGE-ON$
         None
     }
   }

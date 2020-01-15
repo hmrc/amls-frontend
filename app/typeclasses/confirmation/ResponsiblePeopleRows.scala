@@ -44,7 +44,9 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
                                                          activities: Set[BusinessActivity]
                                                         ): Seq[BreakdownRow] = {
 
+    // $COVERAGE-OFF$
     Logger.debug(s"[createBreakdownRowForAmendVariationRenewalResponse] - value: ${value}")
+    // $COVERAGE-ON$
 
     val notPassedFP = value.addedResponsiblePeopleFitAndProper
     val notPassedApprovalCheck = value.addedResponsiblePeopleApprovalCheck
@@ -76,7 +78,9 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
                                                activities: Set[BusinessActivity]
                                              ) = {
 
+    // $COVERAGE-OFF$
     Logger.debug(s"[createBreakdownRowForSubmissionResponse] - value: ${value}")
+    // $COVERAGE-ON$
 
     val fitAndProperCount = countNonDeletedPeopleWhoHaventPassedFitAndProper(people.getOrElse(Seq.empty))
     val approvalCheckCount = countNonDeletedPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))

@@ -198,7 +198,9 @@ object BusinessActivities {
   implicit val writes: Writes[BusinessActivities] = Writes[BusinessActivities] {
     model =>
       if(!model.accountantForAMLSRegulations.isDefined) {
+        // $COVERAGE-OFF$
         Logger.debug("accountantForAMLSRegulations is not defined()")
+        // $COVERAGE-ON$
       }
       Seq(
         Json.toJson(model.involvedInOther).asOpt[JsObject],

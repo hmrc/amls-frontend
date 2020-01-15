@@ -384,7 +384,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
           val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "15",
             "endDate.month" -> "1",
-            "endDate.year" -> "2020"
+            "endDate.year" -> "2030"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))

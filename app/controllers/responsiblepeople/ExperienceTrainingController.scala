@@ -80,7 +80,9 @@ class ExperienceTrainingController @Inject () (val dataCacheConnector: DataCache
   private def businessMatchingData(credId: String)(implicit hc: HeaderCarrier): Future[BusinessMatching] = {
     dataCacheConnector.fetchAll(credId) map {
       cache =>
+        // $COVERAGE-OFF$
         Logger.debug(cache.toString)
+        // $COVERAGE-ON$
         (for {
           c <- cache
           businessMatching <- c.getEntry[BusinessMatching](BusinessMatching.key)
