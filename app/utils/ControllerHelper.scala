@@ -109,8 +109,6 @@ object ControllerHelper {
   }
 
   //For repeating section
-
-
   def allowedToEdit(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
                    (implicit statusService: StatusService, hc: HeaderCarrier): Future[Boolean] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, credId) map {
