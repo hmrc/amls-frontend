@@ -19,23 +19,30 @@ package controllers.declaration
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.actions.SuccessfulAuthAction
 import models.declaration.BusinessNominatedOfficer
+import models.registrationprogress.{Completed, Section, Started}
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.StatusService
+import services.{SectionsProvider, StatusService}
 import utils._
+
+import scala.concurrent.Future
 
 class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
+    val mockSectionsProvider = mock[SectionsProvider]
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -43,6 +50,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
       .overrides(bind[AmlsConnector].to(mock[AmlsConnector]))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[StatusService].to(mockStatusService))
+      .overrides(bind[SectionsProvider].to(mockSectionsProvider))
 
     val builder = defaultBuilder
     lazy val app = builder.build()
@@ -73,8 +81,16 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
     val responsiblePeoples = Seq(rp, rp1, rp2)
 
     "load 'Who is the business’s nominated officer?' page successfully" when {
+      "with completed sections" must {
+        val completedSections = Seq(
+          Section("s1", Completed, true, mock[Call]),
+          Section("s2", Completed, true, mock[Call])
+        )
 
         "status is pre-submission" in new Fixture {
+          when {
+            mockSectionsProvider.sections(any[String])(any(), any())
+          }.thenReturn(Future.successful(completedSections))
 
           mockApplicationStatus(SubmissionReady)
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
@@ -87,6 +103,9 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
         }
 
         "status is pending" in new Fixture {
+          when {
+            mockSectionsProvider.sections(any[String])(any(), any())
+          }.thenReturn(Future.successful(completedSections))
 
           mockApplicationStatus(SubmissionReadyForReview)
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
@@ -99,6 +118,9 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
         }
 
         "status is approved" in new Fixture {
+          when {
+            mockSectionsProvider.sections(any[String])(any(), any())
+          }.thenReturn(Future.successful(completedSections))
 
           mockApplicationStatus(SubmissionDecisionApproved)
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
@@ -111,6 +133,9 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
         }
 
         "status is ready for renewal" in new Fixture {
+          when {
+            mockSectionsProvider.sections(any[String])(any(), any())
+          }.thenReturn(Future.successful(completedSections))
 
           mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
@@ -121,6 +146,29 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
           contentAsString(result) must include(Messages("submit.renewal.application"))
         }
+      }
+
+      "with incomplete sections" must {
+        val incompleteSections = Seq(
+          Section("s1", Completed, true, mock[Call]),
+          Section("s2", Started, true, mock[Call])
+        )
+
+        "redirect to the RegistrationProgressController" in new Fixture {
+          when {
+            mockSectionsProvider.sections(any[String])(any(), any())
+          }.thenReturn(Future.successful(incompleteSections))
+
+          mockApplicationStatus(SubmissionReady)
+          mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
+          mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
+
+          val result = controller.get()(request)
+          status(result) must be(SEE_OTHER)
+
+          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+        }
+      }
     }
 
     "redirect to 'Who is registering this business?' page" when {
