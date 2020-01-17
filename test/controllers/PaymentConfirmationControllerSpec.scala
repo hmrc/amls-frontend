@@ -200,8 +200,9 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review"))
-        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review2"))
+        doc.html() must include(Messages("confirmation.payment.info.hmrc.review.1"))
+        doc.html() must include(Messages("confirmation.payment.info.hmrc.review.2"))
+        doc.html() must include(Messages("confirmation.payment.info.hmrc.review.3"))
       }
 
       "the application status is 'pending'" in new Fixture {

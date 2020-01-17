@@ -57,8 +57,9 @@ class PaymentConfirmedViewSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the correct content" in new ViewFixture {
-        doc.html() must include(Messages("confirmation.payment.info.hmrc_review"))
-        doc.html() must include(Messages("confirmation.payment.info.hmrc_review2"))
+      doc.html() must include(Messages("confirmation.payment.info.hmrc.review.1"))
+      doc.html() must include(Messages("confirmation.payment.info.hmrc.review.2"))
+      doc.html() must include(Messages("confirmation.payment.info.hmrc.review.3"))
     }
 
     "have a footer with the correct information" in new ViewFixture {
@@ -70,8 +71,5 @@ class PaymentConfirmedViewSpec extends AmlsViewSpec with MustMatchers {
       doc.getElementsByClass("print-link").first().text() mustBe Messages("link.print")
       doc.getElementsByClass("button").first().text() mustBe Messages("confirmation.payment.continue_button.text")
     }
-
-
   }
-
 }
