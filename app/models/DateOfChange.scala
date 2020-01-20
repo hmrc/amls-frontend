@@ -16,16 +16,15 @@
 
 package models
 
-import models.FormTypes._
-import models.tradingpremises.TradingPremises
-import org.joda.time.LocalDate
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Path, Rule, Write}
-import play.api.libs.json._
-import play.api.libs.json.JodaWrites._
+import models.FormTypes._
+import org.joda.time.{DateTimeFieldType, LocalDate}
 import play.api.libs.json.JodaReads._
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json._
 
-case class DateOfChange (dateOfChange: LocalDate)
+case class DateOfChange(dateOfChange: LocalDate)
 
 object DateOfChange {
 
@@ -45,12 +44,11 @@ object DateOfChange {
     __.read(dateOfChangeActivityStartDateRule) map DateOfChange.apply
   }
 
-  implicit val formWrites: Write[DateOfChange, UrlFormEncoded] =
-    Write {
-      case DateOfChange(b) =>Map(
-        "dateOfChange.day" -> Seq(""),
-        "dateOfChange.month" -> Seq(""),
-        "dateOfChange.year" -> Seq("")
-      )
-    }
+  implicit def formWrites = Write[DateOfChange, UrlFormEncoded] { data: DateOfChange =>
+    Map(
+      "dateOfChange.day" -> Seq(data.dateOfChange.get(DateTimeFieldType.dayOfMonth()).toString),
+      "dateOfChange.month" -> Seq(data.dateOfChange.get(DateTimeFieldType.monthOfYear()).toString),
+      "dateOfChange.year" -> Seq(data.dateOfChange.get(DateTimeFieldType.year()).toString)
+    )
+  }
 }

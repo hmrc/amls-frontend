@@ -56,6 +56,11 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
   "CurrentAddressDateOfChangeController" must {
     "when get is called" must {
       "return view for Date of Change when given a valid request" in new Fixture {
+        val responsiblePeople = ResponsiblePerson()
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
         val result = controller.get(0, false)(request)
         status(result) must be(OK)
       }

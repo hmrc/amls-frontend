@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonAddressHistory, ResponsiblePersonCurrentAddress}
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
@@ -38,13 +38,18 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
                                                      statusService: StatusService,
                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
-  def get(index: Int, edit: Boolean) = authAction {
+  def get(index: Int, edit: Boolean) = authAction.async {
     implicit request =>
-      Ok(views.html.date_of_change(
-        Form2[DateOfChange](DateOfChange(LocalDate.now)),
-        "summary.responsiblepeople",
-        controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
-      ))
+      getData[ResponsiblePerson](request.credId, index) map {
+        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _,
+        Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_, _, Some(doc))), _, _)), _, _, _, _, _, _, _, _, _, _, _, _))
+        => Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(doc.dateOfChange)), "summary.responsiblepeople",
+          controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
+        ))
+        case _ => Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), "summary.responsiblepeople",
+          controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
+        ))
+      }
   }
 
   def post(index: Int, edit: Boolean) = authAction.async {
