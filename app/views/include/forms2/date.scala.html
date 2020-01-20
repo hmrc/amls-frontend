@@ -39,7 +39,7 @@
     <fieldset
             class="form-field form-date"
             id="@field.id"
-            @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {form-field--hint} @if(field.hasErrors) {@{field.id}-error-notification}"}
+            @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}"}
     >
         @legend(
             legend = labelText,
@@ -48,7 +48,7 @@
             supportingContent = supportingContent
         )
         @if(hintText.nonEmpty) {
-            <span class="form-field--hint">@Messages(hintText)</span>
+            <span id="@{field.id}-hint" class="form-field--hint">@Messages(hintText)</span>
         }
         @if(field.hasErrors) {
             <span class="error-notification" data-journey="error - field:user input:@field.id" id="@{field.id}-error-notification">
@@ -63,8 +63,7 @@
             attrType = "number",
             attrMinMax = AttrMinMax(attrMin = "1", attrMax = "31"),
             attrPattern = "[0-9]{2}",
-            attrStep = "1",
-            attrDescribedBy = s"${hintId}"
+            attrStep = "1"
         )
         @input(
             labelText = "lbl.month",
