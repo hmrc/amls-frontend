@@ -22,7 +22,6 @@
     p: String = "",
     labelText: String = "",
     hintText: String = "",
-    example: Boolean = true,
     hintId: String = "",
     jsHidden: Boolean = false,
     legendHidden: Boolean = false,
@@ -40,7 +39,7 @@
     <fieldset
             class="form-field form-date"
             id="@field.id"
-            @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}"}
+            @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {form-field--hint} @if(field.hasErrors) {@{field.id}-error-notification}"}
     >
         @legend(
             legend = labelText,
@@ -50,9 +49,6 @@
         )
         @if(hintText.nonEmpty) {
             <span class="form-field--hint">@Messages(hintText)</span>
-        }
-        @if(example) {
-            <span class="form-field--hint"@if(hintId.nonEmpty) { id="@hintId-hint"}>@Messages("lbl.date.example")</span>
         }
         @if(field.hasErrors) {
             <span class="error-notification" data-journey="error - field:user input:@field.id" id="@{field.id}-error-notification">
