@@ -30,10 +30,6 @@
     @errorSummary(f)
 }
 
-@supportingContent = {
-    <p>@hint(Messages("businessmatching.updateservice.psr.number.hint"))</p>
-}
-
 @main(
     title = Messages("businessmatching.psr.number.title") + " - " + Messages("summary.updateservice"),
     heading = header
@@ -46,7 +42,7 @@
             heading = "businessmatching.updateservice.psr.number.title",
             section = "summary.updateservice",
             panel = false,
-            supportingContent = supportingContent
+            hint = "businessmatching.updateservice.psr.number.hint"
         ) {
             @radio(
                 f = f("appliedFor"),

@@ -29,10 +29,6 @@
     @errorSummary(f)
 }
 
-@supportingContent = {
-    <p>@hint("businessactivities.do.keep.records.hint")</p>
-}
-
 @main(
     title = Messages("businessactivities.do.keep.records") + " - " + Messages("summary.businessactivities"),
     heading = header
@@ -44,7 +40,7 @@
             section = "summary.businessactivities",
             classes = Seq(s"$target"),
             panel = false,
-            supportingContent = supportingContent
+            hint = "businessactivities.do.keep.records.hint"
         ) {
             @checkbox(
                 f = f("types[]"),

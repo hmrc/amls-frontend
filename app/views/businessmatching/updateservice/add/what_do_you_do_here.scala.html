@@ -26,10 +26,6 @@
     @errorSummary(f)
 }
 
-@supportingContent = {
-    <p>@hint(Messages("businessmatching.updateservice.whatdoyoudohere.list.hint"))</p>
-}
-
 @main(
     title = Messages("businessmatching.updateservice.whatdoyoudohere.title") + " - " + Messages("summary.updateservice"),
     heading = header
@@ -42,7 +38,7 @@
             heading = "businessmatching.updateservice.whatdoyoudohere.title",
             section = "summary.updateservice",
             panel = false,
-            supportingContent = supportingContent
+            hint = "businessmatching.updateservice.whatdoyoudohere.list.hint"
         ) {
             @if(msbServiceValues.contains("03")) {
                 @checkbox(
