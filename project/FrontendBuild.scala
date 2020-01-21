@@ -20,7 +20,7 @@ private object AppDependencies {
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
   private val jsonEncryptionVersion = "4.4.0-play-26"
-  private val playReactivemongoVersion = "7.20.0-play-26"
+  private val playReactivemongoVersion = "7.22.0-play-26"
   private val authVersion = "2.27.0-play-26"
   private val domain = "5.6.0-play-26"
 
