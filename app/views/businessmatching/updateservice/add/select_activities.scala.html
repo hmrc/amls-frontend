@@ -27,10 +27,6 @@
     @errorSummary(f)
 }
 
-@supportingContent = {
-    <p>@hint(Messages("businessmatching.updateservice.selectactivities.hint"))</p>
-}
-
 @main(
     title = Messages("businessmatching.updateservice.selectactivities.title") + " - " + Messages("summary.updateservice"),
     heading = header
@@ -43,8 +39,7 @@
             heading = "businessmatching.updateservice.selectactivities.title",
             section = "summary.updateservice",
             panel = false,
-            supportingContent = supportingContent
-        ) {
+            hint = "businessmatching.updateservice.selectactivities.hint") {
             @{activityValues map (value => radio(
                 f = f("businessActivities[]"),
                 labelText = s"businessmatching.registerservices.servicename.lbl.$value",
