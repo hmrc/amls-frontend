@@ -19,7 +19,7 @@ package controllers.responsiblepeople.address
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{Form2, FormHelpers, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonAddressHistory, ResponsiblePersonCurrentAddress}
 import org.joda.time.LocalDate
@@ -46,7 +46,7 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
         => Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(doc.dateOfChange)), "summary.responsiblepeople",
           controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
         ))
-        case _ => Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)), "summary.responsiblepeople",
+        case _ => Ok(views.html.date_of_change(EmptyForm, "summary.responsiblepeople",
           controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
         ))
       }
