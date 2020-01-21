@@ -116,7 +116,7 @@ class WhereAreTradingPremisesController @Inject () (
 
   def dateOfChange(index: Int) = authAction.async {
     implicit request =>
-        Future(Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
+        Future(Ok(views.html.date_of_change(EmptyForm,
           "summary.tradingpremises", controllers.tradingpremises.routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
   }
 
