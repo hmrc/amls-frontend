@@ -1749,7 +1749,7 @@ h2.override-heading-medium {
     border-color: #d4351c;
 }
 
-legend .page-header {
+legend.page-header {
     margin: 0;
 }
 
