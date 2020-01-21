@@ -20,10 +20,10 @@
 @import models.bankdetails._
 @import include.forms2._
 
-@(bankDetails: BankDetails, index: Integer)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(bankDetails: BankDetails, index: Integer)(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
-    @heading("title.cya", "summary.bankdetails")
+@heading("title.cya", "summary.bankdetails")
 }
 
 @main(
@@ -31,90 +31,102 @@
     heading = header
 ) {
 
-@bankDetails.accountName.map { accountName =>
-@checkYourAnswers(question = Messages("bankdetails.bankaccount.accountname.title"),
-editUrl = controllers.bankdetails.routes.BankAccountNameController.getIndex(index, true).toString
-) {
-@accountName
-}
-}
+    <dl class="cya-summary-list">
+
+    @bankDetails.accountName.map { accountName =>
+        @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.accountname.title"),
+            editUrl = controllers.bankdetails.routes.BankAccountNameController.getIndex(index, true).toString
+        ) {
+            @accountName
+        }
+    }
 
     @bankDetails.bankAccountType.map { bankAccountType =>
-        @checkYourAnswers(question = Messages("bankdetails.accounttype.title"),
+        @checkYourAnswersRow(question = Messages("bankdetails.accounttype.title"),
             editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(index, true).toString
         ) {
             @bankAccountType match {
-                case PersonalAccount => { @Messages("bankdetails.summary.accounttype.lbl.01") }
-                case BelongsToBusiness => { @Messages("bankdetails.summary.accounttype.lbl.02") }
-                case BelongsToOtherBusiness => { @Messages("bankdetails.summary.accounttype.lbl.03") }
+                case PersonalAccount => {
+                    @Messages("bankdetails.summary.accounttype.lbl.01")
+                }
+                case BelongsToBusiness => {
+                    @Messages("bankdetails.summary.accounttype.lbl.02")
+                }
+                case BelongsToOtherBusiness => {
+                    @Messages("bankdetails.summary.accounttype.lbl.03")
+                }
             }
         }
     }
-
-
 
     @bankDetails.bankAccount.map { bankAccount =>
 
-            @checkYourAnswers(  question = Messages("bankdetails.bankaccount.accounttype.title"),
-                                editUrl = controllers.bankdetails.routes.BankAccountIsUKController.get(index, true).toString
-            ) {
-                @bankAccount.isUk match {
-                    case Some(BankAccountIsUk(true)) =>  { @Messages("lbl.yes") }
-                    case Some(BankAccountIsUk(false)) => { @Messages("lbl.no") }
-                    case _ => {}
+        @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.accounttype.title"),
+            editUrl = controllers.bankdetails.routes.BankAccountIsUKController.get(index, true).toString
+        ) {
+            @bankAccount.isUk match {
+                case Some(BankAccountIsUk(true)) => {
+                    @Messages("lbl.yes")
                 }
-            }
-
-            @bankAccount.hasIban match {
-                case Some(BankAccountHasIban(true)) => {
-                    @checkYourAnswers(  question = Messages("bankdetails.bankaccount.hasiban"),
-                                        editUrl = controllers.bankdetails.routes.BankAccountHasIbanController.get(index, true).toString
-                    ) {
-                        @Messages("lbl.yes")
-                    }}
-                case Some(BankAccountHasIban(false)) => {
-                    @checkYourAnswers(  question = Messages("bankdetails.bankaccount.hasiban"),
-                                        editUrl = controllers.bankdetails.routes.BankAccountHasIbanController.get(index, true).toString
-                    ) {
-                        @Messages("lbl.no")
-                    }}
-                case _ => {}
-            }
-
-            @bankAccount.account match {
-                case Some(ba:UKAccount) => {
-                    @checkYourAnswers(  question = Messages("bankdetails.bankaccount.accountnumber"),
-                                        editUrl = controllers.bankdetails.routes.BankAccountUKController.get(index, true).toString
-                    ) {
-                        @ba.accountNumber
-                    }
-                    @checkYourAnswers(  question = Messages("bankdetails.bankaccount.sortcode"),
-                                        editUrl = controllers.bankdetails.routes.BankAccountUKController.get(index, true).toString
-                    ) {
-                        @ba.displaySortCode
-                    }
-                }
-                case Some(ba: NonUKAccountNumber) => {
-                    @checkYourAnswers(  question = Messages("bankdetails.bankaccount.accountnumber"),
-                                        editUrl = controllers.bankdetails.routes.BankAccountNonUKController.get(index, true).toString
-                    ) {
-                        @ba.accountNumber
-                    }
-                }
-                case Some(ba: NonUKIBANNumber) => {
-                    @checkYourAnswers(  question = Messages("bankdetails.bankaccount.iban"),
-                                        editUrl = controllers.bankdetails.routes.BankAccountIbanController.get(index, true).toString
-                    ) {
-                        @ba.IBANNumber
-                    }
+                case Some(BankAccountIsUk(false)) => {
+                    @Messages("lbl.no")
                 }
                 case _ => {}
+            }
+        }
 
+        @bankAccount.hasIban match {
+            case Some(BankAccountHasIban(true)) => {
+                @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.hasiban"),
+                    editUrl = controllers.bankdetails.routes.BankAccountHasIbanController.get(index, true).toString
+                ) {
+                    @Messages("lbl.yes")
+                }
+            }
+            case Some(BankAccountHasIban(false)) => {
+                @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.hasiban"),
+                    editUrl = controllers.bankdetails.routes.BankAccountHasIbanController.get(index, true).toString
+                ) {
+                    @Messages("lbl.no")
+                }
+            }
+            case _ => {}
+        }
+
+        @bankAccount.account match {
+            case Some(ba: UKAccount) => {
+                @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.accountnumber"),
+                    editUrl = controllers.bankdetails.routes.BankAccountUKController.get(index, true).toString
+                ) {
+                    @ba.accountNumber
+                }
+                @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.sortcode"),
+                    editUrl = controllers.bankdetails.routes.BankAccountUKController.get(index, true).toString
+                ) {
+                    @ba.displaySortCode
+                }
+            }
+            case Some(ba: NonUKAccountNumber) => {
+                @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.accountnumber"),
+                    editUrl = controllers.bankdetails.routes.BankAccountNonUKController.get(index, true).toString
+                ) {
+                    @ba.accountNumber
+                }
+            }
+            case Some(ba: NonUKIBANNumber) => {
+                @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.iban"),
+                    editUrl = controllers.bankdetails.routes.BankAccountIbanController.get(index, true).toString
+                ) {
+                    @ba.IBANNumber
+                }
+            }
+            case _ => {}
         }
     }
+
+    </dl>
 
     @form(EmptyForm, controllers.bankdetails.routes.SummaryController.post(index)) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandaddbankaccount")), false, buttonId = Some("accept-and-add"))
     }
-
 }

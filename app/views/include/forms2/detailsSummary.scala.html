@@ -15,18 +15,19 @@
  *@
 
 @(
-    summary: String = "",
-    detailsClass: Boolean = true,
-    detailsInner: Boolean = true,
-    summaryClasses: Seq[String] = Seq("summary")
+        summary: String = "",
+        detailsClass: Boolean = true,
+        detailsInner: Boolean = true,
+        summaryClasses: Seq[String] = Seq("summary")
 )(content: Html)(implicit m: Messages, lang: Lang)
-
-@* http://hmrc.github.io/assets-frontend/section-details.html *@
+    @* http://hmrc.github.io/assets-frontend/section-details.html *@
 <div class="form-group no-print">
     <details role="group">
         <summary class="@summaryClasses.mkString(" ")" role="button">@summary</summary>
-        <div@if(detailsInner) { class="details__inner"}>
-            @content
-        </div>
-    </details>
+        <div
+        @if(detailsInner) { class="details__inner"}
+        >
+        @content
+</div>
+</details>
 </div>
