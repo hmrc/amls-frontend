@@ -64,7 +64,7 @@ class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheCon
                 rp <- responsiblePerson
                 addressHistory <- rp.addressHistory
                 currentAddress <- addressHistory.currentAddress
-              } yield data.copy(timeAtAddress = currentAddress.timeAtAddress)).getOrElse(data)
+              } yield data.copy(timeAtAddress = currentAddress.timeAtAddress, dateOfChange = currentAddress.dateOfChange)).getOrElse(data)
 
               statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap {
                 status => updateCurrentAddressAndRedirect(request.credId, currentAddressWithTime, index, edit, flow, responsiblePerson, status)
