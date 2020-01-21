@@ -15,7 +15,8 @@
  *@
 
 @import include._
-@import config.{ ApplicationConfig}
+@import config.ApplicationConfig
+@import views.html.confirmation.footer
 
 @(companyName: String, paymentReference: String)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
@@ -30,9 +31,9 @@
         </p>
     </div>
 
-    <p>@messages("confirmation.payment.info.transitional.renewal.hmrc_review")</p>
-    <p>@messages("confirmation.payment.info.transitional.renewal.hmrc_review2")</p>
+    <p>@messages("confirmation.payment.info.hmrc.review.1")</p>
+    <p>@messages("confirmation.payment.info.hmrc.review.2")</p>
+    <p>@messages("confirmation.payment.info.hmrc.review.3")</p>
 
     @footer()
-
 }
