@@ -1,1 +1,1 @@
- + [AMLS-5587] - 'Change to make description on BACS payment optional ready for migration to new PAY API endpoint'
+ + [AMLS-5587] - 'Migrate to new pay api endpoint'
