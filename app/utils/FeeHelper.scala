@@ -37,7 +37,9 @@ class FeeHelper  @Inject()(val feeResponseService: FeeResponseService,
                                   prefix: String)
                                  (implicit hc: HeaderCarrier): Future[Option[FeeResponse]] = {
 
+    // $COVERAGE-OFF$
     Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
+    // $COVERAGE-ON$
     (for {
       amlsRegNo <- OptionT(enrolmentService.amlsRegistrationNumber(amlsRegistrationNumber, groupIdentifier))
       fees      <- OptionT(feeResponseService.getFeeResponse(amlsRegNo, accountTypeId))

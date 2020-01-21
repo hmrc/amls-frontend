@@ -35,7 +35,9 @@ object BusinessName {
       bm <- OptionT(cache.fetch[BusinessMatching](credId, BusinessMatching.key))
       rd <- OptionT.fromOption[Future](bm.reviewDetails)
     } yield {
+      // $COVERAGE-OFF$
       Logger.debug(s"Found business name in cache: ${rd.businessName}")
+      // $COVERAGE-ON$
       rd.businessName
     }
 

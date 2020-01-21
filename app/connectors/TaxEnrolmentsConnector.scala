@@ -39,7 +39,9 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
     s"${appConfig.enrolmentStoreUrl}/tax-enrolments"
   }
 
+  // $COVERAGE-OFF$
   val warn: String => Unit = msg => Logger.warn(s"[TaxEnrolmentsConnector] $msg")
+  // $COVERAGE-ON$
 
   object ResponseCodes {
     val duplicateEnrolment = "ERROR_INVALID_IDENTIFIERS"
@@ -49,7 +51,9 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
   def enrol(enrolKey: EnrolmentKey, enrolment: TaxEnrolment, groupId: Option[String])
            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
+    // $COVERAGE-OFF$
       Logger.debug("TaxEnrolmentsConnector:enrol:enrolKey:" + enrolKey)
+    // $COVERAGE-ON$
       groupId match {
         case Some(groupId) =>
           val url = s"$baseUrl/groups/$groupId/enrolments/${enrolKey.key}"
@@ -61,7 +65,9 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
             case e: Upstream4xxResponse if Json.parse(e.message).asOpt[ErrorResponse].isDefined =>
               val error = Json.parse(e.message).as[ErrorResponse]
               audit.sendEvent(ESEnrolFailureEvent(enrolment, e, enrolKey))
+              // $COVERAGE-OFF$
               warn(error.toString)
+              // $COVERAGE-ON$
 
               (e.upstreamResponseCode, error.code) match {
                 case (BAD_REQUEST, ResponseCodes.duplicateEnrolment) =>
@@ -72,7 +78,9 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
 
             case e: Throwable =>
               audit.sendEvent(ESEnrolFailureEvent(enrolment, e, enrolKey))
+              // $COVERAGE-OFF$
               warn(e.getMessage)
+              // $COVERAGE-ON$
               throw e
           }
 
@@ -84,7 +92,9 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
+    // $COVERAGE-OFF$
       Logger.debug("TaxEnrolmentsConnector:deEnrol:enrolKey:" + enrolKey)
+    // $COVERAGE-ON$
       groupId match {
         case Some(groupId) =>
           val url = s"$baseUrl/groups/$groupId/enrolments/$enrolKey"

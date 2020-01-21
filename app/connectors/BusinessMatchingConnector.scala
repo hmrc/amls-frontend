@@ -82,15 +82,21 @@ class BusinessMatchingConnector @Inject()(val http: HttpClient,
     val url = s"${applicationConfig.businessMatchingUrl}/fetch-review-details/$serviceName"
     val logPrefix = "[BusinessMatchingConnector][getReviewDetails]"
 
+    // $COVERAGE-OFF$
     Logger.debug(s"$logPrefix Fetching $url..")
+    // $COVERAGE-ON$
 
     http.GET[BusinessMatchingReviewDetails](url) map { result =>
+      // $COVERAGE-OFF$
       Logger.debug(s"$logPrefix Finished getting review details. Name: ${result.businessName}")
+      // $COVERAGE-ON$
       Some(result)
     } recoverWith {
       case _: NotFoundException => Future.successful(None)
       case ex =>
+        // $COVERAGE-OFF$
         Logger.warn(s"$logPrefix Failed to fetch review details", ex)
+        // $COVERAGE-ON$
         Future.failed(ex)
     }
   }

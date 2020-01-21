@@ -57,11 +57,11 @@ class ResidentialRedressSchemeControllerSpec extends AmlsSpec with MockitoSugar 
   "on get load redress scheme page with pre populated data" in new Fixture {
 
     when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any(), any())
-      (any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, Some(Other("test")),None, None))))
+      (any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(None, Some(PropertyRedressScheme),None, None))))
 
     val result = controller.get()(request)
     status(result) must be(OK)
-    contentAsString(result) must include ("test")
+    contentAsString(result) must include ("Property Redress Scheme")
 
   }
 
@@ -69,8 +69,7 @@ class ResidentialRedressSchemeControllerSpec extends AmlsSpec with MockitoSugar 
 
     val newRequest = requestWithUrlEncodedBody(
       "isRedress" -> "true",
-      "propertyRedressScheme" -> "04",
-      "other" -> "test"
+      "propertyRedressScheme" -> "03"
     )
 
     when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any(), any())
@@ -88,14 +87,14 @@ class ResidentialRedressSchemeControllerSpec extends AmlsSpec with MockitoSugar 
 
     val newRequest = requestWithUrlEncodedBody(
       "isRedress" -> "true",
-      "propertyRedressScheme" -> "04"
+      "test" -> "03"
     )
 
     val result = controller.post()(newRequest)
     status(result) must be(BAD_REQUEST)
 
     val document = Jsoup.parse(contentAsString(result))
-    contentAsString(result) must include("This field is required")
+    contentAsString(result) must include("There is a problem")
   }
 
    "on post with valid data in edit mode" in new Fixture {

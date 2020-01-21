@@ -32,7 +32,9 @@ class FeeResponseService @Inject()(val feeConnector: FeeConnector) {
   def getFeeResponse(amlsReferenceNumber: String, accountTypeId: (String, String))
                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[FeeResponse]] = {
 
+    // $COVERAGE-OFF$
     Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
+    // $COVERAGE-ON$
     feeConnector.feeResponse(amlsReferenceNumber, accountTypeId) map ( feeResponse =>
       feeResponse.responseType match {
         case AmendOrVariationResponseType

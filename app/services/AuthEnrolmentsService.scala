@@ -36,26 +36,34 @@ class AuthEnrolmentsService @Inject()(val enrolmentStore: TaxEnrolmentsConnector
   def amlsRegistrationNumber(amlsRegistrationNumber: Option[String], groupIdentifier: Option[String])
                             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] = {
 
+    // $COVERAGE-OFF$
     Logger.debug(s"[$prefix][amlsRegistrationNumber] - Begin...)")
     Logger.debug(s"[$prefix][amlsRegistrationNumber] - config.enrolmentStubsEnabled: ${config.enrolmentStubsEnabled})")
+    // $COVERAGE-ON$
 
     val stubbedEnrolments =  if (config.enrolmentStubsEnabled) {
       stubConnector.enrolments(groupIdentifier.getOrElse(throw new Exception("Group ID is unavailable")))
     } else {
+      // $COVERAGE-OFF$
       Logger.debug(s"[$prefix][amlsRegistrationNumber] - Returning empty sequence...)")
+      // $COVERAGE-ON$
       Future.successful(Seq.empty)
     }
 
     amlsRegistrationNumber match {
       case regNo@Some(_) => Future.successful(regNo)
       case None => stubbedEnrolments map { enrolmentsList =>
+        // $COVERAGE-OFF$
         Logger.debug(s"[$prefix][amlsRegistrationNumber] - enrolmentsList: $enrolmentsList)")
+        // $COVERAGE-ON$
           for {
             amlsEnrolment   <- enrolmentsList.find(enrolment => enrolment.key == amlsKey)
             amlsIdentifier  <- amlsEnrolment.identifiers.find(identifier => identifier.key == amlsNumberKey)
           } yield {
+            // $COVERAGE-OFF$
             Logger.debug(s"[$prefix][amlsRegistrationNumber] - amlsEnrolment: $amlsEnrolment)")
             Logger.debug(s"[$prefix][amlsRegistrationNumber] : ${amlsIdentifier.value}")
+            // $COVERAGE-ON$
             amlsIdentifier.value
           }
         }

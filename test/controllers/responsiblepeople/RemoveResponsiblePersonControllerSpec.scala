@@ -501,13 +501,13 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
         }
 
-        "removing a trading premises from an application with future date" in new Fixture {
+        "removing a rp from an application with future date" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
           val newRequest = requestWithUrlEncodedBody(
             "endDate.day" -> "15",
             "endDate.month" -> "1",
-            "endDate.year" -> "2020"
+            "endDate.year" -> "2030"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))

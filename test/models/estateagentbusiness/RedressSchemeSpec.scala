@@ -24,55 +24,19 @@ import play.api.libs.json._
 
 class RedressSchemeSpec extends PlaySpec with MockitoSugar {
 
-  "RedressScheemsSpec" must {
+  "RedressSchemesSpec" must {
 
     "successfully validate model" in {
 
       RedressScheme.formRedressRule.validate(Map("propertyRedressScheme" -> Seq("01"))) must
         be(Valid(ThePropertyOmbudsman))
 
-      RedressScheme.formRedressRule.validate(Map("propertyRedressScheme" -> Seq("02"))) must
-        be(Valid(OmbudsmanServices))
-
       RedressScheme.formRedressRule.validate(Map("propertyRedressScheme" -> Seq("03"))) must
         be(Valid(PropertyRedressScheme))
-
-      RedressScheme.formRedressRule.validate(Map("propertyRedressScheme" -> Seq("04"), "other" -> Seq("test"))) must
-        be(Valid(Other("test")))
 
       RedressScheme.formRedressRule.validate(Map("propertyRedressScheme" -> Seq("05"))) must
         be(Valid(RedressSchemedNo))
     }
-
-    "fail to validate given an `other` with no value" in {
-
-      val data = Map(
-        "isRedress" -> Seq("true"),
-        "propertyRedressScheme" -> Seq("04"),
-          "other" -> Seq("")
-      )
-
-      RedressScheme.formRedressRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "other") -> Seq(ValidationError("error.required.eab.redress.scheme.name"))
-        )))
-    }
-
-    "fail to validate given an `other` with max value" in {
-
-      val data = Map(
-        "isRedress" -> Seq("true"),
-        "propertyRedressScheme" -> Seq("04"),
-        "other" -> Seq("asadasas"*50)
-      )
-
-      RedressScheme.formRedressRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "other") -> Seq(ValidationError("error.invalid.eab.redress.scheme.name"))
-        )))
-    }
-
-
     "fail to validate given a non-enum value" in {
 
       val data = Map(
@@ -109,14 +73,8 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
       RedressScheme.formRedressWrites.writes(ThePropertyOmbudsman) must
         be(Map("propertyRedressScheme" -> Seq("01")))
 
-      RedressScheme.formRedressWrites.writes(OmbudsmanServices) must
-        be(Map("propertyRedressScheme" -> Seq("02")))
-
       RedressScheme.formRedressWrites.writes(PropertyRedressScheme) must
         be(Map("propertyRedressScheme" -> Seq("03")))
-
-      RedressScheme.formRedressWrites.writes(Other("foobar")) must
-        be(Map("propertyRedressScheme" -> Seq("04"), "other" -> Seq("foobar")))
 
       RedressScheme.formRedressWrites.writes(RedressSchemedNo) must
         be(Map("propertyRedressScheme" -> Seq("05")))
@@ -134,32 +92,12 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
         Json.fromJson[RedressScheme](Json.obj("isRedress"-> true,"propertyRedressScheme" -> "01")) must
           be(JsSuccess(ThePropertyOmbudsman, JsPath))
 
-        Json.fromJson[RedressScheme](Json.obj("isRedress"-> true,"propertyRedressScheme" -> "02")) must
-          be(JsSuccess(OmbudsmanServices, JsPath ))
-
         Json.fromJson[RedressScheme](Json.obj("isRedress"-> true,"propertyRedressScheme" -> "03")) must
           be(JsSuccess(PropertyRedressScheme, JsPath))
-
-        val json = Json.obj("isRedress"-> true,
-                            "propertyRedressScheme" -> "04",
-                            "propertyRedressSchemeOther" -> "test")
-
-        Json.fromJson[RedressScheme](json) must
-          be(JsSuccess(Other("test"), JsPath \ "propertyRedressSchemeOther"))
 
         Json.fromJson[RedressScheme](Json.obj("isRedress"-> false)) must
           be(JsSuccess(RedressSchemedNo, JsPath))
 
-      }
-
-      "fail to validate when given an empty `other` value" in {
-
-        val json = Json.obj("isRedress"-> true,
-                             "propertyRedressScheme" -> "04"
-                            )
-
-        Json.fromJson[RedressScheme](json) must
-          be(JsError((JsPath \"propertyRedressSchemeOther") -> play.api.libs.json.JsonValidationError("error.path.missing")))
       }
 
       "fail to validate when invalid option is passed" in {
@@ -177,15 +115,7 @@ class RedressSchemeSpec extends PlaySpec with MockitoSugar {
 
         Json.toJson(ThePropertyOmbudsman) must be(Json.obj("isRedress"-> true, "propertyRedressScheme" -> "01"))
 
-        Json.toJson(OmbudsmanServices) must be(Json.obj("isRedress"-> true, "propertyRedressScheme" -> "02"))
-
         Json.toJson(PropertyRedressScheme) must be(Json.obj("isRedress"-> true, "propertyRedressScheme" -> "03"))
-
-        val json = Json.obj("isRedress"-> true,
-          "propertyRedressScheme" -> "04",
-          "propertyRedressSchemeOther" -> "test")
-
-        Json.toJson(Other("test")) must be(json)
 
         Json.toJson(RedressSchemedNo) must be(Json.obj("isRedress"-> false))
       }

@@ -47,10 +47,14 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
     val postUrl = s"$url/$accountType/$accountId/$safeId"
     val prefix = "[AmlsConnector][subscribe]"
+    // $COVERAGE-OFF$
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(subscriptionRequest)}")
+    // $COVERAGE-ON$
     http.POST[SubscriptionRequest, SubscriptionResponse](postUrl, subscriptionRequest) map {
       response =>
+        // $COVERAGE-OFF$
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        // $COVERAGE-ON$
         response
     }
   }
@@ -62,11 +66,15 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
     val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/status"
     val prefix = "[AmlsConnector][status]"
+    // $COVERAGE-OFF$
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
+    // $COVERAGE-ON$
 
     http.GET[ReadStatusResponse](getUrl) map {
       response =>
+        // $COVERAGE-OFF$
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        // $COVERAGE-ON$
         response
     }
   }
@@ -78,11 +86,15 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
     val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[AmlsConnector][view]"
+    // $COVERAGE-OFF$
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
+    // $COVERAGE-ON$
 
     http.GET[ViewResponse](getUrl) map {
       response =>
+        // $COVERAGE-OFF$
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        // $COVERAGE-ON$
         response
     }
 
@@ -95,10 +107,14 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/update"
     val prefix = "[AmlsConnector][update]"
+    // $COVERAGE-OFF$
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
+    // $COVERAGE-ON$
     http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
       response =>
+        // $COVERAGE-OFF$
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        // $COVERAGE-ON$
         response
     }
   }
@@ -110,10 +126,14 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/variation"
     val prefix = "[AmlsConnector][variation]"
+    // $COVERAGE-OFF$
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
+    // $COVERAGE-ON$
     http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
       response =>
+        // $COVERAGE-OFF$
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        // $COVERAGE-ON$
         response
     }
   }
@@ -124,12 +144,16 @@ class AmlsConnector @Inject()(val http: HttpClient,
     val (accountType, accountId) = accountTypeId
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/renewal"
+    // $COVERAGE-OFF$
     val log = (msg: String) => Logger.debug(s"[AmlsConnector][renewal] $msg")
 
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
+    // $COVERAGE-ON$
 
     http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
+      // $COVERAGE-OFF$
       log(s"Response body: ${Json.toJson(response)}")
+      // $COVERAGE-ON$
       response
     }
   }
@@ -140,12 +164,16 @@ class AmlsConnector @Inject()(val http: HttpClient,
     val (accountType, accountId) = accountTypeId
 
     val postUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber/renewalAmendment"
+    // $COVERAGE-OFF$
     val log = (msg: String) => Logger.debug(s"[AmlsConnector][renewalAmendment] $msg")
 
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
+    // $COVERAGE-ON$
 
     http.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
+      // $COVERAGE-OFF$
       log(s"Response body: ${Json.toJson(response)}")
+      // $COVERAGE-ON$
       response
     }
   }
@@ -174,7 +202,9 @@ class AmlsConnector @Inject()(val http: HttpClient,
     val (accountType, accountId) = accountTypeId
     val postUrl = s"$paymentUrl/$accountType/$accountId/$amlsRefNo/$safeId"
 
+    // $COVERAGE-OFF$
     Logger.debug(s"[AmlsConnector][savePayment]: Request to $postUrl with paymentId $paymentId")
+    // $COVERAGE-ON$
 
     http.POSTString[HttpResponse](postUrl, paymentId)
   }
@@ -185,7 +215,9 @@ class AmlsConnector @Inject()(val http: HttpClient,
     val (accountType, accountId) = accountTypeId
     val getUrl = s"$paymentUrl/$accountType/$accountId/payref/$paymentReference"
 
+    // $COVERAGE-OFF$
     Logger.debug(s"[AmlsConnector][getPaymentByPaymentReference]: Request to $getUrl with $paymentReference")
+    // $COVERAGE-ON$
 
     http.GET[Payment](getUrl) map { result =>
       Some(result)
@@ -200,7 +232,9 @@ class AmlsConnector @Inject()(val http: HttpClient,
     val (accountType, accountId) = accountTypeId
     val getUrl = s"$paymentUrl/$accountType/$accountId/amlsref/$amlsRef"
 
+    // $COVERAGE-OFF$
     Logger.debug(s"[AmlsConnector][getPaymentByAmlsReference]: Request to $getUrl with $amlsRef")
+    // $COVERAGE-ON$
 
     http.GET[Payment](getUrl) map { result =>
       Some(result)
@@ -214,7 +248,9 @@ class AmlsConnector @Inject()(val http: HttpClient,
 
     val (accountType, accountId) = accountTypeId
     val putUrl = s"$paymentUrl/$accountType/$accountId/refreshstatus"
+    // $COVERAGE-OFF$
     Logger.debug(s"[AmlsConnector][refreshPaymentStatus]: Request to $putUrl with $paymentReference")
+    // $COVERAGE-ON$
     http.PUT[RefreshPaymentStatusRequest, PaymentStatusResult](putUrl, RefreshPaymentStatusRequest(paymentReference))
   }
 

@@ -743,4 +743,11 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
     }
   }
 
+  "insensitive" must {
+    "add flag - i - to to the regex to make it case insensitive" in {
+
+      RegexHelpers("someRegex".r).insensitive.regex mustBe "(?i)someRegex"
+    }
+  }
+
 }

@@ -84,7 +84,9 @@ class PositionWithinBusinessStartDateController @Inject ()(val dataCacheConnecto
               _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp => rp.positions match {
                   case Some(x) => rp.positions(Positions.update(x, data))
                   case _ => {
+                    // $COVERAGE-OFF$
                     Logger.error(s"Positions does not exist for ${rp.personName.getOrElse("[NAME MISSING]")}")
+                    // $COVERAGE-ON$
                     throw new IllegalStateException("Positions does not exist, cannot update start date")
                   }
                 }

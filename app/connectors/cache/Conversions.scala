@@ -19,7 +19,7 @@ package connectors.cache
 import play.api.libs.json.{JsObject, JsValue, Reads}
 import services.cache.{Cache, CryptoCache}
 import uk.gov.hmrc.http.cache.client.CacheMap
-
+// $COVERAGE-OFF$
 trait Conversions {
 
   /**
@@ -51,4 +51,4 @@ trait Conversions {
   }
 
 }
-
+// $COVERAGE-ON$

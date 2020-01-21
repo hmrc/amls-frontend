@@ -73,7 +73,9 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
         Retrievals.credentialRole
       ) {
       case enrolments ~ Some(credentials) ~ Some(affinityGroup) ~ groupIdentifier ~ credentialRole =>
+        // $COVERAGE-OFF$
         Logger.debug("DefaultAuthAction:Refine - Enrolments:" + enrolments)
+        // $COVERAGE-ON$
 
         Future.successful(
           Right(
@@ -90,7 +92,9 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
           )
         )
       case _ =>
+        // $COVERAGE-OFF$
         Logger.debug("DefaultAuthAction:Refine - Non match (enrolments ~ Some(credentials) ~ Some(affinityGroup))")
+        // $COVERAGE-ON$
         Future.successful(Left(Redirect(Call("GET", unauthorised))))
     }.recover[Either[Result, AuthorisedRequest[A]]] {
       case nas: NoActiveSession =>
