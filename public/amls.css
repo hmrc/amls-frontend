@@ -1934,6 +1934,9 @@ details summary:focus,
 .error-summary:focus {
   outline-color: #ffdd00;
 }
+.error-summary-list li {
+  margin-bottom: 5px;
+}
 .multiple-choice [type=radio]:focus+label::before {
   -webkit-box-shadow: 0 0 0 4px #ffdd00;
   box-shadow: 0 0 0 4px #ffdd00;
@@ -2127,6 +2130,25 @@ input.form-control-error[type="password"],
   border-color: #0b0c0c;
   -webkit-box-shadow: none;
   box-shadow: none
+}
+
+.multiple-choice input {
+  top: -2px;
+  left: -2px;
+  width: 44px;
+  height: 44px;
+}
+.multiple-choice [type="radio"] + label::before {
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+}
+.multiple-choice [type="radio"]:focus + label::before {
+  border-width: 4px;
+}
+.multiple-choice [type=radio]+label::after {
+  top: 10px;
+  left: 10px;
 }
 
 .login-event  .button,
