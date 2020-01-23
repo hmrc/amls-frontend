@@ -22,7 +22,6 @@
     p: String = "",
     labelText: String = "",
     hintText: String = "",
-    example: Boolean = true,
     hintId: String = "",
     jsHidden: Boolean = false,
     legendHidden: Boolean = false,
@@ -49,10 +48,7 @@
             supportingContent = supportingContent
         )
         @if(hintText.nonEmpty) {
-            <span class="form-field--hint">@Messages(hintText)</span>
-        }
-        @if(example) {
-            <span class="form-field--hint"@if(hintId.nonEmpty) { id="@hintId-hint"}>@Messages("lbl.date.example")</span>
+            <span id="@{field.id}-hint" class="form-field--hint">@Messages(hintText)</span>
         }
         @if(field.hasErrors) {
             <span class="error-notification" data-journey="error - field:user input:@field.id" id="@{field.id}-error-notification">
@@ -67,8 +63,7 @@
             attrType = "number",
             attrMinMax = AttrMinMax(attrMin = "1", attrMax = "31"),
             attrPattern = "[0-9]{2}",
-            attrStep = "1",
-            attrDescribedBy = s"${hintId}"
+            attrStep = "1"
         )
         @input(
             labelText = "lbl.month",

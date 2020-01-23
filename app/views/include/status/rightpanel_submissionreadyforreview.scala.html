@@ -21,37 +21,48 @@
 @import config.{ApplicationConfig}
 @import uk.gov.hmrc.play.views.html.{helpers => uiHelpers}
 
-@(feeResponse: Option[FeeResponse])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(feeResponse: Option[FeeResponse], can_cannot_trade: Html)(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @getHelpForm = {
-    @{uiHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
+@{
+    uiHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)
+}
 }
 
 @feeResponse match {
     case Some(fee) => {
-        <p>@Messages("status.submissionreadyforreview.description")
+        <p>
+        @Messages("status.submissionreadyforreview.description")
         <p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
-                <ul class="list list-bullet">
-                    <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
-                    <li>@Messages("status.submissionreadyforreview.description.2.listline2")</li>
-                    <li>@Messages("status.submissionreadyforreview.description.2.listline3")</li>
-                </ul>
-                <p>@Messages("status.submissionreadyforreview.description.3")</p>
-        <p>@Messages("status.submissionreadyforreview.description.5")
-        <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/money-laundering">@Messages("status.submissionreadyforreview.description.5.link")</a>@Messages("full.stop")</p>
-    }
-    case None => {
-        <p>@Messages("status.submissionreadyforreview.description.no.fee")</p>
-        <p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
-                <ul class="list list-bullet">
+        <ul class="list list-bullet">
             <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
             <li>@Messages("status.submissionreadyforreview.description.2.listline2")</li>
             <li>@Messages("status.submissionreadyforreview.description.2.listline3")</li>
         </ul>
         <p>@Messages("status.submissionreadyforreview.description.3")</p>
+
+        @can_cannot_trade
+
         <p>@Messages("status.submissionreadyforreview.description.5")
-            <a href="https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs">@Messages("status.submissionreadyforreview.description.5.link")</a>@Messages("full.stop")</p>
-        }
+        <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/money-laundering">@Messages("status.submissionreadyforreview.description.5.link")</a>
+            @Messages("full.stop")</p>
+    }
+    case None => {
+        <p>@Messages("status.submissionreadyforreview.description.no.fee")</p>
+        <p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
+        <ul class="list list-bullet">
+            <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
+            <li>@Messages("status.submissionreadyforreview.description.2.listline2")</li>
+            <li>@Messages("status.submissionreadyforreview.description.2.listline3")</li>
+        </ul>
+        <p>@Messages("status.submissionreadyforreview.description.3")</p>
+
+        @can_cannot_trade
+
+        <p>@Messages("status.submissionreadyforreview.description.5")
+        <a href="https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs">@Messages("status.submissionreadyforreview.description.5.link")</a>
+            @Messages("full.stop")</p>
+    }
 
 }
 

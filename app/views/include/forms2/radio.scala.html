@@ -31,11 +31,13 @@
                 id="@{f.id}-@value"
                 value="@value"
                 @if(f.value.contains(value)){ checked="checked"}
-                @if(target.nonEmpty){ data-toggle="@target"} />
+                @if(target.nonEmpty){ data-toggle="@target"}
+                @if(description.nonEmpty){ aria-describedby="@{f.id}-@value-hint"}
+    />
         <label class="block-label" for="@{f.id}-@value">@Messages(labelText)</label>
 
         @if(description.nonEmpty) {
-            <span class="form-hint clear radio-description">@Messages(description)</span>
+            <span id="@{f.id}-@value-hint" class="form-hint clear radio-description">@Messages(description)</span>
         }
     </div>
 

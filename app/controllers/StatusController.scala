@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, _}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
 import models.responsiblepeople.ResponsiblePerson
 import models.status._
 import models.{FeeResponse, ReadStatusResponse}
@@ -29,10 +29,11 @@ import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName, ControllerHelper}
+import views.html.include.status.{rightpanel_submissionreadyforreview, can_cannot_trade, can_cannot_trade_msb_or_tcsp_only, can_cannot_trade_no_msb_or_tcsp}
 import views.html.status._
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class StatusController @Inject()(val landingService: LandingService,
@@ -50,27 +51,27 @@ class StatusController @Inject()(val landingService: LandingService,
                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(fromDuplicateSubmission: Boolean = false) = authAction.async {
-      implicit request =>
-        for {
-          refNo <- enrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier)
-          statusInfo <- statusService.getDetailedStatus(refNo, request.accountTypeId, request.credId)
-          statusResponse <- Future(statusInfo._2)
-          maybeBusinessName <- getBusinessName(request.credId, statusResponse.fold(none[String])(_.safeId), request.accountTypeId).value
-          feeResponse <- getFeeResponse(refNo, statusInfo._1, request.accountTypeId)
-          responsiblePeople <- dataCache.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
-          bm <- dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-          maybeActivities <- Future(bm.activities)
-          page <- getPageBasedOnStatus(
-              refNo,
-              statusInfo,
-              maybeBusinessName,
-              feeResponse,
-              fromDuplicateSubmission,
-              responsiblePeople,
-              maybeActivities,
-              request.accountTypeId,
-              request.credId)
-        } yield page
+    implicit request =>
+      for {
+        refNo <- enrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier)
+        statusInfo <- statusService.getDetailedStatus(refNo, request.accountTypeId, request.credId)
+        statusResponse <- Future(statusInfo._2)
+        maybeBusinessName <- getBusinessName(request.credId, statusResponse.fold(none[String])(_.safeId), request.accountTypeId).value
+        feeResponse <- getFeeResponse(refNo, statusInfo._1, request.accountTypeId)
+        responsiblePeople <- dataCache.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
+        bm <- dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+        maybeActivities <- Future(bm.activities)
+        page <- getPageBasedOnStatus(
+          refNo,
+          statusInfo,
+          maybeBusinessName,
+          feeResponse,
+          fromDuplicateSubmission,
+          responsiblePeople,
+          maybeActivities,
+          request.accountTypeId,
+          request.credId)
+      } yield page
   }
 
   def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus, accountTypeId: (String, String))
@@ -83,16 +84,16 @@ class StatusController @Inject()(val landingService: LandingService,
   }
 
   def newSubmission = authAction.async {
-      implicit request => {
-        val redirect = for {
-          amlsRegNumber <- OptionT.fromOption[Future](request.amlsRefNumber)
-          _ <- OptionT.liftF(enrolmentsService.deEnrol(amlsRegNumber, request.groupIdentifier))
-          _ <- OptionT.liftF(authenticator.refreshProfile)
-          _ <- OptionT.liftF(dataCache.remove(request.credId))
-        } yield Redirect(controllers.routes.LandingController.start(true))
+    implicit request => {
+      val redirect = for {
+        amlsRegNumber <- OptionT.fromOption[Future](request.amlsRefNumber)
+        _ <- OptionT.liftF(enrolmentsService.deEnrol(amlsRegNumber, request.groupIdentifier))
+        _ <- OptionT.liftF(authenticator.refreshProfile)
+        _ <- OptionT.liftF(dataCache.remove(request.credId))
+      } yield Redirect(controllers.routes.LandingController.start(true))
 
-        redirect getOrElse InternalServerError("New submission failed")
-      }
+      redirect getOrElse InternalServerError("New submission failed")
+    }
   }
 
   private def getPageBasedOnStatus(mlrRegNumber: Option[String],
@@ -107,7 +108,7 @@ class StatusController @Inject()(val landingService: LandingService,
                                   (implicit request: Request[AnyContent]) = {
     statusInfo match {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
-        getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission, accountTypeId, cacheId)
+        getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission, accountTypeId, cacheId, activities)
       case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
            (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
            (SubmissionWithdrawn, _) | (DeRegistered, _) =>
@@ -124,7 +125,8 @@ class StatusController @Inject()(val landingService: LandingService,
                                        feeResponse: Option[FeeResponse],
                                        fromDuplicateSubmission: Boolean,
                                        accountTypeId: (String, String),
-                                       cacheId: String)
+                                       cacheId: String,
+                                       activities: Option[BusinessActivities])
                                       (implicit request: Request[AnyContent]): Future[Result] = {
 
     status match {
@@ -138,9 +140,9 @@ class StatusController @Inject()(val landingService: LandingService,
       case _ =>
         Future.successful(
           Ok(status_submitted(mlrRegNumber.getOrElse(""),
-          businessNameOption,
-          feeResponse,
-          fromDuplicateSubmission)))
+            businessNameOption,
+            feeResponse,
+            fromDuplicateSubmission, canCannotTradeContent(activities))))
     }
   }
 
@@ -236,6 +238,26 @@ class StatusController @Inject()(val landingService: LandingService,
 
   private def getBusinessName(credId: String, safeId: Option[String], accountTypeId: (String, String))(implicit hc: HeaderCarrier, ec: ExecutionContext) =
     BusinessName.getName(credId, safeId, accountTypeId)(hc, ec, dataCache, amlsConnector)
+
+  private def hasMsb(activities: Option[BusinessActivities]) = {
+    activities.fold(false)(_.businessActivities.contains(MoneyServiceBusiness))
+  }
+
+  private def hasTcsp(activities: Option[BusinessActivities]) = {
+    activities.fold(false)(_.businessActivities.contains(TrustAndCompanyServices))
+  }
+
+  private def hasOther(activities: Option[BusinessActivities]) = {
+    activities.fold(false)(ba => (ba.businessActivities -- Set(MoneyServiceBusiness, TrustAndCompanyServices)).nonEmpty)
+  }
+
+  private def canCannotTradeContent(activities: Option[BusinessActivities])(implicit request: Request[AnyContent]) =
+    (hasMsb(activities), hasTcsp(activities), hasOther(activities)) match {
+      case (false, false, true) => can_cannot_trade_no_msb_or_tcsp()
+      case (true, _, false) | (_, true, false) => can_cannot_trade_msb_or_tcsp_only()
+      case (true, _, true) | (_, true, true) => can_cannot_trade()
+      case (_, _, _) => throw new MatchError("Could not match activities against given options.")
+    }
 }
 
 

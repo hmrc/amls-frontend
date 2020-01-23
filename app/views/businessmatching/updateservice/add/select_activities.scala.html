@@ -39,8 +39,7 @@
             heading = "businessmatching.updateservice.selectactivities.title",
             section = "summary.updateservice",
             panel = false,
-            hint = "businessmatching.updateservice.selectactivities.hint"
-        ) {
+            hint = "businessmatching.updateservice.selectactivities.hint") {
             @{activityValues map (value => radio(
                 f = f("businessActivities[]"),
                 labelText = s"businessmatching.registerservices.servicename.lbl.$value",

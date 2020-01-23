@@ -14,20 +14,13 @@
  * limitations under the License.
  *@
 
-@(
-        summary: String = "",
-        detailsClass: Boolean = true,
-        detailsInner: Boolean = true,
-        summaryClasses: Seq[String] = Seq("summary")
-)(content: Html)(implicit m: Messages, lang: Lang)
-    @* http://hmrc.github.io/assets-frontend/section-details.html *@
-<div class="form-group no-print">
-    <details role="group">
-        <summary class="@summaryClasses.mkString(" ")" role="button">@summary</summary>
-        <div
-        @if(detailsInner) { class="details__inner"}
-        >
-        @content
-</div>
-</details>
-</div>
+@import include._
+@import forms2._
+@import config.{ ApplicationConfig}
+
+@()(implicit messages: Messages, request: Request[_])
+
+<p>@Messages("status.submissionreadyforreview.description.4")
+ <a href="https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019">@Messages("status.submissionreadyforreview.description.4.link")</a>
+ @Messages("full.stop")</p>
+
