@@ -26,10 +26,6 @@
     @errorSummary(f)
 }
 
-@supportingContent = {
-    <p>@hint(Messages("businessmatching.updateservice.msb.services.list.heading"))</p>
-}
-
 @main(
     title = Messages("businessmatching.updateservice.msb.services.title") + " - " + Messages("summary.updateservice"),
     heading = header
@@ -42,7 +38,7 @@
         heading = "businessmatching.updateservice.msb.services.title",
         section = "summary.updateservice",
         panel = false,
-        supportingContent = supportingContent
+        hint = "businessmatching.updateservice.msb.services.list.heading"
       ) {
           @checkbox(
             f = f("msbServices[]"),

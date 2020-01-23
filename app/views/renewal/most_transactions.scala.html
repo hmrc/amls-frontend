@@ -26,10 +26,6 @@
     @errorSummary(f)
 }
 
-@supportingContent = {
-    <p>@hint("lbl.list.upto.3.countries")</p>
-}
-
 @main(
     title = Messages("renewal.msb.most.transactions.title") + " - " + Messages("summary.renewal"),
     heading = header
@@ -42,7 +38,7 @@
             heading = "renewal.msb.most.transactions.title",
             section = "summary.renewal",
             panel = false,
-            supportingContent = supportingContent
+            hint = "lbl.list.upto.3.countries"
         ) {
             @for(i <- 0 until 3) {
                 @defining(

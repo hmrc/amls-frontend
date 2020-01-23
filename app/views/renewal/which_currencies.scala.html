@@ -26,10 +26,6 @@
     @errorSummary(f)
 }
 
-@supportingContent = {
-    <p>@hint("msb.which_currencies.uptoThree.hint2")</p>
-}
-
 @main(
     title = Messages("renewal.msb.whichcurrencies.header") + " - " + Messages("summary.renewal"),
     heading = header
@@ -41,7 +37,7 @@
             section = "summary.renewal",
             panel = false,
             classes = Seq("form-group"),
-            supportingContent = supportingContent
+            hint = "msb.which_currencies.uptoThree.hint2"
         ) {
             @currency(
                 field = f("currencies[0]"),
