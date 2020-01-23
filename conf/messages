@@ -726,7 +726,10 @@ status.submissionreadyforreview.description.2.listline1 = we need to contact you
 status.submissionreadyforreview.description.2.listline2 = we need to contact you about additional fees you need to pay
 status.submissionreadyforreview.description.2.listline3 = you make an update to your application
 status.submissionreadyforreview.description.3 = We’ll email you when we have made a decision.
-status.submissionreadyforreview.description.4 = You can trade and carry out business activities while your application is pending.
+status.submissionreadyforreview.description.4 = There are some services you cannot provide while your application is pending.
+status.submissionreadyforreview.description.4.link = Find out if you can trade
+status.submissionreadyforreview.description.4.msb.or.tcsp = You cannot trade or carry out business activities while your application is pending.
+status.submissionreadyforreview.description.4.no.msb.or.tcsp = You can trade and carry out business activities while your application is pending.
 status.submissionreadyforreview.description.5 = If you have a question about the Money Laundering Regulations,
 status.submissionreadyforreview.description.5.link = contact HMRC
 status.submissionreadyforreview.description.link = pay your fees now
@@ -992,8 +995,13 @@ confirmation.renewal.summary = This shows your total renewal fees for each item.
 confirmation.payment.title = You have submitted
 confirmation.payment.lede = You have submitted
 confirmation.payment.reference_header = Payment reference: {0}
-confirmation.payment.info.hmrc_review = HMRC will review your application when we receive your payment. It can take up to 45 days to review your application, or request further information.
-confirmation.payment.info.hmrc_review2 = You can sign into this service at any time to see the status of your application. We’ll email you when we’ve made a decision. You’ll need to sign in to see the decision.
+confirmation.payment.info.hmrc.review.1 = HMRC will review your application when we receive your payment.
+confirmation.payment.info.hmrc.review.2 = We’ll email you when we have made a decision.
+confirmation.payment.info.hmrc.review.3 = You can sign into your account at any time to check your application status.
+
+
+
+
 confirmation.payment.renewal.info.hmrc_review = HMRC will review your application when we receive your payment.
 confirmation.payment.renewal.info.hmrc_review2 = You can continue to trade while your application is being reviewed.
 confirmation.payment.renewal.info.hmrc_review3 = We’ll email you when we have made a decision.
@@ -1002,7 +1010,7 @@ confirmation.payment.info.heading.keep_up_to_date = Keep your information up to 
 confirmation.payment.info.keep_up_to_date = If any of your information changes, you’ll need to sign in to update your details within 30 days of the change. For example, you’ll need to update if:
 confirmation.payment.info.keep_up_to_date.item1 = a responsible person leaves your business
 confirmation.payment.info.keep_up_to_date.item2 = you start trading from a new premises
-confirmation.payment.info.keep_up_to_date.item3 = your main contact number changes
+confirmation.payment.info.keep_up_to_date.item3 = your business email address changes
 confirmation.payment.status_button.text = View your current status
 confirmation.payment.continue_button.text = Continue
 
@@ -1015,9 +1023,6 @@ confirmation.payment.bacs.header = You have submitted
 
 confirmation.payment.renewal.lede = You have submitted your renewal and paid
 confirmation.payment.renewal.title = You have submitted your renewal and paid
-
-confirmation.payment.info.transitional.renewal.hmrc_review = HM Revenue and Customs (HMRC) will review your application when we receive your payment. It can take more than 45 days to review your application or request further information.
-confirmation.payment.info.transitional.renewal.hmrc_review2 = You can sign into this service at any time to see the status of your application. We’ll send you an email when the decision has been made. You’ll need to sign in to see the decision.
 
 confirmation.payment.failed.title = Something went wrong with your payment
 confirmation.payment.failed.header = Something went wrong with your payment
@@ -1334,15 +1339,13 @@ estateagentbusiness.service.lbl.07 = Land management
 estateagentbusiness.service.lbl.08 = Development company
 estateagentbusiness.service.lbl.09 = Social housing provision
 estateagentbusiness.redress.lbl = Redress scheme:
-estateagentbusiness.redress.lbl.01 = The Property Ombudsman Limited
-estateagentbusiness.redress.lbl.02 = Ombudsman Services
+estateagentbusiness.redress.lbl.01 = The Property Ombudsman
 estateagentbusiness.redress.lbl.03 = Property Redress Scheme
-estateagentbusiness.redress.lbl.04 = Other
 estateagentbusiness.redress.lbl.05 = Business is not registered with a redress scheme
 estateagentbusiness.redress.lbl.other = Redress scheme your business is registered with
 estateagentbusiness.registered.redress.title = Which redress scheme is your business registered with?
 estateagentbusiness.registered.redress.heading = Which redress scheme is your business registered with?
-estateagentbusiness.registered.redress.text = A redress scheme resolves disputes between an estate agency business and its customers. It is an independent service.
+estateagentbusiness.registered.redress.text = A redress scheme is an independent service that resolves disputes between an estate agency business and its customers
 estateagentbusiness.which.redress.scheme.lbl = Which redress scheme?
 
 businessmatching.businessType.title = What’s your business structure?

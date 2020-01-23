@@ -33,9 +33,11 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.PrivateMethodTester
 import play.api.http.Status.OK
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.twirl.api.Html
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -44,29 +46,30 @@ import utils.{AmlsSpec, DependencyMocks}
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-class StatusControllerSpec extends AmlsSpec with PaymentGenerator {
+class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMethodTester {
 
   val cacheMap = mock[CacheMap]
 
   trait Fixture extends DependencyMocks {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
-    val controller = new StatusController (
-       mock[LandingService],
-       mock[StatusService],
-       mock[AuthEnrolmentsService],
-       mock[FeeConnector],
-       mock[RenewalService],
-       mock[ProgressService],
-       mock[AmlsConnector],
-       mockCacheConnector,
-       mock[AuthenticatorConnector],
-       SuccessfulAuthAction,
+    val controller = new StatusController(
+      mock[LandingService],
+      mock[StatusService],
+      mock[AuthEnrolmentsService],
+      mock[FeeConnector],
+      mock[RenewalService],
+      mock[ProgressService],
+      mock[AmlsConnector],
+      mockCacheConnector,
+      mock[AuthenticatorConnector],
+      SuccessfulAuthAction,
       commonDependencies,
-       mock[FeeResponseService],
+      mock[FeeResponseService],
       mockMcc)
 
-    val controllerNoAmlsNumber = new StatusController (
+    val controllerNoAmlsNumber = new StatusController(
       mock[LandingService],
       mock[StatusService],
       mock[AuthEnrolmentsService],
@@ -83,7 +86,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator {
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
     val rp1 = ResponsiblePerson(
-      personName = Some(PersonName("first1",Some("middle"), "last1")),
+      personName = Some(PersonName("first1", Some("middle"), "last1")),
       legalName = None,
       legalNameChangeDate = None,
       knownBy = None,
@@ -142,6 +145,14 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator {
 
   val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
     Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+  val noMsbNoTcsp = Some(BusinessActivities(Set(TelephonePaymentService, BillPaymentServices, AccountancyServices, EstateAgentBusinessService)))
+  val tcspAndOther = Some(BusinessActivities(Set(TelephonePaymentService, BillPaymentServices, AccountancyServices, EstateAgentBusinessService, TrustAndCompanyServices)))
+  val msbAndOther = Some(BusinessActivities(Set(TelephonePaymentService, BillPaymentServices, AccountancyServices, EstateAgentBusinessService, MoneyServiceBusiness)))
+  val msbAndTcsp = Some(BusinessActivities(Set(TelephonePaymentService, BillPaymentServices, AccountancyServices, EstateAgentBusinessService, MoneyServiceBusiness, TrustAndCompanyServices)))
+  val onlyMsb = Some(BusinessActivities(Set(MoneyServiceBusiness)))
+  val onlyTcsp = Some(BusinessActivities(Set(TrustAndCompanyServices)))
+  val msbAndTcspOnly = Some(BusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness)))
 
   "StatusController" should {
     "respond with SEE_OTHER and redirect to the landing page" when {
@@ -213,7 +224,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator {
 
     "show correct content" when {
 
-     "application status is NotCompleted" in new Fixture {
+      "application status is NotCompleted" in new Fixture {
 
         when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -238,8 +249,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator {
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
             .thenReturn(Future.successful(Some(cacheMap)))
 
-          when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+          when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
           when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
             .thenReturn(Future.successful((SubmissionReadyForReview, None)))
@@ -254,8 +265,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator {
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
             .thenReturn(Future.successful(Some(cacheMap)))
 
-          when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+          when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
           when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
             .thenReturn(Future.successful((SubmissionReadyForReview, None)))
@@ -526,7 +537,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator {
           Some(CustomersOutsideIsUK(true)),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
           Some(PercentageOfCashPaymentOver15000.First),
-          Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
+          Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other")))))),
           Some(TotalThroughput("01")),
           Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
           Some(TransactionsInLast12Months("1500")),
@@ -560,9 +571,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator {
         when(statusResponse.processingDate).thenReturn(LocalDateTime.now)
         when(statusResponse.safeId).thenReturn(None)
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-          .thenReturn(
-            Some(BusinessMatching(Some(reviewDetails), None)))
+        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
         when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -666,6 +676,142 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator {
         doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").asScala foreach {
           _.text mustBe Messages("changeofficer.changelink.text")
         }
+      }
+    }
+
+    "have hasMsb method which" must {
+      "return true if Msb activities are present in business activities" in new Fixture {
+        val hasMsb = PrivateMethod[Boolean]('hasMsb)
+
+        val result = controller invokePrivate hasMsb(msbAndOther)
+
+        result mustBe true
+      }
+
+      "return false if Msb activities are not present in business activities" in new Fixture {
+        val hasMsb = PrivateMethod[Boolean]('hasMsb)
+
+        val result = controller invokePrivate hasMsb(noMsbNoTcsp)
+
+        result mustBe false
+      }
+    }
+
+    "have hasTcsp method which" must {
+      "return true if Tcsp activities are present in business activities" in new Fixture {
+        val hasTcsp = PrivateMethod[Boolean]('hasTcsp)
+
+        val result = controller invokePrivate hasTcsp(tcspAndOther)
+
+        result mustBe true
+      }
+
+      "return false if Tcsp activities are not present in business activities" in new Fixture {
+        val hasTcsp = PrivateMethod[Boolean]('hasTcsp)
+
+        val result = controller invokePrivate hasTcsp(noMsbNoTcsp)
+
+        result mustBe false
+      }
+    }
+
+    "have hasOther method which" must {
+      "return true if there are other activities than Msb present" in new Fixture {
+        val hasOther = PrivateMethod[Boolean]('hasOther)
+
+        val result = controller invokePrivate hasOther(noMsbNoTcsp)
+
+        result mustBe true
+      }
+
+      "return false if there are no other activities than Msb or Tcsp" in new Fixture {
+        val hasOther = PrivateMethod[Boolean]('hasOther)
+
+        val result = controller invokePrivate hasOther(onlyMsb)
+
+        result mustBe false
+      }
+    }
+
+    "have canCannotTradeContent method which" must {
+      "return correct content if no msb or tcsp in BA" in new Fixture {
+
+        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+
+        val result = controller invokePrivate canCannotTradeContent(noMsbNoTcsp, request)
+
+        result.body must include("You can trade and carry out business activities while your application is pending")
+      }
+
+      "return correct content if msb only in BA" in new Fixture {
+
+        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+
+        val result = controller invokePrivate canCannotTradeContent(onlyMsb, request)
+
+        result.body must include("You cannot trade or carry out business activities while your application is pending")
+      }
+
+      "return correct content if tcsp only in BA" in new Fixture {
+
+        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+
+        val result = controller invokePrivate canCannotTradeContent(onlyTcsp, request)
+
+        result.body must include("You cannot trade or carry out business activities while your application is pending")
+      }
+
+      "return correct content if tcsp and msb only in BA" in new Fixture {
+
+        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+
+        val result = controller invokePrivate canCannotTradeContent(msbAndTcspOnly, request)
+
+        result.body must include("You cannot trade or carry out business activities while your application is pending")
+      }
+
+      "return correct content if msb and other in BA" in new Fixture {
+
+        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+
+        val result = controller invokePrivate canCannotTradeContent(msbAndOther, request)
+
+        result.body must include("There are some services you cannot provide while your application is pending")
+        result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
+        result.body must include("Find out if you can trade")
+      }
+
+      "return correct content if tcsp and other in BA" in new Fixture {
+
+        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+
+        val result = controller invokePrivate canCannotTradeContent(tcspAndOther, request)
+
+        result.body must include("There are some services you cannot provide while your application is pending")
+        result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
+        result.body must include("Find out if you can trade")
+      }
+
+      "return correct content if tcsp, msb and other in BA" in new Fixture {
+
+        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+
+        val result = controller invokePrivate canCannotTradeContent(msbAndTcsp, request)
+
+        result.body must include("There are some services you cannot provide while your application is pending")
+        result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
+        result.body must include("Find out if you can trade")
+      }
+
+      "throw no match error if BA is empty" in new Fixture {
+
+        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+
+        val result = intercept[MatchError] {
+          controller invokePrivate canCannotTradeContent(Some(BusinessActivities(Set())), request)
+        }
+
+        assert(result.getMessage.contains("Could not match activities against given options."))
       }
     }
   }

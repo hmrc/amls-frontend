@@ -1,0 +1,9 @@
+ + [AMLS-5587] - 'Migrate to new pay api endpoint'
+ + [AMLS-5596] - 'Bug fix: Date of change routing not working in RP section'
+ + [AMLS-5618] - 'Removed div tag from legend'
+ + [AMLS-5620] - 'Removed reference to 45 days and updated content on cofirmation pages'
+ + [AMLS-5621] - 'Removing title attribute from inpout template'
+ + [AMLS-5622] - 'Added parameter aria-described-by to date template'
+ + [AMLS-5624] - 'New CYA layout bank details'
+ + [AMLS-5631] - 'Fixed aria-describedby attributes in checkboxes, radios, fieldsets
+ + [AMLS-5635] - 'Content for businesses that can and can't trade'

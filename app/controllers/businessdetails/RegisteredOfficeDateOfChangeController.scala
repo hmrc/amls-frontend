@@ -19,7 +19,7 @@ package controllers.businessdetails
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessdetails.{BusinessDetails, RegisteredOfficeNonUK, RegisteredOfficeUK}
 import org.joda.time.LocalDate
@@ -42,7 +42,7 @@ class RegisteredOfficeDateOfChangeController @Inject () (
   def get = authAction.async {
       implicit request =>
         Future(Ok(views.html.date_of_change(
-          Form2[DateOfChange](DateOfChange(LocalDate.now)),
+          EmptyForm,
           "summary.businessdetails",
           controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
         )))

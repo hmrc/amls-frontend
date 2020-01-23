@@ -28,18 +28,15 @@ class EstateAgentBusinessSpec extends AmlsSpec {
   val services = Services(Set(Residential, Commercial, Auction))
   val professionalBody = ProfessionalBodyYes("details")
   val penalisedUnderEAAct =  PenalisedUnderEstateAgentsActYes("test")
-  val redressSchemeOther = Other("test")
 
   val newServices = Services(Set(Commercial, Relocation))
   val newProfessionalBody = ProfessionalBodyNo
   val newPenalisedEAAct = PenalisedUnderEstateAgentsActNo
-  val newRedressScheme = OmbudsmanServices
 
   val completeJson = Json.obj(
     "services" -> Seq("01", "02","03"),
     "isRedress" -> true,
-    "propertyRedressScheme" -> "04",
-    "propertyRedressSchemeOther" -> "test",
+    "propertyRedressScheme" -> "03",
     "penalised" -> true,
     "professionalBody" -> "details",
     "penalisedUnderEstateAgentsAct" -> true,
@@ -50,7 +47,7 @@ class EstateAgentBusinessSpec extends AmlsSpec {
 
   val completeModel = EstateAgentBusiness(
     services = Some(services),
-    redressScheme =  Some(redressSchemeOther),
+    redressScheme = Some(PropertyRedressScheme),
     professionalBody = Some(professionalBody),
     penalisedUnderEstateAgentsAct = Some(penalisedUnderEAAct),
     hasAccepted = true
@@ -63,6 +60,8 @@ class EstateAgentBusinessSpec extends AmlsSpec {
     penalisedUnderEstateAgentsAct = None
   )
 
+  val invalidRedressScheme = completeModel.copy(redressScheme = Some(OmbudsmanServices))
+  val invalidRedressSchemeOther = completeModel.copy(redressScheme = Some(Other("foo")))
 
   "EstateAgentBusiness" must {
     "validate complete json" must {
@@ -98,11 +97,6 @@ class EstateAgentBusinessSpec extends AmlsSpec {
       result must be (EstateAgentBusiness(Some(services), None, hasChanged = true, hasAccepted = false))
     }
 
-    "return EstateAgentBusiness with correct redressScheme when set and indicate changes have been made" in {
-      val result = initial.redressScheme(redressSchemeOther)
-      result must be (EstateAgentBusiness(None,Some(redressSchemeOther), None, hasChanged = true))
-    }
-
     "return EstateAgentBusiness with correct professionalBody when set and indicate changes have been made" in {
       val result = initial.professionalBody(professionalBody)
       result must be (EstateAgentBusiness(None, None, Some(professionalBody), None, hasChanged = true))
@@ -116,26 +110,21 @@ class EstateAgentBusinessSpec extends AmlsSpec {
 
   "EstateAgentBusiness with existing values" must {
 
-    val initial = EstateAgentBusiness(Some(services), Some(redressSchemeOther), Some(professionalBody), Some(penalisedUnderEAAct))
+    val initial = EstateAgentBusiness(Some(services), Some(ThePropertyOmbudsman), Some(professionalBody), Some(penalisedUnderEAAct))
 
     "return EstateAgentBusiness with correct business services when set and indicate changes have been made" in {
         val result = initial.services(newServices)
-        result must be (EstateAgentBusiness(Some(newServices),  Some(redressSchemeOther), Some(professionalBody), Some(penalisedUnderEAAct), hasChanged = true))
-      }
-
-    "return EstateAgentBusiness with correct redressScheme when set and indicate changes have been made" in {
-        val result = initial.redressScheme(newRedressScheme)
-        result must be (EstateAgentBusiness(Some(services),  Some(newRedressScheme), Some(professionalBody), Some(penalisedUnderEAAct), hasChanged = true))
+        result must be (EstateAgentBusiness(Some(newServices),  Some(ThePropertyOmbudsman), Some(professionalBody), Some(penalisedUnderEAAct), hasChanged = true))
       }
 
       "return EstateAgentBusiness with correct professionalBody when set and indicate changes have been made" in {
         val result = initial.professionalBody(newProfessionalBody)
-        result must be (EstateAgentBusiness(Some(services), Some(redressSchemeOther), Some(newProfessionalBody), Some(penalisedUnderEAAct), hasChanged = true))
+        result must be (EstateAgentBusiness(Some(services), Some(ThePropertyOmbudsman), Some(newProfessionalBody), Some(penalisedUnderEAAct), hasChanged = true))
       }
 
       "return EstateAgentBusiness with correct penalisedUnderEAAct when set and indicate changes have been made" in {
         val result = initial.penalisedUnderEstateAgentsAct(newPenalisedEAAct)
-        result must be (EstateAgentBusiness(Some(services), Some(redressSchemeOther), Some(professionalBody), Some(newPenalisedEAAct), hasChanged = true))
+        result must be (EstateAgentBusiness(Some(services), Some(ThePropertyOmbudsman), Some(professionalBody), Some(newPenalisedEAAct), hasChanged = true))
       }
   }
 
@@ -159,6 +148,14 @@ class EstateAgentBusinessSpec extends AmlsSpec {
 
     "equal false when all properties equal `None`" in {
       incompleteModel.isComplete mustEqual false
+    }
+
+    "equal false for an invalid redress scheme" in {
+      invalidRedressScheme.isComplete mustEqual false
+    }
+
+    "equal false for an invalid other redress scheme" in {
+      invalidRedressSchemeOther.isComplete mustEqual false
     }
   }
 
@@ -243,16 +240,25 @@ class EstateAgentBusinessSpec extends AmlsSpec {
     "redressScheme value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.redressScheme(redressSchemeOther)
-          res must be(completeModel)
+
+          val completeModel2 = EstateAgentBusiness(
+            services = Some(services),
+            redressScheme = Some(ThePropertyOmbudsman),
+            professionalBody = Some(professionalBody),
+            penalisedUnderEstateAgentsAct = Some(penalisedUnderEAAct),
+            hasAccepted = true
+          )
+
+          val res = completeModel2.redressScheme(ThePropertyOmbudsman)
+          res must be(completeModel2)
           res.hasChanged must be(false)
         }
       }
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val res = completeModel.redressScheme(newRedressScheme)
+          val res = completeModel.redressScheme(ThePropertyOmbudsman)
           res.hasChanged must be(true)
-          res.redressScheme must be(Some(newRedressScheme))
+          res.redressScheme must be(Some(ThePropertyOmbudsman))
         }
       }
     }
