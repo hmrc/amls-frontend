@@ -40,12 +40,14 @@
             panel = false
         ) {
             @input(
+                classes = Seq("form-control-1-3"),
                 attrPattern = "\\d*",
                 field = f("sortCode"),
                 hintText = "bankdetails.bankaccount.sortcode.hint",
                 labelText = "bankdetails.bankaccount.sortcode"
             )
             @input(
+                classes = Seq("form-control-1-2"),
                 attrPattern = "\\d*",
                 field = f("accountNumber"),
                 hintText = "bankdetails.bankaccount.accountnumber.hint",
