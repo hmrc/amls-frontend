@@ -24,6 +24,7 @@ import jto.validation.{Path, ValidationError}
 import models.ReadStatusResponse
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.declaration.{AddPerson, WhoIsRegistering}
+import models.registrationprogress.{Completed, Section, Started}
 import models.renewal.Renewal
 import models.responsiblepeople._
 import models.status._
@@ -32,26 +33,30 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import play.api.i18n.Messages
+import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.{RenewalService, StatusService}
+import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
+
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    val controller = new WhoIsRegisteringController (
+    val mockSectionsProvider = mock[SectionsProvider]
+
+    val controller = new WhoIsRegisteringController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       amlsConnector = mock[AmlsConnector],
       statusService = mock[StatusService],
       renewalService = mock[RenewalService],
-      cc = mockMcc
+      cc = mockMcc,
+      sectionsProvider = mockSectionsProvider
     )
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,
@@ -83,9 +88,6 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
       when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
         .thenReturn(Some(people))
 
-//      when(cacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
-//        .thenReturn(None)
-
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(people)))
 
@@ -102,75 +104,118 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
   val emptyCache = CacheMap("", Map.empty)
 
   "WhoIsRegisteringController" must {
+    "Get" must {
+      "with completed sections" must {
+        val completedSections = Seq(
+          Section("s1", Completed, true, mock[Call]),
+          Section("s2", Completed, true, mock[Call])
+        )
 
-    "Get Option:" must {
+        "load the who is registering page" when {
+          "status is pending" in new Fixture {
+            when {
+              mockSectionsProvider.sections(any[String])(any(), any())
+            }.thenReturn(Future.successful(completedSections))
 
-      "load the who is registering page" when {
-        "status is pending" in new Fixture {
+            run(SubmissionReadyForReview) { _ =>
+              val result = controller.get()(request)
+              status(result) must be(OK)
+
+              val htmlValue = Jsoup.parse(contentAsString(result))
+              htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
+              htmlValue.getElementById("person-0").parent().text() must include(responsiblePeople.head.personName.get.fullName)
+
+              contentAsString(result) must include(Messages("submit.amendment.application"))
+            }
+          }
+
+          "status is approved" in new Fixture {
+            when {
+              mockSectionsProvider.sections(any[String])(any(), any())
+            }.thenReturn(Future.successful(completedSections))
+
+            run(SubmissionDecisionApproved) { _ =>
+              val result = controller.get()(request)
+              status(result) must be(OK)
+
+              val htmlValue = Jsoup.parse(contentAsString(result))
+              htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
+              htmlValue.getElementById("person-0").parent().text() must include(responsiblePeople.head.personName.get.fullName)
+
+              contentAsString(result) must include(Messages("submit.amendment.application"))
+            }
+          }
+
+          "status is pre-submission" in new Fixture {
+            when {
+              mockSectionsProvider.sections(any[String])(any(), any())
+            }.thenReturn(Future.successful(completedSections))
+
+            run(SubmissionReady) { _ =>
+              val result = controller.get()(request)
+              status(result) must be(OK)
+
+              val htmlValue = Jsoup.parse(contentAsString(result))
+              htmlValue.title mustBe Messages("declaration.who.is.registering.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
+              htmlValue.getElementById("person-0").parent().text() must include(responsiblePeople.head.personName.get.fullName)
+
+              contentAsString(result) must include(Messages("submit.registration"))
+            }
+          }
+
+          "status is renewal amendment" in new Fixture {
+            when {
+              mockSectionsProvider.sections(any[String])(any(), any())
+            }.thenReturn(Future.successful(completedSections))
+
+            run(RenewalSubmitted(None)) { _ =>
+              val result = controller.get()(request)
+              status(result) must be(OK)
+
+              val htmlValue = Jsoup.parse(contentAsString(result))
+
+              contentAsString(result) must include(Messages("submit.amendment.application"))
+            }
+          }
+
+
+          "status is renewal" in new Fixture {
+            when {
+              mockSectionsProvider.sections(any[String])(any(), any())
+            }.thenReturn(Future.successful(completedSections))
+
+            run(ReadyForRenewal(None), Some(mock[Renewal])) { _ =>
+              val result = controller.get(request)
+              status(result) must be(OK)
+
+              val htmlValue = Jsoup.parse(contentAsString(result))
+              contentAsString(result) must include(Messages("declaration.renewal.who.is.registering.heading"))
+            }
+          }
+        }
+      }
+
+      "with incomplete sections" must {
+        val incompleteSections = Seq(
+          Section("s1", Completed, true, mock[Call]),
+          Section("s2", Started, true, mock[Call])
+        )
+
+        "redirect to the RegistrationProgressController" in new Fixture {
+          when {
+            mockSectionsProvider.sections(any[String])(any(), any())
+          }.thenReturn(Future.successful(incompleteSections))
+
           run(SubmissionReadyForReview) { _ =>
             val result = controller.get()(request)
-            status(result) must be(OK)
-
-            val htmlValue = Jsoup.parse(contentAsString(result))
-            htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
-            htmlValue.getElementById("person-0").parent().text() must include(responsiblePeople.head.personName.get.fullName)
-
-            contentAsString(result) must include(Messages("submit.amendment.application"))
-          }
-        }
-
-        "status is approved" in new Fixture {
-          run(SubmissionDecisionApproved) { _ =>
-            val result = controller.get()(request)
-            status(result) must be(OK)
-
-            val htmlValue = Jsoup.parse(contentAsString(result))
-            htmlValue.title mustBe Messages("declaration.who.is.registering.amendment.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
-            htmlValue.getElementById("person-0").parent().text() must include(responsiblePeople.head.personName.get.fullName)
-
-            contentAsString(result) must include(Messages("submit.amendment.application"))
-          }
-        }
-
-        "status is pre-submission" in new Fixture {
-          run(SubmissionReady) { _ =>
-            val result = controller.get()(request)
-            status(result) must be(OK)
-
-            val htmlValue = Jsoup.parse(contentAsString(result))
-            htmlValue.title mustBe Messages("declaration.who.is.registering.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
-            htmlValue.getElementById("person-0").parent().text() must include(responsiblePeople.head.personName.get.fullName)
-
-            contentAsString(result) must include(Messages("submit.registration"))
-          }
-        }
-
-        "status is renewal amendment" in new Fixture {
-          run(RenewalSubmitted(None)) { _ =>
-            val result = controller.get()(request)
-            status(result) must be(OK)
-
-            val htmlValue = Jsoup.parse(contentAsString(result))
-
-            contentAsString(result) must include(Messages("submit.amendment.application"))
-          }
-        }
-
-
-        "status is renewal" in new Fixture {
-          run(ReadyForRenewal(None), Some(mock[Renewal])) { _ =>
-            val result = controller.get(request)
-            status(result) must be(OK)
-
-            val htmlValue = Jsoup.parse(contentAsString(result))
-            contentAsString(result) must include(Messages("declaration.renewal.who.is.registering.heading"))
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
           }
         }
       }
     }
 
     "Post" must {
-
       "successfully redirect next page when user selects the option 'Someone else'" when {
         "status is pending" in new Fixture {
           run(SubmissionReadyForReview) { _ =>

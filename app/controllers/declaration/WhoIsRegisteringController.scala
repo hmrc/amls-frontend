@@ -27,9 +27,10 @@ import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePerson}
 import models.status._
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
-import services.{RenewalService, StatusService}
+import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.AuthAction
+import utils.{AuthAction, DeclarationHelper}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.declaration.{who_is_registering_this_registration, who_is_registering_this_renewal, who_is_registering_this_update}
 
@@ -41,18 +42,24 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
                                              val statusService: StatusService,
                                              val renewalService: RenewalService,
                                              val amlsConnector: AmlsConnector,
-                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                             val cc: MessagesControllerComponents,
+                                             val sectionsProvider: SectionsProvider) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>
-      dataCacheConnector.fetchAll(request.credId) flatMap {
-        optionalCache =>
-          (for {
-            cache <- optionalCache
-            responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-          } yield whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
-          ) getOrElse whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, Seq.empty)
+      DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
+        case true =>  dataCacheConnector.fetchAll(request.credId) flatMap {
+          optionalCache =>
+            (for {
+              cache <- optionalCache
+              responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+            } yield whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
+              ) getOrElse whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, Seq.empty)
+        }
+        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }
+
+
   }
 
   def post: Action[AnyContent] = authAction.async {

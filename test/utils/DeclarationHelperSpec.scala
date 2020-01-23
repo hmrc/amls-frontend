@@ -16,7 +16,8 @@
 
 package utils
 
-import models.{Country}
+import models.Country
+import models.registrationprogress.{Completed, Section, Started}
 import models.renewal._
 import models.responsiblepeople._
 import models.status._
@@ -24,12 +25,13 @@ import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import services.{RenewalService, StatusService}
+import services.{RenewalService, SectionsProvider, StatusService}
 import org.mockito.Mockito.when
 import org.mockito.Matchers.any
 import utils.DeclarationHelper._
 import play.api.test.Helpers._
 import org.mockito.Matchers.{eq => eqTo, _}
+import play.api.mvc.Call
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
@@ -289,6 +291,35 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
       } thenReturn Future.successful(SubmissionReady)
 
       await(statusEndDate(amlsRegNo, accountTypeId, credId)) mustBe(None)
+    }
+  }
+
+  "sectionsComplete" must {
+    val sectionsProvider = mock[SectionsProvider]
+    val completedSections = Seq(
+      Section("s1", Completed, true,  mock[Call]),
+      Section("s2", Completed, true,  mock[Call])
+    )
+
+    val incompleteSections = Seq(
+      Section("s1", Completed, true,  mock[Call]),
+      Section("s2", Started,   true,  mock[Call])
+    )
+
+    "return false where one or more sections are imcomplete" in {
+      when{
+        sectionsProvider.sections(eqTo(credId))(any(), any())
+      }.thenReturn(Future.successful(incompleteSections))
+
+      await(sectionsComplete(credId, sectionsProvider)) mustBe(false)
+    }
+
+    "return true where all sections are complete" in {
+      when{
+        sectionsProvider.sections(eqTo(credId))(any(), any())
+      }.thenReturn(Future.successful(completedSections))
+
+      await(sectionsComplete(credId, sectionsProvider)) mustBe(true)
     }
   }
 

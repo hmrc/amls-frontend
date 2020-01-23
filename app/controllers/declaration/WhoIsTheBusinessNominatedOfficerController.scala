@@ -26,9 +26,9 @@ import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePerson}
 import models.status._
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
-import services.StatusService
+import services.{SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.AuthAction
+import utils.{AuthAction, DeclarationHelper}
 import views.html.declaration.select_business_nominated_officer
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -41,7 +41,8 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                                                              val ds: CommonPlayDependencies,
                                                              val statusService: StatusService,
                                                              config: ApplicationConfig,
-                                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                             val cc: MessagesControllerComponents,
+                                                             val sectionsProvider: SectionsProvider) extends AmlsBaseController(ds, cc) {
 
   def businessNominatedOfficerView(amlsRegistrationNo: Option[String],
                                    accountTypeId: (String, String),
@@ -59,13 +60,16 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
 
   def get = authAction.async {
       implicit request =>
-        dataCacheConnector.fetchAll(request.credId) flatMap {
-          optionalCache =>
-            (for {
-              cache <- optionalCache
-              responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-            } yield businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
-              ) getOrElse businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, Seq.empty)
+        DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
+          case true =>  dataCacheConnector.fetchAll(request.credId) flatMap {
+            optionalCache =>
+              (for {
+                cache <- optionalCache
+                responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+              } yield businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
+                ) getOrElse businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, Seq.empty)
+          }
+          case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
         }
   }
 

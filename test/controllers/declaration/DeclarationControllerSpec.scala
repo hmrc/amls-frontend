@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
+import models.registrationprogress.{Completed, Section, Started}
 import models.status.{NotCompleted, ReadyForRenewal, SubmissionReadyForReview}
 import models.{ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
 import org.joda.time.{LocalDate, LocalDateTime}
@@ -28,8 +29,10 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.mvc.Call
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import services.SectionsProvider
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.Future
 
@@ -38,25 +41,27 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
+    val mockSectionsProvider = mock[SectionsProvider]
 
-    val declarationController = new DeclarationController (
+    val declarationController = new DeclarationController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mockStatusService,
-      cc = mockMcc
+      cc = mockMcc,
+      sectionsProvider = mockSectionsProvider
     )
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
       amlsRefNo = "", Some(SubscriptionFees(
-      registrationFee = 0,
-      fpFee = None,
-      fpFeeRate = None,
-      approvalCheckFee = None,
-      approvalCheckFeeRate = None,
-      premiseFee = 0,
-      premiseFeeRate = None,
-      totalFees = 0,
-      paymentReference = "")
+        registrationFee = 0,
+        fpFee = None,
+        fpFeeRate = None,
+        approvalCheckFee = None,
+        approvalCheckFeeRate = None,
+        premiseFee = 0,
+        premiseFeeRate = None,
+        totalFees = 0,
+        paymentReference = "")
       )
     )
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,
@@ -68,126 +73,209 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
   }
 
   "Declaration get" must {
+    "with completed sections" must {
+      val completedSections = Seq(
+        Section("s1", Completed, true, mock[Call]),
+        Section("s2", Completed, true, mock[Call])
+      )
 
-    "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
+      "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
 
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+          (any(), any())).thenReturn(Future.successful(None))
 
-      mockApplicationStatus(NotCompleted)
+        mockApplicationStatus(NotCompleted)
 
-      val result = declarationController.get()(request)
-      status(result) must be(SEE_OTHER)
+        val result = declarationController.get()(request)
+        status(result) must be(SEE_OTHER)
 
-      redirectLocation(result) mustBe Some(routes.AddPersonController.get().url)
+        redirectLocation(result) mustBe Some(routes.AddPersonController.get().url)
+      }
+
+      "load the declaration page for pre-submissions if name and business matching is found" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
+
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(addPerson)))
+
+        mockApplicationStatus(NotCompleted)
+
+        val result = declarationController.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(addPerson.firstName)
+        contentAsString(result) must include(addPerson.middleName mkString)
+        contentAsString(result) must include(addPerson.lastName)
+        contentAsString(result) must include(Messages("submit.registration"))
+      }
+
+      "load the declaration page for pre-submissions if name and business matching is found (renewal)" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
+
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(addPerson)))
+
+        mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
+
+        val result = declarationController.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(addPerson.firstName)
+        contentAsString(result) must include(addPerson.middleName mkString)
+        contentAsString(result) must include(addPerson.lastName)
+        contentAsString(result) must include(Messages("submit.renewal.application"))
+      }
+
+      "load the declaration page for pre-submissions if name and business matching is found (amendment)" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
+
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(addPerson)))
+
+        mockApplicationStatus(SubmissionReadyForReview)
+
+        val result = declarationController.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(addPerson.firstName)
+        contentAsString(result) must include(addPerson.middleName mkString)
+        contentAsString(result) must include(addPerson.lastName)
+        contentAsString(result) must include(Messages("submit.amendment.application"))
+      }
+
+      "report error if retrieval of amlsRegNo fails" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
+
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(addPerson)))
+
+        mockApplicationStatus(NotCompleted)
+
+        val result = declarationController.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(addPerson.firstName)
+        contentAsString(result) must include(addPerson.middleName mkString)
+        contentAsString(result) must include(addPerson.lastName)
+        contentAsString(result) must include(Messages("submit.registration"))
+        contentAsString(result) must include(Messages("declaration.declaration.title"))
+      }
     }
 
-    "load the declaration page for pre-submissions if name and business matching is found" in new Fixture {
+    "with incomplete sections" must {
+      val incompleteSections = Seq(
+        Section("s1", Completed, true, mock[Call]),
+        Section("s2", Started, true, mock[Call])
+      )
 
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(addPerson)))
+      "redirect to the RegistrationProgressController" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(incompleteSections))
 
-      mockApplicationStatus(NotCompleted)
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+          (any(), any())).thenReturn(Future.successful(None))
 
-      val result = declarationController.get()(request)
-      status(result) must be(OK)
+        mockApplicationStatus(NotCompleted)
 
-      contentAsString(result) must include(addPerson.firstName)
-      contentAsString(result) must include(addPerson.middleName mkString)
-      contentAsString(result) must include(addPerson.lastName)
-      contentAsString(result) must include(Messages("submit.registration"))
+        val result = declarationController.get()(request)
+        status(result) must be(SEE_OTHER)
+
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+      }
     }
-
-    "load the declaration page for pre-submissions if name and business matching is found (renewal)" in new Fixture {
-
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(addPerson)))
-
-      mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
-
-      val result = declarationController.get()(request)
-      status(result) must be(OK)
-
-      contentAsString(result) must include(addPerson.firstName)
-      contentAsString(result) must include(addPerson.middleName mkString)
-      contentAsString(result) must include(addPerson.lastName)
-      contentAsString(result) must include(Messages("submit.renewal.application"))
-    }
-
-    "load the declaration page for pre-submissions if name and business matching is found (amendment)" in new Fixture {
-
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(addPerson)))
-
-      mockApplicationStatus(SubmissionReadyForReview)
-
-      val result = declarationController.get()(request)
-      status(result) must be(OK)
-
-      contentAsString(result) must include(addPerson.firstName)
-      contentAsString(result) must include(addPerson.middleName mkString)
-      contentAsString(result) must include(addPerson.lastName)
-      contentAsString(result) must include(Messages("submit.amendment.application"))
-    }
-
-    "report error if retrieval of amlsRegNo fails" in new Fixture {
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(addPerson)))
-
-      mockApplicationStatus(NotCompleted)
-
-      val result = declarationController.get()(request)
-      status(result) must be(OK)
-
-      contentAsString(result) must include(addPerson.firstName)
-      contentAsString(result) must include(addPerson.middleName mkString)
-      contentAsString(result) must include(addPerson.lastName)
-      contentAsString(result) must include(Messages("submit.registration"))
-      contentAsString(result) must include(Messages("declaration.declaration.title"))
-    }
-
   }
 
   "Declaration getWithAmendment" must {
-    "load the declaration for amendments page for submissions if name and business matching is found" in new Fixture {
+    "with completed sections" must {
+      val completedSections = Seq(
+        Section("s1", Completed, true, mock[Call]),
+        Section("s2", Completed, true, mock[Call])
+      )
 
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(addPerson)))
+      "load the declaration for amendments page for submissions if name and business matching is found" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
 
-      val result = declarationController.getWithAmendment()(request)
-      status(result) must be(OK)
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(addPerson)))
 
-      contentAsString(result) must include(addPerson.firstName)
-      contentAsString(result) must include(addPerson.middleName mkString)
-      contentAsString(result) must include(addPerson.lastName)
-      contentAsString(result) must include(Messages("submit.amendment.application"))
-      contentAsString(result) must include(Messages("declaration.declaration.amendment.title"))
+        val result = declarationController.getWithAmendment()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(addPerson.firstName)
+        contentAsString(result) must include(addPerson.middleName mkString)
+        contentAsString(result) must include(addPerson.lastName)
+        contentAsString(result) must include(Messages("submit.amendment.application"))
+        contentAsString(result) must include(Messages("declaration.declaration.amendment.title"))
+      }
+
+      "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
+
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+          (any(), any())).thenReturn(Future.successful(None))
+
+        mockApplicationStatus(NotCompleted)
+
+        val result = declarationController.getWithAmendment()(request)
+        status(result) must be(SEE_OTHER)
+
+        redirectLocation(result) mustBe Some(routes.AddPersonController.get().url)
+      }
+
+      "redirect to the declaration-persons for amendments page if name and/or business matching not found and submission is ready for review" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
+
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+          (any(), any())).thenReturn(Future.successful(None))
+
+        mockApplicationStatus(SubmissionReadyForReview)
+
+        val result = declarationController.getWithAmendment()(request)
+        status(result) must be(SEE_OTHER)
+
+        redirectLocation(result) mustBe Some(routes.AddPersonController.getWithAmendment().url)
+      }
     }
 
-    "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
+    "with incomplete sections" must {
+      val incompleteSections = Seq(
+        Section("s1", Completed, true, mock[Call]),
+        Section("s2", Started, true, mock[Call])
+      )
 
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+      "redirect to the RegistrationProgressController" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(incompleteSections))
 
-      mockApplicationStatus(NotCompleted)
+        when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
+          (any(), any())).thenReturn(Future.successful(None))
 
-      val result = declarationController.getWithAmendment()(request)
-      status(result) must be(SEE_OTHER)
+        mockApplicationStatus(NotCompleted)
 
-      redirectLocation(result) mustBe Some(routes.AddPersonController.get().url)
-    }
+        val result = declarationController.getWithAmendment(request)
+        status(result) must be(SEE_OTHER)
 
-    "redirect to the declaration-persons for amendments page if name and/or business matching not found and submission is ready for review" in new Fixture {
-
-      when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
-
-      mockApplicationStatus(SubmissionReadyForReview)
-
-      val result = declarationController.getWithAmendment()(request)
-      status(result) must be(SEE_OTHER)
-
-      redirectLocation(result) mustBe Some(routes.AddPersonController.getWithAmendment().url)
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+      }
     }
   }
 }
