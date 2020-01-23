@@ -23,9 +23,9 @@ import models.status._
 import models.{SubmissionResponse, SubscriptionResponse}
 import play.api.Logger
 import play.api.mvc.MessagesControllerComponents
-import services.{RenewalService, StatusService, SubmissionService}
+import services.{RenewalService, SectionsProvider, StatusService, SubmissionService}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
-import utils.AuthAction
+import utils.{AuthAction, DeclarationHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -37,7 +37,8 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
                                      val authenticator: AuthenticatorConnector,
                                      authAction: AuthAction,
                                      val ds: CommonPlayDependencies,
-                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                     val cc: MessagesControllerComponents,
+                                     val sectionsProvider: SectionsProvider) extends AmlsBaseController(ds, cc) {
 
   private def handleRenewalAmendment(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
                                     (implicit headerCarrier: HeaderCarrier) = {
@@ -49,28 +50,32 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
   }
 
   def post() = authAction.async {
-      implicit request => {
-        statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap[SubmissionResponse](status =>
-          subscribeBasedOnStatus(status, request.groupIdentifier, request.credId, request.amlsRefNumber, request.accountTypeId))
-      }.flatMap {
-        case SubscriptionResponse(_, _, _, Some(true)) =>
-          authenticator.refreshProfile map { _ =>
-            Redirect(controllers.routes.LandingController.get())
-          }
-        case _ => Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
-      } recoverWith {
-        case _: DuplicateEnrolmentException =>
-          Logger.info("[SubmissionController][post] handling DuplicateEnrolmentException")
-          Future.successful(Ok(views.html.submission.duplicate_enrolment()))
-        case e: DuplicateSubscriptionException =>
-          Logger.info("[SubmissionController][post] handling DuplicateSubscriptionException")
-          Future.successful(Ok(views.html.submission.duplicate_submission(e.message)))
-        case _: InvalidEnrolmentCredentialsException =>
-          Logger.info("[SubmissionController][post] handling InvalidEnrolmentCredentialsException")
-          Future.successful(Ok(views.html.submission.wrong_credential_type()))
-        case _: BadRequestException =>
-          Logger.info("[SubmissionController][post] handling BadRequestException")
-          Future.successful(Ok(views.html.submission.bad_request()))
+    implicit request =>
+      DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
+        case true => {
+          statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap[SubmissionResponse](status =>
+            subscribeBasedOnStatus(status, request.groupIdentifier, request.credId, request.amlsRefNumber, request.accountTypeId))
+          }.flatMap {
+          case SubscriptionResponse(_, _, _, Some(true)) =>
+            authenticator.refreshProfile map { _ =>
+              Redirect(controllers.routes.LandingController.get())
+            }
+          case _ => Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
+        } recoverWith {
+          case _: DuplicateEnrolmentException =>
+            Logger.info("[SubmissionController][post] handling DuplicateEnrolmentException")
+            Future.successful(Ok(views.html.submission.duplicate_enrolment()))
+          case e: DuplicateSubscriptionException =>
+            Logger.info("[SubmissionController][post] handling DuplicateSubscriptionException")
+            Future.successful(Ok(views.html.submission.duplicate_submission(e.message)))
+          case _: InvalidEnrolmentCredentialsException =>
+            Logger.info("[SubmissionController][post] handling InvalidEnrolmentCredentialsException")
+            Future.successful(Ok(views.html.submission.wrong_credential_type()))
+          case _: BadRequestException =>
+            Logger.info("[SubmissionController][post] handling BadRequestException")
+            Future.successful(Ok(views.html.submission.bad_request()))
+        }
+        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }
   }
 

@@ -20,6 +20,7 @@ import connectors.AuthenticatorConnector
 import controllers.actions.SuccessfulAuthAction
 import exceptions._
 import generators.AmlsReferenceNumberGenerator
+import models.registrationprogress.{Completed, Section, Started}
 import models.renewal.Renewal
 import models.status._
 import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionFees, SubscriptionResponse}
@@ -28,8 +29,9 @@ import org.jsoup._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
+import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.{RenewalService, StatusService, SubmissionService}
+import services.{RenewalService, SectionsProvider, StatusService, SubmissionService}
 import uk.gov.hmrc.http
 import uk.gov.hmrc.http.{BadRequestException, HttpResponse, Upstream4xxResponse, Upstream5xxResponse}
 import utils.{AmlsSpec, AuthorisedFixture}
@@ -40,31 +42,35 @@ import scala.concurrent.Future
 class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsReferenceNumberGenerator {
 
   trait Fixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
-    val controller = new SubmissionController (
+    val mockSectionsProvider = mock[SectionsProvider]
+
+    val controller = new SubmissionController(
       mock[SubmissionService],
       mock[StatusService],
       mock[RenewalService],
       mock[AuthenticatorConnector],
       SuccessfulAuthAction,
       commonDependencies,
-      mockMcc
+      mockMcc,
+      mockSectionsProvider
     )
   }
 
   val response = SubscriptionResponse(
     etmpFormBundleNumber = "",
     amlsRefNo = "", Some(SubscriptionFees(
-    registrationFee = 0,
-    fpFee = None,
-    fpFeeRate = None,
-    approvalCheckFee = None,
-    approvalCheckFeeRate = None,
-    premiseFee = 0,
-    premiseFeeRate = None,
-    totalFees = 0,
-    paymentReference = ""))
+      registrationFee = 0,
+      fpFee = None,
+      fpFeeRate = None,
+      approvalCheckFee = None,
+      approvalCheckFeeRate = None,
+      premiseFee = 0,
+      premiseFeeRate = None,
+      totalFees = 0,
+      paymentReference = ""))
   )
 
   val amendmentResponse = AmendVariationRenewalResponse(
@@ -82,11 +88,42 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     difference = Some(0)
   )
 
+  val completedSections = Seq(
+    Section("s1", Completed, true, mock[Call]),
+    Section("s2", Completed, true, mock[Call])
+  )
+
+  val incompleteSections = Seq(
+    Section("s1", Completed, true, mock[Call]),
+    Section("s2", Started, true, mock[Call])
+  )
+
   "SubmissionController" when {
 
     "subscribing" must {
 
+      "redirect to the RegistrationProgressController when incomplete" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(incompleteSections))
+
+        when {
+          controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
+        } thenReturn Future.successful(response)
+
+        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+          .thenReturn(Future.successful(SubmissionReady))
+
+        val result = controller.post()(request)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+      }
+
       "return to the confirmation page on first submission" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
 
         when {
           controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
@@ -102,6 +139,10 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       }
 
       "return to the landing controller when recovers from duplicate response" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
+
         when {
           controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
         } thenReturn Future.successful(response.copy(previouslySubmitted = Some(true)))
@@ -122,6 +163,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     }
 
     "post must return the response from the service correctly when Submission Ready for review" in new Fixture {
+      when {
+        mockSectionsProvider.sections(any[String])(any(), any())
+      }.thenReturn(Future.successful(completedSections))
 
       when {
         controller.subscriptionService.update(any[String](), any(), any())(any(), any())
@@ -138,6 +182,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
     "show the correct help page when a duplicate enrolment error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
       val msg = "HMRC-MLR-ORG duplicate enrolment"
+      when {
+        mockSectionsProvider.sections(any[String])(any(), any())
+      }.thenReturn(Future.successful(completedSections))
 
       when {
         controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
@@ -157,6 +204,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
     "show the correct help page when a duplicate subscription error is encountered" in new Fixture with ParagraphHelpers {
       val msg = "HMRC-MLR-ORG duplicate subscription"
+      when {
+        mockSectionsProvider.sections(any[String])(any(), any())
+      }.thenReturn(Future.successful(completedSections))
 
       when {
         controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any())
@@ -176,6 +226,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
     "show the correct help page when an error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
       val msg = "invalid credentials"
+      when {
+        mockSectionsProvider.sections(any[String])(any(), any())
+      }.thenReturn(Future.successful(completedSections))
 
       when {
         controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
@@ -195,6 +248,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
     "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
       val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
+      when {
+        mockSectionsProvider.sections(any[String])(any(), any())
+      }.thenReturn(Future.successful(completedSections))
 
       when {
         controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any())
@@ -217,6 +273,10 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     "Submission is approved" must {
       "call the variation method on the service" in new Fixture {
         when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
+
+        when {
           controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
         } thenReturn Future.successful(mock[AmendVariationRenewalResponse])
 
@@ -233,6 +293,10 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       "Redirect to the correct confirmation page" in new Fixture {
         when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
+
+        when {
           controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
         } thenReturn Future.successful(amendmentResponse)
 
@@ -247,6 +311,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
         val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
 
         when {
           controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
@@ -267,6 +334,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
     "Submission is in renewal status" must {
       "call the renewal method on the service" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
 
         when {
           controller.subscriptionService.renewal(any(), any(), any(), any())(any(), any())
@@ -289,6 +359,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       }
 
       "do a variation if user is in renewal period but has no renewal object" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
 
         when {
           controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
@@ -310,6 +383,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
         val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
 
         when {
           controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
@@ -334,6 +410,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
     "Submission is in renewal amendment status" must {
       "call the renewal amendment method on the service" in new Fixture {
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
 
         when {
           controller.subscriptionService.renewalAmendment(any(), any(), any(), any())(any(), any())
@@ -355,6 +434,9 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
         val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
+        when {
+          mockSectionsProvider.sections(any[String])(any(), any())
+        }.thenReturn(Future.successful(completedSections))
 
         when {
           controller.subscriptionService.renewalAmendment(any(), any(), any(), any())(any(), any())
