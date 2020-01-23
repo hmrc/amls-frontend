@@ -9,7 +9,6 @@
  + [AMLS-5539] - 'Added EAB FE model'
  + [AMLS-5546] - 'Would you like to renew your registration page and logic'
  + [AMLS-5567] - | Auto save what you need panel
- + [AMLS-5587] - 'Change to make description on BACS payment optional ready for migration to new PAY API endpoint'
  + [AMLS-5590] - 'Pending - replace full stop with comma'
  + [AMLS-5592] - 'Correct date validation in business activity start date and tp start date'
  + [AMLS-5595] - 'Changes "section" on about your business page to "business information"'
