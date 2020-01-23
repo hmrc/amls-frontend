@@ -23,7 +23,8 @@ import models.ResponseType.SubscriptionResponseType
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.{DateHelper, AmlsViewSpec}
+import play.twirl.api.{Html, HtmlFormat}
+import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
 
 class status_submittedSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator{
@@ -54,7 +55,7 @@ class status_submittedSpec extends AmlsViewSpec with MustMatchers with AmlsRefer
 
       val form2 = EmptyForm
 
-      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), Some(feeResponse))
+      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), Some(feeResponse), can_cannot_trade = HtmlFormat.empty)
 
       doc.title must be(Messages("status.submissionreadyforreview.heading") + pageTitleSuffix)
       heading.html must be(Messages("status.submissionreadyforreview.heading"))
@@ -63,7 +64,7 @@ class status_submittedSpec extends AmlsViewSpec with MustMatchers with AmlsRefer
 
     "contain content elements" in new ViewFixture {
 
-      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), Some(feeResponse))
+      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), Some(feeResponse), can_cannot_trade = HtmlFormat.empty)
 
       doc.getElementsContainingOwnText("business Name").hasText must be(true)
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
@@ -101,7 +102,7 @@ class status_submittedSpec extends AmlsViewSpec with MustMatchers with AmlsRefer
 
     "contain the no fee response content elements" in new ViewFixture {
 
-      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), None)
+      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), None, can_cannot_trade = HtmlFormat.empty)
 
       doc.getElementsContainingOwnText("business Name").hasText must be(true)
       doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
@@ -139,7 +140,7 @@ class status_submittedSpec extends AmlsViewSpec with MustMatchers with AmlsRefer
 
     "contain fee information and link" in new ViewFixture {
 
-      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), None)
+      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), None, can_cannot_trade = HtmlFormat.empty)
 
       doc.getElementsByClass("statusblock").first().html() must include(Messages("status.fees"))
       doc.getElementsByClass("statusblock").first().html() must include(Messages("status.howtopay"))
@@ -147,14 +148,14 @@ class status_submittedSpec extends AmlsViewSpec with MustMatchers with AmlsRefer
 
     "contain 'update/amend information' content and link" in new ViewFixture {
 
-      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), None)
+      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), None, can_cannot_trade = HtmlFormat.empty)
 
       doc.getElementsByClass("statusblock").first().html() must include(Messages("status.hassomethingchanged"))
       doc.getElementsByClass("statusblock").first().html() must include(Messages("status.amendment.edit"))
     }
 
     "contain survey link for supervised status" in new ViewFixture {
-      def view =  views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), Some(feeResponse))
+      def view =  views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), Some(feeResponse), can_cannot_trade = HtmlFormat.empty)
 
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.beforeyougo")).text() must
         be(Messages("survey.satisfaction.beforeyougo"))
@@ -166,7 +167,7 @@ class status_submittedSpec extends AmlsViewSpec with MustMatchers with AmlsRefer
     "show specific content" when {
       "view input has feeData and submitted date" in new ViewFixture {
 
-        def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business name"), Some(feeResponse))
+        def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business name"), Some(feeResponse), can_cannot_trade = HtmlFormat.empty)
         val date = DateHelper.formatDate(feeResponse.createdAt.toLocalDate)
         doc.getElementsMatchingOwnText(Messages("status.submittedForReview.submitteddate.text")).text must
           be(Messages("status.submittedForReview.submitteddate.text", date))
@@ -174,7 +175,7 @@ class status_submittedSpec extends AmlsViewSpec with MustMatchers with AmlsRefer
 
       "view input is none" in new ViewFixture {
 
-        def view = views.html.status.status_submitted(amlsRegistrationNumber, None, None)
+        def view = views.html.status.status_submitted(amlsRegistrationNumber, None, None, can_cannot_trade = HtmlFormat.empty)
 
         doc.getElementById("status-submitted-business") must be(null)
         doc.getElementById("status-submitted-business-name") must be(null)

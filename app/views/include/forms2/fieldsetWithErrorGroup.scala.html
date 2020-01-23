@@ -43,7 +43,7 @@
     <fieldset
             @if(f.id.nonEmpty){ id="@f.id"}
             class="@if(panel){ panel-indent}@if(jsHidden){js-hidden} @classes.mkString(" ")" @data.mkString(" ")
-            @if(hint.nonEmpty || f.hasErrors) { aria-describedby="@if(hint.nonEmpty) {@{f.id}-hint} @if(f.hasErrors) {@{f.id}-error-notification}"}
+            @if(hint.nonEmpty || f.hasErrors) { aria-describedby="@if(hint.nonEmpty){@{f.id}-hint}@if(f.hasErrors){@{f.id}-error-notification}"}
     >
         @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden, heading, f.id, supportingContent)
         @if(f.hasErrors) {
