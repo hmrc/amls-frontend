@@ -25,16 +25,17 @@
     supportingContent: Html = play.twirl.api.HtmlFormat.empty
 )(implicit m: Messages)
 
-<legend>
+
         @if(heading.nonEmpty) {
-            <div class="page-header form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}"><h1 class="heading-xlarge">@Messages(heading)</h1></div>
+            <legend class="page-header form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}"><h1 class="heading-xlarge">@Messages(heading)</h1></legend>
         }
         @if(legend.nonEmpty) {
-            <span class="form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}">
-                @Messages(legend)
-            </span>
+            <legend>
+                <span class="form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}">
+                    @Messages(legend)
+                </span>
+            </legend>
         }
 
-</legend>
 @supportingContent
 @if(hint.nonEmpty) {<span id="@if(fieldId.nonEmpty){@fieldId-hint}" class="form-hint clear">@Messages(hint)</span>}
