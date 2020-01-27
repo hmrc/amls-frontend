@@ -59,14 +59,14 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
           rp <- rpO
           name <- rp.personName
           position <- rp.positions
-          date <- position.startDate
+          date <- if(position.isComplete) position.startDate else None
         } yield {
-          (date, name, rpO)
+          (date, name)
         }
       }
 
       extraInfo.flatMap {
-        case Some((date, name, responsiblePeople)) => {
+        case Some((date, name)) => {
           val extraFields = Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
 
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
@@ -92,7 +92,28 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
             }
           }
         }
-        case _ => Future.successful(NotFound(notFoundView))
+        case _ => {
+          Form2[DateOfChange](request.body.asFormUrlEncoded.get) match {
+            case f: InvalidForm => {
+              Future.successful(BadRequest(
+                views.html.date_of_change(
+                  f,
+                  "summary.responsiblepeople",
+                  controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
+                )
+              ))
+            }
+            case ValidForm(_, dateOfChange) => {
+              doUpdate(request.credId, index, dateOfChange).map { cache: CacheMap =>
+                if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
+                  Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
+                } else {
+                  Redirect(routes.TimeAtCurrentAddressController.get(index, edit))
+                }
+              }
+            }
+          }
+        }
       }
   }
 
