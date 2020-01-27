@@ -21,11 +21,12 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonAddressHistory, ResponsiblePersonCurrentAddress}
+import models.responsiblepeople.{PersonName, PositionStartDate, ResponsiblePerson, ResponsiblePersonAddressHistory, ResponsiblePersonCurrentAddress}
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 
@@ -59,7 +60,7 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
           rp <- rpO
           name <- rp.personName
           position <- rp.positions
-          date <- if(position.isComplete) position.startDate else None
+          date <- if (position.isComplete) position.startDate else None
         } yield {
           (date, name)
         }
@@ -71,50 +72,59 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
 
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
             case f: InvalidForm => {
-              val fullName = name.fullName
-              val dateFormatted = date.startDate.toString("d MMMM yyyy")
-              Future.successful(BadRequest(
-                views.html.date_of_change(
-                  f.withMessageFor(DateOfChange.errorPath, Messages("error.expected.rp.date.after.start", fullName, dateFormatted)),
-                  "summary.responsiblepeople",
-                  controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
-                )
-              ))
+              invalidViewWithPositionInBusiness(name, date, f, index, edit)
             }
             case ValidForm(_, dateOfChange) => {
-              doUpdate(request.credId, index, dateOfChange).map { cache: CacheMap =>
-                if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
-                  Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
-                } else {
-                  Redirect(routes.TimeAtCurrentAddressController.get(index, edit))
-                }
-              }
+              validFormView(request.credId, index, dateOfChange, edit)
             }
           }
         }
         case _ => {
           Form2[DateOfChange](request.body.asFormUrlEncoded.get) match {
             case f: InvalidForm => {
-              Future.successful(BadRequest(
-                views.html.date_of_change(
-                  f,
-                  "summary.responsiblepeople",
-                  controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
-                )
-              ))
+              invalidViewNoPositionInBusiness(f, index, edit)
             }
             case ValidForm(_, dateOfChange) => {
-              doUpdate(request.credId, index, dateOfChange).map { cache: CacheMap =>
-                if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
-                  Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
-                } else {
-                  Redirect(routes.TimeAtCurrentAddressController.get(index, edit))
-                }
-              }
+              validFormView(request.credId, index, dateOfChange, edit)
             }
           }
         }
       }
+  }
+
+  private def invalidViewNoPositionInBusiness(f: forms.Form2[_], index: Integer, edit: Boolean)
+                                             (implicit request: Request[AnyContent]) = {
+    Future.successful(BadRequest(
+      views.html.date_of_change(
+        f,
+        "summary.responsiblepeople",
+        controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
+      )
+    ))
+  }
+
+  private def invalidViewWithPositionInBusiness(name: PersonName, date: PositionStartDate, f: InvalidForm, index: Integer, edit: Boolean)
+                                             (implicit request: Request[AnyContent]) = {
+    val fullName = name.fullName
+    val dateFormatted = date.startDate.toString("d MMMM yyyy")
+    Future.successful(BadRequest(
+      views.html.date_of_change(
+        f.withMessageFor(DateOfChange.errorPath, Messages("error.expected.rp.date.after.start", fullName, dateFormatted)),
+        "summary.responsiblepeople",
+        controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
+      )
+    ))
+  }
+
+  private def validFormView(credId: String, index: Int, date: DateOfChange, edit: Boolean)
+                           (implicit request: Request[AnyContent]) = {
+    doUpdate(credId, index, date).map { cache: CacheMap =>
+      if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
+        Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
+      } else {
+        Redirect(routes.TimeAtCurrentAddressController.get(index, edit))
+      }
+    }
   }
 
   private def doUpdate(credId: String, index: Int, date: DateOfChange)(implicit request: Request[AnyContent]) =
