@@ -1,0 +1,3 @@
+ + [AMLS-5623] - 'Removed hint template and refactored wherever used'
+ + [AMLS-5628] - 'Added panel class to sort code and account number inputs'
+ + [AMLS-5637] - 'Fix - MSB Applications with Blank list of countries where branches or agents in other countries is selected'
