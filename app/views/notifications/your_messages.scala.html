@@ -32,7 +32,7 @@
             <div class="message-inbox__list-item @if(comms.isRead){message-inbox__list-item--read}" role="listitem">
                 @if(!comms.isRead){<span class="visuallyhidden">unread</span>}else{<span class="visuallyhidden">read</span>}
                 <span class="message-inbox__block">
-                    <a id="hyper-link" href="@controllers.routes.NotificationController.messageDetails(comms._id.id, ContactTypeHelper.getContactType(comms.status, comms.contactType, comms.variation), comms.amlsRegistrationNumber, comms.templatePackageVersion)">@Messages(comms.subject)</a>
+                    <a id="hyper-link-@id" href="@controllers.routes.NotificationController.messageDetails(comms._id.id, ContactTypeHelper.getContactType(comms.status, comms.contactType, comms.variation), comms.amlsRegistrationNumber, comms.templatePackageVersion)">@Messages(comms.subject)</a>
                 </span>
                 <span class="message-inbox__block">@Messages(comms.notificationType)</span>
                 <span class="message-inbox__block">@comms.dateReceived</span>

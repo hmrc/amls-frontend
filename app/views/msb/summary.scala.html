@@ -246,7 +246,7 @@
                 @wc.usesForeignCurrencies.map { ufc =>
                     @checkYourAnswersRow(
                         question = Messages("msb.deal_foreign_currencies.title"),
-                        editLinkTag = "msbwhichcurrencies-edit",
+                        editLinkTag = "usesForeignCurrencies-edit",
                         editUrl = controllers.msb.routes.UsesForeignCurrenciesController.get(true).toString
                     ) {
                         @ufc match {
