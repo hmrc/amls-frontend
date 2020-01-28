@@ -266,7 +266,7 @@
                     @if(ms.bankMoneySource.isDefined | ms.wholesalerMoneySource.isDefined | ms.customerMoneySource.isDefined){
                         @checkYourAnswersRow(
                             question = Messages("msb.supply_foreign_currencies.title"),
-                            editLinkTag = "msbwhichcurrencies-edit",
+                            editLinkTag = "moneysources-edit",
                             editUrl = controllers.msb.routes.MoneySourcesController.get(true).toString
                         ) {
                             @ms.bankMoneySource.map { bms =>
