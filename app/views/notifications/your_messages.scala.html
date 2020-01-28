@@ -16,26 +16,25 @@
 
 @import include._
 @import models.notifications._
-@import utils.ContactTypeHelper
-@import config.{ ApplicationConfig}
+@import config.ApplicationConfig
 
-@(businessName: String, currentApplicationNotifications: Seq[NotificationRow], previousApplicationNotifications: Seq[NotificationRow] = Seq())(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(businessName: String, currentApplicationNotifications: Seq[(NotificationRow, Int)], previousApplicationNotifications: Seq[(NotificationRow, Int)] = Seq())(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
     @heading("notifications.header", "summary.status")
 }
 
-@notification_table(id: String, notifications: Seq[NotificationRow]) = {
+@notification_table(id: String, notifications: Seq[(NotificationRow, Int)]) = {
     <div id="@id" class="message-inbox__list" role="list">
-        @notifications.map { comms =>
-            <div class="message-inbox__list-item @if(comms.isRead){message-inbox__list-item--read}" role="listitem">
-                @if(!comms.isRead){<span class="visuallyhidden">unread</span>}else{<span class="visuallyhidden">read</span>}
+        @notifications.map { case (notification: NotificationRow, index: Int) =>
+            <div class="message-inbox__list-item @if(notification.isRead){message-inbox__list-item--read}" role="listitem">
+                @if(!notification.isRead){<span class="visuallyhidden">unread</span>}else{<span class="visuallyhidden">read</span>}
                 <span class="message-inbox__block">
-                    <a id="hyper-link-@id" href="@controllers.routes.NotificationController.messageDetails(comms._id.id, ContactTypeHelper.getContactType(comms.status, comms.contactType, comms.variation), comms.amlsRegistrationNumber, comms.templatePackageVersion)">@Messages(comms.subject)</a>
+                    <a id="hyper-link-@id-@index" href="@controllers.routes.NotificationController.messageDetails(notification._id.id, utils.ContactTypeHelper.getContactType(notification.status, notification.contactType, notification.variation), notification.amlsRegistrationNumber, notification.templatePackageVersion)">@Messages(notification.subject)</a>
                 </span>
-                <span class="message-inbox__block">@Messages(comms.notificationType)</span>
-                <span class="message-inbox__block">@comms.dateReceived</span>
+                <span class="message-inbox__block">@Messages(notification.notificationType)</span>
+                <span class="message-inbox__block">@notification.dateReceived</span>
             </div>
         }
     </div>
