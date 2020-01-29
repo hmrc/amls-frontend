@@ -17,31 +17,15 @@
 @import models.FeeResponse
 @import config.ApplicationConfig
 
-@(feeResponse: Option[FeeResponse])(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
+@()(implicit request: Request[_], m: Messages, lang: Lang)
 
-@feeResponse match {
-    case Some(fee) => {
-        <p>
-        @Messages("status.submissionreadyforreview.description")
-        <p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
-        <ul class="list list-bullet">
-            <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
-            <li>@Messages("status.submissionreadyforreview.description.2.listline2")</li>
-            <li>@Messages("status.submissionreadyforreview.description.2.listline3")</li>
-        </ul>
-        <p>@Messages("status.submissionreadyforreview.description.3")</p>
-    }
-    case None => {
-        <p>@Messages("status.submissionreadyforreview.description.no.fee")</p>
-        <p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
-        <ul class="list list-bullet">
-            <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
-            <li>@Messages("status.submissionreadyforreview.description.2.listline2")</li>
-            <li>@Messages("status.submissionreadyforreview.description.2.listline3")</li>
-        </ul>
-        <p>@Messages("status.submissionreadyforreview.description.3")</p>
-    }
-}
+<p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
+<ul class="list list-bullet">
+    <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
+    <li>@Messages("status.submissionreadyforreview.description.2.listline2")</li>
+    <li>@Messages("status.submissionreadyforreview.description.2.listline3")</li>
+</ul>
+<p>@Messages("status.submissionreadyforreview.description.3")</p>
 
 
 
