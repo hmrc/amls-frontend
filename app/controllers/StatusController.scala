@@ -138,8 +138,14 @@ class StatusController @Inject()(val landingService: LandingService,
           ) getOrElse InternalServerError("Unable to get redirect data")
       }
       case _ =>
+//        Future.successful(
+//          Ok(status_submitted(mlrRegNumber.getOrElse(""),
+//            businessNameOption,
+//            feeResponse,
+//            fromDuplicateSubmission, canCannotTradeContent(activities))))
+
         Future.successful(
-          Ok(status_submitted(mlrRegNumber.getOrElse(""),
+          Ok(your_registration(mlrRegNumber.getOrElse(""),
             businessNameOption,
             feeResponse,
             fromDuplicateSubmission, canCannotTradeContent(activities))))

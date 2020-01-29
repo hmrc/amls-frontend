@@ -718,6 +718,10 @@ status.hassomethingchanged = About your business
 status.submissionready.changelink1 = Check or update your business information
 status.submissionready.buttontext = Continue
 
+your.registration = Your registration
+your.registration.status = Registration status
+your.registration.messages = Messages
+
 status.submissionreadyforreview.heading = Application pending
 status.submissionreadyforreview.description = You have 28 days to pay your fees from the date you submitted your application. Your application will be refused if you do not pay the fees.
 status.submissionreadyforreview.description.no.fee = You have 28 days to pay your fees from the date you submitted your application. Your application will be refused if you do not pay the fees.
