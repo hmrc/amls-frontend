@@ -1579,6 +1579,8 @@ details {
 
 .print-link {
     display: inline;
+    background: none;
+    padding: unset;
 }
 
 /* autocomplete */
@@ -1687,6 +1689,54 @@ li.autocomplete__option {
     width: 33.3333333%;
   }
 }
+
+.registration-info,
+.registration-info * {
+  box-sizing: border-box;
+}
+
+.registration-info:after,
+.registration-info:before {
+  content: '';
+  display: table;
+}
+
+.registration-info:after {
+  clear: both;
+}
+
+@media (min-width: 641px) {
+  .registration-info .registration-info__item {
+    display: block;
+    float: left;
+    width: 33.3333333%;
+    padding-right: 1em;
+  }
+}
+
+/* Chained for specificity */
+.margin-bottom-medium.margin-bottom-medium {
+  margin-bottom: 1em;
+}
+
+/* Chained for specificity */
+.margin-bottom-large.margin-bottom-large {
+  margin-bottom: 3em;
+}
+
+.hmrc-notification-badge {
+  display: inline-block;
+  min-width: 10px;
+  padding: 1px 5px 0;
+  border-radius: 10px;
+  color: #fff;
+  background: #d4351c;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
 /*  new progress page css */
 .task-list-item {
   border-bottom: 1px solid #bfc1c3;
@@ -1766,10 +1816,6 @@ legend.page-header {
   background-color: #1d70b8;
   color: #ffffff;
   margin-bottom: 30px;
-}
-
-.heading-small {
-  margin-top: 0;
 }
 
 
