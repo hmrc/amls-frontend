@@ -236,6 +236,14 @@ object FormTypes {
       ).tupled andThen dateRuleMapping(messagePrefix) andThen jodaLocalDateR("yyyy-MM-dd").withMessage("error.invalid.date.tp.not.real")
   }.repath(_ => Path)
 
+  def newLocalDateRuleWithPatternRP(messagePrefix: String): Rule[UrlFormEncoded, LocalDate] = From[UrlFormEncoded] { __ =>
+    (
+      (__ \ "year").read[String] ~
+        (__ \ "month").read[String] ~
+        (__ \ "day").read[String]
+      ).tupled andThen dateRuleMapping(messagePrefix) andThen jodaLocalDateR("yyyy-MM-dd").withMessage("error.invalid.date.rp.not.real")
+  }.repath(_ => Path)
+
   def newLocalDateRuleWithPatternAgent(messagePrefix: String): Rule[UrlFormEncoded, LocalDate] = From[UrlFormEncoded] { __ =>
     (
       (__ \ "year").read[String] ~
@@ -294,7 +302,7 @@ object FormTypes {
   def pastStartDateRuleWithMsg1700(message: String): Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1700, 1, 1), message)
   val allowedPastAndFutureDateRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen endOfCenturyDateRule
 
-  def newAllowedPastAndFutureDateRule(messagePrefix: String = "", messagePast: String = "", messageFuture: String = ""): Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern(messagePrefix) andThen
+  def newAllowedPastAndFutureDateRule(messagePrefix: String = "", messagePast: String = "", messageFuture: String = ""): Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPatternRP(messagePrefix) andThen
     pastStartDateRuleWithMsg(messagePast) andThen
     maxDateWithMsg(LocalDate.now, messageFuture)
 
