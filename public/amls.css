@@ -101,11 +101,6 @@ ul.list.activities-list, ul.list.activities-list li {
 
 
 
-/* -- application progress page -- */
-
-.grid-layout {
-  table-layout: fixed;
-}
 
 
 /* -- Progress Step -- */
@@ -1690,27 +1685,16 @@ li.autocomplete__option {
   }
 }
 
-.registration-info,
-.registration-info * {
-  box-sizing: border-box;
-}
-
-.registration-info:after,
-.registration-info:before {
-  content: '';
-  display: table;
-}
-
-.registration-info:after {
-  clear: both;
+.grid-layout__column,
+.grid-layout__column--1-3 {
+  display: initial;
 }
 
 @media (min-width: 641px) {
-  .registration-info .registration-info__item {
-    display: block;
-    float: left;
-    width: 33.3333333%;
-    padding-right: 1em;
+  .grid-layout__column,
+  .grid-layout__column--1-3 {
+    display: table-cell;
+    padding-right: .5em;
   }
 }
 

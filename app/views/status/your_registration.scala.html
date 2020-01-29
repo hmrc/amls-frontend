@@ -26,7 +26,6 @@
 
 @main2(title = "Your registration", showURRBanner = true) {
 
-
     <div class="grid-layout">
         <div class="grid-layout__column--2-3">
             <header class="page-header">
@@ -40,15 +39,15 @@
 
     <div class="grid-layout margin-bottom-medium">
         <div class="grid-layout__column grid-layout__column--2-3">
-            @include.status.rightpanel_submissionreadyforreview(feeResponse, can_cannot_trade)
+            @include.status.application_pending(feeResponse)
         </div>
         <div class="grid-layout__column grid-layout__column--1-3">
             @* empty for layout reasons *@
         </div>
     </div>
 
-    <div class="registration-info">
-        <div class="registration-info__item">
+    <div class="grid-layout">
+        <div class="grid-layout__column grid-layout__column--1-3">
             @businessName.map { bn =>
                 <h2 id="status-submitted-business" class="heading-small">@Messages("status.business")</h2>
                 <p id="status-submitted-business-name">
@@ -58,25 +57,25 @@
                 </p>
             }
         </div>
-        <div class="registration-info__item">
+        <div class="grid-layout__column grid-layout__column--1-3">
             @feeResponse.map { fees =>
                 <h2 class="heading-small">@Messages("your.registration.status")</h2>
                 <p>@Messages("status.submittedForReview.submitteddate.text", DateHelper.formatDate(fees.createdAt.toLocalDate))@Messages("full.stop") @can_cannot_trade</p>
             }
         </div>
-        <div class="registration-info__item">
+        <div class="grid-layout__column grid-layout__column--1-3">
             <h2 class="heading-small">@Messages("your.registration.messages")</h2>
-            <a id="view-message" href="@controllers.routes.NotificationController.getMessages()">@Messages("notifications.youHaveMessages") <span class="hmrc-notification-badge">2</span></a>
+            <p><a id="view-message" href="@controllers.routes.NotificationController.getMessages()">@Messages("notifications.youHaveMessages") <span class="hmrc-notification-badge">2</span></a></p>
         </div>
     </div>
 
-    <div class="registration-info margin-bottom-large">
-        <div class="registration-info__item">
+    <div class="grid-layout margin-bottom-large">
+        <div class="grid-layout__column grid-layout__column--1-3">
             <h2 class="heading-small">@Messages("status.fees")</h2>
-            <ul>
-                <li><a id="how-to-pay" href="how-to-pay">@Messages("status.howtopay")</a></li>
-            </ul>
+            <p><a id="how-to-pay" href="how-to-pay">@Messages("status.howtopay")</a></p>
         </div>
+        <div class="grid-layout__column grid-layout__column--1-3"></div>
+        <div class="grid-layout__column grid-layout__column--1-3"></div>
     </div>
 
     <div>
