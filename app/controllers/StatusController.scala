@@ -61,7 +61,7 @@ class StatusController @Inject()(val landingService: LandingService,
         feeResponse <- getFeeResponse(refNo, statusInfo._1, request.accountTypeId)
         responsiblePeople <- dataCache.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
         bm <- dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-        unreadNotifications <- countUnreadNotifications(refNo, statusResponse.flatMap(_.safeId), request.accountTypeId)
+        unreadNotifications <- countUnreadNotifications(refNo, statusResponse.fold(none[String])(_.safeId), request.accountTypeId)
         maybeActivities <- Future(bm.activities)
         page <- getPageBasedOnStatus(
           refNo,
@@ -274,7 +274,8 @@ class StatusController @Inject()(val landingService: LandingService,
     val notifications = (amlsRefNo, safeId) match {
       case (Some(ref), _) => notificationConnector.fetchAllByAmlsRegNo(ref, accountTypeId)
       case (None, Some(id)) => notificationConnector.fetchAllBySafeId(id, accountTypeId)
-      case (_, _) => throw new MatchError("No amls reference or safe Id found.")
+      case (None, None) => Future.successful(Seq())
+      case (_, _) => throw new MatchError("Could not match amls ref number or safe id against given conditions.")
     }
 
     notifications.map(_.count(!_.isRead))

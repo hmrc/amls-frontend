@@ -67,7 +67,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       SuccessfulAuthAction,
       commonDependencies,
       mock[FeeResponseService],
-      mockMcc)
+      mockMcc,
+      mock[AmlsNotificationConnector])
 
     val controllerNoAmlsNumber = new StatusController(
       mock[LandingService],
@@ -82,7 +83,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       SuccessfulAuthActionNoAmlsRefNo,
       commonDependencies,
       mock[FeeResponseService],
-      mockMcc)
+      mockMcc,
+      mock[AmlsNotificationConnector])
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
     val rp1 = ResponsiblePerson(
@@ -128,6 +130,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
     when(controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any()))
       .thenReturn(Future.successful(Some(feeResponse)))
+
+    when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
+      .thenReturn(Future.successful(Seq()))
   }
 
   val feeResponse = FeeResponse(
@@ -258,7 +263,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
           val result = controller.get()(request)
           status(result) must be(OK)
 
-          contentAsString(result) must include(Messages("status.submissionreadyforreview.description"))
+          contentAsString(result) must include("If you do not pay your fees within 28 days of submitting your application it will be rejected.")
         }
 
         "there is no ReadStatusResponse" in new Fixture {
@@ -274,7 +279,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(OK)
 
-          contentAsString(result) must include(Messages("status.submissionreadyforreview.description.no.fee"))
+          contentAsString(result) must include("If you do not pay your fees within 28 days of submitting your application it will be rejected.")
         }
       }
 
