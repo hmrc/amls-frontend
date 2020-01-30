@@ -14,15 +14,11 @@
  * limitations under the License.
  *@
 
+@import config.ApplicationConfig
 @import include._
 @import include.status._
-@import models.status._
-@import config.ApplicationConfig
-@import org.joda.time.LocalDateTime
-@import utils.DateHelper
-@import config.{ ApplicationConfig}
 
-@(regNo: String, businessName: Option[String], feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean = false, can_cannot_trade: Html, unreadNotifications: Int = 0)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(regNo: String, businessName: Option[String], feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean = false, yourRegistrationInfo: Html, can_cannot_trade: Html, unreadNotifications: Int = 0)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main2(title = "Your registration", showURRBanner = true) {
 
@@ -39,7 +35,7 @@
 
     <div class="grid-layout margin-bottom-medium">
         <div class="grid-layout__column grid-layout__column--2-3">
-            @include.status.application_pending()
+            @yourRegistrationInfo
         </div>
         <div class="grid-layout__column grid-layout__column--1-3">
             @* empty for layout reasons *@
@@ -98,5 +94,4 @@
     @before_you_go()
 
     @printLink(linkId="status-submitted-print", gaTag=Some("status-submitted:click:print"))
-
 }

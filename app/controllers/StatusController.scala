@@ -29,7 +29,7 @@ import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName, ControllerHelper}
-import views.html.include.status.{rightpanel_submissionreadyforreview, can_cannot_trade, can_cannot_trade_msb_or_tcsp_only, can_cannot_trade_no_msb_or_tcsp}
+import views.html.include.status.{application_pending, can_cannot_trade, can_cannot_trade_msb_or_tcsp_only, can_cannot_trade_no_msb_or_tcsp, rightpanel_submissionreadyforreview}
 import views.html.status._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -153,7 +153,7 @@ class StatusController @Inject()(val landingService: LandingService,
           Ok(your_registration(mlrRegNumber.getOrElse(""),
             businessNameOption,
             feeResponse,
-            fromDuplicateSubmission, canCannotTradeContent(activities), unreadNotifications)))
+            fromDuplicateSubmission, application_pending(), canCannotTradeContent(activities), unreadNotifications)))
     }
   }
 
