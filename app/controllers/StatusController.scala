@@ -48,7 +48,8 @@ class StatusController @Inject()(val landingService: LandingService,
                                  authAction: AuthAction,
                                  val ds: CommonPlayDependencies,
                                  val feeResponseService: FeeResponseService,
-                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                 val cc: MessagesControllerComponents,
+                                 val notificationConnector: AmlsNotificationConnector) extends AmlsBaseController(ds, cc) {
 
   def get(fromDuplicateSubmission: Boolean = false) = authAction.async {
     implicit request =>
@@ -60,6 +61,7 @@ class StatusController @Inject()(val landingService: LandingService,
         feeResponse <- getFeeResponse(refNo, statusInfo._1, request.accountTypeId)
         responsiblePeople <- dataCache.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
         bm <- dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+        unreadNotifications <- countUnreadNotifications(refNo, statusResponse.flatMap(_.safeId), request.accountTypeId)
         maybeActivities <- Future(bm.activities)
         page <- getPageBasedOnStatus(
           refNo,
@@ -70,7 +72,8 @@ class StatusController @Inject()(val landingService: LandingService,
           responsiblePeople,
           maybeActivities,
           request.accountTypeId,
-          request.credId)
+          request.credId,
+          unreadNotifications)
       } yield page
   }
 
@@ -104,11 +107,12 @@ class StatusController @Inject()(val landingService: LandingService,
                                    responsiblePeople: Option[Seq[ResponsiblePerson]],
                                    activities: Option[BusinessActivities],
                                    accountTypeId: (String, String),
-                                   cacheId: String)
+                                   cacheId: String,
+                                   unreadNotifications: Int)
                                   (implicit request: Request[AnyContent]) = {
     statusInfo match {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
-        getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission, accountTypeId, cacheId, activities)
+        getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission, accountTypeId, cacheId, activities, unreadNotifications)
       case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
            (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
            (SubmissionWithdrawn, _) | (DeRegistered, _) =>
@@ -126,7 +130,8 @@ class StatusController @Inject()(val landingService: LandingService,
                                        fromDuplicateSubmission: Boolean,
                                        accountTypeId: (String, String),
                                        cacheId: String,
-                                       activities: Option[BusinessActivities])
+                                       activities: Option[BusinessActivities],
+                                       unreadNotifications: Int)
                                       (implicit request: Request[AnyContent]): Future[Result] = {
 
     status match {
@@ -148,7 +153,7 @@ class StatusController @Inject()(val landingService: LandingService,
           Ok(your_registration(mlrRegNumber.getOrElse(""),
             businessNameOption,
             feeResponse,
-            fromDuplicateSubmission, canCannotTradeContent(activities))))
+            fromDuplicateSubmission, canCannotTradeContent(activities), unreadNotifications)))
     }
   }
 
@@ -264,6 +269,16 @@ class StatusController @Inject()(val landingService: LandingService,
       case (true, _, true) | (_, true, true) => can_cannot_trade()
       case (_, _, _) => throw new MatchError("Could not match activities against given options.")
     }
+
+  def countUnreadNotifications(amlsRefNo: Option[String], safeId: Option[String], accountTypeId: (String, String))(implicit headerCarrier: HeaderCarrier) = {
+    val notifications = (amlsRefNo, safeId) match {
+      case (Some(ref), _) => notificationConnector.fetchAllByAmlsRegNo(ref, accountTypeId)
+      case (None, Some(id)) => notificationConnector.fetchAllBySafeId(id, accountTypeId)
+      case (_, _) => throw new MatchError("No amls reference or safe Id found.")
+    }
+
+    notifications.map(_.count(!_.isRead))
+  }
 }
 
 
