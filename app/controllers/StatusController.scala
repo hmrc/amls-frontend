@@ -29,7 +29,7 @@ import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName, ControllerHelper}
-import views.html.include.status.{application_pending, can_cannot_trade, can_cannot_trade_msb_or_tcsp_only, can_cannot_trade_no_msb_or_tcsp, rightpanel_submissionreadyforreview}
+import views.html.include.status._
 import views.html.status._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -143,17 +143,11 @@ class StatusController @Inject()(val landingService: LandingService,
           ) getOrElse InternalServerError("Unable to get redirect data")
       }
       case _ =>
-//        Future.successful(
-//          Ok(status_submitted(mlrRegNumber.getOrElse(""),
-//            businessNameOption,
-//            feeResponse,
-//            fromDuplicateSubmission, canCannotTradeContent(activities))))
-
         Future.successful(
           Ok(your_registration(mlrRegNumber.getOrElse(""),
             businessNameOption,
             feeResponse,
-            fromDuplicateSubmission, application_pending(), canCannotTradeContent(activities), unreadNotifications)))
+            fromDuplicateSubmission, application_pending(), canOrCannotTradeInformation(activities), unreadNotifications)))
     }
   }
 
@@ -262,11 +256,11 @@ class StatusController @Inject()(val landingService: LandingService,
     activities.fold(false)(ba => (ba.businessActivities -- Set(MoneyServiceBusiness, TrustAndCompanyServices)).nonEmpty)
   }
 
-  private def canCannotTradeContent(activities: Option[BusinessActivities])(implicit request: Request[AnyContent]) =
+  private def canOrCannotTradeInformation(activities: Option[BusinessActivities])(implicit request: Request[AnyContent]) =
     (hasMsb(activities), hasTcsp(activities), hasOther(activities)) match {
-      case (false, false, true) => can_cannot_trade_no_msb_or_tcsp()
-      case (true, _, false) | (_, true, false) => can_cannot_trade_msb_or_tcsp_only()
-      case (true, _, true) | (_, true, true) => can_cannot_trade()
+      case (false, false, true) => trade_information_no_msb_or_tcsp()
+      case (true, _, false) | (_, true, false) => trade_information_msb_or_tcsp_only()
+      case (true, _, true) | (_, true, true) => trade_information()
       case (_, _, _) => throw new MatchError("Could not match activities against given options.")
     }
 

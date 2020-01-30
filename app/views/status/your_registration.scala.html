@@ -18,7 +18,7 @@
 @import include._
 @import include.status._
 
-@(regNo: String, businessName: Option[String], feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean = false, yourRegistrationInfo: Html, can_cannot_trade: Html, unreadNotifications: Int = 0)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(regNo: String, businessName: Option[String], feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean = false, yourRegistrationInfo: Html, canOrCannotTradeInformation: Html, unreadNotifications: Int = 0)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main2(title = "Your registration", showURRBanner = true) {
 
@@ -34,7 +34,7 @@
     </div>
 
     <div class="grid-layout margin-bottom-medium">
-        <div class="grid-layout__column grid-layout__column--2-3">
+        <div id="registration-info" class="grid-layout__column grid-layout__column--2-3">
             @yourRegistrationInfo
         </div>
         <div class="grid-layout__column grid-layout__column--1-3">
@@ -43,7 +43,7 @@
     </div>
 
     <div class="grid-layout">
-        <div class="grid-layout__column grid-layout__column--1-3">
+        <div id="your-business" class="grid-layout__column grid-layout__column--1-3">
             @businessName.map { bn =>
                 <h2 id="status-submitted-business" class="heading-small">@Messages("status.business")</h2>
                 <p id="status-submitted-business-name">
@@ -53,21 +53,21 @@
                 </p>
             }
         </div>
-        <div class="grid-layout__column grid-layout__column--1-3">
+        <div id="registration-status" class="grid-layout__column grid-layout__column--1-3">
             <h2 class="heading-small">@Messages("your.registration.status")</h2>
             <p>@Messages("your.registration.status.pending")
-                @can_cannot_trade
+                @canOrCannotTradeInformation
             </p>
 
         </div>
-        <div class="grid-layout__column grid-layout__column--1-3">
+        <div id="messages" class="grid-layout__column grid-layout__column--1-3">
             <h2 class="heading-small">@Messages("your.registration.messages")</h2>
             <p><a id="view-message" href="@controllers.routes.NotificationController.getMessages()">@Messages("notifications.youHaveMessages") @if(unreadNotifications > 0){<span class="hmrc-notification-badge">@unreadNotifications</span>}</a></p>
         </div>
     </div>
 
     <div class="grid-layout margin-bottom-large">
-        <div class="grid-layout__column grid-layout__column--1-3">
+        <div id="fees" class="grid-layout__column grid-layout__column--1-3">
             <h2 class="heading-small">@Messages("status.fees")</h2>
             <p>@Messages("your.registration.fees")
                 <br />
@@ -80,7 +80,7 @@
 
     <div>
         <p>@Messages("status.submissionreadyforreview.description.5")
-            <a href="https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs">@Messages("status.submissionreadyforreview.description.5.link")</a>@Messages("full.stop")
+            <a id="contact-link" href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/money-laundering">@Messages("status.submissionreadyforreview.description.5.link")</a>@Messages("full.stop")
         </p>
     </div>
 

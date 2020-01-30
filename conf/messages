@@ -821,7 +821,7 @@ status.amendment.edit.uppercase.start = Check or update your business informatio
 status.fee.link = If you haven’t paid the fee
 status.readyforrenewal.warning = Your supervision will expire on {0} unless you renew.
 status.submittedForReview.submitteddate.text = Application submitted {0}
-status.fees = Your fees
+status.fees = Fees
 status.howtopay = How to pay your fees
 
 fee.details.heading = Your application won’t be reviewed by HMRC until you have paid the fee.
