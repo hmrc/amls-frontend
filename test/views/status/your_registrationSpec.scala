@@ -60,7 +60,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = HtmlFormat.empty,
-        can_cannot_trade = HtmlFormat.empty)
+        canOrCannotTradeInformation = HtmlFormat.empty)
 
       doc.title must be(pageTitle)
       heading.html must be(Messages("your.registration"))
@@ -72,7 +72,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
-        can_cannot_trade = Html("some additional content"),
+        canOrCannotTradeInformation = Html("some additional content"),
         unreadNotifications = 0)
 
       doc.getElementById("registration-info").html() must include("some registration information")
@@ -84,7 +84,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
-        can_cannot_trade = Html("some additional content"),
+        canOrCannotTradeInformation = Html("some additional content"),
         unreadNotifications = 0)
 
       val yourBusinessCell = doc.getElementById("your-business")
@@ -100,7 +100,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
-        can_cannot_trade = Html("some additional content"),
+        canOrCannotTradeInformation = Html("some additional content"),
         unreadNotifications = 0)
 
       val registrationStatusCell = doc.getElementById("registration-status")
@@ -115,7 +115,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
-        can_cannot_trade = Html("some additional content"),
+        canOrCannotTradeInformation = Html("some additional content"),
         unreadNotifications = 0)
 
       val messagesCell = doc.getElementById("messages")
@@ -131,7 +131,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
-        can_cannot_trade = Html("some additional content"),
+        canOrCannotTradeInformation = Html("some additional content"),
         unreadNotifications = 0)
 
       val feeCell = doc.getElementById("fees")
@@ -147,7 +147,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
-        can_cannot_trade = Html("some additional content"),
+        canOrCannotTradeInformation = Html("some additional content"),
         unreadNotifications = 100)
 
       val messagesCell = doc.getElementById("messages")
