@@ -86,12 +86,10 @@ error.required.name.of.business = Enter business name
 error.invalid.name.of.business = Business name must be 120 characters or less
 error.invalid.name.of.business.validation = Business name can include letters a to z, numbers, spaces, and most punctuation and special characters
 
-error.required.nino = Enter a valid National Insurance number
-error.invalid.nino = Enter a valid National Insurance number
+error.required.nino = Enter a National Insurance number in the correct format
+error.invalid.nino = Enter a National Insurance number in the correct format
 
-error.required.uk.passport = Enter a valid passport number
 error.required.non.uk.passport = Enter a valid passport number
-error.invalid.uk.passport = Only use numbers 0 to 9, with no spaces or other characters
 error.invalid.non.uk.passport = Enter a valid passport number
 
 error.required.utr.number = Enter a valid UTR number
@@ -333,7 +331,6 @@ error.invalid.eab.penalised.by.professional.body.description.length = Descriptio
 error.invalid.characters.eab.penalised.by.professional.body.description = Description of the penalty can include letters a to z, numbers, spaces, and most punctuation and special characters
 
 ############################### Responsible People ###############################
-error.required.rp.is.uk.resident = Select yes if {0} is a UK resident
 error.required.rp.birth.country = Enter a country name, like France
 error.required.rp.nationality = Enter a nationality
 error.required.rp.passport.option = Select one or more options to show what kind of passport this person has
@@ -385,10 +382,34 @@ error.rp.name_change.required.date.year.month.day = Enter the date this person c
 error.rp.name_change.required.date.year.day = Date this person changed their name must include a day and year
 error.rp.name_change.invalid.date.after.1900 = Date this person changed their name must be after 1900
 error.rp.name_change.invalid.date.future = Date this person changed their name must be today or in the past
-error.invalid.date.rp.not.real = Enter a real date for when this person changed their name
+error.rp.name_change.invalid.date.not.real = Enter a real date for when this person changed their name
+
+error.required.rp.isknownbyothernames = Select yes if this person is known by another name
+error.required.rp.otherfirstnames = Enter all other first names
+error.required.rp.otherlastnames = Enter all other last names
+error.required.rp.hasOtherNames = Select yes if this person is known by other names
+error.required.rp.otherNames = Enter the other names this person is known by
+error.invalid.rp.maxlength.140 = Other names must be 140 characters or less
+error.invalid.rp.char = Other names can include letters a to z, numbers, spaces and punctuation
+
+error.rp.dob.required.date.day = Date of birth must include a day
+error.rp.dob.required.date.month = Date of birth must include a month
+error.rp.dob.required.date.year = Date of birth must include a year
+error.rp.dob.required.date.month.day = Date of birth must include a day and month
+error.rp.dob.required.date.year.month = Date of birth must include a month and year
+error.rp.dob.required.date.year.month.day = Enter this person’s date of birth
+error.rp.dob.required.date.year.day = Date of birth must include a day and year
+error.rp.dob.invalid.date.after.1900 = Date of birth must be after 1900
+error.rp.dob.invalid.date.future = Date of birth must be in the past
+error.rp.dob.invalid.date.not.real = Enter a real date of birth
+
+error.required.rp.is.uk.resident = Select yes if this person is a UK resident
+
+error.required.uk.passport = Select yes if this person has a UK passport
+error.required.uk.passport.number = Enter this person’s passport number
+error.invalid.uk.passport = Enter a passport number in the correct format
 ################### END RP Changes AMLS-5441 ######################################
 
-error.required.rp.otherNames = Enter the responsible person’s alternative name
 error.invalid.length.otherNames = You can’t enter more than 140 characters
 error.required.timeAtAddress = Select one option to show how long this person lived at this address
 error.required.positionWithinBusiness = Select one or more options to show this person’s position in the business
@@ -399,6 +420,7 @@ error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
 error.required.rp.confirm.address = Select yes if this is {0}’s home address
 error.required.rp.moved.address = Select yes if {0} has moved from this home address
 error.required.rp.select.country.of.birth = Select yes if {0} was born in the UK
+
 error.required.select.uk.passport = Select yes if {0} has a UK passport
 error.required.select.non.uk.passport = Select yes if {0} has a passport from another country
 error.required.select.non.uk = Enter a country that is not the United Kingdom because {0} in the UK

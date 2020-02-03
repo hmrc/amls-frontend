@@ -45,7 +45,6 @@ class LegalNameChangeDateSpec extends PlaySpec with MockitoSugar {
     }
 
     "fail validation" when {
-
       "required fields are missing" when {
         "nothing has been selected" in {
 
@@ -125,7 +124,7 @@ class LegalNameChangeDateSpec extends PlaySpec with MockitoSugar {
           "date.month" -> Seq("BAR"),
           "date.day" -> Seq("FOO")
         )) must equal(Invalid(Seq(
-          (Path \ "date") -> Seq(ValidationError("error.invalid.date.rp.not.real"))
+          (Path \ "date") -> Seq(ValidationError("error.rp.name_change.invalid.date.not.real"))
         )))
       }
 
@@ -150,8 +149,6 @@ class LegalNameChangeDateSpec extends PlaySpec with MockitoSugar {
             (Path \ "date") -> Seq(ValidationError("error.rp.name_change.invalid.date.after.1900"))
           )))
       }
-
     }
-
   }
 }

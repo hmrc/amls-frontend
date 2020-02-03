@@ -33,7 +33,10 @@ object LegalNameChangeDate {
 
   implicit val formRule: Rule[UrlFormEncoded, LegalNameChangeDate] =
     From[UrlFormEncoded] { __ =>
-      (__ \ "date").read(newAllowedPastAndFutureDateRule("error.rp.name_change.required.date", "error.rp.name_change.invalid.date.after.1900", "error.rp.name_change.invalid.date.future")) map LegalNameChangeDate.apply
+      (__ \ "date").read(newAllowedPastAndFutureDateRule("error.rp.name_change.required.date",
+        "error.rp.name_change.invalid.date.after.1900",
+        "error.rp.name_change.invalid.date.future",
+        "error.rp.name_change.invalid.date.not.real")) map LegalNameChangeDate.apply
     }
 
   implicit def formWrites = Write[LegalNameChangeDate, UrlFormEncoded] { data =>

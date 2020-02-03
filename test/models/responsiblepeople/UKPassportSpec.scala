@@ -33,12 +33,12 @@ class UKPassportSpec extends PlaySpec {
     "fail validation" when {
       "the passport number has too many characters" in {
         UKPassport.ukPassportType.validate("a" * 10) mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.required.uk.passport")))
+          Seq(Path -> Seq(ValidationError("error.invalid.uk.passport")))
         )
       }
       "the passport number has too few characters" in {
         UKPassport.ukPassportType.validate("a" * 8) mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.required.uk.passport")))
+          Seq(Path -> Seq(ValidationError("error.invalid.uk.passport")))
         )
       }
       "the passport number includes invalid characters (letters, punctuation etc)" in {
@@ -48,12 +48,12 @@ class UKPassportSpec extends PlaySpec {
       }
       "the passport number is an empty string" in {
         UKPassport.ukPassportType.validate("") mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.required.uk.passport")))
+          Seq(Path -> Seq(ValidationError("error.required.uk.passport.number")))
         )
       }
       "the passport number is given a sequence of whitespace" in {
         UKPassport.ukPassportType.validate("    ") mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.required.uk.passport")))
+          Seq(Path -> Seq(ValidationError("error.required.uk.passport.number")))
         )
       }
     }
@@ -83,7 +83,7 @@ class UKPassportSpec extends PlaySpec {
 
       UKPassport.formRule.validate(urlFormEncoded) must
         be(Invalid(Seq(
-          (Path \ "ukPassportNumber") -> Seq(ValidationError("error.required.uk.passport"))
+          (Path \ "ukPassportNumber") -> Seq(ValidationError("error.invalid.uk.passport"))
         )))
     }
 
@@ -93,7 +93,7 @@ class UKPassportSpec extends PlaySpec {
 
       UKPassport.formRule.validate(urlFormEncoded) must
         be(Invalid(Seq(
-          (Path \ "ukPassport") -> Seq(ValidationError("error.required.select.uk.passport"))
+          (Path \ "ukPassport") -> Seq(ValidationError("error.required.uk.passport"))
         )))
     }
 
