@@ -1,1 +1,2 @@
  + [AMLS-5699] - 'Changed the url and content for 1 Click testing'
+ + [AMLS-5686-5687-5688-5689] - 'Duplicate ID's fixes'
