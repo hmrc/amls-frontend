@@ -20,13 +20,14 @@ import forms.EmptyForm
 import generators.AmlsReferenceNumberGenerator
 import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
-import org.joda.time.{DateTime, DateTimeZone}
-import org.jsoup.select.Elements
+import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
+import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
 import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
+import views.html.status.components.{fee_information, registration_status, withdraw_or_deregister_information}
 
 class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator {
 
@@ -60,7 +61,8 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = HtmlFormat.empty,
-        canOrCannotTradeInformation = HtmlFormat.empty)
+        registrationStatus = HtmlFormat.empty,
+        feeInformation = HtmlFormat.empty)
 
       doc.title must be(pageTitle)
       heading.html must be(Messages("your.registration"))
@@ -72,8 +74,8 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
-        canOrCannotTradeInformation = Html("some additional content"),
-        unreadNotifications = 0)
+        registrationStatus = HtmlFormat.empty,
+        feeInformation = HtmlFormat.empty)
 
       doc.getElementById("registration-info").html() must include("some registration information")
     }
@@ -84,8 +86,8 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
-        canOrCannotTradeInformation = Html("some additional content"),
-        unreadNotifications = 0)
+        registrationStatus = HtmlFormat.empty,
+        feeInformation = HtmlFormat.empty)
 
       val yourBusinessCell = doc.getElementById("your-business")
       yourBusinessCell.getElementsByClass("heading-small").first().html() must include("Your business")
@@ -94,19 +96,35 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         .attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
     }
 
-    "contain your registration status information cell with right content" in new ViewFixture {
+    "contain your registration status information cell with right content for status SubmissionReadyForReview" in new ViewFixture {
 
       def view = views.html.status.your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
-        canOrCannotTradeInformation = Html("some additional content"),
-        unreadNotifications = 0)
+        registrationStatus = registration_status(status = SubmissionReadyForReview, canOrCannotTradeInformation = Html("some additional content")),
+        feeInformation = HtmlFormat.empty)
 
       val registrationStatusCell = doc.getElementById("registration-status")
       registrationStatusCell.getElementsByClass("heading-small").first().html() must include("Registration status")
       registrationStatusCell.html() must include("Application pending.")
       registrationStatusCell.html() must include("some additional content")
+    }
+
+    "contain your registration status information cell with right content for status SubmissionDecisionApproved" in new ViewFixture {
+
+      def view = views.html.status.your_registration(amlsRegistrationNumber,
+        Some("business Name"),
+        Some(feeResponse),
+        yourRegistrationInfo = Html("some registration information"),
+        registrationStatus = registration_status(status = SubmissionDecisionApproved, amlsRegNo = Some("XBML0987654345"), endDate = Some(LocalDate.now())),
+        feeInformation = HtmlFormat.empty)
+
+      val registrationStatusCell = doc.getElementById("registration-status")
+      registrationStatusCell.getElementsByClass("heading-small").first().html() must include("Registration status")
+      registrationStatusCell.html() must include("Supervised to")
+      registrationStatusCell.html() must include(DateHelper.formatDate(LocalDate.now()))
+      registrationStatusCell.html() must include("Registration number XBML0987654345")
     }
 
     "contain your messages cell with right content" in new ViewFixture {
@@ -115,8 +133,8 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
-        canOrCannotTradeInformation = Html("some additional content"),
-        unreadNotifications = 0)
+        registrationStatus = HtmlFormat.empty,
+        feeInformation = HtmlFormat.empty)
 
       val messagesCell = doc.getElementById("messages")
       messagesCell.getElementsByClass("heading-small").first().html() must include("Messages")
@@ -125,14 +143,14 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       messagesCell.getElementsByClass("hmrc-notification-badge").isEmpty must be(true)
     }
 
-    "contain your fees cell with right content" in new ViewFixture {
+    "contain your fees cell with right content for status SubmissionReadyForReview" in new ViewFixture {
 
       def view = views.html.status.your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
-        canOrCannotTradeInformation = Html("some additional content"),
-        unreadNotifications = 0)
+        registrationStatus = HtmlFormat.empty,
+        feeInformation = fee_information(SubmissionReadyForReview))
 
       val feeCell = doc.getElementById("fees")
       feeCell.getElementsByClass("heading-small").first().html() must include("Fees")
@@ -141,14 +159,31 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         .attr("href") must be("how-to-pay")
     }
 
+    "contain your fees cell with right content for status SubmissionDecisionApproved" in new ViewFixture {
 
-    "contain additional content elements" in new ViewFixture {
       def view = views.html.status.your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
-        canOrCannotTradeInformation = Html("some additional content"),
-        unreadNotifications = 100)
+        registrationStatus = HtmlFormat.empty,
+        feeInformation = fee_information(SubmissionDecisionApproved))
+
+      val feeCell = doc.getElementById("fees")
+      feeCell.getElementsByClass("heading-small").first().html() must include("Fees")
+      feeCell.getElementsMatchingOwnText("How to pay")
+        .attr("href") must be("how-to-pay")
+    }
+
+    "contain additional content elements" in new ViewFixture {
+
+      def view = views.html.status.your_registration(amlsRegistrationNumber,
+        Some("business Name"),
+        Some(feeResponse),
+        yourRegistrationInfo = HtmlFormat.empty,
+        registrationStatus = HtmlFormat.empty,
+        feeInformation = HtmlFormat.empty,
+        unreadNotifications = 100,
+        displayContactLink = true)
 
       val messagesCell = doc.getElementById("messages")
       messagesCell.getElementsByClass("hmrc-notification-badge").isEmpty must be(false)
@@ -157,14 +192,41 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       doc.getElementsMatchingOwnText("contact HMRC")
         .attr("href") must be("https://www.gov.uk/government/organisations/hm-revenue-customs/contact/money-laundering")
 
-      doc.getElementsMatchingOwnText("withdraw your application")
-        .attr("href") must be(controllers.withdrawal.routes.WithdrawApplicationController.get().url)
-
       doc.getElementsMatchingOwnText("Give feedback on the service")
         .attr("href") must be("/anti-money-laundering/satisfaction-survey")
 
       doc.getElementsMatchingOwnText("Print this page")
         .attr("href") must be("javascript:window.print()")
+    }
+
+    "contain withdraw application link for status SubmissionReadyForReview" in new ViewFixture {
+
+      def view = views.html.status.your_registration(amlsRegistrationNumber,
+        Some("business Name"),
+        Some(feeResponse),
+        yourRegistrationInfo = HtmlFormat.empty,
+        registrationStatus = HtmlFormat.empty,
+        feeInformation = HtmlFormat.empty,
+        unreadNotifications = 100,
+        withdrawOrDeregisterInformation = withdraw_or_deregister_information(SubmissionReadyForReview))
+
+      doc.getElementsMatchingOwnText("withdraw your application")
+        .attr("href") must be(controllers.withdrawal.routes.WithdrawApplicationController.get().url)
+    }
+
+    "contain deregister link for status SubmissionDecisionApproved" in new ViewFixture {
+
+      def view = views.html.status.your_registration(amlsRegistrationNumber,
+        Some("business Name"),
+        Some(feeResponse),
+        yourRegistrationInfo = HtmlFormat.empty,
+        registrationStatus = HtmlFormat.empty,
+        feeInformation = HtmlFormat.empty,
+        unreadNotifications = 100,
+        withdrawOrDeregisterInformation = withdraw_or_deregister_information(SubmissionDecisionApproved))
+
+      doc.getElementsMatchingOwnText("deregister your business")
+        .attr("href") must be(controllers.deregister.routes.DeRegisterApplicationController.get().url)
     }
   }
 }

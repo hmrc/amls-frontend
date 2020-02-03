@@ -145,7 +145,7 @@ class StatusController @Inject()(val landingService: LandingService,
       }
       case _ =>
         Future.successful(
-          Ok(your_registration_v2(
+          Ok(your_registration(
             regNo = mlrRegNumber.getOrElse(""),
             businessName = businessNameOption,
             fromDuplicateSubmission = fromDuplicateSubmission,
@@ -174,7 +174,7 @@ class StatusController @Inject()(val landingService: LandingService,
         val activities = maybeActivities.map(_.businessActivities.map(_.getMessage())) getOrElse Set.empty
 
         Ok {
-          your_registration_v2(
+          your_registration(
             regNo = mlrRegNumber.getOrElse(""),
             businessName = businessNameOption,
             unreadNotifications = unreadNotifications,
