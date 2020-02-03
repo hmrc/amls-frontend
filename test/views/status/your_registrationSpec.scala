@@ -20,13 +20,15 @@ import forms.EmptyForm
 import generators.AmlsReferenceNumberGenerator
 import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
-import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
+import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import play.api.mvc.Call
 import play.twirl.api.{Html, HtmlFormat}
 import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
+import views.html.include.status.{application_incomplete, application_submission_ready}
 import views.html.status.components.{fee_information, registration_status, withdraw_or_deregister_information}
 
 class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator {
@@ -80,6 +82,34 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       doc.getElementById("registration-info").html() must include("some registration information")
     }
 
+    "contain registration information for status NotCompleted" in new ViewFixture {
+
+      def view = views.html.status.your_registration(amlsRegistrationNumber,
+        Some("business Name"),
+        Some(feeResponse),
+        yourRegistrationInfo = application_incomplete(),
+        registrationStatus = HtmlFormat.empty,
+        feeInformation = HtmlFormat.empty)
+
+      doc.getElementById("incomplete-description").html() must be("Your application to register with HMRC is incomplete. You have 28 days to complete your application from when you last saved your progress.")
+      doc.getElementById("return-to-saved-application").html() must include("Return to your application")
+      doc.getElementById("return-to-saved-application").attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
+    }
+
+    "contain registration information for status SubmissionReady" in new ViewFixture {
+
+      def view = views.html.status.your_registration(amlsRegistrationNumber,
+        Some("business Name"),
+        Some(feeResponse),
+        yourRegistrationInfo = application_submission_ready(Call("GET", "/some/url")),
+        registrationStatus = HtmlFormat.empty,
+        feeInformation = HtmlFormat.empty)
+
+      doc.getElementById("registration-info").html() must include("Your application to register with HMRC is ready to submit. You have 28 days to submit your application from when you last saved your progress.")
+      doc.getElementById("status-submit").html() must include("Check and submit your application")
+      doc.getElementById("status-submit").attr("href") must be("/some/url")
+    }
+
     "contain your business information cell with right content" in new ViewFixture {
 
       def view = views.html.status.your_registration(amlsRegistrationNumber,
@@ -91,7 +121,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
       val yourBusinessCell = doc.getElementById("your-business")
       yourBusinessCell.getElementsByClass("heading-small").first().html() must include("Your business")
-      yourBusinessCell.getElementById("status-submitted-business-name").html() must include("business Name")
+      yourBusinessCell.getElementById("business-name").html() must include("business Name")
       yourBusinessCell.getElementsMatchingOwnText("Check or update your business information")
         .attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
     }
@@ -125,6 +155,34 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       registrationStatusCell.html() must include("Supervised to")
       registrationStatusCell.html() must include(DateHelper.formatDate(LocalDate.now()))
       registrationStatusCell.html() must include("Registration number XBML0987654345")
+    }
+
+    "contain your registration status information cell with right content for status SubmissionReady" in new ViewFixture {
+
+      def view = views.html.status.your_registration(amlsRegistrationNumber,
+        Some("business Name"),
+        None,
+        yourRegistrationInfo = Html("some registration information"),
+        registrationStatus = registration_status(status = SubmissionReady),
+        feeInformation = HtmlFormat.empty)
+
+      val registrationStatusCell = doc.getElementById("registration-status")
+      registrationStatusCell.getElementsByClass("heading-small").first().html() must include("Registration status")
+      registrationStatusCell.html() must include("Application not submitted.")
+    }
+
+    "contain your registration status information cell with right content for status NotCompleted" in new ViewFixture {
+
+      def view = views.html.status.your_registration(amlsRegistrationNumber,
+        Some("business Name"),
+        None,
+        yourRegistrationInfo = Html("some registration information"),
+        registrationStatus = registration_status(status = NotCompleted),
+        feeInformation = HtmlFormat.empty)
+
+      val registrationStatusCell = doc.getElementById("registration-status")
+      registrationStatusCell.getElementsByClass("heading-small").first().html() must include("Registration status")
+      registrationStatusCell.html() must include("Application incomplete.")
     }
 
     "contain your messages cell with right content" in new ViewFixture {
