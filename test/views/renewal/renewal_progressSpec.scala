@@ -24,7 +24,7 @@ import utils.Strings.TextHelpers
 import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
 
-class renewal_progressSpec extends AmlsViewSpec with MustMatchers{
+class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addTokenForView()
@@ -54,17 +54,21 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers{
 
       override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal)
 
-      html must include (Messages("renewal.progress.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
+      html must include(Messages("renewal.progress.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
     }
 
     "show the business name and services" in new ViewFixture {
       override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal)
-      val element = doc.getElementsByClass("business-info").first()
-      serviceNames.foreach(name => element.text() must include { name } )
+
+      val element = doc.getElementsByClass("grid-layout")
+      serviceNames.foreach(name => element.text() must include {
+        name
+      })
     }
 
     "not show the view details link under services section" in new ViewFixture {
       override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal)
+
       val element = Option(doc.getElementById("view-details"))
       element mustBe None
     }
@@ -76,7 +80,7 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers{
 
       doc.select("form button[name=submit]").hasAttr("disabled") mustBe false
 
-      html must include (Messages("renewal.progress.ready.to.submit.intro"))
+      html must include(Messages("renewal.progress.ready.to.submit.intro"))
 
       doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
     }
@@ -85,7 +89,7 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers{
       override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, canSubmit = false,
         msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = false)
 
-      html must include (Messages("renewal.progress.submit.intro"))
+      html must include(Messages("renewal.progress.submit.intro"))
 
       doc.select(".application-submit form button[name=submit]").isEmpty mustBe true
 
@@ -116,16 +120,36 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers{
       val fullStop = "."
 
       val expectedText = s"${Messages("renewal.progress.information.not.completed.info.part1")}" +
-                         s"$space" +
-                         s"${Messages("renewal.progress.information.not.completed.info.part2")}" +
-                         s"$fullStop"
+        s"$space" +
+        s"${Messages("renewal.progress.information.not.completed.info.part2")}" +
+        s"$fullStop"
 
       doc.select("#renewal-information-not-completed").get(0).text() must be(expectedText)
       doc.select("#renewal-information-not-completed a").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
-      html must include (Messages("renewal.progress.submit.intro"))
+      html must include(Messages("renewal.progress.submit.intro"))
     }
 
+    "show the Nominated officer box with correct title, name and link" in new ViewFixture {
+      def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal, false,
+        hasCompleteNominatedOfficer = true,
+        nominatedOfficerName = Some("FirstName LastName"))
 
+      val element = doc.getElementById("nominated-officer")
+
+      element.getElementsByClass("heading-small").text() must be("Nominated officer")
+      element.html() must include("FirstName LastName")
+      element.getElementById("change-officer-change-link-mobile").attr("href") must be(controllers.changeofficer.routes.StillEmployedController.get().url)
+      element.getElementById("change-officer-change-link-mobile").text() must be("Change")
+    }
+
+    "do not show the Nominated officer box if NO is not defined" in new ViewFixture {
+      def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal, false,
+        hasCompleteNominatedOfficer = false,
+        nominatedOfficerName = None)
+
+      val element = Option(doc.getElementById("nominated-officer"))
+
+      element mustBe None
+    }
   }
-
 }

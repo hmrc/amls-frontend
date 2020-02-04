@@ -137,8 +137,22 @@ object ControllerHelper {
     }
   }
 
+  def hasCompleteNominatedOfficer(responsiblePeople: Option[Seq[ResponsiblePerson]]): Boolean = {
+    responsiblePeople match {
+      case Some(rps) => ResponsiblePerson.filter(rps).exists(rp => rp.isComplete && rp.isNominatedOfficer)
+      case _ => false
+    }
+  }
+
   def getNominatedOfficer(responsiblePeople: Seq[ResponsiblePerson]): Option[ResponsiblePerson] = {
     ResponsiblePerson.filter(responsiblePeople).filter(_.isNominatedOfficer) match {
+      case rps@_::_ => Some(rps.head)
+      case _ => None
+    }
+  }
+
+  def getCompleteNominatedOfficer(responsiblePeople: Seq[ResponsiblePerson]): Option[ResponsiblePerson] = {
+    ResponsiblePerson.filter(responsiblePeople).filter(rp => rp.isComplete && rp.isNominatedOfficer) match {
       case rps@_::_ => Some(rps.head)
       case _ => None
     }
@@ -147,6 +161,12 @@ object ControllerHelper {
   def nominatedOfficerTitleName(responsiblePeople: Option[Seq[ResponsiblePerson]]): Option[String] = {
     responsiblePeople map { rps =>
       rpTitleName(getNominatedOfficer(rps))
+    }
+  }
+
+  def completeNominatedOfficerTitleName(responsiblePeople: Option[Seq[ResponsiblePerson]]): Option[String] = {
+    responsiblePeople map { rps =>
+      rpTitleName(getCompleteNominatedOfficer(rps))
     }
   }
 
