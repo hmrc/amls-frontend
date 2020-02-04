@@ -282,8 +282,7 @@ class StatusController @Inject()(val landingService: LandingService,
     val notifications = (amlsRefNo, safeId) match {
       case (Some(ref), _) => notificationConnector.fetchAllByAmlsRegNo(ref, accountTypeId)
       case (None, Some(id)) => notificationConnector.fetchAllBySafeId(id, accountTypeId)
-      case (None, None) => Future.successful(Seq())
-      case (_, _) => throw new MatchError("Could not match amls ref number or safe id against given conditions.")
+      case (_, _) => Future.successful(Seq())
     }
 
     notifications.map(_.count(!_.isRead))
