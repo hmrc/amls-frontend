@@ -2503,6 +2503,7 @@ survey.satisfaction.helpus = now.
 ############################### Banners ###############################
 urr.title = Help improve GOV.UK
 urr.bannertext = Get involved in making government services better (opens in a new window)
+urr.clicktest = Complete our 2-3 minute online task to help improve our content
 urr.nothanks = No thanks
 
 ############################### LoginEvents ###############################
