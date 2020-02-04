@@ -32,22 +32,22 @@ class NonUKPassportSpec extends PlaySpec {
     "fail validation" when {
       "the passport number has too many characters" in {
         NonUKPassport.noUKPassportType.validate("a" * 50) mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.invalid.non.uk.passport")))
+          Seq(Path -> Seq(ValidationError("error.invalid.non.uk.passport.number")))
         )
       }
       "the passport number includes invalid characters (letters, punctuation etc)" in {
         NonUKPassport.noUKPassportType.validate("123abc7{}") mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.invalid.non.uk.passport")))
+          Seq(Path -> Seq(ValidationError("error.invalid.non.uk.passport.number")))
         )
       }
       "the passport number is an empty string" in {
         NonUKPassport.noUKPassportType.validate("") mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.required.non.uk.passport")))
+          Seq(Path -> Seq(ValidationError("error.required.non.uk.passport.number")))
         )
       }
       "the passport number is given a sequence of whitespace" in {
         NonUKPassport.noUKPassportType.validate("    ") mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.required.non.uk.passport")))
+          Seq(Path -> Seq(ValidationError("error.required.non.uk.passport.number")))
         )
       }
     }
@@ -75,7 +75,7 @@ class NonUKPassportSpec extends PlaySpec {
         "nonUKPassportNumber" -> Seq("")
       )
       NonUKPassport.formRule.validate(urlFormEncoded) must be(Invalid(Seq(
-        (Path \ "nonUKPassportNumber") -> Seq(ValidationError("error.required.non.uk.passport"))
+        (Path \ "nonUKPassportNumber") -> Seq(ValidationError("error.required.non.uk.passport.number"))
       )))
     }
 
@@ -101,7 +101,7 @@ class NonUKPassportSpec extends PlaySpec {
 
       NonUKPassport.formRule.validate(urlFormEncoded) must
         be(Invalid(Seq(
-          (Path \ "nonUKPassport") -> Seq(ValidationError("error.required.select.non.uk.passport"))
+          (Path \ "nonUKPassport") -> Seq(ValidationError("error.required.non.uk.passport"))
         )))
     }
 
@@ -127,6 +127,4 @@ class NonUKPassportSpec extends PlaySpec {
       }
     }
   }
-
-
 }

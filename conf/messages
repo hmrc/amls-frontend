@@ -51,7 +51,6 @@ error.invalid.postcode = Enter a postcode, like AA1 1AA
 error.required.country = Enter a country
 error.invalid.country = Enter a country name, like France
 error.required.country.name = Enter a country name, like France
-error.required.nationality = Select one or more options to show this person’s nationality
 error.required.uk.or.overseas.address.previous.other = Select yes if {0}’s other previous home address was in the UK
 error.required.uk.or.overseas.address.previous = Select yes if {0}’s previous home address was in the UK
 error.required.uk.or.overseas.address.current = Select yes if {0}’s home address is in the UK
@@ -88,9 +87,6 @@ error.invalid.name.of.business.validation = Business name can include letters a 
 
 error.required.nino = Enter a National Insurance number in the correct format
 error.invalid.nino = Enter a National Insurance number in the correct format
-
-error.required.non.uk.passport = Enter a valid passport number
-error.invalid.non.uk.passport = Enter a valid passport number
 
 error.required.utr.number = Enter a valid UTR number
 error.invalid.length.utr.number = Enter a valid UTR number
@@ -259,7 +255,7 @@ error.required.ba.advisor.isuk = Select yes if your adviser’s address is in th
 error.required.ba.select.yes = Select yes if you had customers who lived or worked outside of the UK in the last 12 months
 
 ###############################  Trading premises ###############################
-error.required.tp.activity.your.business.do = Select which services your business provides at these premises 
+error.required.tp.activity.your.business.do = Select which services your business provides at these premises
 error.required.tp.trading.name = Enter your trading name
 error.invalid.tp.trading.name = Trading name must be 120 characters or less
 error.char.tp.trading.name = Trading name can include letters a to z, numbers, spaces, and punctuation
@@ -331,7 +327,6 @@ error.invalid.eab.penalised.by.professional.body.description.length = Descriptio
 error.invalid.characters.eab.penalised.by.professional.body.description = Description of the penalty can include letters a to z, numbers, spaces, and most punctuation and special characters
 
 ############################### Responsible People ###############################
-error.required.rp.birth.country = Enter a country name, like France
 error.required.rp.nationality = Enter a nationality
 error.required.rp.passport.option = Select one or more options to show what kind of passport this person has
 error.required.rp.register.another.person = Select yes if you want to register another responsible person
@@ -408,6 +403,20 @@ error.required.rp.is.uk.resident = Select yes if this person is a UK resident
 error.required.uk.passport = Select yes if this person has a UK passport
 error.required.uk.passport.number = Enter this person’s passport number
 error.invalid.uk.passport = Enter a passport number in the correct format
+
+error.required.non.uk.passport = Select yes if this person has a passport from another country
+error.required.non.uk.passport.number = Enter this person’s passport number
+error.invalid.non.uk.passport.number = Enter a passport number in the correct format
+
+error.required.rp.select.country.of.birth = Select yes if this person was born in the UK
+error.required.enter.valid.non.uk = Enter a country that is not the United Kingdom because this person was not born in the UK
+
+error.required.rp.birth.country = Enter the country this person was born in
+error.invalid.rp.birth.country = Enter a country name, like France
+
+error.required.nationality = Select this person’s nationality
+error.required.rp.nationality.country = Enter the country this person is a national of
+error.invalid.rp.nationality.country = Enter a country name, like France
 ################### END RP Changes AMLS-5441 ######################################
 
 error.invalid.length.otherNames = You can’t enter more than 140 characters
@@ -419,7 +428,6 @@ error.required.rp.sole_proprietor = Select yes if {0} is the sole proprietor of 
 error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
 error.required.rp.confirm.address = Select yes if this is {0}’s home address
 error.required.rp.moved.address = Select yes if {0} has moved from this home address
-error.required.rp.select.country.of.birth = Select yes if {0} was born in the UK
 
 error.required.select.uk.passport = Select yes if {0} has a UK passport
 error.required.select.non.uk.passport = Select yes if {0} has a passport from another country
@@ -428,7 +436,6 @@ error.required.select.non.uk.address = does not live
 error.required.select.non.uk.previous.address = this person’s previous address was not
 error.required.select.non.uk.home.address = this person’s home address is not
 error.required.select.non.uk.other.previous.address = this person’s other previous address was not
-error.required.enter.valid.non.uk = Enter a country that is not the United Kingdom because {0} was not born in the UK
 
 error.required.select.uk = Select yes if {0}’s home address is in the UK
 error.required.enter.addressline.one = Enter address line 1
