@@ -910,15 +910,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
         result returns 0
       }
-
-      "throw an exception if no match found" in new Fixture with FutureAssertions {
-
-        val result = intercept[MatchError] {
-          controller.countUnreadNotifications(null, null, ("", ""))
-        }
-
-        result.getMessage() must include("Could not match amls ref number or safe id against given conditions.")
-      }
     }
   }
 }
