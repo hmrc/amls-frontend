@@ -1,0 +1,97 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import include._
+@import include.status._
+
+@(regNo: String, businessName: Option[String], feeResponse: Option[FeeResponse], fromDuplicateSubmission: Boolean = false, yourRegistrationInfo: Html, canOrCannotTradeInformation: Html, unreadNotifications: Int = 0)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+
+@main2(title = "Your registration", showURRBanner = true) {
+
+    <div class="grid-layout">
+        <div class="grid-layout__column--2-3">
+            <header class="page-header">
+                <h1 id="pending-status-header" class="heading-xlarge">@Messages("your.registration")</h1>
+            </header>
+        </div>
+        <div class="grid-layout__column grid-layout__column--1-3">
+            @* empty for layout reasons *@
+        </div>
+    </div>
+
+    <div class="grid-layout margin-bottom-medium">
+        <div id="registration-info" class="grid-layout__column grid-layout__column--2-3">
+            @yourRegistrationInfo
+        </div>
+        <div class="grid-layout__column grid-layout__column--1-3">
+            @* empty for layout reasons *@
+        </div>
+    </div>
+
+    <div class="grid-layout">
+        <div id="your-business" class="grid-layout__column grid-layout__column--1-3">
+            @businessName.map { bn =>
+                <h2 id="status-submitted-business" class="heading-small">@Messages("status.business")</h2>
+                <p id="status-submitted-business-name">
+                    @bn
+                    <br />
+                    <a id="update-information" href="@controllers.routes.RegistrationProgressController.get()">@Messages("status.amendment.edit")</a>
+                </p>
+            }
+        </div>
+        <div id="registration-status" class="grid-layout__column grid-layout__column--1-3">
+            <h2 class="heading-small">@Messages("your.registration.status")</h2>
+            <p>@Messages("your.registration.status.pending")
+                @canOrCannotTradeInformation
+            </p>
+
+        </div>
+        <div id="messages" class="grid-layout__column grid-layout__column--1-3">
+            <h2 class="heading-small">@Messages("your.registration.messages")</h2>
+            <p><a id="view-message" href="@controllers.routes.NotificationController.getMessages()">@Messages("notifications.youHaveMessages") @if(unreadNotifications > 0){<span class="hmrc-notification-badge">@unreadNotifications</span>}</a></p>
+        </div>
+    </div>
+
+    <div class="grid-layout margin-bottom-large">
+        <div id="fees" class="grid-layout__column grid-layout__column--1-3">
+            <h2 class="heading-small">@Messages("status.fees")</h2>
+            <p>@Messages("your.registration.fees")
+                <br />
+                <a id="how-to-pay" href="how-to-pay">@Messages("status.howtopay")</a>
+            </p>
+        </div>
+        <div class="grid-layout__column grid-layout__column--1-3"></div>
+        <div class="grid-layout__column grid-layout__column--1-3"></div>
+    </div>
+
+    <div>
+        <p>@Messages("status.submissionreadyforreview.description.5")
+            <a id="contact-link" href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/money-laundering">@Messages("status.submissionreadyforreview.description.5.link")</a>@Messages("full.stop")
+        </p>
+    </div>
+
+    <div>
+        <p class="no-print">
+            @Messages("your.registration.withdraw")
+            <a id="withdraw-application" href="@controllers.withdrawal.routes.WithdrawApplicationController.get()">@Messages("status.withdraw.link-text")</a>@Messages("full.stop")
+        </p>
+    </div>
+
+    @before_you_go()
+
+    @printLink(linkId="status-submitted-print", gaTag=Some("status-submitted:click:print"))
+}
