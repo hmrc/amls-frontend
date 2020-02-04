@@ -53,7 +53,7 @@ class registration_progressSpec extends AmlsViewSpec with MockitoSugar with Addr
 
     "show the business name and services" in new ViewFixture {
       def view = views.html.registrationprogress.registration_progress(sections, true, businessName, serviceNames, true)
-      val element = doc.getElementsByClass("business-info").first()
+      val element = doc.getElementsByClass("grid-layout")
       serviceNames.foreach(name => element.text() must include { name } )
     }
 

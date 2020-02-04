@@ -33,7 +33,9 @@
     canSubmit: Boolean,
     msbOrTcspExists: Boolean,
     renewal: Renewal,
-    renewalSectionCompleted: Boolean = false
+    renewalSectionCompleted: Boolean = false,
+    hasCompleteNominatedOfficer: Boolean = false,
+    nominatedOfficerName: Option[String] = None
 )(implicit messages: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
@@ -80,7 +82,7 @@
     </div>
 
     <div class="grid-layout grid-layout--stacked">
-        @services_sidebar(canEditPreApplication = false, displayLink = false, businessName, serviceNames.toList.sorted, None)
+        @services_sidebar(canEditPreApplication = false, displayLink = false, businessName, serviceNames.toList.sorted, hasCompleteNominatedOfficer, nominatedOfficerName)
     </div>
 
     <div class="grid-layout grid-layout--stacked">
