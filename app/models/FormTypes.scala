@@ -151,16 +151,16 @@ object FormTypes {
   val nameRequired = required("error.required.yourname")
   val nameType = maxLength(nameMaxLength).withMessage("error.invalid.yourname")
 
-  private val phoneNumberRequired = required("error.required.phone.number")
-  private val phoneNumberLength = maxWithMsg(maxPhoneNumberLength, "error.max.length.phone")
-  private val phoneNumberPattern = regexWithMsg(phoneNumberRegex, "err.invalid.phone.number")
+  private def phoneNumberRequiredWithMessage(msg: String = "error.required.phone.number") = required(msg)
+  private def phoneNumberLengthWithMessage(msg: String = "error.max.length.phone") = maxWithMsg(maxPhoneNumberLength, msg)
+  private def phoneNumberPatternWithMessage(msg: String = "err.invalid.phone.number") = regexWithMsg(phoneNumberRegex, msg)
 
-  private val emailRequired = required("error.required.rp.email")
+  private def emailRequiredWithMessage(msg: String = "error.required.rp.email") = required(msg)
   private val confirmEmailRequired = required("error.required.email.reenter")
-  private val emailLength = maxWithMsg(maxEmailLength, "error.invalid.email.max.length")
+  private def emailLengthWithMessage(msg: String = "error.invalid.email.max.length") = maxWithMsg(maxEmailLength, msg)
 
   private val confirmEmailPattern = regexWithMsg(emailRegex, "error.invalid.email.reenter")
-  private val emailPattern = regexWithMsg(emailRegex, "error.required.rp.email")
+  private def emailPatternWithMessage(msg: String = "error.required.rp.email") = regexWithMsg(emailRegex, msg)
 
   private val dayRequired = required("error.required.tp.date")
   private val dayPattern = regexWithMsg(dayRegex, "error.invalid.tp.date")
@@ -172,13 +172,28 @@ object FormTypes {
   private val yearPatternPost1900 = regexWithMsg(yearRegexPost1900, "error.invalid.year.post1900")
   private val yearPattern = regexWithMsg(yearRegexFourDigits, "error.invalid.year")
 
-  val phoneNumberType = notEmptyStrip andThen phoneNumberRequired andThen phoneNumberLength andThen phoneNumberPattern
-  val emailType = emailRequired andThen emailLength andThen emailPattern
+  val phoneNumberType = notEmptyStrip andThen
+    phoneNumberRequiredWithMessage() andThen
+    phoneNumberLengthWithMessage() andThen
+    phoneNumberPatternWithMessage()
+
+  def phoneNumberTypeWithMessages(requiredMsg: String, invalidMsg: String) =
+    notEmptyStrip andThen phoneNumberRequiredWithMessage(requiredMsg) andThen
+      phoneNumberLengthWithMessage(invalidMsg) andThen
+      phoneNumberPatternWithMessage(invalidMsg)
+
+  def emailType = emailRequiredWithMessage() andThen emailLengthWithMessage() andThen emailPatternWithMessage()
+
+  def emailTypeWithMessages(requiredMsg: String, invalidLengthMsg: String, invalidMsg: String) =
+    emailRequiredWithMessage(requiredMsg) andThen
+      emailLengthWithMessage(invalidLengthMsg) andThen
+      emailPatternWithMessage(invalidMsg)
+
   val emailTypeBusinessDetails = required("error.required.email") andThen
     maxWithMsg(maxEmailLength, "error.invalid.email.max.length") andThen
     regexWithMsg(emailRegex, "error.invalid.email")
 
-  val confirmEmailType = confirmEmailRequired andThen emailLength andThen confirmEmailPattern
+  val confirmEmailType = confirmEmailRequired andThen emailLengthWithMessage() andThen confirmEmailPattern
   val dayType = dayRequired andThen dayPattern
   val monthType = monthRequired andThen monthPattern
   private val yearTypePost1900: Rule[String, String] = yearRequired andThen yearPatternPost1900

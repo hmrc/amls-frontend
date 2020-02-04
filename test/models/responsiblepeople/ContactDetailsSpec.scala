@@ -47,8 +47,8 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
 
           ContactDetails.formReads.validate(emptyForm) must
             be(Invalid(Seq(
-              (Path \ "phoneNumber") -> Seq(ValidationError("error.required.phone.number")),
-              (Path \ "emailAddress") -> Seq(ValidationError("error.required.rp.email"))
+              (Path \ "phoneNumber") -> Seq(ValidationError("error.required.rp.contact.phone.number")),
+              (Path \ "emailAddress") -> Seq(ValidationError("error.required.rp.contact.email"))
             )))
         }
 
@@ -61,7 +61,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
 
           ContactDetails.formReads.validate(urlFormEncoded) must
             be(Invalid(Seq(
-              (Path \ "phoneNumber") -> Seq(ValidationError("error.required.phone.number"))
+              (Path \ "phoneNumber") -> Seq(ValidationError("error.required.rp.contact.phone.number"))
             )))
         }
 
@@ -74,7 +74,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
 
           ContactDetails.formReads.validate(urlFormEncoded) must
             be(Invalid(Seq(
-              (Path \ "emailAddress") -> Seq(ValidationError("error.required.rp.email"))
+              (Path \ "emailAddress") -> Seq(ValidationError("error.required.rp.contact.email"))
             )))
         }
 
@@ -86,7 +86,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
           )
           ContactDetails.formReads.validate(urlFormEncoded) must
             be(Invalid(Seq(
-              (Path \ "emailAddress") -> Seq(ValidationError("error.required.rp.email"))
+              (Path \ "emailAddress") -> Seq(ValidationError("error.invalid.rp.contact.email"))
             )))
         }
 
@@ -98,7 +98,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
           )
           ContactDetails.formReads.validate(urlFormEncoded) must
             be(Invalid(Seq(
-              (Path \ "phoneNumber") -> Seq(ValidationError("err.invalid.phone.number"))
+              (Path \ "phoneNumber") -> Seq(ValidationError("error.invalid.rp.contact.phone.number"))
             )))
         }
 
@@ -109,7 +109,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
           )
           ContactDetails.formReads.validate(urlFormEncoded) must
             be(Invalid(Seq(
-              (Path \ "emailAddress") -> Seq(ValidationError("error.invalid.email.max.length"))
+              (Path \ "emailAddress") -> Seq(ValidationError("error.invalid.rp.contact.email.length"))
             )))
         }
 
@@ -120,7 +120,7 @@ class ContactDetailsSpec extends PlaySpec with MockitoSugar {
           )
           ContactDetails.formReads.validate(urlFormEncoded) must
             be(Invalid(Seq(
-              (Path \ "phoneNumber") -> Seq(ValidationError("error.max.length.phone"))
+              (Path \ "phoneNumber") -> Seq(ValidationError("error.invalid.rp.contact.phone.number"))
             )))
         }
 

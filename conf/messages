@@ -53,7 +53,7 @@ error.invalid.country = Enter a country name, like France
 error.required.country.name = Enter a country name, like France
 error.required.uk.or.overseas.address.previous.other = Select yes if {0}’s other previous home address was in the UK
 error.required.uk.or.overseas.address.previous = Select yes if {0}’s previous home address was in the UK
-error.required.uk.or.overseas.address.current = Select yes if {0}’s home address is in the UK
+error.required.uk.or.overseas.address.current = Select yes if this person’s home address is in the UK
 error.required.uk.or.overseas.address.default = Select yes if this is a UK address
 error.required.uk.or.overseas = Select yes if this is a UK address
 error.required.uk.or.overseas.address.new.home = Select yes if this person’s new address is in the UK
@@ -417,6 +417,13 @@ error.invalid.rp.birth.country = Enter a country name, like France
 error.required.nationality = Select this person’s nationality
 error.required.rp.nationality.country = Enter the country this person is a national of
 error.invalid.rp.nationality.country = Enter a country name, like France
+
+error.required.rp.contact.phone.number = Enter this person’s telephone number
+error.invalid.rp.contact.phone.number = Enter a telephone number, like 01632 960 001, 07700900982 or +44 808 157 0192
+
+error.required.rp.contact.email = Enter this person’s email address
+error.invalid.rp.contact.email = Enter an email address in the correct format
+error.invalid.rp.contact.email.length = Email address must be 100 characters or less
 ################### END RP Changes AMLS-5441 ######################################
 
 error.invalid.length.otherNames = You can’t enter more than 140 characters
