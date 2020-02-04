@@ -23,15 +23,15 @@
     serviceNames: List[String]
 )(implicit request: Request[_], messages: Messages)
 
-    <div class="business-info">
-        <div class="business-info__item">
+    <div class="grid-layout">
+        <div class="grid-layout__column grid-layout__column--1-3">
             <h2 class="heading-small">Your business</h2>
             <p>
                 @Html(businessName)
             </p>
         </div>
 
-        <div class="business-info__item">
+        <div class="grid-layout__column grid-layout__column--1-3">
             <h2 class="heading-small">Your services</h2>
             @if(serviceNames.length == 1) {
                 <p>@Html(serviceNames(0))</p>
@@ -48,5 +48,12 @@
                     </a>
                 </p>
             }
+        </div>
+
+        <div class="grid-layout__column grid-layout__column--1-3">
+            <h2 class="heading-small">Nominated officer</h2>
+            <p>
+            @Html(businessName)
+            </p>
         </div>
     </div>
