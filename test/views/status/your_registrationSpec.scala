@@ -87,12 +87,13 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       def view = views.html.status.your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
-        yourRegistrationInfo = application_incomplete(),
+        yourRegistrationInfo = application_incomplete(Some("business Name")),
         registrationStatus = HtmlFormat.empty,
         feeInformation = HtmlFormat.empty)
 
       doc.getElementById("incomplete-description").html() must be("Your application to register with HMRC is incomplete. You have 28 days to complete your application from when you last saved your progress.")
       doc.getElementById("return-to-saved-application").html() must include("Return to your application")
+      doc.getElementById("return-to-saved-application").html() must include("for business Name")
       doc.getElementById("return-to-saved-application").attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
     }
 
@@ -101,12 +102,13 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       def view = views.html.status.your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
-        yourRegistrationInfo = application_submission_ready(Call("GET", "/some/url")),
+        yourRegistrationInfo = application_submission_ready(Call("GET", "/some/url"), Some("business Name")),
         registrationStatus = HtmlFormat.empty,
         feeInformation = HtmlFormat.empty)
 
       doc.getElementById("registration-info").html() must include("Your application to register with HMRC is ready to submit. You have 28 days to submit your application from when you last saved your progress.")
       doc.getElementById("status-submit").html() must include("Check and submit your application")
+      doc.getElementById("status-submit").html() must include("for business Name")
       doc.getElementById("status-submit").attr("href") must be("/some/url")
     }
 

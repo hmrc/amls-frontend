@@ -14,10 +14,11 @@
  * limitations under the License.
  *@
 
-@(call: Call)(implicit request: Request[_], m: Messages, lang: Lang)
+@(call: Call, businessName: Option[String])(implicit request: Request[_], m: Messages, lang: Lang)
 
 <p>@Messages("status.submissionready.description")</p>
-<a href="@call.url" id="status-submit" class="button" type="submit">@Messages("your.registration.status.not.submitted.button")</a>
+<a href="@call.url" id="status-submit" class="button" type="submit">@Messages("your.registration.status.not.submitted.button")
+ @if(businessName.isDefined){<span class="visually-hidden"> for @businessName.get</span>}</a>
 
 
 

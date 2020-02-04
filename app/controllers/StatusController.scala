@@ -141,7 +141,7 @@ class StatusController @Inject()(val landingService: LandingService,
         Ok(your_registration(
           regNo = mlrRegNumber.getOrElse(""),
           businessName = businessNameOption,
-          yourRegistrationInfo = application_incomplete(),
+          yourRegistrationInfo = application_incomplete(businessNameOption),
           unreadNotifications = unreadNotifications,
           registrationStatus = registration_status(
             amlsRegNo = mlrRegNumber,
@@ -155,7 +155,7 @@ class StatusController @Inject()(val landingService: LandingService,
             Ok(your_registration(
               regNo = mlrRegNumber.getOrElse(""),
               businessName = businessNameOption,
-              yourRegistrationInfo = application_submission_ready(url),
+              yourRegistrationInfo = application_submission_ready(url, businessNameOption),
               unreadNotifications = unreadNotifications,
               registrationStatus = registration_status(
                 amlsRegNo = mlrRegNumber,
