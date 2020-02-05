@@ -289,8 +289,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
@@ -602,54 +602,23 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
         when(statusResponse.safeId).thenReturn(None)
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-          .thenReturn(
-            Some(BusinessMatching(Some(reviewDetails), None)))
-
-        when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
-
-        val result = controllerNoAmlsNumber.get()(request)
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("status.deregister.link-text")
-      }
-    }
-
-    "show the change officer link" when {
-      "application status is SubmissionDecisionApproved" in new Fixture {
+        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
-
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
-
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
-          Some(LocalDate.now.plusDays(30)), false)
-
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
-          .thenReturn(Future.successful((SubmissionDecisionApproved, Some(readStatusResponse))))
+          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
-
-        contentAsString(result) must include(Messages("status.submissiondecisionsupervised.heading"))
-        contentAsString(result) mustNot include(Messages("status.submissiondecisionsupervised.renewal.btn"))
-
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").asScala foreach {
-          _.text mustBe Messages("changeofficer.changelink.text")
-        }
+        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("your.registration.deregister.link")
       }
+    }
 
+    "show the change officer link" when {
       "application status is ReadyForRenewal" in new Fixture {
 
         when(controller.landingService.cacheMap(any[String])(any(), any()))

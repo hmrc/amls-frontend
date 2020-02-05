@@ -31,6 +31,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName, ControllerHelper}
 import views.html.include.status._
 import views.html.status._
+import views.html.status.components.{fee_information, registration_status, withdraw_or_deregister_information}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -116,7 +117,7 @@ class StatusController @Inject()(val landingService: LandingService,
       case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
            (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
            (SubmissionWithdrawn, _) | (DeRegistered, _) =>
-        Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities))
+        Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, accountTypeId, unreadNotifications))
       case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
         getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, cacheId)
       case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
@@ -144,10 +145,19 @@ class StatusController @Inject()(val landingService: LandingService,
       }
       case _ =>
         Future.successful(
-          Ok(your_registration(mlrRegNumber.getOrElse(""),
-            businessNameOption,
-            feeResponse,
-            fromDuplicateSubmission, application_pending(), canOrCannotTradeInformation(activities), unreadNotifications)))
+          Ok(your_registration(
+            regNo = mlrRegNumber.getOrElse(""),
+            businessName = businessNameOption,
+            fromDuplicateSubmission = fromDuplicateSubmission,
+            yourRegistrationInfo = application_pending(),
+            unreadNotifications = unreadNotifications,
+            displayContactLink = true,
+            registrationStatus = registration_status(
+              amlsRegNo = mlrRegNumber,
+              status = status,
+              canOrCannotTradeInformation = canOrCannotTradeInformation(activities)),
+            feeInformation = fee_information(status),
+            withdrawOrDeregisterInformation = withdraw_or_deregister_information(status))))
     }
   }
 
@@ -155,22 +165,26 @@ class StatusController @Inject()(val landingService: LandingService,
                               statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
                               businessNameOption: Option[String],
                               responsiblePeople: Option[Seq[ResponsiblePerson]],
-                              maybeActivities: Option[BusinessActivities])(implicit request: Request[AnyContent]) = {
+                              maybeActivities: Option[BusinessActivities],
+                              accountTypeId: (String, String),
+                              unreadNotifications: Int)(implicit request: Request[AnyContent]) = {
     statusInfo match {
       case (SubmissionDecisionApproved, statusDtls) => {
         val endDate = statusDtls.fold[Option[LocalDate]](None)(_.currentRegYearEndDate)
         val activities = maybeActivities.map(_.businessActivities.map(_.getMessage())) getOrElse Set.empty
 
         Ok {
-          //noinspection ScalaStyle
-          status_supervised(
-            mlrRegNumber.getOrElse(""),
-            businessNameOption,
-            endDate,
-            renewalFlow = false,
-            ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-            activities
-          )
+          your_registration(
+            regNo = mlrRegNumber.getOrElse(""),
+            businessName = businessNameOption,
+            unreadNotifications = unreadNotifications,
+            registrationStatus = registration_status(
+              amlsRegNo = mlrRegNumber,
+              status = statusInfo._1,
+              canOrCannotTradeInformation = canOrCannotTradeInformation(maybeActivities),
+              endDate = endDate),
+            feeInformation = fee_information(statusInfo._1),
+            withdrawOrDeregisterInformation = withdraw_or_deregister_information(statusInfo._1))
         }
       }
 
