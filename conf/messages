@@ -339,29 +339,24 @@ error.required.rp.experiencetraining.one = in the services you’re registering
 
 error.required.rp.experiencetraining.information = Enter a description of this person’s experience
 error.required.rp.training = Select yes if this person has had training in anti-money laundering or counter-terrorism funding
-error.required.rp.training.information = Enter a brief description of this person’s training
-error.required.rp.fit_and_proper = Select yes if this person has already passed the Fit and Proper test
-error.required.rp.approval_check = Select yes if this person has already been charged for the approval check
+error.required.rp.training.information = Enter a description of this person’s training
+error.required.rp.fit_and_proper = Select yes if this person has passed HMRC’s fit and proper test
+error.required.rp.approval_check = Select yes if HMRC has charged your business or another business to do an approval check about this person
 error.invalid.length.rp.training.information = You can’t enter more than 255 characters
 error.required.rp.isknownbyothernames = Select yes if this person is known by another name
 error.required.rp.otherfirstnames = Enter all other first names
 error.required.rp.otherlastnames = Enter all other last names
 error.required.rp.hasOtherNames = Select yes if this person is known by another name
 
-################### RP Changes AMLS-5441 ######################################
 error.required.rp.hasPreviousName = Select yes if this person has ever legally changed their name
-
 error.required.rp.first_name = Enter this responsible person’s first name
 error.invalid.rp.first_name.validation = Responsible person’s first name must only include letters a to z, hyphens, spaces and apostrophes
 error.invalid.rp.first_name.length = Responsible person’s first name must be 35 characters or less
-
 error.invalid.rp.middle_name.validation = Responsible person’s middle name must only include letters a to z, hyphens, spaces and apostrophes
 error.invalid.rp.middle_name.length = Responsible person’s middle name must be 35 characters or less
-
 error.required.rp.last_name = Enter this responsible person’s last name
 error.invalid.rp.last_name.validation = Responsible person’s last name must only include letters a to z, hyphens, spaces and apostrophes
 error.invalid.rp.last_name.length = Responsible person’s last name must be 35 characters or less
-
 error.rp.previous.first.invalid = Enter this person’s previous first name
 error.rp.previous.last.invalid = Enter this person’s previous last name
 error.rp.previous.first.length.invalid = Previous first name must be 35 characters or less
@@ -370,7 +365,6 @@ error.rp.previous.last.length.invalid = Previous last name must be 35 characters
 error.rp.previous.first.char.invalid = Previous first name must only include letters a to z, hyphens, spaces and apostrophes
 error.rp.previous.middle.char.invalid = Previous middle name must only include letters a to z, hyphens, spaces and apostrophes
 error.rp.previous.last.char.invalid = Previous last name must only include letters a to z, hyphens, spaces and apostrophes
-
 error.rp.name_change.required.date.day = Date this person changed their name must include a day
 error.rp.name_change.required.date.month = Date this person changed their name must include a month
 error.rp.name_change.required.date.year = Date this person changed their name must include a year
@@ -381,7 +375,6 @@ error.rp.name_change.required.date.year.day = Date this person changed their nam
 error.rp.name_change.invalid.date.after.1900 = Date this person changed their name must be after 1900
 error.rp.name_change.invalid.date.future = Date this person changed their name must be today or in the past
 error.rp.name_change.invalid.date.not.real = Enter a real date for when this person changed their name
-
 error.required.rp.isknownbyothernames = Select yes if this person is known by another name
 error.required.rp.otherfirstnames = Enter all other first names
 error.required.rp.otherlastnames = Enter all other last names
@@ -389,7 +382,6 @@ error.required.rp.hasOtherNames = Select yes if this person is known by other na
 error.required.rp.otherNames = Enter the other names this person is known by
 error.invalid.rp.maxlength.140 = Other names must be 140 characters or less
 error.invalid.rp.char = Other names can include letters a to z, numbers, spaces and punctuation
-
 error.rp.dob.required.date.day = Date of birth must include a day
 error.rp.dob.required.date.month = Date of birth must include a month
 error.rp.dob.required.date.year = Date of birth must include a year
@@ -400,37 +392,27 @@ error.rp.dob.required.date.year.day = Date of birth must include a day and year
 error.rp.dob.invalid.date.after.1900 = Date of birth must be after 1900
 error.rp.dob.invalid.date.future = Date of birth must be in the past
 error.rp.dob.invalid.date.not.real = Enter a real date of birth
-
 error.required.rp.is.uk.resident = Select yes if this person is a UK resident
-
 error.required.uk.passport = Select yes if this person has a UK passport
 error.required.uk.passport.number = Enter this person’s passport number
 error.invalid.uk.passport = Enter a passport number in the correct format
-
 error.required.non.uk.passport = Select yes if this person has a passport from another country
 error.required.non.uk.passport.number = Enter this person’s passport number
 error.invalid.non.uk.passport.number = Enter a passport number in the correct format
-
 error.required.rp.select.country.of.birth = Select yes if this person was born in the UK
 error.required.enter.valid.non.uk = Enter a country that is not the United Kingdom because this person was not born in the UK
-
 error.required.rp.birth.country = Enter the country this person was born in
 error.invalid.rp.birth.country = Enter a country name, like France
-
 error.required.nationality = Select this person’s nationality
 error.required.rp.nationality.country = Enter the country this person is a national of
 error.invalid.rp.nationality.country = Enter a country name, like France
-
 error.required.rp.contact.phone.number = Enter this person’s telephone number
 error.invalid.rp.contact.phone.number = Enter a telephone number, like 01632 960 001, 07700900982 or +44 808 157 0192
-
 error.required.rp.contact.email = Enter this person’s email address
 error.invalid.rp.contact.email = Enter an email address in the correct format
 error.invalid.rp.contact.email.length = Email address must be 100 characters or less
-
 error.invalid.rp.position_within_business.other_position.maxlength.255 = Role must be 255 characters or less
 error.invalid.rp.position_within_business.other_position = Role can include letters a to z, numbers, spaces and punctuation
-
 error.rp.position.required.date.day = Date this person started their role in the business must include a day
 error.rp.position.required.date.month = Date this person started their role in the business must include a month
 error.rp.position.required.date.year = Date this person started their role in the business must include a year
@@ -441,14 +423,11 @@ error.rp.position.required.date.year.day = Date this person started their role i
 error.rp.position.invalid.date.after.1900 = Date this person started their role in the business must be after 1900
 error.rp.position.invalid.date.future = Date this person started their role in the business must be today or in the past
 error.rp.position.invalid.date.not.real = Enter a real date for when this person started their role in the business
-
 error.rp.required.vat.number = Enter this person’s VAT registration number
-
 error.rp.invalid.experiencetraining.information.maxlength.255 = Description of experience must be 255 characters or less
 error.rp.invalid.experiencetraining.information = Description of experience can include letters a to z, numbers, spaces and punctuation
-
-
-################### END RP Changes AMLS-5441 ######################################
+error.rp.invalid.training.information.maxlength.255 = Description of training must be 255 characters or less
+error.rp.invalid.training.information = Description of training can include letters a to z, numbers, spaces and punctuation
 
 error.invalid.length.otherNames = You can’t enter more than 140 characters
 error.required.timeAtAddress = Select how long this person lived at this address
