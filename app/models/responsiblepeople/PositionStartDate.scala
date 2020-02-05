@@ -27,7 +27,10 @@ object PositionStartDate {
 
   implicit val formRule: Rule[UrlFormEncoded, PositionStartDate] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "startDate").read(localDateFutureRule) map PositionStartDate.apply
+    (__ \ "startDate").read(newAllowedPastAndFutureDateRule("error.rp.position.required.date",
+      "error.rp.position.invalid.date.after.1900",
+      "error.rp.position.invalid.date.future",
+      "error.rp.position.invalid.date.not.real")) map PositionStartDate.apply
   }
 
   implicit def formWrites: Write[PositionStartDate, UrlFormEncoded] = Write {

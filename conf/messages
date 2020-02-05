@@ -51,8 +51,8 @@ error.invalid.postcode = Enter a postcode, like AA1 1AA
 error.required.country = Enter a country
 error.invalid.country = Enter a country name, like France
 error.required.country.name = Enter a country name, like France
-error.required.uk.or.overseas.address.previous.other = Select yes if {0}’s other previous home address was in the UK
-error.required.uk.or.overseas.address.previous = Select yes if {0}’s previous home address was in the UK
+error.required.uk.or.overseas.address.previous.other = Select yes if this person’s previous home address was in the UK
+error.required.uk.or.overseas.address.previous = Select yes if this person’s previous home address was in the UK
 error.required.uk.or.overseas.address.current = Select yes if this person’s home address is in the UK
 error.required.uk.or.overseas.address.default = Select yes if this is a UK address
 error.required.uk.or.overseas = Select yes if this is a UK address
@@ -424,11 +424,25 @@ error.invalid.rp.contact.phone.number = Enter a telephone number, like 01632 960
 error.required.rp.contact.email = Enter this person’s email address
 error.invalid.rp.contact.email = Enter an email address in the correct format
 error.invalid.rp.contact.email.length = Email address must be 100 characters or less
+
+error.invalid.rp.position_within_business.other_position.maxlength.255 = Role must be 255 characters or less
+error.invalid.rp.position_within_business.other_position = Role can include letters a to z, numbers, spaces and punctuation
+
+error.rp.position.required.date.day = Date this person started their role in the business must include a day
+error.rp.position.required.date.month = Date this person started their role in the business must include a month
+error.rp.position.required.date.year = Date this person started their role in the business must include a year
+error.rp.position.required.date.month.day = Date this person started their role in the business must include a day and month
+error.rp.position.required.date.year.month = Date this person started their role in the business must include a month and year
+error.rp.position.required.date.year.month.day = Enter the date this person started their role in the business
+error.rp.position.required.date.year.day = Date this person started their role in the business must include a day and year
+error.rp.position.invalid.date.after.1900 = Date this person started their role in the business must be after 1900
+error.rp.position.invalid.date.future = Date this person started their role in the business must be today or in the past
+error.rp.position.invalid.date.not.real = Enter a real date for when this person started their role in the business
 ################### END RP Changes AMLS-5441 ######################################
 
 error.invalid.length.otherNames = You can’t enter more than 140 characters
-error.required.timeAtAddress = Select one option to show how long this person lived at this address
-error.required.positionWithinBusiness = Select one or more options to show this person’s position in the business
+error.required.timeAtAddress = Select how long this person lived at this address
+error.required.positionWithinBusiness = Select this person’s role in the business
 error.expected.future.date = The date can’t be in the future
 error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
 error.required.rp.sole_proprietor = Select yes if {0} is the sole proprietor of another business
@@ -1981,7 +1995,7 @@ responsiblepeople.position_within_business.lbl.07 = Designated member (partner)
 responsiblepeople.position_within_business.lbl.08 = External accountant
 responsiblepeople.position_within_business.lbl.09 = Another role in the business
 responsiblepeople.position_within_business.other_position.lbl = Add role in the business
-responsiblepeople.position_within_business.other_position.othermissing = You haven’t specified their role in the business. Enter their role in the business
+responsiblepeople.position_within_business.other_position.othermissing = Enter this person’s role in the business
 
 responsiblepeople.aretheynominatedofficer.heading = Is {0} the nominated officer for the business?
 responsiblepeople.aretheynominatedofficer.title = Is this person the nominated officer for the business?
