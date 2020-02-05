@@ -1547,6 +1547,7 @@ details {
 }
 .full-width-banner a {
     color: #fff;
+    font-weight: bold;
 }
 .full-width-banner__title {
     font-size: 18px;
