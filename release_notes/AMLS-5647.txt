@@ -1,0 +1,1 @@
+ + [AMLS-5647] - 'New status page 'Application pending''

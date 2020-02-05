@@ -29,8 +29,9 @@ import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName, ControllerHelper}
-import views.html.include.status.{rightpanel_submissionreadyforreview, can_cannot_trade, can_cannot_trade_msb_or_tcsp_only, can_cannot_trade_no_msb_or_tcsp}
+import views.html.include.status._
 import views.html.status._
+import views.html.status.components.{fee_information, registration_status, withdraw_or_deregister_information}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,7 +49,8 @@ class StatusController @Inject()(val landingService: LandingService,
                                  authAction: AuthAction,
                                  val ds: CommonPlayDependencies,
                                  val feeResponseService: FeeResponseService,
-                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                 val cc: MessagesControllerComponents,
+                                 val notificationConnector: AmlsNotificationConnector) extends AmlsBaseController(ds, cc) {
 
   def get(fromDuplicateSubmission: Boolean = false) = authAction.async {
     implicit request =>
@@ -60,6 +62,7 @@ class StatusController @Inject()(val landingService: LandingService,
         feeResponse <- getFeeResponse(refNo, statusInfo._1, request.accountTypeId)
         responsiblePeople <- dataCache.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
         bm <- dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+        unreadNotifications <- countUnreadNotifications(refNo, statusResponse.fold(none[String])(_.safeId), request.accountTypeId)
         maybeActivities <- Future(bm.activities)
         page <- getPageBasedOnStatus(
           refNo,
@@ -70,7 +73,8 @@ class StatusController @Inject()(val landingService: LandingService,
           responsiblePeople,
           maybeActivities,
           request.accountTypeId,
-          request.credId)
+          request.credId,
+          unreadNotifications)
       } yield page
   }
 
@@ -104,15 +108,16 @@ class StatusController @Inject()(val landingService: LandingService,
                                    responsiblePeople: Option[Seq[ResponsiblePerson]],
                                    activities: Option[BusinessActivities],
                                    accountTypeId: (String, String),
-                                   cacheId: String)
+                                   cacheId: String,
+                                   unreadNotifications: Int)
                                   (implicit request: Request[AnyContent]) = {
     statusInfo match {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
-        getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission, accountTypeId, cacheId, activities)
+        getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission, accountTypeId, cacheId, activities, unreadNotifications)
       case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
            (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
            (SubmissionWithdrawn, _) | (DeRegistered, _) =>
-        Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities))
+        Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, accountTypeId, unreadNotifications))
       case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
         getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, cacheId)
       case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
@@ -126,7 +131,8 @@ class StatusController @Inject()(val landingService: LandingService,
                                        fromDuplicateSubmission: Boolean,
                                        accountTypeId: (String, String),
                                        cacheId: String,
-                                       activities: Option[BusinessActivities])
+                                       activities: Option[BusinessActivities],
+                                       unreadNotifications: Int)
                                       (implicit request: Request[AnyContent]): Future[Result] = {
 
     status match {
@@ -139,10 +145,19 @@ class StatusController @Inject()(val landingService: LandingService,
       }
       case _ =>
         Future.successful(
-          Ok(status_submitted(mlrRegNumber.getOrElse(""),
-            businessNameOption,
-            feeResponse,
-            fromDuplicateSubmission, canCannotTradeContent(activities))))
+          Ok(your_registration(
+            regNo = mlrRegNumber.getOrElse(""),
+            businessName = businessNameOption,
+            fromDuplicateSubmission = fromDuplicateSubmission,
+            yourRegistrationInfo = application_pending(),
+            unreadNotifications = unreadNotifications,
+            displayContactLink = true,
+            registrationStatus = registration_status(
+              amlsRegNo = mlrRegNumber,
+              status = status,
+              canOrCannotTradeInformation = canOrCannotTradeInformation(activities)),
+            feeInformation = fee_information(status),
+            withdrawOrDeregisterInformation = withdraw_or_deregister_information(status))))
     }
   }
 
@@ -150,22 +165,26 @@ class StatusController @Inject()(val landingService: LandingService,
                               statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
                               businessNameOption: Option[String],
                               responsiblePeople: Option[Seq[ResponsiblePerson]],
-                              maybeActivities: Option[BusinessActivities])(implicit request: Request[AnyContent]) = {
+                              maybeActivities: Option[BusinessActivities],
+                              accountTypeId: (String, String),
+                              unreadNotifications: Int)(implicit request: Request[AnyContent]) = {
     statusInfo match {
       case (SubmissionDecisionApproved, statusDtls) => {
         val endDate = statusDtls.fold[Option[LocalDate]](None)(_.currentRegYearEndDate)
         val activities = maybeActivities.map(_.businessActivities.map(_.getMessage())) getOrElse Set.empty
 
         Ok {
-          //noinspection ScalaStyle
-          status_supervised(
-            mlrRegNumber.getOrElse(""),
-            businessNameOption,
-            endDate,
-            renewalFlow = false,
-            ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-            activities
-          )
+          your_registration(
+            regNo = mlrRegNumber.getOrElse(""),
+            businessName = businessNameOption,
+            unreadNotifications = unreadNotifications,
+            registrationStatus = registration_status(
+              amlsRegNo = mlrRegNumber,
+              status = statusInfo._1,
+              canOrCannotTradeInformation = canOrCannotTradeInformation(maybeActivities),
+              endDate = endDate),
+            feeInformation = fee_information(statusInfo._1),
+            withdrawOrDeregisterInformation = withdraw_or_deregister_information(statusInfo._1))
         }
       }
 
@@ -251,13 +270,23 @@ class StatusController @Inject()(val landingService: LandingService,
     activities.fold(false)(ba => (ba.businessActivities -- Set(MoneyServiceBusiness, TrustAndCompanyServices)).nonEmpty)
   }
 
-  private def canCannotTradeContent(activities: Option[BusinessActivities])(implicit request: Request[AnyContent]) =
+  private def canOrCannotTradeInformation(activities: Option[BusinessActivities])(implicit request: Request[AnyContent]) =
     (hasMsb(activities), hasTcsp(activities), hasOther(activities)) match {
-      case (false, false, true) => can_cannot_trade_no_msb_or_tcsp()
-      case (true, _, false) | (_, true, false) => can_cannot_trade_msb_or_tcsp_only()
-      case (true, _, true) | (_, true, true) => can_cannot_trade()
+      case (false, false, true) => trade_information_no_msb_or_tcsp()
+      case (true, _, false) | (_, true, false) => trade_information_msb_or_tcsp_only()
+      case (true, _, true) | (_, true, true) => trade_information()
       case (_, _, _) => throw new MatchError("Could not match activities against given options.")
     }
+
+  def countUnreadNotifications(amlsRefNo: Option[String], safeId: Option[String], accountTypeId: (String, String))(implicit headerCarrier: HeaderCarrier) = {
+    val notifications = (amlsRefNo, safeId) match {
+      case (Some(ref), _) => notificationConnector.fetchAllByAmlsRegNo(ref, accountTypeId)
+      case (None, Some(id)) => notificationConnector.fetchAllBySafeId(id, accountTypeId)
+      case (_, _) => Future.successful(Seq())
+    }
+
+    notifications.map(_.count(!_.isRead))
+  }
 }
 
 
