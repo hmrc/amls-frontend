@@ -84,7 +84,6 @@ class RegistrationProgressControllerSpec extends AmlsSpec
     } thenReturn Some(BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)))
 
     when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
-    //when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any())).thenReturn(Some(Seq(completeResponsiblePerson)))
   }
 
   "RegistrationProgressController" when {
