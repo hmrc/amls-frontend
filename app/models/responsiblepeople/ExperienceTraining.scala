@@ -39,8 +39,8 @@ object ExperienceTraining {
 
   val experienceInformationType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.rp.experiencetraining.information") andThen
-    maxLength(maxInformationTypeLength).withMessage("error.invalid.maxlength.255") andThen
-    basicPunctuationPattern()
+    maxLength(maxInformationTypeLength).withMessage("error.rp.invalid.experiencetraining.information.maxlength.255") andThen
+    basicPunctuationPattern().withMessage("error.rp.invalid.experiencetraining.information")
 
 
   implicit val formRule: Rule[UrlFormEncoded, ExperienceTraining] = From[UrlFormEncoded] { __ =>

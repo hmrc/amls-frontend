@@ -77,7 +77,7 @@ error.invalid.middlename.validation = Middle name must only include letters a to
 error.invalid.lastname.validation = Last name must only include letters a to z, hyphens, spaces, and apostrophes
 error.invalid.position.validation = Select if you are a beneficial shareholder, director, nominated officer, an external accountant, or another role in the business
 
-error.required.vat.number = Enter your VAT registration number
+error.required.vat.number = Enter this person’s VAT registration number
 error.invalid.vat.number.length = VAT registration number must be 9 numbers
 error.invalid.vat.number = VAT registration number must only include numbers
 
@@ -88,8 +88,8 @@ error.invalid.name.of.business.validation = Business name can include letters a 
 error.required.nino = Enter a National Insurance number in the correct format
 error.invalid.nino = Enter a National Insurance number in the correct format
 
-error.required.utr.number = Enter a valid UTR number
-error.invalid.length.utr.number = Enter a valid UTR number
+error.required.utr.number = Enter this person’s Unique Taxpayer Reference
+error.invalid.length.utr.number = Unique Taxpayer Reference must be 10 numbers
 error.required.sa.registration = Select yes if this person is registered for Self Assessment
 
 error.required.rp.nominated_officer = Select yes if this person is the nominated officer for the business
@@ -333,8 +333,11 @@ error.required.rp.register.another.person = Select yes if you want to register a
 error.required.rp.email = Enter an email address in the correct format, like myname@example.com
 error.invalid.rp.email = Re-enter the email address in the correct format, like name@example.com
 error.max.length.rp.email = You can’t enter more than 100 characters
-error.required.rp.experiencetraining = Select yes if this person has experience in these activities
-error.required.rp.experiencetraining.information = Enter a brief description of this person’s experience
+
+error.required.rp.experiencetraining = Select yes if this person has experience {0}
+error.required.rp.experiencetraining.one = in the services you’re registering
+
+error.required.rp.experiencetraining.information = Enter a description of this person’s experience
 error.required.rp.training = Select yes if this person has had training in anti-money laundering or counter-terrorism funding
 error.required.rp.training.information = Enter a brief description of this person’s training
 error.required.rp.fit_and_proper = Select yes if this person has already passed the Fit and Proper test
@@ -438,6 +441,13 @@ error.rp.position.required.date.year.day = Date this person started their role i
 error.rp.position.invalid.date.after.1900 = Date this person started their role in the business must be after 1900
 error.rp.position.invalid.date.future = Date this person started their role in the business must be today or in the past
 error.rp.position.invalid.date.not.real = Enter a real date for when this person started their role in the business
+
+error.rp.required.vat.number = Enter this person’s VAT registration number
+
+error.rp.invalid.experiencetraining.information.maxlength.255 = Description of experience must be 255 characters or less
+error.rp.invalid.experiencetraining.information = Description of experience can include letters a to z, numbers, spaces and punctuation
+
+
 ################### END RP Changes AMLS-5441 ######################################
 
 error.invalid.length.otherNames = You can’t enter more than 140 characters
@@ -445,8 +455,8 @@ error.required.timeAtAddress = Select how long this person lived at this address
 error.required.positionWithinBusiness = Select this person’s role in the business
 error.expected.future.date = The date can’t be in the future
 error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
-error.required.rp.sole_proprietor = Select yes if {0} is the sole proprietor of another business
-error.required.rp.registered.for.vat = Select yes if {0} is registered for VAT
+error.required.rp.sole_proprietor = Select yes if this person is the sole proprietor of another business
+error.required.rp.registered.for.vat = Select yes if this person is registered for VAT with another business
 error.required.rp.confirm.address = Select yes if this is {0}’s home address
 error.required.rp.moved.address = Select yes if {0} has moved from this home address
 

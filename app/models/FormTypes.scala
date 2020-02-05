@@ -126,6 +126,10 @@ object FormTypes {
     maxWithMsg(9, "error.invalid.vat.number.length") andThen
     minWithMsg(9, "error.invalid.vat.number.length") andThen vrnRegex
 
+  val vrnTypeRp = notEmptyStrip.withMessage("error.rp.invalid.vat.number") andThen vrnRequired andThen
+    maxWithMsg(9, "error.invalid.vat.number.length") andThen
+    minWithMsg(9, "error.invalid.vat.number.length") andThen vrnRegex
+
   /** Corporation Tax Type Rules **/
 
   private val corporationTaxRequired = required("error.required.atb.corporation.tax.number")
