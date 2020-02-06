@@ -30,7 +30,10 @@ object SupervisionStart {
   implicit val formRule: Rule[UrlFormEncoded, SupervisionStart] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
 
-    __.read(supervisionStartDateRule) map SupervisionStart.apply
+    __.read(newAllowedPastAndFutureDateRule("error.rp.dob.required.date",
+      "error.rp.dob.invalid.date.after.1900",
+      "error.rp.dob.invalid.date.future",
+      "error.rp.dob.invalid.date.not.real")) map SupervisionStart.apply
   }
 
   implicit val formWrites: Write[SupervisionStart, UrlFormEncoded] = Write {

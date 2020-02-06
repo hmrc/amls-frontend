@@ -413,17 +413,17 @@ error.tcsp.services.another.tcsp.number.length = Money Laundering Regulations nu
 error.tcsp.services.another.tcsp.number.punctuation = Money Laundering Regulations number must only include numbers and letters a to z
 
 ############################### Accountancy service provide ###############################
-error.required.asp.other.business.tax.matters = Select yes if you’re registered with HMRC to handle other businesses’ tax matters
+error.required.asp.other.business.tax.matters = Select yes if you're registered with HMRC to handle other businesses’ tax matters
 error.required.asp.agentRegNo = Enter a HMRC Agent Reference Number.
 error.invalid.asp.agentRegNo = Enter a valid HMRC Agent Reference Number. It must be 11 characters long.
 error.invalid.length.asp.agentRegNo = You can’t enter more than 11 characters.
-error.required.asp.business.services = Select one or more options to show the services your business provides
+error.required.asp.business.services = Select which services your business provides
 
 ############################### Supervision ###############################
-error.required.supervision.supervisor = Enter the name of your last supervisor
+error.required.supervision.supervisor = Enter the name of your previous supervising body
 error.required.supervision.reason = Enter a reason why the supervision ended
-error.required.supervision.anotherbody = Select yes if your business has previously been registered with another supervising body
-error.invalid.supervision.supervisor = You can’t enter more than 140 characters
+error.required.supervision.anotherbody = Select yes if your business has ever been registered with another supervising body for anti-money laundering supervision
+error.invalid.supervision.supervisor.length.140 = Name of previous supervising body must be 140 characters or less
 error.invalid.supervision.reason = You can’t enter more than 255 characters
 error.required.supervision.business.a.member = Select yes if your business is a member of a professional body
 error.required.supervision.one.professional.body = Select one or more options to show which professional bodies your business is a member of
@@ -434,6 +434,7 @@ error.expected.supervision.enddate.after.startdate = The date your supervision e
 error.required.professionalbody.info.about.penalty = Enter some information about the penalty received
 error.invalid.professionalbody.info.about.penalty = You can’t enter more than 255 characters
 error.required.professionalbody.penalised.by.professional.body = Select yes if the business, or anyone in it, has ever been penalised by a professional body
+error.invalid.supervision.supervisor = Name of previous supervising body can include letters a to z, numbers, spaces and punctuation
 
 
 ############################### Money Services Business ###############################
