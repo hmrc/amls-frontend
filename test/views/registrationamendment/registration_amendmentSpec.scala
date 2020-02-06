@@ -72,8 +72,6 @@ class registration_amendmentSpec extends AmlsViewSpec with MockitoSugar with Add
 
       element.getElementsByClass("heading-small").text() must be("Nominated officer")
       element.html() must include("FirstName LastName")
-      element.getElementById("change-officer-change-link-mobile").attr("href") must be(controllers.changeofficer.routes.StillEmployedController.get().url)
-      element.getElementById("change-officer-change-link-mobile").text() must be("Change")
     }
 
     "do not show the Nominated officer box if NO is not defined" in new ViewFixture {

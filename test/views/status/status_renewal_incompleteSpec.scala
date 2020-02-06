@@ -66,9 +66,6 @@ class status_renewal_incompleteSpec extends AmlsViewSpec with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("status.renewalincomplete.description2")).text must be(Messages("status.renewalincomplete.description2"))
       doc.getElementsMatchingOwnText(Messages("status.renewalincomplete.description3", endDateFormatted)).text must be(Messages("status.renewalincomplete.description3", endDateFormatted))
       doc.getElementsMatchingOwnText(Messages("status.renewalincomplete.description4")).text must be(Messages("status.renewalincomplete.description4"))
-
-      html must include(controllers.changeofficer.routes.StillEmployedController.get.url)
-
     }
 
     "contain fee information and link" in new ViewFixture {
