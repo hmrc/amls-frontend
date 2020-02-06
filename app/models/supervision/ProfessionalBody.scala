@@ -35,8 +35,8 @@ object ProfessionalBody {
 
   val maxPenalisedTypeLength = 255
   val penalisedType = notEmpty.withMessage("error.required.professionalbody.info.about.penalty") andThen
-    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.professionalbody.info.about.penalty") andThen
-    basicPunctuationPattern()
+    maxLength(maxPenalisedTypeLength).withMessage("error.invalid.professionalbody.info.about.penalty.length.255") andThen
+    basicPunctuationPattern().withMessage("error.invalid.professionalbody.info.about.penalty")
 
   implicit val formRule: Rule[UrlFormEncoded, ProfessionalBody] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
