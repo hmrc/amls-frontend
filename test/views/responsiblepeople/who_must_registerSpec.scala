@@ -60,9 +60,6 @@ class who_must_registerSpec extends AmlsViewSpec with MustMatchers {
       html must include(Messages("responsiblepeople.whomustregister.line_3"))
       html must include(Messages("responsiblepeople.whomustregister.line_4"))
       html must include(Messages("responsiblepeople.whomustregister.line_5"))
-
-      html must include(Messages("whatYouNeed.attention.title"))
-      html must include(Messages("whatYouNeed.attention.information"))
     }
   }
 }

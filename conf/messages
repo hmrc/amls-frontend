@@ -784,7 +784,7 @@ start.line3 = You need to be signed into your Government Gateway account to acce
 
 start.button.text = Sign in
 start.before.heading = Before you register
-start.before.line1 = You’ll need to pay <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees">a fee</a> when you apply, renew, or make changes to your registration. You can pay by Bacs or by debit or credit card when you complete your submission. We will not be able to process your submission until you have paid the registration fees.
+start.before.line1 = You’ll need to pay <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees">fees for anti-money laundering supervision</a>. You can pay by Bacs or by debit or corporate credit card after you submit your information. HMRC will review your submission after we have received payment.
 start.utr.heading = Unique Taxpayer Reference (UTR) number
 start.utr.heading1 = Registration fees
 start.utr.line1 = If we can’t find your business automatically, we’ll ask for your UTR. This is a 10 digit number that you can find on previous tax returns and other documents from HMRC. It may be labelled ‘Tax Reference’, ‘UTR’ or ‘Official Use’.
@@ -803,11 +803,11 @@ status.feepaid = Fee paid
 status.underreview = Decision pending
 status.decisionmade = Decision made
 status.incomplete.heading = Application incomplete
-status.incomplete.description = You have started your application but have not finished it. You need to complete all sections on the about your business page.
+status.incomplete.description = Your application to register with HMRC is incomplete. You have 28 days to complete your application from when you last saved your progress.
 status.incomplete.description1 = You have 28 days to finish the application from when you last saved your progress.
 status.incomplete.buttontext = Return to your application
 status.submissionready.heading = Application not submitted
-status.submissionready.description = You have completed your application but have not submitted it.
+status.submissionready.description = Your application to register with HMRC is ready to submit. You have 28 days to submit your application from when you last saved your progress.
 status.submissionready.description2 = You have 28 days to submit your application from when you last saved your progress.
 status.submissionready.description3 = To submit your application you need to complete a declaration, and pay the fees. HMRC will then review your application.
 status.hassomethingchanged = About your business
@@ -824,6 +824,9 @@ your.registration.deregister = If you no longer need to be registered with HMRC 
 your.registration.deregister.link = deregister your business
 your.registration.number = Registration number {0}
 your.registration.how.to.pay = How to pay
+your.registration.status.incomplete = Application incomplete.
+your.registration.status.not.submitted = Application not submitted.
+your.registration.status.not.submitted.button = Check and submit your application
 
 status.submissionreadyforreview.heading = Application pending
 status.submissionreadyforreview.description = You have 28 days to pay your fees from the date you submitted your application. Your application will be refused if you do not pay the fees.
