@@ -731,6 +731,8 @@ your.registration.how.to.pay = How to pay
 your.registration.status.incomplete = Application incomplete.
 your.registration.status.not.submitted = Application not submitted.
 your.registration.status.not.submitted.button = Check and submit your application
+your.registration.status.renewal.not.submitted.button = Check business information and submit renewal
+your.registration.status.renewal.incomplete.button = Return to your renewal
 
 status.submissionreadyforreview.heading = Application pending
 status.submissionreadyforreview.description = You have 28 days to pay your fees from the date you submitted your application. Your application will be refused if you do not pay the fees.
@@ -790,14 +792,16 @@ status.renewalsubmitted.description3 = HMRC will review your application after w
 status.renewalsubmitted.description4 = We’ll email you when we have made a decision.
 status.renewalsubmitted.description5 = You’re still registered with HMRC under the Money Laundering Regulations.
 
-status.renewalincomplete.description = Renewal incomplete
+status.renewalincomplete.description = You have started your renewal but have not completed it. If you do not submit your renewal, your registration with HMRC will expire.
 status.renewalincomplete.description2 = You have started the renewal application but you have not finished it.
 status.renewalincomplete.description3 = Your supervision will expire on {0} unless you renew before then.
 status.renewalincomplete.description4 = When you submit your renewal you’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for new responsible people you add.
-status.renewal.incomplete.buttontext = Return to your renewal application
+status.renewal.incomplete.buttontext = Return to your renewal
 status.renewalnotsubmitted.buttontext = Continue
+status.renewal.due = Your registration with HMRC will expire on {0} unless you renew.
+status.renewal.due.start = Start your renewal
 
-status.renewalnotsubmitted.description = Renewal not submitted
+status.renewalnotsubmitted.description = You have completed your renewal but have not submitted it. If you do not submit your renewal, your registration with HMRC will expire.
 status.renewalnotsubmitted.description2 = You have completed the renewal application but you have not submitted it.
 status.renewalnotsubmitted.description3 = Your supervision will expire on {0} unless you renew before then.
 status.renewalnotsubmitted.description4 = You’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for new responsible people you add.
