@@ -24,6 +24,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.ReadStatusResponse
 import models.businessmatching._
 import models.registrationprogress._
+import models.responsiblepeople.{ResponsiblePeopleValues, ResponsiblePerson}
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
@@ -44,7 +45,7 @@ import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
+class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenerator with ResponsiblePeopleValues {
 
   trait Fixture {
     self =>
@@ -110,6 +111,8 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
       sectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
     } thenReturn Set(defaultSection)
 
+    when(cacheMap.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any()))
+      .thenReturn(Some(Seq(completeResponsiblePerson)))
   }
 
   "The Renewal Progress Controller" must {

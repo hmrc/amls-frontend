@@ -64,8 +64,6 @@ class status_supervisedSpec extends AmlsViewSpec with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
 
-      html must include(controllers.changeofficer.routes.StillEmployedController.get.url)
-
       html must include("Your services")
 
       for (activity <- activities) {
