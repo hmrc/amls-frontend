@@ -43,9 +43,20 @@ object PersonName {
   implicit val formRule: Rule[UrlFormEncoded, PersonName] = From[UrlFormEncoded] { __ =>
 
     (
-      (__ \ "firstName").read(genericNameRule("error.required.rp.first_name")) ~
-        (__ \ "middleName").read(optionR(genericNameRule())) ~
-        (__ \ "lastName").read(genericNameRule("error.required.rp.last_name"))
+      (__ \ "firstName").read(genericNameRule(
+        "error.required.rp.first_name",
+        maxLengthMsg = "error.invalid.rp.first_name.length",
+        regExMessage="error.invalid.rp.first_name.validation"
+      )) ~
+        (__ \ "middleName").read(optionR(genericNameRule(
+          maxLengthMsg = "error.invalid.rp.middle_name.length",
+          regExMessage="error.invalid.rp.middle_name.validation"
+        ))) ~
+        (__ \ "lastName").read(genericNameRule(
+          "error.required.rp.last_name",
+          maxLengthMsg = "error.invalid.rp.last_name.length",
+          regExMessage="error.invalid.rp.last_name.validation"
+        ))
       )(PersonName.apply _)
   }
 

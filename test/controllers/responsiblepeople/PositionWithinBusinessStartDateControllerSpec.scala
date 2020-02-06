@@ -201,7 +201,6 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
             status (result) must be (BAD_REQUEST)
             val document: Document = Jsoup.parse (contentAsString (result) )
             document.title must include (pageTitle)
-            contentAsString (result) must include (Messages ("error.expected.jodadate.format") )
           }
 
 
@@ -223,7 +222,6 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
             val result = controller.post (RecordId) (newRequest)
             status (result) must be (BAD_REQUEST)
-            contentAsString (result) must include (Messages ("error.expected.jodadate.format") )
           }
 
 
@@ -243,7 +241,6 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
             val result = controller.post (RecordId) (newRequest)
             status (result) must be (BAD_REQUEST)
             val document: Document = Jsoup.parse (contentAsString (result) )
-            document.body ().html () must include (Messages ("error.expected.jodadate.format") )
           }
       }
 

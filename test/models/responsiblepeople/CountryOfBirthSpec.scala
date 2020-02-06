@@ -57,7 +57,7 @@ class CountryOfBirthSpec extends PlaySpec {
         )
 
         CountryOfBirth.formRule.validate(urlFormEncoded) must be(Invalid(Seq((Path \ "country") ->
-          Seq(ValidationError("error.required.country")))))
+          Seq(ValidationError("error.required.rp.birth.country")))))
       }
 
       "throw validation error when mandatory field country of birth is selected as 'yes' and country selected in United Kingdom" in {
