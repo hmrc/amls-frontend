@@ -149,9 +149,6 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#endDate]").html() must be(Messages("error.expected.jodadate.format"))
     }
 
   }
