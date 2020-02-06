@@ -26,6 +26,7 @@ import models.status._
 import models.{FeeResponse, ReadStatusResponse}
 import org.joda.time.LocalDate
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
+import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName, ControllerHelper}
@@ -136,11 +137,32 @@ class StatusController @Inject()(val landingService: LandingService,
                                       (implicit request: Request[AnyContent]): Future[Result] = {
 
     status match {
-      case NotCompleted => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
+      case NotCompleted => Future.successful(
+        Ok(your_registration(
+          regNo = mlrRegNumber.getOrElse(""),
+          businessName = businessNameOption,
+          yourRegistrationInfo = application_incomplete(businessNameOption),
+          unreadNotifications = unreadNotifications,
+          registrationStatus = registration_status(
+            amlsRegNo = mlrRegNumber,
+            status = status
+          ),
+          feeInformation = HtmlFormat.empty
+        )))
       case SubmissionReady => {
         OptionT(progressService.getSubmitRedirect(mlrRegNumber, accountTypeId, cacheId)) map (
           url =>
-            Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, url))
+            Ok(your_registration(
+              regNo = mlrRegNumber.getOrElse(""),
+              businessName = businessNameOption,
+              yourRegistrationInfo = application_submission_ready(url, businessNameOption),
+              unreadNotifications = unreadNotifications,
+              registrationStatus = registration_status(
+                amlsRegNo = mlrRegNumber,
+                status = status
+              ),
+              feeInformation = HtmlFormat.empty
+            ))
           ) getOrElse InternalServerError("Unable to get redirect data")
       }
       case _ =>

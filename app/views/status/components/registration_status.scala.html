@@ -21,6 +21,8 @@
 @import org.joda.time.LocalDate
 @import play.twirl.api.HtmlFormat
 
+@import models.status.NotCompleted
+@import models.status.SubmissionReady
 @(amlsRegNo: Option[String] = None, status: SubmissionStatus, canOrCannotTradeInformation: Html = HtmlFormat.empty, endDate: Option[LocalDate] = None)(implicit messages: Messages, request: Request[_])
 
 @status match {
@@ -39,5 +41,11 @@
                 @Messages("your.registration.number", number)
             }
         </p>
+    }
+    case NotCompleted => {
+        <p>@Messages("your.registration.status.incomplete")</p>
+    }
+    case SubmissionReady => {
+        <p>@Messages("your.registration.status.not.submitted")</p>
     }
 }

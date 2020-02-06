@@ -225,7 +225,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("status-incomplete-business-name").html() must be("Test Company")
+      document.getElementById("business-name").html() must include("Test Company")
     }
 
     "show correct content" when {
