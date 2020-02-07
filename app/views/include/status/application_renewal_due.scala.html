@@ -14,15 +14,13 @@
  * limitations under the License.
  *@
 
-@import models.FeeResponse
-@import config.ApplicationConfig
+@import utils.DateHelper
+@import org.joda.time.LocalDate
 
-@()(implicit request: Request[_], m: Messages, lang: Lang)
+@(businessName: Option[String], endDate: Option[LocalDate] = None)(implicit request: Request[_], m: Messages, lang: Lang)
 
-<p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
-<ul class="list list-bullet">
-    <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
-    <li>@Messages("status.submissionreadyforreview.description.2.listline2")</li>
-    <li>@Messages("status.submissionreadyforreview.description.2.listline3")</li>
-</ul>
-<p>@Messages("status.submissionreadyforreview.description.3")</p>
+@endDate.map { date =>
+ <p>@Messages("status.renewal.due", DateHelper.formatDate(date))</p>
+}
+<a href="@controllers.renewal.routes.WhatYouNeedController.get()" id="start-renewal" class="button" type="submit">@Messages("status.renewal.due.start")
+ @if(businessName.isDefined){<span class="visually-hidden"> for @businessName.get</span>}</a>

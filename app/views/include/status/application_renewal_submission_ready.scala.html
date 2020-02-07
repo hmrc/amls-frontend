@@ -14,15 +14,12 @@
  * limitations under the License.
  *@
 
-@import models.FeeResponse
-@import config.ApplicationConfig
+@(businessName: Option[String])(implicit request: Request[_], m: Messages, lang: Lang)
 
-@()(implicit request: Request[_], m: Messages, lang: Lang)
+<p>@Messages("status.renewalnotsubmitted.description")</p>
+<a href="@controllers.routes.RegistrationProgressController.get()" id="go-to-about-your-business" class="button" type="submit">@Messages("your.registration.status.renewal.not.submitted.button")
+ @if(businessName.isDefined){<span class="visually-hidden"> for @businessName.get</span>}</a>
 
-<p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
-<ul class="list list-bullet">
-    <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
-    <li>@Messages("status.submissionreadyforreview.description.2.listline2")</li>
-    <li>@Messages("status.submissionreadyforreview.description.2.listline3")</li>
-</ul>
-<p>@Messages("status.submissionreadyforreview.description.3")</p>
+
+
+

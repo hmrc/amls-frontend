@@ -23,6 +23,8 @@
 
 @import models.status.NotCompleted
 @import models.status.SubmissionReady
+@import models.status.ReadyForRenewal
+
 @(amlsRegNo: Option[String] = None, status: SubmissionStatus, canOrCannotTradeInformation: Html = HtmlFormat.empty, endDate: Option[LocalDate] = None)(implicit messages: Messages, request: Request[_])
 
 @status match {
@@ -31,14 +33,14 @@
             @canOrCannotTradeInformation
         </p>
     }
-    case SubmissionDecisionApproved => {
+    case SubmissionDecisionApproved | ReadyForRenewal(_) => {
         <p>
             @endDate.map { date =>
                 @Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date))@Messages("full.stop")
                 <br/>
             }
             @amlsRegNo.map { number =>
-                @Messages("your.registration.number", number)
+                @Messages("your.registration.number", number)@Messages("full.stop")
             }
         </p>
     }
