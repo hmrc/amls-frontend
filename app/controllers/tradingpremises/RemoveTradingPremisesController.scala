@@ -78,11 +78,11 @@ class RemoveTradingPremisesController @Inject () (
         case NotCompleted | SubmissionReady => removeDataStrict[TradingPremises](request.credId, index) map { _ =>
           Redirect(routes.YourTradingPremisesController.get(complete))
         }
-        case SubmissionReadyForReview => for {
-          _ <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
-            tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
-          }
-        } yield Redirect(routes.YourTradingPremisesController.get(complete))
+        //case SubmissionReadyForReview => for {
+        //  _ <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
+        //    tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
+        //  }
+        //} yield Redirect(routes.YourTradingPremisesController.get(complete))
         case _ =>
           getData[TradingPremises](request.credId, index) flatMap { premises =>
             premises.lineId match {
