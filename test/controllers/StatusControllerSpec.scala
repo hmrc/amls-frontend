@@ -561,10 +561,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
         val html = contentAsString(result)
         html must include(Messages("status.renewalnotsubmitted.description"))
-
-        val doc = Jsoup.parse(html)
-        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
-
       }
     }
 
