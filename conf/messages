@@ -85,7 +85,7 @@ error.required.name.of.business = Enter business name
 error.invalid.name.of.business = Business name must be 120 characters or less
 error.invalid.name.of.business.validation = Business name can include letters a to z, numbers, spaces, and most punctuation and special characters
 
-error.required.nino = Enter a National Insurance number in the correct format
+error.required.nino = Enter this person’s National Insurance number
 error.invalid.nino = Enter a National Insurance number in the correct format
 
 error.required.utr.number = Enter this person’s Unique Taxpayer Reference
@@ -99,7 +99,6 @@ error.not-found.heading = Item not found
 error.not-found.message = Check that you’ve entered the correct web address
 
 error.required.declaration.partners = You must select a partner. Select one of the partners or register someone else
-
 
 error.invalid.maxlength.40 = You can’t enter more than 40 characters
 error.invalid.maxlength.120 = You can’t enter more than 120 characters
