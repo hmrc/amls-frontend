@@ -479,7 +479,7 @@ error.tcsp.services.another.tcsp.number.length = Money Laundering Regulations nu
 error.tcsp.services.another.tcsp.number.punctuation = Money Laundering Regulations number must only include numbers and letters a to z
 
 ############################### Accountancy service provide ###############################
-error.required.asp.other.business.tax.matters = Select yes if you're registered with HMRC to handle other businesses’ tax matters
+error.required.asp.other.business.tax.matters = Select yes if you’re registered with HMRC to handle other businesses’ tax matters
 error.required.asp.agentRegNo = Enter a HMRC Agent Reference Number.
 error.invalid.asp.agentRegNo = Enter a valid HMRC Agent Reference Number. It must be 11 characters long.
 error.invalid.length.asp.agentRegNo = You can’t enter more than 11 characters.
