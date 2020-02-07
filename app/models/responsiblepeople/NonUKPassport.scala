@@ -34,7 +34,7 @@ object NonUKPassport {
   import utils.MappingUtils.Implicits._
 
   private val nonUKPassportRequired = required("error.required.non.uk.passport.number")
-  private val nonUkPassportLength = maxWithMsg(maxNonUKPassportLength, "error.invalid.non.uk.passport.number")
+  private val nonUkPassportLength = maxWithMsg(maxNonUKPassportLength, "error.invalid.non.uk.passport.number.length.40")
 
   val noUKPassportType = notEmptyStrip andThen
     nonUKPassportRequired andThen
