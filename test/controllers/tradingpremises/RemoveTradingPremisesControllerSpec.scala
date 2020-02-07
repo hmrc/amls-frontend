@@ -296,26 +296,6 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
         "removing a trading premises (no line id) from an application with status SubmissionReadyForReview" in new Fixture {
 
-//          val emptyCache = CacheMap("", Map.empty)
-//
-//          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
-//            .thenReturn(Future.successful(Some(tradingPremisesList)))
-//          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
-//            .thenReturn(Future.successful(emptyCache))
-//          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
-//            .thenReturn(Future.successful(SubmissionReadyForReview))
-//
-//
-//          val result = controller.remove(1, false)(request)
-//          status(result) must be(SEE_OTHER)
-//          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
-//
-//          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), any(), meq(Seq(
-//            completeTradingPremises1.copy(status = Some(StatusConstants.Deleted), hasChanged = true),
-//            completeTradingPremises2,
-//            completeTradingPremises3
-//          )))(any(), any())
-
           val emptyCache = CacheMap("", Map.empty)
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
