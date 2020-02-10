@@ -121,7 +121,19 @@ class StatusController @Inject()(val landingService: LandingService,
         Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, accountTypeId, unreadNotifications))
       case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
         getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, cacheId, unreadNotifications)
-      case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
+      case (_, _) => Future.successful(
+        Ok(your_registration(
+          regNo = mlrRegNumber.getOrElse(""),
+          businessName = businessNameOption,
+          yourRegistrationInfo = application_incomplete(businessNameOption),
+          unreadNotifications = unreadNotifications,
+          registrationStatus = registration_status(
+            amlsRegNo = mlrRegNumber,
+            status = statusInfo._1
+          ),
+          feeInformation = HtmlFormat.empty
+        ))
+      )
     }
   }
 
