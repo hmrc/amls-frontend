@@ -121,7 +121,19 @@ class StatusController @Inject()(val landingService: LandingService,
         Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, accountTypeId, unreadNotifications))
       case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
         getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, cacheId, unreadNotifications)
-      case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
+      case (_, _) => Future.successful(
+        Ok(your_registration(
+          regNo = mlrRegNumber.getOrElse(""),
+          businessName = businessNameOption,
+          yourRegistrationInfo = application_incomplete(businessNameOption),
+          unreadNotifications = unreadNotifications,
+          registrationStatus = registration_status(
+            amlsRegNo = mlrRegNumber,
+            status = statusInfo._1
+          ),
+          feeInformation = HtmlFormat.empty
+        ))
+      )
     }
   }
 
@@ -241,12 +253,20 @@ class StatusController @Inject()(val landingService: LandingService,
 
     statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>
-        Future.successful(Ok(status_renewal_submitted(
-          mlrRegNumber.getOrElse(""),
-          businessNameOption,
-          renewalDate,
-          ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
-        )))
+        Future.successful(
+          Ok(
+            your_registration(
+              regNo = mlrRegNumber.getOrElse(""),
+              businessName = businessNameOption,
+              yourRegistrationInfo = application_renewal_submitted(),
+              unreadNotifications = unreadNotifications,
+              registrationStatus = registration_status(
+                amlsRegNo = mlrRegNumber,
+                status = statusInfo._1,
+                endDate = renewalDate),
+              feeInformation = fee_information(statusInfo._1))
+          )
+        )
       case (ReadyForRenewal(renewalDate), _) => {
         renewalService.getRenewal(cacheId) flatMap {
           case Some(renewal) =>

@@ -433,7 +433,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         status(result) must be(OK)
 
         val html = contentAsString(result)
-        html must include(Messages("status.renewalsubmitted.description"))
+        html must include(Messages("your.registration.status.renewal.submitted"))
       }
 
       "application status is ReadyForRenewal, and the renewal has not been started" in new Fixture {
