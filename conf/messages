@@ -333,7 +333,7 @@ error.required.rp.email = Enter an email address in the correct format, like myn
 error.invalid.rp.email = Re-enter the email address in the correct format, like name@example.com
 error.max.length.rp.email = You can’t enter more than 100 characters
 
-error.required.rp.experiencetraining = Select yes if this person has experience {0}
+error.required.rp.experiencetraining = Select yes if this person has experience as {0}
 error.required.rp.experiencetraining.one = in the services you’re registering
 
 error.required.rp.experiencetraining.information = Enter a description of this person’s experience
