@@ -26,7 +26,7 @@
 @getErrorPlaceholder = {
     @businessMatching.prefixedAlphabeticalBusinessTypes(false).map { types =>
         @if(types.size > 1) {
-            Messages("error.required.rp.experiencetraining.one")
+            @Messages("error.required.rp.experiencetraining.one")
         } else {
             @types.head
         }
