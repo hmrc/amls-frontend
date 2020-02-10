@@ -241,12 +241,20 @@ class StatusController @Inject()(val landingService: LandingService,
 
     statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>
-        Future.successful(Ok(status_renewal_submitted(
-          mlrRegNumber.getOrElse(""),
-          businessNameOption,
-          renewalDate,
-          ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
-        )))
+        Future.successful(
+          Ok(
+            your_registration(
+              regNo = mlrRegNumber.getOrElse(""),
+              businessName = businessNameOption,
+              yourRegistrationInfo = application_renewal_submitted(),
+              unreadNotifications = unreadNotifications,
+              registrationStatus = registration_status(
+                amlsRegNo = mlrRegNumber,
+                status = statusInfo._1,
+                endDate = renewalDate),
+              feeInformation = fee_information(statusInfo._1))
+          )
+        )
       case (ReadyForRenewal(renewalDate), _) => {
         renewalService.getRenewal(cacheId) flatMap {
           case Some(renewal) =>

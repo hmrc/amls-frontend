@@ -20,7 +20,7 @@ import forms.EmptyForm
 import generators.AmlsReferenceNumberGenerator
 import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
-import models.status.{NotCompleted, ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.status.{NotCompleted, ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -28,7 +28,7 @@ import play.api.mvc.Call
 import play.twirl.api.{Html, HtmlFormat}
 import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
-import views.html.include.status.{application_incomplete, application_renewal_due, application_renewal_incomplete, application_renewal_submission_ready, application_submission_ready}
+import views.html.include.status.{application_incomplete, application_renewal_due, application_renewal_incomplete, application_renewal_submission_ready, application_renewal_submitted, application_submission_ready}
 import views.html.status.components.{fee_information, registration_status, withdraw_or_deregister_information}
 
 class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator {
@@ -112,7 +112,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       doc.getElementById("status-submit").attr("href") must be("/some/url")
     }
 
-    "contain registration information for status ReadyForRenewal" when {
+    "contain correct content for renewal statuses" when {
       "renewal section is complete" in new ViewFixture {
         val renewalDate = Some(LocalDate.now())
         val businessName = "business Name"
@@ -162,6 +162,24 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         doc.getElementById("start-renewal").html() must include("Start your renewal")
         doc.getElementById("start-renewal").html() must include("for business Name")
         doc.getElementById("start-renewal").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
+      }
+
+      "renewal is submitted" in new ViewFixture {
+        val renewalDate = Some(LocalDate.now())
+        val businessName = "business Name"
+
+        def view = views.html.status.your_registration(amlsRegistrationNumber,
+          Some(businessName),
+          yourRegistrationInfo = application_renewal_submitted(),
+          unreadNotifications = 10,
+          registrationStatus = registration_status(Some(amlsRegistrationNumber), RenewalSubmitted(renewalDate), endDate = renewalDate),
+          feeInformation = fee_information(RenewalSubmitted(renewalDate)))
+
+        doc.getElementById("renewal-pending-description-1").text() must be("You have submitted your renewal. HMRC will review your renewal after we have received payment.")
+        doc.getElementById("renewal-pending-description-2").text() must be("We’ll email you when we have made a decision.")
+        doc.getElementById("registration-status").html() must include("Supervised. Renewal submitted.")
+        doc.getElementById("registration-status").html() must include(s"Registration number $amlsRegistrationNumber.")
+        doc.getElementById("fees").getElementsMatchingOwnText("How to pay your fees").attr("href") must be("how-to-pay")
       }
     }
 
