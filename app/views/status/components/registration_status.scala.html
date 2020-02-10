@@ -25,6 +25,7 @@
 @import models.status.SubmissionReady
 @import models.status.ReadyForRenewal
 
+@import models.status.SubmissionWithdrawn
 @(amlsRegNo: Option[String] = None, status: SubmissionStatus, canOrCannotTradeInformation: Html = HtmlFormat.empty, endDate: Option[LocalDate] = None)(implicit messages: Messages, request: Request[_])
 
 @status match {
@@ -49,5 +50,8 @@
     }
     case SubmissionReady => {
         <p>@Messages("your.registration.status.not.submitted")</p>
+    }
+    case SubmissionWithdrawn => {
+        <p>@Messages("your.registration.status.withdrawn")</p>
     }
 }
