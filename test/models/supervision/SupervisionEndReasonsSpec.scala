@@ -47,7 +47,7 @@ class SupervisionEndReasonsSpec extends PlaySpec with MockitoSugar {
           "anotherBody" -> Seq("true"),
           "endingReason" -> Seq("invalid {} <>"))
 
-        val expected = Invalid(Seq((Path \ "endingReason") -> Seq(ValidationError("err.text.validation"))))
+        val expected = Invalid(Seq((Path \ "endingReason") -> Seq(ValidationError("error.supervision.end.reason.invalid"))))
 
         SupervisionEndReasons.formRule.validate(urlFormEncoded) must be(expected)
       }

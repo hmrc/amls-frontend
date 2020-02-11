@@ -105,8 +105,8 @@ object ProfessionalBodies {
   val maxSpecifyDetailsLength = 255
   val specifyOtherType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.supervision.business.details") andThen
-    maxLength(maxSpecifyDetailsLength).withMessage("error.invalid.supervision.business.details") andThen
-    basicPunctuationPattern()
+    maxLength(maxSpecifyDetailsLength).withMessage("error.invalid.supervision.business.details.length.255") andThen
+    basicPunctuationPattern().withMessage("error.invalid.supervision.business.details")
 
   def stringToRule(businessType: BusinessType): Rule[UrlFormEncoded, BusinessType] =
     Rule[UrlFormEncoded, BusinessType](_ => Valid(businessType))

@@ -306,13 +306,23 @@ object FormTypes {
   def supervisionEndDateRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "extraStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
-      (__ \ "endDate").read(localDateFutureRule)).tupled.andThen(supervisionEndDateRuleMapping).repath(_ => Path \ "endDate")
+      (__ \ "endDate").read(newAllowedPastAndFutureDateRule(
+        "error.supervision.end.required.date",
+        "error.supervision.end.invalid.date.after.1900",
+        "error.supervision.end.invalid.date.future",
+        "error.supervision.end.invalid.date.not.real"
+      ))).tupled.andThen(supervisionEndDateRuleMapping).repath(_ => Path \ "endDate")
   }
 
   def supervisionStartDateRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "extraEndDate").read(extraEndDateRule) ~
-      (__ \ "startDate").read(localDateFutureRule)).tupled.andThen(supervisionStartDateRuleMapping).repath(_ => Path \ "startDate")
+      (__ \ "startDate").read(newAllowedPastAndFutureDateRule(
+        "error.supervision.start.required.date",
+        "error.supervision.start.invalid.date.after.1900",
+        "error.supervision.start.invalid.date.future",
+        "error.supervision.start.invalid.date.not.real"
+      ))).tupled.andThen(supervisionStartDateRuleMapping).repath(_ => Path \ "startDate")
   }
 
   val endOfCenturyDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(new LocalDate(2099, 12, 31), "error.future.date")

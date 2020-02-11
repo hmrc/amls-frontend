@@ -45,24 +45,119 @@ class SupervisionEndSpec extends PlaySpec with MockitoSugar {
     }
 
     "fail validation" when {
-      "given a future date" in new Fixture {
+      "required fields are missing" when {
+        "nothing has been selected" in new Fixture{
 
-        val data = SupervisionEnd.formWrites.writes(SupervisionEnd(LocalDate.now().plusMonths(1)))
+          SupervisionEnd.formRule.validate(startDateField ++ Map(
+            "anotherBody" -> Seq("true"),
+            "endDate.year" -> Seq(""),
+            "endDate.month" -> Seq(""),
+            "endDate.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "endDate") -> Seq(ValidationError("error.supervision.end.required.date.year.month.day"))
+          )))
+        }
 
-        SupervisionEnd.formRule.validate(data ++ startDateField) must be(Invalid(Seq(Path \ "endDate" -> Seq(
-          ValidationError("error.future.date")))))
+        "day is missing" in new Fixture {
+          SupervisionEnd.formRule.validate(startDateField ++ Map(
+            "anotherBody" -> Seq("true"),
+            "endDate.year" -> Seq("2020"),
+            "endDate.month" -> Seq("01"),
+            "endDate.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "endDate") -> Seq(ValidationError("error.supervision.end.required.date.day"))
+          )))
+        }
+
+        "month is missing" in new Fixture {
+          SupervisionEnd.formRule.validate(startDateField ++ Map(
+            "anotherBody" -> Seq("true"),
+            "endDate.year" -> Seq("2020"),
+            "endDate.month" -> Seq(""),
+            "endDate.day" -> Seq("01")
+          )) must equal(Invalid(Seq(
+            (Path \ "endDate") -> Seq(ValidationError("error.supervision.end.required.date.month"))
+          )))
+        }
+
+        "year is missing" in new Fixture {
+          SupervisionEnd.formRule.validate(startDateField ++ Map(
+            "anotherBody" -> Seq("true"),
+            "endDate.year" -> Seq(""),
+            "endDate.month" -> Seq("01"),
+            "endDate.day" -> Seq("01")
+          )) must equal(Invalid(Seq(
+            (Path \ "endDate") -> Seq(ValidationError("error.supervision.end.required.date.year"))
+          )))
+        }
+
+        "day and month are missing" in new Fixture {
+          SupervisionEnd.formRule.validate(startDateField ++ Map(
+            "anotherBody" -> Seq("true"),
+            "endDate.year" -> Seq("2020"),
+            "endDate.month" -> Seq(""),
+            "endDate.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "endDate") -> Seq(ValidationError("error.supervision.end.required.date.month.day"))
+          )))
+        }
+
+        "day and year are missing" in new Fixture {
+          SupervisionEnd.formRule.validate(startDateField ++ Map(
+            "anotherBody" -> Seq("true"),
+            "endDate.year" -> Seq(""),
+            "endDate.month" -> Seq("01"),
+            "endDate.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "endDate") -> Seq(ValidationError("error.supervision.end.required.date.year.day"))
+          )))
+        }
+
+        "year and month are missing" in new Fixture {
+          SupervisionEnd.formRule.validate(startDateField ++ Map(
+            "anotherBody" -> Seq("true"),
+            "endDate.year" -> Seq(""),
+            "endDate.month" -> Seq(""),
+            "endDate.day" -> Seq("01")
+          )) must equal(Invalid(Seq(
+            (Path \ "endDate") -> Seq(ValidationError("error.supervision.end.required.date.year.month"))
+          )))
+        }
       }
 
-      "supervision enddate is before supervision startdate" in new Fixture {
+      "Not a real date" in new Fixture {
+        SupervisionEnd.formRule.validate(startDateField ++ Map(
+          "anotherBody" -> Seq("true"),
+          "endDate.year" -> Seq("FOO"),
+          "endDate.month" -> Seq("BAR"),
+          "endDate.day" -> Seq("FOO")
+        )) must equal(Invalid(Seq(
+          (Path \ "endDate") -> Seq(ValidationError("error.supervision.end.invalid.date.not.real"))
+        )))
+      }
 
-        val urlFormEncoded = startDateField ++ Map(
-          "endDate.day" -> Seq("24"),
-          "endDate.month" -> Seq("2"),
-          "endDate.year" -> Seq("1990"))
+      "Future date" in new Fixture {
+        SupervisionEnd.formRule.validate(startDateField ++ Map(
+          "anotherBody" -> Seq("true"),
+          "endDate.year" -> Seq("2090"),
+          "endDate.month" -> Seq("02"),
+          "endDate.day" -> Seq("24")
+        )) must
+          equal(Invalid(Seq(
+            (Path \ "endDate") -> Seq(ValidationError("error.supervision.end.invalid.date.future"))
+          )))
+      }
 
-        val expected = Invalid(Seq((Path \ "endDate") -> Seq(ValidationError("error.expected.supervision.enddate.after.startdate"))))
-
-        SupervisionEnd.formRule.validate(urlFormEncoded) must be(expected)
+      "Pre 1900" in new Fixture {
+        SupervisionEnd.formRule.validate(startDateField ++ Map(
+          "anotherBody" -> Seq("true"),
+          "endDate.year" -> Seq("1890"),
+          "endDate.month" -> Seq("02"),
+          "endDate.day" -> Seq("24")
+        )) must
+          equal(Invalid(Seq(
+            (Path \ "endDate") -> Seq(ValidationError("error.supervision.end.invalid.date.after.1900"))
+          )))
       }
     }
   }

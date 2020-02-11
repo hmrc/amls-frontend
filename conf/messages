@@ -484,24 +484,54 @@ error.required.asp.other.business.tax.matters = Select yes if you’re registere
 error.required.asp.agentRegNo = Enter a HMRC Agent Reference Number.
 error.invalid.asp.agentRegNo = Enter a valid HMRC Agent Reference Number. It must be 11 characters long.
 error.invalid.length.asp.agentRegNo = You can’t enter more than 11 characters.
-error.required.asp.business.services = Select one or more options to show the services your business provides
+error.required.asp.business.services = Select which services your business provides
 
 ############################### Supervision ###############################
-error.required.supervision.supervisor = Enter the name of your last supervisor
-error.required.supervision.reason = Enter a reason why the supervision ended
-error.required.supervision.anotherbody = Select yes if your business has previously been registered with another supervising body
-error.invalid.supervision.supervisor = You can’t enter more than 140 characters
+error.required.supervision.supervisor = Enter the name of your previous supervising body
+error.required.supervision.reason = Enter the reason your previous supervision ended
+
+error.supervision.end.reason.invalid.maxlength.255 = The reason your supervision ended must be 255 characters or less
+error.supervision.end.reason.invalid = The reason your supervision ended can include letters a to z, numbers, spaces and punctuation
+
+error.required.supervision.anotherbody = Select yes if your business has ever been registered with another supervising body for anti-money laundering supervision
+error.invalid.supervision.supervisor.length.140 = Name of previous supervising body must be 140 characters or less
 error.invalid.supervision.reason = You can’t enter more than 255 characters
 error.required.supervision.business.a.member = Select yes if your business is a member of a professional body
-error.required.supervision.one.professional.body = Select one or more options to show which professional bodies your business is a member of
-error.required.supervision.business.details = Enter the name of the professional body
-error.invalid.supervision.business.details = You can’t enter more than 255 characters the name of the professional body
-error.expected.supervision.startdate.before.enddate = The date your supervision started must be before the date it ended
-error.expected.supervision.enddate.after.startdate = The date your supervision ended must be after the date it started
-error.required.professionalbody.info.about.penalty = Enter some information about the penalty received
-error.invalid.professionalbody.info.about.penalty = You can’t enter more than 255 characters
-error.required.professionalbody.penalised.by.professional.body = Select yes if the business, or anyone in it, has ever been penalised by a professional body
+error.required.supervision.one.professional.body = Select which professional bodies you’re a member of
+error.required.supervision.business.details = Enter the name of the professional body you’re a member of
+error.invalid.supervision.business.details.length.255 = Name of the professional body must be 255 characters or less
+error.invalid.supervision.business.details = Name of the professional body can include letters a to z, numbers, spaces and punctuation
 
+error.expected.supervision.startdate.before.enddate = The date your supervision started must be before the date it ended
+error.expected.supervision.enddate.after.startdate = Date your previous supervision ended must be after the date your supervision started
+error.required.professionalbody.penalised.by.professional.body = Select yes if your business, or anyone in your business, has been penalised for business activities covered by the Money Laundering Regulations
+error.required.professionalbody.info.about.penalty = Enter a description of the penalty, and when it happened
+error.invalid.professionalbody.info.about.penalty.length.255 = Description of the penalty must be 255 characters or less
+error.invalid.professionalbody.info.about.penalty = Description of the penalty can include letters a to z, numbers, spaces and punctuation
+
+error.invalid.supervision.supervisor = Name of previous supervising body can include letters a to z, numbers, spaces and punctuation
+
+error.supervision.start.required.date.day = Date your previous supervision started must include a day
+error.supervision.start.required.date.month = Date your previous supervision started must include a month
+error.supervision.start.required.date.year = Date your previous supervision started must include a year
+error.supervision.start.required.date.month.day = Date your previous supervision started must include a day and month
+error.supervision.start.required.date.year.month = Date your previous supervision started must include a month and year
+error.supervision.start.required.date.year.month.day = Enter the date your previous supervision started
+error.supervision.start.required.date.year.day = Date your previous supervision started must include a day and year
+error.supervision.start.invalid.date.after.1900 = Date your previous supervision started must be after 1900
+error.supervision.start.invalid.date.future = Date your previous supervision started must be in the past
+error.supervision.start.invalid.date.not.real = Enter a real date for when your previous supervision started
+
+error.supervision.end.required.date.day = Date your previous supervision ended must include a day
+error.supervision.end.required.date.month = Date your previous supervision ended must include a month
+error.supervision.end.required.date.year = Date your previous supervision ended must include a year
+error.supervision.end.required.date.month.day = Date your previous supervision ended must include a day and month
+error.supervision.end.required.date.year.month = Date your previous supervision ended must include a month and year
+error.supervision.end.required.date.year.month.day = Enter the date your previous supervision ended
+error.supervision.end.required.date.year.day = Date your previous supervision ended must include a day and year
+error.supervision.end.invalid.date.after.1900 = Date your previous supervision ended must be after 1900
+error.supervision.end.invalid.date.future = Date your previous supervision ended must be in the past
+error.supervision.end.invalid.date.not.real = Enter a real date for when your previous supervision ended
 
 ############################### Money Services Business ###############################
 error.required.msb.services = Select the money service business activities you will do
