@@ -25,98 +25,132 @@ class PositionInBusinessStartDateSpec extends PlaySpec with MockitoSugar {
 
   "PositionStartDate" should {
 
-      "successfully validate given a valid date" in {
+    "successfully validate given a valid date" in {
 
-        val data = Map(
-          "startDate.day" -> Seq("15"),
-          "startDate.month" -> Seq("2"),
-          "startDate.year" -> Seq("1956")
-        )
+      val data = Map(
+        "startDate.day" -> Seq("15"),
+        "startDate.month" -> Seq("2"),
+        "startDate.year" -> Seq("1956")
+      )
 
-        PositionStartDate.formRule.validate(data) must
-          be(Valid(PositionStartDate(new LocalDate(1956, 2, 15))))
-      }
+      PositionStartDate.formRule.validate(data) must
+        be(Valid(PositionStartDate(new LocalDate(1956, 2, 15))))
+    }
 
-      "fail validation" when {
-        "given a day in future beyond end of 2099" in {
-          val model = PositionStartDate.formWrites.writes(PositionStartDate(new LocalDate(2100, 1, 1)))
+    "fail validation" when {
+      "required fields are missing" when {
+        "nothing has been selected" in {
 
-          PositionStartDate.formRule.validate(model) must be(Invalid(Seq(
-            Path \ "startDate" -> Seq(ValidationError("error.future.date"))
+          PositionStartDate.formRule.validate(Map(
+            "startDate.year" -> Seq(""),
+            "startDate.month" -> Seq(""),
+            "startDate.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "startDate") -> Seq(ValidationError("error.rp.position.required.date.year.month.day"))
           )))
         }
 
-        "given a day in the past before start of 1900" in {
-          val model = PositionStartDate.formWrites.writes(PositionStartDate(new LocalDate(1089, 12, 31)))
-
-          PositionStartDate.formRule.validate(model) must
-            be(Invalid(Seq(Path \ "startDate" -> Seq(ValidationError("error.allowed.start.date")))))
+        "day is missing" in {
+          PositionStartDate.formRule.validate(Map(
+            "startDate.year" -> Seq("2020"),
+            "startDate.month" -> Seq("01"),
+            "startDate.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "startDate") -> Seq(ValidationError("error.rp.position.required.date.day"))
+          )))
         }
 
-        "given an invalid date" in {
-
-          val data = Map(
-            "startDate.day" -> Seq("30"),
-            "startDate.month" -> Seq("2"),
-            "startDate.year" -> Seq("1956")
-          )
-
-          PositionStartDate.formRule.validate(data) must
-            be(Invalid(Seq(Path \ "startDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
-        }
-
-        "given an future date" in {
-          val model = PositionStartDate.formWrites.writes(PositionStartDate(LocalDate.now.plusMonths(1)))
-
-          PositionStartDate.formRule.validate(model) must
-            be(Invalid(Seq(Path \ "startDate" -> Seq(ValidationError("error.future.date")))))
-        }
-
-        "given a missing day" in {
-
-          val data = Map(
-            "startDate.day" -> Seq(""),
-            "startDate.month" -> Seq("2"),
-            "startDate.year" -> Seq("1956")
-          )
-
-          PositionStartDate.formRule.validate(data) must
-            be(Invalid(Seq(Path \ "startDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
-        }
-
-        "given a missing month" in {
-
-          val data = Map(
-            "startDate.day" -> Seq("2"),
+        "month is missing" in {
+          PositionStartDate.formRule.validate(Map(
+            "startDate.year" -> Seq("2020"),
             "startDate.month" -> Seq(""),
-            "startDate.year" -> Seq("1956")
-          )
-
-          PositionStartDate.formRule.validate(data) must
-            be(Invalid(Seq(Path \ "startDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+            "startDate.day" -> Seq("01")
+          )) must equal(Invalid(Seq(
+            (Path \ "startDate") -> Seq(ValidationError("error.rp.position.required.date.month"))
+          )))
         }
 
-        "given a missing year" in {
-
-          val data = Map(
-            "startDate.day" -> Seq("1"),
-            "startDate.month" -> Seq("2"),
-            "startDate.year" -> Seq("")
-          )
-
-          PositionStartDate.formRule.validate(data) must
-            be(Invalid(Seq(Path \ "startDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+        "year is missing" in {
+          PositionStartDate.formRule.validate(Map(
+            "startDate.year" -> Seq(""),
+            "startDate.month" -> Seq("01"),
+            "startDate.day" -> Seq("01")
+          )) must equal(Invalid(Seq(
+            (Path \ "startDate") -> Seq(ValidationError("error.rp.position.required.date.year"))
+          )))
         }
 
+        "day and month are missing" in {
+          PositionStartDate.formRule.validate(Map(
+            "startDate.year" -> Seq("2020"),
+            "startDate.month" -> Seq(""),
+            "startDate.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "startDate") -> Seq(ValidationError("error.rp.position.required.date.month.day"))
+          )))
+        }
+
+        "day and year are missing" in {
+          PositionStartDate.formRule.validate(Map(
+            "startDate.year" -> Seq(""),
+            "startDate.month" -> Seq("01"),
+            "startDate.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "startDate") -> Seq(ValidationError("error.rp.position.required.date.year.day"))
+          )))
+        }
+
+        "year and month are missing" in {
+          PositionStartDate.formRule.validate(Map(
+            "startDate.year" -> Seq(""),
+            "startDate.month" -> Seq(""),
+            "startDate.day" -> Seq("01")
+          )) must equal(Invalid(Seq(
+            (Path \ "startDate") -> Seq(ValidationError("error.rp.position.required.date.year.month"))
+          )))
+        }
       }
 
-      "write to form given a valid start date" in {
-
-        val startDate = PositionStartDate(new LocalDate(1990, 2, 24))
-
-        PositionStartDate.formWrites.writes(startDate) must
-          be(Map(
-            "startDate.day" -> List("24"), "startDate.month" -> List("2"), "startDate.year" -> List("1990")))
+      "Not a real date" in {
+        PositionStartDate.formRule.validate(Map(
+          "startDate.year" -> Seq("FOO"),
+          "startDate.month" -> Seq("BAR"),
+          "startDate.day" -> Seq("FOO")
+        )) must equal(Invalid(Seq(
+          (Path \ "startDate") -> Seq(ValidationError("error.rp.position.invalid.date.not.real"))
+        )))
       }
+
+      "Future date" in {
+        PositionStartDate.formRule.validate(Map(
+          "startDate.year" -> Seq("2090"),
+          "startDate.month" -> Seq("02"),
+          "startDate.day" -> Seq("24")
+        )) must
+          equal(Invalid(Seq(
+            (Path \ "startDate") -> Seq(ValidationError("error.rp.position.invalid.date.future"))
+          )))
+      }
+
+      "Pre 1900" in {
+        PositionStartDate.formRule.validate(Map(
+          "startDate.year" -> Seq("1890"),
+          "startDate.month" -> Seq("02"),
+          "startDate.day" -> Seq("24")
+        )) must
+          equal(Invalid(Seq(
+            (Path \ "startDate") -> Seq(ValidationError("error.rp.position.invalid.date.after.1900"))
+          )))
+      }
+    }
+
+    "write to form given a valid start date" in {
+
+      val startDate = PositionStartDate(new LocalDate(1990, 2, 24))
+
+      PositionStartDate.formWrites.writes(startDate) must
+        be(Map(
+          "startDate.day" -> List("24"), "startDate.month" -> List("2"), "startDate.year" -> List("1990")))
+    }
   }
 }

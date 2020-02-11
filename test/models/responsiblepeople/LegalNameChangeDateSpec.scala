@@ -45,7 +45,6 @@ class LegalNameChangeDateSpec extends PlaySpec with MockitoSugar {
     }
 
     "fail validation" when {
-
       "required fields are missing" when {
         "nothing has been selected" in {
 
@@ -54,24 +53,102 @@ class LegalNameChangeDateSpec extends PlaySpec with MockitoSugar {
             "date.month" -> Seq(""),
             "date.day" -> Seq("")
           )) must equal(Invalid(Seq(
-            (Path \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+            (Path \ "date") -> Seq(ValidationError("error.rp.name_change.required.date.year.month.day"))
+          )))
+        }
+
+        "day is missing" in {
+          LegalNameChangeDate.formRule.validate(Map(
+            "date.year" -> Seq("2020"),
+            "date.month" -> Seq("01"),
+            "date.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "date") -> Seq(ValidationError("error.rp.name_change.required.date.day"))
+          )))
+        }
+
+        "month is missing" in {
+          LegalNameChangeDate.formRule.validate(Map(
+            "date.year" -> Seq("2020"),
+            "date.month" -> Seq(""),
+            "date.day" -> Seq("01")
+          )) must equal(Invalid(Seq(
+            (Path \ "date") -> Seq(ValidationError("error.rp.name_change.required.date.month"))
+          )))
+        }
+
+        "year is missing" in {
+          LegalNameChangeDate.formRule.validate(Map(
+            "date.year" -> Seq(""),
+            "date.month" -> Seq("01"),
+            "date.day" -> Seq("01")
+          )) must equal(Invalid(Seq(
+            (Path \ "date") -> Seq(ValidationError("error.rp.name_change.required.date.year"))
+          )))
+        }
+
+        "day and month are missing" in {
+          LegalNameChangeDate.formRule.validate(Map(
+            "date.year" -> Seq("2020"),
+            "date.month" -> Seq(""),
+            "date.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "date") -> Seq(ValidationError("error.rp.name_change.required.date.month.day"))
+          )))
+        }
+
+        "day and year are missing" in {
+          LegalNameChangeDate.formRule.validate(Map(
+            "date.year" -> Seq(""),
+            "date.month" -> Seq("01"),
+            "date.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "date") -> Seq(ValidationError("error.rp.name_change.required.date.year.day"))
+          )))
+        }
+
+        "year and month are missing" in {
+          LegalNameChangeDate.formRule.validate(Map(
+            "date.year" -> Seq(""),
+            "date.month" -> Seq(""),
+            "date.day" -> Seq("01")
+          )) must equal(Invalid(Seq(
+            (Path \ "date") -> Seq(ValidationError("error.rp.name_change.required.date.year.month"))
           )))
         }
       }
 
-      "fields are invalid" in {
-
+      "Not a real date" in {
         LegalNameChangeDate.formRule.validate(Map(
-          "date.year" -> Seq("199000"),
+          "date.year" -> Seq("FOO"),
+          "date.month" -> Seq("BAR"),
+          "date.day" -> Seq("FOO")
+        )) must equal(Invalid(Seq(
+          (Path \ "date") -> Seq(ValidationError("error.rp.name_change.invalid.date.not.real"))
+        )))
+      }
+
+      "Future date" in {
+        LegalNameChangeDate.formRule.validate(Map(
+          "date.year" -> Seq("2090"),
           "date.month" -> Seq("02"),
           "date.day" -> Seq("24")
         )) must
           equal(Invalid(Seq(
-            (Path \ "date") -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))
+            (Path \ "date") -> Seq(ValidationError("error.rp.name_change.invalid.date.future"))
           )))
       }
 
+      "Pre 1900" in {
+        LegalNameChangeDate.formRule.validate(Map(
+          "date.year" -> Seq("1890"),
+          "date.month" -> Seq("02"),
+          "date.day" -> Seq("24")
+        )) must
+          equal(Invalid(Seq(
+            (Path \ "date") -> Seq(ValidationError("error.rp.name_change.invalid.date.after.1900"))
+          )))
+      }
     }
-
   }
 }

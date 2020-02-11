@@ -37,8 +37,8 @@ object Training {
   val maxInformationTypeLength = 255
   val informationType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.rp.training.information") andThen
-    maxLength(maxInformationTypeLength).withMessage("error.invalid.maxlength.255") andThen
-    basicPunctuationPattern()
+    maxLength(maxInformationTypeLength).withMessage("error.rp.invalid.training.information.maxlength.255") andThen
+    basicPunctuationPattern().withMessage("error.rp.invalid.training.information")
 
   implicit val formRule: Rule[UrlFormEncoded, Training] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._

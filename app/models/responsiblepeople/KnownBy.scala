@@ -37,15 +37,15 @@ object KnownBy {
   import play.api.libs.json._
 
   val otherNamesLength = 140
-  val otherNamesType = notEmptyStrip andThen
+  val otherNamesRule = notEmptyStrip andThen
     notEmpty.withMessage("error.required.rp.otherNames") andThen
-    maxLength(otherNamesLength).withMessage("error.invalid.maxlength.140") andThen
-    basicPunctuationPattern()
+    maxLength(otherNamesLength).withMessage("error.invalid.rp.maxlength.140") andThen
+    basicPunctuationPattern("error.invalid.rp.char")
 
   implicit val formRule: Rule[UrlFormEncoded, KnownBy] =
     From[UrlFormEncoded] { __ =>
       (__ \ "hasOtherNames").read[Boolean].withMessage("error.required.rp.hasOtherNames") flatMap  {
-        case true => (__ \ "otherNames").read(otherNamesType) map { x => KnownBy(Some(true), Some(x))}
+        case true => (__ \ "otherNames").read(otherNamesRule) map { x => KnownBy(Some(true), Some(x))}
         case false => Rule.fromMapping { _ => Valid(KnownBy(Some(false), None)) }
       }
     }
