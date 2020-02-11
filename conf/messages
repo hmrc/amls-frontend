@@ -800,10 +800,14 @@ your.registration.status.incomplete = Application incomplete.
 your.registration.status.not.submitted = Application not submitted.
 your.registration.status.renewal.submitted = Supervised. Renewal submitted.
 your.registration.status.not.submitted.button = Check and submit your application
+your.registration.status.withdrawn.new.application.button = Start a new application
 your.registration.status.renewal.not.submitted.button = Check business information and submit renewal
 your.registration.status.renewal.incomplete.button = Return to your renewal
 your.registration.status.renewal.pending.description.line1 = You have submitted your renewal. HMRC will review your renewal after we have received payment.
 your.registration.status.renewal.pending.description.line2 = We’ll email you when we have made a decision.
+your.registration.status.withdrawn.line1 = You have withdrawn your application to register with HMRC.
+your.registration.status.withdrawn.line2 = Your business is not registered with HMRC under the Money Laundering Regulations.
+your.registration.status.withdrawn = Not supervised. Application withdrawn.
 
 status.submissionreadyforreview.heading = Application pending
 status.submissionreadyforreview.description = You have 28 days to pay your fees from the date you submitted your application. Your application will be refused if you do not pay the fees.

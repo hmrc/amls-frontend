@@ -20,7 +20,7 @@ import forms.EmptyForm
 import generators.AmlsReferenceNumberGenerator
 import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
-import models.status.{NotCompleted, ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.status._
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -28,7 +28,7 @@ import play.api.mvc.Call
 import play.twirl.api.{Html, HtmlFormat}
 import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
-import views.html.include.status.{application_incomplete, application_renewal_due, application_renewal_incomplete, application_renewal_submission_ready, application_renewal_submitted, application_submission_ready}
+import views.html.include.status._
 import views.html.status.components.{fee_information, registration_status, withdraw_or_deregister_information}
 
 class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator {
@@ -95,6 +95,22 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       doc.getElementById("return-to-saved-application").html() must include("Return to your application")
       doc.getElementById("return-to-saved-application").html() must include("for business Name")
       doc.getElementById("return-to-saved-application").attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
+    }
+
+    "contain correct content for status SubmissionWithdrawn" in new ViewFixture {
+      def view = views.html.status.your_registration("",
+        Some("business Name"),
+        displayCheckOrUpdateLink = false,
+        yourRegistrationInfo = application_withdrawn(Some("business Name")),
+        registrationStatus = registration_status(status = SubmissionWithdrawn),
+        unreadNotifications = 10,
+        feeInformation = HtmlFormat.empty)
+
+      doc.getElementById("application-withdrawn-description-1").text() must be("You have withdrawn your application to register with HMRC.")
+      doc.getElementById("application-withdrawn-description-2").text() must be("Your business is not registered with HMRC under the Money Laundering Regulations.")
+      doc.getElementById("new.application.button").attr("href") must be(controllers.routes.StatusController.newSubmission().url)
+      Option(doc.getElementById("update-information")) must be(None)
+      doc.getElementById("registration-status").html() must include("Not supervised. Application withdrawn.")
     }
 
     "contain registration information for status SubmissionReady" in new ViewFixture {

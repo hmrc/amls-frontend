@@ -160,7 +160,8 @@ class StatusController @Inject()(val landingService: LandingService,
             status = status
           ),
           feeInformation = HtmlFormat.empty
-        )))
+        ))
+      )
       case SubmissionReady => {
         OptionT(progressService.getSubmitRedirect(mlrRegNumber, accountTypeId, cacheId)) map (
           url =>
@@ -182,7 +183,6 @@ class StatusController @Inject()(val landingService: LandingService,
           Ok(your_registration(
             regNo = mlrRegNumber.getOrElse(""),
             businessName = businessNameOption,
-            fromDuplicateSubmission = fromDuplicateSubmission,
             yourRegistrationInfo = application_pending(),
             unreadNotifications = unreadNotifications,
             displayContactLink = true,
@@ -228,8 +228,19 @@ class StatusController @Inject()(val landingService: LandingService,
         Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
       case (SubmissionDecisionExpired, _) =>
         Ok(status_expired(mlrRegNumber.getOrElse(""), businessNameOption))
-      case (SubmissionWithdrawn, _) =>
-        Ok(status_withdrawn(businessNameOption))
+      case (SubmissionWithdrawn, _) => {
+        Ok {
+          your_registration(
+            regNo = "",
+            businessName = businessNameOption,
+            yourRegistrationInfo = application_withdrawn(businessNameOption),
+            displayCheckOrUpdateLink = false,
+            unreadNotifications = unreadNotifications,
+            registrationStatus = registration_status(
+              status = statusInfo._1),
+            feeInformation = HtmlFormat.empty)
+        }
+      }
       case (DeRegistered, _) =>
         val deregistrationDate = for {
           info <- statusInfo._2
