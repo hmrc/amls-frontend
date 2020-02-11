@@ -18,13 +18,14 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
-import controllers.actions.{SuccessfulAuthAction}
+import controllers.actions.SuccessfulAuthAction
 import generators.AmlsReferenceNumberGenerator
 import generators.businesscustomer.ReviewDetailsGenerator
 import models.Country
 import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.{AMLSTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherNo, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
+import models.responsiblepeople.{ResponsiblePeopleValues, ResponsiblePerson}
 import models.status._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -44,15 +45,17 @@ import scala.concurrent.Future
 
 class RegistrationProgressControllerSpec extends AmlsSpec
   with ReviewDetailsGenerator
-  with AmlsReferenceNumberGenerator {
+  with AmlsReferenceNumberGenerator
+  with ResponsiblePeopleValues {
 
-  trait Fixture extends DependencyMocks { self =>
+  trait Fixture extends DependencyMocks {
+    self =>
     val request = addToken(authRequest)
 
     val mockBusinessMatching = mock[BusinessMatching]
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
-    val controller = new RegistrationProgressController (
+    val controller = new RegistrationProgressController(
       SuccessfulAuthAction,
       progressService = mock[ProgressService],
       dataCache = mockCacheConnector,
@@ -90,6 +93,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           mockApplicationStatus(SubmissionReadyForReview)
 
+          mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+
           when(controller.sectionsProvider.sections(mockCacheMap))
             .thenReturn(Seq.empty[Section])
 
@@ -106,36 +111,40 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       "status is ReadyForRenewal and renewal data exists in mongoCache" must {
         "redirect to renewal registration progress" in new Fixture {
 
-            mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
+          mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
 
-            mockApplicationStatus(ReadyForRenewal(None))
+          mockApplicationStatus(ReadyForRenewal(None))
 
-            val responseF = controller.get()(request)
-            status(responseF) must be(SEE_OTHER)
-            redirectLocation(responseF) must be(Some(renewal.routes.RenewalProgressController.get().url))
-          }
+          mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+
+          val responseF = controller.get()(request)
+          status(responseF) must be(SEE_OTHER)
+          redirectLocation(responseF) must be(Some(renewal.routes.RenewalProgressController.get().url))
         }
-        "status is renewal submitted and renewal data exists in mongoCache" must {
-          "show the registration amendment page" in new Fixture {
+      }
+      "status is renewal submitted and renewal data exists in mongoCache" must {
+        "show the registration amendment page" in new Fixture {
 
-            when(controller.sectionsProvider.sections(mockCacheMap))
-              .thenReturn(Seq(
-                Section("TESTSECTION1", Completed, false, mock[Call]),
-                Section("TESTSECTION2", Completed, true, mock[Call])
-              ))
+          when(controller.sectionsProvider.sections(mockCacheMap))
+            .thenReturn(Seq(
+              Section("TESTSECTION1", Completed, false, mock[Call]),
+              Section("TESTSECTION2", Completed, true, mock[Call])
+            ))
 
-            mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
+          mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
 
-            mockApplicationStatus(RenewalSubmitted(None))
+          mockApplicationStatus(RenewalSubmitted(None))
 
-            val responseF = controller.get()(request)
-            status(responseF) must be(OK)
-            val pageTitle = Messages("amendment.title") + " - " +
-              Messages("title.amls") + " - " + Messages("title.gov")
+          mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-            Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
-          }
+          val responseF = controller.get()(request)
+          status(responseF) must be(OK)
+          val pageTitle = Messages("amendment.title") + " - " +
+            Messages("title.amls") + " - " + Messages("title.gov")
+
+          Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
         }
+      }
 
 
       "redirect to registration progress" when {
@@ -143,6 +152,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           "redirectWithNominatedOfficer" in new Fixture {
 
             mockApplicationStatus(ReadyForRenewal(None))
+
+            mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
             when(controller.sectionsProvider.sections(mockCacheMap))
               .thenReturn(Seq.empty[Section])
@@ -171,6 +182,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
                   Section("TESTSECTION2", Completed, true, mock[Call])
                 ))
 
+              mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+
               val responseF = controller.get()(request)
               status(responseF) must be(OK)
 
@@ -184,6 +197,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             "show Submit Updates form" in new Fixture {
 
               mockApplicationStatus(SubmissionReadyForReview)
+
+              mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
               when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -214,6 +229,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
                   Section("TESTSECTION2", Completed, false, mock[Call])
                 ))
 
+              mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+
               val responseF = controller.get()(request)
               status(responseF) must be(OK)
 
@@ -227,6 +244,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             "show View Status button" in new Fixture {
 
               mockApplicationStatus(SubmissionReadyForReview)
+
+              mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
               when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -260,6 +279,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
                   Section("TESTSECTION2", Completed, true, mock[Call])
                 ))
 
+              mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+
               val responseF = controller.get()(request)
               status(responseF) must be(OK)
 
@@ -272,6 +293,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             "show View Status button" in new Fixture {
 
               mockApplicationStatus(SubmissionReadyForReview)
+
+              mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
               when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -302,6 +325,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
                 Section("TESTSECTION2", Completed, false, mock[Call])
               ))
 
+            mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
 
@@ -316,6 +341,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           Seq(SubmissionReady, SubmissionReadyForReview, SubmissionDecisionApproved).foreach { subStatus =>
 
             mockApplicationStatus(subStatus)
+
+            mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
             val sections = Seq(
               Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
@@ -346,6 +373,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           mockApplicationStatus(SubmissionDecisionApproved)
 
+          mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+
           val sections = Seq(
             Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
             Section("TESTSECTION2", Completed, false, mock[Call])
@@ -372,6 +401,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           when(controller.sectionsProvider.sections(mockCacheMap))
             .thenReturn(Seq.empty[Section])
 
+          mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+
           val responseF = controller.get()(request)
           status(responseF) must be(OK)
 
@@ -385,6 +416,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         "the business matching is incomplete and status is pre-application" in new Fixture {
           when(mockBusinessMatching.isComplete) thenReturn false
           mockCacheFetch(Some(mockBusinessMatching))
+
+          mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
           val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get())
           when(controller.sectionsProvider.sections(mockCacheMap)) thenReturn Seq(completeSection)
@@ -401,6 +434,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
 
           mockApplicationStatus(SubmissionDecisionApproved)
+
+          mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
           val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get())
           when(controller.sectionsProvider.sections(mockCacheMap)) thenReturn Seq(completeSection)
@@ -441,6 +476,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           mockApplicationStatus(SubmissionDecisionApproved)
 
+          mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+
           val result = controller.get()(request)
           status(result) mustBe OK
 
@@ -459,7 +496,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         Some(CustomersOutsideIsUK(true)),
         Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
         Some(PercentageOfCashPaymentOver15000.First),
-        Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
+        Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other")))))),
         Some(TotalThroughput("01")),
         Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
         Some(TransactionsInLast12Months("1500")),
@@ -473,8 +510,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         "redirect to the url provided by progressService" in new Fixture {
           val call = controllers.routes.RegistrationProgressController.get()
 
-          when{
-            controller.statusService.getStatus(any(),any(), any())(any(),any())
+          when {
+            controller.statusService.getStatus(any(), any(), any())(any(), any())
           } thenReturn Future.successful(RenewalSubmitted(None))
 
           when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
@@ -500,7 +537,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
         "redirect to the renew registration controller" in new Fixture {
           when {
-            controller.statusService.getStatus(any(),any(), any())(any(),any())
+            controller.statusService.getStatus(any(), any(), any())(any(), any())
           } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
 
           when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
@@ -519,8 +556,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       }
 
       "return INTERNAL_SERVER_ERROR if no call is returned" in new Fixture {
-        when{
-          controller.statusService.getStatus(any(),any(), any())(any(),any())
+        when {
+          controller.statusService.getStatus(any(), any(), any())(any(), any())
         } thenReturn Future.successful(RenewalSubmitted(None))
 
         when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))

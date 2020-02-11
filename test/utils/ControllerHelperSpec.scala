@@ -61,6 +61,32 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
   val accountantNameInCompleteModel = Some(BusinessActivities(
     whoIsYourAccountant = None))
 
+  val completeRpAndNotNominated = completeResponsiblePerson.copy(positions = Some(Positions(Set(BeneficialOwner), Some(PositionStartDate(LocalDate.now())))))
+  val inCompleteRpAndNominated = completeResponsiblePerson.copy(approvalFlags = ApprovalFlags(None, None))
+  val inCompleteRpAndNotNominated = completeResponsiblePerson.copy(personName = None, positions = Some(Positions(Set(BeneficialOwner), Some(PositionStartDate(LocalDate.now())))))
+
+  val oneCompleteNominatedOff: Option[Seq[ResponsiblePerson]] = {
+    Some(Seq(completeResponsiblePerson,
+      completeRpAndNotNominated,
+      incompleteResponsiblePeople,
+      inCompleteRpAndNotNominated
+    ))
+  }
+
+  val oneInCompleteNominatedOff: Option[Seq[ResponsiblePerson]] = {
+    Some(Seq(inCompleteRpAndNominated,
+      completeRpAndNotNominated,
+      incompleteResponsiblePeople,
+      inCompleteRpAndNotNominated
+    ))
+  }
+
+  val inCompleteAndNoNominatedOff: Option[Seq[ResponsiblePerson]] = {
+    Some(Seq(inCompleteRpAndNotNominated,
+      incompleteResponsiblePeople
+    ))
+  }
+
   "ControllerHelper" must {
 
     "hasInvalidRedressScheme" must {
@@ -279,6 +305,34 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
         updatedForm.data.get("""countries\[1\]-autocomp""") mustBe Some(Seq("value2b"))
         updatedForm.data.get("countries[2]") mustBe Some(Seq("value3a"))
         updatedForm.data.get("""countries\[2\]-autocomp""") mustBe Some(Seq("value3b"))
+      }
+    }
+
+    "hasCompleteNominatedOfficer" must {
+      "return true if there is complete nominated officer in the cache" in {
+        ControllerHelper.hasCompleteNominatedOfficer(oneCompleteNominatedOff) mustBe true
+      }
+
+      "return false if there is incomplete nominated officer in the cache" in {
+        ControllerHelper.hasCompleteNominatedOfficer(oneInCompleteNominatedOff) mustBe false
+      }
+
+      "return false if there are incomplete rps in the cache" in {
+        ControllerHelper.hasCompleteNominatedOfficer(inCompleteAndNoNominatedOff) mustBe false
+      }
+    }
+
+    "completeNominatedOfficerTitleName" must {
+      "return officer name if there is complete nominated officer in the cache" in {
+        ControllerHelper.completeNominatedOfficerTitleName(oneCompleteNominatedOff) mustBe Some("ANSTY DAVID")
+      }
+
+      "return empty string if there is incomplete nominated officer in the cache" in {
+        ControllerHelper.completeNominatedOfficerTitleName(oneInCompleteNominatedOff) mustBe Some("")
+      }
+
+      "return empty string if there are incomplete rps in the cache" in {
+        ControllerHelper.completeNominatedOfficerTitleName(inCompleteAndNoNominatedOff) mustBe Some("")
       }
     }
   }

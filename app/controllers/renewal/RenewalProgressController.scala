@@ -23,6 +23,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.registrationprogress.Completed
+import models.responsiblepeople.ResponsiblePerson
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import play.api.i18n.MessagesApi
 import play.api.mvc.MessagesControllerComponents
@@ -53,6 +54,7 @@ class RenewalProgressController @Inject()(val authAction: AuthAction,
             for {
               renewalSection <- OptionT.liftF(renewals.getSection(request.credId))
               cache <- OptionT(dataCacheConnector.fetchAll(request.credId))
+              responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
               businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
             } yield {
               val businessName = businessMatching.reviewDetails.map(r => r.businessName).getOrElse("")
@@ -61,7 +63,10 @@ class RenewalProgressController @Inject()(val authAction: AuthAction,
               val canSubmit = renewals.canSubmit(renewalSection, variationSections)
               val msbOrTcspExists = ControllerHelper.isMSBSelected(Some(businessMatching)) ||
                 ControllerHelper.isTCSPSelected(Some(businessMatching))
-              Ok(renewal_progress(variationSections, businessName, activities, canSubmit, msbOrTcspExists, r, renewalSection.status == Completed))
+              val hasCompleteNominatedOfficer = ControllerHelper.hasCompleteNominatedOfficer(Option(responsiblePeople))
+              val nominatedOfficerName = ControllerHelper.completeNominatedOfficerTitleName(Option(responsiblePeople))
+
+              Ok(renewal_progress(variationSections, businessName, activities, canSubmit, msbOrTcspExists, r, renewalSection.status == Completed, hasCompleteNominatedOfficer, nominatedOfficerName))
             }
           }
           case (r:RenewalSubmitted, _) => OptionT.fromOption[Future](Some(Redirect(controllers.routes.RegistrationProgressController.get)))

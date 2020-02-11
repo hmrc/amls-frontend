@@ -37,8 +37,8 @@ object UKPassport {
   private val passportRequired = required("error.required.uk.passport.number")
   private val passportInputLength = 9
   private val passportPattern = regexWithMsg(passportRegex, "error.invalid.uk.passport")
-  private val passportLengthRule = maxLength(passportInputLength).withMessage("error.invalid.uk.passport") andThen
-    minLength(passportInputLength).withMessage("error.invalid.uk.passport")
+  private val passportLengthRule = maxLength(passportInputLength).withMessage("error.invalid.uk.passport.length.9") andThen
+    minLength(passportInputLength).withMessage("error.invalid.uk.passport.length.9")
 
   val ukPassportType = notEmptyStrip andThen
     passportRequired andThen

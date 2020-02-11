@@ -29,7 +29,9 @@
     businessName: String,
     serviceNames: Seq[String],
     canEditPreApplication: Boolean,
-    newSections: Option[Seq[Section]] = None
+    newSections: Option[Seq[Section]] = None,
+    hasCompleteNominatedOfficer: Boolean = false,
+    nominatedOfficerName: Option[String] = None
 )(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main2(
@@ -49,7 +51,7 @@
     </div>
 
     @* Sidebar *@
-    @services_sidebar(canEditPreApplication, displayLink = true, businessName, serviceNames.toList.sorted)
+    @services_sidebar(canEditPreApplication, displayLink = true, businessName, serviceNames.toList.sorted, hasCompleteNominatedOfficer, nominatedOfficerName)
 
     <div class="grid-layout grid-layout--stacked">
         <h2 class="heading-medium">Business information</h2>

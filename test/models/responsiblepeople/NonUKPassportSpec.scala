@@ -32,7 +32,7 @@ class NonUKPassportSpec extends PlaySpec {
     "fail validation" when {
       "the passport number has too many characters" in {
         NonUKPassport.noUKPassportType.validate("a" * 50) mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.invalid.non.uk.passport.number")))
+          Seq(Path -> Seq(ValidationError("error.invalid.non.uk.passport.number.length.40")))
         )
       }
       "the passport number includes invalid characters (letters, punctuation etc)" in {

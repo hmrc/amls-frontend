@@ -33,12 +33,12 @@ class UKPassportSpec extends PlaySpec {
     "fail validation" when {
       "the passport number has too many characters" in {
         UKPassport.ukPassportType.validate("a" * 10) mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.invalid.uk.passport")))
+          Seq(Path -> Seq(ValidationError("error.invalid.uk.passport.length.9")))
         )
       }
       "the passport number has too few characters" in {
         UKPassport.ukPassportType.validate("a" * 8) mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.invalid.uk.passport")))
+          Seq(Path -> Seq(ValidationError("error.invalid.uk.passport.length.9")))
         )
       }
       "the passport number includes invalid characters (letters, punctuation etc)" in {
@@ -83,7 +83,7 @@ class UKPassportSpec extends PlaySpec {
 
       UKPassport.formRule.validate(urlFormEncoded) must
         be(Invalid(Seq(
-          (Path \ "ukPassportNumber") -> Seq(ValidationError("error.invalid.uk.passport"))
+          (Path \ "ukPassportNumber") -> Seq(ValidationError("error.invalid.uk.passport.length.9"))
         )))
     }
 

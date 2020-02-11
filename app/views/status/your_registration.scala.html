@@ -20,7 +20,7 @@
 @import play.twirl.api.HtmlFormat
 
 @(regNo: String, businessName: Option[String], feeResponse: Option[FeeResponse] = None,
-        fromDuplicateSubmission: Boolean = false, yourRegistrationInfo: Html = HtmlFormat.empty,
+        displayCheckOrUpdateLink: Boolean = true, yourRegistrationInfo: Html = HtmlFormat.empty,
         unreadNotifications: Int = 0, registrationStatus: Html, feeInformation: Html, displayContactLink: Boolean = false,
         withdrawOrDeregisterInformation: Html = HtmlFormat.empty)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
@@ -53,7 +53,9 @@
                 <p id="business-name">
                     @bn
                     <br />
-                    <a id="update-information" href="@controllers.routes.RegistrationProgressController.get()">@Messages("status.amendment.edit")</a>
+                    @if(displayCheckOrUpdateLink){
+                        <a id="update-information" href="@controllers.routes.RegistrationProgressController.get()">@Messages("status.amendment.edit")</a>
+                    }
                 </p>
             }
         </div>

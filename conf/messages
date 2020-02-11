@@ -85,7 +85,7 @@ error.required.name.of.business = Enter business name
 error.invalid.name.of.business = Business name must be 120 characters or less
 error.invalid.name.of.business.validation = Business name can include letters a to z, numbers, spaces, and most punctuation and special characters
 
-error.required.nino = Enter a National Insurance number in the correct format
+error.required.nino = Enter this person’s National Insurance number
 error.invalid.nino = Enter a National Insurance number in the correct format
 
 error.required.utr.number = Enter this person’s Unique Taxpayer Reference
@@ -99,7 +99,6 @@ error.not-found.heading = Item not found
 error.not-found.message = Check that you’ve entered the correct web address
 
 error.required.declaration.partners = You must select a partner. Select one of the partners or register someone else
-
 
 error.invalid.maxlength.40 = You can’t enter more than 40 characters
 error.invalid.maxlength.120 = You can’t enter more than 120 characters
@@ -334,7 +333,7 @@ error.required.rp.email = Enter an email address in the correct format, like myn
 error.invalid.rp.email = Re-enter the email address in the correct format, like name@example.com
 error.max.length.rp.email = You can’t enter more than 100 characters
 
-error.required.rp.experiencetraining = Select yes if this person has experience {0}
+error.required.rp.experiencetraining = Select yes if this person has experience as {0}
 error.required.rp.experiencetraining.one = in the services you’re registering
 
 error.required.rp.experiencetraining.information = Enter a description of this person’s experience
@@ -396,9 +395,11 @@ error.required.rp.is.uk.resident = Select yes if this person is a UK resident
 error.required.uk.passport = Select yes if this person has a UK passport
 error.required.uk.passport.number = Enter this person’s passport number
 error.invalid.uk.passport = Enter a passport number in the correct format
+error.invalid.uk.passport.length.9 = Passport number must be 9 characters or less
 error.required.non.uk.passport = Select yes if this person has a passport from another country
 error.required.non.uk.passport.number = Enter this person’s passport number
 error.invalid.non.uk.passport.number = Enter a passport number in the correct format
+error.invalid.non.uk.passport.number.length.40 = Passport number must be 40 characters or less
 error.required.rp.select.country.of.birth = Select yes if this person was born in the UK
 error.required.enter.valid.non.uk = Enter a country that is not the United Kingdom because this person was not born in the UK
 error.required.rp.birth.country = Enter the country this person was born in
@@ -435,7 +436,7 @@ error.required.positionWithinBusiness = Select this person’s role in the busin
 error.expected.future.date = The date can’t be in the future
 error.expected.rp.date.after.start = The date must be after {0} started as a responsible person, which was {1}
 error.required.rp.sole_proprietor = Select yes if this person is the sole proprietor of another business
-error.required.rp.registered.for.vat = Select yes if this person is registered for VAT with another business
+error.required.rp.registered.for.vat = Select yes if this person is registered for VAT with that business
 error.required.rp.confirm.address = Select yes if this is {0}’s home address
 error.required.rp.moved.address = Select yes if {0} has moved from this home address
 
@@ -819,6 +820,7 @@ your.registration.status = Registration status
 your.registration.messages = Messages
 your.registration.status.pending = Application pending.
 your.registration.fees = If you do not pay your fees within 28 days of submitting your application it will be rejected.
+your.registration.renewal.fees = If you do not pay your fees within 28 days of submitting your renewal it will be rejected.
 your.registration.withdraw = If you no longer need to register with HRMC, you can
 your.registration.deregister = If you no longer need to be registered with HMRC under the Money Laundering Regulations, you can
 your.registration.deregister.link = deregister your business
@@ -826,7 +828,16 @@ your.registration.number = Registration number {0}
 your.registration.how.to.pay = How to pay
 your.registration.status.incomplete = Application incomplete.
 your.registration.status.not.submitted = Application not submitted.
+your.registration.status.renewal.submitted = Supervised. Renewal submitted.
 your.registration.status.not.submitted.button = Check and submit your application
+your.registration.status.withdrawn.new.application.button = Start a new application
+your.registration.status.renewal.not.submitted.button = Check business information and submit renewal
+your.registration.status.renewal.incomplete.button = Return to your renewal
+your.registration.status.renewal.pending.description.line1 = You have submitted your renewal. HMRC will review your renewal after we have received payment.
+your.registration.status.renewal.pending.description.line2 = We’ll email you when we have made a decision.
+your.registration.status.withdrawn.line1 = You have withdrawn your application to register with HMRC.
+your.registration.status.withdrawn.line2 = Your business is not registered with HMRC under the Money Laundering Regulations.
+your.registration.status.withdrawn = Not supervised. Application withdrawn.
 
 status.submissionreadyforreview.heading = Application pending
 status.submissionreadyforreview.description = You have 28 days to pay your fees from the date you submitted your application. Your application will be refused if you do not pay the fees.
@@ -886,14 +897,16 @@ status.renewalsubmitted.description3 = HMRC will review your application after w
 status.renewalsubmitted.description4 = We’ll email you when we have made a decision.
 status.renewalsubmitted.description5 = You’re still registered with HMRC under the Money Laundering Regulations.
 
-status.renewalincomplete.description = Renewal incomplete
+status.renewalincomplete.description = You have started your renewal but have not completed it. If you do not submit your renewal, your registration with HMRC will expire.
 status.renewalincomplete.description2 = You have started the renewal application but you have not finished it.
 status.renewalincomplete.description3 = Your supervision will expire on {0} unless you renew before then.
 status.renewalincomplete.description4 = When you submit your renewal you’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for new responsible people you add.
-status.renewal.incomplete.buttontext = Return to your renewal application
+status.renewal.incomplete.buttontext = Return to your renewal
 status.renewalnotsubmitted.buttontext = Continue
+status.renewal.due = Your registration with HMRC will expire on {0} unless you renew.
+status.renewal.due.start = Start your renewal
 
-status.renewalnotsubmitted.description = Renewal not submitted
+status.renewalnotsubmitted.description = You have completed your renewal but have not submitted it. If you do not submit your renewal, your registration with HMRC will expire.
 status.renewalnotsubmitted.description2 = You have completed the renewal application but you have not submitted it.
 status.renewalnotsubmitted.description3 = Your supervision will expire on {0} unless you renew before then.
 status.renewalnotsubmitted.description4 = You’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for new responsible people you add.
@@ -1973,8 +1986,8 @@ responsiblepeople.wherepersonlives.postcode = Postcode
 responsiblepeople.wherepersonlives.country = Country
 responsiblepeople.wherepersonlives.address_history = How long has this person lived at this address?
 
-responsiblepeople.timeataddress.address_history.heading = How long has {0} lived at this address?
-responsiblepeople.timeataddress.address_history.title = How long has this person lived at this address?
+responsiblepeople.timeataddress.address_history.heading = How long did {0} live at this address?
+responsiblepeople.timeataddress.address_history.title = How long did this person live at this address?
 responsiblepeople.timeataddress.5_months_history = 0 to 5 months
 responsiblepeople.timeataddress.11_months_history = 6 to 11 months
 responsiblepeople.timeataddress.3_years_history = 1 to 3 years
@@ -2150,7 +2163,7 @@ responsiblepeople.nationality.title = What is the nationality of this person?
 responsiblepeople.nationality.select = Select all that apply
 responsiblepeople.nationality.selection.british = British (including English, Scottish, Welsh and Northern Irish)
 responsiblepeople.nationality.selection.other = National of a different country
-responsiblepeople.nationality.selection.other.name = Country name
+responsiblepeople.nationality.selection.other.name = Country this person is a national of
 responsiblepeople.summary.responsible.people = People you have registered
 responsiblepeople.summary.no.responsible.people = You currently have no responsible people registered
 responsiblepeople.remove.named.responsible.person = When did {0} stop being a responsible person for your business?

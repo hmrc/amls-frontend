@@ -56,5 +56,38 @@ class registration_amendmentSpec extends AmlsViewSpec with MockitoSugar with Add
 
       }
     }
+
+    "show the Nominated officer box with correct title, name and link" in new ViewFixture {
+      def view = views.html.registrationamendment.registration_amendment(
+        Seq(Section("section1", Completed, true, mock[Call]),
+          Section("section2", Started, true, mock[Call])),
+        true,
+        "businessName",
+        Seq.empty,
+        true,
+        hasCompleteNominatedOfficer = true,
+        nominatedOfficerName = Some("FirstName LastName"))
+
+      val element = doc.getElementById("nominated-officer")
+
+      element.getElementsByClass("heading-small").text() must be("Nominated officer")
+      element.html() must include("FirstName LastName")
+    }
+
+    "do not show the Nominated officer box if NO is not defined" in new ViewFixture {
+      def view = views.html.registrationamendment.registration_amendment(
+        Seq(Section("section1", Completed, true, mock[Call]),
+          Section("section2", Started, true, mock[Call])),
+        true,
+        "businessName",
+        Seq.empty,
+        true,
+        hasCompleteNominatedOfficer = false,
+        nominatedOfficerName = None)
+
+      val element = Option(doc.getElementById("nominated-officer"))
+
+      element mustBe None
+    }
   }
 }
