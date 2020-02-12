@@ -260,34 +260,47 @@ $(function () {
   var partialDeskproForm = $('.partial-deskpro-form');
   if(partialDeskproForm.length) {
 
-    $('#get-help-action').remove();
-    var container = $('.report-error__content');
-    container.find('h2').remove();
-    container.find('p').remove();
+        // activate the on-page ajax link
+        // this means the form gets the link-loaded js which sets up validation and submit handler
+        $('#get-help-action').click();
 
-    var css = {
-        visibility: 'hidden',
-        height: 0
-    };
+        // set up a checker to see when the ajax form gets loaded so we can do some stuff with the form
+        var checkForm = setInterval(checkLoaded, 50);
 
+        // see if the form has loaded, once it has, clear the setInterval and do our form stuff
+        function checkLoaded(){
+            if($('#report-name').length > 0){
+                clearInterval(checkForm);
+                loadForm();
+            }
+        }
 
-    if(partialDeskproForm.data('action-value') !== undefined) {
-        var reportActionField = $('#report-action');
-        reportActionField
-            .val(partialDeskproForm.data('action-value'))
-            .closest('.form-group-compound')
-            .css(css);
-    }
+        // do our form stuff
+        function loadForm(){
+            // remove the links (as we are actioning them ourselves)
+            $('.report-error__toggle').remove();
+            // remove the copy which is not required
+            $('#report-error-partial-form > h2, #report-error-partial-form > p').remove();
 
-    if(partialDeskproForm.data('error-value') !== undefined) {
-        var reportErrorField = $('#report-error');
-        reportErrorField
-            .val(partialDeskproForm.data('error-value'))
-            .closest('.form-group-compound')
-            .css(css);
-    }
+            // pre-populate the action and error fields with our data
+            // delete the associated labels (so they don't get picked up by screen-readers)
+            // set the inputs to hidden
+            if(partialDeskproForm.data('action-value') !== undefined) {
+                 var reportActionField = $('#report-action');
+                 reportActionField
+                     .val(partialDeskproForm.data('action-value'))
+                     .attr('type','hidden');
+                 $('label[for="' + reportActionField.attr('id') + '"]').remove();
+             }
 
-    $(document.body).find('.report-error__content.js-hidden').removeClass('js-hidden');
+             if(partialDeskproForm.data('error-value') !== undefined) {
+                  var reportErrorField = $('#report-error');
+                  reportErrorField
+                      .val(partialDeskproForm.data('error-value'))
+                      .attr('type','hidden');
+                  $('label[for="' + reportErrorField.attr('id') + '"]').remove();
+              }
+        }
   }
 
   $('[data-gov-autocomplete]').each(function() {
