@@ -113,6 +113,71 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       doc.getElementById("registration-status").html() must include("Not supervised. Application withdrawn.")
     }
 
+    "contain correct content for status SubmissionDecisionRejected" in new ViewFixture {
+      def view = views.html.status.your_registration("",
+        Some("business Name"),
+        displayCheckOrUpdateLink = false,
+        yourRegistrationInfo = application_rejected(Some("business Name")),
+        registrationStatus = registration_status(status = SubmissionDecisionRejected),
+        unreadNotifications = 10,
+        feeInformation = HtmlFormat.empty)
+
+      doc.getElementById("application-rejected-description-1").text() must be("Your application to register with HMRC has been rejected.")
+      doc.getElementById("application-rejected-description-2").text() must be("Your business is not registered with HMRC. Your business must not carry out activities that are covered by the Money Laundering Regulations.")
+      doc.getElementById("new.application.button").attr("href") must be(controllers.routes.StatusController.newSubmission().url)
+      Option(doc.getElementById("update-information")) must be(None)
+      doc.getElementById("registration-status").html() must include("Not supervised. Application rejected.")
+    }
+
+    "contain correct content for status SubmissionDecisionRevoked" in new ViewFixture {
+      def view = views.html.status.your_registration("",
+        Some("business Name"),
+        displayCheckOrUpdateLink = false,
+        yourRegistrationInfo = application_revoked(Some("business Name")),
+        registrationStatus = registration_status(status = SubmissionDecisionRevoked),
+        unreadNotifications = 10,
+        feeInformation = HtmlFormat.empty)
+
+      doc.getElementById("application-revoked-description-1").text() must be("Your registration has been revoked.")
+      doc.getElementById("application-revoked-description-2").text() must be("Your business is not registered with HMRC. Your business must not carry out activities that are covered by the Money Laundering Regulations.")
+      doc.getElementById("new.application.button").attr("href") must be(controllers.routes.StatusController.newSubmission().url)
+      Option(doc.getElementById("update-information")) must be(None)
+      doc.getElementById("registration-status").html() must include("Not supervised. Registration revoked.")
+    }
+
+    "contain correct content for status SubmissionDecisionExpired" in new ViewFixture {
+      def view = views.html.status.your_registration("",
+        Some("business Name"),
+        displayCheckOrUpdateLink = false,
+        yourRegistrationInfo = application_expired(Some("business Name")),
+        registrationStatus = registration_status(status = SubmissionDecisionExpired),
+        unreadNotifications = 10,
+        feeInformation = HtmlFormat.empty)
+
+      doc.getElementById("application-expired-description-1").text() must be("Your registration has expired.")
+      doc.getElementById("application-expired-description-2").text() must be("Your business is not registered with HMRC under the Money Laundering Regulations.")
+      doc.getElementById("new.application.button").attr("href") must be(controllers.routes.StatusController.newSubmission().url)
+      Option(doc.getElementById("update-information")) must be(None)
+      doc.getElementById("registration-status").html() must include("Not supervised. Registration expired.")
+    }
+
+    "contain correct content for status DeRegistered" in new ViewFixture {
+      val deregistrationDate = Some(LocalDate.now())
+      def view = views.html.status.your_registration("",
+        Some("business Name"),
+        displayCheckOrUpdateLink = false,
+        yourRegistrationInfo = application_deregistered(Some("business Name")),
+        registrationStatus = registration_status(status = DeRegistered, endDate = deregistrationDate),
+        unreadNotifications = 10,
+        feeInformation = HtmlFormat.empty)
+
+      doc.getElementById("application-deregistered-description-1").text() must be("You have deregistered your business.")
+      doc.getElementById("application-deregistered-description-2").text() must be("Your business is not registered with HMRC under the Money Laundering Regulations.")
+      doc.getElementById("new.application.button").attr("href") must be(controllers.routes.StatusController.newSubmission().url)
+      Option(doc.getElementById("update-information")) must be(None)
+      doc.getElementById("registration-status").html() must include("Not supervised. Deregistered on " + DateHelper.formatDate(deregistrationDate.value) + ".")
+    }
+
     "contain registration information for status SubmissionReady" in new ViewFixture {
 
       def view = views.html.status.your_registration(amlsRegistrationNumber,
