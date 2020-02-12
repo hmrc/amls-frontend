@@ -223,11 +223,41 @@ class StatusController @Inject()(val landingService: LandingService,
       }
 
       case (SubmissionDecisionRejected, _) =>
-        Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
+        Ok {
+          your_registration(
+            regNo = "",
+            businessName = businessNameOption,
+            yourRegistrationInfo = application_rejected(businessNameOption),
+            displayCheckOrUpdateLink = false,
+            unreadNotifications = unreadNotifications,
+            registrationStatus = registration_status(
+              status = statusInfo._1),
+            feeInformation = HtmlFormat.empty)
+        }
       case (SubmissionDecisionRevoked, _) =>
-        Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
+        Ok {
+          your_registration(
+            regNo = "",
+            businessName = businessNameOption,
+            yourRegistrationInfo = application_revoked(businessNameOption),
+            displayCheckOrUpdateLink = false,
+            unreadNotifications = unreadNotifications,
+            registrationStatus = registration_status(
+              status = statusInfo._1),
+            feeInformation = HtmlFormat.empty)
+        }
       case (SubmissionDecisionExpired, _) =>
-        Ok(status_expired(mlrRegNumber.getOrElse(""), businessNameOption))
+        Ok {
+          your_registration(
+            regNo = "",
+            businessName = businessNameOption,
+            yourRegistrationInfo = application_expired(businessNameOption),
+            displayCheckOrUpdateLink = false,
+            unreadNotifications = unreadNotifications,
+            registrationStatus = registration_status(
+              status = statusInfo._1),
+            feeInformation = HtmlFormat.empty)
+        }
       case (SubmissionWithdrawn, _) => {
         Ok {
           your_registration(
@@ -247,7 +277,18 @@ class StatusController @Inject()(val landingService: LandingService,
           date <- info.deRegistrationDate
         } yield date
 
-        Ok(status_deregistered(businessNameOption, deregistrationDate))
+        Ok {
+          your_registration(
+            regNo = "",
+            businessName = businessNameOption,
+            yourRegistrationInfo = application_deregistered(businessNameOption),
+            displayCheckOrUpdateLink = false,
+            unreadNotifications = unreadNotifications,
+            registrationStatus = registration_status(
+              status = statusInfo._1,
+              endDate = deregistrationDate),
+            feeInformation = HtmlFormat.empty)
+        }
     }
   }
 
