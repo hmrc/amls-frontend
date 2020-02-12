@@ -2349,8 +2349,8 @@ msb.summary.ipsp-name = IPSP’s name
 msb.summary.ipsp-registration-number = IPSP’s Money Laundering Regulations registration number
 msb.ce.transactions.expected.in.12.months.title = How many currency exchange transactions do you expect in the next 12 months?
 msb.fx.transactions.expected.in.12.months.title = How many foreign exchange transactions do you expect in the next 12 months?
-msb.bank.names = Names of banks that supplied your foreign currency
-msb.wholesaler.names = Names of wholesalers that supplied your foreign currency
+msb.bank.names = Names of banks that will supply your foreign currency
+msb.wholesaler.names = Names of wholesalers that will supply your foreign currency
 msb.bank.names.hint = asd
 
 msb.services.title = Which money service business activities will you do?
