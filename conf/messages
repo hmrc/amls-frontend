@@ -1420,6 +1420,7 @@ tradingpremises.remove_reasons.agent.premises.lbl.03 = Lack of profit from agent
 tradingpremises.remove_reasons.agent.premises.lbl.04 = Agent ceased trading
 tradingpremises.remove_reasons.agent.premises.lbl.05 = Requested by agent
 tradingpremises.remove_reasons.agent.premises.lbl.06 = Other
+tradingpremises.remove_reasons.agent.premises.other.tag = Add the reason for removing this trading premises
 tradingpremises.remove_reasons.agent.other.missing = Enter a reason for removing this trading premises
 tradingpremises.remove_reasons.missing = Select one option to show why you’re removing this trading premises
 tradingpremises.confirmaddress.title = Is this your trading premises address?
