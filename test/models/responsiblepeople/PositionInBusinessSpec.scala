@@ -55,6 +55,16 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
         Invalid(Seq((Path \ "otherPosition") -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
     }
 
+    "fail to validate when 'other' is selected but white space 'other' value is given" in {
+      val form = Map(
+        "positions[0]" -> Seq("01"),
+        "positions[1]" -> Seq("other"),
+        "otherPosition" -> Seq(" "))
+
+      PositionWithinBusiness.positionsRule.validate(form) mustBe
+        Invalid(Seq((Path \ "otherPosition") -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
+    }
+
     "fail to validate when an invalid valid was given" in {
       val form = Map(
         "positions[0]" -> Seq("10")
