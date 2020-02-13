@@ -31,6 +31,8 @@
     heading = header
 ) {
 
+    <dl class="cya-summary-list">
+
     @model.services.map { a =>
         @checkYourAnswersRow(
             question = Messages("estateagentbusiness.services.title"),
@@ -97,6 +99,7 @@
         }
     }
 
+    </dl>
 
     @form(f, controllers.estateagentbusiness.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
