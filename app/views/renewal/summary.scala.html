@@ -216,10 +216,10 @@
                             editUrl = controllers.renewal.routes.MoneySourcesController.get(true).toString
                         ) {
                             @ms.bankMoneySource.map { bms =>
-                                <p>@Messages("msb.bank.names"): @bms.bankNames</p>
+                                <p>@Messages("renewal.msb.money_sources.bank"): @bms.bankNames</p>
                             }
                             @ms.wholesalerMoneySource.map { wms =>
-                                <p>@Messages("msb.wholesaler.names"): @wms.wholesalerNames</p>
+                                <p>@Messages("renewal.msb.money_sources.wholesaler"): @wms.wholesalerNames</p>
                             }
                             @ms.customerMoneySource.map { cms =>
                                 @if(cms) {

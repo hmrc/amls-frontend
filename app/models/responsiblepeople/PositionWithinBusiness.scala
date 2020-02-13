@@ -110,7 +110,10 @@ object PositionWithinBusiness
 
   private[responsiblepeople] val atLeastOneRule = minLengthR[Set[String]](1).withMessage("error.required.positionWithinBusiness")
   private val otherLength = 255
-  private val maxLengthRule = optionR(maxLength(otherLength) andThen basicPunctuationPattern())
+  private val maxLengthRule = optionR(
+    maxLength(otherLength).withMessage("error.invalid.rp.position_within_business.other_position.maxlength.255") andThen
+      basicPunctuationPattern().withMessage("error.invalid.rp.position_within_business.other_position")
+  )
 
   private[responsiblepeople] val fullySpecifiedRule = Rule[(Set[String], Option[String]), Set[PositionWithinBusiness]]  {
     case (s, None) if s.contains("other") =>

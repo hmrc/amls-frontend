@@ -72,7 +72,7 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
           "anotherBody" -> Seq("true"),
           "supervisorName" -> Seq("invalid {} <>"))
 
-        val expected = Invalid(Seq((Path \ "supervisorName") -> Seq(ValidationError("err.text.validation"))))
+        val expected = Invalid(Seq((Path \ "supervisorName") -> Seq(ValidationError("error.invalid.supervision.supervisor"))))
 
         AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
       }

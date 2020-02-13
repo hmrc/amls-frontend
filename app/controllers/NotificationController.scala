@@ -72,13 +72,13 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
       businessName <- BusinessName.getName(credId, Some(safeId), accountTypeId)
       records: Seq[NotificationRow] <- OptionT.liftF(amlsNotificationService.getNotifications(safeId, accountTypeId))
     } yield {
-      val currentRecords: Seq[NotificationRow] = (for {
+      val currentRecordsWithIndexes = (for {
         amls <- refNumber
-      } yield records.filter(_.amlsRegistrationNumber == amls)) getOrElse records
-      val previousRecords: Seq[NotificationRow] = (for {
+      } yield records.zipWithIndex.filter(_._1.amlsRegistrationNumber == amls)) getOrElse records.zipWithIndex
+      val previousRecordsWithIndexes = (for {
         amls <- refNumber
-      } yield records.filter(_.amlsRegistrationNumber != amls)) getOrElse Seq()
-      Ok(views.html.notifications.your_messages(businessName, currentRecords, previousRecords))
+      } yield records.zipWithIndex.filter(_._1.amlsRegistrationNumber != amls)) getOrElse Seq()
+      Ok(views.html.notifications.your_messages(businessName, currentRecordsWithIndexes, previousRecordsWithIndexes))
     }) getOrElse (throw new Exception("Cannot retrieve business name"))
   }
 

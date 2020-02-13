@@ -30,7 +30,10 @@ object DateOfBirth {
 
   implicit val formRule: Rule[UrlFormEncoded, DateOfBirth] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "dateOfBirth").read(localDateFutureRule).map(DateOfBirth.apply)
+    (__ \ "dateOfBirth").read(newAllowedPastAndFutureDateRule("error.rp.dob.required.date",
+      "error.rp.dob.invalid.date.after.1900",
+      "error.rp.dob.invalid.date.future",
+      "error.rp.dob.invalid.date.not.real")) map DateOfBirth.apply
   }
 
   implicit def formWrites = Write[DateOfBirth, UrlFormEncoded] { data =>

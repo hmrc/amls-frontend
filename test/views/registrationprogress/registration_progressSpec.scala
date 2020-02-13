@@ -24,6 +24,7 @@ import play.api.i18n.Messages
 import play.api.mvc.Call
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.registrationprogress._
 
 class registration_progressSpec extends AmlsViewSpec with MockitoSugar with AddressGenerator {
 
@@ -34,7 +35,7 @@ class registration_progressSpec extends AmlsViewSpec with MockitoSugar with Addr
     implicit val requestWithToken = addTokenForView()
 
     val sections = Seq(
-        Section("section1", Completed, true, mock[Call])
+      Section("section1", Completed, true, mock[Call])
     )
   }
 
@@ -42,7 +43,7 @@ class registration_progressSpec extends AmlsViewSpec with MockitoSugar with Addr
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.registrationprogress.registration_progress(sections, true, "biz name", Seq.empty[String], true)
+      def view = registration_progress(sections, true, "biz name", Seq.empty[String], true)
 
       doc.title must be(Messages("progress.title") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov"))
@@ -52,15 +53,50 @@ class registration_progressSpec extends AmlsViewSpec with MockitoSugar with Addr
     }
 
     "show the business name and services" in new ViewFixture {
-      def view = views.html.registrationprogress.registration_progress(sections, true, businessName, serviceNames, true)
-      val element = doc.getElementsByClass("business-info").first()
-      serviceNames.foreach(name => element.text() must include { name } )
+      def view = registration_progress(sections, true, businessName, serviceNames, true)
+
+      val element = doc.getElementsByClass("grid-layout")
+      serviceNames.foreach(name => element.text() must include {
+        name
+      })
     }
 
     "show the view details link under services section" in new ViewFixture {
-      def view = views.html.registrationprogress.registration_progress(sections, true, businessName, serviceNames, true)
+      def view = registration_progress(sections, true, businessName, serviceNames, true)
+
       val element = Option(doc.getElementById("view-details"))
       element mustNot be(None)
+    }
+
+    "show the Nominated officer box with correct title, name and link" in new ViewFixture {
+      def view = registration_progress(
+        sections = sections,
+        declarationAvailable = true,
+        businessName = businessName,
+        serviceNames = serviceNames,
+        canEditPreApplication = true,
+        hasCompleteNominatedOfficer = true,
+        nominatedOfficerName = Some("FirstName LastName"))
+
+      val element = doc.getElementById("nominated-officer")
+
+      element.getElementsByClass("heading-small").text() must be("Nominated officer")
+      element.html() must include("FirstName LastName")
+    }
+
+    "do not show the Nominated officer box if NO is not defined" in new ViewFixture {
+      def view = registration_progress(
+        sections = sections,
+        declarationAvailable = true,
+        businessName = businessName,
+        serviceNames = serviceNames,
+        canEditPreApplication = true,
+        hasCompleteNominatedOfficer = false,
+        nominatedOfficerName = None)
+
+      val element = Option(doc.getElementById("nominated-officer"))
+
+      element mustBe None
     }
   }
 }

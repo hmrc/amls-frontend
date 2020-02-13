@@ -92,7 +92,7 @@ class satisfaction_surveySpec extends AmlsViewSpec with MustMatchers with Mockit
 
     "Includes the correct sub and hint text" in new SatisfactionSurveyFixture {
       doc.select("#satisfaction > legend > span").text() mustBe Messages("survey.satisfaction.text.1")
-      doc.select("#details > legend > span").text() mustBe Messages("survey.satisfaction.text.2")
+      doc.select("#details-fieldset > legend > span").text() mustBe Messages("survey.satisfaction.text.2")
       doc.select("#details-hint").text() mustBe Messages("survey.satisfaction.hint")
     }
 

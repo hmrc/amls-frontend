@@ -27,7 +27,9 @@
     declarationAvailable: Boolean,
     businessName: String,
     serviceNames: Seq[String],
-    canEditPreApplication: Boolean
+    canEditPreApplication: Boolean,
+    hasCompleteNominatedOfficer: Boolean = false,
+    nominatedOfficerName: Option[String] = None
 )(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main2(
@@ -47,7 +49,7 @@ title = Messages("progress.title")
     </div>
 
     @* registration progress *@
-    @services_sidebar(canEditPreApplication, displayLink = true, businessName, serviceNames.toList.sorted)
+    @services_sidebar(canEditPreApplication, displayLink = true, businessName, serviceNames.toList.sorted, hasCompleteNominatedOfficer, nominatedOfficerName)
 
     @if(!declarationAvailable) {
         <div class="grid-layout grid-layout--stacked">

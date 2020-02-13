@@ -16,7 +16,7 @@
 
 @import config.{ ApplicationConfig}
 
-@(name: Option[String], id: Option[String]=Some("change-officer-change-link"))(implicit request: Request[_], m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(name: Option[String])(implicit request: Request[_], m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
-<p class="heading-small">@Messages("changeofficer.changelink.heading")</p>@name
-<p class="no-print"><a id="@id" href="@controllers.changeofficer.routes.StillEmployedController.get.url">@Messages("changeofficer.changelink.text")</a></p>
+<p class="heading-small">@Messages("changeofficer.changelink.heading")</p>
+ @name

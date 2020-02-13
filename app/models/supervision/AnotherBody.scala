@@ -63,8 +63,8 @@ object AnotherBody {
 
   private val supervisorRule = notEmptyStrip andThen
     notEmpty.withMessage("error.required.supervision.supervisor") andThen
-    maxLength(supervisorMaxLength).withMessage("error.invalid.supervision.supervisor") andThen
-    basicPunctuationPattern()
+    maxLength(supervisorMaxLength).withMessage("error.invalid.supervision.supervisor.length.140") andThen
+    basicPunctuationPattern().withMessage("error.invalid.supervision.supervisor")
 
   implicit val formRule: Rule[UrlFormEncoded, AnotherBody] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
