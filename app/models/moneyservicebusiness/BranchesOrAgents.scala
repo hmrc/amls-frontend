@@ -37,8 +37,7 @@ object BranchesOrAgents {
     Writes[BranchesOrAgents] {
       case BranchesOrAgents(BranchesOrAgentsHasCountries(hasCountries), None) =>
         Json.obj(
-          "hasCountries" -> hasCountries,
-          "countries" -> Seq[String]()
+          "hasCountries" -> hasCountries
         )
       case BranchesOrAgents(BranchesOrAgentsHasCountries(hasCountries), Some(BranchesOrAgentsWhichCountries(countries))) =>
         Json.obj(
