@@ -14,13 +14,8 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
-@import config.{ ApplicationConfig}
+@(businessName: Option[String])(implicit request: Request[_], m: Messages, lang: Lang)
 
-@()(implicit messages: Messages, request: Request[_])
-
-<p>@Messages("status.submissionreadyforreview.description.4")
- <a href="https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019">@Messages("status.submissionreadyforreview.description.4.link")</a>
- @Messages("full.stop")</p>
-
+<p id="incomplete-description">@Messages("status.incomplete.description")</p>
+<a id="return-to-saved-application" href="@controllers.routes.RegistrationProgressController.get()" class="button">@Messages("status.incomplete.buttontext")
+ @if(businessName.isDefined){<span class="visually-hidden"> for @businessName.get</span>}</a>

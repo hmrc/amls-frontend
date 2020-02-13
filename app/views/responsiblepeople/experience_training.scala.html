@@ -23,9 +23,19 @@
 
 @(f: Form2[_], businessMatching: BusinessMatching, edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
+@getErrorPlaceholder = {
+    @businessMatching.prefixedAlphabeticalBusinessTypes(false).map { types =>
+        @if(types.size > 1) {
+            @Messages("error.required.rp.experiencetraining.one")
+        } else {
+            @types.head
+        }
+    }
+}
+
 @header = {
     @components.back_link()
-    @errorSummary(f)
+    @errorSummaryWithPlaceholder(f, getErrorPlaceholder.toString())
 }
 
 @supportingContent = {
@@ -65,7 +75,8 @@
             section = "summary.responsiblepeople",
             heading = getServicesHeading.toString(),
             supportingContent = supportingContent,
-            panel = false
+            panel = false,
+            errorGroupPlaceholder = getErrorPlaceholder.toString()
         ) {
             @radio(
                 f = f("experienceTraining"),

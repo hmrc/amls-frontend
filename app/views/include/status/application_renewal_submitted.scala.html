@@ -14,14 +14,10 @@
  * limitations under the License.
  *@
 
-@import forms.Form2
-@import include._
-@import forms2._
+@import models.FeeResponse
+@import config.ApplicationConfig
 
-@()(implicit request: Request[_],m:Messages, lang: Lang)
+@()(implicit request: Request[_], m: Messages, lang: Lang)
 
-<h2 class="heading-medium no-margin">@Messages("status.renewalsubmitted.description")</h2>
-<p>@Messages("status.renewalsubmitted.description2")</p>
-<p>@Messages("status.renewalsubmitted.description3")</p>
-<p>@Messages("status.renewalsubmitted.description4")</p>
-<p>@Messages("status.renewalsubmitted.description5")</p>
+<p id="renewal-pending-description-1">@Messages("your.registration.status.renewal.pending.description.line1")</p>
+<p id="renewal-pending-description-2">@Messages("your.registration.status.renewal.pending.description.line2")</p>

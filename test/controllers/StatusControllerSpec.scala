@@ -23,6 +23,7 @@ import generators.PaymentGenerator
 import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
+import models.notifications.{IDType, NotificationRow}
 import models.registrationdetails.RegistrationDetails
 import models.renewal._
 import models.responsiblepeople.{PersonName, _}
@@ -41,7 +42,7 @@ import play.twirl.api.Html
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
@@ -67,7 +68,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       SuccessfulAuthAction,
       commonDependencies,
       mock[FeeResponseService],
-      mockMcc)
+      mockMcc,
+      mock[AmlsNotificationConnector])
 
     val controllerNoAmlsNumber = new StatusController(
       mock[LandingService],
@@ -82,7 +84,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       SuccessfulAuthActionNoAmlsRefNo,
       commonDependencies,
       mock[FeeResponseService],
-      mockMcc)
+      mockMcc,
+      mock[AmlsNotificationConnector])
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
     val rp1 = ResponsiblePerson(
@@ -128,6 +131,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
     when(controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any()))
       .thenReturn(Future.successful(Some(feeResponse)))
+
+    when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
+      .thenReturn(Future.successful(Seq()))
   }
 
   val feeResponse = FeeResponse(
@@ -219,7 +225,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.getElementById("status-incomplete-business-name").html() must be("Test Company")
+      document.getElementById("business-name").html() must include("Test Company")
     }
 
     "show correct content" when {
@@ -258,7 +264,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
           val result = controller.get()(request)
           status(result) must be(OK)
 
-          contentAsString(result) must include(Messages("status.submissionreadyforreview.description"))
+          contentAsString(result) must include("If you do not pay your fees within 28 days of submitting your application it will be rejected.")
         }
 
         "there is no ReadStatusResponse" in new Fixture {
@@ -274,7 +280,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(OK)
 
-          contentAsString(result) must include(Messages("status.submissionreadyforreview.description.no.fee"))
+          contentAsString(result) must include("If you do not pay your fees within 28 days of submitting your application it will be rejected.")
         }
       }
 
@@ -283,8 +289,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
@@ -427,12 +433,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         status(result) must be(OK)
 
         val html = contentAsString(result)
-        html must include(Messages("status.renewalsubmitted.description"))
-
-        val doc = Jsoup.parse(html)
-
-        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
-
+        html must include(Messages("your.registration.status.renewal.submitted"))
       }
 
       "application status is ReadyForRenewal, and the renewal has not been started" in new Fixture {
@@ -555,10 +556,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
         val html = contentAsString(result)
         html must include(Messages("status.renewalnotsubmitted.description"))
-
-        val doc = Jsoup.parse(html)
-        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
-
       }
     }
 
@@ -596,54 +593,23 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
         when(statusResponse.safeId).thenReturn(None)
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-          .thenReturn(
-            Some(BusinessMatching(Some(reviewDetails), None)))
-
-        when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
-
-        val result = controllerNoAmlsNumber.get()(request)
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("status.deregister.link-text")
-      }
-    }
-
-    "show the change officer link" when {
-      "application status is SubmissionDecisionApproved" in new Fixture {
+        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
-
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
-
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
-          Some(LocalDate.now.plusDays(30)), false)
-
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
-          .thenReturn(Future.successful((SubmissionDecisionApproved, Some(readStatusResponse))))
+          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
 
         val result = controller.get()(request)
-        status(result) must be(OK)
-
-        contentAsString(result) must include(Messages("status.submissiondecisionsupervised.heading"))
-        contentAsString(result) mustNot include(Messages("status.submissiondecisionsupervised.renewal.btn"))
-
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").asScala foreach {
-          _.text mustBe Messages("changeofficer.changelink.text")
-        }
+        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("your.registration.deregister.link")
       }
+    }
 
+    "show the change officer link" when {
       "application status is ReadyForRenewal" in new Fixture {
 
         when(controller.landingService.cacheMap(any[String])(any(), any()))
@@ -733,48 +699,48 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       }
     }
 
-    "have canCannotTradeContent method which" must {
+    "have canOrCannotTradeInformation method which" must {
       "return correct content if no msb or tcsp in BA" in new Fixture {
 
-        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
 
-        val result = controller invokePrivate canCannotTradeContent(noMsbNoTcsp, request)
+        val result = controller invokePrivate canOrCannotTradeInformation(noMsbNoTcsp, request)
 
         result.body must include("You can trade and carry out business activities while your application is pending")
       }
 
       "return correct content if msb only in BA" in new Fixture {
 
-        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
 
-        val result = controller invokePrivate canCannotTradeContent(onlyMsb, request)
+        val result = controller invokePrivate canOrCannotTradeInformation(onlyMsb, request)
 
         result.body must include("You cannot trade or carry out business activities while your application is pending")
       }
 
       "return correct content if tcsp only in BA" in new Fixture {
 
-        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
 
-        val result = controller invokePrivate canCannotTradeContent(onlyTcsp, request)
+        val result = controller invokePrivate canOrCannotTradeInformation(onlyTcsp, request)
 
         result.body must include("You cannot trade or carry out business activities while your application is pending")
       }
 
       "return correct content if tcsp and msb only in BA" in new Fixture {
 
-        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
 
-        val result = controller invokePrivate canCannotTradeContent(msbAndTcspOnly, request)
+        val result = controller invokePrivate canOrCannotTradeInformation(msbAndTcspOnly, request)
 
         result.body must include("You cannot trade or carry out business activities while your application is pending")
       }
 
       "return correct content if msb and other in BA" in new Fixture {
 
-        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
 
-        val result = controller invokePrivate canCannotTradeContent(msbAndOther, request)
+        val result = controller invokePrivate canOrCannotTradeInformation(msbAndOther, request)
 
         result.body must include("There are some services you cannot provide while your application is pending")
         result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
@@ -783,9 +749,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "return correct content if tcsp and other in BA" in new Fixture {
 
-        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
 
-        val result = controller invokePrivate canCannotTradeContent(tcspAndOther, request)
+        val result = controller invokePrivate canOrCannotTradeInformation(tcspAndOther, request)
 
         result.body must include("There are some services you cannot provide while your application is pending")
         result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
@@ -794,9 +760,9 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "return correct content if tcsp, msb and other in BA" in new Fixture {
 
-        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
 
-        val result = controller invokePrivate canCannotTradeContent(msbAndTcsp, request)
+        val result = controller invokePrivate canOrCannotTradeInformation(msbAndTcsp, request)
 
         result.body must include("There are some services you cannot provide while your application is pending")
         result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
@@ -805,13 +771,104 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "throw no match error if BA is empty" in new Fixture {
 
-        val canCannotTradeContent = PrivateMethod[Html]('canCannotTradeContent)
+        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
 
         val result = intercept[MatchError] {
-          controller invokePrivate canCannotTradeContent(Some(BusinessActivities(Set())), request)
+          controller invokePrivate canOrCannotTradeInformation(Some(BusinessActivities(Set())), request)
         }
 
         assert(result.getMessage.contains("Could not match activities against given options."))
+      }
+    }
+
+    "have countUnreadNotifications method which" must {
+      "return 0 if there is no amls ref number or safe id available" in new Fixture with FutureAssertions {
+
+        val result = controller.countUnreadNotifications(None, None, ("", ""))
+
+        result returns 0
+      }
+
+      "return 0 if there is amls ref number available but no notifications returned" in new Fixture with FutureAssertions {
+
+        when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
+          .thenReturn(Future.successful(Seq()))
+
+        val result = controller.countUnreadNotifications(Some(amlsRegistrationNumber), None, ("", ""))
+
+        result returns 0
+      }
+
+      "return 1 if there is amls ref number available and 1 unread notification" in new Fixture with FutureAssertions {
+
+        when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
+          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), false, amlsRegistrationNumber, "", IDType("")))))
+
+        val result = controller.countUnreadNotifications(Some(amlsRegistrationNumber), None, ("", ""))
+
+        result returns 1
+      }
+
+      "return 1 if there is amls ref number available and 1 unread notification and 1 read notification" in new Fixture with FutureAssertions {
+
+        when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
+          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), false, amlsRegistrationNumber, "", IDType("")),
+            NotificationRow(None, None, None, false, DateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
+
+        val result = controller.countUnreadNotifications(Some(amlsRegistrationNumber), None, ("", ""))
+
+        result returns 1
+      }
+
+      "return 0 if there is amls ref number available and 1 read notification" in new Fixture with FutureAssertions {
+
+        when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
+          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
+
+        val result = controller.countUnreadNotifications(Some(amlsRegistrationNumber), None, ("", ""))
+
+        result returns 0
+      }
+
+      "return 0 if there is safe id available but no notifications returned" in new Fixture with FutureAssertions {
+
+        when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
+          .thenReturn(Future.successful(Seq()))
+
+        val result = controller.countUnreadNotifications(None, Some("internalId"), ("", ""))
+
+        result returns 0
+      }
+
+      "return 1 if there is safe id available and 1 unread notification" in new Fixture with FutureAssertions {
+
+        when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
+          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), false, amlsRegistrationNumber, "", IDType("")))))
+
+        val result = controller.countUnreadNotifications(None, Some("internalId"), ("", ""))
+
+        result returns 1
+      }
+
+      "return 1 if there is safe id available and 1 unread notification and 1 read notification" in new Fixture with FutureAssertions {
+
+        when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
+          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), false, amlsRegistrationNumber, "", IDType("")),
+            NotificationRow(None, None, None, false, DateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
+
+        val result = controller.countUnreadNotifications(None, Some("internalId"), ("", ""))
+
+        result returns 1
+      }
+
+      "return 0 if there is safe id available and 1 read notification" in new Fixture with FutureAssertions {
+
+        when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
+          .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
+
+        val result = controller.countUnreadNotifications(None, Some("internalId"), ("", ""))
+
+        result returns 0
       }
     }
   }

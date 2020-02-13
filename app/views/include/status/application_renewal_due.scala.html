@@ -14,18 +14,13 @@
  * limitations under the License.
  *@
 
-@import include.forms2._
-@import forms.EmptyForm
+@import utils.DateHelper
+@import org.joda.time.LocalDate
 
-@()(implicit request: Request[_], messages: Messages)
-<p>@messages("status.submissiondecisionwithdrawn.description")</p>
-<p>@messages("status.submissiondecisionwithdrawn.description2")</p>
+@(businessName: Option[String], endDate: Option[LocalDate] = None)(implicit request: Request[_], m: Messages, lang: Lang)
 
-@form(EmptyForm, controllers.routes.StatusController.newSubmission()) {
-
-     @submit(
-        buttonMessageKey = Some("status.newsubmission.btn"),
-        returnLink = false,
-        buttonId = Some("new.application.button"),
-        gaTag = Some("new-application:click:withdrawn"))
+@endDate.map { date =>
+ <p>@Messages("status.renewal.due", DateHelper.formatDate(date))</p>
 }
+<a href="@controllers.renewal.routes.WhatYouNeedController.get()" id="start-renewal" class="button" type="submit">@Messages("status.renewal.due.start")
+ @if(businessName.isDefined){<span class="visually-hidden"> for @businessName.get</span>}</a>

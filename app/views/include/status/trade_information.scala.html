@@ -14,20 +14,12 @@
  * limitations under the License.
  *@
 
-@import forms.Form2
 @import include._
 @import forms2._
-@import models.FeeResponse
+@import config.{ ApplicationConfig}
 
-@(feeResponse: Option[FeeResponse])(implicit request: Request[_],m:Messages, lang: Lang)
+@()(implicit messages: Messages, request: Request[_])
 
-<p>@Messages("status.submissiondecisionapproved.description")</p>
-<p>@Messages("status.submissiondecisionapproved.description2")</p>
-
-@feeResponse.map {fee =>
-    @detailsSummary(
-        summary = Messages("status.fee.link")
-    ) {
-        @include.status.fee_details(fee)
-    }
-}
+@Messages("status.submissionreadyforreview.description.4")
+ <br />
+ <a href="https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019">@Messages("status.submissionreadyforreview.description.4.link")</a>

@@ -101,6 +101,7 @@ object FormTypes {
   val removeDashRule: Rule[String, String] = removeCharacterRule('-')
 
   def basicPunctuationPattern(msg: String = "err.text.validation") = regexWithMsg(basicPunctuationRegex, msg)
+
   val postcodePattern = regexWithMsg(postcodeRegex, "error.invalid.postcode")
 
   val referenceNumberRegex = """^[0-9]{8}|[a-zA-Z0-9]{15}$""".r
@@ -122,6 +123,10 @@ object FormTypes {
   private val vrnRegex = regexWithMsg(vrnTypeRegex, "error.invalid.vat.number")
 
   val vrnType = notEmptyStrip.withMessage("error.invalid.vat.number") andThen vrnRequired andThen
+    maxWithMsg(9, "error.invalid.vat.number.length") andThen
+    minWithMsg(9, "error.invalid.vat.number.length") andThen vrnRegex
+
+  val vrnTypeRp = notEmptyStrip.withMessage("error.rp.invalid.vat.number") andThen vrnRequired andThen
     maxWithMsg(9, "error.invalid.vat.number.length") andThen
     minWithMsg(9, "error.invalid.vat.number.length") andThen vrnRegex
 
@@ -150,16 +155,16 @@ object FormTypes {
   val nameRequired = required("error.required.yourname")
   val nameType = maxLength(nameMaxLength).withMessage("error.invalid.yourname")
 
-  private val phoneNumberRequired = required("error.required.phone.number")
-  private val phoneNumberLength = maxWithMsg(maxPhoneNumberLength, "error.max.length.phone")
-  private val phoneNumberPattern = regexWithMsg(phoneNumberRegex, "err.invalid.phone.number")
+  private def phoneNumberRequiredWithMessage(msg: String = "error.required.phone.number") = required(msg)
+  private def phoneNumberLengthWithMessage(msg: String = "error.max.length.phone") = maxWithMsg(maxPhoneNumberLength, msg)
+  private def phoneNumberPatternWithMessage(msg: String = "err.invalid.phone.number") = regexWithMsg(phoneNumberRegex, msg)
 
-  private val emailRequired = required("error.required.rp.email")
+  private def emailRequiredWithMessage(msg: String = "error.required.rp.email") = required(msg)
   private val confirmEmailRequired = required("error.required.email.reenter")
-  private val emailLength = maxWithMsg(maxEmailLength, "error.invalid.email.max.length")
+  private def emailLengthWithMessage(msg: String = "error.invalid.email.max.length") = maxWithMsg(maxEmailLength, msg)
 
   private val confirmEmailPattern = regexWithMsg(emailRegex, "error.invalid.email.reenter")
-  private val emailPattern = regexWithMsg(emailRegex, "error.required.rp.email")
+  private def emailPatternWithMessage(msg: String = "error.required.rp.email") = regexWithMsg(emailRegex, msg)
 
   private val dayRequired = required("error.required.tp.date")
   private val dayPattern = regexWithMsg(dayRegex, "error.invalid.tp.date")
@@ -171,13 +176,28 @@ object FormTypes {
   private val yearPatternPost1900 = regexWithMsg(yearRegexPost1900, "error.invalid.year.post1900")
   private val yearPattern = regexWithMsg(yearRegexFourDigits, "error.invalid.year")
 
-  val phoneNumberType = notEmptyStrip andThen phoneNumberRequired andThen phoneNumberLength andThen phoneNumberPattern
-  val emailType = emailRequired andThen emailLength andThen emailPattern
+  val phoneNumberType = notEmptyStrip andThen
+    phoneNumberRequiredWithMessage() andThen
+    phoneNumberLengthWithMessage() andThen
+    phoneNumberPatternWithMessage()
+
+  def phoneNumberTypeWithMessages(requiredMsg: String, invalidMsg: String) =
+    notEmptyStrip andThen phoneNumberRequiredWithMessage(requiredMsg) andThen
+      phoneNumberLengthWithMessage(invalidMsg) andThen
+      phoneNumberPatternWithMessage(invalidMsg)
+
+  def emailType = emailRequiredWithMessage() andThen emailLengthWithMessage() andThen emailPatternWithMessage()
+
+  def emailTypeWithMessages(requiredMsg: String, invalidLengthMsg: String, invalidMsg: String) =
+    emailRequiredWithMessage(requiredMsg) andThen
+      emailLengthWithMessage(invalidLengthMsg) andThen
+      emailPatternWithMessage(invalidMsg)
+
   val emailTypeBusinessDetails = required("error.required.email") andThen
     maxWithMsg(maxEmailLength, "error.invalid.email.max.length") andThen
     regexWithMsg(emailRegex, "error.invalid.email")
 
-  val confirmEmailType = confirmEmailRequired andThen emailLength andThen confirmEmailPattern
+  val confirmEmailType = confirmEmailRequired andThen emailLengthWithMessage() andThen confirmEmailPattern
   val dayType = dayRequired andThen dayPattern
   val monthType = monthRequired andThen monthPattern
   private val yearTypePost1900: Rule[String, String] = yearRequired andThen yearPatternPost1900
@@ -236,6 +256,14 @@ object FormTypes {
       ).tupled andThen dateRuleMapping(messagePrefix) andThen jodaLocalDateR("yyyy-MM-dd").withMessage("error.invalid.date.tp.not.real")
   }.repath(_ => Path)
 
+  def newLocalDateRuleWithPattern(messagePrefix: String, notRealDateMessage: String): Rule[UrlFormEncoded, LocalDate] = From[UrlFormEncoded] { __ =>
+    (
+      (__ \ "year").read[String] ~
+        (__ \ "month").read[String] ~
+        (__ \ "day").read[String]
+      ).tupled andThen dateRuleMapping(messagePrefix) andThen jodaLocalDateR("yyyy-MM-dd").withMessage(notRealDateMessage)
+  }.repath(_ => Path)
+
   def newLocalDateRuleWithPatternAgent(messagePrefix: String): Rule[UrlFormEncoded, LocalDate] = From[UrlFormEncoded] { __ =>
     (
       (__ \ "year").read[String] ~
@@ -278,13 +306,23 @@ object FormTypes {
   def supervisionEndDateRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "extraStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
-      (__ \ "endDate").read(localDateFutureRule)).tupled.andThen(supervisionEndDateRuleMapping).repath(_ => Path \ "endDate")
+      (__ \ "endDate").read(newAllowedPastAndFutureDateRule(
+        "error.supervision.end.required.date",
+        "error.supervision.end.invalid.date.after.1900",
+        "error.supervision.end.invalid.date.future",
+        "error.supervision.end.invalid.date.not.real"
+      ))).tupled.andThen(supervisionEndDateRuleMapping).repath(_ => Path \ "endDate")
   }
 
   def supervisionStartDateRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "extraEndDate").read(extraEndDateRule) ~
-      (__ \ "startDate").read(localDateFutureRule)).tupled.andThen(supervisionStartDateRuleMapping).repath(_ => Path \ "startDate")
+      (__ \ "startDate").read(newAllowedPastAndFutureDateRule(
+        "error.supervision.start.required.date",
+        "error.supervision.start.invalid.date.after.1900",
+        "error.supervision.start.invalid.date.future",
+        "error.supervision.start.invalid.date.not.real"
+      ))).tupled.andThen(supervisionStartDateRuleMapping).repath(_ => Path \ "startDate")
   }
 
   val endOfCenturyDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(new LocalDate(2099, 12, 31), "error.future.date")
@@ -294,7 +332,7 @@ object FormTypes {
   def pastStartDateRuleWithMsg1700(message: String): Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1700, 1, 1), message)
   val allowedPastAndFutureDateRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen endOfCenturyDateRule
 
-  def newAllowedPastAndFutureDateRule(messagePrefix: String = "", messagePast: String = "", messageFuture: String = ""): Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern(messagePrefix) andThen
+  def newAllowedPastAndFutureDateRule(messagePrefix: String = "", messagePast: String = "", messageFuture: String = "", messageNotReal: String = ""): Rule[UrlFormEncoded, LocalDate] = newLocalDateRuleWithPattern(messagePrefix, messageNotReal) andThen
     pastStartDateRuleWithMsg(messagePast) andThen
     maxDateWithMsg(LocalDate.now, messageFuture)
 

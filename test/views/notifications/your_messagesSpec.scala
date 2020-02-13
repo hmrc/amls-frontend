@@ -31,9 +31,9 @@ class your_messagesSpec extends AmlsViewSpec with MustMatchers  {
 
         implicit val requestWithToken = addTokenForView()
 
-        val emptyNotifications: Seq[NotificationRow] = Seq()
-        val notifications:Seq[NotificationRow] = Seq(
-            NotificationRow(
+        val emptyNotifications: Seq[(NotificationRow, Int)] = Seq()
+        val notifications: Seq[(NotificationRow, Int)] = Seq(
+            (NotificationRow(
                 Some(Status(Some(Approved), None)),
                 Some(RenewalApproval),
                 Some("123456789"),
@@ -43,8 +43,8 @@ class your_messagesSpec extends AmlsViewSpec with MustMatchers  {
                 "XAML00000123456",
                 "v1m0",
                 IDType("123")
-            ),
-            NotificationRow(
+            ), 0),
+            (NotificationRow(
                 Some(Status(Some(Approved), None)),
                 Some(RenewalApproval),
                 Some("123456789"),
@@ -54,8 +54,8 @@ class your_messagesSpec extends AmlsViewSpec with MustMatchers  {
                 "XAML00000123456",
                 "v1m0",
                 IDType("123")
-            ),
-            NotificationRow(
+            ), 1),
+            (NotificationRow(
                 Some(Status(Some(Rejected), None)),
                 Some(RenewalApproval),
                 Some("123456789"),
@@ -65,7 +65,7 @@ class your_messagesSpec extends AmlsViewSpec with MustMatchers  {
                 "XAML00000123456",
                 "v1m0",
                 IDType("123")
-            )
+            ), 2)
         )
 
         val businessName = "Fake Name Ltd."
@@ -120,21 +120,21 @@ class your_messagesSpec extends AmlsViewSpec with MustMatchers  {
                 "display the subject of the notification" in new CurrentNotificationsOnlyViewFixture {
                     val tableRows = doc.getElementById("current-application-notifications").getElementsByClass("message-inbox__list-item")
                     notifications.indices foreach { i =>
-                        tableRows.get(i).text must include(Messages(notifications(i).subject))
+                        tableRows.get(i).text must include(Messages(notifications(i)._1.subject))
                     }
                 }
 
                 "display the type of the notification" in new CurrentNotificationsOnlyViewFixture {
                     val tableRows = doc.getElementById("current-application-notifications").getElementsByClass("message-inbox__list-item")
                     notifications.indices foreach { i =>
-                        tableRows.get(i).text must include(Messages(notifications(i).notificationType))
+                        tableRows.get(i).text must include(Messages(notifications(i)._1.notificationType))
                     }
                 }
 
                 "display the date of the notification" in new CurrentNotificationsOnlyViewFixture {
                     val tableRows = doc.getElementById("current-application-notifications").getElementsByClass("message-inbox__list-item")
                     notifications.indices foreach { i =>
-                        tableRows.get(i).text must include(notifications(i).dateReceived)
+                        tableRows.get(i).text must include(notifications(i)._1.dateReceived)
                     }
                 }
             }
@@ -175,21 +175,21 @@ class your_messagesSpec extends AmlsViewSpec with MustMatchers  {
                 "display the subject of the notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
                     val tableRows = doc.getElementById("previous-application-notifications").getElementsByClass("message-inbox__list-item")
                     notifications.indices foreach { i =>
-                        tableRows.get(i).text must include(Messages(notifications(i).subject))
+                        tableRows.get(i).text must include(Messages(notifications(i)._1.subject))
                     }
                 }
 
                 "display the type of the notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
                     val tableRows = doc.getElementById("previous-application-notifications").getElementsByClass("message-inbox__list-item")
                     notifications.indices foreach { i =>
-                        tableRows.get(i).text must include(Messages(notifications(i).notificationType))
+                        tableRows.get(i).text must include(Messages(notifications(i)._1.notificationType))
                     }
                 }
 
                 "display the date of the notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
                     val tableRows = doc.getElementById("previous-application-notifications").getElementsByClass("message-inbox__list-item")
                     notifications.indices foreach { i =>
-                        tableRows.get(i).text must include(notifications(i).dateReceived)
+                        tableRows.get(i).text must include(notifications(i)._1.dateReceived)
                     }
                 }
 

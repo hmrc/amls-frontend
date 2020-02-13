@@ -33,17 +33,17 @@ object NonUKPassport {
   import jto.validation.forms.Rules._
   import utils.MappingUtils.Implicits._
 
-  private val nonUKPassportRequired = required("error.required.non.uk.passport")
-  private val nonUkPassportLength = maxWithMsg(maxNonUKPassportLength, "error.invalid.non.uk.passport")
+  private val nonUKPassportRequired = required("error.required.non.uk.passport.number")
+  private val nonUkPassportLength = maxWithMsg(maxNonUKPassportLength, "error.invalid.non.uk.passport.number.length.40")
 
   val noUKPassportType = notEmptyStrip andThen
     nonUKPassportRequired andThen
     nonUkPassportLength andThen
-    basicPunctuationPattern("error.invalid.non.uk.passport")
+    basicPunctuationPattern("error.invalid.non.uk.passport.number")
 
   implicit val formRule: Rule[UrlFormEncoded, NonUKPassport] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "nonUKPassport").read[Boolean].withMessage("error.required.select.non.uk.passport") flatMap {
+    (__ \ "nonUKPassport").read[Boolean].withMessage("error.required.non.uk.passport") flatMap {
       case true =>
         (__ \ "nonUKPassportNumber").read(noUKPassportType) map (NonUKPassportYes apply _)
       case false => Rule.fromMapping { _ => Valid(NoPassport) }

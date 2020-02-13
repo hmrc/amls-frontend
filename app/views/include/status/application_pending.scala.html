@@ -14,11 +14,15 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
-@import config.{ ApplicationConfig}
+@import models.FeeResponse
+@import config.ApplicationConfig
 
-@()(implicit messages: Messages, request: Request[_])
+@()(implicit request: Request[_], m: Messages, lang: Lang)
 
-<p>@Messages("status.submissionreadyforreview.description.4.msb.or.tcsp")</p>
-
+<p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
+<ul class="list list-bullet">
+    <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
+    <li>@Messages("status.submissionreadyforreview.description.2.listline2")</li>
+    <li>@Messages("status.submissionreadyforreview.description.2.listline3")</li>
+</ul>
+<p>@Messages("status.submissionreadyforreview.description.3")</p>

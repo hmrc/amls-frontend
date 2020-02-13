@@ -48,7 +48,7 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
         "otherCountry" -> Seq("")
       )
       Nationality.formRule.validate(urlFormEncoded) must be(Invalid(Seq(
-        (Path \ "otherCountry") -> Seq(ValidationError("error.required.country"))
+        (Path \ "otherCountry") -> Seq(ValidationError("error.required.rp.nationality.country"))
       )))
     }
 
@@ -58,7 +58,7 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
         "otherCountry" -> Seq("invalid")
       )
       Nationality.formRule.validate(urlFormEncoded) must be(Invalid(Seq(
-        (Path \ "otherCountry") -> Seq(ValidationError("error.invalid.country"))
+        (Path \ "otherCountry") -> Seq(ValidationError("error.invalid.rp.nationality.country"))
       )))
     }
 

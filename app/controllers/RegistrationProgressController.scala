@@ -23,13 +23,14 @@ import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivity, BusinessMatching}
 import models.registrationprogress.{Completed, Section}
 import models.renewal.Renewal
+import models.responsiblepeople.ResponsiblePerson
 import models.status._
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import services.{AuthEnrolmentsService, ProgressService, RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthAction, DeclarationHelper}
+import utils.{AuthAction, ControllerHelper, DeclarationHelper}
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
 
@@ -58,6 +59,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
               status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
               cacheMap <- OptionT(dataCache.fetchAll(request.credId))
               completePreApp <- OptionT(preApplicationComplete(cacheMap, status, request.amlsRefNumber))
+              responsiblePeople <- OptionT.fromOption[Future](cacheMap.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
               businessMatching <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
               newActivities <- getNewActivities(request.credId) orElse OptionT.some(Set.empty[BusinessActivity])
             } yield {
@@ -67,6 +69,8 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                 val sectionsToDisplay = sections.filter(s => s.name != BusinessMatching.messageKey) diff newSections
                 val canEditPreapplication = Set(NotCompleted, SubmissionReady, SubmissionDecisionApproved).contains(status)
                 val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage()).toSeq)
+                val hasCompleteNominatedOfficer = ControllerHelper.hasCompleteNominatedOfficer(Option(responsiblePeople))
+                val nominatedOfficerName = ControllerHelper.completeNominatedOfficerTitleName(Option(responsiblePeople))
 
                 completePreApp match {
                   case true => Ok(registration_amendment(
@@ -75,14 +79,18 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                     reviewDetails.businessName,
                     activities,
                     canEditPreapplication,
-                    Some(newSections)
+                    Some(newSections),
+                    hasCompleteNominatedOfficer,
+                    nominatedOfficerName
                   ))
                   case _ => Ok(registration_progress(
                     sectionsToDisplay,
                     declarationAvailable(sections),
                     reviewDetails.businessName,
                     activities,
-                    canEditPreapplication
+                    canEditPreapplication,
+                    hasCompleteNominatedOfficer,
+                    nominatedOfficerName
                   ))
                 }
               } getOrElse InternalServerError("Unable to retrieve the business details")

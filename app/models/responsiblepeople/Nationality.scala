@@ -16,7 +16,8 @@
 
 package models.responsiblepeople
 
-import models.Country
+import cats.data.Validated.{Invalid, Valid}
+import models.{Country, countries}
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
@@ -32,13 +33,26 @@ object Nationality {
 
   import utils.MappingUtils.Implicits._
 
+  val validateCountry: Rule[String, Country] = {
+    Rule {
+      case "" => Invalid(Seq(Path -> Seq(ValidationError("error.required.rp.nationality.country"))))
+      case code =>
+        countries.collectFirst {
+          case e @ Country(_, c) if c == code =>
+            Valid(e)
+        } getOrElse {
+          Invalid(Seq(Path -> Seq(ValidationError("error.invalid.rp.nationality.country"))))
+        }
+    }
+  }
+
   implicit val formRule: Rule[UrlFormEncoded, Nationality] =
     From[UrlFormEncoded] { readerURLFormEncoded =>
       import jto.validation.forms.Rules._
       (readerURLFormEncoded \ "nationality").read[String].withMessage("error.required.nationality") flatMap {
         case "01" => British
         case "02" =>
-          (readerURLFormEncoded \ "otherCountry").read[Country] map OtherCountry.apply
+          (readerURLFormEncoded \ "otherCountry").read(validateCountry) map OtherCountry.apply
         case _ =>
           (Path \ "nationality") -> Seq(ValidationError("error.invalid"))
       }

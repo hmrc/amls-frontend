@@ -63,7 +63,7 @@ class ProfessionalBodiesSpec extends PlaySpec with AmlsSpec {
         )
 
         ProfessionalBodies.formRule.validate(model) must
-          be(Invalid(List((Path \ "specifyOtherBusiness", Seq(ValidationError("error.invalid.supervision.business.details"))))))
+          be(Invalid(List((Path \ "specifyOtherBusiness", Seq(ValidationError("error.invalid.supervision.business.details.length.255"))))))
       }
 
       "businessType[] is empty" in {
@@ -102,7 +102,7 @@ class ProfessionalBodiesSpec extends PlaySpec with AmlsSpec {
         )
 
         ProfessionalBodies.formRule.validate(model) must
-          be(Invalid(Seq((Path \ "specifyOtherBusiness", Seq(ValidationError("err.text.validation"))))))
+          be(Invalid(Seq((Path \ "specifyOtherBusiness", Seq(ValidationError("error.invalid.supervision.business.details"))))))
       }
 
     }

@@ -31,8 +31,8 @@ object SupervisionEndReasons {
   private val reasonMaxLength = 255
 
   private val reasonRule = notEmptyStrip andThen notEmpty.withMessage("error.required.supervision.reason") andThen
-    maxLength(reasonMaxLength).withMessage("error.invalid.maxlength.255") andThen
-    basicPunctuationPattern()
+    maxLength(reasonMaxLength).withMessage("error.supervision.end.reason.invalid.maxlength.255") andThen
+    basicPunctuationPattern().withMessage("error.supervision.end.reason.invalid")
 
   implicit val formRule: Rule[UrlFormEncoded, SupervisionEndReasons] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
