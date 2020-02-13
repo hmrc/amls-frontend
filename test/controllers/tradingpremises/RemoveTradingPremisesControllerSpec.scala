@@ -263,7 +263,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
           )))(any(), any())
         }
 
-        "removing a trading premises from an application with status SubmissionReadyForReview" in new Fixture {
+        "removing a trading premises (with line id) from an application with status SubmissionReadyForReview" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
           val newRequest = requestWithUrlEncodedBody(
