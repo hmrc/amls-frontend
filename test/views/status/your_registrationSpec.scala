@@ -20,7 +20,7 @@ import forms.EmptyForm
 import generators.AmlsReferenceNumberGenerator
 import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
-import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.status._
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -28,7 +28,7 @@ import play.api.mvc.Call
 import play.twirl.api.{Html, HtmlFormat}
 import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
-import views.html.include.status.{application_incomplete, application_submission_ready}
+import views.html.include.status._
 import views.html.status.components.{fee_information, registration_status, withdraw_or_deregister_information}
 
 class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator {
@@ -97,6 +97,22 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       doc.getElementById("return-to-saved-application").attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
     }
 
+    "contain correct content for status SubmissionWithdrawn" in new ViewFixture {
+      def view = views.html.status.your_registration("",
+        Some("business Name"),
+        displayCheckOrUpdateLink = false,
+        yourRegistrationInfo = application_withdrawn(Some("business Name")),
+        registrationStatus = registration_status(status = SubmissionWithdrawn),
+        unreadNotifications = 10,
+        feeInformation = HtmlFormat.empty)
+
+      doc.getElementById("application-withdrawn-description-1").text() must be("You have withdrawn your application to register with HMRC.")
+      doc.getElementById("application-withdrawn-description-2").text() must be("Your business is not registered with HMRC under the Money Laundering Regulations.")
+      doc.getElementById("new.application.button").attr("href") must be(controllers.routes.StatusController.newSubmission().url)
+      Option(doc.getElementById("update-information")) must be(None)
+      doc.getElementById("registration-status").html() must include("Not supervised. Application withdrawn.")
+    }
+
     "contain registration information for status SubmissionReady" in new ViewFixture {
 
       def view = views.html.status.your_registration(amlsRegistrationNumber,
@@ -110,6 +126,77 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       doc.getElementById("status-submit").html() must include("Check and submit your application")
       doc.getElementById("status-submit").html() must include("for business Name")
       doc.getElementById("status-submit").attr("href") must be("/some/url")
+    }
+
+    "contain correct content for renewal statuses" when {
+      "renewal section is complete" in new ViewFixture {
+        val renewalDate = Some(LocalDate.now())
+        val businessName = "business Name"
+
+        def view = views.html.status.your_registration(amlsRegistrationNumber,
+          Some(businessName),
+          yourRegistrationInfo = application_renewal_submission_ready(Some(businessName)),
+          unreadNotifications = 10,
+          registrationStatus = registration_status(Some(amlsRegistrationNumber), ReadyForRenewal(renewalDate), endDate = renewalDate),
+          feeInformation = fee_information(ReadyForRenewal(renewalDate)))
+
+        doc.getElementById("registration-info").html() must include("You have completed your renewal but have not submitted it. If you do not submit your renewal, your registration with HMRC will expire.")
+        doc.getElementById("go-to-about-your-business").html() must include("Check business information and submit renewal")
+        doc.getElementById("go-to-about-your-business").html() must include("for business Name")
+        doc.getElementById("go-to-about-your-business").attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
+      }
+
+      "renewal section is incomplete" in new ViewFixture {
+        val renewalDate = Some(LocalDate.now())
+        val businessName = "business Name"
+
+        def view = views.html.status.your_registration(amlsRegistrationNumber,
+          Some(businessName),
+          yourRegistrationInfo = application_renewal_incomplete(Some(businessName)),
+          unreadNotifications = 10,
+          registrationStatus = registration_status(Some(amlsRegistrationNumber), ReadyForRenewal(renewalDate), endDate = renewalDate),
+          feeInformation = fee_information(ReadyForRenewal(renewalDate)))
+
+        doc.getElementById("registration-info").html() must include("You have started your renewal but have not completed it. If you do not submit your renewal, your registration with HMRC will expire.")
+        doc.getElementById("continue-renewal").html() must include("Return to your renewal")
+        doc.getElementById("continue-renewal").html() must include("for business Name")
+        doc.getElementById("continue-renewal").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
+      }
+
+      "renewal section is not started (due)" in new ViewFixture {
+        val renewalDate = Some(LocalDate.now())
+        val businessName = "business Name"
+
+        def view = views.html.status.your_registration(amlsRegistrationNumber,
+          Some(businessName),
+          yourRegistrationInfo = application_renewal_due(Some(businessName), renewalDate),
+          unreadNotifications = 10,
+          registrationStatus = registration_status(Some(amlsRegistrationNumber), ReadyForRenewal(renewalDate), endDate = renewalDate),
+          feeInformation = fee_information(ReadyForRenewal(renewalDate)))
+
+        doc.getElementById("registration-info").html() must include("Your registration with HMRC will expire on " + DateHelper.formatDate(renewalDate.get) + " unless you renew.")
+        doc.getElementById("start-renewal").html() must include("Start your renewal")
+        doc.getElementById("start-renewal").html() must include("for business Name")
+        doc.getElementById("start-renewal").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
+      }
+
+      "renewal is submitted" in new ViewFixture {
+        val renewalDate = Some(LocalDate.now())
+        val businessName = "business Name"
+
+        def view = views.html.status.your_registration(amlsRegistrationNumber,
+          Some(businessName),
+          yourRegistrationInfo = application_renewal_submitted(),
+          unreadNotifications = 10,
+          registrationStatus = registration_status(Some(amlsRegistrationNumber), RenewalSubmitted(renewalDate), endDate = renewalDate),
+          feeInformation = fee_information(RenewalSubmitted(renewalDate)))
+
+        doc.getElementById("renewal-pending-description-1").text() must be("You have submitted your renewal. HMRC will review your renewal after we have received payment.")
+        doc.getElementById("renewal-pending-description-2").text() must be("We’ll email you when we have made a decision.")
+        doc.getElementById("registration-status").html() must include("Supervised. Renewal submitted.")
+        doc.getElementById("registration-status").html() must include(s"Registration number $amlsRegistrationNumber.")
+        doc.getElementById("fees").getElementsMatchingOwnText("How to pay your fees").attr("href") must be("how-to-pay")
+      }
     }
 
     "contain your business information cell with right content" in new ViewFixture {

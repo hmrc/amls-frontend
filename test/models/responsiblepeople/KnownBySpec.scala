@@ -77,7 +77,7 @@ class KnownBySpec extends PlaySpec with MockitoSugar {
 
         KnownBy.formRule.validate(data) must
           equal(Invalid(Seq(
-            (Path \ "otherNames") -> Seq(ValidationError("error.invalid.maxlength.140"))
+            (Path \ "otherNames") -> Seq(ValidationError("error.invalid.rp.maxlength.140"))
           )))
       }
 
@@ -88,7 +88,7 @@ class KnownBySpec extends PlaySpec with MockitoSugar {
           "otherNames" -> Seq("($£*£$:?/{")
         )) must
           equal(Invalid(Seq(
-            (Path \ "otherNames") -> Seq(ValidationError("err.text.validation"))
+            (Path \ "otherNames") -> Seq(ValidationError("error.invalid.rp.char"))
           )))
       }
 

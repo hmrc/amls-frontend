@@ -86,9 +86,9 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
 
         PersonName.formRule.validate(data) must
           equal(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.length")),
-            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.length")),
-            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.length"))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.rp.first_name.length")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.rp.middle_name.length")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.rp.last_name.length"))
           )))
       }
 
@@ -101,9 +101,9 @@ class PersonNameSpec extends PlaySpec with MockitoSugar {
           "lastName" -> Seq("9*£@$")
         )) must
           equal(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.invalid.common_name.validation")),
-            (Path \ "middleName") -> Seq(ValidationError("error.invalid.common_name.validation")),
-            (Path \ "lastName") -> Seq(ValidationError("error.invalid.common_name.validation"))
+            (Path \ "firstName") -> Seq(ValidationError("error.invalid.rp.first_name.validation")),
+            (Path \ "middleName") -> Seq(ValidationError("error.invalid.rp.middle_name.validation")),
+            (Path \ "lastName") -> Seq(ValidationError("error.invalid.rp.last_name.validation"))
           )))
       }
 

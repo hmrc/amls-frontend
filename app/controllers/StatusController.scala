@@ -120,8 +120,20 @@ class StatusController @Inject()(val landingService: LandingService,
            (SubmissionWithdrawn, _) | (DeRegistered, _) =>
         Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, accountTypeId, unreadNotifications))
       case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
-        getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, cacheId)
-      case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
+        getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, cacheId, unreadNotifications)
+      case (_, _) => Future.successful(
+        Ok(your_registration(
+          regNo = mlrRegNumber.getOrElse(""),
+          businessName = businessNameOption,
+          yourRegistrationInfo = application_incomplete(businessNameOption),
+          unreadNotifications = unreadNotifications,
+          registrationStatus = registration_status(
+            amlsRegNo = mlrRegNumber,
+            status = statusInfo._1
+          ),
+          feeInformation = HtmlFormat.empty
+        ))
+      )
     }
   }
 
@@ -148,7 +160,8 @@ class StatusController @Inject()(val landingService: LandingService,
             status = status
           ),
           feeInformation = HtmlFormat.empty
-        )))
+        ))
+      )
       case SubmissionReady => {
         OptionT(progressService.getSubmitRedirect(mlrRegNumber, accountTypeId, cacheId)) map (
           url =>
@@ -170,7 +183,6 @@ class StatusController @Inject()(val landingService: LandingService,
           Ok(your_registration(
             regNo = mlrRegNumber.getOrElse(""),
             businessName = businessNameOption,
-            fromDuplicateSubmission = fromDuplicateSubmission,
             yourRegistrationInfo = application_pending(),
             unreadNotifications = unreadNotifications,
             displayContactLink = true,
@@ -216,8 +228,19 @@ class StatusController @Inject()(val landingService: LandingService,
         Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
       case (SubmissionDecisionExpired, _) =>
         Ok(status_expired(mlrRegNumber.getOrElse(""), businessNameOption))
-      case (SubmissionWithdrawn, _) =>
-        Ok(status_withdrawn(businessNameOption))
+      case (SubmissionWithdrawn, _) => {
+        Ok {
+          your_registration(
+            regNo = "",
+            businessName = businessNameOption,
+            yourRegistrationInfo = application_withdrawn(businessNameOption),
+            displayCheckOrUpdateLink = false,
+            unreadNotifications = unreadNotifications,
+            registrationStatus = registration_status(
+              status = statusInfo._1),
+            feeInformation = HtmlFormat.empty)
+        }
+      }
       case (DeRegistered, _) =>
         val deregistrationDate = for {
           info <- statusInfo._2
@@ -233,45 +256,78 @@ class StatusController @Inject()(val landingService: LandingService,
                                  businessNameOption: Option[String],
                                  responsiblePeople: Option[Seq[ResponsiblePerson]],
                                  maybeActivities: Option[BusinessActivities],
-                                 cacheId: String)
+                                 cacheId: String,
+                                 unreadNotifications: Int)
                                 (implicit request: Request[AnyContent]) = {
 
     val activities = maybeActivities.map(_.businessActivities.map(_.getMessage())) getOrElse Set.empty
 
     statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>
-        Future.successful(Ok(status_renewal_submitted(
-          mlrRegNumber.getOrElse(""),
-          businessNameOption,
-          renewalDate,
-          ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
-        )))
+        Future.successful(
+          Ok(
+            your_registration(
+              regNo = mlrRegNumber.getOrElse(""),
+              businessName = businessNameOption,
+              yourRegistrationInfo = application_renewal_submitted(),
+              unreadNotifications = unreadNotifications,
+              registrationStatus = registration_status(
+                amlsRegNo = mlrRegNumber,
+                status = statusInfo._1,
+                endDate = renewalDate),
+              feeInformation = fee_information(statusInfo._1))
+          )
+        )
       case (ReadyForRenewal(renewalDate), _) => {
         renewalService.getRenewal(cacheId) flatMap {
           case Some(renewal) =>
             renewalService.isRenewalComplete(renewal, cacheId) flatMap { complete =>
               if (complete) {
-                Future.successful(Ok(status_renewal_not_submitted(
-                  mlrRegNumber.getOrElse(""),
-                  businessNameOption,
-                  renewalDate,
-                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
-                )))
+                Future.successful(
+                  Ok(
+                    your_registration(
+                      regNo = mlrRegNumber.getOrElse(""),
+                      businessName = businessNameOption,
+                      yourRegistrationInfo = application_renewal_submission_ready(businessNameOption),
+                      unreadNotifications = unreadNotifications,
+                      registrationStatus = registration_status(
+                        amlsRegNo = mlrRegNumber,
+                        status = statusInfo._1,
+                        endDate = renewalDate),
+                      feeInformation = fee_information(statusInfo._1))
+                  )
+                )
               } else {
-                Future.successful(Ok(status_renewal_incomplete(
-                  mlrRegNumber.getOrElse(""),
-                  businessNameOption,
-                  renewalDate,
-                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople))))
+                Future.successful(
+                  Ok(
+                    your_registration(
+                      regNo = mlrRegNumber.getOrElse(""),
+                      businessName = businessNameOption,
+                      yourRegistrationInfo = application_renewal_incomplete(businessNameOption),
+                      unreadNotifications = unreadNotifications,
+                      registrationStatus = registration_status(
+                        amlsRegNo = mlrRegNumber,
+                        status = statusInfo._1,
+                        endDate = renewalDate),
+                      feeInformation = fee_information(statusInfo._1))
+                  )
+                )
               }
             }
-          case _ => Future.successful(Ok(
-            status_supervised(mlrRegNumber.getOrElse(""),
-              businessNameOption,
-              renewalDate,
-              true,
-              ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-              activities)))
+          case _ => Future.successful(
+            Ok {
+            your_registration(
+              regNo = mlrRegNumber.getOrElse(""),
+              businessName = businessNameOption,
+              yourRegistrationInfo = application_renewal_due(businessNameOption, renewalDate),
+              unreadNotifications = unreadNotifications,
+              registrationStatus = registration_status(
+                amlsRegNo = mlrRegNumber,
+                status = statusInfo._1,
+                endDate = renewalDate),
+              feeInformation = fee_information(statusInfo._1),
+              withdrawOrDeregisterInformation = withdraw_or_deregister_information(statusInfo._1))
+          })
         }
       }
     }

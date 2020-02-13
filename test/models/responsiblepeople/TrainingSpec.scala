@@ -87,7 +87,7 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
 
         Training.formRule.validate(data) must
           be(Invalid(Seq(
-            (Path \ "information") -> Seq(ValidationError("error.invalid.maxlength.255"))
+            (Path \ "information") -> Seq(ValidationError("error.rp.invalid.training.information.maxlength.255"))
           )))
       }
       "given an `Yes` with invalid characters" in {
@@ -99,7 +99,7 @@ class TrainingSpec extends PlaySpec with MockitoSugar {
 
         Training.formRule.validate(data) must
           be(Invalid(Seq(
-            (Path \ "information") -> Seq(ValidationError("err.text.validation"))
+            (Path \ "information") -> Seq(ValidationError("error.rp.invalid.training.information"))
           )))
       }
     }

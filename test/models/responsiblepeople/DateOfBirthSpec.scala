@@ -50,61 +50,110 @@ class DateOfBirthSpec extends PlaySpec {
         ))
     }
 
-    "throw error message" when {
-      "day entered is invalid" in {
-        val errorDayModel = Map(
-          "dateOfBirth.day" -> Seq("2466"),
-          "dateOfBirth.month" -> Seq("2"),
-          "dateOfBirth.year" -> Seq("1990")
-        )
+    "fail validation" when {
+      "required fields are missing" when {
+        "nothing has been selected" in {
 
-        DateOfBirth.formRule.validate(errorDayModel) must be(
-          Invalid(Seq(Path \ "dateOfBirth" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          DateOfBirth.formRule.validate(Map(
+            "dateOfBirth.year" -> Seq(""),
+            "dateOfBirth.month" -> Seq(""),
+            "dateOfBirth.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "dateOfBirth") -> Seq(ValidationError("error.rp.dob.required.date.year.month.day"))
+          )))
+        }
+
+        "day is missing" in {
+          DateOfBirth.formRule.validate(Map(
+            "dateOfBirth.year" -> Seq("2020"),
+            "dateOfBirth.month" -> Seq("01"),
+            "dateOfBirth.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "dateOfBirth") -> Seq(ValidationError("error.rp.dob.required.date.day"))
+          )))
+        }
+
+        "month is missing" in {
+          DateOfBirth.formRule.validate(Map(
+            "dateOfBirth.year" -> Seq("2020"),
+            "dateOfBirth.month" -> Seq(""),
+            "dateOfBirth.day" -> Seq("01")
+          )) must equal(Invalid(Seq(
+            (Path \ "dateOfBirth") -> Seq(ValidationError("error.rp.dob.required.date.month"))
+          )))
+        }
+
+        "year is missing" in {
+          DateOfBirth.formRule.validate(Map(
+            "dateOfBirth.year" -> Seq(""),
+            "dateOfBirth.month" -> Seq("01"),
+            "dateOfBirth.day" -> Seq("01")
+          )) must equal(Invalid(Seq(
+            (Path \ "dateOfBirth") -> Seq(ValidationError("error.rp.dob.required.date.year"))
+          )))
+        }
+
+        "day and month are missing" in {
+          DateOfBirth.formRule.validate(Map(
+            "dateOfBirth.year" -> Seq("2020"),
+            "dateOfBirth.month" -> Seq(""),
+            "dateOfBirth.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "dateOfBirth") -> Seq(ValidationError("error.rp.dob.required.date.month.day"))
+          )))
+        }
+
+        "day and year are missing" in {
+          DateOfBirth.formRule.validate(Map(
+            "dateOfBirth.year" -> Seq(""),
+            "dateOfBirth.month" -> Seq("01"),
+            "dateOfBirth.day" -> Seq("")
+          )) must equal(Invalid(Seq(
+            (Path \ "dateOfBirth") -> Seq(ValidationError("error.rp.dob.required.date.year.day"))
+          )))
+        }
+
+        "year and month are missing" in {
+          DateOfBirth.formRule.validate(Map(
+            "dateOfBirth.year" -> Seq(""),
+            "dateOfBirth.month" -> Seq(""),
+            "dateOfBirth.day" -> Seq("01")
+          )) must equal(Invalid(Seq(
+            (Path \ "dateOfBirth") -> Seq(ValidationError("error.rp.dob.required.date.year.month"))
+          )))
+        }
       }
 
-      "month entered is invalid" in {
-        val errorDayModel = Map(
-          "dateOfBirth.day" -> Seq("24"),
-          "dateOfBirth.month" -> Seq("29"),
-          "dateOfBirth.year" -> Seq("1990")
-        )
-
-        DateOfBirth.formRule.validate(errorDayModel) must be(
-          Invalid(Seq(Path \ "dateOfBirth" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+      "Not a real date" in {
+        DateOfBirth.formRule.validate(Map(
+          "dateOfBirth.year" -> Seq("FOO"),
+          "dateOfBirth.month" -> Seq("BAR"),
+          "dateOfBirth.day" -> Seq("FOO")
+        )) must equal(Invalid(Seq(
+          (Path \ "dateOfBirth") -> Seq(ValidationError("error.rp.dob.invalid.date.not.real"))
+        )))
       }
 
-      "year entered is too long" in {
-        val errorDayModel = Map(
-          "dateOfBirth.day" -> Seq("24"),
-          "dateOfBirth.month" -> Seq("11"),
-          "dateOfBirth.year" -> Seq("199000")
-        )
-
-        DateOfBirth.formRule.validate(errorDayModel) must be(
-          Invalid(Seq(Path \ "dateOfBirth" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+      "Future date" in {
+        DateOfBirth.formRule.validate(Map(
+          "dateOfBirth.year" -> Seq("2090"),
+          "dateOfBirth.month" -> Seq("02"),
+          "dateOfBirth.day" -> Seq("24")
+        )) must
+          equal(Invalid(Seq(
+            (Path \ "dateOfBirth") -> Seq(ValidationError("error.rp.dob.invalid.date.future"))
+          )))
       }
 
-      "year entered is too short" in {
-        val errorDayModel = Map(
-          "dateOfBirth.day" -> Seq("24"),
-          "dateOfBirth.month" -> Seq("11"),
-          "dateOfBirth.year" -> Seq("16")
-        )
-
-        DateOfBirth.formRule.validate(errorDayModel) must be(
-          Invalid(Seq(Path \ "dateOfBirth" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
-      }
-
-      "all fields are empty" in {
-        val noContentModel = Map(
-          "dateOfBirth.day" -> Seq(""),
-          "dateOfBirth.month" -> Seq(""),
-          "dateOfBirth.year" -> Seq("")
-        )
-
-        DateOfBirth.formRule.validate(noContentModel) must be(
-          Invalid(Seq(Path \ "dateOfBirth" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd"))))
-        )
+      "Pre 1900" in {
+        DateOfBirth.formRule.validate(Map(
+          "dateOfBirth.year" -> Seq("1890"),
+          "dateOfBirth.month" -> Seq("02"),
+          "dateOfBirth.day" -> Seq("24")
+        )) must
+          equal(Invalid(Seq(
+            (Path \ "dateOfBirth") -> Seq(ValidationError("error.rp.dob.invalid.date.after.1900"))
+          )))
       }
     }
   }

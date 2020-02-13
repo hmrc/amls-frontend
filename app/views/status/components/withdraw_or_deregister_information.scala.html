@@ -17,6 +17,7 @@
 @import models.status.SubmissionStatus
 @import models.status.SubmissionReadyForReview
 @import models.status.SubmissionDecisionApproved
+@import models.status.ReadyForRenewal
 
 @(status: SubmissionStatus)(implicit messages: Messages, request: Request[_])
 
@@ -29,7 +30,7 @@
             </p>
         </div>
     }
-    case SubmissionDecisionApproved => {
+    case SubmissionDecisionApproved | ReadyForRenewal(_) => {
         <div>
             <p class="no-print">
                 @Messages("your.registration.deregister")

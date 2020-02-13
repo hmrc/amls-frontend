@@ -18,6 +18,8 @@
 @import models.status.SubmissionReadyForReview
 @import models.status.SubmissionDecisionApproved
 
+@import models.status.ReadyForRenewal
+@import models.status.RenewalSubmitted
 @(status: SubmissionStatus)(implicit messages: Messages, request: Request[_])
 
 @status match {
@@ -28,8 +30,15 @@
             <a id="how-to-pay" href="how-to-pay">@Messages("status.howtopay")</a>
         </p>
     }
-    case SubmissionDecisionApproved => {
+    case SubmissionDecisionApproved | ReadyForRenewal(_) => {
         <h2 class="heading-small">@Messages("status.fees")</h2>
             <p><a id="how-to-pay" href="how-to-pay">@Messages("your.registration.how.to.pay")</a></p>
+    }
+    case RenewalSubmitted(_) => {
+        <h2 class="heading-small">@Messages("status.fees")</h2>
+        <p>@Messages("your.registration.renewal.fees")
+        <br />
+        <a id="how-to-pay" href="how-to-pay">@Messages("status.howtopay")</a>
+        </p>
     }
 }

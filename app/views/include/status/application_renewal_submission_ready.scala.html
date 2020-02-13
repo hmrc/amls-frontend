@@ -14,8 +14,12 @@
  * limitations under the License.
  *@
 
-@(call: Call)(implicit request: Request[_],m:Messages, lang: Lang)
-<p>@Messages("status.submissionready.description")</p>
-<p>@Messages("status.submissionready.description2")</p>
-<p>@Messages("status.submissionready.description3")</p>
-<a href="@call.url" id="status-submit" class="button" type="submit">@Messages("status.submissionready.buttontext")</a>
+@(businessName: Option[String])(implicit request: Request[_], m: Messages, lang: Lang)
+
+<p>@Messages("status.renewalnotsubmitted.description")</p>
+<a href="@controllers.routes.RegistrationProgressController.get()" id="go-to-about-your-business" class="button" type="submit">@Messages("your.registration.status.renewal.not.submitted.button")
+ @if(businessName.isDefined){<span class="visually-hidden"> for @businessName.get</span>}</a>
+
+
+
+

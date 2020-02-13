@@ -30,8 +30,14 @@ object ContactDetails {
     import jto.validation.forms.Rules._
     import models.FormTypes._
     (
-      (__ \ "phoneNumber").read(phoneNumberType) ~
-        (__ \ "emailAddress").read(emailType)
+      (__ \ "phoneNumber").read(phoneNumberTypeWithMessages(
+        "error.required.rp.contact.phone.number",
+        "error.invalid.rp.contact.phone.number")) ~
+        (__ \ "emailAddress").read(emailTypeWithMessages(
+          "error.required.rp.contact.email",
+          "error.invalid.rp.contact.email.length",
+          "error.invalid.rp.contact.email"
+        ))
     )(ContactDetails.apply)
   }
 
