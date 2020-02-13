@@ -33,6 +33,8 @@
     heading = header
 ) {
 
+    <dl class="cya-summary-list">
+
     @model.anotherBody.map {
         case AnotherBodyNo => {
             @checkYourAnswersRow(
@@ -131,6 +133,8 @@
             case ProfessionalBodyYes(v) => { @v }
         }</p>
     }
+
+    </dl>
 
     @form(f, controllers.supervision.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
