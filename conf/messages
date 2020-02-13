@@ -219,7 +219,7 @@ error.required.ba.involved.in.other.text = Enter the other activities your busin
 error.invalid.ba.involved.in.other.text = Other activities must be 255 characters or less
 error.invalid.characters.ba.involved.in.other.text = Other activities can include letters a to z, spaces, and most punctuation and special characters
 error.required.ba.business.turnover = Select how much total net profit your business expects in the next 12 months
-error.required.ba.turnover.from.mlr = Select how much total net profit your business expects in the next 12 months from the services you’re registering
+error.required.ba.turnover.from.mlr = Select how much total net profit your business expects in the next 12 months from the services you're registering
 error.required.ba.is.your.franchise = Select yes if your business is a franchise
 error.required.ba.franchise.name = Enter franchisor’s name
 error.max.length.ba.franchise.name = Franchisor’s name must be 140 characters or less
@@ -1791,8 +1791,10 @@ businessactivities.confirm-activities.subtitle_3 = for anti-money laundering sup
 businessactivities.confirm-activities.subtitle_4 = You’ve told us your business is
 businessactivities.identify-suspicious-activity.title = Do you have written guidance on how to identify and report suspicious activity?
 businessactivities.turnover.title = How much total net profit does your business expect in the next 12 months from the services you're registering?
-businessactivities.turnover.heading = How much total net profit does your business expect in the next 12 months from the services you're registering?
-businessactivities.turnover.heading.multiple = How much total net profit does your business expect in the next 12 months from {0} activities?
+
+businessactivities.turnover.heading.multiple = How much total net profit does your business expect in the next 12 months from the services you're registering?
+businessactivities.turnover.heading = How much total net profit does your business expect in the next 12 months from {0} activities?
+
 businessactivities.turnover.lbl.01 = £0 to £14,999
 businessactivities.turnover.lbl.02 = £15,000 to £49,999
 businessactivities.turnover.lbl.03 = £50,000 to £99,999

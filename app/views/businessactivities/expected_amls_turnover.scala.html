@@ -60,9 +60,9 @@
 @headings = {
     @businessMatching.alphabeticalBusinessActivitiesLowerCase(false).map { types =>
         @if(types.size > 1) {
-            @Messages("businessactivities.turnover.heading")
+            @Messages("businessactivities.turnover.heading.multiple")
         } else {
-            @Messages("businessactivities.turnover.heading.multiple", types.head)
+            @Messages("businessactivities.turnover.heading", types.head)
         }
     }
 }

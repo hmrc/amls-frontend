@@ -22,6 +22,7 @@ import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
+import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching, EstateAgentBusinessService}
 import play.api.i18n.Messages
 import views.Fixture
 
@@ -30,6 +31,7 @@ class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addTokenForView()
+    val businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices))))
   }
 
   "expected_amls_turnover view" must {
@@ -42,13 +44,25 @@ class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
       doc.title must startWith(Messages("businessactivities.turnover.title") + " - " + Messages("summary.businessactivities"))
     }
 
-    "have correct headings" in new ViewFixture {
+    "have correct heading when one service is selected" in new ViewFixture {
 
       val form2: ValidForm[ExpectedAMLSTurnover] = Form2(ExpectedAMLSTurnover.Third)
 
-      def view = views.html.businessactivities.expected_amls_turnover(form2, true, None)
+      def view = views.html.businessactivities.expected_amls_turnover(form2, true, businessMatching)
 
-      heading.html must be(Messages("businessactivities.turnover.heading"))
+      heading.html must be(Messages("businessactivities.turnover.heading", "accountancy service provider"))
+      subHeading.html must include( Messages("summary.businessactivities"))
+
+    }
+
+    "have correct heading when multiple services are selected" in new ViewFixture {
+      val businessMatching2 = BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices, EstateAgentBusinessService))))
+
+      val form2: ValidForm[ExpectedAMLSTurnover] = Form2(ExpectedAMLSTurnover.Third)
+
+      def view = views.html.businessactivities.expected_amls_turnover(form2, true, businessMatching2)
+
+      heading.html must be(Messages("businessactivities.turnover.heading.multiple"))
       subHeading.html must include( Messages("summary.businessactivities"))
 
     }

@@ -21,7 +21,7 @@
 @import config.ApplicationConfig
 
 @import models.businessmatching.BusinessMatching
-@(f: forms.Form2[_], model: BusinessActivities, bmBusinessActivities:BusinessMatching, hideReceiveAdvice:Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(f: forms.Form2[_], model: BusinessActivities, bmBusinessActivities: BusinessMatching, hideReceiveAdvice:Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("title.cya", "summary.businessactivities")
@@ -30,9 +30,9 @@
 @headings = {
     @bmBusinessActivities.alphabeticalBusinessActivitiesLowerCase().map { types =>
         @if(types.size > 1) {
-            @Messages("businessactivities.turnover.heading")
+            @Messages("businessactivities.turnover.heading.multiple")
         } else {
-            @Messages("businessactivities.turnover.heading.multiple", types.head)
+            @Messages("businessactivities.turnover.heading", types.head)
         }
     }
 }
