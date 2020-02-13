@@ -46,8 +46,8 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
             (for {
               businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
               expectedTurnover <- businessActivities.expectedAMLSTurnover
-            } yield Ok(expected_amls_turnover(Form2[ExpectedAMLSTurnover](expectedTurnover), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false))))
-              .getOrElse (Ok(expected_amls_turnover(EmptyForm, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false))))
+            } yield Ok(expected_amls_turnover(Form2[ExpectedAMLSTurnover](expectedTurnover), edit, businessMatching)))
+              .getOrElse (Ok(expected_amls_turnover(EmptyForm, edit, businessMatching)))
           }) getOrElse Ok(expected_amls_turnover(EmptyForm, edit, None))
       }
   }
@@ -59,7 +59,7 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
           } yield {
-            BadRequest(expected_amls_turnover(f, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
+            BadRequest(expected_amls_turnover(f, edit, businessMatching))
           }
 
         case ValidForm(_, data) =>

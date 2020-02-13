@@ -35,7 +35,7 @@
 @import config.{ ApplicationConfig}
 @import models.businessmatching._
 
-@(f: forms.Form2[_], edit: Boolean, businessTypes:Option[List[String]])(implicit   m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
+@(f: forms.Form2[_], edit: Boolean, businessMatching: BusinessMatching)(implicit   m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
@@ -43,7 +43,7 @@
 }
 
 @supportingContent = {
-    @businessTypes.map { types =>
+    @businessMatching.alphabeticalBusinessActivitiesLowerCase(false).map { types =>
         @if(types.size > 1) {
             <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
             <ul class="list list-bullet">
@@ -57,6 +57,16 @@
     }
 }
 
+@headings = {
+    @businessMatching.alphabeticalBusinessActivitiesLowerCase(false).map { types =>
+        @if(types.size > 1) {
+            @Messages("businessactivities.turnover.heading")
+        } else {
+            @Messages("businessactivities.turnover.heading.multiple", types.head)
+        }
+    }
+}
+
 @main(
     title = Messages("businessactivities.turnover.title") + " - " + Messages("summary.businessactivities"),
     heading = header
@@ -66,7 +76,7 @@
 
         @fieldsetWithErrorGroup(
             f = f("expectedAMLSTurnover"),
-            heading = "businessactivities.turnover.title",
+            heading = headings.toString(),
             section = "summary.businessactivities",
             panel = false,
             supportingContent = supportingContent
