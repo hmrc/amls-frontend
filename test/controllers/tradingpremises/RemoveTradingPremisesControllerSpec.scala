@@ -287,8 +287,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
           verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), any(), meq(Seq(
             completeTradingPremises1.copy(
               status = Some(StatusConstants.Deleted),
-              hasChanged = true,
-              endDate = Some(ActivityEndDate(new LocalDate(2001, 1, 1)))),
+              hasChanged = true),
             completeTradingPremises2,
             completeTradingPremises3
           )))(any(), any())
