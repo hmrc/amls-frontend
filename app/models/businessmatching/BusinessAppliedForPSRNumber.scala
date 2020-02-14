@@ -34,8 +34,9 @@ object BusinessAppliedForPSRNumber {
   val minPSRNumberLength = 6
   val PSRNumberMinLength = minWithMsg(minPSRNumberLength, "error.max.length.msb.psr.number")
   val PSRNumberLength = maxWithMsg(maxPSRNumberLength, "error.max.length.msb.psr.number")
+  val PSRCorrectFormat = regexWithMsg(numbersOnlyRegex, "error.max.msb.psr.number.format")
   val PSRNumberRequired = required("error.invalid.msb.psr.number")
-  val registrationNumberType = notEmptyStrip andThen PSRNumberRequired andThen PSRNumberLength andThen PSRNumberMinLength
+  val registrationNumberType = notEmptyStrip andThen PSRCorrectFormat andThen PSRNumberRequired andThen PSRNumberLength andThen PSRNumberMinLength
 
   implicit val formRule: Rule[UrlFormEncoded, BusinessAppliedForPSRNumber] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._

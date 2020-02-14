@@ -52,7 +52,7 @@ class SelectBusinessTypeController @Inject()(
                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   implicit val activityReader: Rule[UrlFormEncoded, BusinessActivity] =
-    FormTypes.businessActivityRule("error.required.bm.register.service.single") map {
+    FormTypes.businessActivityRule("error.required.bm.register.service") map {
       _.businessActivities.head
     }
 
