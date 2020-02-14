@@ -263,9 +263,14 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
           )))(any(), any())
         }
 
-        "removing a trading premises from an application with status SubmissionReadyForReview" in new Fixture {
+        "removing a trading premises (with line id) from an application with status SubmissionReadyForReview" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
+          val newRequest = requestWithUrlEncodedBody(
+            "endDate.day" -> "1",
+            "endDate.month" -> "1",
+            "endDate.year" -> "2001"
+          )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
@@ -275,15 +280,37 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
 
-          val result = controller.remove(1, false)(request)
+          val result = controller.remove(1, false)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
 
           verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), any(), meq(Seq(
-            completeTradingPremises1.copy(status = Some(StatusConstants.Deleted), hasChanged = true),
+            completeTradingPremises1.copy(
+              status = Some(StatusConstants.Deleted),
+              hasChanged = true,
+              endDate = Some(ActivityEndDate(new LocalDate(2001, 1, 1)))),
             completeTradingPremises2,
             completeTradingPremises3
           )))(any(), any())
+        }
+
+        "removing a trading premises (no line id) from an application with status SubmissionReadyForReview" in new Fixture {
+
+          val emptyCache = CacheMap("", Map.empty)
+
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises(lineId = None)))))
+
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+            .thenReturn(Future.successful(SubmissionReadyForReview))
+
+          when(controller.dataCacheConnector.save(any(), any(), any())(any(),  any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.remove(1, false)(request)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
         }
 
         "removing a trading premises from an application with status SubmissionDecisionApproved" in new Fixture {
