@@ -22,8 +22,6 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonAddressHistory, ResponsiblePersonCurrentAddress}
-import org.joda.time.LocalDate
-import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -54,46 +52,36 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
 
   def post(index: Int, edit: Boolean) = authAction.async {
     implicit request =>
-      val extraInfo = getData[ResponsiblePerson](request.credId, index) map { rpO =>
-        for {
-          rp <- rpO
-          name <- rp.personName
-          position <- rp.positions
-          date <- position.startDate
-        } yield {
-          (date, name, rpO)
+      Form2[DateOfChange](request.body.asFormUrlEncoded.get) match {
+        case f: InvalidForm => {
+          invalidView(f, index, edit)
+        }
+        case ValidForm(_, dateOfChange) => {
+          validFormView(request.credId, index, dateOfChange, edit)
         }
       }
+  }
 
-      extraInfo.flatMap {
-        case Some((date, name, responsiblePeople)) => {
-          val extraFields = Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
+  private def invalidView(f: forms.Form2[_], index: Integer, edit: Boolean)
+                                             (implicit request: Request[AnyContent]) = {
+    Future.successful(BadRequest(
+      views.html.date_of_change(
+        f,
+        "summary.responsiblepeople",
+        controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
+      )
+    ))
+  }
 
-          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
-            case f: InvalidForm => {
-              val fullName = name.fullName
-              val dateFormatted = date.startDate.toString("d MMMM yyyy")
-              Future.successful(BadRequest(
-                views.html.date_of_change(
-                  f.withMessageFor(DateOfChange.errorPath, Messages("error.expected.rp.date.after.start", fullName, dateFormatted)),
-                  "summary.responsiblepeople",
-                  controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
-                )
-              ))
-            }
-            case ValidForm(_, dateOfChange) => {
-              doUpdate(request.credId, index, dateOfChange).map { cache: CacheMap =>
-                if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
-                  Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
-                } else {
-                  Redirect(routes.TimeAtCurrentAddressController.get(index, edit))
-                }
-              }
-            }
-          }
-        }
-        case _ => Future.successful(NotFound(notFoundView))
+  private def validFormView(credId: String, index: Int, date: DateOfChange, edit: Boolean)
+                           (implicit request: Request[AnyContent]) = {
+    doUpdate(credId, index, date).map { cache: CacheMap =>
+      if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
+        Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
+      } else {
+        Redirect(routes.TimeAtCurrentAddressController.get(index, edit))
       }
+    }
   }
 
   private def doUpdate(credId: String, index: Int, date: DateOfChange)(implicit request: Request[AnyContent]) =
