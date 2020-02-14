@@ -31,6 +31,10 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
     val request = addToken(authRequest)
 
+    val accountType = PersonalAccount
+
+    val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
+
     val controller = new BankAccountTypeController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
@@ -100,10 +104,15 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "editing an amendment" in new Fixture {
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(
-            BankDetails(Some(PersonalAccount), hasAccepted = true),
-            BankDetails(Some(PersonalAccount), hasAccepted = true)
-          )))
+          mockCacheFetch[Seq[BankDetails]](
+            Some(
+              Seq(
+                BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true),
+                BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true)
+              )
+            ), Some(BankDetails.key)
+          )
+
           mockApplicationStatus(SubmissionReadyForReview)
 
           val result = controller.get(1, true)(request)
@@ -113,10 +122,15 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
         "editing an variation" in new Fixture {
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(
-            BankDetails(Some(PersonalAccount), hasAccepted = true),
-            BankDetails(Some(PersonalAccount), hasAccepted = true)
-          )))
+          mockCacheFetch[Seq[BankDetails]](
+            Some(
+              Seq(
+                BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true),
+                BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true)
+              )
+            ), Some(BankDetails.key)
+          )
+
           mockApplicationStatus(SubmissionDecisionApproved)
 
           val result = controller.get(1, true)(request)
@@ -176,8 +190,6 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
           val newRequest = requestWithUrlEncodedBody(
             "bankAccountType" -> "01"
           )
-
-          val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12345678", "000000")))
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(
             Some(PersonalAccount),
