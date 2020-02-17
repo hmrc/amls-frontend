@@ -58,6 +58,22 @@ class BusinessMatchingMsbServicesSpec extends PlaySpec {
           .mustEqual(Invalid(Seq((Path \ "msbServices") -> Seq(ValidationError("error.required.msb.services")))))
       }
 
+      "the Map is empty on tp question" in {
+
+        BusinessMatchingMsbServices.formReadsTP.validate(Map.empty)
+          .mustEqual(Invalid(Seq((Path \ "msbServices") -> Seq(ValidationError("error.required.msb.services.tp")))))
+      }
+
+      "the set is empty on tp question" in {
+
+        val data: UrlFormEncoded = Map(
+          "msbServices" -> Seq.empty[String]
+        )
+
+        BusinessMatchingMsbServices.formReadsTP.validate(data)
+          .mustEqual(Invalid(Seq((Path \ "msbServices") -> Seq(ValidationError("error.required.msb.services.tp")))))
+      }
+
       "there is an invalid entry in the set" in {
 
         val data: UrlFormEncoded = Map(
