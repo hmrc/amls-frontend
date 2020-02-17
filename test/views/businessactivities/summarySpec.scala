@@ -18,6 +18,7 @@ package views.businessactivities
 
 import forms.EmptyForm
 import models.businessactivities._
+import models.businessmatching.{BusinessMatching, MoneyServiceBusiness, BusinessActivities => BMBusinessActivities}
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
@@ -55,8 +56,10 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
       ("businessactivities.confirm-activities.title",checkElementTextIncludes(_, "OtherActivities")),
-      ("businessactivities.business-turnover.title",checkElementTextIncludes(_, "businessactivities.turnover.lbl.01")),
-      ("businessactivities.turnover.title",checkElementTextIncludes(_, "businessactivities.business-turnover.lbl.01")),
+      ("businessactivities.business-turnover.title",checkElementTextIncludes(_, "businessactivities.business-turnover.lbl.01")),
+
+      (Messages("businessactivities.turnover.heading", "money service business"),checkElementTextIncludes(_, "businessactivities.turnover.lbl.01")),
+
       ("businessactivities.businessfranchise.title",checkElementTextIncludes(_, "FranchiseName")),
       ("businessactivities.employees.line1.cya",checkElementTextIncludes(_, "123")),
       ("businessactivities.employees.line2.cya",checkElementTextIncludes(_, "456")),
@@ -97,7 +100,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
           taxMatters = Some(TaxMatters(true)),
           transactionRecordTypes = Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("SoftwareName"))))
         ),
-        bmBusinessActivities = None,
+        bmBusinessActivities = BusinessMatching(activities = Some(BMBusinessActivities(Set(MoneyServiceBusiness)))),
         hideReceiveAdvice = false
       )
 
