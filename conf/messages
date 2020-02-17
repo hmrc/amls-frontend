@@ -156,7 +156,7 @@ error.submission.wrong_credentials.content = Your account doesn’t have enough 
 ############################        Custom Error Messages for Different Sections         ###############################
 ########################################################################################################################
 ####  Business Matching ####
-error.required.bm.register.service = Select the services you need to register
+error.required.bm.register.service = Select which services you need to register
 error.required.bm.remove.service = Select which service you need to remove
 error.required.bm.remove.service.multiple = Select which services you need to remove
 error.required.bm.remove.leave.twobusinesses = You cannot remove both of your registered services
@@ -544,7 +544,8 @@ error.supervision.end.invalid.date.future = Date your previous supervision ended
 error.supervision.end.invalid.date.not.real = Enter a real date for when your previous supervision ended
 
 ############################### Money Services Business ###############################
-error.required.msb.services = Select which money service business activities you will do at these premises
+error.required.msb.services = Select which money service business activities you will do
+error.required.msb.services.tp = Select which money service business activities you will do at these premises
 error.required.msb.throughput = Select one option to show how much throughput you expect in the next 12 months
 error.required.msb.ipsp = Select yes if your business uses an IPSP
 error.required.msb.ipsp.name = Enter your IPSP’s name

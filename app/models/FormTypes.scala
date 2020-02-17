@@ -284,6 +284,12 @@ object FormTypes {
   def dateOfChangeActivityStartDateRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "activityStartDate").read(optionR(jodaLocalDateR("yyyy-MM-dd"))) ~
+      (__ \ "dateOfChange").read(localDateFutureRule)).tupled.andThen(dateOfChangeActivityStartDateRuleMapping).repath(_ => Path \ "dateOfChange")
+  }
+
+  def dateOfChangeActivityStartDateRulePreApp = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    ((__ \ "activityStartDate").read(optionR(jodaLocalDateR("yyyy-MM-dd"))) ~
       (__ \ "dateOfChange").read(newAllowedPastAndFutureDateRule("error.required.dateofchange",
         "error.required.dateofchange.1900",
         "error.required.dateofchange.future",

@@ -109,64 +109,12 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
       redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true).url))
     }
 
-    "fail submission when future date is supplied" in new Fixture {
-
-      val newRequest = requestWithUrlEncodedBody(
-        "dateOfChange.day" -> "24",
-        "dateOfChange.month" -> "2",
-        "dateOfChange.year" -> "2100"
-      )
-
-      val mockCacheMap = mock[CacheMap]
-      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
-
-      when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
-        .thenReturn(None)
-
-      when(controller.dataCacheConnector.fetchAll(any())( any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(),any(), any())
-        ( any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.dateofchange.future"))
-    }
-
-    "fail submission when date before 1900 is supplied" in new Fixture {
-
-      val newRequest = requestWithUrlEncodedBody(
-        "dateOfChange.day" -> "24",
-        "dateOfChange.month" -> "2",
-        "dateOfChange.year" -> "1700"
-      )
-
-      val mockCacheMap = mock[CacheMap]
-      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
-
-      when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
-        .thenReturn(None)
-
-      when(controller.dataCacheConnector.fetchAll(any())( any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(),any(), any())
-        ( any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.dateofchange.1900"))
-    }
-
     "fail submission when invalid date is supplied" in new Fixture {
 
       val newRequest = requestWithUrlEncodedBody(
         "dateOfChange.day" -> "24",
-        "dateOfChange.month" -> "222",
-        "dateOfChange.year" -> "2000"
+        "dateOfChange.month" -> "2",
+        "dateOfChange.year" -> "199000"
       )
 
       val mockCacheMap = mock[CacheMap]
@@ -184,33 +132,7 @@ class ServicesDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar  {
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.dateofchange.not.real"))
-    }
-
-    "fail submission when day and month is not supplied" in new Fixture {
-
-      val newRequest = requestWithUrlEncodedBody(
-        "dateOfChange.day" -> "",
-        "dateOfChange.month" -> "",
-        "dateOfChange.year" -> "2000"
-      )
-
-      val mockCacheMap = mock[CacheMap]
-      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
-
-      when(mockCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
-        .thenReturn(None)
-
-      when(controller.dataCacheConnector.fetchAll(any())( any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(),any(), any())
-        ( any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.dateofchange.month.day"))
+      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
     }
 
     "fail submission when input date is before activity start date" in new Fixture {

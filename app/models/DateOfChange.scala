@@ -44,6 +44,11 @@ object DateOfChange {
     __.read(dateOfChangeActivityStartDateRule) map DateOfChange.apply
   }
 
+  def formRulePreApp: Rule[UrlFormEncoded, DateOfChange] = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    __.read(dateOfChangeActivityStartDateRulePreApp) map DateOfChange.apply
+  }
+
   implicit def formWrites = Write[DateOfChange, UrlFormEncoded] { data: DateOfChange =>
     Map(
       "dateOfChange.day" -> Seq(data.dateOfChange.get(DateTimeFieldType.dayOfMonth()).toString),
