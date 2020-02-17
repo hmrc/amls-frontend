@@ -27,7 +27,7 @@ import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
+import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
