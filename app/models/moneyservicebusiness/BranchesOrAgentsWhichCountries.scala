@@ -50,7 +50,7 @@ object BranchesOrAgentsWhichCountries {
       }
 
       val countrySeqR = {
-        (seqToOptionSeq[String] andThen flattenR[String] andThen cR)
+        (seqToOptionSeq[String] andThen flattenR[String] andThen seqR(Country.newFormRule("error.invalid.countries.msb.branchesOrAgents.country")))
           .andThen(minLengthR[Seq[Country]](minLength) withMessage "error.invalid.countries.msb.branchesOrAgents")
       }
 

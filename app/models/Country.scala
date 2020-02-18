@@ -59,6 +59,18 @@ object Country {
         }
     }
 
+  def newFormRule(formatError: String) : Rule[String, Country] =
+    Rule {
+      case "" => Invalid(Seq(Path -> Seq(ValidationError(formatError))))
+      case code =>
+        countries.collectFirst {
+          case e @ Country(_, c) if c == code =>
+            Valid(e)
+        } getOrElse {
+          Invalid(Seq(Path -> Seq(ValidationError("error.invalid.country"))))
+        }
+    }
+
   implicit val jsonW: Write[Country, JsValue] = {
     import jto.validation.playjson.Writes.string
     formWrites andThen string
