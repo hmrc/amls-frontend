@@ -575,7 +575,7 @@ error.required.hvd.receive.cash.payments = Select yes if you expect to receive c
 error.required.hvd.describe = Enter how you will receive cash payments of €10,000 or more
 error.required.hvd.format = Description of how you will receive cash payments of €10,000 or more can include letters a to z, numbers, spaces and punctuation
 error.maxlength.hvd.describe = Description of how you will receive cash payments of €10,000 or more must be 255 characters or less
-error.required.hvd.choose.option = Select how you expect to  receive cash payments of €10,000 or more from customers you have not met
+error.required.hvd.choose.option = Select how you expect to receive cash payments of €10,000 or more from customers you have not met
 error.required.hvd.excise.goods = Select yes if you will buy or sell duty-suspended excise goods
 error.required.hvd.percentage = Select what percentage of your turnover you expect to come from cash payments of €10,000 or more
 

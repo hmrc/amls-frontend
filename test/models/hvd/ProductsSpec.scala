@@ -85,7 +85,7 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
           "otherDetails" -> Seq("¡93u4jk<>{}"))
 
         Products.formRule.validate(model) must be(
-          Invalid(List((Path \ "otherDetails", Seq(ValidationError("err.text.validation")))))
+          Invalid(List((Path \ "otherDetails", Seq(ValidationError("error.invalid.hvd.business.sell.other.format")))))
         )
       }
     }

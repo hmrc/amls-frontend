@@ -45,7 +45,7 @@ class CashPaymentFirstDateSpec extends PlaySpec with MockitoSugar {
           val model = CashPaymentFirstDate.formWrites.writes(CashPaymentFirstDate(new LocalDate(2100, 1, 1)))
 
           CashPaymentFirstDate.formRule.validate(model) must be(Invalid(Seq(
-            Path \ "paymentDate" -> Seq(ValidationError("error.future.date"))
+            Path \ "paymentDate" -> Seq(ValidationError("error.date.hvd.future"))
           )))
         }
       }
@@ -55,7 +55,7 @@ class CashPaymentFirstDateSpec extends PlaySpec with MockitoSugar {
           val model = CashPaymentFirstDate.formWrites.writes(CashPaymentFirstDate(new LocalDate(1089, 12, 31)))
 
           CashPaymentFirstDate.formRule.validate(model) must
-            be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.allowed.start.date")))))
+            be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.date.hvd.past")))))
         }
       }
 
@@ -69,14 +69,14 @@ class CashPaymentFirstDateSpec extends PlaySpec with MockitoSugar {
         )
 
         CashPaymentFirstDate.formRule.validate(data) must
-          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.date.hvd.real")))))
       }
 
       "fail to validate given an future date" in {
         val model = CashPaymentFirstDate.formWrites.writes(CashPaymentFirstDate(LocalDate.now.plusMonths(1)))
 
         CashPaymentFirstDate.formRule.validate(model) must
-          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.future.date")))))
+          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.date.hvd.future")))))
       }
 
       "fail to validate given missing day" in {
@@ -89,7 +89,7 @@ class CashPaymentFirstDateSpec extends PlaySpec with MockitoSugar {
         )
 
         CashPaymentFirstDate.formRule.validate(data) must
-          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.date.hvd.day")))))
       }
 
       "fail to validate given missing month" in {
@@ -102,7 +102,7 @@ class CashPaymentFirstDateSpec extends PlaySpec with MockitoSugar {
         )
 
         CashPaymentFirstDate.formRule.validate(data) must
-          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.date.hvd.month")))))
       }
 
       "fail to validate given missing year" in {
@@ -115,7 +115,7 @@ class CashPaymentFirstDateSpec extends PlaySpec with MockitoSugar {
         )
 
         CashPaymentFirstDate.formRule.validate(data) must
-          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.expected.jodadate.format", "yyyy-MM-dd")))))
+          be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.date.hvd.year")))))
       }
 
       "write correct data from `Yes` value" in {

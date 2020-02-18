@@ -98,13 +98,17 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "show error if invalid data" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody("" -> "")
+        val newRequest = requestWithUrlEncodedBody(
+          "acceptedAnyPayment" -> "true",
+          "paymentDate.day" -> "",
+          "paymentDate.month" -> "",
+          "paymentDate.year" -> "")
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+        contentAsString(result) must include(Messages("error.date.hvd.year.month.day"))
 
       }
 
@@ -120,16 +124,16 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+        contentAsString(result) must include(Messages("error.date.hvd.day"))
 
       }
 
-      "show error if year field too short" in new Fixture {
+      "show error if year field is in past" in new Fixture {
 
         val newRequest = requestWithUrlEncodedBody("acceptedAnyPayment" -> "true",
           "paymentDate.day" -> "12",
           "paymentDate.month" -> "5",
-          "paymentDate.year" -> "99"
+          "paymentDate.year" -> "122"
         )
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
@@ -140,15 +144,15 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+        contentAsString(result) must include(Messages("error.date.hvd.past"))
       }
 
-      "show error if year field too long" in new Fixture {
+      "show error if in the future" in new Fixture {
 
         val newRequest = requestWithUrlEncodedBody("acceptedAnyPayment" -> "true",
           "paymentDate.day" -> "12",
           "paymentDate.month" -> "5",
-          "paymentDate.year" -> "19995"
+          "paymentDate.year" -> "2200"
         )
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
@@ -159,7 +163,7 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+        contentAsString(result) must include(Messages("error.date.hvd.future"))
       }
     }
   }
