@@ -35,6 +35,17 @@ error.invalid.date.not.real = Enter a real date for when your business started o
 error.invalid.date.tp.not.real = Enter a real date for when your business started or will start trading from these premises
 error.invalid.date.agent.not.real = Enter a real date of birth
 
+error.required.dateofchange.day = Date of the change must include a day
+error.required.dateofchange.month = Date of the change must include a month
+error.required.dateofchange.year = Date of the change must include a year
+error.required.dateofchange.month.day = Date of the change must include a day and month
+error.required.dateofchange.year.month = Date of the change must include a month and year
+error.required.dateofchange.year.month.day = Enter the date the change happened
+error.required.dateofchange.year.day = Date of the change must include a day and year
+error.required.dateofchange.not.real = Enter a real date for when this change happened
+error.required.dateofchange.1900 = Date of the change must be after 1900
+error.required.dateofchange.future = Date of the change must be today or in the past
+
 error.required.address.line1 = Enter address line 1
 error.required.address.line2 = Enter address line 2
 error.max.length.address.line = You can’t enter more than 35 characters
@@ -145,8 +156,7 @@ error.submission.wrong_credentials.content = Your account doesn’t have enough 
 ############################        Custom Error Messages for Different Sections         ###############################
 ########################################################################################################################
 ####  Business Matching ####
-error.required.bm.register.service = Select the services you need to register
-error.required.bm.register.service.single = Select which service you need to register
+error.required.bm.register.service = Select which services you need to register
 error.required.bm.remove.service = Select which service you need to remove
 error.required.bm.remove.service.multiple = Select which services you need to remove
 error.required.bm.remove.leave.twobusinesses = You cannot remove both of your registered services
@@ -179,13 +189,13 @@ error.invalid.email.reenter = Reenter your business email address in the correct
 error.invalid.email.match = The email addresses you enter must match
 error.invalid.email.max.length = Email address must be 100 characters or less
 
-error.businessmatching.updateservice.responsiblepeople = Select at least one option to show which responsible people have passed the HMRC Money Laundering Regulations fit and proper test
-error.businessmatching.updateservice.addmoreactivities = Select yes if you want to add another type of business
+error.businessmatching.updateservice.responsiblepeople = Select which of your responsible people have passed HMRC’s fit and proper test
+error.businessmatching.updateservice.addmoreactivities = Select yes if you want to add another service
 error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes if you do {0} activities from any of your registered trading premises
 error.businessmatching.updateservice.tradingpremisessubmittedactivities = Select yes if you still do this activity from all of your registered trading premises
-error.businessmatching.updateservice.tradingpremises = Select which premises you will do {0} activities from
+error.businessmatching.updateservice.tradingpremises = Select which premises you will do {0} activities at
 
-error.businessmatching.updateservice.fitandproper = Select yes if any of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test
+error.businessmatching.updateservice.fitandproper = Select yes if any of your responsible people have passed HMRC’s fit and proper test
 error.businessmatching.updateservice.changeservices = Select what you want to do
 
 ###############################  Bank Details ###############################
@@ -534,15 +544,18 @@ error.supervision.end.invalid.date.future = Date your previous supervision ended
 error.supervision.end.invalid.date.not.real = Enter a real date for when your previous supervision ended
 
 ############################### Money Services Business ###############################
-error.required.msb.services = Select the money service business activities you will do
+error.required.msb.services = Select which money service business activities you will do
+error.required.msb.services.tp = Select which money service business activities you will do at these premises
 error.required.msb.throughput = Select one option to show how much throughput you expect in the next 12 months
 error.required.msb.ipsp = Select yes if your business uses an IPSP
 error.required.msb.ipsp.name = Enter your IPSP’s name
 error.invalid.msb.ipsp.name = You can’t enter more than 140 characters
 error.required.msb.linked.txn = Select yes if your systems can identify linked transactions
-error.required.msb.psr.options = Select yes if your business has a PSR number
+error.required.msb.psr.options = Select yes if your business has a Payment Services Regulation (PSR) number
 error.invalid.msb.psr.number = Enter your PSR number
 error.max.length.msb.psr.number = PSR number must be 6 numbers
+error.max.msb.psr.number.format = PSR number most only include numbers
+
 error.required.msb.send.money = Select yes if you send money to other countries
 error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months
 error.required.msb.fx.transactions.in.12months = Enter the number of foreign exchange transactions you expect in the next 12 months

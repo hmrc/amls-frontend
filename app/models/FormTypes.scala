@@ -58,6 +58,7 @@ object FormTypes {
   val yearRegexPost1900 = "((19|20)\\d\\d)".r
   val yearRegexFourDigits = "(?<!\\d)(?!0000)\\d{4}(?!\\d)".r
   val corporationTaxRegex = "^[0-9]{10}$".r
+  val numbersOnlyRegex = "^[0-9]*$".r
 
   val basicPunctuationRegex = "^[a-zA-Z0-9\u00C0-\u00FF !#$%&'‘’\"“”«»()*+,./:;=?@\\[\\]|~£€¥\\u005C\u2014\u2013\u2010\u005F\u005E\u0060\u000A\u000D\u002d]+$".r
   private val postcodeRegex = "^[A-Za-z]{1,2}[0-9][0-9A-Za-z]?\\s?[0-9][A-Za-z]{2}$".r
@@ -284,6 +285,15 @@ object FormTypes {
     import jto.validation.forms.Rules._
     ((__ \ "activityStartDate").read(optionR(jodaLocalDateR("yyyy-MM-dd"))) ~
       (__ \ "dateOfChange").read(localDateFutureRule)).tupled.andThen(dateOfChangeActivityStartDateRuleMapping).repath(_ => Path \ "dateOfChange")
+  }
+
+  def dateOfChangeActivityStartDateRulePreApp = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    ((__ \ "activityStartDate").read(optionR(jodaLocalDateR("yyyy-MM-dd"))) ~
+      (__ \ "dateOfChange").read(newAllowedPastAndFutureDateRule("error.required.dateofchange",
+        "error.required.dateofchange.1900",
+        "error.required.dateofchange.future",
+        "error.required.dateofchange.not.real"))).tupled.andThen(dateOfChangeActivityStartDateRuleMapping).repath(_ => Path \ "dateOfChange")
   }
 
   def premisesEndDateRule = From[UrlFormEncoded] { __ =>
