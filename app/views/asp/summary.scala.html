@@ -30,6 +30,8 @@
     heading = header
 ) {
 
+    <dl class="cya-summary-list">
+
     @model.services.map { a =>
         @checkYourAnswersRow(
             question = Messages("asp.services.title"),
@@ -60,6 +62,9 @@
             case OtherBusinessTaxMattersYes => { @Messages("lbl.yes") }
         }
     }
+
+    </dl>
+
     @form(f, controllers.asp.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
     }

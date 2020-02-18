@@ -95,6 +95,34 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
         }
       }
 
+      "RP is incomplete and date entered before RP start date" must {
+        "redirect to the how long at current address page" in new Fixture {
+          val postRequest = requestWithUrlEncodedBody(
+            "dateOfChange.year" -> "2010",
+            "dateOfChange.month" -> "10",
+            "dateOfChange.day" -> "01"
+          )
+
+          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
+          val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
+          val responsiblePeople = ResponsiblePerson(
+            addressHistory = Some(history),
+            personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
+            positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2011,1,1))))))
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(controller.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1, false)(postRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(address.routes.TimeAtCurrentAddressController.get(1, false).url))
+        }
+      }
+
       "when RP is complete" must {
         "redirect to the detailed answers page" in new Fixture with ResponsiblePeopleValues {
           val postRequest = requestWithUrlEncodedBody(
@@ -138,53 +166,6 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
         val result = controller.post(1, true)(invalidPostRequest)
 
         status(result) must be(BAD_REQUEST)
-
-      }
-      "given a date before the responsible person start date" in new Fixture {
-
-        val postRequest = requestWithUrlEncodedBody(
-          "dateOfChange.year" -> "2010",
-          "dateOfChange.month" -> "10",
-          "dateOfChange.day" -> "01",
-          "activityStartDate" -> new LocalDate(2017, 1, 1).toString("yyyy-MM-dd")
-        )
-
-        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
-        val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus), Some(DateOfChange(new LocalDate(2017,1,1))))
-        val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-        val responsiblePeople = ResponsiblePerson(
-          addressHistory = Some(history),
-          personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
-          positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2017,1,1))))))
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-        when(controller.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post(1, true)(postRequest)
-
-        status(result) must be(BAD_REQUEST)
-
-      }
-    }
-    "respond with NOT_FOUND" when {
-      "post is called with an out of bounds index" in new Fixture {
-
-        val postRequest = requestWithUrlEncodedBody(
-          "dateOfChange.year" -> "2010",
-          "dateOfChange.month" -> "10",
-          "dateOfChange.day" -> "01"
-        )
-
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post(40, true)(postRequest)
-
-        status(result) must be(NOT_FOUND)
 
       }
     }

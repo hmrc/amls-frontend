@@ -26,6 +26,10 @@
 @import models.status.RenewalSubmitted
 @import models.status.SubmissionWithdrawn
 
+@import models.status.SubmissionDecisionRejected
+@import models.status.SubmissionDecisionRevoked
+@import models.status.SubmissionDecisionExpired
+@import models.status.DeRegistered
 @(amlsRegNo: Option[String] = None, status: SubmissionStatus, canOrCannotTradeInformation: Html = HtmlFormat.empty, endDate: Option[LocalDate] = None)(implicit messages: Messages, request: Request[_])
 
 @status match {
@@ -62,5 +66,22 @@
     }
     case SubmissionWithdrawn => {
         <p>@Messages("your.registration.status.withdrawn")</p>
+    }
+    case SubmissionDecisionRejected => {
+        <p>@Messages("your.registration.status.rejected")</p>
+    }
+    case SubmissionDecisionRevoked => {
+        <p>@Messages("your.registration.status.revoked")</p>
+    }
+    case SubmissionDecisionExpired => {
+        <p>@Messages("your.registration.status.expired")</p>
+    }
+    case DeRegistered => {
+        <p>@Messages("your.registration.status.deregistered")
+        @endDate.map { date =>
+            @Messages("your.registration.status.deregistered.date", DateHelper.formatDate(date))
+
+        }
+        </p>
     }
 }

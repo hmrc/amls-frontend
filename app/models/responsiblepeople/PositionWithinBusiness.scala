@@ -118,6 +118,8 @@ object PositionWithinBusiness
   private[responsiblepeople] val fullySpecifiedRule = Rule[(Set[String], Option[String]), Set[PositionWithinBusiness]]  {
     case (s, None) if s.contains("other") =>
       Invalid(Seq(Path \ "otherPosition" -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
+    case (s, o) if s.contains("other") && o.get.trim.isEmpty =>
+      Invalid(Seq(Path \ "otherPosition" -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
     case (s, o) =>
       Valid(s.map {
         case "01" => BeneficialOwner

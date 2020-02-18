@@ -49,7 +49,7 @@ class SummaryController @Inject() (val dataCache: DataCacheConnector,
             bmActivities <- businessMatching.activities
           } yield {
             val hideReceiveAdvice = bmActivities.businessActivities.contains(AccountancyServices)
-              Ok(summary(EmptyForm, businessActivity, businessMatching.alphabeticalBusinessTypes, hideReceiveAdvice))
+              Ok(summary(EmptyForm, businessActivity, businessMatching, hideReceiveAdvice))
           }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
