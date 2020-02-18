@@ -27,7 +27,10 @@ object CashPaymentFirstDate {
 
   implicit val formRule: Rule[UrlFormEncoded, CashPaymentFirstDate] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-        (__ \ "paymentDate").read(localDateFutureRule) map CashPaymentFirstDate.apply
+        (__ \ "paymentDate").read(newAllowedPastAndFutureDateRule("error.date.hvd",
+          "error.date.hvd.past",
+          "error.date.hvd.future",
+          "error.date.hvd.real")) map CashPaymentFirstDate.apply
   }
 
   implicit def formWrites: Write[CashPaymentFirstDate, UrlFormEncoded] = Write {
