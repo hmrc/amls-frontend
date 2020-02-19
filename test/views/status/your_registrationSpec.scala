@@ -108,9 +108,9 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
       doc.getElementById("application-withdrawn-description-1").text() must be("You have withdrawn your application to register with HMRC.")
       doc.getElementById("application-withdrawn-description-2").text() must be("Your business is not registered with HMRC under the Money Laundering Regulations.")
-      doc.getElementById("new.application.button").attr("href") must be(controllers.routes.StatusController.newSubmission().url)
       Option(doc.getElementById("update-information")) must be(None)
       doc.getElementById("registration-status").html() must include("Not supervised. Application withdrawn.")
+      doc.getElementById("new.application.button").html() must include("Start a new application")
     }
 
     "contain correct content for status SubmissionDecisionRejected" in new ViewFixture {
@@ -124,9 +124,9 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
       doc.getElementById("application-rejected-description-1").text() must be("Your application to register with HMRC has been rejected.")
       doc.getElementById("application-rejected-description-2").text() must be("Your business is not registered with HMRC. Your business must not carry out activities that are covered by the Money Laundering Regulations.")
-      doc.getElementById("new.application.button").attr("href") must be(controllers.routes.StatusController.newSubmission().url)
       Option(doc.getElementById("update-information")) must be(None)
       doc.getElementById("registration-status").html() must include("Not supervised. Application rejected.")
+      doc.getElementById("new.application.button").html() must include("Start a new application")
     }
 
     "contain correct content for status SubmissionDecisionRevoked" in new ViewFixture {
@@ -140,9 +140,9 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
       doc.getElementById("application-revoked-description-1").text() must be("Your registration has been revoked.")
       doc.getElementById("application-revoked-description-2").text() must be("Your business is not registered with HMRC. Your business must not carry out activities that are covered by the Money Laundering Regulations.")
-      doc.getElementById("new.application.button").attr("href") must be(controllers.routes.StatusController.newSubmission().url)
       Option(doc.getElementById("update-information")) must be(None)
       doc.getElementById("registration-status").html() must include("Not supervised. Registration revoked.")
+      doc.getElementById("new.application.button").html() must include("Start a new application")
     }
 
     "contain correct content for status SubmissionDecisionExpired" in new ViewFixture {
@@ -156,9 +156,9 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
       doc.getElementById("application-expired-description-1").text() must be("Your registration has expired.")
       doc.getElementById("application-expired-description-2").text() must be("Your business is not registered with HMRC under the Money Laundering Regulations.")
-      doc.getElementById("new.application.button").attr("href") must be(controllers.routes.StatusController.newSubmission().url)
       Option(doc.getElementById("update-information")) must be(None)
       doc.getElementById("registration-status").html() must include("Not supervised. Registration expired.")
+      doc.getElementById("new.application.button").html() must include("Start a new application")
     }
 
     "contain correct content for status DeRegistered" in new ViewFixture {
@@ -173,9 +173,9 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
       doc.getElementById("application-deregistered-description-1").text() must be("You have deregistered your business.")
       doc.getElementById("application-deregistered-description-2").text() must be("Your business is not registered with HMRC under the Money Laundering Regulations.")
-      doc.getElementById("new.application.button").attr("href") must be(controllers.routes.StatusController.newSubmission().url)
       Option(doc.getElementById("update-information")) must be(None)
       doc.getElementById("registration-status").html() must include("Not supervised. Deregistered on " + DateHelper.formatDate(deregistrationDate.value) + ".")
+      doc.getElementById("new.application.button").html() must include("Start a new application")
     }
 
     "contain registration information for status SubmissionReady" in new ViewFixture {
