@@ -33,7 +33,7 @@ object TransactionsInNext12Months {
   private val maxWithMSG = maxWithMsg(11, "error.invalid.msb.transactions.in.12months")
   private val txnAmountRegex = regexWithMsg("^[0-9]{1,11}$".r, "error.invalid.msb.transactions.in.12months")
   private val txnAmountType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.msb.transactions.in.12months") andThen txnAmountRegex
+    notEmpty.withMessage("error.required.msb.transactions.in.12months") andThen txnAmountRegex andThen maxWithMSG
 
   implicit val formRule: Rule[UrlFormEncoded, TransactionsInNext12Months] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
