@@ -14,11 +14,19 @@
  * limitations under the License.
  *@
 
+@import views.html.include.forms2.form
+@import views.html.include.forms2.submitWithPlaceholder
+@import forms.EmptyForm
+
 @(businessName: Option[String])(implicit request: Request[_], m: Messages, lang: Lang)
 
 <p id="application-withdrawn-description-1">@Messages("your.registration.status.withdrawn.line1")</p>
 <p id="application-withdrawn-description-2">@Messages("your.registration.status.withdrawn.line2")</p>
 
-<a href="@controllers.routes.StatusController.newSubmission()" id="new.application.button" data-journey-click = "new-application:click:withdrawn" class="button" type="submit">
- @Messages("your.registration.status.new.application.button")
- @if(businessName.isDefined){<span class="visually-hidden"> for @businessName.get</span>}</a>
+ @form(EmptyForm, controllers.routes.StatusController.newSubmission()) {
+  @submitWithPlaceholder(
+   buttonMessageKey = Some("your.registration.status.new.application.button"),
+   buttonId = Some("new.application.button"),
+   gaTag = Some("new-application:click:withdrawn"),
+   placeholder = businessName)
+ }
