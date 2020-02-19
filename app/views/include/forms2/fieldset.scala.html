@@ -31,7 +31,7 @@
 )(content: Html)(implicit m: Messages)
 
 @if(section.nonEmpty) {
-    <div class="page-header"><p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages(section)</p></div>
+    <div class="page-header"><p class="heading-secondary"><span class="visuallyhidden">This section is </span>@Messages(section)</p></div>
 }
 <fieldset
     @if(f.id.nonEmpty){ id="@f.id"}
