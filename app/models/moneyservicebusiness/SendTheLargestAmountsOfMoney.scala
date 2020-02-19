@@ -42,7 +42,7 @@ private sealed trait SendTheLargestAmountsOfMoney0 {
       }
 
       val seqR = {
-        (seqToOptionSeq[String] andThen flattenR[String] andThen cR)
+        (seqToOptionSeq[String] andThen flattenR[String] andThen cR )
           .andThen(minLengthR[Seq[Country]](1) withMessage "error.invalid.country")
           .andThen(maxLengthR[Seq[Country]](3))
       }
