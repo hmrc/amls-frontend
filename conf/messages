@@ -2029,6 +2029,8 @@ responsiblepeople.wherepersonlives.postcode = Postcode
 responsiblepeople.wherepersonlives.country = Country
 responsiblepeople.wherepersonlives.address_history = How long has this person lived at this address?
 
+responsiblepeople.timeataddress.address_history.current.heading = How long has {0} lived at this address?
+responsiblepeople.timeataddress.address_history.current.title = How long has this person lived at this address?
 responsiblepeople.timeataddress.address_history.heading = How long did {0} live at this address?
 responsiblepeople.timeataddress.address_history.title = How long did this person live at this address?
 responsiblepeople.timeataddress.5_months_history = 0 to 5 months
