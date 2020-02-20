@@ -96,7 +96,7 @@ class BusinessUseAnIPSPSpec extends PlaySpec with CharacterSets {
             "name" -> Seq("abcd" * 100),
             "referenceNumber" -> Seq("1234567891")
           )
-          BusinessUseAnIPSP.formRule.validate(map) must be(Invalid(Seq((Path \ "name", Seq(ValidationError("error.invalid.maxlength.140"))),
+          BusinessUseAnIPSP.formRule.validate(map) must be(Invalid(Seq((Path \ "name", Seq(ValidationError("error.invalid.msb.ipsp.name"))),
             (Path \ "referenceNumber", Seq(ValidationError("error.invalid.mlr.number"))))))
         }
 

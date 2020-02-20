@@ -49,7 +49,7 @@ class BranchesOrAgentsWhichCountriesSpec extends PlaySpec with MustMatchers{
       )
 
       rule.validate(form) mustBe Invalid(
-        Seq((Path \ "countries") -> Seq(ValidationError("error.invalid.countries.msb.branchesOrAgents")))
+        Seq((Path \ "countries") -> Seq(ValidationError("error.invalid.countries.msb.branchesOrAgents.country")))
       )
     }
 

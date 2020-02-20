@@ -34,7 +34,7 @@ object FXTransactionsInNext12Months {
     private val txnAmountType = notEmptyStrip andThen
       notEmpty.withMessage("error.required.msb.fx.transactions.in.12months") andThen
       maxLength(maxCharLength).withMessage("error.invalid.msb.fx.transactions.in.12months") andThen
-      regexWithMsg("^[0-9]".r, "error.invalid.msb.fx.transactions.in.12months.number")
+      regexWithMsg("^[0-9]{1,11}".r, "error.invalid.msb.fx.transactions.in.12months.number")
 
     implicit val formRule: Rule[UrlFormEncoded, FXTransactionsInNext12Months] = From[UrlFormEncoded] { __ =>
         import jto.validation.forms.Rules._
