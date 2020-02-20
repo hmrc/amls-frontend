@@ -544,15 +544,17 @@ error.supervision.end.invalid.date.future = Date your previous supervision ended
 error.supervision.end.invalid.date.not.real = Enter a real date for when your previous supervision ended
 
 ############################### Money Services Business ###############################
-error.required.msb.services = Select the money service business activities you will do
+error.required.msb.services = Select which money service business activities you will do
+error.required.msb.services.tp = Select which money service business activities you will do at these premises
 error.required.msb.throughput = Select one option to show how much throughput you expect in the next 12 months
 error.required.msb.ipsp = Select yes if your business uses an IPSP
 error.required.msb.ipsp.name = Enter your IPSP’s name
 error.invalid.msb.ipsp.name = You can’t enter more than 140 characters
 error.required.msb.linked.txn = Select yes if your systems can identify linked transactions
-error.required.msb.psr.options = Select yes if your business has a PSR number
+error.required.msb.psr.options = Select yes if your business has a Payment Services Regulation (PSR) number
 error.invalid.msb.psr.number = Enter your PSR number
 error.max.length.msb.psr.number = PSR number must be 6 numbers
+error.max.msb.psr.number.format = PSR number most only include numbers
 error.required.msb.send.money = Select yes if you send money to other countries
 error.required.msb.transactions.in.12months = Enter the number of transactions you expect in the next 12 months
 error.required.msb.fx.transactions.in.12months = Enter the number of foreign exchange transactions you expect in the next 12 months
