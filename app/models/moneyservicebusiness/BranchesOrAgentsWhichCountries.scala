@@ -36,7 +36,8 @@ object BranchesOrAgentsWhichCountries {
 
   private implicit def rule
   (implicit
-   a: Path => RuleLike[UrlFormEncoded, Seq[String]]
+   a: Path => RuleLike[UrlFormEncoded, Seq[String]],
+   cR: Rule[Seq[String], Seq[Country]]
   ): Rule[UrlFormEncoded, BranchesOrAgentsWhichCountries] =
     From[UrlFormEncoded] { __ =>
 
