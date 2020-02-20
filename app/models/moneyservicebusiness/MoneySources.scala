@@ -37,16 +37,16 @@ object MoneySources {
   import jto.validation.forms.Rules._
   import utils.MappingUtils.Implicits._
 
-  private def bankNameType(fieldName: String) = {
+  val bankNameType = {
     notEmptyStrip andThen
-      minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") andThen
+      minLength(1).withMessage(s"error.invalid.msb.wc.bankNames") andThen
       maxLength(140).withMessage("error.maxlength.msb.wc.bankNames") andThen
       basicPunctuationPattern("error.format.msb.wc.banknames")
   }
 
-  private def wholeSalerNameType(fieldName: String) = {
+  val wholeSalerNameType = {
     notEmptyStrip andThen
-      minLength(1).withMessage(s"error.invalid.msb.wc.$fieldName") andThen
+      minLength(1).withMessage(s"error.invalid.msb.wc.wholesaler") andThen
       maxLength(140).withMessage("error.maxlength.msb.wc.wholesaler") andThen
       basicPunctuationPattern("error.format.msb.wc.wholesaler")
   }
@@ -66,7 +66,7 @@ object MoneySources {
     val bankMoneySource: Rule[UrlFormEncoded, Option[BankMoneySource]] =
       (__ \ "bankMoneySource").read[Option[String]] flatMap {
         case Some("Yes") => (__ \ "bankNames")
-          .read(bankNameType("bankNames"))
+          .read(bankNameType)
           .map(names => Some(BankMoneySource(names)))
         case _ => Rule[UrlFormEncoded, Option[BankMoneySource]](_ => Valid(None))
       }
