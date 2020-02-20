@@ -544,11 +544,9 @@ error.supervision.end.invalid.date.future = Date your previous supervision ended
 error.supervision.end.invalid.date.not.real = Enter a real date for when your previous supervision ended
 
 ############################### Money Services Business ###############################
-error.required.msb.services = Select the money service business activities you will do
-error.required.msb.throughput = Select how much throughput you expect in the next 12 months
-error.required.msb.services.preapp = Select which money service business activities you will do
-error.required.msb.services.tp.preapp = Select which money service business activities you will do at these premises
-error.required.msb.throughput.preapp = Select one option to show how much throughput you expect in the next 12 months
+error.required.msb.services = Select which money service business activities you will do
+error.required.msb.services.tp = Select which money service business activities you will do at these premises
+error.required.msb.throughput = Select one option to show how much throughput you expect in the next 12 months
 error.required.msb.ipsp = Select yes if your business uses an IPSP
 error.required.msb.ipsp.name = Enter your IPSP’s name
 error.invalid.msb.ipsp.name = Your IPSP’s name must be 144 characters or less
