@@ -52,6 +52,134 @@ class DateOfChangeSpec extends PlaySpec {
 
     }
 
+    "fail form validation when given a future date in pre-app" in {
+      val model =    Map (
+        "dateOfChange.day" -> Seq("24"),
+        "dateOfChange.month" -> Seq("2"),
+        "dateOfChange.year" -> Seq(LocalDate.now().plusYears(1).getYear.toString)
+      )
+
+      DateOfChange.formRulePreApp.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("error.required.dateofchange.future")))
+        ))
+
+    }
+
+    "fail form validation when given a fake date in pre-app" in {
+      val model =    Map (
+        "dateOfChange.day" -> Seq("244"),
+        "dateOfChange.month" -> Seq("2"),
+        "dateOfChange.year" -> Seq("1900")
+      )
+
+      DateOfChange.formRulePreApp.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("error.required.dateofchange.not.real")))
+        ))
+
+    }
+
+    "fail form validation when given a past 1900 date in pre-app" in {
+      val model =    Map (
+        "dateOfChange.day" -> Seq("24"),
+        "dateOfChange.month" -> Seq("2"),
+        "dateOfChange.year" -> Seq("1800")
+      )
+
+      DateOfChange.formRulePreApp.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("error.required.dateofchange.1900")))
+        ))
+    }
+
+    "fail form validation when missing day field in pre-app" in {
+      val model =    Map (
+        "dateOfChange.day" -> Seq(""),
+        "dateOfChange.month" -> Seq("2"),
+        "dateOfChange.year" -> Seq("2000")
+      )
+
+      DateOfChange.formRulePreApp.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("error.required.dateofchange.day")))
+        ))
+    }
+
+    "fail form validation when missing month field in pre-app" in {
+      val model =    Map (
+        "dateOfChange.day" -> Seq("2"),
+        "dateOfChange.month" -> Seq(""),
+        "dateOfChange.year" -> Seq("2000")
+      )
+
+      DateOfChange.formRulePreApp.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("error.required.dateofchange.month")))
+        ))
+    }
+
+    "fail form validation when missing year field in pre-app" in {
+      val model =    Map (
+        "dateOfChange.day" -> Seq("2"),
+        "dateOfChange.month" -> Seq("2"),
+        "dateOfChange.year" -> Seq("")
+      )
+
+      DateOfChange.formRulePreApp.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("error.required.dateofchange.year")))
+        ))
+    }
+
+    "fail form validation when missing day and month field in pre-app" in {
+      val model =    Map (
+        "dateOfChange.day" -> Seq(""),
+        "dateOfChange.month" -> Seq(""),
+        "dateOfChange.year" -> Seq("2000")
+      )
+
+      DateOfChange.formRulePreApp.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("error.required.dateofchange.month.day")))
+        ))
+    }
+
+    "fail form validation when missing day and year field in pre-app" in {
+      val model =    Map (
+        "dateOfChange.day" -> Seq(""),
+        "dateOfChange.month" -> Seq("2"),
+        "dateOfChange.year" -> Seq("")
+      )
+
+      DateOfChange.formRulePreApp.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("error.required.dateofchange.year.day")))
+        ))
+    }
+
+    "fail form validation when missing month and year field in pre-app" in {
+      val model =    Map (
+        "dateOfChange.day" -> Seq("2"),
+        "dateOfChange.month" -> Seq(""),
+        "dateOfChange.year" -> Seq("")
+      )
+
+      DateOfChange.formRulePreApp.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("error.required.dateofchange.year.month")))
+        ))
+    }
+
     "fail form validation when given a date before a business activities start date" in {
       val model = Map (
         "dateOfChange.day" -> Seq("24"),

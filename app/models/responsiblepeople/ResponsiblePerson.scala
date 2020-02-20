@@ -302,7 +302,6 @@ object ResponsiblePerson {
   import play.api.libs.json.JodaWrites._
   import play.api.libs.json.JodaReads._
 
-  val flowChangeOfficer = "changeofficer"
   val flowFromDeclaration = "fromDeclaration"
 
   val key = "responsible-people"

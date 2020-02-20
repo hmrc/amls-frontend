@@ -36,6 +36,13 @@ case class BankAccount(isUk: Option[BankAccountIsUk], hasIban: Option[BankAccoun
     this.copy(hasIban = Option(hasIban))
   }
 
+  def isComplete: Boolean = this match {
+    case BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount(_, _))) => true
+    case BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber(_))) => true
+    case BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some(NonUKIBANNumber(_))) => true
+    case _ => false
+  }
+
   def account(account: Account): BankAccount = this.copy(account = Option(account))
 
   private def changedIsUk(newData: BankAccountIsUk): Boolean =

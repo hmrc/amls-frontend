@@ -62,7 +62,7 @@ class WhatDateRemovedController @Inject()(
 
   def post(edit: Boolean = false) = authAction.async {
       implicit request =>
-        Form2[DateOfChange](request.body) match {
+        Form2[DateOfChange](request.body)(DateOfChange.formRulePreApp) match {
           case form: InvalidForm =>
             Future.successful(BadRequest(date_of_change(form, "summary.updateservice", routes.WhatDateRemovedController.post(edit), false, "button.continue")))
 

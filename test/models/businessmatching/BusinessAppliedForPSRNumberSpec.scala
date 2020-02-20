@@ -69,10 +69,18 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec {
 
         "given a 'yes' value with an invalid psr number with too many characters" in {
           val map = Map("appliedFor" -> Seq("true"),
-            "regNumber" -> Seq("a" * 7))
+            "regNumber" -> Seq("1111111"))
 
           BusinessAppliedForPSRNumber.formRule.validate(map) must be(Invalid(Seq((Path \ "regNumber",
             Seq(ValidationError("error.max.length.msb.psr.number"))))))
+        }
+
+        "given a 'yes' value with an invalid psr number" in {
+          val map = Map("appliedFor" -> Seq("true"),
+            "regNumber" -> Seq("aaaaaa"))
+
+          BusinessAppliedForPSRNumber.formRule.validate(map) must be(Invalid(Seq((Path \ "regNumber",
+            Seq(ValidationError("error.max.msb.psr.number.format"))))))
         }
       }
 

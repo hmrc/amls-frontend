@@ -105,6 +105,14 @@ object BusinessMatchingMsbServices {
       (__ \ "msbServices").read(minLengthR[Set[BusinessMatchingMsbService]](1).withMessage("error.required.msb.services")).flatMap(BusinessMatchingMsbServices.apply)
     }
 
+  def formReadsTP
+  (implicit
+   p: Path => RuleLike[UrlFormEncoded, Set[BusinessMatchingMsbService]]
+  ): Rule[UrlFormEncoded, BusinessMatchingMsbServices] =
+    From[UrlFormEncoded] { __ =>
+      (__ \ "msbServices").read(minLengthR[Set[BusinessMatchingMsbService]](1).withMessage("error.required.msb.services.tp")).flatMap(BusinessMatchingMsbServices.apply)
+    }
+
   implicit def formWrites
   (implicit
    w: Write[BusinessMatchingMsbService, String]

@@ -16,15 +16,10 @@
 
 package controllers.responsiblepeople
 
-import config.ApplicationConfig
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import controllers.changeofficer.RoleInBusinessController
 import models.responsiblepeople.{KnownBy, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
-import play.api.inject.bind
-import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import utils._
 

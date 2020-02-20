@@ -35,6 +35,17 @@ error.invalid.date.not.real = Enter a real date for when your business started o
 error.invalid.date.tp.not.real = Enter a real date for when your business started or will start trading from these premises
 error.invalid.date.agent.not.real = Enter a real date of birth
 
+error.required.dateofchange.day = Date of the change must include a day
+error.required.dateofchange.month = Date of the change must include a month
+error.required.dateofchange.year = Date of the change must include a year
+error.required.dateofchange.month.day = Date of the change must include a day and month
+error.required.dateofchange.year.month = Date of the change must include a month and year
+error.required.dateofchange.year.month.day = Enter the date the change happened
+error.required.dateofchange.year.day = Date of the change must include a day and year
+error.required.dateofchange.not.real = Enter a real date for when this change happened
+error.required.dateofchange.1900 = Date of the change must be after 1900
+error.required.dateofchange.future = Date of the change must be today or in the past
+
 error.required.address.line1 = Enter address line 1
 error.required.address.line2 = Enter address line 2
 error.max.length.address.line = You can’t enter more than 35 characters
@@ -145,8 +156,7 @@ error.submission.wrong_credentials.content = Your account doesn’t have enough 
 ############################        Custom Error Messages for Different Sections         ###############################
 ########################################################################################################################
 ####  Business Matching ####
-error.required.bm.register.service = Select the services you need to register
-error.required.bm.register.service.single = Select which service you need to register
+error.required.bm.register.service = Select which services you need to register
 error.required.bm.remove.service = Select which service you need to remove
 error.required.bm.remove.service.multiple = Select which services you need to remove
 error.required.bm.remove.leave.twobusinesses = You cannot remove both of your registered services
@@ -179,13 +189,13 @@ error.invalid.email.reenter = Reenter your business email address in the correct
 error.invalid.email.match = The email addresses you enter must match
 error.invalid.email.max.length = Email address must be 100 characters or less
 
-error.businessmatching.updateservice.responsiblepeople = Select at least one option to show which responsible people have passed the HMRC Money Laundering Regulations fit and proper test
-error.businessmatching.updateservice.addmoreactivities = Select yes if you want to add another type of business
+error.businessmatching.updateservice.responsiblepeople = Select which of your responsible people have passed HMRC’s fit and proper test
+error.businessmatching.updateservice.addmoreactivities = Select yes if you want to add another service
 error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes if you do {0} activities from any of your registered trading premises
 error.businessmatching.updateservice.tradingpremisessubmittedactivities = Select yes if you still do this activity from all of your registered trading premises
-error.businessmatching.updateservice.tradingpremises = Select which premises you will do {0} activities from
+error.businessmatching.updateservice.tradingpremises = Select which premises you will do {0} activities at
 
-error.businessmatching.updateservice.fitandproper = Select yes if any of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test
+error.businessmatching.updateservice.fitandproper = Select yes if any of your responsible people have passed HMRC’s fit and proper test
 error.businessmatching.updateservice.changeservices = Select what you want to do
 
 ###############################  Bank Details ###############################
@@ -536,14 +546,18 @@ error.supervision.end.invalid.date.not.real = Enter a real date for when your pr
 ############################### Money Services Business ###############################
 error.required.msb.services = Select the money service business activities you will do
 error.required.msb.throughput = Select how much throughput you expect in the next 12 months
+error.required.msb.services.preapp = Select which money service business activities you will do
+error.required.msb.services.tp.preapp = Select which money service business activities you will do at these premises
+error.required.msb.throughput.preapp = Select one option to show how much throughput you expect in the next 12 months
 error.required.msb.ipsp = Select yes if your business uses an IPSP
 error.required.msb.ipsp.name = Enter your IPSP’s name
 error.invalid.msb.ipsp.name = Your IPSP’s name must be 144 characters or less
 error.invalid.msb.ipsp.format = Your IPSP’s name can include letters a to z, numbers, spaces and punctuation
 error.required.msb.linked.txn = Select yes if your systems can identify linked transactions
-error.required.msb.psr.options = Select yes if your business has a PSR number
+error.required.msb.psr.options = Select yes if your business has a Payment Services Regulation (PSR) number
 error.invalid.msb.psr.number = Enter your PSR number
 error.max.length.msb.psr.number = PSR number must be 6 numbers
+error.max.msb.psr.number.format = PSR number most only include numbers
 error.required.msb.send.money = Select yes if you send money to other countries
 error.required.msb.transactions.in.12months = Enter how many money transfers you expect to make in the next 12 months
 error.required.msb.transactions.in.12months.length = Number of money transfers must be 11 characters or less
@@ -577,18 +591,31 @@ error.required.countries.msb.most.transactions = Enter where you expect to send 
 error.required.renewal.send.money = Select yes if you sent money to other countries in the last 12 months
 
 ############################### High Value Dealer ###############################
-error.required.hvd.accepted.cash.payment = Select yes if you’ve already accepted cash payments of €10,000 or more
-error.required.hvd.how-will-you-sell-goods = Select one or more options to show how you’ll sell these goods
-error.required.hvd.business.sell.atleast = Select one or more options to show what your business will sell
-error.required.hvd.business.sell.other.details = Enter a description of what your business will sell
-error.invalid.hvd.business.sell.other.details = You can’t enter more than 255 characters
-error.required.hvd.linked.cash.payment = Select yes if you can automatically identify linked cash payments that come to €10,000 or more
-error.required.hvd.receive.cash.payments = Select yes if you expect to receive cash payments over €10,000 from customers you’ve not met in person
-error.required.hvd.describe = Enter details of how you expect to receive these payments
-error.maxlength.hvd.describe = You can’t enter more than 255 characters
-error.required.hvd.choose.option = Please choose at least one option.
-error.required.hvd.excise.goods = Select yes if you’ll be buying or selling duty-suspended excise goods
-error.required.hvd.percentage = Select one option to show how much of your turnover you expect to come from cash payments over €10,000
+error.required.hvd.accepted.cash.payment = Select yes if your business has made or accepted any cash payments of €10,000 or more
+error.required.hvd.how-will-you-sell-goods = Select how will you sell these goods
+error.required.hvd.business.sell.atleast = Select what your business will buy or sell
+error.required.hvd.business.sell.other.details = Enter what your business will buy and sell
+error.invalid.hvd.business.sell.other.details = What your business buys or sells must be 255 characters or less
+error.invalid.hvd.business.sell.other.format = What you buy or sell can include letters a to z, numbers, spaces and punctuation
+error.required.hvd.linked.cash.payment = Select yes if you’re able to automatically identify linked cash payments that come to €10,000 or more
+error.required.hvd.receive.cash.payments = Select yes if you expect to receive cash payments of €10,000 or more from customers you have not met in person
+error.required.hvd.describe = Enter how you will receive cash payments of €10,000 or more
+error.required.hvd.format = Description of how you will receive cash payments of €10,000 or more can include letters a to z, numbers, spaces and punctuation
+error.maxlength.hvd.describe = Description of how you will receive cash payments of €10,000 or more must be 255 characters or less
+error.required.hvd.choose.option = Select how you expect to receive cash payments of €10,000 or more from customers you have not met
+error.required.hvd.excise.goods = Select yes if you will buy or sell duty-suspended excise goods
+error.required.hvd.percentage = Select what percentage of your turnover you expect to come from cash payments of €10,000 or more
+
+error.date.hvd.day = Date of the first payment must include a day
+error.date.hvd.month = Date of the first payment must include a month
+error.date.hvd.year = Date of the first payment must include a year
+error.date.hvd.month.day = Date of the first payment must include a day and month
+error.date.hvd.year.month = Date of the first payment must include a month and year
+error.date.hvd.year.day = Date of the first payment must include a day and year
+error.date.hvd.year.month.day = Enter the date of the first payment
+error.date.hvd.future = Date of the first payment must be today or in the past
+error.date.hvd.real = Enter a real date for the date of the first payment
+error.date.hvd.past = Date of the first payment must be after 1900
 
 
 ################################# Renewal ###################################
@@ -2425,7 +2452,7 @@ hvd.products.option.10 = Mobile phones
 hvd.products.option.11 = Clothing
 hvd.products.option.12 = Other
 
-hvd.identify.linked.cash.payment.title = Are you able to automatically identify linked cash payments which come to €10,000 or more?
+hvd.identify.linked.cash.payment.title = Are you able to automatically identify linked cash payments that come to €10,000 or more?
 hvd.identify.linked.cash.payments.subtitle = If you do not use euros you’ll need to convert the amount to the currency you use.
 
 hvd.receiving.title = Do you expect to receive cash payments of €10,000 or more from customers you have not met in person?
@@ -2433,7 +2460,7 @@ hvd.receiving.convert.currency.text = If you do not use euros you’ll need to c
 hvd.receiving.expect.to.receive = How do you expect to receive cash payments of €10,000 or more from customers you have not met?
 hvd.receiving.option.01 = By courier
 hvd.receiving.option.02 = Directly into a bank account
-hvd.receiving.option.03 = Other
+hvd.receiving.option.03 = Another way to receive cash payments
 hvd.receiving.give.details.lbl = Add how you will receive cash payments over €10,000 from customers you have not met
 
 hvd.expect.to.receive.title = How do you expect to receive cash payments of €10,000 or more from customers you have not met?

@@ -28,7 +28,7 @@ abstract class BankDetailsController(ds: CommonPlayDependencies,
   implicit class BankDetailsSyntax(model: BankDetails) {
     def canEdit(status: SubmissionStatus): Boolean = status match {
       case SubmissionReady | NotCompleted => true
-      case _ if !model.hasAccepted => true
+      case _ if !model.hasAccepted || !model.isComplete => true
       case _ => false
     }
   }
