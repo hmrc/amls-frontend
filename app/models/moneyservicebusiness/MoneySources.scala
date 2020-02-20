@@ -74,7 +74,7 @@ object MoneySources {
     val wholesalerMoneySource: Rule[UrlFormEncoded, Option[WholesalerMoneySource]] =
       (__ \ "wholesalerMoneySource").read[Option[String]] flatMap {
         case Some("Yes") => (__ \ "wholesalerNames")
-          .read(wholeSalerNameType("wholesalerNames"))
+          .read(wholeSalerNameType)
           .map(names => Some(WholesalerMoneySource(names)))
         case _ => Rule[UrlFormEncoded, Option[WholesalerMoneySource]](_ => Valid(None))
       }
