@@ -43,6 +43,18 @@ class ways_to_paySpec extends AmlsViewSpec {
       doc.html must include(Messages("payments.waystopay.lead.time"))
     }
 
+    "have correct title, headings and form fields for renewal" in new ViewFixture {
+
+      def view = views.html.payments.ways_to_pay(EmptyForm, isRenewal = true)
+
+      doc.title must startWith(Messages("payments.waystopay.title"))
+      heading.html must be(Messages("payments.waystopay.header"))
+      subHeading.html must include(Messages("submit.renewal.application"))
+      doc.html must include(Messages("payments.waystopay.info"))
+      doc.html must include(Messages("payments.waystopay.info2"))
+      doc.html must include(Messages("payments.waystopay.lead.time"))
+    }
+
     "have a back link" in new ViewFixture {
 
       def view = views.html.payments.ways_to_pay(EmptyForm)

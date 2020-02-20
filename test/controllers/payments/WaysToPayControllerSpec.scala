@@ -21,7 +21,7 @@ import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.ResponseType.SubscriptionResponseType
 import models.confirmation.Currency
 import models.payments._
-import models.status.SubmissionReadyForReview
+import models.status.{SubmissionReady, SubmissionReadyForReview}
 import models.{FeeResponse, ReadStatusResponse, ReturnLocation}
 import org.joda.time.DateTime
 import org.mockito.Matchers.{any, eq => eqTo}
@@ -92,6 +92,10 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
     when {
       controller.feeResponseService.getFeeResponse(any(), any())(any(),any())
     } thenReturn Future.successful(Some(fees))
+
+    when {
+      controller.statusService.getStatus(any(), any(), any())(any(), any())
+    } thenReturn Future.successful(SubmissionReady)
 
   }
 

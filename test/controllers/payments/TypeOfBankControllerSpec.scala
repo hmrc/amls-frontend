@@ -21,6 +21,7 @@ import generators.PaymentGenerator
 import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
 import models.confirmation.Currency
+import models.status.SubmissionReady
 import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.{verify, when}
@@ -49,7 +50,8 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
       paymentsService = mock[PaymentsService],
-      cc = mockMcc
+      cc = mockMcc,
+      statusService = mock[StatusService]
     )
 
     val paymentRef = paymentRefGen.sample.get
@@ -80,6 +82,10 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
     when {
       controller.paymentsService.amountFromSubmissionData(any())
     } thenReturn Some(Currency.fromInt(100))
+
+    when {
+      controller.statusService.getStatus(any(), any(), any())(any(), any())
+    } thenReturn Future.successful(SubmissionReady)
 
   }
 

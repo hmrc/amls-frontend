@@ -23,13 +23,13 @@ import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
 
-class type_of_bankSpec extends PlaySpec with AmlsViewSpec{
+class type_of_bankSpec extends PlaySpec with AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addTokenForView()
   }
 
-    "type_of_bank view" must {
+  "type_of_bank view" must {
 
     "have correct title, headings and form fields" in new ViewFixture {
 
@@ -38,7 +38,15 @@ class type_of_bankSpec extends PlaySpec with AmlsViewSpec{
       doc.title must startWith(Messages("payments.typeofbank.title"))
       heading.html must be(Messages("payments.typeofbank.header"))
       subHeading.html must include(Messages("submit.registration"))
+    }
 
+    "have correct title, headings and form fields for renewal" in new ViewFixture {
+
+      def view = views.html.payments.type_of_bank(EmptyForm, isRenewal = true)
+
+      doc.title must startWith(Messages("payments.typeofbank.title"))
+      heading.html must be(Messages("payments.typeofbank.header"))
+      subHeading.html must include(Messages("submit.renewal.application"))
     }
 
     "have a back link" in new ViewFixture {
