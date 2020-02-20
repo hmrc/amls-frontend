@@ -1,1 +1,0 @@
- + [AMLS-5726] - 'Bug fix: Unused element taking up vertical space on some Status pages'

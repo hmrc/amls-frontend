@@ -80,7 +80,7 @@ class ReceiveCashPaymentsSpec extends PlaySpec {
       )
 
       ReceiveCashPayments.formR.validate(data)
-        .mustEqual(Invalid(Seq((Path \ "paymentMethods" \ "details") -> Seq(ValidationError("error.invalid.maxlength.255")))))
+        .mustEqual(Invalid(Seq((Path \ "paymentMethods" \ "details") -> Seq(ValidationError("error.maxlength.hvd.describe")))))
     }
   }
 

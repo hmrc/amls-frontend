@@ -1,1 +1,0 @@
- + [AMLS-5693] - 'Prevent save on position in business where other is selected and only white space is provided'

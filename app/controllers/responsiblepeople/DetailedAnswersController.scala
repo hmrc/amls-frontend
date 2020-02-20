@@ -25,7 +25,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.Partnership
 import models.responsiblepeople.ResponsiblePerson
-import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
+import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved}
 import play.api.mvc.{MessagesControllerComponents, Request}
 import services.StatusService
@@ -89,8 +89,7 @@ class DetailedAnswersController @Inject () (
       } flatMap { _ =>
         flow match {
           case Some(`flowFromDeclaration`) => redirectFromDeclarationFlow(request.amlsRefNumber, request.accountTypeId, request.credId)
-          case Some(`flowChangeOfficer`) => Future.successful(Redirect(controllers.changeofficer.routes.NewOfficerController.get()))
-          case None => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))
+          case _ => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))
         }
       }
   }

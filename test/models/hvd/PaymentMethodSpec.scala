@@ -56,7 +56,7 @@ class PaymentMethodSpec extends PlaySpec {
       )
 
       PaymentMethods.formR.validate(data) must be(
-        Invalid(Seq((Path \ "details") -> Seq(ValidationError("err.text.validation"))))
+        Invalid(Seq((Path \ "details") -> Seq(ValidationError("error.required.hvd.format"))))
       )
     }
   }

@@ -107,6 +107,32 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
         bankDetails.isComplete must be(false)
       }
     }
+
+    "return false" when {
+      "given incomplete UK BankAccount" in {
+        val bankAccount = BankAccount(Some(BankAccountIsUk(true)), None, None)
+        val bankDetails = BankDetails(Some(accountType), Some("name"), Some( bankAccount), hasAccepted = true)
+        bankDetails.isComplete must be(false)
+      }
+
+      "given incomplete Non UK BankAccount without IBAN" in {
+        val bankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), None)
+        val bankDetails = BankDetails(Some(accountType), Some("name"), Some( bankAccount), hasAccepted = true)
+        bankDetails.isComplete must be(false)
+      }
+
+      "given incomplete Non UK BankAccount without IBAN answer" in {
+        val bankAccount = BankAccount(Some(BankAccountIsUk(false)), None, None)
+        val bankDetails = BankDetails(Some(accountType), Some("name"), Some( bankAccount), hasAccepted = true)
+        bankDetails.isComplete must be(false)
+      }
+
+      "given incomplete UK BankAccount with IBAN" in {
+        val bankAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), None)
+        val bankDetails = BankDetails(Some(accountType), Some("name"), Some( bankAccount), hasAccepted = true)
+        bankDetails.isComplete must be(false)
+      }
+    }
   }
 
   "getBankAccountDescription" must {

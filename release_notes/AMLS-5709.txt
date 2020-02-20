@@ -1,1 +1,0 @@
- + [AMLS-5709] - 'Made type of bank inputs inline'

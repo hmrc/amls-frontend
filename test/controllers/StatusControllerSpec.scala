@@ -609,42 +609,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       }
     }
 
-    "show the change officer link" when {
-      "application status is ReadyForRenewal" in new Fixture {
-
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
-
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
-
-        val renewalDate = LocalDate.now().plusDays(15)
-
-        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
-          Some(renewalDate), false)
-
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
-          .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
-
-        when(controller.renewalService.getRenewal(any[String]())(any(), any()))
-          .thenReturn(Future.successful(None))
-
-        val result = controller.get()(request)
-        status(result) must be(OK)
-
-        contentAsString(result) must include(Messages("status.submissiondecisionsupervised.renewal.btn"))
-
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").asScala foreach {
-          _.text mustBe Messages("changeofficer.changelink.text")
-        }
-      }
-    }
-
     "have hasMsb method which" must {
       "return true if Msb activities are present in business activities" in new Fixture {
         val hasMsb = PrivateMethod[Boolean]('hasMsb)
