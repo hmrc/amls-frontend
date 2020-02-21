@@ -17,6 +17,6 @@
 @(title: String = "", section: String = "")(implicit m: Messages)
 
 <div class="page-header">
-    @if(section.nonEmpty) {<p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages(section)</p>}
+    @if(section.nonEmpty) {<p class="heading-secondary"><span class="visuallyhidden">This section is </span>@Messages(section)</p>}
     @if(title.nonEmpty) {<h1 class="heading-xlarge">@Messages(title)</h1>}
 </div>
