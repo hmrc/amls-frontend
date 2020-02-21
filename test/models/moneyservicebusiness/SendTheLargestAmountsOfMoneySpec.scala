@@ -60,7 +60,7 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
       )
 
       rule.validate(form) mustEqual Invalid(
-        Seq((Path \ "largestAmountsOfMoney") -> Seq(ValidationError("error.invalid.country")))
+        Seq((Path \ "largestAmountsOfMoney") -> Seq(ValidationError("error.invalid.countries.msb.sendlargestamount.country")))
       )
     }
 

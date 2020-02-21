@@ -113,7 +113,25 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.msb.transactions.in.12months"))
+      contentAsString(result) must include(Messages("error.required.msb.ce.transactions.in.12months"))
+
+    }
+
+    "Show error message when user has entered data in the wrong format" in new Fixture {
+
+      val newRequest = requestWithUrlEncodedBody(
+        "ceTransaction" -> "asas"
+      )
+
+      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
+        (any(), any())).thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(Messages("error.invalid.msb.ce.transactions.in.12months.number"))
 
     }
 

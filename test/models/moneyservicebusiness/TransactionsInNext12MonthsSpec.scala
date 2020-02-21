@@ -46,14 +46,14 @@ class TransactionsInNext12MonthsSpec extends PlaySpec {
 
         val map = Map("txnAmount" -> Seq("asas"))
         TransactionsInNext12Months.formRule.validate(map) must be(Invalid(
-          Seq( Path \ "txnAmount" -> Seq(ValidationError("error.invalid.msb.transactions.in.12months")))))
+          Seq( Path \ "txnAmount" -> Seq(ValidationError("error.required.msb.transactions.in.12months.format")))))
       }
 
       "fail validation on invalid field when it exceeds the max length" in {
 
         val map = Map("txnAmount" -> Seq("123"*10))
         TransactionsInNext12Months.formRule.validate(map) must be(Invalid(
-          Seq( Path \ "txnAmount" -> Seq(ValidationError("error.invalid.msb.transactions.in.12months")))))
+          Seq( Path \ "txnAmount" -> Seq(ValidationError("error.required.msb.transactions.in.12months.length")))))
       }
 
       "fail validation on invalid field1" in {
