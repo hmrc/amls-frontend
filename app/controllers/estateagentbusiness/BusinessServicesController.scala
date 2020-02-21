@@ -21,7 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{EstateAgentBusinessService => EAB}
-import models.estateagentbusiness.{EstateAgentBusiness, Residential, Services}
+import models.estateagentbusiness.{EstateAgentBusiness, RedressSchemedNo, Residential, Services}
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
@@ -67,7 +67,7 @@ class BusinessServicesController @Inject()(val dataCacheConnector: DataCacheConn
     if(data.services.contains(Residential)) {
       business
     } else {
-      business.copy(redressScheme = None)
+      business.copy(redressScheme = Some(RedressSchemedNo))
     }
   }
 
