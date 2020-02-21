@@ -14,7 +14,7 @@ private object AppDependencies {
   import play.core.PlayVersion
 
   private val playPartialsVersion = "6.9.0-play-26"
-  private val httpCachingClientVersion = "8.5.0-play-26"
+  private val httpCachingClientVersion = "9.0.0-play-26"
   private val playWhitelistFilterVersion = "3.1.0-play-26"
   private val validationVersion = "2.1.0"
   private val flexmarkVersion = "0.19.1"
@@ -34,9 +34,9 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "simple-reactivemongo" % playReactivemongoVersion,
     "uk.gov.hmrc" %% "auth-client" % authVersion,
     "uk.gov.hmrc" %% "play-ui" % "8.0.0-play-26",
-    "uk.gov.hmrc" %% "bootstrap-play-26" % "0.45.0",
+    "uk.gov.hmrc" %% "bootstrap-play-26" % "1.3.0",
     "uk.gov.hmrc" %% "govuk-template" % "5.38.0-play-26",
-    "uk.gov.hmrc" %% "http-verbs" % "9.8.0-play-26",
+    "uk.gov.hmrc" %% "http-verbs" % "10.5.0-play-26",
 
     "io.github.jto" %% "validation-core"      % validationVersion,
     "io.github.jto" %% "validation-playjson"  % validationVersion,
