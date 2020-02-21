@@ -20,8 +20,8 @@ private object AppDependencies {
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
   private val jsonEncryptionVersion = "4.4.0-play-26"
-  private val playReactivemongoVersion = "7.22.0-play-26"
-  private val authVersion = "2.27.0-play-26"
+  private val playReactivemongoVersion = "7.23.0-play-26"
+  private val authVersion = "2.32.2-play-26"
   private val domain = "5.6.0-play-26"
 
   val compile = Seq(
@@ -33,7 +33,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "json-encryption" % jsonEncryptionVersion,
     "uk.gov.hmrc" %% "simple-reactivemongo" % playReactivemongoVersion,
     "uk.gov.hmrc" %% "auth-client" % authVersion,
-    "uk.gov.hmrc" %% "play-ui" % "8.0.0-play-26",
+    "uk.gov.hmrc" %% "play-ui" % "8.7.0-play-26",
     "uk.gov.hmrc" %% "bootstrap-play-26" % "1.3.0",
     "uk.gov.hmrc" %% "govuk-template" % "5.38.0-play-26",
     "uk.gov.hmrc" %% "http-verbs" % "10.5.0-play-26",
