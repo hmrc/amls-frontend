@@ -39,14 +39,14 @@ object MoneySources {
 
   val bankNameType = {
     notEmptyStrip andThen
-      minLength(1).withMessage(s"error.invalid.msb.wc.bankNames") andThen
+      minLength(1).withMessage("error.invalid.msb.wc.bankNames") andThen
       maxLength(140).withMessage("error.maxlength.msb.wc.bankNames") andThen
       basicPunctuationPattern("error.format.msb.wc.banknames")
   }
 
   val wholeSalerNameType = {
     notEmptyStrip andThen
-      minLength(1).withMessage(s"error.invalid.msb.wc.wholesaler") andThen
+      minLength(1).withMessage("error.invalid.msb.wc.wholesalerNames") andThen
       maxLength(140).withMessage("error.maxlength.msb.wc.wholesaler") andThen
       basicPunctuationPattern("error.format.msb.wc.wholesaler")
   }
