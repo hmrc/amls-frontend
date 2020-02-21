@@ -546,10 +546,10 @@ error.supervision.end.invalid.date.not.real = Enter a real date for when your pr
 ############################### Money Services Business ###############################
 error.required.msb.services = Select which money service business activities you will do
 error.required.msb.services.tp = Select which money service business activities you will do at these premises
-error.required.msb.throughput = Select one option to show how much throughput you expect in the next 12 months
+error.required.msb.throughput = Select how much throughput you expect in the next 12 months
 error.required.msb.ipsp = Select yes if your business uses an IPSP
 error.required.msb.ipsp.name = Enter your IPSP’s name
-error.invalid.msb.ipsp.name = Your IPSP’s name must be 144 characters or less
+error.invalid.msb.ipsp.name = Your IPSP’s name must be 140 characters or less
 error.invalid.msb.ipsp.format = Your IPSP’s name can include letters a to z, numbers, spaces and punctuation
 error.required.msb.linked.txn = Select yes if your systems can identify linked transactions
 error.required.msb.psr.options = Select yes if your business has a Payment Services Regulation (PSR) number
