@@ -30,9 +30,11 @@ object CETransactionsInNext12Months {
 
   implicit val format = Json.format[CETransactionsInNext12Months]
 
-  private val txnAmountRegex = regexWithMsg("^[0-9]{1,11}$".r, "error.invalid.msb.transactions.in.12months")
+  private val maxCharLength = 11
   private val txnAmountType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.msb.transactions.in.12months") andThen txnAmountRegex
+    notEmpty.withMessage("error.required.msb.ce.transactions.in.12months") andThen
+    maxLength(maxCharLength).withMessage("error.invalid.msb.ce.transactions.in.12months") andThen
+    regexWithMsg("^[0-9]{1,11}".r, "error.invalid.msb.ce.transactions.in.12months.number")
 
   implicit val formRule: Rule[UrlFormEncoded, CETransactionsInNext12Months] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
