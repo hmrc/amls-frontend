@@ -39,6 +39,16 @@ class bank_detailsSpec extends AmlsViewSpec with PaymentGenerator {
       doc.getElementsContainingOwnText(Messages("payments.bankdetails.hint")) must not be empty
     }
 
+    "have correct title, headings for renewal" in new ViewFixture {
+
+      def view = views.html.payments.bank_details(true, 0, paymentReferenceNumber, true)
+
+      doc.title must startWith(Messages("payments.bankdetails.title"))
+      heading.html must be(Messages("payments.bankdetails.header"))
+      subHeading.html must include(Messages("submit.renewal.application"))
+      doc.getElementsContainingOwnText(Messages("payments.bankdetails.hint")) must not be empty
+    }
+
     "have a back link" in new ViewFixture {
 
       def view = views.html.payments.bank_details(true, 0, paymentReferenceNumber)

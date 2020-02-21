@@ -24,67 +24,74 @@ import javax.inject.{Inject, Singleton}
 import models.FeeResponse
 import models.payments.WaysToPay._
 import models.payments.{CreateBacsPaymentRequest, WaysToPay}
+import models.status.Renewal
 import play.api.mvc.{MessagesControllerComponents, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, AuthorisedRequest}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 @Singleton
-class WaysToPayController @Inject()(
-                                     val authAction: AuthAction,
-                                     val ds: CommonPlayDependencies,
-                                     val statusService: StatusService,
-                                     val paymentsService: PaymentsService,
-                                     val authEnrolmentsService: AuthEnrolmentsService,
-                                     val feeResponseService: FeeResponseService,
-                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+class WaysToPayController @Inject()(val authAction: AuthAction,
+                                    val ds: CommonPlayDependencies,
+                                    val statusService: StatusService,
+                                    val paymentsService: PaymentsService,
+                                    val authEnrolmentsService: AuthEnrolmentsService,
+                                    val feeResponseService: FeeResponseService,
+                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
-      implicit request =>
-        Future.successful(Ok(views.html.payments.ways_to_pay(EmptyForm)))
+    implicit request =>
+      (for {
+        status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
+      } yield {
+        status match {
+          case _: Renewal => Ok(views.html.payments.ways_to_pay(EmptyForm, true))
+          case _ => Ok(views.html.payments.ways_to_pay(EmptyForm))
+        }
+      }) getOrElse InternalServerError("Failed to retrieve status data.")
   }
 
   def post() = authAction.async {
     implicit request =>
-        Form2[WaysToPay](request.body) match {
-          case ValidForm(_, data) =>
-            data match {
-              case Card =>
-                progressToPayment{ (fees, paymentReference, safeId) =>
-                  paymentsService.requestPaymentsUrl(
-                    fees,
-                    controllers.routes.PaymentConfirmationController.paymentConfirmation(paymentReference).url,
+      Form2[WaysToPay](request.body) match {
+        case ValidForm(_, data) =>
+          data match {
+            case Card =>
+              progressToPayment { (fees, paymentReference, safeId) =>
+                paymentsService.requestPaymentsUrl(
+                  fees,
+                  controllers.routes.PaymentConfirmationController.paymentConfirmation(paymentReference).url,
+                  fees.amlsReferenceNumber,
+                  safeId,
+                  request.accountTypeId
+                ).map { nextUrl =>
+                  Redirect(nextUrl.value)
+                }
+              }("Cannot retrieve payment information")
+            case Bacs =>
+              progressToPayment { (fees, paymentReference, safeId) =>
+                paymentsService.createBacsPayment(
+                  CreateBacsPaymentRequest(
                     fees.amlsReferenceNumber,
+                    paymentReference,
                     safeId,
-                    request.accountTypeId
-                  ).map { nextUrl =>
-                    Redirect(nextUrl.value)
-                  }
-                }("Cannot retrieve payment information")
-              case Bacs =>
-                progressToPayment{ (fees, paymentReference, safeId) =>
-                  paymentsService.createBacsPayment(
-                    CreateBacsPaymentRequest(
-                      fees.amlsReferenceNumber,
-                      paymentReference,
-                      safeId,
-                      paymentsService.amountFromSubmissionData(fees).fold(0)(_.map(_ * 100).value.toInt)),
-                    request.accountTypeId
-                  ).map { _ =>
-                    Redirect(controllers.payments.routes.TypeOfBankController.get())
-                  }
-                }("Unable to save BACS info")
-            }
-          case f: InvalidForm => Future.successful(BadRequest(views.html.payments.ways_to_pay(f)))
-        }
+                    paymentsService.amountFromSubmissionData(fees).fold(0)(_.map(_ * 100).value.toInt)),
+                  request.accountTypeId
+                ).map { _ =>
+                  Redirect(controllers.payments.routes.TypeOfBankController.get())
+                }
+              }("Unable to save BACS info")
+          }
+        case f: InvalidForm => Future.successful(BadRequest(views.html.payments.ways_to_pay(f)))
+      }
   }
 
   def progressToPayment(fn: (FeeResponse, String, String) => Future[Result])
                        (errorMessage: String)
-                       (implicit hc: HeaderCarrier, request:AuthorisedRequest[_]): Future[Result] = {
+                       (implicit hc: HeaderCarrier, request: AuthorisedRequest[_]): Future[Result] = {
 
     val submissionDetails = for {
       amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))

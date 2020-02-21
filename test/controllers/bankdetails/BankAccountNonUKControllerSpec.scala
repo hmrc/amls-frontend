@@ -39,6 +39,7 @@ class BankAccountNonUKControllerSpec extends AmlsSpec {
 
     val request = addToken(authRequest)
 
+    val accountType = PersonalAccount
 
     val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
 
@@ -113,9 +114,13 @@ class BankAccountNonUKControllerSpec extends AmlsSpec {
 
         "editing an amendment" in new Fixture {
 
-
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(
-            BankDetails(None, None, Some(ukBankAccount), hasAccepted = true))), Some(BankDetails.key))
+          mockCacheFetch[Seq[BankDetails]](
+            Some(
+              Seq(
+                BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true)
+              )
+            ), Some(BankDetails.key)
+          )
 
           mockApplicationStatus(SubmissionReadyForReview)
 
@@ -127,8 +132,13 @@ class BankAccountNonUKControllerSpec extends AmlsSpec {
 
         "editing a variation" in new Fixture {
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(
-            BankDetails(None, None, Some(ukBankAccount), hasAccepted = true))), Some(BankDetails.key))
+          mockCacheFetch[Seq[BankDetails]](
+            Some(
+              Seq(
+                BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true)
+              )
+            ), Some(BankDetails.key)
+          )
 
           mockApplicationStatus(SubmissionDecisionApproved)
 

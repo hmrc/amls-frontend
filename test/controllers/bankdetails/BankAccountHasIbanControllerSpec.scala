@@ -37,6 +37,8 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec {
     val request = addToken(authRequest)
     val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
 
+    val accountType = PersonalAccount
+
     val controller = new BankAccountHasIbanController(
       mockCacheConnector,
       SuccessfulAuthAction,
@@ -77,9 +79,13 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec {
 
         "editing an amendment" in new Fixture {
 
-
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(
-            BankDetails(None, None, Some(ukBankAccount), hasAccepted = true))), Some(BankDetails.key))
+          mockCacheFetch[Seq[BankDetails]](
+            Some(
+              Seq(
+                BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true)
+              )
+            ), Some(BankDetails.key)
+          )
 
           mockApplicationStatus(SubmissionReadyForReview)
 
@@ -91,8 +97,13 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec {
 
         "editing a variation" in new Fixture {
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(
-            BankDetails(None, None, Some(ukBankAccount), hasAccepted = true))), Some(BankDetails.key))
+          mockCacheFetch[Seq[BankDetails]](
+            Some(
+              Seq(
+                BankDetails(Some(accountType), Some("bankName"), Some(ukBankAccount), hasAccepted = true)
+              )
+            ), Some(BankDetails.key)
+          )
 
           mockApplicationStatus(SubmissionDecisionApproved)
 

@@ -36,6 +36,17 @@ class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
         Some(BranchesOrAgentsWhichCountries(Seq(Country("United Kingdom", "GB")))))
       Json.fromJson[BranchesOrAgents](Json.toJson(model)) mustBe JsSuccess(model)
     }
+
+    "parse json correctly where no countries" in {
+      val model: BranchesOrAgents = BranchesOrAgents(
+        BranchesOrAgentsHasCountries(false), None)
+
+      val json = Json.obj(
+        "hasCountries" -> false
+      )
+
+      BranchesOrAgents.jsonWrites.writes(model) must be(json)
+    }
   }
 
   "BranchesOrAgents" when {

@@ -18,7 +18,7 @@
 @import forms2._
 @import config.{ ApplicationConfig}
 
-@(f: forms.Form2[_])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(f: forms.Form2[_], isRenewal: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
@@ -31,8 +31,16 @@
     <p>@Messages("payments.waystopay.lead.time")</p>
 }
 
+@sectionHeading = {
+    @if(isRenewal){
+        @Messages("submit.renewal.application")
+    }else{
+        @Messages("submit.registration")
+    }
+}
+
 @main(
-    title = Messages("payments.waystopay.title") + " - " + Messages("submit.registration"),
+    title = Messages("payments.waystopay.title") + " - " + sectionHeading,
     heading = header
 ) {
 
@@ -42,7 +50,7 @@
         @fieldsetWithErrorGroup(
             f = f("waysToPay"),
             heading = "payments.waystopay.title",
-            section = "submit.registration",
+            section = sectionHeading.toString(),
             supportingContent = supportingContent,
             panel = false
         ) {

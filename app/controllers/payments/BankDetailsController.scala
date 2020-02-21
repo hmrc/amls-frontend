@@ -22,6 +22,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.SubmissionRequestStatus
+import models.status.Renewal
 import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
 import utils.AuthAction
@@ -39,17 +40,19 @@ class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector
 
 
   def get(isUK: Boolean = true) = authAction.async {
-      implicit request =>
-        (for {
-          submissionRequestStatus <- OptionT.liftF(dataCacheConnector.fetch[SubmissionRequestStatus](request.credId, SubmissionRequestStatus.key))
-          status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
-          amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-          fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber, request.accountTypeId))
-          paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
-        } yield {
-          val amount = fees.toPay(status, submissionRequestStatus)
-          Ok(views.html.payments.bank_details(isUK, amount, paymentReference))
-        }) getOrElse InternalServerError("Failed to retrieve submission data")
+    implicit request =>
+      (for {
+        submissionRequestStatus <- OptionT.liftF(dataCacheConnector.fetch[SubmissionRequestStatus](request.credId, SubmissionRequestStatus.key))
+        status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
+        amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+        fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber, request.accountTypeId))
+        paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
+      } yield {
+        val amount = fees.toPay(status, submissionRequestStatus)
+        status match {
+          case _: Renewal => Ok(views.html.payments.bank_details(isUK, amount, paymentReference, true))
+          case _ => Ok(views.html.payments.bank_details(isUK, amount, paymentReference))
+        }
+      }) getOrElse InternalServerError("Failed to retrieve submission data")
   }
-
 }
