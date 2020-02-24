@@ -27,7 +27,7 @@
 }
 
 @main(
-    title = Messages("responsiblepeople.timeataddress.address_history.title") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.timeataddress.address_history.current.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
@@ -35,7 +35,7 @@
 
         @fieldsetWithErrorGroup(
             f = f("timeAtAddress"),
-            heading = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
+            heading = Messages("responsiblepeople.timeataddress.address_history.current.heading", personName),
             section = "summary.responsiblepeople",
             panel = false
         ) {
