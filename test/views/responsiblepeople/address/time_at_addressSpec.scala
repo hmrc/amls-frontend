@@ -46,7 +46,7 @@ class time_at_addressSpec extends AmlsViewSpec with MustMatchers  {
 
       def view = views.html.responsiblepeople.address.time_at_address(form2, false, 0, None, "FirstName LastName")
 
-      doc.title must be(Messages("responsiblepeople.timeataddress.address_history.title") +
+      doc.title must be(Messages("responsiblepeople.timeataddress.address_history.current.title") +
         " - " + Messages("summary.responsiblepeople") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
@@ -58,7 +58,7 @@ class time_at_addressSpec extends AmlsViewSpec with MustMatchers  {
 
       def view = views.html.responsiblepeople.address.time_at_address(form2, false, 0, None, "FirstName LastName")
 
-      heading.html() must be(Messages("responsiblepeople.timeataddress.address_history.heading", "FirstName LastName"))
+      heading.html() must be(Messages("responsiblepeople.timeataddress.address_history.current.heading", "FirstName LastName"))
     }
 
     "show errors in correct places when validation fails" in new ViewFixture {
