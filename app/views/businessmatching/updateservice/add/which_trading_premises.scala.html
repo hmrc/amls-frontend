@@ -33,10 +33,6 @@
     @errorSummaryWithPlaceholder(f, Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased"))
 }
 
-@supportingContent = {
-    <p>@Messages("lbl.select.all")</p>
-}
-
 @main(
     title = Messages("businessmatching.updateservice.whichtradingpremises.title") + " - " + Messages("summary.updateservice"),
     heading = header
@@ -49,8 +45,8 @@
             heading = pageHeading,
             section = "summary.updateservice",
             panel = false,
-            supportingContent = supportingContent,
-            errorGroupPlaceholder = Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")
+            errorGroupPlaceholder = Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased"),
+            hint = Messages("lbl.select.all")
         ) {
             @tradingPremises.map{ case (tp, index) =>
                 @checkbox(f = f("tradingPremises[]"), labelText = tp.label.getOrElse(index.toString), value = index.toString)
