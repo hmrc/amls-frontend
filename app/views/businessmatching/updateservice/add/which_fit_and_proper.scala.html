@@ -27,10 +27,6 @@
     @errorSummary(f)
 }
 
-@supportingContent = {
-    <p>@Messages("businessmatching.updateservice.whichfitandproper.hint")</p>
-}
-
 @main(
     title = Messages("businessmatching.updateservice.whichfitandproper.title") + " - " + Messages("summary.updateservice"),
     heading = header
@@ -43,7 +39,7 @@
             heading = "businessmatching.updateservice.whichfitandproper.heading",
             section = "summary.updateservice",
             panel = false,
-            supportingContent = supportingContent
+            hint = Messages("lbl.select.all")
         ) {
             @responsiblePeople.map{ case (rp, index) =>
                 @checkbox(f = f("responsiblePeople[]"), labelText = rp.personName.fold("")(_.fullName), value = index.toString)
