@@ -24,6 +24,7 @@ import play.api.libs.json.{Json, Reads}
 case class Renewal(involvedInOtherActivities: Option[InvolvedInOther] = None,
                    businessTurnover: Option[BusinessTurnover] = None,
                    turnover: Option[AMLSTurnover] = None,
+                   ampTurnover: Option[AMPTurnover] = None,
                    customersOutsideIsUK: Option[CustomersOutsideIsUK] = None,
                    customersOutsideUK: Option[CustomersOutsideUK] = None,
                    percentageOfCashPaymentOver15000: Option[PercentageOfCashPaymentOver15000] = None,
@@ -53,6 +54,10 @@ case class Renewal(involvedInOtherActivities: Option[InvolvedInOther] = None,
   def turnover(model: AMLSTurnover): Renewal =
     this.copy(turnover = Some(model), hasChanged = hasChanged || !this.turnover.contains(model),
       hasAccepted = hasAccepted && this.turnover.contains(model))
+
+  def ampTurnover(model: AMPTurnover): Renewal =
+    this.copy(ampTurnover = Some(model), hasChanged = hasChanged || !this.ampTurnover.contains(model),
+      hasAccepted = hasAccepted && this.ampTurnover.contains(model))
 
   def customersOutsideIsUK(model: CustomersOutsideIsUK): Renewal =
     this.copy(customersOutsideIsUK = Some(model), hasChanged = hasChanged || !this.customersOutsideIsUK.contains(model),
@@ -117,6 +122,7 @@ object Renewal {
       (__ \ "involvedInOtherActivities").readNullable[InvolvedInOther] and
         (__ \ "businessTurnover").readNullable[BusinessTurnover] and
         (__ \ "turnover").readNullable[AMLSTurnover] and
+        (__ \ "ampTurnover").readNullable[AMPTurnover] and
         ((__ \ "customersOutsideUK" \"isOutside").read[Boolean].map(c => Option(CustomersOutsideIsUK(c))) orElse
           (__ \ "customersOutsideIsUK").readNullable[CustomersOutsideIsUK]) and
         ((__ \ "customersOutsideUK" \"countries").readNullable[Seq[Country]].map(c => Option(CustomersOutsideUK(c))) orElse
@@ -183,8 +189,8 @@ object Renewal {
     }
 
     val aspRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
-      case r@Renewal(_,_,_,Some(CustomersOutsideIsUK(true)),Some(_),_,_,_,_,_,_,_,_,_,_,_,_) => Valid(r)
-      case r@Renewal(_,_,_,Some(CustomersOutsideIsUK(false)),_,_,_,_,_,_,_,_,_,_,_,_,_) => Valid(r)
+      case r@Renewal(_,_,_,_,Some(CustomersOutsideIsUK(true)),Some(_),_,_,_,_,_,_,_,_,_,_,_,_) => Valid(r)
+      case r@Renewal(_,_,_,_,Some(CustomersOutsideIsUK(false)),_,_,_,_,_,_,_,_,_,_,_,_,_) => Valid(r)
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for accountancy service provider"))))
     }
 
@@ -194,8 +200,8 @@ object Renewal {
     }
 
     val receiveCashPaymentsRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
-      case r@Renewal(_,_,_,_,_,_,Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(_))),_,_,_,_,_,_,_,_,_,_) => Valid(r)
-      case r@Renewal(_,_,_,_,_,_,Some(CashPayments(CashPaymentsCustomerNotMet(false), None)),_,_,_,_,_,_,_,_,_,_) => Valid(r)
+      case r@Renewal(_,_,_,_,_,_,_,Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(_))),_,_,_,_,_,_,_,_,_,_) => Valid(r)
+      case r@Renewal(_,_,_,_,_,_,_,Some(CashPayments(CashPaymentsCustomerNotMet(false), None)),_,_,_,_,_,_,_,_,_,_) => Valid(r)
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for high value dealing"))))
     }
 

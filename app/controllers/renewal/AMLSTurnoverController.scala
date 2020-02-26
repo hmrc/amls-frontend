@@ -85,6 +85,7 @@ class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnecto
   private def getRouting(ba: Option[BusinessActivities]) = {
     ba match {
       case Some(activities) => activities.businessActivities match {
+        case x if x.contains(ArtMarketParticipant) => Redirect(routes.AMPTurnoverController.get())
         case x if x.contains(MoneyServiceBusiness) => Redirect(routes.TotalThroughputController.get())
         case x if x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
         case x if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideIsUKController.get())
