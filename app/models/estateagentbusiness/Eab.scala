@@ -105,20 +105,21 @@ object Eab {
   val notPresent                      = "null"
 
   val redirectCallType       = "GET"
-  val key                    = "eab"
+  val key                    = "estate-agent-business"
 
   private def generateRedirect(destinationUrl: String) = {
     Call(redirectCallType, destinationUrl)
   }
 
   def section(implicit cache: CacheMap): Section = {
-    val notStarted = Section(key, NotStarted, false, generateRedirect(appConfig.eabWhatYouNeedUrl))
-    cache.getEntry[Amp](key).fold(notStarted) {
+    val messageKey = "eab"
+    val notStarted = Section(messageKey, NotStarted, false, generateRedirect(appConfig.eabWhatYouNeedUrl))
+    cache.getEntry[Eab](key).fold(notStarted) {
       model =>
         if (model.isComplete && model.hasAccepted) {
-          Section(key, Completed, model.hasChanged, generateRedirect(appConfig.eabSummaryUrl))
+          Section(messageKey, Completed, model.hasChanged, generateRedirect(appConfig.eabSummaryUrl))
         } else {
-          Section(key, Started, model.hasChanged, generateRedirect(appConfig.eabWhatYouNeedUrl))
+          Section(messageKey, Started, model.hasChanged, generateRedirect(appConfig.eabWhatYouNeedUrl))
         }
     }
   }

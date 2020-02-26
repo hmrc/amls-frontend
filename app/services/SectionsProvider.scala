@@ -16,6 +16,7 @@
 
 package services
 
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.Inject
 import models.amp.Amp
@@ -24,7 +25,7 @@ import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching._
-import models.estateagentbusiness.EstateAgentBusiness
+import models.estateagentbusiness.{Eab, EstateAgentBusiness}
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.registrationprogress.Section
@@ -37,7 +38,8 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector) {
+class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector,
+                                 val config: ApplicationConfig) {
 
   def sections(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[Section]] =
 
@@ -64,8 +66,11 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
           m + Asp.section + Supervision.section
         case ArtMarketParticipant =>
           m + Amp.section
-        case EstateAgentBusinessService =>
+        case EstateAgentBusinessService => if(config.standAloneEABService) {
+          m + Eab.section
+        } else {
           m + EstateAgentBusiness.section
+        }
         case HighValueDealing =>
           m + Hvd.section
         case MoneyServiceBusiness if msbServices.isDefined =>

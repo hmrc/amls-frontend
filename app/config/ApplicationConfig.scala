@@ -82,6 +82,8 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
 
   def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
 
+  def standAloneEABService = servicesConfig.getConfBool("feature-toggle.stand-alone-eab-service", false)
+
   lazy val authUrl = baseUrl("auth")
 
   def enrolmentStoreUrl = baseUrl("tax-enrolments")
