@@ -34,37 +34,37 @@
     heading = header
 ) {
 
-    @form(f, controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.post(edit)) {
+    @form(f, controllers.renewal.routes.AMPTurnoverController.post(edit)) {
 
         @fieldsetWithErrorGroup(
-            f = f("percentage"),
+            f = f("percentageExpectedTurnover"),
             heading = "renewal.amp.turnover.title",
             section = "summary.renewal",
             panel = false,
             supportingContent = supportingContent
         ) {
             @radio(
-                f = f("percentage"),
+                f = f("percentageExpectedTurnover"),
                 labelText = "hvd.percentage.lbl.01",
                 value = "01"
             )
             @radio(
-                f = f("percentage"),
+                f = f("percentageExpectedTurnover"),
                 labelText = "hvd.percentage.lbl.02",
                 value = "02"
             )
             @radio(
-                f = f("percentage"),
+                f = f("percentageExpectedTurnover"),
                 labelText = "hvd.percentage.lbl.03",
                 value = "03"
             )
             @radio(
-                f = f("percentage"),
+                f = f("percentageExpectedTurnover"),
                 labelText = "hvd.percentage.lbl.04",
                 value = "04"
             )
             @radio(
-                f = f("percentage"),
+                f = f("percentageExpectedTurnover"),
                 labelText = "hvd.percentage.lbl.05",
                 value = "05"
             )

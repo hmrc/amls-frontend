@@ -35,7 +35,7 @@ object AMPTurnover {
 
   implicit val formRule: Rule[UrlFormEncoded, AMPTurnover] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "percentageExpectedTurnover").read[String].withMessage("") flatMap {
+    (__ \ "percentageExpectedTurnover").read[String].withMessage("error.required.renewal.amp.percentage") flatMap {
       case "01" => First
       case "02" => Second
       case "03" => Third
