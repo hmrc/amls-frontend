@@ -93,6 +93,22 @@
         }
     }
 
+    @model.ampTurnover.map { ampTurnover =>
+            @checkYourAnswersRow(
+                question = Messages("renewal.amp.turnover.title"),
+                editLinkTag = "ampTurnover-edit",
+                editUrl = controllers.renewal.routes.AMPTurnoverController.get(true).toString
+            ) {
+                <p>@ampTurnover match {
+                    case AMPTurnover.First => {@Messages("hvd.percentage.lbl.01")}
+                    case AMPTurnover.Second => {@Messages("hvd.percentage.lbl.02")}
+                    case AMPTurnover.Third => {@Messages("hvd.percentage.lbl.03")}
+                    case AMPTurnover.Fourth => {@Messages("hvd.percentage.lbl.04")}
+                    case AMPTurnover.Fifth => {@Messages("hvd.percentage.lbl.05")}
+                }</p>
+            }
+        }
+
     @bmMsbServices.map {services =>
 
         @model.totalThroughput.map { m =>
