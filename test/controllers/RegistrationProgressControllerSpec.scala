@@ -24,7 +24,7 @@ import generators.businesscustomer.ReviewDetailsGenerator
 import models.Country
 import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import models.renewal.{AMLSTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherNo, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
+import models.renewal.{AMLSTurnover, AMPTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherNo, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
 import models.responsiblepeople.{ResponsiblePeopleValues, ResponsiblePerson}
 import models.status._
 import org.joda.time.LocalDate
@@ -493,6 +493,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         Some(InvolvedInOtherYes("test")),
         Some(BusinessTurnover.First),
         Some(AMLSTurnover.First),
+        Some(AMPTurnover.First),
         Some(CustomersOutsideIsUK(true)),
         Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
         Some(PercentageOfCashPaymentOver15000.First),
