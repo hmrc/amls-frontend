@@ -1,0 +1,3 @@
+
+GET         /get/:credId       @controllers.amp.EabController.get(credId: String)
+PUT         /set/:credId       @controllers.amp.EabController.set(credId: String)

@@ -61,7 +61,8 @@ final case class Eab(data: JsObject = Json.obj(),
     val scheme = get[String](Eab.redressScheme)
     (services, scheme) match {
       case (x, _) if !x.contains("residential") => true
-      case (_, Some(x)) if x.nonEmpty => true
+      case (_, Some(x)) if x.nonEmpty && x.contains("propertyRedressScheme") => true
+      case (_, Some(x)) if x.nonEmpty && x.contains("propertyOmbudsman") => true
       case _ => false
     }
   }
@@ -150,7 +151,7 @@ object Eab {
 
     val redressTransform = (__ \ 'data ++ redressScheme).json.copyFrom(
       (__ \ 'propertyRedressScheme).readNullable[JsValue].map {
-        case Some(JsString("01")) => JsString("propertyOmbudsmanLimited")
+        case Some(JsString("01")) => JsString("propertyOmbudsman")
         case Some(JsString("02")) => JsString("ombudsmanServices")
         case Some(JsString("03")) => JsString("propertyRedressScheme")
         case Some(JsString("04")) => JsString("other")

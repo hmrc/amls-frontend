@@ -29,7 +29,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
-import services.amp.AmpCacheService
+import services.amp.ProxyCacheService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture, CacheMocks}
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -62,13 +62,13 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
   trait Fixture extends AuthorisedFixture {
     self =>
     val request         = addToken(authRequest)
-    val ampCacheService = mock[AmpCacheService]
+    val proxyCacheService = mock[ProxyCacheService]
     val credId          = "someId"
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[AmpCacheService].to(ampCacheService))
+      .overrides(bind[ProxyCacheService].to(proxyCacheService))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .build()
 
@@ -77,7 +77,7 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
 
   "get returns 200" when {
     "no amp section in cache" in new Fixture {
-      when(ampCacheService.get(any())(any())).thenReturn(Future.successful(Some(Json.obj())))
+      when(proxyCacheService.getAmp(any())(any())).thenReturn(Future.successful(Some(Json.obj())))
 
 
 
@@ -89,7 +89,7 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
     }
 
     "amp section in cache" in new Fixture {
-      when(ampCacheService.get(any())(any())).thenReturn(Future.successful(Some(completeJson)))
+      when(proxyCacheService.getAmp(any())(any())).thenReturn(Future.successful(Some(completeJson)))
 
       val result = controller.get(credId)(request)
       status(result) must be(OK)
@@ -105,7 +105,7 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
         .withHeaders(CONTENT_TYPE -> "application/json")
         .withBody[JsValue](completeJson)
 
-      when(ampCacheService.set(any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
+      when(proxyCacheService.setAmp(any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.set(credId)(postRequest)
       status(result) must be(OK)

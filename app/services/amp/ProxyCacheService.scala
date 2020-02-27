@@ -19,15 +19,17 @@ package services.amp
 import connectors.DataCacheConnector
 import javax.inject.Inject
 import models.amp.Amp
+import models.estateagentbusiness.Eab
 import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmpCacheService @Inject()(cacheConnector: DataCacheConnector)
-                               (implicit ec: ExecutionContext){
+class ProxyCacheService @Inject()(cacheConnector: DataCacheConnector)
+                                 (implicit ec: ExecutionContext){
 
-  def get(credId: String)(implicit hc: HeaderCarrier): Future[Option[JsValue]] = {
+  //AMP
+  def getAmp(credId: String)(implicit hc: HeaderCarrier): Future[Option[JsValue]] = {
     for {
       amp <- cacheConnector.fetch[Amp](credId, Amp.key)
     } yield amp match {
@@ -36,13 +38,33 @@ class AmpCacheService @Inject()(cacheConnector: DataCacheConnector)
     }
   }
 
-  def set(credId: String, body: JsValue)(implicit hc: HeaderCarrier) = {
+  def setAmp(credId: String, body: JsValue)(implicit hc: HeaderCarrier) = {
     val jsonObject: JsObject = body.as[JsObject]
     val ampData = jsonObject.value("data").as[JsObject]
 
     for {
       existing <- cacheConnector.fetch[Amp](credId, Amp.key)
       result   <- cacheConnector.save[Amp](credId, Amp.key, existing.getOrElse(Amp()).data(ampData))
+    } yield result
+  }
+
+  //EAB
+  def getEab(credId: String)(implicit hc: HeaderCarrier): Future[Option[JsValue]] = {
+    for {
+      eab <- cacheConnector.fetch[Eab](credId, Eab.key)
+    } yield eab match {
+      case Some(eab) => Some(Json.toJson(eab))
+      case _ => None
+    }
+  }
+
+  def setEab(credId: String, body: JsValue)(implicit hc: HeaderCarrier) = {
+    val jsonObject: JsObject = body.as[JsObject]
+    val eabData = jsonObject.value("data").as[JsObject]
+
+    for {
+      existing <- cacheConnector.fetch[Eab](credId, Eab.key)
+      result   <- cacheConnector.save[Eab](credId, Eab.key, existing.getOrElse(Eab()).data(eabData))
     } yield result
   }
 }
