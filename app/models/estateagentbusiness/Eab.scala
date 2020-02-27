@@ -129,6 +129,7 @@ object Eab {
     override def apply(): String = key
   }
 
+  //TODO - Need to add a reads for no redress scheme
   implicit lazy val reads: Reads[Eab] = {
 
     val servicesTransform = (__ \ 'data ++ eabServicesProvided).json.copyFrom(
