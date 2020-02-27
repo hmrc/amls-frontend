@@ -22,7 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.declaration.AddPerson
 import models.status.{ReadyForRenewal, SubmissionReadyForReview}
 import play.api.mvc.{MessagesControllerComponents, Result}
-import services.{SectionsProvider, StatusService}
+import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, DeclarationHelper}
 
@@ -35,7 +35,8 @@ class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnect
                                         authAction: AuthAction,
                                         val ds: CommonPlayDependencies,
                                         val cc: MessagesControllerComponents,
-                                        val sectionsProvider: SectionsProvider) extends AmlsBaseController(ds, cc) {
+                                        val sectionsProvider: SectionsProvider,
+                                        val renewalService: RenewalService) extends AmlsBaseController(ds, cc) {
 
   lazy val defaultView = declarationView("declaration.declaration.title", "submit.registration", isAmendment = false)
 
@@ -46,11 +47,12 @@ class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnect
           case Some(addPerson) => {
             val name = s"${addPerson.firstName} ${addPerson.middleName getOrElse ""} ${addPerson.lastName}"
             for{
+              renewalComplete <- DeclarationHelper.renewalComplete(renewalService, request.credId)
               status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
             } yield status match {
-              case ReadyForRenewal(_) => Ok(
+              case ReadyForRenewal(_) if renewalComplete => Ok(
                 views.html.declaration.declare("declaration.declaration.amendment.title", "submit.renewal.application", name, false))
-              case SubmissionReadyForReview => Ok(
+              case ReadyForRenewal(_) | SubmissionReadyForReview => Ok(
                 views.html.declaration.declare("declaration.declaration.amendment.title", "submit.amendment.application", name, true))
               case _ => Ok(
                 views.html.declaration.declare("declaration.declaration.amendment.title", "submit.registration", name, false))
