@@ -84,7 +84,7 @@ class WaysToPayController @Inject()(val authAction: AuthAction,
         case f: InvalidForm =>
           (for {
           subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
-        } yield Ok(views.html.payments.ways_to_pay(f, subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
+        } yield BadRequest(views.html.payments.ways_to_pay(f, subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
       }
   }
 

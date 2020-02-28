@@ -27,31 +27,24 @@ class type_of_bankSpec extends PlaySpec with AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addTokenForView()
+    val secondaryHeading = "Submit application"
+
   }
 
   "type_of_bank view" must {
 
     "have correct title, headings and form fields" in new ViewFixture {
 
-      def view = views.html.payments.type_of_bank(EmptyForm)
+      def view = views.html.payments.type_of_bank(EmptyForm, secondaryHeading)
 
       doc.title must startWith(Messages("payments.typeofbank.title"))
       heading.html must be(Messages("payments.typeofbank.header"))
       subHeading.html must include(Messages("submit.registration"))
     }
 
-    "have correct title, headings and form fields for renewal" in new ViewFixture {
-
-      def view = views.html.payments.type_of_bank(EmptyForm, isRenewal = true)
-
-      doc.title must startWith(Messages("payments.typeofbank.title"))
-      heading.html must be(Messages("payments.typeofbank.header"))
-      subHeading.html must include(Messages("submit.renewal.application"))
-    }
-
     "have a back link" in new ViewFixture {
 
-      def view = views.html.payments.type_of_bank(EmptyForm)
+      def view = views.html.payments.type_of_bank(EmptyForm, secondaryHeading)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -62,14 +55,14 @@ class type_of_bankSpec extends PlaySpec with AmlsViewSpec {
         (Path \ "typeOfBank") -> Seq(ValidationError("not a message Key"))
       ))
 
-      def view = views.html.payments.type_of_bank(form2)
+      def view = views.html.payments.type_of_bank(form2, secondaryHeading)
 
       errorSummary.html() must include("not a message Key")
     }
 
     "display all fields" in new ViewFixture {
 
-      def view = views.html.payments.type_of_bank(EmptyForm)
+      def view = views.html.payments.type_of_bank(EmptyForm, secondaryHeading)
 
       doc.getElementsByAttributeValue("for", "typeOfBank-true") must not be empty
       doc.getElementsByAttributeValue("for", "typeOfBank-false") must not be empty

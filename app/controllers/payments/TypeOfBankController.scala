@@ -64,7 +64,7 @@ class TypeOfBankController @Inject()(val authAction: AuthAction,
         case f: InvalidForm => (for {
           subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
         } yield {
-          Ok(views.html.payments.type_of_bank(f, subHeading))
+          BadRequest(views.html.payments.type_of_bank(f, subHeading))
         }) getOrElse InternalServerError("Failed to retrieve data.")
       }
   }
