@@ -47,7 +47,6 @@ class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector
         amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
         fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber, request.accountTypeId))
         subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
-        renewalComplete <- OptionT.liftF(DeclarationHelper.renewalComplete(renewalService, request.credId))
         paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
       } yield {
         val amount = fees.toPay(status, submissionRequestStatus)
