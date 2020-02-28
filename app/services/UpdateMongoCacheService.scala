@@ -44,6 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: DataCacheConnector, val applicationConfig: ApplicationConfig) {
 
+  //TODO AMLS-5540 - Need to update to new EAB model here (BE ticket?)
   def update(credId: String, response: UpdateMongoCacheResponse)
             (implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Any] = {
 

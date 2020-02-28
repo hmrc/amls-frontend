@@ -71,6 +71,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
         case AccountancyServices =>
           dataCacheConnector.removeByKey[Asp](credId, Asp.key)
         case EstateAgentBusinessService =>
+          //TODO AMLS-5540 - Add toggled remove by new EAB key
           dataCacheConnector.removeByKey[EstateAgentBusiness](credId, EstateAgentBusiness.key)
         case _ =>
           dataCacheConnector.fetchAllWithDefault(credId)

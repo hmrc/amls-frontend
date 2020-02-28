@@ -303,7 +303,7 @@ class LandingController @Inject()(val landingService: LandingService,
             // $COVERAGE-ON$
             val hasInvalidRedressScheme = if(config.standAloneEABService) {
               for {
-                eab <- cache.map(_.getEntry[Eab](EstateAgentBusiness.key))
+                eab <- cache.map(_.getEntry[Eab](Eab.key))
               } yield ControllerHelper.hasInvalidRedressSchemeNewEab(eab)
             } else {
               //TODO - can be removed when we remove the old EAB models

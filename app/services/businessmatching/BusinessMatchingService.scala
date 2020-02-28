@@ -85,6 +85,7 @@ class BusinessMatchingService @Inject()(
     case AccountancyServices =>
       dataCacheConnector.removeByKey[Asp](credId, Asp.key)
     case EstateAgentBusinessService =>
+      //TODO AMLS-5540 - Need to provide a toggled remove by new EAB object
       dataCacheConnector.removeByKey[EstateAgentBusiness](credId, EstateAgentBusiness.key)
     case HighValueDealing =>
       dataCacheConnector.removeByKey[Hvd](credId, Hvd.key)

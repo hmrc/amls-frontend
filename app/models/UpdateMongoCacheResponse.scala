@@ -35,6 +35,7 @@ import play.api.libs.json._
 
 import scala.collection.Seq
 
+//TODO AMLS-5540 - do we need to replace 'EstateAgentBusiness' with 'Eab' here?
 case class UpdateMongoCacheResponse(dataImport: Option[DataImport],
                                     view: Option[ViewResponse],
                                     businessMatching: Option[BusinessMatching],
