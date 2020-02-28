@@ -56,13 +56,14 @@ final case class Eab(data: JsObject = Json.obj(),
 
   private[estateagentbusiness] def isServicesComplete: Boolean = (data \ "eabServicesProvided").as[List[String]].nonEmpty
 
-  private[estateagentbusiness] def isRedressSchemeComplete: Boolean = {
+  private[estateagentbusiness]def isRedressSchemeComplete: Boolean = {
     val services = (data \ "eabServicesProvided").as[List[String]]
     val scheme = get[String](Eab.redressScheme)
     (services, scheme) match {
       case (x, _) if !x.contains("residential") => true
       case (_, Some(x)) if x.nonEmpty && x.contains("propertyRedressScheme") => true
       case (_, Some(x)) if x.nonEmpty && x.contains("propertyOmbudsman") => true
+      case (_, Some(x)) if x.nonEmpty && x.contains("notRegistered") => true
       case _ => false
     }
   }
@@ -89,6 +90,16 @@ final case class Eab(data: JsObject = Json.obj(),
 
   private[estateagentbusiness] def isProfessionalBodyPenaltyComplete: Boolean =
     booleanAndDetailComplete(get[Boolean](Eab.penalisedProfessionalBody), get[String](Eab.penalisedProfessionalBodyDetail))
+
+  def isInvalidRedressScheme: Boolean = {
+    val scheme = get[String](Eab.redressScheme)
+    scheme match {
+      case Some(x) if x.nonEmpty && x.contains("other") => true
+      case Some(x) if x.nonEmpty && x.contains("ombudsmanServices") => true
+      case _ => false
+    }
+  }
+
 }
 
 object Eab {
@@ -129,7 +140,6 @@ object Eab {
     override def apply(): String = key
   }
 
-  //TODO - Need to add a reads for no redress scheme
   implicit lazy val reads: Reads[Eab] = {
 
     val servicesTransform = (__ \ 'data ++ eabServicesProvided).json.copyFrom(
@@ -150,13 +160,22 @@ object Eab {
         case _ => JsArray()
       })
 
-    val redressTransform = (__ \ 'data ++ redressScheme).json.copyFrom(
-      (__ \ 'propertyRedressScheme).readNullable[JsValue].map {
-        case Some(JsString("01")) => JsString("propertyOmbudsman")
-        case Some(JsString("02")) => JsString("ombudsmanServices")
-        case Some(JsString("03")) => JsString("propertyRedressScheme")
-        case Some(JsString("04")) => JsString("other")
-        case _ => JsNull}
+    val isRedressTransform = (__ \ 'data ++ redressScheme).json.copyFrom(
+      (__ \ 'isRedress).readNullable[JsValue].map {
+        case Some(JsBoolean(false)) => Some(JsString("notRegistered"))
+        case _ => None
+      }.filter(redressScheme => redressScheme.isDefined).orElse(
+        (__ \ 'propertyRedressScheme).readNullable[JsValue].map {
+          case Some(JsString("01")) => Some(JsString("propertyOmbudsman"))
+          case Some(JsString("02")) => Some(JsString("ombudsmanServices"))
+          case Some(JsString("03")) => Some(JsString("propertyRedressScheme"))
+          case Some(JsString("04")) => Some(JsString("other"))
+          case _ => None
+        }
+      ).map {
+        case Some(redressScheme) => redressScheme
+        case None => JsNull
+      }
     )
 
     def readPathOrReturn(path: JsPath, returnValue: JsValue) =
@@ -165,7 +184,7 @@ object Eab {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
 
-    val oldModelTransformer:Reads[JsObject] = (servicesTransform and redressTransform and
+    val oldModelTransformer:Reads[JsObject] = (servicesTransform and isRedressTransform and
       (__ \ 'data ++ penalisedEstateAgentsAct).json.copyFrom(readPathOrReturn(__ \ 'penalisedUnderEstateAgentsAct, JsNull)) and
       (__ \ 'data ++ penalisedEstateAgentsActDetail).json.copyFrom(readPathOrReturn( __ \ 'penalisedUnderEstateAgentsActDetails, JsNull)) and
       (__ \ 'data ++ penalisedProfessionalBody).json.copyFrom(readPathOrReturn(__ \ 'penalised, JsNull)) and

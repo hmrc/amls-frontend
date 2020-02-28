@@ -52,6 +52,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
     val mockApplicationConfig = mock[ApplicationConfig]
 
     val request = addToken(authRequest)
+    val config = mock[ApplicationConfig]
 
     val controllerNoAmlsNumber = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -63,6 +64,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       ds = commonDependencies,
       mcc = mockMcc,
       messagesApi = messagesApi,
+      config = config,
       parser = mock[BodyParsers.Default])
 
     val controllerNoUserRole = new LandingController(
@@ -75,6 +77,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       ds = commonDependencies,
       mcc = mockMcc,
       messagesApi = messagesApi,
+      config = config,
       parser = mock[BodyParsers.Default])
 
     when {

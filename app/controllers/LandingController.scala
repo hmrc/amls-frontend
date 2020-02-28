@@ -20,6 +20,7 @@ import java.net.URLEncoder
 
 import audit.ServiceEntrantEvent
 import cats.data.Validated.{Invalid, Valid}
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models._
@@ -29,7 +30,7 @@ import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessdetails.BusinessDetails
 import models.businessmatching.BusinessMatching
-import models.estateagentbusiness.EstateAgentBusiness
+import models.estateagentbusiness.{Eab, EstateAgentBusiness}
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Renewal
@@ -49,7 +50,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Future}
 
 @Singleton
 class LandingController @Inject()(val landingService: LandingService,
@@ -61,13 +62,15 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val statusService: StatusService,
                                   val mcc: MessagesControllerComponents,
                                   implicit override val messagesApi: MessagesApi,
+                                  val config: ApplicationConfig,
                                   parser: BodyParsers.Default) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper {
 
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8")
+
   def signoutUrl = s"${appConfig.logoutUrl}?continue=$unauthorisedUrl"
 
   private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
-      headerCarrier.authorization.isDefined
+    headerCarrier.authorization.isDefined
 
   /**
     * allowRedirect allows us to configure whether or not the start page is *always* shown,
@@ -83,11 +86,11 @@ class LandingController @Inject()(val landingService: LandingService,
   }
 
   def get() = authAction.async {
-      implicit request =>
-        request.credentialRole match {
-          case Some(User) => getWithAmendments(request.amlsRefNumber, request.credId, request.accountTypeId)
-          case _ => Future.successful(Redirect(signoutUrl))
-        }
+    implicit request =>
+      request.credentialRole match {
+        case Some(User) => getWithAmendments(request.amlsRefNumber, request.credId, request.accountTypeId)
+        case _ => Future.successful(Redirect(signoutUrl))
+      }
   }
 
   def getWithAmendments(amlsRegistrationNumber: Option[String], credId: String, accountTypeId: (String, String))
@@ -113,7 +116,7 @@ class LandingController @Inject()(val landingService: LandingService,
               // $COVERAGE-ON$
               cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
                 case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
-              } getOrElse landingService.setAltCorrespondenceAddress(mlrNumber, Some(cacheMap), accountTypeId, credId) flatMap { _=>
+              } getOrElse landingService.setAltCorrespondenceAddress(mlrNumber, Some(cacheMap), accountTypeId, credId) flatMap { _ =>
                 preFlightChecksAndRedirect(amlsRegistrationNumber, accountTypeId, credId)
               }
             } else {
@@ -162,7 +165,7 @@ class LandingController @Inject()(val landingService: LandingService,
   }
 
   private def preFlightChecksAndRedirect(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
-                                        (implicit headerCarrier: HeaderCarrier):  Future[Result] = {
+                                        (implicit headerCarrier: HeaderCarrier): Future[Result] = {
 
     val loginEvent = for {
       dupe <- cacheConnector.fetch[SubscriptionResponse](cacheId, SubscriptionResponse.key).recover { case _ => None } map {
@@ -218,7 +221,7 @@ class LandingController @Inject()(val landingService: LandingService,
             // $COVERAGE-ON$
             Future.successful(Redirect(controllers.routes.StatusController.get()))
         }
-      }.flatMap(identity)
+        }.flatMap(identity)
     }
   }
 
@@ -274,7 +277,7 @@ class LandingController @Inject()(val landingService: LandingService,
   }
 
   private def hasIncompleteRedressScheme(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
-                                            (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
+                                        (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
 
     // $COVERAGE-OFF$
     Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: calling statusService.getDetailedStatus")
@@ -298,9 +301,16 @@ class LandingController @Inject()(val landingService: LandingService,
             // $COVERAGE-OFF$
             Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: checking cacheMap for incomplete redress scheme")
             // $COVERAGE-ON$
-            val hasInvalidRedressScheme: Option[Boolean] = for {
-              eab <- cache.map(_.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
-            } yield ControllerHelper.hasInvalidRedressScheme(eab)
+            val hasInvalidRedressScheme = if(config.standAloneEABService) {
+              for {
+                eab <- cache.map(_.getEntry[Eab](EstateAgentBusiness.key))
+              } yield ControllerHelper.hasInvalidRedressSchemeNewEab(eab)
+            } else {
+              //TODO - can be removed when we remove the old EAB models
+              for {
+                eab <- cache.map(_.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
+              } yield ControllerHelper.hasInvalidRedressScheme(eab)
+            }
             // $COVERAGE-OFF$
             Logger.debug(s"[AMLSLandingController][hasIncompleteRedressScheme]: eab.isRedressInvalid = ${hasInvalidRedressScheme.contains(true)}")
             // $COVERAGE-ON$
@@ -309,7 +319,17 @@ class LandingController @Inject()(val landingService: LandingService,
     }
   }
 
+  //TODO - can be removed when we remove the old EAB models
   private def dataHasChanged(cacheMap: CacheMap) = {
+    if(config.standAloneEABService) {
+      dataHasChangedNewEab(cacheMap)
+    } else {
+      dataHasChangedOldEab(cacheMap)
+    }
+  }
+
+  //TODO - can be removed when we remove the old EAB models
+  private def dataHasChangedOldEab(cacheMap: CacheMap) = {
     Seq(
       cacheMap.getEntry[Asp](Asp.key).fold(false) {
         _.hasChanged
@@ -355,6 +375,53 @@ class LandingController @Inject()(val landingService: LandingService,
       }
     ).exists(identity)
   }
+  private def dataHasChangedNewEab(cacheMap: CacheMap) = {
+    Seq(
+      cacheMap.getEntry[Asp](Asp.key).fold(false) {
+        _.hasChanged
+      },
+      cacheMap.getEntry[Amp](Amp.key).fold(false) {
+        _.hasChanged
+      },
+      cacheMap.getEntry[BusinessDetails](BusinessDetails.key).fold(false) {
+        _.hasChanged
+      },
+      cacheMap.getEntry[Seq[BankDetails]](BankDetails.key).fold(false) {
+        _.exists(_.hasChanged)
+      },
+      cacheMap.getEntry[BusinessActivities](BusinessActivities.key).fold(false) {
+        _.hasChanged
+      },
+      cacheMap.getEntry[BusinessMatching](BusinessMatching.key).fold(false) {
+        _.hasChanged
+      },
+      cacheMap.getEntry[Eab](Eab.key).fold(false) {
+        _.hasChanged
+      },
+      cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false) {
+        _.hasChanged
+      },
+      cacheMap.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).fold(false) {
+        _.exists(_.hasChanged)
+      },
+      cacheMap.getEntry[Supervision](Supervision.key).fold(false) {
+        _.hasChanged
+      },
+      cacheMap.getEntry[Tcsp](Tcsp.key).fold(false) {
+        _.hasChanged
+      },
+      cacheMap.getEntry[Seq[TradingPremises]](TradingPremises.key).fold(false) {
+        _.exists(_.hasChanged)
+      },
+      cacheMap.getEntry[Hvd](Hvd.key).fold(false) {
+        _.hasChanged
+      },
+      cacheMap.getEntry[Renewal](Renewal.key).fold(false) {
+        _.hasChanged
+      }
+    ).exists(identity)
+  }
+
 
   private def fixEmptyRecords[T](credId: String, cache: CacheMap, key: String)
                                 (implicit hc: HeaderCarrier, f: play.api.libs.json.Format[T]) = {
