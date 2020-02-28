@@ -24,7 +24,6 @@ import javax.inject.{Inject, Singleton}
 import models.FeeResponse
 import models.payments.WaysToPay._
 import models.payments.{CreateBacsPaymentRequest, WaysToPay}
-import models.status.Renewal
 import play.api.mvc.{MessagesControllerComponents, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -83,8 +82,8 @@ class WaysToPayController @Inject()(val authAction: AuthAction,
           }
         case f: InvalidForm =>
           (for {
-          subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
-        } yield BadRequest(views.html.payments.ways_to_pay(f, subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
+            subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
+          } yield BadRequest(views.html.payments.ways_to_pay(f, subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
       }
   }
 

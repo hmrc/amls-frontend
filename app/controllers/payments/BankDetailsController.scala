@@ -22,8 +22,6 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.SubmissionRequestStatus
-import models.status.{ReadyForRenewal, Renewal, SubmissionReady, SubmissionReadyForReview}
-import play.api.i18n.Messages
 import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, FeeResponseService, RenewalService, StatusService}
 import utils.{AuthAction, DeclarationHelper}
@@ -48,16 +46,12 @@ class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector
         status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
         amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
         fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber, request.accountTypeId))
+        subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
         renewalComplete <- OptionT.liftF(DeclarationHelper.renewalComplete(renewalService, request.credId))
         paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
       } yield {
         val amount = fees.toPay(status, submissionRequestStatus)
-        status match {
-          case ReadyForRenewal(_) if renewalComplete => Ok(views.html.payments.bank_details(isUK, amount, paymentReference, "submit.renewal.application"))
-          case SubmissionReady => Ok(views.html.payments.bank_details(isUK, amount, paymentReference, "submit.registration"))
-          case _ => Ok(views.html.payments.bank_details(isUK, amount, paymentReference, "submit.amendment.application"))
-
-        }
+          Ok(views.html.payments.bank_details(isUK, amount, paymentReference, subHeading))
       }) getOrElse InternalServerError("Failed to retrieve submission data")
   }
 }

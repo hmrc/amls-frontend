@@ -23,8 +23,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.payments.TypeOfBank
-import models.status.{ReadyForRenewal, Renewal, SubmissionReady, SubmissionStatus}
-import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.mvc.MessagesControllerComponents
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
