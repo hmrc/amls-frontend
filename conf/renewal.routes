@@ -12,8 +12,8 @@ POST        /net-profit-last-12-months                                        @c
 GET         /net-profit-registered-services                                   @controllers.renewal.AMLSTurnoverController.get(edit: Boolean ?= false)
 POST        /net-profit-registered-services                                   @controllers.renewal.AMLSTurnoverController.post(edit: Boolean ?= false)
 
-GET         /renewal/turnover-from-art-sales                                  @controllers.renewal.AMPTurnoverController.get(edit: Boolean ?= false)
-POST        /renewal/turnover-from-art-sales                                  @controllers.renewal.AMPTurnoverController.post(edit: Boolean ?= false)
+GET         /turnover-from-art-sales                                          @controllers.renewal.AMPTurnoverController.get(edit: Boolean ?= false)
+POST        /turnover-from-art-sales                                          @controllers.renewal.AMPTurnoverController.post(edit: Boolean ?= false)
 
 GET         /customers-outside-uk                                             @controllers.renewal.CustomersOutsideIsUKController.get(edit: Boolean ?= false)
 POST        /customers-outside-uk                                             @controllers.renewal.CustomersOutsideIsUKController.post(edit: Boolean ?= false)
