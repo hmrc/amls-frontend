@@ -17,7 +17,6 @@
 package models.estateagentbusiness
 
 import config.ApplicationConfig
-import models.amp.Amp
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.Play
 import play.api.libs.json._
