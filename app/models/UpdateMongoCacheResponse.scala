@@ -35,7 +35,7 @@ import play.api.libs.json._
 
 import scala.collection.Seq
 
-//TODO AMLS-5540 - I believe this is used for the test only (stubs) controller and can be done as part of the BE ticket.
+//TODO AMLS-5779 - Change to new EAB model for DES/STUBS integration
 case class UpdateMongoCacheResponse(dataImport: Option[DataImport],
                                     view: Option[ViewResponse],
                                     businessMatching: Option[BusinessMatching],

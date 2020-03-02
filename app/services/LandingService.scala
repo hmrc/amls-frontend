@@ -129,7 +129,7 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
     val cachedBusinessMatching = cacheConnector.upsertNewAuth[BusinessMatching](cachedViewResponse, BusinessMatching.key,
       viewResponseSection(viewResponse))
 
-    //TODO AMLS-5540 - provde a new EAB cache upadte for new EAB class from API5 data (BE ticket)
+    //TODO AMLS-5779 - Change to new EAB model for DES/STUBS integration
     val cachedEstateAgentBusiness = cacheConnector.upsertNewAuth[Option[EstateAgentBusiness]](cachedBusinessMatching,
       EstateAgentBusiness.key, eabSection(viewResponse))
 

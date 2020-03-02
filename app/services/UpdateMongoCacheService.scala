@@ -44,7 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: DataCacheConnector, val applicationConfig: ApplicationConfig) {
 
-  //TODO AMLS-5540 - I believe this is used for the test only (stubs) controller and can be done as part of the BE ticket.
+  //TODO AMLS-5779 - Change to new EAB model for DES/STUBS integration
   def update(credId: String, response: UpdateMongoCacheResponse)
             (implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Any] = {
 
