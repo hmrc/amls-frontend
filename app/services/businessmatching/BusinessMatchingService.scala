@@ -24,7 +24,8 @@ import javax.inject.Inject
 import models.ViewResponse
 import models.asp.Asp
 import models.businessmatching._
-import models.estateagentbusiness.{Eab, EstateAgentBusiness}
+import models.estateagentbusiness.{EstateAgentBusiness}
+import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.tcsp.Tcsp

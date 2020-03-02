@@ -19,7 +19,7 @@ package services.amp
 import connectors.DataCacheConnector
 import javax.inject.Inject
 import models.amp.Amp
-import models.estateagentbusiness.Eab
+import models.eab.Eab
 import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.http.HeaderCarrier
 

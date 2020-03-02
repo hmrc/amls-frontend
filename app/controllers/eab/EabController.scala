@@ -21,7 +21,7 @@ import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
-import models.estateagentbusiness.Eab
+import models.eab.Eab
 import play.api.libs.json._
 import play.api.mvc.MessagesControllerComponents
 import services.amp.ProxyCacheService

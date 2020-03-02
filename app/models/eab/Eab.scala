@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.estateagentbusiness
+package models.eab
 
 import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
@@ -53,9 +53,9 @@ final case class Eab(data: JsObject = Json.obj(),
     isProfessionalBodyPenaltyComplete &&
     hasAccepted
 
-  private[estateagentbusiness] def isServicesComplete: Boolean = (data \ "eabServicesProvided").as[List[String]].nonEmpty
+  private[eab] def isServicesComplete: Boolean = (data \ "eabServicesProvided").as[List[String]].nonEmpty
 
-  private[estateagentbusiness]def isRedressSchemeComplete: Boolean = {
+  private[eab]def isRedressSchemeComplete: Boolean = {
     val services = (data \ "eabServicesProvided").as[List[String]]
     val scheme = get[String](Eab.redressScheme)
     (services, scheme) match {
@@ -67,7 +67,7 @@ final case class Eab(data: JsObject = Json.obj(),
     }
   }
 
-  private[estateagentbusiness] def isProtectionSchemeComplete: Boolean = {
+  private[eab] def isProtectionSchemeComplete: Boolean = {
     val services = (data \ "eabServicesProvided").as[List[String]]
     val scheme = get[Boolean](Eab.clientMoneyProtectionScheme)
     (services, scheme) match {
@@ -77,17 +77,17 @@ final case class Eab(data: JsObject = Json.obj(),
     }
   }
 
-  private[estateagentbusiness] def booleanAndDetailComplete(boolOpt: Option[Boolean], detailOpt: Option[String]):Boolean =
+  private[eab] def booleanAndDetailComplete(boolOpt: Option[Boolean], detailOpt: Option[String]):Boolean =
     (boolOpt, detailOpt) match {
       case (Some(true), Some(detail)) if detail.nonEmpty => true
       case (Some(false), _) => true
       case _ => false
     }
 
-  private[estateagentbusiness] def isEstateAgentActPenaltyComplete: Boolean =
+  private[eab] def isEstateAgentActPenaltyComplete: Boolean =
     booleanAndDetailComplete(get[Boolean](Eab.penalisedEstateAgentsAct), get[String](Eab.penalisedEstateAgentsActDetail))
 
-  private[estateagentbusiness] def isProfessionalBodyPenaltyComplete: Boolean =
+  private[eab] def isProfessionalBodyPenaltyComplete: Boolean =
     booleanAndDetailComplete(get[Boolean](Eab.penalisedProfessionalBody), get[String](Eab.penalisedProfessionalBodyDetail))
 
   def isInvalidRedressScheme: Boolean = {

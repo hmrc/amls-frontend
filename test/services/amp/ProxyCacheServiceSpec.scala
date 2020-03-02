@@ -19,7 +19,7 @@ package services.amp
 import java.time.{LocalDate, LocalDateTime}
 
 import models.amp.Amp
-import models.estateagentbusiness.Eab
+import models.eab.Eab
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import play.api.libs.json.Json

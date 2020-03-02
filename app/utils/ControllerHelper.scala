@@ -22,7 +22,8 @@ import forms.InvalidForm
 import models.businessactivities.{BusinessActivities => BA}
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.estateagentbusiness.{Eab, EstateAgentBusiness, OmbudsmanServices, Other}
+import models.estateagentbusiness.{EstateAgentBusiness, OmbudsmanServices, Other}
+import models.eab.Eab
 import models.renewal.CustomersOutsideUK
 import models.responsiblepeople.ResponsiblePerson.filter
 import models.responsiblepeople.{NonUKResidence, ResponsiblePerson}

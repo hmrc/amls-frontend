@@ -30,7 +30,8 @@ import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessdetails.BusinessDetails
 import models.businessmatching.BusinessMatching
-import models.estateagentbusiness.{Eab, EstateAgentBusiness}
+import models.estateagentbusiness.{EstateAgentBusiness}
+import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Renewal

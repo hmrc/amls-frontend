@@ -25,7 +25,8 @@ import models.amp.Amp
 import models.asp.Asp
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching, _}
-import models.estateagentbusiness.{Eab, EstateAgentBusiness}
+import models.estateagentbusiness.{EstateAgentBusiness}
+import models.eab.Eab
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBSection}

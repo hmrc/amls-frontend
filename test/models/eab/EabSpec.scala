@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.estateagentbusiness
+package models.eab
 
 import play.api.libs.json._
 import utils.AmlsSpec
