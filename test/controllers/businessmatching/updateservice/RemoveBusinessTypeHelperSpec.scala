@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice
 
+import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import models.asp.Asp
 import models.businessmatching.{BillPaymentServices, BusinessActivities => BMBusinessActivities, _}
@@ -41,8 +42,11 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
   trait Fixture extends DependencyMocks {
     self =>
 
+    val mockApplicationConfig = mock[ApplicationConfig]
+
     val helper = new RemoveBusinessTypeHelper(
       SuccessfulAuthAction,
+      mockApplicationConfig,
       mockCacheConnector
     )
   }

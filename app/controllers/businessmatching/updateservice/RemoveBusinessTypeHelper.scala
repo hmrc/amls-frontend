@@ -18,13 +18,14 @@ package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.amp.Amp
 import models.asp.Asp
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching, _}
-import models.estateagentbusiness.EstateAgentBusiness
+import models.estateagentbusiness.{Eab, EstateAgentBusiness}
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBSection}
@@ -34,13 +35,14 @@ import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
+                                         appConfig: ApplicationConfig,
                                          implicit val dataCacheConnector: DataCacheConnector) {
 
   def removeSectionData(credId: String, model: RemoveBusinessTypeFlowModel)
@@ -71,8 +73,12 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
         case AccountancyServices =>
           dataCacheConnector.removeByKey[Asp](credId, Asp.key)
         case EstateAgentBusinessService =>
-          //TODO AMLS-5540 - Add toggled remove by new EAB key
-          dataCacheConnector.removeByKey[EstateAgentBusiness](credId, EstateAgentBusiness.key)
+          //TODO AMLS-5540 - Can be removed when feature toggle for new EAB service is removed.
+          if(appConfig.standAloneEABService) {
+            dataCacheConnector.removeByKey[EstateAgentBusiness](credId, EstateAgentBusiness.key)
+          } else {
+            dataCacheConnector.removeByKey[Eab](credId, Eab.key)
+          }
         case _ =>
           dataCacheConnector.fetchAllWithDefault(credId)
       }

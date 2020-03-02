@@ -24,13 +24,14 @@ import javax.inject.Inject
 import models.ViewResponse
 import models.asp.Asp
 import models.businessmatching._
-import models.estateagentbusiness.EstateAgentBusiness
+import models.estateagentbusiness.{Eab, EstateAgentBusiness}
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.tcsp.Tcsp
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -85,8 +86,12 @@ class BusinessMatchingService @Inject()(
     case AccountancyServices =>
       dataCacheConnector.removeByKey[Asp](credId, Asp.key)
     case EstateAgentBusinessService =>
-      //TODO AMLS-5540 - Need to provide a toggled remove by new EAB object
-      dataCacheConnector.removeByKey[EstateAgentBusiness](credId, EstateAgentBusiness.key)
+      //TODO AMLS-5540 - Can be removed when feature toggle for new EAB service is removed.
+      if(appConfig.standAloneEABService) {
+        dataCacheConnector.removeByKey[EstateAgentBusiness](credId, EstateAgentBusiness.key)
+      } else {
+        dataCacheConnector.removeByKey[Eab](credId, Eab.key)
+      }
     case HighValueDealing =>
       dataCacheConnector.removeByKey[Hvd](credId, Hvd.key)
     case MoneyServiceBusiness =>
