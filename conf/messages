@@ -1205,8 +1205,8 @@ confirmation.payment.failed.reason.cancelled = Your payment was cancelled
 confirmation.payment.failed.info = We’ve definitely received your application, but there has been a problem taking your payment. Your application won’t be reviewed until the fee has been paid.
 confirmation.payment.button.retry = Try to pay again
 
-payments.waystopay.title = How do you want to pay your fees?
-payments.waystopay.header = How do you want to pay your fees?
+payments.waystopay.title = How do you want to pay your fee?
+payments.waystopay.header = How do you want to pay your fee?
 
 payments.waystopay.info = If paying by Bacs, check transaction limits and processing times for your bank.
 payments.waystopay.info2 = There is a fee if you pay by corporate credit card. You cannot pay by personal credit card.
