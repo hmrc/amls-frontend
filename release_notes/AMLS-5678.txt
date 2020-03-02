@@ -1,0 +1,1 @@
+ + [AMLS-5678] - 'Fixed ordering of services on registration progress page'

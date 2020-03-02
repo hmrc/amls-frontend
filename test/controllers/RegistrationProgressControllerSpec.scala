@@ -77,7 +77,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
     when {
       controller.sectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
-    } thenReturn Set.empty[Section]
+    } thenReturn Seq.empty[Section]
 
     when {
       mockBusinessMatching.activities
@@ -465,7 +465,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             controller.sectionsProvider.sections(any[CacheMap])
           } thenReturn sections
 
-          val newSections = Set(
+          val newSections = Seq(
             models.moneyservicebusiness.MoneyServiceBusiness.section,
             models.hvd.Hvd.section
           )
