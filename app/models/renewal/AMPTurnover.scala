@@ -19,6 +19,7 @@ package models.renewal
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
+import models.amp.Amp
 import play.api.libs.json._
 
 sealed trait AMPTurnover
@@ -74,5 +75,23 @@ object AMPTurnover {
     case Third => Json.obj("percentageExpectedTurnover" -> "03")
     case Fourth => Json.obj("percentageExpectedTurnover" -> "04")
     case Fifth => Json.obj("percentageExpectedTurnover" -> "05")
+  }
+
+  def update(key: String, jsonObj: JsObject, newValue: JsObject): JsObject = {
+    if(jsonObj.keys.contains(key)) {
+      (jsonObj - key) ++ newValue
+    } else {
+      jsonObj
+    }
+  }
+
+  def convert(model: Option[AMPTurnover], amp: Amp): Amp = { model match {
+    case Some(AMPTurnover.First) => Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "zeroToTwenty")))
+    case Some(AMPTurnover.Second) => Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "twentyOneToForty")))
+    case Some(AMPTurnover.Third) => Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "fortyOneToSixty")))
+    case Some(AMPTurnover.Fourth) => Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "sixtyOneToEighty")))
+    case Some(AMPTurnover.Fifth) => Amp(update("percentageExpectedTurnover", amp.data, Json.obj("percentageExpectedTurnover" -> "eightyOneToOneHundred")))
+    case _ => throw new Exception("Invalid AMP Turnover")
+    }
   }
 }

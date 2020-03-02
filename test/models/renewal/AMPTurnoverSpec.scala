@@ -17,8 +17,12 @@
 package models.renewal
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
+import models.amp.Amp
+import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+
+import scala.collection.Seq
 
 class AMPTurnoverSpec extends PlaySpec {
 
@@ -120,6 +124,25 @@ class AMPTurnoverSpec extends PlaySpec {
           be(JsError(JsPath , play.api.libs.json.JsonValidationError("error.invalid")))
       }
     }
-   
+
+    "Convert amp section data" in {
+      val ampData = Amp(Json.obj(
+        "typeOfParticipant"      -> Seq("artGalleryOwner"),
+        "soldOverThreshold"             -> true,
+        "dateTransactionOverThreshold"  -> LocalDate.now.toString,
+        "identifyLinkedTransactions"    -> true,
+        "percentageExpectedTurnover"    -> "zeroToTwenty"
+      ))
+      val newAmpData = Json.obj(
+        "typeOfParticipant"      -> Seq("artGalleryOwner"),
+        "soldOverThreshold"             -> true,
+        "dateTransactionOverThreshold"  -> LocalDate.now.toString,
+        "identifyLinkedTransactions"    -> true,
+        "percentageExpectedTurnover"    -> "twentyOneToForty"
+      )
+
+      AMPTurnover.convert(Some(AMPTurnover.Second), ampData) must be(Amp(newAmpData))
+    }
+
   }
 }
