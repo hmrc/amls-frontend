@@ -53,6 +53,7 @@ object ControllerHelper {
           case _  => false
         }))
   }
+
   def hasInvalidRedressSchemeNewEab(eabOpt: Option[Eab]): Boolean = {
     eabOpt match {
       case Some(eab) => eab.isInvalidRedressScheme

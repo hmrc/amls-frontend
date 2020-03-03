@@ -23,6 +23,7 @@ import models.eab.Eab
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import play.api.libs.json.Json
+import services.ProxyCacheService
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global

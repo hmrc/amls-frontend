@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.amp
+package controllers.eab
 
 import cats.implicits._
 import cats.data.OptionT
@@ -24,9 +24,8 @@ import javax.inject.Inject
 import models.eab.Eab
 import play.api.libs.json._
 import play.api.mvc.MessagesControllerComponents
-import services.amp.ProxyCacheService
+import services.ProxyCacheService
 import utils.AuthAction
-
 
 class EabController @Inject()(proxyCacheService  : ProxyCacheService,
                               authAction         : AuthAction,

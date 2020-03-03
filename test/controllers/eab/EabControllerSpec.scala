@@ -18,7 +18,7 @@ package controllers.eab
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import controllers.amp.EabController
+import controllers.eab.EabController
 import models.eab.Eab
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -27,7 +27,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.amp.ProxyCacheService
+import services.ProxyCacheService
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture, CacheMocks}
 
 import scala.concurrent.Future
@@ -98,7 +98,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
   }
 
   "get returns 200" when {
-    "no amp section in cache" in new Fixture {
+    "no eab section in cache" in new Fixture {
       when(proxyCacheService.getEab(any())(any())).thenReturn(Future.successful(Some(Json.obj())))
 
 
@@ -110,7 +110,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
       document mustBe(Json.obj())
     }
 
-    "amp section in cache" in new Fixture {
+    "eab section in cache" in new Fixture {
       when(proxyCacheService.getEab(any())(any())).thenReturn(Future.successful(Some(completeEabJson)))
 
       val result = controller.get(credId)(request)

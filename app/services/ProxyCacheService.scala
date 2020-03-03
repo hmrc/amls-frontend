@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package services.amp
+package services
 
 import connectors.DataCacheConnector
 import javax.inject.Inject

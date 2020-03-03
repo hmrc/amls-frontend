@@ -24,9 +24,8 @@ import javax.inject.Inject
 import models.amp.Amp
 import play.api.libs.json._
 import play.api.mvc.{Action, MessagesControllerComponents}
-import services.amp.ProxyCacheService
+import services.ProxyCacheService
 import utils.AuthAction
-
 
 class AmpController @Inject()(proxyCacheService: ProxyCacheService,
                               authAction     : AuthAction,

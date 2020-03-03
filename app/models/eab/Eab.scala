@@ -98,7 +98,6 @@ final case class Eab(data: JsObject = Json.obj(),
       case _ => false
     }
   }
-
 }
 
 object Eab {
