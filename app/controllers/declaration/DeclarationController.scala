@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.declaration.AddPerson
-import models.status.{ReadyForRenewal, SubmissionReadyForReview}
+import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import play.api.mvc.{MessagesControllerComponents, Result}
 import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -52,9 +52,11 @@ class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnect
             } yield status match {
               case ReadyForRenewal(_) if renewalComplete => Ok(
                 views.html.declaration.declare("declaration.declaration.amendment.title", "submit.renewal.application", name, false))
-              case ReadyForRenewal(_) | SubmissionReadyForReview => Ok(
+              case ReadyForRenewal(_) | SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_) => Ok(
                 views.html.declaration.declare("declaration.declaration.amendment.title", "submit.amendment.application", name, true))
-              case _ => Ok(
+              case _ =>
+                println("statussssssssssss" + status)
+                Ok(
                 views.html.declaration.declare("declaration.declaration.amendment.title", "submit.registration", name, false))
             }
           }
