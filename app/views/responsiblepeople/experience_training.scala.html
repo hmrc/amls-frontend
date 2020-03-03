@@ -24,7 +24,7 @@
 @(f: Form2[_], businessMatching: BusinessMatching, edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @getErrorPlaceholder = {
-    @businessMatching.prefixedAlphabeticalBusinessTypes(false).map { types =>
+    @businessMatching.prefixedAlphabeticalBusinessTypes(true).map { types =>
         @if(types.size > 1) {
             @Messages("error.required.rp.experiencetraining.one")
         } else {
