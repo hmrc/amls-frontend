@@ -27,13 +27,14 @@ class ways_to_paySpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addTokenForView()
+    val secondaryHeading = "Submit application"
   }
 
   "ways_to_pay view" must {
 
     "have correct title, headings and form fields" in new ViewFixture {
 
-      def view = views.html.payments.ways_to_pay(EmptyForm)
+      def view = views.html.payments.ways_to_pay(EmptyForm, secondaryHeading)
 
       doc.title must startWith(Messages("payments.waystopay.title"))
       heading.html must be(Messages("payments.waystopay.header"))
@@ -43,21 +44,9 @@ class ways_to_paySpec extends AmlsViewSpec {
       doc.html must include(Messages("payments.waystopay.lead.time"))
     }
 
-    "have correct title, headings and form fields for renewal" in new ViewFixture {
-
-      def view = views.html.payments.ways_to_pay(EmptyForm, isRenewal = true)
-
-      doc.title must startWith(Messages("payments.waystopay.title"))
-      heading.html must be(Messages("payments.waystopay.header"))
-      subHeading.html must include(Messages("submit.renewal.application"))
-      doc.html must include(Messages("payments.waystopay.info"))
-      doc.html must include(Messages("payments.waystopay.info2"))
-      doc.html must include(Messages("payments.waystopay.lead.time"))
-    }
-
     "have a back link" in new ViewFixture {
 
-      def view = views.html.payments.ways_to_pay(EmptyForm)
+      def view = views.html.payments.ways_to_pay(EmptyForm, secondaryHeading)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -68,14 +57,14 @@ class ways_to_paySpec extends AmlsViewSpec {
         (Path \ "waysToPay") -> Seq(ValidationError("not a message Key"))
       ))
 
-      def view = views.html.payments.ways_to_pay(form2)
+      def view = views.html.payments.ways_to_pay(form2, secondaryHeading)
 
       errorSummary.html() must include("not a message Key")
     }
 
     "display all fields" in new ViewFixture {
 
-      def view = views.html.payments.ways_to_pay(EmptyForm)
+      def view = views.html.payments.ways_to_pay(EmptyForm, secondaryHeading)
 
       doc.getElementsByAttributeValue("for", "waysToPay-card") must not be empty
       doc.getElementsByAttributeValue("for", "waysToPay-bacs") must not be empty
