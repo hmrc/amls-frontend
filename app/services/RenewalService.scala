@@ -84,6 +84,18 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     isComplete.getOrElse(false)
   }
 
+  def isCachePresent(credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
+
+    val isCache = for {
+      cache <- dataCache.fetchAll(credId)
+    } yield cache match {
+      case Some(c) => true
+      case _ => false
+    }
+
+    isCache
+  }
+
   private def checkCompletionOfMsb(renewal: Renewal, msbServices: Option[BusinessMatchingMsbServices]) = {
 
     val validationRule = compileOpt {

@@ -55,28 +55,60 @@ class StatusController @Inject()(val landingService: LandingService,
 
   def get(fromDuplicateSubmission: Boolean = false) = authAction.async {
     implicit request =>
-      for {
-        refNo <- enrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier)
-        statusInfo <- statusService.getDetailedStatus(refNo, request.accountTypeId, request.credId)
-        statusResponse <- Future(statusInfo._2)
-        maybeBusinessName <- getBusinessName(request.credId, statusResponse.fold(none[String])(_.safeId), request.accountTypeId).value
-        feeResponse <- getFeeResponse(refNo, statusInfo._1, request.accountTypeId)
-        responsiblePeople <- dataCache.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)
-        bm <- dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-        unreadNotifications <- countUnreadNotifications(refNo, statusResponse.fold(none[String])(_.safeId), request.accountTypeId)
-        maybeActivities <- Future(bm.activities)
-        page <- getPageBasedOnStatus(
-          refNo,
-          statusInfo,
-          maybeBusinessName,
-          feeResponse,
-          fromDuplicateSubmission,
-          responsiblePeople,
-          maybeActivities,
-          request.accountTypeId,
+
+      request.amlsRefNumber match {
+        case Some(amlsRefNo) =>
+          renewalService.isCachePresent(request.credId) flatMap {
+            case true => getPage(
+              request.amlsRefNumber,
+              request.credId,
+              request.accountTypeId,
+              request.groupIdentifier,
+              fromDuplicateSubmission
+            )
+            case _    => landingService.refreshCache(amlsRefNo, request.credId, request.accountTypeId)
+              getPage(
+                request.amlsRefNumber,
+                request.credId,
+                request.accountTypeId,
+                request.groupIdentifier,
+                fromDuplicateSubmission
+              )
+          }
+        case _ => getPage(
+          request.amlsRefNumber,
           request.credId,
-          unreadNotifications)
-      } yield page
+          request.accountTypeId,
+          request.groupIdentifier,
+          fromDuplicateSubmission
+        )
+      }
+  }
+
+  def getPage(amlsRefNumber: Option[String], credId: String, accountTypeId: (String, String), groupIdentifier: Option[String], fromDuplicateSubmission: Boolean)
+         (implicit headerCarrier: HeaderCarrier, request: Request[AnyContent]) = {
+    for {
+      refNo <- enrolmentsService.amlsRegistrationNumber(amlsRefNumber, groupIdentifier)
+      statusInfo <- statusService.getDetailedStatus(refNo, accountTypeId, credId)
+      statusResponse <- Future(statusInfo._2)
+      maybeBusinessName <- getBusinessName(credId, statusResponse.fold(none[String])(_.safeId), accountTypeId).value
+      feeResponse <- getFeeResponse(refNo, statusInfo._1, accountTypeId)
+      responsiblePeople <- dataCache.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key)
+      bm <- dataCache.fetch[BusinessMatching](credId, BusinessMatching.key)
+      unreadNotifications <- countUnreadNotifications(refNo, statusResponse.fold(none[String])(_.safeId), accountTypeId)
+      maybeActivities <- Future(bm.activities)
+      page <- getPageBasedOnStatus(
+        refNo,
+        statusInfo,
+        maybeBusinessName,
+        feeResponse,
+        fromDuplicateSubmission,
+        responsiblePeople,
+        maybeActivities,
+        accountTypeId,
+        credId,
+        unreadNotifications)
+    } yield page
   }
 
   def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus, accountTypeId: (String, String))
