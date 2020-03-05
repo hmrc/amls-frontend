@@ -21,9 +21,25 @@
 
 @(f: forms.Form2[_], edit: Boolean, businessTypes:Option[List[String]])(implicit   m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 
+@errorPlaceholder = {
+    @businessTypes.map { types =>
+        @if(types.size == 1) {
+            @types.head
+        } else {
+            ""
+        }
+    }
+}
+
 @header = {
     @components.back_link()
-    @errorSummary(f)
+    @businessTypes.map { types =>
+        @if(types.size > 1) {
+            @errorSummary(f)
+        } else {
+            @errorSummaryWithPlaceholder(f, types.head)
+        }
+}
 }
 
 @supportingContent = {
@@ -36,8 +52,16 @@
                 <li>@businessType</li>
                 }
             </ul>
+        }
+    }
+}
+
+@heading = {
+    @businessTypes.map { types =>
+        @if(types.size > 1) {
+            @Messages("renewal.turnover.title")
         } else {
-            <p>@Messages("businessactivities.confirm-activities.subtitle_4") @types.head </p>
+            @Messages("renewal.turnover.title.single.service", types.head)
         }
     }
 }
@@ -51,10 +75,11 @@
 
             @fieldsetWithErrorGroup(
                 f = f("turnover"),
-                heading = "renewal.turnover.title",
+                heading = heading.toString(),
                 section = "summary.renewal",
                 panel = false,
-                supportingContent = supportingContent
+                supportingContent = supportingContent,
+                errorGroupPlaceholder = errorPlaceholder.toString()
             ) {
                 @radio(
                     f = f("turnover"),
