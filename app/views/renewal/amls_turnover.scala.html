@@ -34,12 +34,12 @@
 @header = {
     @components.back_link()
     @businessTypes.map { types =>
-        @if(types.size > 1) {
-            @errorSummary(f)
-        } else {
+        @if(types.size == 1) {
             @errorSummaryWithPlaceholder(f, types.head)
+        } else {
+            @errorSummary(f)
         }
-}
+    }
 }
 
 @supportingContent = {
@@ -58,10 +58,10 @@
 
 @heading = {
     @businessTypes.map { types =>
-        @if(types.size > 1) {
-            @Messages("renewal.turnover.title")
-        } else {
+        @if(types.size == 1) {
             @Messages("renewal.turnover.title.single.service", types.head)
+        } else {
+            @Messages("renewal.turnover.title")
         }
     }
 }
