@@ -221,6 +221,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
         .thenReturn(Future.successful((NotCompleted, Some(statusResponse))))
 
+      when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+
       val result = controller.get()(request)
       status(result) must be(OK)
 
@@ -260,6 +262,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
           when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
             .thenReturn(Future.successful((SubmissionReadyForReview, None)))
+
+          when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -301,6 +305,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionApproved, Some(readStatusResponse))))
 
+        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+
         val result = controller.get()(request)
         status(result) must be(OK)
 
@@ -321,6 +327,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionRejected, None)))
+
+        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -344,6 +352,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionRevoked, None)))
+
+        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -369,6 +379,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionExpired, None)))
 
+        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+
         val result = controller.get()(request)
         status(result) must be(OK)
 
@@ -388,6 +400,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((SubmissionWithdrawn, None)))
+
+        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -409,6 +423,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((DeRegistered, None)))
 
+        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+
         val result = controller.get()(request)
         status(result) must be(OK)
 
@@ -429,6 +445,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((RenewalSubmitted(Some(LocalDate.now)), None)))
 
+        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+
         val result = controller.get()(request)
         status(result) must be(OK)
 
@@ -446,6 +464,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
+
+        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
 
         val renewalDate = LocalDate.now().plusDays(15)
 
@@ -478,6 +498,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
         when(controller.renewalService.isRenewalComplete(any(), any[String]())(any(), any()))
           .thenReturn(Future.successful(false))
+
+        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
 
         val renewalDate = LocalDate.now().plusDays(15)
 
@@ -530,6 +552,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+
+        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
 
         private val completeRenewal = Renewal(
           Some(InvolvedInOtherYes("test")),
@@ -602,8 +626,39 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
 
+        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+
         val result = controller.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
+
+        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("your.registration.deregister.link")
+      }
+
+      "the status is 'approved' and there is no current mongo cache" in new Fixture {
+        val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+        val statusResponse = mock[ReadStatusResponse]
+        when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
+        when(statusResponse.safeId).thenReturn(None)
+
+        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
+
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
+
+        when(controller.landingService.refreshCache(any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
+
+        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(false))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        verify(controller.landingService).refreshCache(any(), any(), any())(any(), any())
 
         doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("your.registration.deregister.link")
       }

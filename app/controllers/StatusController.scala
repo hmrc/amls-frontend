@@ -55,9 +55,9 @@ class StatusController @Inject()(val landingService: LandingService,
 
   def get(fromDuplicateSubmission: Boolean = false) = authAction.async {
     implicit request =>
-
       request.amlsRefNumber match {
         case Some(amlsRefNo) =>
+          // MUST ensure we have a cache here! If the cache has expired reload from API5 as it must be populated to succeed.
           renewalService.isCachePresent(request.credId) flatMap {
             case true => getPage(
               request.amlsRefNumber,
@@ -66,14 +66,17 @@ class StatusController @Inject()(val landingService: LandingService,
               request.groupIdentifier,
               fromDuplicateSubmission
             )
-            case _    => landingService.refreshCache(amlsRefNo, request.credId, request.accountTypeId)
-              getPage(
-                request.amlsRefNumber,
-                request.credId,
-                request.accountTypeId,
-                request.groupIdentifier,
-                fromDuplicateSubmission
-              )
+            case _ =>
+              for {
+                _    <- landingService.refreshCache(amlsRefNo, request.credId, request.accountTypeId)
+                page <- getPage(
+                  request.amlsRefNumber,
+                  request.credId,
+                  request.accountTypeId,
+                  request.groupIdentifier,
+                  fromDuplicateSubmission
+                )
+              } yield page
           }
         case _ => getPage(
           request.amlsRefNumber,
@@ -86,7 +89,7 @@ class StatusController @Inject()(val landingService: LandingService,
   }
 
   def getPage(amlsRefNumber: Option[String], credId: String, accountTypeId: (String, String), groupIdentifier: Option[String], fromDuplicateSubmission: Boolean)
-         (implicit headerCarrier: HeaderCarrier, request: Request[AnyContent]) = {
+         (implicit request: Request[AnyContent]) = {
     for {
       refNo <- enrolmentsService.amlsRegistrationNumber(amlsRefNumber, groupIdentifier)
       statusInfo <- statusService.getDetailedStatus(refNo, accountTypeId, credId)
