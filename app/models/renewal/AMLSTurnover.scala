@@ -52,6 +52,22 @@ object AMLSTurnover {
     }
   }
 
+  def formRuleWithErrorMsg(message: String = ""): Rule[UrlFormEncoded, AMLSTurnover] = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    import models.FormTypes._
+    (__ \ "turnover").read[String].withMessage(message) flatMap {
+      case "01" => First
+      case "02" => Second
+      case "03" => Third
+      case "04" => Fourth
+      case "05" => Fifth
+      case "06" => Sixth
+      case "07" => Seventh
+      case _ =>
+        (Path \ "turnover") -> Seq(ValidationError("error.invalid"))
+    }
+  }
+
   implicit val formWrites: Write[AMLSTurnover, UrlFormEncoded] = Write {
     case First => "turnover" -> "01"
     case Second => "turnover" -> "02"
