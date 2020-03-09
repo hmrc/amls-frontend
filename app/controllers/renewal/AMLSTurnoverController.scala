@@ -16,6 +16,8 @@
 
 package controllers.renewal
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
@@ -24,9 +26,12 @@ import models.businessmatching._
 import models.renewal.{AMLSTurnover, Renewal}
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.amls_turnover
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 @Singleton
 class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -36,36 +41,30 @@ class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnecto
                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetchAll(request.credId) map {
-          optionalCache =>
-            (for {
-              cache <- optionalCache
-              businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-            } yield {
-
-              val form = (for {
-                renewal <- cache.getEntry[Renewal](Renewal.key)
-                turnover <- renewal.turnover
-              } yield Form2[AMLSTurnover](turnover)) getOrElse EmptyForm
-              val businessTypes = if (businessMatching.activities.getOrElse(BusinessActivities(Set())).businessActivities.size > 1) {
-                businessMatching.alphabeticalBusinessTypes
-              } else {
-                businessMatching.prefixedAlphabeticalBusinessTypes(false)
-              }
-              Ok(amls_turnover(form, edit, businessTypes))
-
-            }) getOrElse Ok(amls_turnover(EmptyForm, edit, None))
-        }
+    implicit request =>
+      dataCacheConnector.fetchAll(request.credId) map {
+        optionalCache =>
+          (for {
+            cache <- optionalCache
+            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          } yield {
+            val form = (for {
+              renewal <- cache.getEntry[Renewal](Renewal.key)
+              turnover <- renewal.turnover
+            } yield Form2[AMLSTurnover](turnover)) getOrElse EmptyForm
+            Ok(amls_turnover(form, edit, businessMatching.alphabeticalBusinessActivitiesLowerCase(false)))
+          }) getOrElse Ok(amls_turnover(EmptyForm, edit, None))
+      }
   }
 
   def post(edit: Boolean = false) = authAction.async {
-      implicit request => {
-        Form2[AMLSTurnover](request.body) match {
+    implicit request => {
+      getErrorMessage(request.credId) flatMap { errorMsg =>
+        Form2[AMLSTurnover](request.body)(AMLSTurnover.formRuleWithErrorMsg(errorMsg)) match {
           case f: InvalidForm =>
             for {
               businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-            } yield BadRequest(amls_turnover(f, edit, businessMatching.alphabeticalBusinessTypes))
+            } yield BadRequest(amls_turnover(f, edit, businessMatching.alphabeticalBusinessActivitiesLowerCase(false)))
           case ValidForm(_, data) =>
             for {
               renewal <- renewalService.getRenewal(request.credId)
@@ -80,6 +79,7 @@ class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnecto
             }
         }
       }
+    }
   }
 
   private def getRouting(ba: Option[BusinessActivities]) = {
@@ -92,5 +92,18 @@ class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnecto
       }
       case _ => InternalServerError("Unable to redirect from Turnover page")
     }
+  }
+
+  private def getErrorMessage(credId: String)(implicit hc: HeaderCarrier) = {
+    (for {
+      businessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
+      activities <- OptionT.fromOption[Future](businessMatching.activities)
+    } yield {
+      if (activities.businessActivities.size == 1) {
+        "error.required.renewal.ba.turnover.from.mlr.single.service"
+      } else {
+        "error.required.renewal.ba.turnover.from.mlr"
+      }
+    }) getOrElse "error.required.renewal.ba.turnover.from.mlr"
   }
 }

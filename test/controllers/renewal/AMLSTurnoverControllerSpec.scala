@@ -24,13 +24,14 @@ import models.renewal.Renewal
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.{OptionValues, PrivateMethodTester}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.Future
 
@@ -46,7 +47,8 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc
+      renewalService = mockRenewalService,
+      cc = mockMcc
     )
 
     val businessMatching = BusinessMatching(
@@ -353,7 +355,58 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         }
       }
 
-    }
+      "getErrorMessage" must {
+        "return error message for multiple services" when {
+          "there's more than one business activity" in new Fixture with PrivateMethodTester {
+            override val businessMatching = BusinessMatching(
+              activities = Some(Activities(Set(models.businessmatching.AccountancyServices, models.businessmatching.MoneyServiceBusiness)))
+            )
 
+            when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
+              .thenReturn(Future.successful(Some(businessMatching)))
+
+            val getErrorMessage = PrivateMethod[Future[String]]('getErrorMessage)
+            val result = controller invokePrivate getErrorMessage("credId", headerCarrier)
+
+            whenReady(result) { res =>
+              res mustBe "error.required.renewal.ba.turnover.from.mlr"
+            }
+          }
+        }
+
+        "return error message for single service" when {
+          "there's one business activity" in new Fixture with PrivateMethodTester {
+
+            when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
+              .thenReturn(Future.successful(Some(businessMatching)))
+
+            val getErrorMessage = PrivateMethod[Future[String]]('getErrorMessage)
+            val result = controller invokePrivate getErrorMessage("credId", headerCarrier)
+
+            whenReady(result) { res =>
+              res mustBe "error.required.renewal.ba.turnover.from.mlr.single.service"
+            }
+          }
+        }
+
+        "return default error message" when {
+          "no business activities are returned" in new Fixture with PrivateMethodTester {
+            override val businessMatching = BusinessMatching(
+              activities = Some(Activities(Set()))
+            )
+
+            when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
+              .thenReturn(Future.successful(Some(businessMatching)))
+
+            val getErrorMessage = PrivateMethod[Future[String]]('getErrorMessage)
+            val result = controller invokePrivate getErrorMessage("credId", headerCarrier)
+
+            whenReady(result) { res =>
+              res mustBe "error.required.renewal.ba.turnover.from.mlr"
+            }
+          }
+        }
+      }
+    }
   }
 }
