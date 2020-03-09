@@ -20,6 +20,8 @@ import java.time.LocalDateTime
 
 import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.renewal.AMPTurnover
+import models.renewal.AMPTurnover.update
 import play.api.{Configuration, Play}
 import play.api.libs.json._
 import play.api.mvc.Call
@@ -126,4 +128,15 @@ object Amp  {
   }
 
   implicit val formatOption = Reads.optionWithNull[Amp]
+
+  def convert(model: Amp): AMPTurnover = {
+    model.get[JsValue](model.percentageExpectedTurnover) match {
+      case Some(JsString("zeroToTwenty")) => AMPTurnover.First
+      case Some(JsString("twentyOneToForty")) => AMPTurnover.Second
+      case Some(JsString("fortyOneToSixty")) => AMPTurnover.Third
+      case Some(JsString("sixtyOneToEighty")) => AMPTurnover.Fourth
+      case Some(JsString("eightyOneToOneHundred")) => AMPTurnover.Fifth
+      case _ => throw new Exception("Incorrect data field from AMP turnover")
+    }
+  }
 }

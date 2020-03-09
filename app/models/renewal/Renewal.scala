@@ -154,6 +154,12 @@ object Renewal {
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Renewal model doesn't pass basic state validation"))))
     }
 
+    val ampRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.ampTurnover.isDefined => Valid(r)
+
+      case _ => Invalid(Seq(Path -> Seq(ValidationError("Renewal model doesn't pass AMP validation"))))
+    }
+
     val involvedInOtherRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
       case r if r.involvedInOtherActivities.exists(_.isInstanceOf[InvolvedInOtherYes]) && r.businessTurnover.isDefined => Valid(r)
       case r if r.involvedInOtherActivities.contains(InvolvedInOtherNo) && r.businessTurnover.isEmpty => Valid(r)

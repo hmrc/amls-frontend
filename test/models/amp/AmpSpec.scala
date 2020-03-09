@@ -18,7 +18,8 @@ package models.amp
 import java.time.{LocalDate, LocalDateTime, ZoneOffset}
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import play.api.libs.json.Json
+import models.renewal.AMPTurnover
+import play.api.libs.json.{JsError, JsPath, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import org.mockito.Mockito._
@@ -26,6 +27,8 @@ import org.scalatest.MustMatchers
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Call
+
+import scala.collection.Seq
 
 trait AmpValues {
 
@@ -196,6 +199,31 @@ class AmpSpec extends AmlsSpec with AmpValues {
 
       "Deserialise as expected" in {
         completeJson.as[Amp] must be(completeModel)
+      }
+      "Convert amp section data" in {
+        val ampData = Amp(Json.obj(
+          "typeOfParticipant"      -> Seq("artGalleryOwner"),
+          "soldOverThreshold"             -> true,
+          "dateTransactionOverThreshold"  -> LocalDate.now.toString,
+          "identifyLinkedTransactions"    -> true,
+          "percentageExpectedTurnover"    -> "zeroToTwenty"
+        ))
+
+        Amp.convert(ampData) must be(AMPTurnover.First)
+      }
+
+      "throw exception when given incorrect data" in {
+        val ampData = Amp(Json.obj(
+          "typeOfParticipant"      -> Seq("artGalleryOwner"),
+          "soldOverThreshold"             -> true,
+          "dateTransactionOverThreshold"  -> LocalDate.now.toString,
+          "identifyLinkedTransactions"    -> true,
+          "percentageExpectedTurnover"    -> "testException"
+        ))
+
+        intercept[Exception] {
+          Amp.convert(ampData)
+        }
       }
     }
   }
