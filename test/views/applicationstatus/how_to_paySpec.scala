@@ -87,7 +87,7 @@ class how_to_paySpec extends AmlsViewSpec with MustMatchers {
       html must include(Messages("howtopay.title2"))
       html must include(Messages("howtopay.para.1"))
       html must include(Messages("howtopay.para.2"))
-      html must include(Messages("howtopay.para.2.link.stop"))
+      html must include(Messages("howtopay.para.2.link"))
 
       html must include(Messages("howtopay.title3"))
       html must include(Messages("howtopay.para.4.b"))

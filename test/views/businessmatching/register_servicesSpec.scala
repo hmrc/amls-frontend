@@ -116,7 +116,7 @@ class register_servicesSpec extends AmlsViewSpec with MustMatchers  {
       doc.html must include("They provide services like professional bookkeeping, accounts preparation and signing, and tax advice.")
       doc.html must include("They facilitate and engage in the selling of art for €10,000 or more. Roles include things like art agents, art auctioneers, art dealers, and gallery owners.")
       doc.html must include("They handle payments for utility and other household bills on behalf of customers.")
-      doc.html must include("They introduce and act on instructions from people who want to buy or sell property. They also secure the purchase or sale of property.")
+      doc.html must include("This includes estate agency activities, like sending out property details and arranging viewings. It also includes lettings when the monthly rent for a property is €10,000 or more.")
       doc.html must include("They accept or make cash payments of €10,000 or more (or equivalent) in exchange for goods. This includes when a customer deposits cash directly into a bank account. Estate agents are not classed as high value dealers.")
       doc.html must include("They exchange currency, transmit money, or cash cheques for their customers.")
       doc.html must include("They form companies, and supply services like providing a business or correspondence address. They also act, or arrange for another person to act, in a certain role. For example, a director in a company or a trustee of an express trust.")

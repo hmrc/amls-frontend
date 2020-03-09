@@ -20,15 +20,7 @@
 
 @import models.confirmation.Currency
 
-@(isUK: Boolean, fee: Currency, paymentReference: String, isRenewal: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
-
-@sectionHeading = {
-    @if(isRenewal){
-        @Messages("submit.renewal.application")
-    }else{
-        @Messages("submit.registration")
-    }
-}
+@(isUK: Boolean, fee: Currency, paymentReference: String, sectionHeading: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
@@ -36,7 +28,7 @@
 }
 
 @main(
-    title = Messages("payments.bankdetails.title") + " - " + sectionHeading,
+    title = Messages("payments.bankdetails.title") + " - " + Messages(sectionHeading),
     heading = header
 ) {
     <p>@Messages("payments.bankdetails.hint")</p>

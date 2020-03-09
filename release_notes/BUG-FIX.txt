@@ -1,1 +1,0 @@
- + [BUG-FIX] - 'Start a new application button not working'

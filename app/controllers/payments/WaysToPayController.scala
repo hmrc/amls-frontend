@@ -24,11 +24,10 @@ import javax.inject.{Inject, Singleton}
 import models.FeeResponse
 import models.payments.WaysToPay._
 import models.payments.{CreateBacsPaymentRequest, WaysToPay}
-import models.status.Renewal
 import play.api.mvc.{MessagesControllerComponents, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AuthAction, AuthorisedRequest}
+import utils.{AuthAction, AuthorisedRequest, DeclarationHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -40,18 +39,14 @@ class WaysToPayController @Inject()(val authAction: AuthAction,
                                     val paymentsService: PaymentsService,
                                     val authEnrolmentsService: AuthEnrolmentsService,
                                     val feeResponseService: FeeResponseService,
-                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                    val cc: MessagesControllerComponents,
+                                    val renewalService: RenewalService) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
     implicit request =>
       (for {
-        status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
-      } yield {
-        status match {
-          case _: Renewal => Ok(views.html.payments.ways_to_pay(EmptyForm, true))
-          case _ => Ok(views.html.payments.ways_to_pay(EmptyForm))
-        }
-      }) getOrElse InternalServerError("Failed to retrieve status data.")
+        subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
+      } yield Ok(views.html.payments.ways_to_pay(EmptyForm, subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
   }
 
   def post() = authAction.async {
@@ -85,7 +80,10 @@ class WaysToPayController @Inject()(val authAction: AuthAction,
                 }
               }("Unable to save BACS info")
           }
-        case f: InvalidForm => Future.successful(BadRequest(views.html.payments.ways_to_pay(f)))
+        case f: InvalidForm =>
+          (for {
+            subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
+          } yield BadRequest(views.html.payments.ways_to_pay(f, subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
       }
   }
 

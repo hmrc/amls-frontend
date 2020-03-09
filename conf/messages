@@ -626,7 +626,8 @@ error.required.renewal.hvd.describe = Enter how you received cash payments from 
 error.required.renewal.hvd.describe.invalid.length = Description of how you received cash payments must be 255 characters or less
 error.required.renewal.hvd.describe.invalid.characters = Description of how you received cash payments can include letters a to z, numbers, spaces, and most punctuation and special characters
 
-error.required.renewal.ba.turnover.from.mlr = Select how much total net profit your business made from services registered for anti-money laundering supervision in the last 12 months
+error.required.renewal.ba.turnover.from.mlr = Select your total net profit for the last 12 months from the services you have registered
+error.required.renewal.ba.turnover.from.mlr.single.service = Select your total net profit for the last 12 months from {0} activities
 
 error.required.renewal.ba.business.turnover = Select the total net profit your business made in the last 12 months
 
@@ -1009,18 +1010,17 @@ howtopay.para.1 = If you have not already paid, you have 28 days to pay your fee
 howtopay.para.2 = Your fees were shown when you submitted your declaration. You’ll also find them in a ‘reminder to pay’ in
 howtopay.para.2.b = 14 days after you submit your application or update.
 howtopay.para.2.link = your messages
-howtopay.para.2.link.stop = your messages.
 howtopay.para.3 = If you do not know what your fees are, you’ll need to email HMRC. You should write ‘fees not known’ in the subject line of your email.
 howtopay.para.3.b = If you do not know your payment reference or fees, you’ll need to email HMRC. You should write ‘fees and payment reference not known’ in the subject line of your email.
 howtopay.para.3.link = Find the email address and how to pay
 howtopay.para.4 = Your payment reference number is
-howtopay.para.4.a = . You’ll need this to pay your fees.
+howtopay.para.4.a = You’ll need this to pay your fees.
 howtopay.para.4.b = To pay your fees you’ll need your payment reference. This has 12 digits, 2 letters and starts with X.
 howtopay.para.4.c = Your payment reference was shown when you submitted your declaration. You’ll also find it in a ‘reminder to pay’ in
 howtopay.para.5 = You can pay by
-howtopay.para.5.link = debit or corporate credit card.
+howtopay.para.5.link = debit or corporate credit card
 howtopay.para.6 = You can also pay by Faster Payments, CHAPS or Bacs.
-howtopay.para.6.link = Find account details and ways to pay.
+howtopay.para.6.link = Find account details and ways to pay
 howtopay.para.7 = Bacs and card payments usually take 3 working days.
 
 ############################### Progress page ###############################
@@ -1207,8 +1207,8 @@ confirmation.payment.failed.reason.cancelled = Your payment was cancelled
 confirmation.payment.failed.info = We’ve definitely received your application, but there has been a problem taking your payment. Your application won’t be reviewed until the fee has been paid.
 confirmation.payment.button.retry = Try to pay again
 
-payments.waystopay.title = How do you want to pay your fees?
-payments.waystopay.header = How do you want to pay your fees?
+payments.waystopay.title = How do you want to pay your fee?
+payments.waystopay.header = How do you want to pay your fee?
 
 payments.waystopay.info = If paying by Bacs, check transaction limits and processing times for your bank.
 payments.waystopay.info2 = There is a fee if you pay by corporate credit card. You cannot pay by personal credit card.
@@ -1563,10 +1563,18 @@ businessmatching.registerservices.servicename.lbl.05.phrased = high value dealin
 businessmatching.registerservices.servicename.lbl.06.phrased = money service business
 businessmatching.registerservices.servicename.lbl.07.phrased = trust or company services
 businessmatching.registerservices.servicename.lbl.08.phrased = telecommunications, digital and IT payment services
+businessmatching.registerservices.servicename.lbl.tp.01.phrased = accountancy service provider
+businessmatching.registerservices.servicename.lbl.tp.02.phrased = art market participant
+businessmatching.registerservices.servicename.lbl.tp.03.phrased = bill payment service provider
+businessmatching.registerservices.servicename.lbl.tp.04.phrased = estate agency business
+businessmatching.registerservices.servicename.lbl.tp.05.phrased = high value dealer
+businessmatching.registerservices.servicename.lbl.tp.06.phrased = money service business
+businessmatching.registerservices.servicename.lbl.tp.07.phrased = trust or company service provider
+businessmatching.registerservices.servicename.lbl.tp.08.phrased = telecommunications, digital and IT payment service provider
 businessmatching.registerservices.servicename.details.01 = They provide services like professional bookkeeping, accounts preparation and signing, and tax advice.
 businessmatching.registerservices.servicename.details.02 = They facilitate and engage in the selling of art for €10,000 or more. Roles include things like art agents, art auctioneers, art dealers, and gallery owners.
 businessmatching.registerservices.servicename.details.03 = They handle payments for utility and other household bills on behalf of customers.
-businessmatching.registerservices.servicename.details.04 = They introduce and act on instructions from people who want to buy or sell property. They also secure the purchase or sale of property.
+businessmatching.registerservices.servicename.details.04 = This includes estate agency activities, like sending out property details and arranging viewings. It also includes lettings when the monthly rent for a property is €10,000 or more.
 businessmatching.registerservices.servicename.details.05 = They accept or make cash payments of €10,000 or more (or equivalent) in exchange for goods. This includes when a customer deposits cash directly into a bank account. Estate agents are not classed as high value dealers.
 businessmatching.registerservices.servicename.details.06 = They exchange currency, transmit money, or cash cheques for their customers.
 businessmatching.registerservices.servicename.details.07 = They form companies, and supply services like providing a business or correspondence address. They also act, or arrange for another person to act, in a certain role. For example, a director in a company or a trustee of an express trust.
@@ -1828,7 +1836,7 @@ businessactivities.confirm-activities.line1.text = Is your business involved in 
 businessactivities.confirm-activities.subtitle = You have told us you’re registering the following services for anti-money laundering supervision:
 businessactivities.confirm-activities.subtitle_2 = You’re registering
 businessactivities.confirm-activities.subtitle_3 = for anti-money laundering supervision.
-businessactivities.confirm-activities.subtitle_4 = You’ve told us your business is
+businessactivities.confirm-activities.subtitle_4 = You have told us your business is
 businessactivities.identify-suspicious-activity.title = Do you have written guidance on how to identify and report suspicious activity?
 businessactivities.turnover.title = How much total net profit does your business expect in the next 12 months from the services you’re registering?
 
@@ -2561,10 +2569,10 @@ notifications.nmrj.title = No longer considering refusal
 notifications.nmrv.title = No longer considering revocation
 
 ############################### Renewal ###############################
-renewal.whatyouneed.requiredinfo.heading = In this section you’ll be asked for things like: 
-renewal.whatyouneed.line_1 = your business activities over the last 12 months
-renewal.whatyouneed.line_2 = net profit
-renewal.whatyouneed.line_3 = net profit on activities covered by Money Laundering Regulations
+renewal.whatyouneed.requiredinfo.heading = In this section you’ll need to tell us:
+renewal.whatyouneed.line_1 = about any other activities your business was involved in over the last 12 months
+renewal.whatyouneed.line_2 = your total net profit for the last 12 months, if your business was involved in other activities
+renewal.whatyouneed.line_3 = your total net profit for the last 12 months from the services you have registered
 renewal.progress.title = About your business
 renewal.progress.intro = If something has changed in your business that is relevant to Money Laundering Regulations you must update your information.\nYou’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for any additional responsible people.
 renewal.progress.submit.header = Submit renewal
@@ -2596,9 +2604,9 @@ renewal.customer.outside.uk.title = In the last 12 months did you have customers
 renewal.customer.outside.uk.countries.title = Which countries did these customers live or work in?
 renewal.customer.outside.uk.countries.text = You’ve told us you have customers who lived or worked outside of the UK in the last 12 months.
 
-renewal.turnover.title.single.service = How much total net profit did your business make in the last 12 months from the following service?
-renewal.turnover.title = How much total net profit did your business make from services registered for anti-money laundering supervision in the last 12 months?
-renewal.turnover.text = You have registered the following services for anti-money laundering supervision:
+renewal.turnover.title = What was your total net profit for the last 12 months from the services you have registered?
+renewal.turnover.title.single.service = What was your total net profit for the last 12 months from {0} activities?
+renewal.turnover.text = You have registered the following services:
 renewal.percentage.turnover.text = If you do not use euros, you’ll need to convert the amount to the currency you use.
 renewal.percentage.info.line1 = Cash can be physical money, notes and coins. It can be paid to you in person or directly into a bank account.
 renewal.percentage.info.line2 = This includes payment of €10,000 or more in:
@@ -2606,7 +2614,7 @@ renewal.percentage.list.line1 = any 90 day period
 renewal.percentage.list.line2 = any single cash payment
 renewal.percentage.list.line3 = several related cash payments, including payment plans, payments on account, and deposits
 
-renewal.business-turnover.title = How much total net profit did your business make in the last 12 months?
+renewal.business-turnover.title = What was your total net profit for the last 12 months?
 renewal.receiving.title = In the last 12 months did you receive cash payments of €10,000 or more from customers you have not met in person?
 renewal.receiving.text = If you do not use euros, you’ll need to convert the amount to the currency you use.
 renewal.receiving.info.line1 = Cash can be physical money, notes and coins. It can be paid to you in person or directly into a bank account.

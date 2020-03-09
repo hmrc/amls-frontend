@@ -295,6 +295,38 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     }
   }
 
+  "getSubheadingBasedOnStatus" must {
+    "return renewal subheading if application is in renewal window and renewal is complete" in {
+      when {
+        statusService.getStatus(any(),any(), any())(any(),any())
+      } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
+
+      when(renewalService.isRenewalComplete(any(), any())(any(), any()))
+        .thenReturn(Future.successful(true))
+
+      val result = getSubheadingBasedOnStatus(credId, amlsRegNo, accountTypeId, statusService, renewalService).value
+      await(result) mustBe Some("submit.amendment.application")
+    }
+
+    "return submit application subheading if application is ready to submit" in {
+      when {
+        statusService.getStatus(any(),any(), any())(any(),any())
+      } thenReturn Future.successful(SubmissionReady)
+
+      val result = getSubheadingBasedOnStatus(credId, amlsRegNo, accountTypeId, statusService, renewalService).value
+      await(result) mustBe Some("submit.registration")
+    }
+
+    "return update information subheading if application is in any other state" in {
+      when {
+        statusService.getStatus(any(),any(), any())(any(),any())
+      } thenReturn Future.successful(SubmissionReadyForReview)
+
+      val result = getSubheadingBasedOnStatus(credId, amlsRegNo, accountTypeId, statusService, renewalService).value
+      await(result) mustBe Some("submit.amendment.application")
+    }
+  }
+
   "sectionsComplete" must {
     val sectionsProvider = mock[SectionsProvider]
     val completedSections = Seq(
