@@ -109,7 +109,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
     when {
       sectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
-    } thenReturn Set(defaultSection)
+    } thenReturn Seq(defaultSection)
 
     when(cacheMap.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any()))
       .thenReturn(Some(Seq(completeResponsiblePerson)))

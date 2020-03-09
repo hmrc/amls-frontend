@@ -22,10 +22,9 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.SubmissionRequestStatus
-import models.status.Renewal
 import play.api.mvc.MessagesControllerComponents
-import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
-import utils.AuthAction
+import services.{AuthEnrolmentsService, FeeResponseService, RenewalService, StatusService}
+import utils.{AuthAction, DeclarationHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -36,7 +35,8 @@ class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector
                                       val authEnrolmentsService: AuthEnrolmentsService,
                                       val feeResponseService: FeeResponseService,
                                       val statusService: StatusService,
-                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                      val cc: MessagesControllerComponents,
+                                      val renewalService: RenewalService) extends AmlsBaseController(ds, cc) {
 
 
   def get(isUK: Boolean = true) = authAction.async {
@@ -46,13 +46,11 @@ class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector
         status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
         amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
         fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber, request.accountTypeId))
+        subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
         paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
       } yield {
         val amount = fees.toPay(status, submissionRequestStatus)
-        status match {
-          case _: Renewal => Ok(views.html.payments.bank_details(isUK, amount, paymentReference, true))
-          case _ => Ok(views.html.payments.bank_details(isUK, amount, paymentReference))
-        }
+          Ok(views.html.payments.bank_details(isUK, amount, paymentReference, subHeading))
       }) getOrElse InternalServerError("Failed to retrieve submission data")
   }
 }

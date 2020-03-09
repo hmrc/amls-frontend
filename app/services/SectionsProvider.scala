@@ -34,9 +34,11 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import play.api.libs.json.JsObject
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 
+import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
 class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector,
@@ -53,40 +55,38 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
     }
 
   def sections(cache: CacheMap) : Seq[Section] = {
-      mandatorySections(cache) ++
-      dependentSections(cache)
+    mandatorySections(cache) ++ dependentSections(cache)
   }
 
   def sectionsFromBusinessActivities(activities: Set[BusinessActivity],
                                      msbServices: Option[BusinessMatchingMsbServices])
-                                    (implicit cache: CacheMap): Set[Section] =
+                                    (implicit cache: CacheMap): Seq[Section] = {
 
-    activities.foldLeft[Set[Section]](Set.empty) {
-      (m, n) => n match {
-        case AccountancyServices =>
-          m + Asp.section + Supervision.section
-        case ArtMarketParticipant =>
-          m + Amp.section
-        case EstateAgentBusinessService => if(config.standAloneEABService) {
-          m + Eab.section
-        } else {
-          m + EstateAgentBusiness.section
-        }
-        case HighValueDealing =>
-          m + Hvd.section
-        case MoneyServiceBusiness if msbServices.isDefined =>
-          m + Msb.section
-        case TrustAndCompanyServices =>
-          m + Tcsp.section + Supervision.section
-        case _ => m
-      }
+    val asp = if (activities.contains(AccountancyServices)) Seq(Asp.section) else Seq.empty
+    val tcsp = if (activities.contains(TrustAndCompanyServices)) Seq(Tcsp.section) else Seq.empty
+    val supervision = if (asp.nonEmpty || tcsp.nonEmpty) Seq(Supervision.section) else Seq.empty
+    val amp = if (activities.contains(ArtMarketParticipant)) Seq(Amp.section) else Seq.empty
+    val eab = if (activities.contains(EstateAgentBusinessService)) toggleEAB else Seq.empty
+    val hvd = if (activities.contains(HighValueDealing)) Seq(Hvd.section) else Seq.empty
+    val msb = if (activities.contains(MoneyServiceBusiness) && msbServices.isDefined) Seq(Msb.section) else Seq.empty
+
+    asp ++ tcsp ++ supervision ++ amp ++ eab ++ hvd ++ msb
+  }
+
+  //TODO AMLS-5540 - can be removed when the feature toggle is removed.
+  private def toggleEAB(implicit cache: CacheMap) = {
+    if (config.standAloneEABService) {
+      Seq(Eab.section)
+    } else {
+      Seq(EstateAgentBusiness.section)
     }
+  }
 
-  private def dependentSections(implicit cache: CacheMap): Set[Section] =
+  private def dependentSections(implicit cache: CacheMap): Seq[Section] =
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       ba <- bm.activities
-    } yield sectionsFromBusinessActivities(ba.businessActivities, bm.msbServices)) getOrElse Set.empty
+    } yield sectionsFromBusinessActivities(ba.businessActivities, bm.msbServices)) getOrElse Seq.empty
 
   private def mandatorySections(implicit cache: CacheMap): Seq[Section] =
     Seq(

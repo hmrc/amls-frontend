@@ -1,1 +1,0 @@
- + [AMLS-5736] - 'Fix the empty countries list in MSB section'

@@ -23,12 +23,11 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.payments.TypeOfBank
-import models.status.Renewal
 import play.api.mvc.MessagesControllerComponents
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.AuthAction
+import utils.{AuthAction, DeclarationHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -40,18 +39,16 @@ class TypeOfBankController @Inject()(val authAction: AuthAction,
                                      val feeResponseService: FeeResponseService,
                                      val paymentsService: PaymentsService,
                                      val cc: MessagesControllerComponents,
-                                     val statusService: StatusService) extends AmlsBaseController(ds, cc) {
+                                     val statusService: StatusService,
+                                     val renewalService: RenewalService) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
     implicit request =>
       (for {
-        status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
+        subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
       } yield {
-        status match {
-          case _: Renewal => Ok(views.html.payments.type_of_bank(EmptyForm, true))
-          case _ => Ok(views.html.payments.type_of_bank(EmptyForm))
-        }
-      }) getOrElse InternalServerError("Failed to retrieve status data.")
+        Ok(views.html.payments.type_of_bank(EmptyForm, subHeading))
+      }) getOrElse InternalServerError("Failed to retrieve data.")
   }
 
   def post() = authAction.async {
@@ -63,7 +60,11 @@ class TypeOfBankController @Inject()(val authAction: AuthAction,
             Redirect(controllers.payments.routes.BankDetailsController.get(data.isUK).url)
           }
 
-        case f: InvalidForm => Future.successful(BadRequest(views.html.payments.type_of_bank(f)))
+        case f: InvalidForm => (for {
+          subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
+        } yield {
+          BadRequest(views.html.payments.type_of_bank(f, subHeading))
+        }) getOrElse InternalServerError("Failed to retrieve data.")
       }
   }
 

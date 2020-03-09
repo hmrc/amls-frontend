@@ -60,7 +60,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
         contentAsString(result) must include(
           Messages(
             "businessmatching.updateservice.tradingpremises.heading",
-            Messages(s"businessmatching.registerservices.servicename.lbl.${BusinessActivities.getValue(HighValueDealing)}.phrased")
+            Messages(s"businessmatching.registerservices.servicename.lbl.tp.${BusinessActivities.getValue(HighValueDealing)}.phrased")
           ))
       }
     }

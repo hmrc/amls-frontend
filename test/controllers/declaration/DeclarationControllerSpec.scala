@@ -21,8 +21,9 @@ import controllers.actions.SuccessfulAuthAction
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.registrationprogress.{Completed, Section, Started}
+import models.renewal.{AMLSTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
 import models.status.{NotCompleted, ReadyForRenewal, SubmissionReadyForReview}
-import models.{ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
+import models.{Country, ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -31,7 +32,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.SectionsProvider
+import services.{RenewalService, SectionsProvider}
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.Future
@@ -48,7 +49,8 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mockStatusService,
       cc = mockMcc,
-      sectionsProvider = mockSectionsProvider
+      sectionsProvider = mockSectionsProvider,
+      renewalService = mock[RenewalService]
     )
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
@@ -70,6 +72,29 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       None, false)
     val addPerson = AddPerson("firstName", Some("middleName"), "lastName",
       RoleWithinBusinessRelease7(Set(models.declaration.release7.InternalAccountant)))
+
+    val completeRenewal = Renewal(
+      Some(InvolvedInOtherYes("test")),
+      Some(BusinessTurnover.First),
+      Some(AMLSTurnover.First),
+      Some(CustomersOutsideIsUK(true)),
+      Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+      Some(PercentageOfCashPaymentOver15000.First),
+      Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other")))))),
+      Some(TotalThroughput("01")),
+      Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
+      Some(TransactionsInLast12Months("1500")),
+      Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
+      Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+      Some(CETransactionsInLast12Months("123")),
+      hasChanged = true
+    )
+
+    when(declarationController.renewalService.getRenewal(any())(any(), any()))
+      .thenReturn(Future.successful(Some(completeRenewal)))
+
+    when(declarationController.renewalService.isRenewalComplete(any(), any())(any(), any()))
+      .thenReturn(Future.successful(true))
   }
 
   "Declaration get" must {

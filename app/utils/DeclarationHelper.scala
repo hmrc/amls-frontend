@@ -17,6 +17,7 @@
 package utils
 
 import cats.data.OptionT
+import cats.implicits._
 import controllers.declaration
 import models.registrationprogress.{Completed, Section}
 import models.responsiblepeople.{Partner, ResponsiblePerson}
@@ -112,7 +113,7 @@ object DeclarationHelper {
     }
   }
 
-  private def renewalComplete(renewalService: RenewalService, credId: String)
+  def renewalComplete(renewalService: RenewalService, credId: String)
                              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
     renewalService.getRenewal(credId) flatMap {
       case Some(renewal) =>
@@ -134,4 +135,18 @@ object DeclarationHelper {
     seq forall {
       _.status == Completed
     }
+
+  def getSubheadingBasedOnStatus(credId: String, amlsRefNumber: Option[String], accountTypeId: (String, String), statusService: StatusService, renewalService: RenewalService)
+                                (implicit hc: HeaderCarrier)= {
+    for {
+      renewalComplete <- OptionT.liftF(DeclarationHelper.renewalComplete(renewalService, credId))
+      status <- OptionT.liftF(statusService.getStatus(amlsRefNumber, accountTypeId, credId))
+    } yield {
+      status match {
+        case ReadyForRenewal(_) if renewalComplete => "submit.renewal.application"
+        case SubmissionReady => "submit.registration"
+        case _ => "submit.amendment.application"
+      }
+    }
+  }
 }

@@ -75,7 +75,8 @@ class ConfirmationController @Inject()(authAction: AuthAction,
               fees.totalFees,
               rows,
               fees.toPay(status, submissionRequestStatus),
-              controllers.payments.routes.WaysToPayController.get().url)).some
+              controllers.payments.routes.WaysToPayController.get().url,
+              submissionRequestStatus.fold[Boolean](false)(_.isRenewalAmendment.getOrElse(false)))).some
           } else {
             Ok(confirm_amendvariation(fees.paymentReference,
               fees.totalFees,

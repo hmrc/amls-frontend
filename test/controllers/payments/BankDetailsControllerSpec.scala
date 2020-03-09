@@ -20,14 +20,15 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import generators.PaymentGenerator
 import models.ResponseType.SubscriptionResponseType
+import models.renewal.{AMLSTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
-import models.{FeeResponse, SubmissionRequestStatus}
+import models.{Country, FeeResponse, SubmissionRequestStatus}
 import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, FeeResponseService}
+import services.{AuthEnrolmentsService, FeeResponseService, RenewalService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
@@ -48,10 +49,34 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
       statusService = mockStatusService,
-      cc = mockMcc
+      cc = mockMcc,
+      renewalService = mock[RenewalService]
     )
 
     val submissionStatus = SubmissionReadyForReview
+
+    val completeRenewal = Renewal(
+      Some(InvolvedInOtherYes("test")),
+      Some(BusinessTurnover.First),
+      Some(AMLSTurnover.First),
+      Some(CustomersOutsideIsUK(true)),
+      Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+      Some(PercentageOfCashPaymentOver15000.First),
+      Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other")))))),
+      Some(TotalThroughput("01")),
+      Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
+      Some(TransactionsInLast12Months("1500")),
+      Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
+      Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+      Some(CETransactionsInLast12Months("123")),
+      hasChanged = true
+    )
+
+    when(controller.renewalService.getRenewal(any())(any(), any()))
+      .thenReturn(Future.successful(Some(completeRenewal)))
+
+    when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
+      .thenReturn(Future.successful(true))
 
   }
 

@@ -19,14 +19,22 @@
 @import views.html.confirmation.{breakdown => breakdown_display}
 @import config.{ ApplicationConfig}
 
-@(paymentReference: Option[String], total: Currency, breakdown: Seq[BreakdownRow], amountToPay: Currency, paymentsUrl: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(paymentReference: Option[String], total: Currency, breakdown: Seq[BreakdownRow], amountToPay: Currency, paymentsUrl: String, isRenewalAmendment: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+
+@subHeading = {
+    @if(isRenewalAmendment){
+        @Messages("confirmation.amendment.header.secondary")
+    }else{
+        @Messages("confirmation.renewal.header.secondary")
+    }
+}
 
 @main(
-    title = Messages("confirmation.renewal.title") + " - " + Messages("confirmation.renewal.header.secondary")
+    title = Messages("confirmation.renewal.title") + " - " + subHeading
 ) {
 
     <header class="page-header">
-        <p class="heading-secondary"><span class="visuallyhidden">This section is </span>@Messages("confirmation.renewal.header.secondary")</p>
+        <p class="heading-secondary"><span class="visuallyhidden">This section is </span>@subHeading</p>
         <h1 class="heading-xlarge">@Messages("confirmation.renewal.header")</h1>
     </header>
 

@@ -21,8 +21,9 @@ import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.ResponseType.SubscriptionResponseType
 import models.confirmation.Currency
 import models.payments._
+import models.renewal.{AMLSTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
 import models.status.{SubmissionReady, SubmissionReadyForReview}
-import models.{FeeResponse, ReadStatusResponse, ReturnLocation}
+import models.{Country, FeeResponse, ReadStatusResponse, ReturnLocation}
 import org.joda.time.DateTime
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -51,7 +52,8 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
       paymentsService = mock[PaymentsService],
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
-      cc = mockMcc
+      cc = mockMcc,
+      renewalService = mock[RenewalService]
     )
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))
@@ -96,6 +98,29 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
     when {
       controller.statusService.getStatus(any(), any(), any())(any(), any())
     } thenReturn Future.successful(SubmissionReady)
+
+    val completeRenewal = Renewal(
+      Some(InvolvedInOtherYes("test")),
+      Some(BusinessTurnover.First),
+      Some(AMLSTurnover.First),
+      Some(CustomersOutsideIsUK(true)),
+      Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+      Some(PercentageOfCashPaymentOver15000.First),
+      Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true, true, Some("other")))))),
+      Some(TotalThroughput("01")),
+      Some(WhichCurrencies(Seq("EUR"), None, Some(MoneySources(None, None, None)))),
+      Some(TransactionsInLast12Months("1500")),
+      Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
+      Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+      Some(CETransactionsInLast12Months("123")),
+      hasChanged = true
+    )
+
+    when(controller.renewalService.getRenewal(any())(any(), any()))
+      .thenReturn(Future.successful(Some(completeRenewal)))
+
+    when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
+      .thenReturn(Future.successful(true))
 
   }
 

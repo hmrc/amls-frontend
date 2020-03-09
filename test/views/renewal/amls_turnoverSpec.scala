@@ -42,15 +42,24 @@ class amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
       doc.title must startWith(Messages("renewal.turnover.title") + " - " + Messages("summary.renewal"))
     }
 
-    "have correct headings" in new ViewFixture {
+    "have correct headings for single service" in new ViewFixture {
 
       val form2: ValidForm[AMLSTurnover] = Form2(AMLSTurnover.Third)
 
-      def view = views.html.renewal.amls_turnover(form2, true, None)
+      def view = views.html.renewal.amls_turnover(form2, true, Some(List("some provider")))
+
+      heading.html must be(Messages("renewal.turnover.title.single.service", "some provider"))
+      subHeading.html must include( Messages("summary.renewal"))
+    }
+
+    "have correct headings for multiple services" in new ViewFixture {
+
+      val form2: ValidForm[AMLSTurnover] = Form2(AMLSTurnover.Third)
+
+      def view = views.html.renewal.amls_turnover(form2, true, Some(List("some provider", "some other provider")))
 
       heading.html must be(Messages("renewal.turnover.title"))
       subHeading.html must include( Messages("summary.renewal"))
-
     }
 
     "correctly list business activities" in new ViewFixture {
@@ -69,7 +78,7 @@ class amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "turnover") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.renewal.amls_turnover(form2, true, None)
+      def view = views.html.renewal.amls_turnover(form2, true, Some(List("some provider")))
 
       errorSummary.html() must include("not a message Key")
 

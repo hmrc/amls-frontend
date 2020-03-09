@@ -43,7 +43,7 @@ class trading_premisesSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have correct heading" in new ViewFixture {
-      heading.html must be(Messages("businessmatching.updateservice.tradingpremises.heading", "high value dealing"))
+      heading.html must be(Messages("businessmatching.updateservice.tradingpremises.heading", "high value dealer"))
     }
 
     "have correct subHeading" in new ViewFixture {
