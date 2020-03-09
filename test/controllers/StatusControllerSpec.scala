@@ -243,6 +243,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful((NotCompleted, None)))
 
+        when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
+
         val result = controllerNoAmlsNumber.get()(request)
         status(result) must be(OK)
 
@@ -254,7 +256,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
           val paymentRef = paymentRefGen.sample.get
           val payment = paymentGen.sample.get.copy(isBacs = Some(true))
 
-          when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
+          when(controller.landingService.cacheMap(any[String])(any(), any()))
             .thenReturn(Future.successful(Some(cacheMap)))
 
           when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
@@ -275,11 +277,13 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
             .thenReturn(Future.successful(Some(cacheMap)))
 
-          when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+          when(controllerNoAmlsNumber.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
           when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
             .thenReturn(Future.successful((SubmissionReadyForReview, None)))
+
+          when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(OK)
@@ -581,6 +585,33 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         val html = contentAsString(result)
         html must include(Messages("status.renewalnotsubmitted.description"))
       }
+
+      "the status is 'approved' and there is no current mongo cache" in new Fixture {
+        val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+        val statusResponse = mock[ReadStatusResponse]
+        when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
+        when(statusResponse.safeId).thenReturn(None)
+
+        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
+
+        when(controller.landingService.cacheMap(any[String])(any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
+
+        when(controller.landingService.refreshCache(any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
+
+        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(false))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+      }
     }
 
     "show the withdrawal link" when {
@@ -600,6 +631,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
         when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful(SubmissionReadyForReview, statusResponse.some))
+
+        when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
 
         val result = controllerNoAmlsNumber.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
@@ -630,35 +663,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
         val result = controller.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
-
-        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("your.registration.deregister.link")
-      }
-
-      "the status is 'approved' and there is no current mongo cache" in new Fixture {
-        val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
-
-        val statusResponse = mock[ReadStatusResponse]
-        when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
-        when(statusResponse.safeId).thenReturn(None)
-
-        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
-
-        when(controller.landingService.cacheMap(any[String])(any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
-
-        when(controller.landingService.refreshCache(any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
-
-        when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(false))
-
-        val result = controller.get()(request)
-        val doc = Jsoup.parse(contentAsString(result))
-
-        verify(controller.landingService).refreshCache(any(), any(), any())(any(), any())
 
         doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("your.registration.deregister.link")
       }

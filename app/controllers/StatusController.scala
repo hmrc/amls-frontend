@@ -55,63 +55,17 @@ class StatusController @Inject()(val landingService: LandingService,
 
   def get(fromDuplicateSubmission: Boolean = false) = authAction.async {
     implicit request =>
-      request.amlsRefNumber match {
-        case Some(amlsRefNo) =>
-          // MUST ensure we have a cache here! If the cache has expired reload from API5 as it must be populated to succeed.
-          renewalService.isCachePresent(request.credId) flatMap {
-            case true => getPage(
-              request.amlsRefNumber,
-              request.credId,
-              request.accountTypeId,
-              request.groupIdentifier,
-              fromDuplicateSubmission
-            )
-            case _ =>
-              for {
-                _    <- landingService.refreshCache(amlsRefNo, request.credId, request.accountTypeId)
-                page <- getPage(
-                  request.amlsRefNumber,
-                  request.credId,
-                  request.accountTypeId,
-                  request.groupIdentifier,
-                  fromDuplicateSubmission
-                )
-              } yield page
-          }
-        case _ => getPage(
+      // MUST ensure we have a cache here! If no cache go back to landing controller and refresh.
+      renewalService.isCachePresent(request.credId) flatMap {
+        case true => getPage(
           request.amlsRefNumber,
           request.credId,
           request.accountTypeId,
           request.groupIdentifier,
           fromDuplicateSubmission
         )
+        case _ => Future.successful(Redirect(controllers.routes.LandingController.get()))
       }
-  }
-
-  def getPage(amlsRefNumber: Option[String], credId: String, accountTypeId: (String, String), groupIdentifier: Option[String], fromDuplicateSubmission: Boolean)
-         (implicit request: Request[AnyContent]) = {
-    for {
-      refNo <- enrolmentsService.amlsRegistrationNumber(amlsRefNumber, groupIdentifier)
-      statusInfo <- statusService.getDetailedStatus(refNo, accountTypeId, credId)
-      statusResponse <- Future(statusInfo._2)
-      maybeBusinessName <- getBusinessName(credId, statusResponse.fold(none[String])(_.safeId), accountTypeId).value
-      feeResponse <- getFeeResponse(refNo, statusInfo._1, accountTypeId)
-      responsiblePeople <- dataCache.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key)
-      bm <- dataCache.fetch[BusinessMatching](credId, BusinessMatching.key)
-      unreadNotifications <- countUnreadNotifications(refNo, statusResponse.fold(none[String])(_.safeId), accountTypeId)
-      maybeActivities <- Future(bm.activities)
-      page <- getPageBasedOnStatus(
-        refNo,
-        statusInfo,
-        maybeBusinessName,
-        feeResponse,
-        fromDuplicateSubmission,
-        responsiblePeople,
-        maybeActivities,
-        accountTypeId,
-        credId,
-        unreadNotifications)
-    } yield page
   }
 
   def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus, accountTypeId: (String, String))
@@ -134,6 +88,33 @@ class StatusController @Inject()(val landingService: LandingService,
 
       redirect getOrElse InternalServerError("New submission failed")
     }
+  }
+
+  private def getPage(amlsRefNumber: Option[String], credId: String, accountTypeId: (String, String),
+                      groupIdentifier: Option[String], fromDuplicateSubmission: Boolean)
+                     (implicit request: Request[AnyContent]) = {
+    for {
+      refNo <- enrolmentsService.amlsRegistrationNumber(amlsRefNumber, groupIdentifier)
+      statusInfo <- statusService.getDetailedStatus(refNo, accountTypeId, credId)
+      statusResponse <- Future(statusInfo._2)
+      maybeBusinessName <- getBusinessName(credId, statusResponse.fold(none[String])(_.safeId), accountTypeId).value
+      feeResponse <- getFeeResponse(refNo, statusInfo._1, accountTypeId)
+      responsiblePeople <- dataCache.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key)
+      bm <- dataCache.fetch[BusinessMatching](credId, BusinessMatching.key)
+      unreadNotifications <- countUnreadNotifications(refNo, statusResponse.fold(none[String])(_.safeId), accountTypeId)
+      maybeActivities <- Future(bm.activities)
+      page <- getPageBasedOnStatus(
+        refNo,
+        statusInfo,
+        maybeBusinessName,
+        feeResponse,
+        fromDuplicateSubmission,
+        responsiblePeople,
+        maybeActivities,
+        accountTypeId,
+        credId,
+        unreadNotifications)
+    } yield page
   }
 
   private def getPageBasedOnStatus(mlrRegNumber: Option[String],
