@@ -21,7 +21,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.registrationprogress.{Completed, Section, Started}
-import models.renewal.{AMLSTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
+import models.renewal.{AMLSTurnover, AMPTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
 import models.status.{NotCompleted, ReadyForRenewal, SubmissionReadyForReview}
 import models.{Country, ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
 import org.joda.time.{LocalDate, LocalDateTime}
@@ -77,6 +77,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       Some(InvolvedInOtherYes("test")),
       Some(BusinessTurnover.First),
       Some(AMLSTurnover.First),
+      Some(AMPTurnover.First),
       Some(CustomersOutsideIsUK(true)),
       Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
       Some(PercentageOfCashPaymentOver15000.First),

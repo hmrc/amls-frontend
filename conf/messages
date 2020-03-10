@@ -640,6 +640,8 @@ error.invalid.characters.renewal.msb.wc.wholesalerNames = Currency wholesaler na
 
 error.required.renewal.hvd.percentage = Select the percentage of your turnover that came from cash payments of €10,000 or more
 
+error.required.renewal.amp.percentage = Select how much of your turnover in the last 12 months came from sales of art for €10,000 or more
+
 error.invalid.renewal.msb.wc.moneySources = Select who supplied your physical foreign currency in the last 12 months
 
 error.required.renewal.country.name = Enter an official country name: for example, Holland is Netherlands
@@ -2588,6 +2590,8 @@ renewal.progress.submit.completed.continue = You can continue making updates to 
 progress.renewal.name = Renewal
 progress.renewal.description = Information about your business over the last 12 months
 progress.renewal.time = 7 and 10
+
+renewal.amp.turnover.title = How much of your turnover for the last 12 months came from sales of art for €10,000 or more?
 
 renewal.involvedinother.title = Was your business involved in any other activities in the last 12 months?
 renewal.involvedinother.example = Other activities include things like:

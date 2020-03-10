@@ -44,7 +44,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
             Future.successful(Section(Renewal.sectionKey, Completed, model.hasChanged, controllers.renewal.routes.SummaryController.get()))
           } else {
             model match {
-              case Renewal(None, None, None, None, _, _, _, _, _, _, _, _, _, _, _, _, _) => Future.successful(notStarted)
+              case Renewal(None, None, None, None, None, _, _, _, _, _, _, _, _, _, _, _, _, _) => Future.successful(notStarted)
               case _ => Future.successful(Section(Renewal.sectionKey, Started, model.hasChanged, controllers.renewal.routes.WhatYouNeedController.get()))
             }
           }
@@ -71,6 +71,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
         case MoneyServiceBusiness => checkCompletionOfMsb(renewal, businessMatching.msbServices)
         case HighValueDealing => checkCompletionOfHvd(renewal)
         case AccountancyServices => checkCompletionOfAsp(renewal)
+        case ArtMarketParticipant => checkCompletionOfAMP(renewal)
       } match {
         case s if s.nonEmpty => s.forall(identity)
 
@@ -97,6 +98,21 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     }
 
     // Validate the renewal object using the composed chain of validation rules
+    validationRule.validate(renewal) match {
+      case Valid(_) => true
+      case r => false
+    }
+  }
+
+  private def checkCompletionOfAMP(renewal: Renewal) = {
+
+    val validationRule = compileOpt {
+      Seq(
+        Some(ampRule),
+        Some(standardRule)
+      )
+    }
+    
     validationRule.validate(renewal) match {
       case Valid(_) => true
       case r => false

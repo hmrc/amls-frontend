@@ -18,6 +18,7 @@ package models.renewal
 import cats.Functor
 import cats.implicits._
 import models.SubscriptionRequest
+import models.amp.Amp
 import models.moneyservicebusiness.MoneyServiceBusiness
 
 object Conversions {
@@ -55,7 +56,11 @@ object Conversions {
           cashPaymentMethods = renewal.receiveCashPayments flatMap CashPayments.convert
         ))
       }
-      request.copy(businessActivitiesSection = baSection, msbSection = msbSection, hvdSection = hvdSection)
+
+      val ampSection: Option[Amp] = request.ampSection map { amp =>
+        AMPTurnover.convert(renewal.ampTurnover, amp)
+      }
+      request.copy(businessActivitiesSection = baSection, msbSection = msbSection, hvdSection = hvdSection, ampSection = ampSection)
     }
   }
 

@@ -53,6 +53,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     Some(InvolvedInOtherYes("test")),
     Some(BusinessTurnover.First),
     Some(AMLSTurnover.First),
+    Some(AMPTurnover.First),
     Some(CustomersOutsideIsUK(true)),
     Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
     Some(PercentageOfCashPaymentOver15000.First),

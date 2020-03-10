@@ -419,10 +419,18 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       hasAccepted = true
     )
 
-    val renewalModel = Renewal(Some(InvolvedInOtherYes("test")),Some(BusinessTurnover.First),
-      Some(AMLSTurnover.First), Some(CustomersOutsideIsUK(true)), Some(CustomersOutsideUK(Some(List(Country("United Kingdom","GB"))))),
-      Some(RPercentageOfCashPaymentOver15000.First), Some(RCashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(RPaymentMethods(true,true,Some("other")))))),
-      Some(TotalThroughput("02")),Some(RenWhichCurrencies(Seq("USD"), None, Some(RMoneySources(None, None, None)))),
+    val renewalModel = Renewal(
+      Some(InvolvedInOtherYes("test")),
+      Some(BusinessTurnover.First),
+      Some(AMLSTurnover.First),
+      Some(AMPTurnover.First),
+      Some(CustomersOutsideIsUK(true)),
+      Some(CustomersOutsideUK(Some(List(Country("United Kingdom","GB"))))),
+      Some(RPercentageOfCashPaymentOver15000.First),
+      Some(RCashPayments(CashPaymentsCustomerNotMet(true),
+      Some(HowCashPaymentsReceived(RPaymentMethods(true,true,Some("other")))))),
+      Some(TotalThroughput("02")),
+      Some(RenWhichCurrencies(Seq("USD"), None, Some(RMoneySources(None, None, None)))),
       Some(TransactionsInLast12Months("12345678963")),
       Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
       Some(MostTransactions(List(Country("United Kingdom", "GB")))),

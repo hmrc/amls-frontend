@@ -22,6 +22,7 @@ import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models._
+import models.amp.Amp
 import models.bankdetails.BankDetails
 import models.businessactivities.{BusinessActivities => BusActivities}
 import models.businesscustomer.ReviewDetails
@@ -34,6 +35,7 @@ import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal._
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
+import org.joda.time.LocalDate
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -45,6 +47,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse}
 import utils.{AmlsSpec, DependencyMocks}
 
+import scala.collection.Seq
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
 
@@ -109,6 +112,13 @@ class SubmissionServiceSpec extends AmlsSpec
     val activities = mock[BusinessActivities]
     val businessMatching = mock[BusinessMatching]
     val businessDetails = mock[BusinessDetails]
+    val amp = Amp(Json.obj(
+      "typeOfParticipant"      -> Seq("artGalleryOwner"),
+      "soldOverThreshold"             -> true,
+      "dateTransactionOverThreshold"  -> LocalDate.now.toString,
+      "identifyLinkedTransactions"    -> true,
+      "percentageExpectedTurnover"    -> "zeroToTwenty"
+    ))
 
     mockCacheFetchAll
     mockCacheSave[SubscriptionResponse]
@@ -135,6 +145,7 @@ class SubmissionServiceSpec extends AmlsSpec
     } thenReturn Set[BusinessActivity]()
 
     mockCacheGetEntry[BusActivities](Some(BusActivities()), BusActivities.key)
+    mockCacheGetEntry[Amp](Some(amp), Amp.key)
     mockCacheGetEntry[MoneyServiceBusiness](Some(MoneyServiceBusiness()), MoneyServiceBusiness.key)
     mockCacheGetEntry[Hvd](Some(Hvd()), Hvd.key)
     mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
@@ -280,6 +291,7 @@ class SubmissionServiceSpec extends AmlsSpec
       val renewal = Renewal(
         turnover = Some(AMLSTurnover.First),
         businessTurnover = Some(BusinessTurnover.Second),
+        ampTurnover = Some(AMPTurnover.Second),
         totalThroughput = Some(TotalThroughput("02")),
         customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("Test", "T"))))),
         involvedInOtherActivities = Some(InvolvedInOtherNo),
@@ -329,6 +341,7 @@ class SubmissionServiceSpec extends AmlsSpec
       val renewal = Renewal(
         turnover = Some(AMLSTurnover.First),
         businessTurnover = Some(BusinessTurnover.Second),
+        ampTurnover = Some(AMPTurnover.Second),
         totalThroughput = Some(TotalThroughput("02")),
         customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("Test", "T"))))),
         involvedInOtherActivities = Some(InvolvedInOtherNo),
@@ -366,6 +379,7 @@ class SubmissionServiceSpec extends AmlsSpec
 
       submission.hvdSection.get.percentageOfCashPaymentOver15000 mustBe defined
       submission.hvdSection.get.receiveCashPayments mustBe defined
+
     }
 
   }
