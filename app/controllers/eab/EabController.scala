@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package controllers.amp
+package controllers.eab
 
-import cats.data.OptionT
 import cats.implicits._
+import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
-import models.amp.Amp
+import models.eab.Eab
 import play.api.libs.json._
-import play.api.mvc.{Action, MessagesControllerComponents}
+import play.api.mvc.MessagesControllerComponents
 import services.ProxyCacheService
 import utils.AuthAction
 
-class AmpController @Inject()(proxyCacheService: ProxyCacheService,
-                              authAction     : AuthAction,
+class EabController @Inject()(proxyCacheService  : ProxyCacheService,
+                              authAction         : AuthAction,
                               val cacheConnector : DataCacheConnector,
                               val ds: CommonPlayDependencies,
                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(credId: String) = Action.async {
     implicit request => {
-      proxyCacheService.getAmp(credId).map {
+      proxyCacheService.getEab(credId).map {
         _.map(Ok(_: JsValue)).getOrElse(NotFound)
       }
     }
@@ -43,7 +43,7 @@ class AmpController @Inject()(proxyCacheService: ProxyCacheService,
 
   def set(credId: String) = Action.async(parse.json) {
     implicit request => {
-      proxyCacheService.setAmp(credId, request.body).map {
+      proxyCacheService.setEab(credId, request.body).map {
         _ => {
           Ok(Json.obj("_id" -> credId))
         }
@@ -54,8 +54,8 @@ class AmpController @Inject()(proxyCacheService: ProxyCacheService,
   def accept = authAction.async {
     implicit request =>
       (for {
-        amp <- OptionT(cacheConnector.fetch[Amp](request.credId, Amp.key))
-        _ <- OptionT.liftF(cacheConnector.save[Amp](request.credId, Amp.key, amp.copy(hasAccepted = true)))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update AMP")
+        eab <- OptionT(cacheConnector.fetch[Eab](request.credId, Eab.key))
+        _ <- OptionT.liftF(cacheConnector.save[Eab](request.credId, Eab.key, eab.copy(hasAccepted = true)))
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update EAB")
   }
 }

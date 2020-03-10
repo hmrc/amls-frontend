@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.estateagentbusiness
+package models.eab
 
 import play.api.libs.json._
 import utils.AmlsSpec
@@ -149,8 +149,11 @@ class EabSpec extends AmlsSpec {
       "penalisedUnderEstateAgentsActDetails" -> "test10")
 
     val oldRedressScheme = Json.obj(
-      "isRedress" -> true,
+      "isRedress" -> false,
       "propertyRedressScheme" -> "03")
+
+    val oldRedressSchemeNoRedress = Json.obj(
+      "isRedress" -> false)
 
     "data are complete" must {
       val completeOldEab = (
@@ -160,6 +163,19 @@ class EabSpec extends AmlsSpec {
         oldEstateAct ++ Json.obj(
         "hasChanged" -> true,
         "hasAccepted" -> true)).as[Eab]
+
+      checkIsComplete(completeOldEab)
+    }
+
+    "data are complete no redress" must {
+      val completeOldEab = (
+        oldServices ++
+          oldRedressSchemeNoRedress ++
+          oldProfessionalBody ++
+          oldEstateAct ++ Json.obj(
+          "hasChanged" -> true,
+          "hasAccepted" -> true)).as[Eab]
+
       checkIsComplete(completeOldEab)
     }
 

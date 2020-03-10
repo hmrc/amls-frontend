@@ -16,6 +16,7 @@
 
 package services
 
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.Inject
 import models.amp.Amp
@@ -24,7 +25,8 @@ import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching._
-import models.estateagentbusiness.EstateAgentBusiness
+import models.estateagentbusiness.{EstateAgentBusiness}
+import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.registrationprogress.Section
@@ -39,7 +41,8 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
-class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector) {
+class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector,
+                                 val config: ApplicationConfig) {
 
   def sections(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[Section]] =
 
@@ -59,16 +62,25 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
                                      msbServices: Option[BusinessMatchingMsbServices])
                                     (implicit cache: CacheMap): Seq[Section] = {
 
-    val asp = if(activities.contains(AccountancyServices)) Seq(Asp.section) else Seq.empty
-    val tcsp = if(activities.contains(TrustAndCompanyServices)) Seq(Tcsp.section) else Seq.empty
-    val supervision = if(asp.nonEmpty || tcsp.nonEmpty) Seq(Supervision.section) else Seq.empty
-    val amp = if(activities.contains(ArtMarketParticipant)) Seq(Amp.section) else Seq.empty
-    val eab = if(activities.contains(EstateAgentBusinessService)) Seq(EstateAgentBusiness.section) else Seq.empty
-    val hvd = if(activities.contains(HighValueDealing)) Seq(Hvd.section) else Seq.empty
-    val msb = if(activities.contains(MoneyServiceBusiness) && msbServices.isDefined) Seq(Msb.section) else Seq.empty
+    val asp = if (activities.contains(AccountancyServices)) Seq(Asp.section) else Seq.empty
+    val tcsp = if (activities.contains(TrustAndCompanyServices)) Seq(Tcsp.section) else Seq.empty
+    val supervision = if (asp.nonEmpty || tcsp.nonEmpty) Seq(Supervision.section) else Seq.empty
+    val amp = if (activities.contains(ArtMarketParticipant)) Seq(Amp.section) else Seq.empty
+    val eab = if (activities.contains(EstateAgentBusinessService)) toggleEAB else Seq.empty
+    val hvd = if (activities.contains(HighValueDealing)) Seq(Hvd.section) else Seq.empty
+    val msb = if (activities.contains(MoneyServiceBusiness) && msbServices.isDefined) Seq(Msb.section) else Seq.empty
 
     asp ++ tcsp ++ supervision ++ amp ++ eab ++ hvd ++ msb
+  }
+
+  //TODO AMLS-5540 - can be removed when the feature toggle is removed.
+  private def toggleEAB(implicit cache: CacheMap) = {
+    if (config.standAloneEABService) {
+      Seq(Eab.section)
+    } else {
+      Seq(EstateAgentBusiness.section)
     }
+  }
 
   private def dependentSections(implicit cache: CacheMap): Seq[Section] =
     (for {

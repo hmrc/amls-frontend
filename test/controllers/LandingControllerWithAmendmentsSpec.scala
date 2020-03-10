@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.{SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefNo}
 import generators.StatusGenerator
@@ -88,6 +89,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
     )
 
     val request = addToken(authRequest)
+    val config = mock[ApplicationConfig]
 
     val controller = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -99,6 +101,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       ds = commonDependencies,
       mcc = mockMcc,
       messagesApi = messagesApi,
+      config = config,
       parser = mock[BodyParsers.Default])
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
@@ -250,6 +253,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
     )
 
     val request = addToken(authRequest)
+    val config = mock[ApplicationConfig]
 
     val controller = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -261,6 +265,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       ds = commonDependencies,
       mcc = mockMcc,
       messagesApi = messagesApi,
+      config = config,
       parser = mock[BodyParsers.Default])
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))

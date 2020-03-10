@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package models.estateagentbusiness
+package models.eab
 
 import config.ApplicationConfig
-import models.amp.Amp
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.Play
 import play.api.libs.json._
@@ -54,19 +53,21 @@ final case class Eab(data: JsObject = Json.obj(),
     isProfessionalBodyPenaltyComplete &&
     hasAccepted
 
-  private[estateagentbusiness] def isServicesComplete: Boolean = (data \ "eabServicesProvided").as[List[String]].nonEmpty
+  private[eab] def isServicesComplete: Boolean = (data \ "eabServicesProvided").as[List[String]].nonEmpty
 
-  private[estateagentbusiness] def isRedressSchemeComplete: Boolean = {
+  private[eab]def isRedressSchemeComplete: Boolean = {
     val services = (data \ "eabServicesProvided").as[List[String]]
     val scheme = get[String](Eab.redressScheme)
     (services, scheme) match {
       case (x, _) if !x.contains("residential") => true
-      case (_, Some(x)) if x.nonEmpty => true
+      case (_, Some(x)) if x.nonEmpty && x.contains("propertyRedressScheme") => true
+      case (_, Some(x)) if x.nonEmpty && x.contains("propertyOmbudsman") => true
+      case (_, Some(x)) if x.nonEmpty && x.contains("notRegistered") => true
       case _ => false
     }
   }
 
-  private[estateagentbusiness] def isProtectionSchemeComplete: Boolean = {
+  private[eab] def isProtectionSchemeComplete: Boolean = {
     val services = (data \ "eabServicesProvided").as[List[String]]
     val scheme = get[Boolean](Eab.clientMoneyProtectionScheme)
     (services, scheme) match {
@@ -76,18 +77,27 @@ final case class Eab(data: JsObject = Json.obj(),
     }
   }
 
-  private[estateagentbusiness] def booleanAndDetailComplete(boolOpt: Option[Boolean], detailOpt: Option[String]):Boolean =
+  private[eab] def booleanAndDetailComplete(boolOpt: Option[Boolean], detailOpt: Option[String]):Boolean =
     (boolOpt, detailOpt) match {
       case (Some(true), Some(detail)) if detail.nonEmpty => true
       case (Some(false), _) => true
       case _ => false
     }
 
-  private[estateagentbusiness] def isEstateAgentActPenaltyComplete: Boolean =
+  private[eab] def isEstateAgentActPenaltyComplete: Boolean =
     booleanAndDetailComplete(get[Boolean](Eab.penalisedEstateAgentsAct), get[String](Eab.penalisedEstateAgentsActDetail))
 
-  private[estateagentbusiness] def isProfessionalBodyPenaltyComplete: Boolean =
+  private[eab] def isProfessionalBodyPenaltyComplete: Boolean =
     booleanAndDetailComplete(get[Boolean](Eab.penalisedProfessionalBody), get[String](Eab.penalisedProfessionalBodyDetail))
+
+  def isInvalidRedressScheme: Boolean = {
+    val scheme = get[String](Eab.redressScheme)
+    scheme match {
+      case Some(x) if x.nonEmpty && x.contains("other") => true
+      case Some(x) if x.nonEmpty && x.contains("ombudsmanServices") => true
+      case _ => false
+    }
+  }
 }
 
 object Eab {
@@ -105,20 +115,21 @@ object Eab {
   val notPresent                      = "null"
 
   val redirectCallType       = "GET"
-  val key                    = "eab"
+  val key                    = "estate-agent-business"
 
   private def generateRedirect(destinationUrl: String) = {
     Call(redirectCallType, destinationUrl)
   }
 
   def section(implicit cache: CacheMap): Section = {
-    val notStarted = Section(key, NotStarted, false, generateRedirect(appConfig.eabWhatYouNeedUrl))
-    cache.getEntry[Amp](key).fold(notStarted) {
+    val messageKey = "eab"
+    val notStarted = Section(messageKey, NotStarted, false, generateRedirect(appConfig.eabWhatYouNeedUrl))
+    cache.getEntry[Eab](key).fold(notStarted) {
       model =>
         if (model.isComplete && model.hasAccepted) {
-          Section(key, Completed, model.hasChanged, generateRedirect(appConfig.eabSummaryUrl))
+          Section(messageKey, Completed, model.hasChanged, generateRedirect(appConfig.eabSummaryUrl))
         } else {
-          Section(key, Started, model.hasChanged, generateRedirect(appConfig.eabWhatYouNeedUrl))
+          Section(messageKey, Started, model.hasChanged, generateRedirect(appConfig.eabWhatYouNeedUrl))
         }
     }
   }
@@ -147,13 +158,22 @@ object Eab {
         case _ => JsArray()
       })
 
-    val redressTransform = (__ \ 'data ++ redressScheme).json.copyFrom(
-      (__ \ 'propertyRedressScheme).readNullable[JsValue].map {
-        case Some(JsString("01")) => JsString("propertyOmbudsmanLimited")
-        case Some(JsString("02")) => JsString("ombudsmanServices")
-        case Some(JsString("03")) => JsString("propertyRedressScheme")
-        case Some(JsString("04")) => JsString("other")
-        case _ => JsNull}
+    val isRedressTransform = (__ \ 'data ++ redressScheme).json.copyFrom(
+      (__ \ 'isRedress).readNullable[JsValue].map {
+        case Some(JsBoolean(false)) => Some(JsString("notRegistered"))
+        case _ => None
+      }.filter(redressScheme => redressScheme.isDefined).orElse(
+        (__ \ 'propertyRedressScheme).readNullable[JsValue].map {
+          case Some(JsString("01")) => Some(JsString("propertyOmbudsman"))
+          case Some(JsString("02")) => Some(JsString("ombudsmanServices"))
+          case Some(JsString("03")) => Some(JsString("propertyRedressScheme"))
+          case Some(JsString("04")) => Some(JsString("other"))
+          case _ => None
+        }
+      ).map {
+        case Some(redressScheme) => redressScheme
+        case None => JsNull
+      }
     )
 
     def readPathOrReturn(path: JsPath, returnValue: JsValue) =
@@ -162,7 +182,7 @@ object Eab {
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
 
-    val oldModelTransformer:Reads[JsObject] = (servicesTransform and redressTransform and
+    val oldModelTransformer:Reads[JsObject] = (servicesTransform and isRedressTransform and
       (__ \ 'data ++ penalisedEstateAgentsAct).json.copyFrom(readPathOrReturn(__ \ 'penalisedUnderEstateAgentsAct, JsNull)) and
       (__ \ 'data ++ penalisedEstateAgentsActDetail).json.copyFrom(readPathOrReturn( __ \ 'penalisedUnderEstateAgentsActDetails, JsNull)) and
       (__ \ 'data ++ penalisedProfessionalBody).json.copyFrom(readPathOrReturn(__ \ 'penalised, JsNull)) and

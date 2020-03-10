@@ -62,7 +62,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   // TODO: EAB TO BE ADDED TO CONFIG
   lazy val eabWhatYouNeedUrl = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/what-you-need"
   lazy val eabSummaryUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/check-your-answers"
-
+  lazy val eabRedressUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/change-redress-scheme"
 
   def businessCustomerUrl = getConfigString("business-customer.url")
   
@@ -81,6 +81,8 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   def enrolmentStoreToggle = servicesConfig.getConfBool("feature-toggle.enrolment-store", false)
 
   def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
+
+  def standAloneEABService = servicesConfig.getConfBool("feature-toggle.stand-alone-eab-service", false)
 
   lazy val authUrl = baseUrl("auth")
 

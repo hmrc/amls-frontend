@@ -14,50 +14,72 @@
  * limitations under the License.
  */
 
-package controllers.amp
+package controllers.eab
 
-import java.time.{LocalDate, LocalDateTime, ZoneOffset}
-
-import akka.stream.Materializer
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.amp.Amp
+import controllers.eab.EabController
+import models.eab.Eab
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, CacheMocks}
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.scalatest.time.Seconds
-import play.api.mvc.DefaultActionBuilder
 import play.api.test.FakeRequest
+import play.api.test.Helpers._
 import services.ProxyCacheService
+import utils.{AmlsSpec, AuthAction, AuthorisedFixture, CacheMocks}
 
 import scala.concurrent.Future
 
-class AmpControllerSpec extends AmlsSpec with CacheMocks {
+class EabControllerSpec extends AmlsSpec with CacheMocks {
 
-  val dateVal = LocalDateTime.now
-
-  val completeData = Json.obj(
-    "typeOfParticipant"             -> Seq("artGalleryOwner"),
-    "soldOverThreshold"             -> true,
-    "dateTransactionOverThreshold"  -> LocalDate.now,
-    "identifyLinkedTransactions"    -> true,
-    "percentageExpectedTurnover"    -> "fortyOneToSixty"
+  val completeEstateAgencyActPenalty = Json.obj(
+    "penalisedEstateAgentsAct" -> true,
+    "penalisedEstateAgentsActDetail" -> "details"
   )
 
-  val completeJson = Json.obj(
-    "_id"            -> "someid",
-    "data"           -> completeData,
-    "lastUpdated"    -> Json.obj("$date" -> dateVal.atZone(ZoneOffset.UTC).toInstant.toEpochMilli),
+  val completePenalisedProfessionalBody = Json.obj(
+    "penalisedProfessionalBody" -> true,
+    "penalisedProfessionalBodyDetail" -> "details"
+  )
+
+  val completeRedressScheme = Json.obj(
+    "redressScheme" -> "propertyRedressScheme",
+    "redressSchemeDetail" -> "null"
+  )
+
+  val completeMoneyProtectionScheme = Json.obj(
+    "clientMoneyProtectionScheme" -> true
+  )
+
+  val completeServiceList = Seq(
+    "assetManagement",
+    "auctioneering",
+    "businessTransfer",
+    "commercial",
+    "developmentCompany",
+    "landManagement",
+    "lettings",
+    "relocation",
+    "residential",
+    "socialHousingProvision")
+
+  val completeServices = Json.obj("eabServicesProvided" -> completeServiceList )
+
+  val completeEabData = completeServices ++
+    completeEstateAgencyActPenalty ++
+    completePenalisedProfessionalBody ++
+    completeRedressScheme ++
+    completeMoneyProtectionScheme
+
+  val completeEabJson = Json.obj(
+    "data"           -> completeEabData,
     "hasChanged"     -> false,
     "hasAccepted"    -> false
   )
+
+  val completeEabModel = Eab(completeEabData)
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -72,12 +94,12 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .build()
 
-    val controller      = app.injector.instanceOf[AmpController]
+    val controller      = app.injector.instanceOf[EabController]
   }
 
   "get returns 200" when {
-    "no amp section in cache" in new Fixture {
-      when(proxyCacheService.getAmp(any())(any())).thenReturn(Future.successful(Some(Json.obj())))
+    "no eab section in cache" in new Fixture {
+      when(proxyCacheService.getEab(any())(any())).thenReturn(Future.successful(Some(Json.obj())))
 
 
 
@@ -88,14 +110,14 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
       document mustBe(Json.obj())
     }
 
-    "amp section in cache" in new Fixture {
-      when(proxyCacheService.getAmp(any())(any())).thenReturn(Future.successful(Some(completeJson)))
+    "eab section in cache" in new Fixture {
+      when(proxyCacheService.getEab(any())(any())).thenReturn(Future.successful(Some(completeEabJson)))
 
       val result = controller.get(credId)(request)
       status(result) must be(OK)
 
       val document = Json.parse(contentAsString(result))
-      document mustBe(completeJson)
+      document mustBe(completeEabJson)
     }
   }
 
@@ -103,9 +125,9 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
     "passed valid json" in new Fixture {
       val postRequest = FakeRequest("POST", "/")
         .withHeaders(CONTENT_TYPE -> "application/json")
-        .withBody[JsValue](completeJson)
+        .withBody[JsValue](completeEabJson)
 
-      when(proxyCacheService.setAmp(any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
+      when(proxyCacheService.setEab(any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.set(credId)(postRequest)
       status(result) must be(OK)
@@ -117,10 +139,10 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
   "accept" must {
     "set accept flag to true and redirect to RegistrationProgressController" in new Fixture {
 
-      when(mockCacheConnector.fetch[Amp](any(), any())(any(), any()))
-        .thenReturn(Future.successful(Some(completeJson.as[Amp])))
+      when(mockCacheConnector.fetch[Eab](any(), any())(any(), any()))
+        .thenReturn(Future.successful(Some(completeEabJson.as[Eab])))
 
-      when(mockCacheConnector.save[Amp](any(), any(), any())(any(), any()))
+      when(mockCacheConnector.save[Eab](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.accept.apply(FakeRequest())
@@ -128,8 +150,8 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
       status(result) mustBe SEE_OTHER
       redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get().toString
 
-      verify(mockCacheConnector).save[Amp](any(), eqTo(Amp.key),
-        eqTo(completeJson.as[Amp].copy(hasAccepted = true)))(any(), any())
+      verify(mockCacheConnector).save[Eab](any(), eqTo(Eab.key),
+        eqTo(completeEabJson.as[Eab].copy(hasAccepted = true)))(any(), any())
     }
   }
 }

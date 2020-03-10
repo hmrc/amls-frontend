@@ -91,6 +91,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     }
   }
 
+  //TODO AMLS-5779 - provide an override for new EAB object
   private def createSubscriptionRequest(cache: CacheMap)
                                               (implicit hc: HeaderCarrier, ec: ExecutionContext): SubscriptionRequest = {
 
