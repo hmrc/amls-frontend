@@ -39,7 +39,7 @@ class send_money_to_other_countrySpec extends AmlsViewSpec with MustMatchers {
       def view = views.html.renewal.send_money_to_other_country(form2, true)
 
       doc.title must be(Messages("renewal.msb.send.money.title") +
-        " - " + Messages("summary.msb") +
+        " - " + Messages("summary.renewal") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
     }
