@@ -83,11 +83,11 @@ class DeregistrationReasonSpec extends PlaySpec with MustMatchers with MockitoSu
       }
       "invalid characters other reason value" in {
         DeregistrationReason.formRule.validate(Map("deregistrationReason" -> Seq("06"), "specifyOtherReason" -> Seq("{}"))) must
-          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("err.text.validation"))))))
+          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.deregistration.reason.format"))))))
       }
       "other reason value has too many characters" in {
         DeregistrationReason.formRule.validate(Map("deregistrationReason" -> Seq("06"), "specifyOtherReason" -> Seq("a" * 41))) must
-          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.maxLength", 40))))))
+          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.deregistration.reason.length"))))))
       }
     }
 
@@ -99,11 +99,11 @@ class DeregistrationReasonSpec extends PlaySpec with MustMatchers with MockitoSu
       "no other reason" which {
         "is an empty string" in {
           DeregistrationReason.formRule.validate(Map("deregistrationReason" -> Seq("06"), "specifyOtherReason" -> Seq(""))) must
-            be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.deregistration.reason.other"))))))
+            be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.deregistration.reason.input"))))))
         }
         "a string of whitespace" in {
           DeregistrationReason.formRule.validate(Map("deregistrationReason" -> Seq("06"), "specifyOtherReason" -> Seq("   \t"))) must
-            be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.deregistration.reason.other"))))))
+            be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.deregistration.reason.input"))))))
         }
         "a missing value" in {
           DeregistrationReason.formRule.validate(Map("deregistrationReason" -> Seq("06"), "specifyOtherReason" -> Seq.empty)) must

@@ -37,10 +37,10 @@ object WithdrawalReason {
   import utils.MappingUtils.Implicits._
 
   private val maxTextLength = 40
-  private val specifyOtherReasonType = notEmptyStrip.withMessage("error.required.withdrawal.reason.other") andThen
-    notEmpty.withMessage("error.required.withdrawal.reason.other") andThen
-    maxLength(maxTextLength) andThen
-    basicPunctuationPattern()
+  private val specifyOtherReasonType = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.withdrawal.reason.input") andThen
+    maxLength(maxTextLength).withMessage("error.required.withdrawal.reason.length") andThen
+    basicPunctuationPattern("error.required.withdrawal.reason.format")
 
   implicit val formRule: Rule[UrlFormEncoded, WithdrawalReason] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
