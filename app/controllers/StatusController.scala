@@ -163,20 +163,19 @@ class StatusController @Inject()(val landingService: LandingService,
         ))
       )
       case SubmissionReady => {
-        OptionT(progressService.getSubmitRedirect(mlrRegNumber, accountTypeId, cacheId)) map (
-          url =>
-            Ok(your_registration(
-              regNo = mlrRegNumber.getOrElse(""),
-              businessName = businessNameOption,
-              yourRegistrationInfo = application_submission_ready(url, businessNameOption),
-              unreadNotifications = unreadNotifications,
-              registrationStatus = registration_status(
-                amlsRegNo = mlrRegNumber,
-                status = status
-              ),
-              feeInformation = HtmlFormat.empty
-            ))
-          ) getOrElse InternalServerError("Unable to get redirect data")
+        Future.successful(
+          Ok(your_registration(
+            regNo = mlrRegNumber.getOrElse(""),
+            businessName = businessNameOption,
+            yourRegistrationInfo = application_submission_ready(controllers.routes.RegistrationProgressController.get(), businessNameOption),
+            unreadNotifications = unreadNotifications,
+            registrationStatus = registration_status(
+              amlsRegNo = mlrRegNumber,
+              status = status
+            ),
+            feeInformation = HtmlFormat.empty
+          ))
+        )
       }
       case _ =>
         Future.successful(
@@ -357,18 +356,18 @@ class StatusController @Inject()(val landingService: LandingService,
             }
           case _ => Future.successful(
             Ok {
-            your_registration(
-              regNo = mlrRegNumber.getOrElse(""),
-              businessName = businessNameOption,
-              yourRegistrationInfo = application_renewal_due(businessNameOption, renewalDate),
-              unreadNotifications = unreadNotifications,
-              registrationStatus = registration_status(
-                amlsRegNo = mlrRegNumber,
-                status = statusInfo._1,
-                endDate = renewalDate),
-              feeInformation = fee_information(statusInfo._1),
-              withdrawOrDeregisterInformation = withdraw_or_deregister_information(statusInfo._1))
-          })
+              your_registration(
+                regNo = mlrRegNumber.getOrElse(""),
+                businessName = businessNameOption,
+                yourRegistrationInfo = application_renewal_due(businessNameOption, renewalDate),
+                unreadNotifications = unreadNotifications,
+                registrationStatus = registration_status(
+                  amlsRegNo = mlrRegNumber,
+                  status = statusInfo._1,
+                  endDate = renewalDate),
+                feeInformation = fee_information(statusInfo._1),
+                withdrawOrDeregisterInformation = withdraw_or_deregister_information(statusInfo._1))
+            })
         }
       }
     }
