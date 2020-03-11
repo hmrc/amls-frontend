@@ -394,7 +394,7 @@ class StatusController @Inject()(val landingService: LandingService,
       case (false, false, true) => trade_information_no_msb_or_tcsp()
       case (true, _, false) | (_, true, false) => trade_information_msb_or_tcsp_only()
       case (true, _, true) | (_, true, true) => trade_information()
-      case (_, _, _) => throw new MatchError("Could not match activities against given options.")
+      case (_, _, _) => trade_information_find_out()
     }
 
   def countUnreadNotifications(amlsRefNo: Option[String], safeId: Option[String], accountTypeId: (String, String))(implicit headerCarrier: HeaderCarrier) = {

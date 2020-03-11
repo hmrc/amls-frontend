@@ -734,15 +734,14 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         result.body must include("Find out if you can trade")
       }
 
-      "throw no match error if BA is empty" in new Fixture {
+      "return default content if BA is empty" in new Fixture {
 
         val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
 
-        val result = intercept[MatchError] {
-          controller invokePrivate canOrCannotTradeInformation(Some(BusinessActivities(Set())), request)
-        }
+        val result = controller invokePrivate canOrCannotTradeInformation(None, request)
 
-        assert(result.getMessage.contains("Could not match activities against given options."))
+        result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
+        result.body must include("Find out if you can trade")
       }
     }
 
