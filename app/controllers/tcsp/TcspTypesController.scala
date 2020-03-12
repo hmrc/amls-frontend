@@ -58,15 +58,20 @@ class TcspTypesController @Inject() (val dataCacheConnector: DataCacheConnector,
             dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key)
             _ <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key,
               {
-                (data.serviceProviders.contains(CompanyFormationAgent)) match {
-                  case (false) => tcsp.tcspTypes(data).copy(onlyOffTheShelfCompsSold = None, complexCorpStructureCreation = None)
+                data.serviceProviders.contains(CompanyFormationAgent) match {
+                  case false => {
+                    if(!data.serviceProviders.contains(RegisteredOfficeEtc)){
+                      tcsp.tcspTypes(data).copy(onlyOffTheShelfCompsSold = None, complexCorpStructureCreation = None, providedServices = None)
+                    } else {
+                      tcsp.tcspTypes(data).copy(onlyOffTheShelfCompsSold = None, complexCorpStructureCreation = None)
+                    }
+                  }
                   case _ => tcsp.tcspTypes(data)
                 }
               }
 
             )
-          } yield (data.serviceProviders.contains(CompanyFormationAgent),
-            data.serviceProviders.contains(RegisteredOfficeEtc)) match {
+          } yield (data.serviceProviders.contains(CompanyFormationAgent), data.serviceProviders.contains(RegisteredOfficeEtc)) match {
             case (true, _) => Redirect(routes.OnlyOffTheShelfCompsSoldController.get(edit))
             case (false, true) => Redirect(routes.ProvidedServicesController.get(edit))
             case (_) => edit match {

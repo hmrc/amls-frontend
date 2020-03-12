@@ -66,7 +66,7 @@ class SummaryController @Inject()(
   def get = authAction.async {
       implicit request =>
         fetchModel(request.credId) map {
-          case Some(data) => Ok(summary(data, sortProviders(data)))
+          case Some(data) if data.copy(hasAccepted = true).isComplete => Ok(summary(data, sortProviders(data)))
           case _ => Redirect(controllers.routes.RegistrationProgressController.get())
         }
   }

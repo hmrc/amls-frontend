@@ -19,22 +19,39 @@ package controllers.tcsp
 import controllers.actions.SuccessfulAuthAction
 import models.tcsp._
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.Future
 
 class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends DependencyMocks{
-    self => val request = addToken(authRequest)
+  trait Fixture extends DependencyMocks {
+    self =>
+    val request = addToken(authRequest)
 
     val controller = new TcspTypesController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
+
+  val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
+  val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
+  val mockTcsp = mock[Tcsp]
+
+  val defaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc,
+    CompanyFormationAgent))
+
+  val model = Tcsp(
+    Some(defaultCompanyServiceProviders),
+    Some(OnlyOffTheShelfCompsSoldYes),
+    Some(ComplexCorpStructureCreationNo),
+    Some(defaultProvidedServices),
+    Some(true),
+    Some(defaultServicesOfAnotherTCSP)
+  )
 
   val cacheMap = CacheMap("", Map.empty)
 
@@ -68,7 +85,7 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
     "Post" must {
 
-      "successfully navigate to Which services does your business provide? page when the option Registered office is selected" in  new Fixture {
+      "successfully navigate to Which services does your business provide? page when the option Registered office is selected" in new Fixture {
 
         val newRequest = requestWithUrlEncodedBody(
           "serviceProviders[0]" -> "01",
@@ -79,13 +96,13 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
         when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
 
-        val result =  controller.post() (newRequest)
+        val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be (Some(controllers.tcsp.routes.ProvidedServicesController.get().url))
+        redirectLocation(result) must be(Some(controllers.tcsp.routes.ProvidedServicesController.get().url))
 
       }
 
-      "successfully navigate to services of another tcsp page when other than Registered office option is selected " in  new Fixture {
+      "successfully navigate to services of another tcsp page when other than Registered office option is selected " in new Fixture {
 
         val newRequest = requestWithUrlEncodedBody(
           "serviceProviders[]" -> "01"
@@ -94,13 +111,28 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
         when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
 
-        val result =  controller.post() (newRequest)
+        val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be (Some(controllers.tcsp.routes.ServicesOfAnotherTCSPController.get().url))
-
+        redirectLocation(result) must be(Some(controllers.tcsp.routes.ServicesOfAnotherTCSPController.get().url))
       }
 
-      "successfully navigate to next page while storing data in in mongoCache in edit mode" in  new Fixture {
+      "successfully clear out the providedServices data when other than Registered office option is selected " in new Fixture {
+
+        val newRequest = requestWithUrlEncodedBody(
+          "serviceProviders[]" -> "01"
+        )
+
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(Some(model)))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
+
+        val result = controller.post()(newRequest)
+
+        val expectedModel = Tcsp(Some(TcspTypes(Set(NomineeShareholdersProvider))), None, None, None, Some(true), Some(ServicesOfAnotherTCSPYes("12345678")), true, false)
+
+        verify(controller.dataCacheConnector).save(any(), any(), eqTo(expectedModel))(any(), any())
+      }
+
+      "successfully navigate to next page while storing data in in mongoCache in edit mode" in new Fixture {
 
         val newRequest = requestWithUrlEncodedBody(
           "serviceProviders[]" -> "01"
@@ -109,21 +141,21 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
         when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
 
-        val result =  controller.post(true) (newRequest)
+        val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be (Some(controllers.tcsp.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.tcsp.routes.SummaryController.get().url))
       }
 
     }
 
     "respond with BAD_REQUEST" when {
 
-      "throw error an invalid data entry" in  new Fixture {
+      "throw error an invalid data entry" in new Fixture {
         val newrequest = requestWithUrlEncodedBody(
           "serviceProviders[]" -> "06"
         )
 
-        val result =  controller.post() (newrequest)
+        val result = controller.post()(newrequest)
         status(result) must be(BAD_REQUEST)
       }
     }
