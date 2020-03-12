@@ -16,6 +16,7 @@
 
 package models.eab
 
+import models.estateagentbusiness._
 import play.api.libs.json._
 import utils.AmlsSpec
 
@@ -104,6 +105,37 @@ class EabSpec extends AmlsSpec {
       }
 
       checkIsComplete(constructedEab)
+
+      "builds des submission (API4/6) EstateAgentBusiness Model correctly" in {
+
+        val converted = EstateAgentBusiness(
+          Some(
+            Services(
+              Set(
+                Residential,
+                Commercial,
+                SocialHousing,
+                BusinessTransfer,
+                Development,
+                AssetManagement,
+                LandManagement,
+                Auction,
+                Lettings,
+                Relocation
+              ),
+              None
+            )
+          ),
+          Some(PropertyRedressScheme),
+          Some(ProfessionalBodyYes("details")),
+          Some(PenalisedUnderEstateAgentsActYes("details")),
+          Some(ClientMoneyProtectionSchemeYes),
+          false,
+          false
+        )
+
+        constructedEab.estateAgentBusinessModel mustBe converted
+      }
     }
 
     "data are incomplete" must {
