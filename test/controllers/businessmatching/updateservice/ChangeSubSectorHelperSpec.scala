@@ -227,6 +227,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
       val updatedBm = await(helper.updateBusinessMatching("internalId", model))
 
       updatedBm.businessAppliedForPSRNumber mustBe Some(BusinessAppliedForPSRNumberYes("12345678"))
+      updatedBm.hasChanged mustBe true
     }
 
     "update the business matching sub sectors" in new Fixture {

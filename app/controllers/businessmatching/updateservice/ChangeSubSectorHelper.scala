@@ -142,7 +142,7 @@ class ChangeSubSectorHelper @Inject()(authAction: AuthAction,
           businessAppliedForPSRNumber = None
         )
       } else {
-        updatedBm.copy(businessAppliedForPSRNumber = model.psrNumber)
+        updatedBm.businessAppliedForPSRNumber(model.psrNumber)
       }
     }
 
