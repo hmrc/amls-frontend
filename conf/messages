@@ -891,7 +891,6 @@ your.registration.status.expired.line1 = Your registration has expired.
 your.registration.status.expired.line2 = Your business is not registered with HMRC under the Money Laundering Regulations.
 your.registration.status.expired = Not supervised. Registration expired.
 your.registration.status.deregistered.line1 = You have deregistered your business.
-your.registration.status.deregistered.line2 = Your business is not registered with HMRC under the Money Laundering Regulations.
 your.registration.status.deregistered = Not supervised.
 your.registration.status.deregistered.date = Deregistered on {0}.
 
