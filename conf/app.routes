@@ -50,8 +50,8 @@ POST        /your-registration/withdraw-application-reason                      
 GET         /your-registration/de-register-application                                @controllers.deregister.DeRegisterApplicationController.get()
 POST        /your-registration/de-register-application                                @controllers.deregister.DeRegisterApplicationController.post()
 
-GET         /your-registration/de-register-reason                                     @controllers.deregister.DeregistrationReasonController.get()
-POST        /your-registration/de-register-reason                                     @controllers.deregister.DeregistrationReasonController.post()
+GET         /your-registration/deregister-reason                                      @controllers.deregister.DeregistrationReasonController.get()
+POST        /your-registration/deregister-reason                                      @controllers.deregister.DeregistrationReasonController.post()
 
 GET         /satisfaction-survey                                                      @controllers.SatisfactionSurveyController.get()
 POST        /satisfaction-survey                                                      @controllers.SatisfactionSurveyController.post()
