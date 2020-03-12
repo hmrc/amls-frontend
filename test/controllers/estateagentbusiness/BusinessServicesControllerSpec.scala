@@ -80,7 +80,7 @@ class BusinessServicesControllerSpec extends AmlsSpec with MockitoSugar {
           )
           val eab = EstateAgentBusiness(Some(Services(Set(Residential))), Some(ThePropertyOmbudsman), None, None)
 
-          val eabWithoutRedress = EstateAgentBusiness(Some(Services(Set(Commercial, Development), None)), Some(RedressSchemedNo), None, None, true)
+          val eabWithoutRedress = EstateAgentBusiness(Some(Services(Set(Commercial, Development), None)), Some(RedressSchemedNo), None, None, None, true)
 
           mockApplicationStatus(SubmissionDecisionRejected)
           mockIsNewActivityNewAuth(true, Some(EAB))

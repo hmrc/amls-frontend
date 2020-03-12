@@ -118,6 +118,7 @@ case class Eab(data: JsObject = Json.obj(),
       case "landManagement"         => LandManagement
       case "developmentCompany"     => Development
       case "socialHousingProvision" => SocialHousing
+      case "lettings"               => Lettings
     }.toSet
   }
 
@@ -134,25 +135,38 @@ case class Eab(data: JsObject = Json.obj(),
     }
   }
 
-  def convPenalisedProfessionalBody = {
+  def convPenalisedProfessionalBody: Option[ProfessionalBody] = {
 
     val penalisedProfessionalBody: Option[Boolean]      = get[Boolean](Eab.penalisedProfessionalBody)
     val penalisedProfessionalBodyDetail: Option[String] = get[String](Eab.penalisedProfessionalBodyDetail)
 
     penalisedProfessionalBody match {
-      case Some(true)  => ProfessionalBodyYes(penalisedProfessionalBodyDetail.getOrElse(""))
-      case Some(false) => ProfessionalBodyNo
+      case Some(true)  => Some(ProfessionalBodyYes(penalisedProfessionalBodyDetail.getOrElse("")))
+      case Some(false) => Some(ProfessionalBodyNo)
+      case _           => None
     }
   }
 
-  def convPenalisedUnderEstateAgentsAct = {
+  def convPenalisedUnderEstateAgentsAct: Option[PenalisedUnderEstateAgentsAct] = {
 
     val penalisedEstateAgentsAct: Option[Boolean]      = get[Boolean](Eab.penalisedEstateAgentsAct)
     val penalisedEstateAgentsActDetail: Option[String] = get[String](Eab.penalisedEstateAgentsActDetail)
 
     penalisedEstateAgentsAct match {
-      case Some(true)  => PenalisedUnderEstateAgentsActYes(penalisedEstateAgentsActDetail.getOrElse(""))
-      case Some(false) => PenalisedUnderEstateAgentsActNo
+      case Some(true)  => Some(PenalisedUnderEstateAgentsActYes(penalisedEstateAgentsActDetail.getOrElse("")))
+      case Some(false) => Some(PenalisedUnderEstateAgentsActNo)
+      case _           => None
+    }
+  }
+
+  def convClientMoneyProtectionScheme: Option[ClientMoneyProtectionScheme] = {
+
+    val clientMoneyProtectionScheme = get[Boolean](Eab.clientMoneyProtectionScheme)
+
+    clientMoneyProtectionScheme match {
+      case Some(true)  => Some(ClientMoneyProtectionSchemeYes)
+      case Some(false) => Some(ClientMoneyProtectionSchemeNo)
+      case _           => None
     }
   }
 
@@ -161,8 +175,9 @@ case class Eab(data: JsObject = Json.obj(),
     EstateAgentBusiness(
       services                      = Some(Services(convServices)),
       redressScheme                 = convRedressScheme,
-      professionalBody              = Some(convPenalisedProfessionalBody),
-      penalisedUnderEstateAgentsAct = Some(convPenalisedUnderEstateAgentsAct)
+      professionalBody              = convPenalisedProfessionalBody,
+      penalisedUnderEstateAgentsAct = convPenalisedUnderEstateAgentsAct,
+      clientMoneyProtectionScheme   = convClientMoneyProtectionScheme
     )
 
   }

@@ -63,6 +63,8 @@ case object SocialHousing extends Service
 
 case object Residential extends Service
 
+case object Lettings extends Service
+
 object Service {
 
   implicit val servicesFormRead = Rule[String, Service] {
@@ -75,6 +77,7 @@ object Service {
     case "07" => Valid(LandManagement)
     case "08" => Valid(Development)
     case "09" => Valid(SocialHousing)
+    case "10" => Valid(Lettings)
     case _ =>
       Invalid(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
   }
@@ -90,6 +93,7 @@ object Service {
       case LandManagement => "07"
       case Development => "08"
       case SocialHousing => "09"
+      case Lettings => "10"
     }
 
   implicit val jsonServiceReads: Reads[Service] =
@@ -103,6 +107,7 @@ object Service {
       case JsString("07") => JsSuccess(LandManagement)
       case JsString("08") => JsSuccess(Development)
       case JsString("09") => JsSuccess(SocialHousing)
+      case JsString("10") => JsSuccess(Lettings)
       case _ => JsError((JsPath \ "services") -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
 
@@ -117,6 +122,7 @@ object Service {
       case LandManagement => JsString("07")
       case Development => JsString("08")
       case SocialHousing => JsString("09")
+      case Lettings => JsString("10")
     }
 }
 
