@@ -16,6 +16,7 @@
 
 package controllers.tcsp
 
+import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.tcsp._
 import org.jsoup.Jsoup
@@ -34,7 +35,9 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new TcspTypesController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    val cache = mock[DataCacheConnector]
+
+    val controller = new TcspTypesController(cache, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
 
   val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
@@ -129,7 +132,7 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
         val expectedModel = Tcsp(Some(TcspTypes(Set(NomineeShareholdersProvider))), None, None, None, Some(true), Some(ServicesOfAnotherTCSPYes("12345678")), true, false)
 
-        verify(controller.dataCacheConnector).save(any(), any(), eqTo(expectedModel))(any(), any())
+        verify(controller.dataCacheConnector).save(any(), eqTo(Tcsp.key), eqTo(expectedModel))(any(), any())
       }
 
       "successfully navigate to next page while storing data in in mongoCache in edit mode" in new Fixture {
