@@ -29,7 +29,7 @@ import models.businessactivities.BusinessActivities
 import models.businessdetails.{BusinessDetails, RegisteredOfficeUK}
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
-import models.estateagentbusiness.EstateAgentBusiness
+import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Conversions._
@@ -91,17 +91,18 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     }
   }
 
-  //TODO AMLS-5779 - provide an override for new EAB object
   private def createSubscriptionRequest(cache: CacheMap)
                                               (implicit hc: HeaderCarrier, ec: ExecutionContext): SubscriptionRequest = {
 
     def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
+    def filteredTradingPremises     = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
+    def convertEabModel              = cache.getEntry[Eab](Eab.key).map(eab => eab.estateAgentBusinessModel)
 
-    def filteredTradingPremises = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
-
+    // EAB has its own front end. The JSON is stored in a different format.
+    // the Eab model reads in the new format and provides a conversion to the existing EstateAgentBusiness model.
     SubscriptionRequest(
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
-      eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
+      eabSection = convertEabModel,
       tradingPremisesSection = filteredTradingPremises,
       businessDetailsSection = cache.getEntry[BusinessDetails](BusinessDetails.key),
       bankDetailsSection = bankDetailsExceptDeleted(cache.getEntry[Seq[BankDetails]](BankDetails.key)),

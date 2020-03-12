@@ -29,6 +29,7 @@ import models.businesscustomer.ReviewDetails
 import models.businessdetails.{BusinessDetails, RegisteredOfficeUK}
 import models.businessmatching.BusinessType.SoleProprietor
 import models.businessmatching._
+import models.eab.Eab
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
@@ -149,7 +150,7 @@ class SubmissionServiceSpec extends AmlsSpec
     mockCacheGetEntry[MoneyServiceBusiness](Some(MoneyServiceBusiness()), MoneyServiceBusiness.key)
     mockCacheGetEntry[Hvd](Some(Hvd()), Hvd.key)
     mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
-    mockCacheGetEntry[EstateAgentBusiness](Some(mock[EstateAgentBusiness]), EstateAgentBusiness.key)
+    mockCacheGetEntry[Eab](Some(mock[Eab]), Eab.key)
     mockCacheGetEntry[BusinessDetails](Some(businessDetails), BusinessDetails.key)
     mockCacheGetEntry[Seq[BankDetails]](Some(Seq(BankDetails())), BankDetails.key)
     mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(responsiblePersonGen.sample.get)), ResponsiblePerson.key)

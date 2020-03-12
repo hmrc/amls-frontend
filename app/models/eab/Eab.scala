@@ -23,8 +23,9 @@ import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
+import models.estateagentbusiness._
 
-final case class Eab(data: JsObject = Json.obj(),
+case class Eab(data: JsObject = Json.obj(),
                      hasChanged: Boolean = false,
                      hasAccepted: Boolean = false) {
 
@@ -98,6 +99,74 @@ final case class Eab(data: JsObject = Json.obj(),
       case _ => false
     }
   }
+
+  /* DES submission logic
+  * Model to be used for DES submission such that the JSON be converted to objects that
+  * can be parsed and understood by AMLS BE and associated models
+  */
+  def convServices: Set[Service] = {
+
+    val newServices: Seq[String] = (data \ "eabServicesProvided").as[List[String]]
+
+    newServices.map {
+      case "residential"            => Residential
+      case "commercial"             => Commercial
+      case "auctioneering"          => Auction
+      case "relocation"             => Relocation
+      case "businessTransfer"       => BusinessTransfer
+      case "assetManagement"        => AssetManagement
+      case "landManagement"         => LandManagement
+      case "developmentCompany"     => Development
+      case "socialHousingProvision" => SocialHousing
+    }.toSet
+  }
+
+  def convRedressScheme: Option[RedressScheme] = {
+
+    val scheme = get[String](Eab.redressScheme)
+
+    scheme match {
+      case Some("propertyOmbudsman")     => Some(ThePropertyOmbudsman)
+      case Some("ombudsmanServices")     => Some(OmbudsmanServices)
+      case Some("propertyRedressScheme") => Some(PropertyRedressScheme)
+      case Some("notRegistered")         => Some(RedressSchemedNo)
+      case _                             => None
+    }
+  }
+
+  def convPenalisedProfessionalBody = {
+
+    val penalisedProfessionalBody: Option[Boolean]      = get[Boolean](Eab.penalisedProfessionalBody)
+    val penalisedProfessionalBodyDetail: Option[String] = get[String](Eab.penalisedProfessionalBodyDetail)
+
+    penalisedProfessionalBody match {
+      case Some(true)  => ProfessionalBodyYes(penalisedProfessionalBodyDetail.getOrElse(""))
+      case Some(false) => ProfessionalBodyNo
+    }
+  }
+
+  def convPenalisedUnderEstateAgentsAct = {
+
+    val penalisedEstateAgentsAct: Option[Boolean]      = get[Boolean](Eab.penalisedEstateAgentsAct)
+    val penalisedEstateAgentsActDetail: Option[String] = get[String](Eab.penalisedEstateAgentsActDetail)
+
+    penalisedEstateAgentsAct match {
+      case Some(true)  => PenalisedUnderEstateAgentsActYes(penalisedEstateAgentsActDetail.getOrElse(""))
+      case Some(false) => PenalisedUnderEstateAgentsActNo
+    }
+  }
+
+  def estateAgentBusinessModel = {
+
+    EstateAgentBusiness(
+      services                      = Some(Services(convServices)),
+      redressScheme                 = convRedressScheme,
+      professionalBody              = Some(convPenalisedProfessionalBody),
+      penalisedUnderEstateAgentsAct = Some(convPenalisedUnderEstateAgentsAct)
+    )
+
+  }
+  /* END DES submission logic */
 }
 
 object Eab {
