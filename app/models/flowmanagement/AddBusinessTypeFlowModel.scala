@@ -22,24 +22,23 @@ import models.responsiblepeople.ResponsiblePerson
 import play.api.i18n.Lang
 import play.api.libs.json.Json
 
-case class AddBusinessTypeFlowModel(
-                                     activity: Option[BusinessActivity] = None,
-                                     areNewActivitiesAtTradingPremises: Option[Boolean] = None,
-                                     tradingPremisesActivities: Option[TradingPremisesActivities] = None,
-                                     addMoreActivities: Option[Boolean] = None,
-                                     fitAndProper: Option[Boolean] = None,
-                                     responsiblePeople: Option[ResponsiblePeopleFitAndProper] = None,
-                                     hasChanged: Boolean = false,
-                                     hasAccepted: Boolean = false,
-                                     businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-                                     subSectors: Option[BusinessMatchingMsbServices] = None,
-                                     tradingPremisesMsbServices: Option[BusinessMatchingMsbServices] = None
-                              ) {
+case class AddBusinessTypeFlowModel(activity: Option[BusinessActivity] = None,
+                                    areNewActivitiesAtTradingPremises: Option[Boolean] = None,
+                                    tradingPremisesActivities: Option[TradingPremisesActivities] = None,
+                                    addMoreActivities: Option[Boolean] = None,
+                                    fitAndProper: Option[Boolean] = None,
+                                    responsiblePeople: Option[ResponsiblePeopleFitAndProper] = None,
+                                    hasChanged: Boolean = false,
+                                    hasAccepted: Boolean = false,
+                                    businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
+                                    subSectors: Option[BusinessMatchingMsbServices] = None,
+                                    tradingPremisesMsbServices: Option[BusinessMatchingMsbServices] = None) {
+
   def fitAndProperFromResponsiblePeople(p: Seq[ResponsiblePerson]): AddBusinessTypeFlowModel = {
     val fitAndProperInts: Set[Int] = p.zipWithIndex
-            .collect({
-              case (person, index) if person.approvalFlags.hasAlreadyPassedFitAndProper.getOrElse(false) => index
-            }).toSet
+      .collect({
+        case (person, index) if person.approvalFlags.hasAlreadyPassedFitAndProper.getOrElse(false) => index
+      }).toSet
     val responsiblePeopleFitAndProper: Option[ResponsiblePeopleFitAndProper] = if (fitAndProperInts.nonEmpty) {
       Some(ResponsiblePeopleFitAndProper(fitAndProperInts))
     } else {
@@ -53,10 +52,10 @@ case class AddBusinessTypeFlowModel(
   }
 
   def mayHavePassedFitAndProper(p: Seq[ResponsiblePerson]): Option[Boolean] = {
-    val hasTrues = p.map (_.approvalFlags.hasAlreadyPassedFitAndProper).count(_.contains(true)) > 0
-    val hasFalses = p.map (_.approvalFlags.hasAlreadyPassedFitAndProper).count(_.contains(false)) > 0
+    val hasTrues = p.map(_.approvalFlags.hasAlreadyPassedFitAndProper).count(_.contains(true)) > 0
+    val hasFalses = p.map(_.approvalFlags.hasAlreadyPassedFitAndProper).count(_.contains(false)) > 0
 
-    if(!hasTrues && !hasFalses) {
+    if (!hasTrues && !hasFalses) {
       None
     } else {
       Some(hasTrues)
@@ -125,13 +124,12 @@ case class AddBusinessTypeFlowModel(
       hasAccepted = hasAccepted && this.responsiblePeople.equals(p))
 
   def isComplete: Boolean = this match {
-    case AddBusinessTypeFlowModel(Some(MoneyServiceBusiness), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _, _) => true
-    case AddBusinessTypeFlowModel(Some(MoneyServiceBusiness), Some(false), _, Some(_), Some(false), _, _, true, _, _, _) => true
+    case AddBusinessTypeFlowModel(Some(MoneyServiceBusiness), Some(_), _, _, Some(true), Some(_), _, true, _, _, _) => true
+    case AddBusinessTypeFlowModel(Some(MoneyServiceBusiness), Some(false), _, _, Some(false), _, _, true, _, _, _) => true
     case AddBusinessTypeFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _, _) => true
     case AddBusinessTypeFlowModel(Some(TrustAndCompanyServices), Some(false), _, Some(_), Some(false), _, _, true, _, _, _) => true
     case AddBusinessTypeFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true, _, _, _) => true
     case AddBusinessTypeFlowModel(Some(_), Some(false), _, Some(_), Some(_), _, _, true, _, _, _) => true
-
 
     case _ => false
   }
@@ -141,7 +139,14 @@ case class AddBusinessTypeFlowModel(
     case _ => true
   }
 
-  def activityName(implicit lang: Lang) = this.activity map { _.getMessage() }
+  def activityName(implicit lang: Lang) = this.activity map {
+    _.getMessage()
+  }
+
+  def isMsbTmDefined: Boolean = this.activity.exists {
+    case MoneyServiceBusiness if this.subSectors.fold[Boolean](false)(_.msbServices.contains(TransmittingMoney)) => true
+    case _ => false
+  }
 
 }
 
