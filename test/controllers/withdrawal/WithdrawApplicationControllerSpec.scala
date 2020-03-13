@@ -89,12 +89,7 @@ class WithdrawApplicationControllerSpec extends AmlsSpec {
 
       "show the business name" in new TestFixture {
         val result = controller.get()(request)
-        contentAsString(result) must include(businessName)
-      }
-
-      "show the registration date" in new TestFixture {
-        val result = controller.get()(request)
-        contentAsString(result) must include(DateHelper.formatDate(processingDate))
+        contentAsString(result) must include("Withdraw your application for Business Name from registration details")
       }
     }
 

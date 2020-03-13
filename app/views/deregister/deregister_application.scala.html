@@ -25,35 +25,27 @@
 @(businessName: String, activities: Set[String], regNumber: String)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
-    @heading("status.deregister.title", "summary.status")
+    @if(businessName.nonEmpty) {
+        @heading(Messages("status.deregister.title", businessName), "summary.status")
+    } else {
+        @heading("status.deregister.empty.title", "summary.status")
+    }
 }
 
+@main(title = messages("status.deregister.empty.title"), heading = header) {
 
-@main(title = messages("status.deregister.title"), heading = header) {
-
-    <h2 class="heading-large">@businessName</h2>
-
-    <div class="grid-layout__column grid-layout__column--2-3">
-        <p class="heading-small">@messages("status.deregister.regnumber")</p>
-        <p>@regNumber</p>
-        <p class="heading-small">@Messages("status.deregister.services")</p>
-        <ul class="list">@for(activity <- activities) {
-                <li>@activity</li>
-            }
-        </ul>
-
-        <p>
-            <a id="change-services" href="@controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get().url">
-            @Messages("status.deregister.button.change")<span class="visuallyhidden"> @Messages("status.deregister.visuallyhidden.change")</span></a>
-        </p>
-
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            @Messages("status.deregister.warning.text")
+        </strong>
     </div>
-
 
     @messages("status.deregister.body-content").paragraphizeH
 
     @form(EmptyForm, controllers.deregister.routes.DeRegisterApplicationController.post()) {
-        @submit(edit = false, Some(Messages("button.continue")), returnLink = false)
+        @submit(edit = false, Some(Messages("status.deregister.continue")), returnLink = false)
     }
 
 }

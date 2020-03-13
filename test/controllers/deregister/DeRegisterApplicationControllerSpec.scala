@@ -80,22 +80,12 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec {
       "show the correct page" in new TestFixture {
         val result = controller.get()(request)
         status(result) mustBe OK
-        contentAsString(result) must include(Messages("status.deregister.title"))
+        contentAsString(result) must include(Messages("De-register Business Name from registration details under the Money Laundering Regulations"))
       }
 
       "show the name of the business" in new TestFixture {
         val result = controller.get()(request)
         contentAsString(result) must include(businessName)
-      }
-
-      "show the application reference" in new TestFixture {
-        val result = controller.get()(request)
-        contentAsString(result) must include(applicationReference)
-      }
-
-      "show the business activities" in new TestFixture {
-        val result = controller.get()(request)
-        contentAsString(result) must include("Accountancy service provider")
       }
     }
 

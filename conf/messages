@@ -966,20 +966,21 @@ status.renewalnotsubmitted.description3 = Your supervision will expire on {0} un
 status.renewalnotsubmitted.description4 = You’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for new responsible people you add.
 status.renewalnotsubmitted.description5 = To submit your renewal you need to complete a declaration, and pay the fees.
 status.withdraw.link-text = withdraw your application
-status.withdraw.title = Withdraw your application
+status.withdraw.title = Withdraw your application for {0}
+status.withdraw.empty.title = Withdraw your application
 status.withdraw.registration-date.label = Registration submitted {0}
 status.withdraw.button-text = Withdraw application
-status.withdraw.body-content = Withdraw your application if you no longer want to apply for anti-money laundering supervision from HM Revenue and Customs (HMRC).\n\
-  We will delete any information you have provided. We won’t refund any fees you have paid.\n\
-  To make a change to your application, you can update or view your information.\n\
-  If you withdraw your application and aren’t supervised by another body, you must not carry out activities covered by the Money Laundering Regulations.
-status.deregister.title = De-register your business
+status.withdraw.body-content = If you withdraw your application, we’ll delete any information you have provided and will not refund fees you have paid.
+status.withdraw.warning.text = If you carry out activities covered by the Money Laundering Regulations, you need to be registered with an appropriate supervisory body.
+status.withdraw.button.text = Continue to withdraw your application
+status.deregister.title = De-register {0} under the Money Laundering Regulations
+status.deregister.empty.title = De-register your business under the Money Laundering Regulations
 status.deregister.link-text = De-register your business
 status.deregister.end-date.text = Currently registered to {0}
 status.deregister.button-text = De-register
-status.deregister.body-content = De-register your business if you no longer want to be supervised by HM Revenue and Customs (HMRC).\n\
-  We’ll delete any information you have provided. We won’t refund any fees you have paid.\n\
-  You mustn’t carry out activities covered by the Money Laundering Regulations if you aren’t supervised.
+status.deregister.body-content = If you deregister your business, we’ll delete any information you have provided and will not refund fees you have paid.
+status.deregister.warning.text = If you carry out activities covered by the Money Laundering Regulations, you need to be registered with an appropriate supervisory body.
+status.deregister.continue = Continue to deregister your business
 status.deregister.services = Your services
 status.deregister.button.change = Add or remove services
 status.deregister.regnumber = Registration number:
