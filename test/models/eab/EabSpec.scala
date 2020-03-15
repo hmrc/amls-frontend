@@ -134,7 +134,7 @@ class EabSpec extends AmlsSpec {
           false
         )
 
-        constructedEab.estateAgentBusinessModel mustBe converted
+        constructedEab.conv mustBe converted
       }
     }
 

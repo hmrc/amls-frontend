@@ -44,4 +44,13 @@ object ClientMoneyProtectionScheme {
     case ClientMoneyProtectionSchemeNo  => Json.obj("clientMoneyProtection" -> false)
   }
 
+  def conv(inbound: Option[Boolean]): Option[ClientMoneyProtectionScheme] = {
+
+    inbound match {
+      case Some(true)  => Some(ClientMoneyProtectionSchemeYes)
+      case Some(false) => Some(ClientMoneyProtectionSchemeNo)
+      case _           => None
+    }
+  }
+
 }

@@ -69,4 +69,13 @@ object ProfessionalBody {
     )
     case ProfessionalBodyNo => Json.obj("penalised" -> false)
   }
+
+  def conv(inboundAns: Option[Boolean], inboundDetail: Option[String]): Option[ProfessionalBody] = {
+
+    inboundAns match {
+      case Some(true)  => Some(ProfessionalBodyYes(inboundDetail.getOrElse("")))
+      case Some(false) => Some(ProfessionalBodyNo)
+      case _           => None
+    }
+  }
 }

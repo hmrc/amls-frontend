@@ -97,13 +97,9 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
     def filteredTradingPremises     = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
 
-    // EAB has its own front end. The JSON is stored in a different format.
-    // the Eab model reads in the new format and provides a conversion to the existing EstateAgentBusiness model for submission to DES.
-    def convertEabModel= cache.getEntry[Eab](Eab.key).map(eab => eab.estateAgentBusinessModel)
-
     SubscriptionRequest(
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
-      eabSection = convertEabModel,
+      eabSection = cache.getEntry[Eab](Eab.key).map(eab => eab.conv),
       tradingPremisesSection = filteredTradingPremises,
       businessDetailsSection = cache.getEntry[BusinessDetails](BusinessDetails.key),
       bankDetailsSection = bankDetailsExceptDeleted(cache.getEntry[Seq[BankDetails]](BankDetails.key)),

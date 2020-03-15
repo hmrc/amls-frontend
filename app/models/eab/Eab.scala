@@ -100,91 +100,40 @@ case class Eab(data: JsObject = Json.obj(),
     }
   }
 
-  /* DES submission logic
-  * Model to be used for DES submission such that the JSON be converted to objects that
-  * can be parsed and understood by AMLS BE and associated models
-  */
-  def convServices: Set[Service] = {
-
-    val newServices: Seq[String] = (data \ "eabServicesProvided").as[List[String]]
-
-    newServices.map {
-      case "residential"            => Residential
-      case "commercial"             => Commercial
-      case "auctioneering"          => Auction
-      case "relocation"             => Relocation
-      case "businessTransfer"       => BusinessTransfer
-      case "assetManagement"        => AssetManagement
-      case "landManagement"         => LandManagement
-      case "developmentCompany"     => Development
-      case "socialHousingProvision" => SocialHousing
-      case "lettings"               => Lettings
-    }.toSet
+  def services = {
+    (data \ "eabServicesProvided").as[List[String]]
   }
 
-  def convRedressScheme: Option[RedressScheme] = {
-
-    val scheme = get[String](Eab.redressScheme)
-
-    scheme match {
-      case Some("propertyOmbudsman")     => Some(ThePropertyOmbudsman)
-      case Some("ombudsmanServices")     => Some(OmbudsmanServices)
-      case Some("propertyRedressScheme") => Some(PropertyRedressScheme)
-      case Some("notRegistered")         => Some(RedressSchemedNo)
-      case _                             => None
-    }
+  def redressScheme = {
+    get[String](Eab.redressScheme)
   }
 
-  def convPenalisedProfessionalBody: Option[ProfessionalBody] = {
-
-    val penalisedProfessionalBody: Option[Boolean]      = get[Boolean](Eab.penalisedProfessionalBody)
-    val penalisedProfessionalBodyDetail: Option[String] = get[String](Eab.penalisedProfessionalBodyDetail)
-
-    penalisedProfessionalBody match {
-      case Some(true)  => Some(ProfessionalBodyYes(penalisedProfessionalBodyDetail.getOrElse("")))
-      case Some(false) => Some(ProfessionalBodyNo)
-      case _           => None
-    }
+  def penalisedProfessionalBody = {
+    get[Boolean](Eab.penalisedProfessionalBody)
   }
 
-  def convPenalisedUnderEstateAgentsAct: Option[PenalisedUnderEstateAgentsAct] = {
-
-    val penalisedEstateAgentsAct: Option[Boolean]      = get[Boolean](Eab.penalisedEstateAgentsAct)
-    val penalisedEstateAgentsActDetail: Option[String] = get[String](Eab.penalisedEstateAgentsActDetail)
-
-    penalisedEstateAgentsAct match {
-      case Some(true)  => Some(PenalisedUnderEstateAgentsActYes(penalisedEstateAgentsActDetail.getOrElse("")))
-      case Some(false) => Some(PenalisedUnderEstateAgentsActNo)
-      case _           => None
-    }
+  def penalisedProfessionalBodyDetail = {
+    get[String](Eab.penalisedProfessionalBodyDetail)
   }
 
-  def convClientMoneyProtectionScheme: Option[ClientMoneyProtectionScheme] = {
-
-    val clientMoneyProtectionScheme = get[Boolean](Eab.clientMoneyProtectionScheme)
-
-    clientMoneyProtectionScheme match {
-      case Some(true)  => Some(ClientMoneyProtectionSchemeYes)
-      case Some(false) => Some(ClientMoneyProtectionSchemeNo)
-      case _           => None
-    }
+  def penalisedUnderEstateAgentsAct = {
+    get[Boolean](Eab.penalisedEstateAgentsAct)
   }
 
-  def estateAgentBusinessModel = {
-
-    EstateAgentBusiness(
-      services                      = Some(Services(convServices)),
-      redressScheme                 = convRedressScheme,
-      professionalBody              = convPenalisedProfessionalBody,
-      penalisedUnderEstateAgentsAct = convPenalisedUnderEstateAgentsAct,
-      clientMoneyProtectionScheme   = convClientMoneyProtectionScheme
-    )
-
+  def penalisedUnderEstateAgentsAcDetail = {
+    get[String](Eab.penalisedEstateAgentsActDetail)
   }
-  /* END DES submission logic */
+
+  def clientMoneyProtectionScheme = {
+    get[Boolean](Eab.clientMoneyProtectionScheme)
+  }
+
+  def conv = {
+    EstateAgentBusiness.conv(this)
+  }
 }
 
-object Eab {
+  object Eab {
 
   lazy val appConfig = Play.current.injector.instanceOf[ApplicationConfig]
 

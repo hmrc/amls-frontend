@@ -145,4 +145,20 @@ object Services {
   }
 
   implicit val formats = Json.format[Services]
+
+  def conv(inbound: Seq[String]): Set[Service] = {
+
+    inbound.map {
+      case "residential"            => Residential
+      case "commercial"             => Commercial
+      case "auctioneering"          => Auction
+      case "relocation"             => Relocation
+      case "businessTransfer"       => BusinessTransfer
+      case "assetManagement"        => AssetManagement
+      case "landManagement"         => LandManagement
+      case "developmentCompany"     => Development
+      case "socialHousingProvision" => SocialHousing
+      case "lettings"               => Lettings
+    }.toSet
+  }
 }
