@@ -22,41 +22,49 @@ import models.tcsp._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach}
 import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.mvc.Result
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
+class TcspTypesControllerSpec extends AmlsSpec {
 
-  trait Fixture extends DependencyMocks {
+  trait Fixture extends AuthorisedFixture {
     self =>
-    val request = addToken(authRequest)
+    val request = addToken(self.authRequest)
 
     val cache = mock[DataCacheConnector]
 
-    val controller = new TcspTypesController(cache, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    lazy val controller = new TcspTypesController(cache, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+
+    val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
+    val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
+
+    val defaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc,
+      CompanyFormationAgent, NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc))
+
+    val model = Tcsp(
+      Some(defaultCompanyServiceProviders),
+      Some(OnlyOffTheShelfCompsSoldYes),
+      Some(ComplexCorpStructureCreationNo),
+      Some(defaultProvidedServices),
+      Some(true),
+      Some(defaultServicesOfAnotherTCSP)
+    )
+
+    val cacheMap = CacheMap("", Map.empty)
+
+    when(cache.fetch[Tcsp](any(), any())(any(), any()))
+      .thenReturn(Future.successful(Some(model)))
+
+    when(cache.save[Tcsp](any(), any(), any())(any(), any()))
+      .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
-
-  val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
-  val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
-  val mockTcsp = mock[Tcsp]
-
-  val defaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc,
-    CompanyFormationAgent))
-
-  val model = Tcsp(
-    Some(defaultCompanyServiceProviders),
-    Some(OnlyOffTheShelfCompsSoldYes),
-    Some(ComplexCorpStructureCreationNo),
-    Some(defaultProvidedServices),
-    Some(true),
-    Some(defaultServicesOfAnotherTCSP)
-  )
-
-  val cacheMap = CacheMap("", Map.empty)
 
   "TcspTypesController" must {
 
@@ -119,20 +127,21 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
         redirectLocation(result) must be(Some(controllers.tcsp.routes.ServicesOfAnotherTCSPController.get().url))
       }
 
-      "successfully clear out the providedServices data when other than Registered office option is selected " in new Fixture {
+      "successfully clear out the data"  when {
+        "full model present in mongo and removing CompanyFormationAgent and RegisteredOfficeEtc" in new Fixture {
+          val newRequest = requestWithUrlEncodedBody(
+            "serviceProviders[0]" -> "01",
+            "serviceProviders[1]" -> "02",
+            "serviceProviders[2]" -> "04"
+          )
 
-        val newRequest = requestWithUrlEncodedBody(
-          "serviceProviders[]" -> "01"
-        )
+          val expectedModel = Tcsp(Some(TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc))),
+            None, None, None, Some(true), Some(ServicesOfAnotherTCSPYes("12345678")), true, false)
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(Some(model)))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
-
-        val result = controller.post()(newRequest)
-
-        val expectedModel = Tcsp(Some(TcspTypes(Set(NomineeShareholdersProvider))), None, None, None, Some(true), Some(ServicesOfAnotherTCSPYes("12345678")), true, false)
-
-        verify(controller.dataCacheConnector).save(any(), eqTo(Tcsp.key), eqTo(expectedModel))(any(), any())
+          val result = controller.post()(newRequest)
+          status(result) mustBe SEE_OTHER
+          verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expectedModel))(any(), any())
+        }
       }
 
       "successfully navigate to next page while storing data in in mongoCache in edit mode" in new Fixture {

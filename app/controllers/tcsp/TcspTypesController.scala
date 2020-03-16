@@ -16,6 +16,7 @@
 
 package controllers.tcsp
 
+import com.google.inject.Singleton
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -23,15 +24,15 @@ import javax.inject.Inject
 import models.tcsp.{CompanyFormationAgent, RegisteredOfficeEtc, Tcsp, TcspTypes}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.tcsp.service_provider_types
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class TcspTypesController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                     val authAction: AuthAction,
-                                     val ds: CommonPlayDependencies,
-                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+class TcspTypesController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                    val authAction: AuthAction,
+                                    val ds: CommonPlayDependencies,
+                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -46,37 +47,35 @@ class TcspTypesController @Inject() (val dataCacheConnector: DataCacheConnector,
       }
   }
 
-  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
+  def post(edit: Boolean = false) = authAction.async {
     implicit request =>
-
       Form2[TcspTypes](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(service_provider_types(f, edit)))
         case ValidForm(_, data) => {
-          for {
-            tcsp <-
-            dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key)
-            _ <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key,
-              {
-                data.serviceProviders.contains(CompanyFormationAgent) match {
-                  case false => {
-                    if(!data.serviceProviders.contains(RegisteredOfficeEtc)){
-                      tcsp.tcspTypes(data).copy(onlyOffTheShelfCompsSold = None, complexCorpStructureCreation = None, providedServices = None)
-                    } else {
-                      tcsp.tcspTypes(data).copy(onlyOffTheShelfCompsSold = None, complexCorpStructureCreation = None)
-                    }
-                  }
-                  case _ => tcsp.tcspTypes(data)
-                }
-              }
+          val companyFormOrRegisteredOffice = (data.serviceProviders.contains(CompanyFormationAgent), data.serviceProviders.contains(RegisteredOfficeEtc))
 
-            )
-          } yield (data.serviceProviders.contains(CompanyFormationAgent), data.serviceProviders.contains(RegisteredOfficeEtc)) match {
-            case (true, _) => Redirect(routes.OnlyOffTheShelfCompsSoldController.get(edit))
-            case (false, true) => Redirect(routes.ProvidedServicesController.get(edit))
-            case (_) => edit match {
+          val result = for {
+            tcsp <- dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key)
+            cache <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key,
+              {
+                companyFormOrRegisteredOffice match {
+                  case (false, false) => tcsp.tcspTypes(data).copy(onlyOffTheShelfCompsSold = None, complexCorpStructureCreation = None, providedServices = None)
+                  case (false, true) => tcsp.tcspTypes(data).copy(onlyOffTheShelfCompsSold = None, complexCorpStructureCreation = None)
+                  case (true, false) => tcsp.tcspTypes(data).copy(providedServices = None)
+                  case (true, true) => tcsp.tcspTypes(data)
+                }
+              })
+          } yield cache
+
+          result map { _ =>
+            companyFormOrRegisteredOffice match {
+              case (true, _) => Redirect(routes.OnlyOffTheShelfCompsSoldController.get(edit))
+              case (false, true) => Redirect(routes.ProvidedServicesController.get(edit))
+              case _ => edit match {
                 case true => Redirect(routes.SummaryController.get())
                 case false => Redirect(routes.ServicesOfAnotherTCSPController.get())
+              }
             }
           }
         }
