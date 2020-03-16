@@ -124,8 +124,8 @@ case class AddBusinessTypeFlowModel(activity: Option[BusinessActivity] = None,
       hasAccepted = hasAccepted && this.responsiblePeople.equals(p))
 
   def isComplete: Boolean = this match {
-    case AddBusinessTypeFlowModel(Some(MoneyServiceBusiness), Some(_), _, _, Some(true), Some(_), _, true, _, _, _) => true
-    case AddBusinessTypeFlowModel(Some(MoneyServiceBusiness), Some(false), _, _, Some(false), _, _, true, _, _, _) => true
+    case AddBusinessTypeFlowModel(Some(MoneyServiceBusiness), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _, _) => true
+    case AddBusinessTypeFlowModel(Some(MoneyServiceBusiness), Some(false), _, Some(_), Some(false), _, _, true, _, _, _) => true
     case AddBusinessTypeFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _, _) => true
     case AddBusinessTypeFlowModel(Some(TrustAndCompanyServices), Some(false), _, Some(_), Some(false), _, _, true, _, _, _) => true
     case AddBusinessTypeFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true, _, _, _) => true
