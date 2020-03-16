@@ -40,7 +40,7 @@ class deregister_applicationSpec extends AmlsViewSpec with MustMatchers with Aml
       val title = s"${Messages("status.deregister.empty.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
 
       doc.title mustBe title
-      heading.html must be(Messages("De-register Test Business under the Money Laundering Regulations"))
+      heading.html must be(Messages("Deregister Test Business under the Money Laundering Regulations"))
       subHeading.html must include(Messages("summary.status"))
 
     }
