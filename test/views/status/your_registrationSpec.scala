@@ -107,7 +107,8 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         feeInformation = HtmlFormat.empty)
 
       doc.getElementById("application-withdrawn-description-1").text() must be("You have withdrawn your application to register with HMRC.")
-      doc.getElementById("application-withdrawn-description-2").text() must be("Your business is not registered with HMRC under the Money Laundering Regulations.")
+      doc.getElementById("application-withdrawn-description-2").text() must be("If the Money Laundering Regulations apply to your business, you need to be registered with an appropriate supervisory body.")
+      doc.getElementById("application-withdrawn-description-3").text() must be("If you’re not registered and carry out activities covered by the Money Laundering Regulations, you may be subject to civil sanctions or criminal proceedings.")
       Option(doc.getElementById("update-information")) must be(None)
       doc.getElementById("registration-status").html() must include("Not supervised. Application withdrawn.")
       doc.getElementById("new.application.button").html() must include("Start a new application")
@@ -172,7 +173,8 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         feeInformation = HtmlFormat.empty)
 
       doc.getElementById("application-deregistered-description-1").text() must be("You have deregistered your business.")
-      doc.getElementById("application-deregistered-description-2").text() must be("Your business is not registered with HMRC under the Money Laundering Regulations.")
+      doc.getElementById("application-deregistered-description-2").text() must be("If the Money Laundering Regulations apply to your business, you need to be registered with an appropriate supervisory body.")
+      doc.getElementById("application-deregistered-description-3").text() must be("If you’re not registered and carry out activities covered by the Money Laundering Regulations, you may be subject to civil sanctions or criminal proceedings.")
       Option(doc.getElementById("update-information")) must be(None)
       doc.getElementById("registration-status").html() must include("Not supervised. Deregistered on " + DateHelper.formatDate(deregistrationDate.value) + ".")
       doc.getElementById("new.application.button").html() must include("Start a new application")
