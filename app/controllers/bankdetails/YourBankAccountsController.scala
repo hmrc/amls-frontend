@@ -37,7 +37,7 @@ class YourBankAccountsController @Inject()(val dataCacheConnector: DataCacheConn
           bankDetails <- dataCacheConnector.fetch[Seq[BankDetails]](request.credId, BankDetails.key)
         } yield bankDetails match {
           case Some(data) =>
-            val filteredBankDetails = data.zipWithIndex.visibleAccounts
+            val filteredBankDetails = data.zipWithIndex.visibleAccounts.reverse
 
             Ok(views.html.bankdetails.your_bank_accounts(
               EmptyForm,

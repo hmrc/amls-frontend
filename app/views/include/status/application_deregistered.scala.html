@@ -21,7 +21,8 @@
 @(businessName: Option[String])(implicit request: Request[_], m: Messages, lang: Lang)
 
 <p id="application-deregistered-description-1">@Messages("your.registration.status.deregistered.line1")</p>
-<p id="application-deregistered-description-2">@Messages("your.registration.status.deregistered.line2")</p>
+<p id="application-deregistered-description-2">@Messages("your.registration.status.withdrawn.line2") <a id="who-needs-to-register" href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#businesses-already-supervised-for-money-laundering-purposes">@Messages("your.registration.status.withdrawn.label1")</a>@Messages("full.stop")</p>
+<p id="application-deregistered-description-3">@Messages("your.registration.status.withdrawn.line3")</p>
 
 @form(EmptyForm, controllers.routes.StatusController.newSubmission()) {
  @submitWithPlaceholder(
