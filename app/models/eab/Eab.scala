@@ -220,6 +220,7 @@ case class Eab(data: JsObject = Json.obj(),
       (__ \ 'data ++ penalisedEstateAgentsActDetail).json.copyFrom(readPathOrReturn( __ \ 'penalisedUnderEstateAgentsActDetails, JsNull)) and
       (__ \ 'data ++ penalisedProfessionalBody).json.copyFrom(readPathOrReturn(__ \ 'penalised, JsNull)) and
       (__ \ 'data ++ penalisedProfessionalBodyDetail).json.copyFrom(readPathOrReturn(__ \ 'professionalBody,JsNull)) and
+      (__ \ 'data ++ clientMoneyProtectionScheme).json.copyFrom(readPathOrReturn(__ \ 'clientMoneyProtection,JsNull)) and
       (__ \ 'hasAccepted).json.copyFrom((__ \ 'hasAccepted).json.pick) and
       (__ \ 'hasChanged).json.copyFrom((__ \ 'hasChanged).json.pick)
     ) reduce

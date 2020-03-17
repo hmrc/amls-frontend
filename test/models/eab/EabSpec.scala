@@ -187,12 +187,16 @@ class EabSpec extends AmlsSpec {
     val oldRedressSchemeNoRedress = Json.obj(
       "isRedress" -> false)
 
+    val oldClientProtection = Json.obj(
+      "clientMoneyProtection" -> false)
+
     "data are complete" must {
       val completeOldEab = (
         oldServices ++
         oldRedressScheme ++
         oldProfessionalBody ++
-        oldEstateAct ++ Json.obj(
+        oldEstateAct ++
+        oldClientProtection ++ Json.obj(
         "hasChanged" -> true,
         "hasAccepted" -> true)).as[Eab]
 
