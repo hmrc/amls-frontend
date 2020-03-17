@@ -657,11 +657,15 @@ error.required.renewal.ba.involved.in.other.text = Enter the other activities yo
 error.text.validation.renewal.ba.involved.in.other = Activities can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.invalid.maxlength.255.renewal.ba.involved.in.other = Activities must be 255 characters or less
 
-error.required.withdrawal.reason = You must select a reason for withdrawing your application
-error.required.withdrawal.reason.other = You haven’t specified the reason for withdrawing your application. Enter your reason for withdrawing
+error.required.withdrawal.reason = Select why you’re withdrawing your application
+error.required.withdrawal.reason.input = Enter the reason you are withdrawing your application
+error.required.withdrawal.reason.length = Reason for withdrawing your application must be 40 characters or less
+error.required.withdrawal.reason.format = Reason for withdrawing your application can include letters a to z, numbers, spaces and punctuation
 
-error.required.deregistration.reason = You must select a reason for de-registering the business
-error.required.deregistration.reason.other = You haven’t specified the reason for de-registering the business. Enter the reason for de-registering
+error.required.deregistration.reason = Select why you’re deregistering the business
+error.required.deregistration.reason.input = Enter the reason you are deregistering your business
+error.required.deregistration.reason.length = Reason for deregistering your business must be 40 characters or less
+error.required.deregistration.reason.format = Reason for deregistering your business can include letters a to z, numbers, spaces and punctuation
 
 error.updateanyInformation.validationerror = Select yes if you want to update any other information
 
@@ -977,7 +981,7 @@ status.withdraw.body-content = Withdraw your application if you no longer want t
 status.deregister.title = De-register your business
 status.deregister.link-text = De-register your business
 status.deregister.end-date.text = Currently registered to {0}
-status.deregister.button-text = De-register
+status.deregister.button-text = Deregister your business
 status.deregister.body-content = De-register your business if you no longer want to be supervised by HM Revenue and Customs (HMRC).\n\
   We’ll delete any information you have provided. We won’t refund any fees you have paid.\n\
   You mustn’t carry out activities covered by the Money Laundering Regulations if you aren’t supervised.
@@ -1305,24 +1309,27 @@ dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980.
 
 deregistration.reason.title = De-Register
-deregistration.reason.heading = Why are you de-registering the business?
+deregistration.reason.heading = Why are you deregistering the business?
 
-deregistration.reason.lbl.01 = Out of scope
-deregistration.reason.lbl.02 = Not trading in own right
-deregistration.reason.lbl.03 = Under another supervisor
-deregistration.reason.lbl.04 = Change of Legal Entity
-deregistration.reason.lbl.05 = HVD - policy of not accepting high value cash payments
-deregistration.reason.lbl.06 = Other
-deregistration.reason.lbl.specify.other.reason = Please specify
+deregistration.reason.lbl.01 = Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations
+deregistration.reason.lbl.02 = Business is not trading in its own right because it is now an agent of a money service business
+deregistration.reason.lbl.03 = Business is registered with another supervisory body
+deregistration.reason.lbl.04 = Legal entity of your business has changed
+deregistration.reason.lbl.05 = You’re registered as a high value dealer but no longer make or accept high value cash payments
+deregistration.reason.lbl.06 = Another reason
+deregistration.reason.lbl.specify.other.reason = Reason for deregistering your business
+
+deregistration.reason.lbl.04.hint = For example, you have changed your business type from a sole trader to a limited company.
 
 withdrawal.reason.title = Withdraw Application
 withdrawal.reason.heading = Why are you withdrawing your application?
 
-withdrawal.reason.lbl.01 = Out of scope
-withdrawal.reason.lbl.02 = Not trading in own right
-withdrawal.reason.lbl.03 = I‘m supervised by another body
-withdrawal.reason.lbl.04 = Other
-withdrawal.reason.lbl.specify.other.reason = Please specify
+withdrawal.reason.lbl.01 = Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations
+withdrawal.reason.lbl.02 = Business is not trading in its own right because it is now an agent of a money service business
+withdrawal.reason.lbl.03 = Business is registered with another supervisory body
+withdrawal.reason.lbl.04 = Another reason
+withdrawal.reason.lbl.specify.other.reason = Reason for withdrawing your application
+withdrawal.reason.lbl.button = Withdraw you application
 
 whatYouNeed.attention.title = Automatic saving
 whatYouNeed.attention.information = Information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
