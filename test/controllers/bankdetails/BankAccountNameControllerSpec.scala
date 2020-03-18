@@ -23,11 +23,12 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 
 class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends DependencyMocks { self =>
+  trait Fixture extends DependencyMocks {
+    self =>
 
     val request = addToken(authRequest)
 
@@ -120,7 +121,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
           val newRequest = requestWithUrlEncodedBody(
             "accountName" -> "test"
-           )
+          )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))
 
@@ -147,7 +148,41 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.BankAccountTypeController.get(1).url))
         }
+        "given valid data when NOT in edit mode and without index" in new Fixture {
 
+          val newRequest = requestWithUrlEncodedBody(
+            "accountName" -> "test"
+          )
+
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))
+
+          mockCacheSave[Seq[BankDetails]]
+
+          val result = controller.postIndex(1)(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.BankAccountTypeController.get(1).url))
+        }
+
+      }
+
+      "save new index in session and respond with SEE_OTHER" when {
+        "given valid data when NOT in edit mode and adding new account (no index)" in new Fixture {
+
+          val newRequest = requestWithUrlEncodedBody(
+            "accountName" -> "test"
+          )
+
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))
+
+          mockCacheSave[Seq[BankDetails]]
+
+          val result = controller.postNoIndex()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.BankAccountTypeController.get(2).url))
+          session(result).get("itemIndex") mustBe Some("2")
+        }
       }
 
       "respond with NOT_FOUND" when {

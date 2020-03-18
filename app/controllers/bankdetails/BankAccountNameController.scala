@@ -25,13 +25,13 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Write}
 import models.FormTypes
 import models.bankdetails.BankDetails
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.mvc._
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, StatusConstants}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 @Singleton
 class BankAccountNameController @Inject()(
@@ -50,23 +50,26 @@ class BankAccountNameController @Inject()(
   }
 
   def getNoIndex: Action[AnyContent] = authAction.async {
-      implicit request =>
-        handleGet(None, false, request.amlsRefNumber, request.accountTypeId, request.credId)
+    implicit request =>
+      request.request.session.get("itemIndex") match {
+        case Some(idx) => Future.successful(Redirect(controllers.bankdetails.routes.BankAccountNameController.getIndex(idx.toInt)))
+        case _ => handleGet(None, false, request.amlsRefNumber, request.accountTypeId, request.credId)
+      }
   }
 
   def getIndex(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
-      implicit request =>
-        handleGet(Some(index), edit, request.amlsRefNumber, request.accountTypeId, request.credId)
+    implicit request =>
+      handleGet(Some(index), edit, request.amlsRefNumber, request.accountTypeId, request.credId)
   }
-  
+
   def postNoIndex: Action[AnyContent] = authAction.async {
-      implicit request =>
-        handlePost(None, false, request.credId)
+    implicit request =>
+      handlePost(None, false, request.credId)
   }
 
   def postIndex(index: Int, edit: Boolean = false) = authAction.async {
-      implicit request =>
-        handlePost(Some(index), edit, request.credId)
+    implicit request =>
+      handlePost(Some(index), edit, request.credId)
   }
 
   private def handleGet(index: Option[Int] = None, edit: Boolean = false, amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
@@ -88,7 +91,7 @@ class BankAccountNameController @Inject()(
   }
 
   private def handlePost(index: Option[Int] = None, edit: Boolean = false, credId: String)
-                (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
+                        (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
     Form2[String](request.body) match {
       case f: InvalidForm =>
         Future.successful(BadRequest(views.html.bankdetails.bank_account_name(f, edit, index)))
@@ -113,7 +116,10 @@ class BankAccountNameController @Inject()(
           }
           case _ => dataCacheConnector.fetch[Seq[BankDetails]](credId, BankDetails.key) flatMap { maybeBankDetails =>
             val newList = maybeBankDetails.getOrElse(Seq.empty) ++ Seq(newBankDetails.copy(status = Some(StatusConstants.Added)))
-            dataCacheConnector.save(credId, BankDetails.key, newList) map { _ => Redirect(routes.BankAccountTypeController.get(newList.size)) }
+            dataCacheConnector.save(credId, BankDetails.key, newList) map { _ =>
+              val redirect = Redirect(routes.BankAccountTypeController.get(newList.size))
+              redirect.addingToSession("itemIndex" -> newList.size.toString)
+            }
           }
         }
     }
