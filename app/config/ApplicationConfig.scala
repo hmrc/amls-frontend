@@ -31,7 +31,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   }
 
   private def getConfigString(key: String) = servicesConfig.getConfString(key, throw new Exception(s"Could not find config '$key'"))
-  private def getConfigInt(key: String) = servicesConfig.getConfInt(key, throw new Exception(s"Could not find config '$key'"))
+  private def getConfigInt(key: String)    = servicesConfig.getConfInt(key, throw new Exception(s"Could not find config '$key'"))
 
   val contactFormServiceIdentifier = "AMLS"
 
