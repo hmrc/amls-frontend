@@ -110,6 +110,9 @@ object EstateAgentBusiness {
   implicit def default(aboutYou: Option[EstateAgentBusiness]): EstateAgentBusiness =
     aboutYou.getOrElse(EstateAgentBusiness())
 
+  // EstateAgentBusiness models are needed for DES interactions. I.e. API 4, 5 and 6.
+  // This method takes the Eab model (used by EAB Frontend) and converts to EstateAgentBusiness for
+  // back end (AMLS) DES interactions.
   def conv(inbound: Eab) = {
 
     EstateAgentBusiness(

@@ -128,6 +128,10 @@ case class Eab(data: JsObject = Json.obj(),
     get[Boolean](Eab.clientMoneyProtectionScheme)
   }
 
+  // EstateAgentBusiness models are needed for DES interactions. I.e. API 4, 5 and 6.
+  // This method takes this Eab model (used by EAB Frontend and converts to EstateAgentBusiness for
+  // back end (AMLS) DES interactions.
+  // AMLS Back end could be refactored in time to receive this model in place of EstateAgentBusiness.
   def conv = {
     EstateAgentBusiness.conv(this)
   }

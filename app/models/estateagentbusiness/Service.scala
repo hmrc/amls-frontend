@@ -33,15 +33,15 @@ sealed trait Service {
   val message = "estateagentbusiness.service.lbl."
   def getMessage(implicit lang: Lang): String =
     this match {
-      case Residential => Messages(s"${message}01")
-      case Commercial => Messages(s"${message}02")
-      case Auction => Messages(s"${message}03")
-      case Relocation => Messages(s"${message}04")
+      case Residential      => Messages(s"${message}01")
+      case Commercial       => Messages(s"${message}02")
+      case Auction          => Messages(s"${message}03")
+      case Relocation       => Messages(s"${message}04")
       case BusinessTransfer => Messages(s"${message}05")
-      case AssetManagement => Messages(s"${message}06")
-      case LandManagement => Messages(s"${message}07")
-      case Development => Messages(s"${message}08")
-      case SocialHousing => Messages(s"${message}09")
+      case AssetManagement  => Messages(s"${message}06")
+      case LandManagement   => Messages(s"${message}07")
+      case Development      => Messages(s"${message}08")
+      case SocialHousing    => Messages(s"${message}09")
     }
 }
 
@@ -84,16 +84,16 @@ object Service {
 
   implicit val servicesFormWrite =
     Write[Service, String] {
-      case Residential => "01"
-      case Commercial => "02"
-      case Auction => "03"
-      case Relocation => "04"
+      case Residential      => "01"
+      case Commercial       => "02"
+      case Auction          => "03"
+      case Relocation       => "04"
       case BusinessTransfer => "05"
-      case AssetManagement => "06"
-      case LandManagement => "07"
-      case Development => "08"
-      case SocialHousing => "09"
-      case Lettings => "10"
+      case AssetManagement  => "06"
+      case LandManagement   => "07"
+      case Development      => "08"
+      case SocialHousing    => "09"
+      case Lettings         => "10"
     }
 
   implicit val jsonServiceReads: Reads[Service] =
@@ -113,16 +113,16 @@ object Service {
 
   implicit val jsonServiceWrites =
     Writes[Service] {
-      case Residential => JsString("01")
-      case Commercial => JsString("02")
-      case Auction => JsString("03")
-      case Relocation => JsString("04")
+      case Residential      => JsString("01")
+      case Commercial       => JsString("02")
+      case Auction          => JsString("03")
+      case Relocation       => JsString("04")
       case BusinessTransfer => JsString("05")
-      case AssetManagement => JsString("06")
-      case LandManagement => JsString("07")
-      case Development => JsString("08")
-      case SocialHousing => JsString("09")
-      case Lettings => JsString("10")
+      case AssetManagement  => JsString("06")
+      case LandManagement   => JsString("07")
+      case Development      => JsString("08")
+      case SocialHousing    => JsString("09")
+      case Lettings         => JsString("10")
     }
 }
 

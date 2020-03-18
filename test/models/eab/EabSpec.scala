@@ -106,7 +106,8 @@ class EabSpec extends AmlsSpec {
 
       checkIsComplete(constructedEab)
 
-      "builds des submission (API4/6) EstateAgentBusiness Model correctly" in {
+      // EstateAgentBusiness models are needed for DES interactions. I.e. API 4, 5 and 6.
+      "builds AMLS back end submission EstateAgentBusiness Model correctly" in {
 
         val converted = EstateAgentBusiness(
           Some(
