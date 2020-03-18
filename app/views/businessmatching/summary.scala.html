@@ -225,7 +225,7 @@
                             editUrl = controllers.businessmatching.routes.PSRNumberController.get(true).toString,
                             editLinkTag = "edit-psr-number"
                         ) {
-                            <p id="psr">@psr match {
+                            <p id="psr-number">@psr match {
                                 case BusinessAppliedForPSRNumberYes(regNumber) => {
                                     @regNumber
                                 }
