@@ -42,9 +42,11 @@ class BusinessAppliedForPSRNumberController @Inject()(
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>
-        OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)) map { case model =>
+        OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)) map {
+          case model if model.isMsbTmDefined =>
           val form = model.businessAppliedForPSRNumber map { v => Form2(v) } getOrElse EmptyForm
           Ok(business_applied_for_psr_number(form, edit))
+          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
         } getOrElse InternalServerError("Get: Unable to show Business Applied For PSR Number page")
   }
 
