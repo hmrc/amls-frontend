@@ -82,7 +82,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
 
   def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
 
-  def standAloneEABService = servicesConfig.getConfBool("feature-toggle.stand-alone-eab-service", false)
+  def phase3Release2La = servicesConfig.getConfBool("feature-toggle.phase3-release2-la", false)
 
   lazy val authUrl = baseUrl("auth")
 
