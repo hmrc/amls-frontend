@@ -570,7 +570,7 @@ error.invalid.renewal.fx.transactions.in.12months = Number of foreign exchange t
 error.invalid.renewal.ce.transactions.in.12months = Number of currency exchange transactions must be 11 numbers or less
 error.required.msb.fundsTransfer = Select yes if you transfer money without using formal banking systems
 error.invalid.countries.msb.branchesOrAgents.country = Enter the countries you have branches or agents in
-error.invalid.countries.msb.sendlargestamount.country = Enter where you expect to send the largest amounts of money to
+error.invalid.countries.msb.sendlargestamount.country = Enter the countries you expect to send the largest amounts of money to
 error.required.hasCountries.msb.branchesOrAgents = Select yes if you have branches or agents in other countries
 error.invalid.msb.wc.currencies = Enter the currencies you expect to supply the most to your customers
 error.invalid.msb.wc.currencies.format = Enter a currency code in the correct format
@@ -585,7 +585,7 @@ error.format.msb.wc.banknames = Bank names can include letters a to z, numbers, 
 error.format.msb.wc.wholesaler = Currency wholesaler names can include letters a to z, numbers, spaces and punctuation
 error.required.msb.wc.foreignCurrencies = Select yes if you expect to deal in physical foreign currencies
 error.required.renewal.wc.foreign.currencies = Select yes if you dealt in physical foreign currencies in the last 12 months
-error.required.countries.msb.most.transactions = Enter where you expect to send the most transactions
+error.required.countries.msb.most.transactions = Enter the countries you expect to send the most transactions to
 error.required.renewal.send.money = Select yes if you sent money to other countries in the last 12 months
 
 ############################### High Value Dealer ###############################
@@ -657,11 +657,15 @@ error.required.renewal.ba.involved.in.other.text = Enter the other activities yo
 error.text.validation.renewal.ba.involved.in.other = Activities can include letters a to z, numbers, spaces, and most punctuation and special characters
 error.invalid.maxlength.255.renewal.ba.involved.in.other = Activities must be 255 characters or less
 
-error.required.withdrawal.reason = You must select a reason for withdrawing your application
-error.required.withdrawal.reason.other = You haven’t specified the reason for withdrawing your application. Enter your reason for withdrawing
+error.required.withdrawal.reason = Select why you’re withdrawing your application
+error.required.withdrawal.reason.input = Enter the reason you are withdrawing your application
+error.required.withdrawal.reason.length = Reason for withdrawing your application must be 40 characters or less
+error.required.withdrawal.reason.format = Reason for withdrawing your application can include letters a to z, numbers, spaces and punctuation
 
-error.required.deregistration.reason = You must select a reason for de-registering the business
-error.required.deregistration.reason.other = You haven’t specified the reason for de-registering the business. Enter the reason for de-registering
+error.required.deregistration.reason = Select why you’re deregistering the business
+error.required.deregistration.reason.input = Enter the reason you are deregistering your business
+error.required.deregistration.reason.length = Reason for deregistering your business must be 40 characters or less
+error.required.deregistration.reason.format = Reason for deregistering your business can include letters a to z, numbers, spaces and punctuation
 
 error.updateanyInformation.validationerror = Select yes if you want to update any other information
 
@@ -877,7 +881,9 @@ your.registration.status.renewal.incomplete.button = Return to your renewal
 your.registration.status.renewal.pending.description.line1 = You have submitted your renewal. HMRC will review your renewal after we have received payment.
 your.registration.status.renewal.pending.description.line2 = We’ll email you when we have made a decision.
 your.registration.status.withdrawn.line1 = You have withdrawn your application to register with HMRC.
-your.registration.status.withdrawn.line2 = Your business is not registered with HMRC under the Money Laundering Regulations.
+your.registration.status.withdrawn.line2 = If the Money Laundering Regulations apply to your business, you need to be registered with an
+your.registration.status.withdrawn.line3 = If you’re not registered and carry out activities covered by the Money Laundering Regulations, you may be subject to civil sanctions or criminal proceedings.
+your.registration.status.withdrawn.label1 = appropriate supervisory body
 your.registration.status.withdrawn = Not supervised. Application withdrawn.
 your.registration.status.rejected.line1 = Your application to register with HMRC has been rejected.
 your.registration.status.rejected.line2 = Your business is not registered with HMRC. Your business must not carry out activities that are covered by the Money Laundering Regulations.
@@ -889,7 +895,6 @@ your.registration.status.expired.line1 = Your registration has expired.
 your.registration.status.expired.line2 = Your business is not registered with HMRC under the Money Laundering Regulations.
 your.registration.status.expired = Not supervised. Registration expired.
 your.registration.status.deregistered.line1 = You have deregistered your business.
-your.registration.status.deregistered.line2 = Your business is not registered with HMRC under the Money Laundering Regulations.
 your.registration.status.deregistered = Not supervised.
 your.registration.status.deregistered.date = Deregistered on {0}.
 
@@ -976,7 +981,7 @@ status.withdraw.body-content = Withdraw your application if you no longer want t
 status.deregister.title = De-register your business
 status.deregister.link-text = De-register your business
 status.deregister.end-date.text = Currently registered to {0}
-status.deregister.button-text = De-register
+status.deregister.button-text = Deregister your business
 status.deregister.body-content = De-register your business if you no longer want to be supervised by HM Revenue and Customs (HMRC).\n\
   We’ll delete any information you have provided. We won’t refund any fees you have paid.\n\
   You mustn’t carry out activities covered by the Money Laundering Regulations if you aren’t supervised.
@@ -1304,24 +1309,27 @@ dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980.
 
 deregistration.reason.title = De-Register
-deregistration.reason.heading = Why are you de-registering the business?
+deregistration.reason.heading = Why are you deregistering the business?
 
-deregistration.reason.lbl.01 = Out of scope
-deregistration.reason.lbl.02 = Not trading in own right
-deregistration.reason.lbl.03 = Under another supervisor
-deregistration.reason.lbl.04 = Change of Legal Entity
-deregistration.reason.lbl.05 = HVD - policy of not accepting high value cash payments
-deregistration.reason.lbl.06 = Other
-deregistration.reason.lbl.specify.other.reason = Please specify
+deregistration.reason.lbl.01 = Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations
+deregistration.reason.lbl.02 = Business is not trading in its own right because it is now an agent of a money service business
+deregistration.reason.lbl.03 = Business is registered with another supervisory body
+deregistration.reason.lbl.04 = Legal entity of your business has changed
+deregistration.reason.lbl.05 = You’re registered as a high value dealer but no longer make or accept high value cash payments
+deregistration.reason.lbl.06 = Another reason
+deregistration.reason.lbl.specify.other.reason = Reason for deregistering your business
+
+deregistration.reason.lbl.04.hint = For example, you have changed your business type from a sole trader to a limited company.
 
 withdrawal.reason.title = Withdraw Application
 withdrawal.reason.heading = Why are you withdrawing your application?
 
-withdrawal.reason.lbl.01 = Out of scope
-withdrawal.reason.lbl.02 = Not trading in own right
-withdrawal.reason.lbl.03 = I‘m supervised by another body
-withdrawal.reason.lbl.04 = Other
-withdrawal.reason.lbl.specify.other.reason = Please specify
+withdrawal.reason.lbl.01 = Business is out of scope as no longer carrying out activities covered by the Money Laundering Regulations
+withdrawal.reason.lbl.02 = Business is not trading in its own right because it is now an agent of a money service business
+withdrawal.reason.lbl.03 = Business is registered with another supervisory body
+withdrawal.reason.lbl.04 = Another reason
+withdrawal.reason.lbl.specify.other.reason = Reason for withdrawing your application
+withdrawal.reason.lbl.button = Withdraw you application
 
 whatYouNeed.attention.title = Automatic saving
 whatYouNeed.attention.information = Information is saved automatically. If you sign out, you’ll have 28 days to complete your application.
@@ -1585,10 +1593,11 @@ businessmatching.typeofbusiness.title = What type of unincorporated association 
 businessmatching.typeofbusiness.lbl = Type of business
 businessmatching.typeofbusiness.lbl.hint = For example, association, charity, trust.
 businessmatching.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
+businessmatching.psr.number.cya.title = PSR registration number
 businessmatching.psr.number.lbl = PSR registration number
 businessmatching.psr.number.hint = This is 6 numbers, for example 123456. You can find on your registration letter from the the Financial Conduct Authority (FCA).
 businessmatching.cannotcontinuewiththeapplication.heading = You can’t continue with your application
-businessmatching.summary.icon.title = You’re applying to register the following business for anti-money laundering supervision with HM Revenue and Customs (HMRC).
+businessmatching.summary.icon.title = You’re applying to register the following business with HMRC under the Money Laundering Regulations.
 businessmatching.summary.business.address.lbl = Your business
 businessmatching.button.confirm.start = Confirm and start application
 businessmatching.confirm.postcode.title = Confirm the postcode for your business
@@ -2403,9 +2412,9 @@ msb.linked.txn.title = Can your systems identify linked transactions?
 msb.psr.number.title = Has your business applied for a Payment Systems Regulator (PSR) registration number?
 msb.psr.number.lbl = Registration reference number
 msb.send.money.title = Do you send money to other countries?
-msb.send.the.largest.amounts.of.money.title = Where do you expect to send the largest amounts of money?
+msb.send.the.largest.amounts.of.money.title = Which countries do you expect to send the largest amounts of money to?
 msb.transactions.expected.title = How many money transfers do you expect to make in the next 12 months?
-msb.most.transactions.title = Where do you expect to send the most transactions?
+msb.most.transactions.title = Which countries do you expect to send the most transactions to?
 msb.most.transactions.list.countries = List up to 3 countries
 msb.fundstransfer.title = Do you transfer money without using formal banking systems?
 msb.branchesoragents.title = Do you have branches or agents in other countries?
