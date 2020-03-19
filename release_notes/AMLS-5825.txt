@@ -1,0 +1,1 @@
+ + [AMLS-5825] - 'Bug fix: duplicated bank accounts when navigating backward'
