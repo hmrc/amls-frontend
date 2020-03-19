@@ -25,22 +25,27 @@
 @(businessName: String, processingDate: LocalDateTime)(implicit messages: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
-  @heading("status.withdraw.title", "summary.status")
+    @if(businessName.nonEmpty) {
+        @heading(Messages("status.withdraw.title", businessName), "summary.status")
+    } else {
+        @heading("status.withdraw.empty.title", "summary.status")
+    }
 }
 
-@main(title = messages("status.withdraw.title"), heading = header) {
+@main(title = messages("status.withdraw.empty.title"), heading = header) {
 
-    <div class="panel-indent panel-indent--gutter panel-border-wide">
-        <p class="heading-small">@Messages("status.business")</p>
-        <p>@businessName</p>
-        <p class="heading-small">@Messages("lbl.registration.status")</p>
-        <p>@Messages("status.withdraw.registration-date.label", DateHelper.formatDate(processingDate))</p>
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            @Messages("status.withdraw.warning.text")
+        </strong>
     </div>
 
-    @Messages("status.withdraw.body-content").paragraphizeH
+    @messages("status.withdraw.body-content").paragraphizeH
 
     @form(EmptyForm, controllers.withdrawal.routes.WithdrawApplicationController.post()) {
-        @submit(edit = false, Some(Messages("button.continue")), returnLink = false)
+        @submit(edit = false, Some(Messages("status.withdraw.button.text")), returnLink = false)
     }
 
 }
