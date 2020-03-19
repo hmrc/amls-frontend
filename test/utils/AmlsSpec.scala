@@ -55,36 +55,46 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
   def addToken[T](fakeRequest: FakeRequest[T]) = {
     import play.api.test.CSRFTokenHelper._
 
-    val csrfConfig     = app.injector.instanceOf[CSRFConfigProvider].get
-    val csrfFilter     = app.injector.instanceOf[CSRFFilter]
-    val token          = csrfFilter.tokenProvider.generateToken
+    val csrfConfig = app.injector.instanceOf[CSRFConfigProvider].get
+    val csrfFilter = app.injector.instanceOf[CSRFFilter]
+    val token = csrfFilter.tokenProvider.generateToken
 
     CSRFRequest(fakeRequest.withHeaders((csrfConfig.headerName, token))).withCSRFToken
   }
 
-  def addTokenWithUrlEncodedBody[T](fakeRequest: FakeRequest[T])(data: (String,String)*) = {
+  def addTokenWithUrlEncodedBody[T](fakeRequest: FakeRequest[T])(data: (String, String)*) = {
     import play.api.test.CSRFTokenHelper._
 
-    val csrfConfig     = app.injector.instanceOf[CSRFConfigProvider].get
-    val csrfFilter     = app.injector.instanceOf[CSRFFilter]
-    val token          = csrfFilter.tokenProvider.generateToken
+    val csrfConfig = app.injector.instanceOf[CSRFConfigProvider].get
+    val csrfFilter = app.injector.instanceOf[CSRFFilter]
+    val token = csrfFilter.tokenProvider.generateToken
 
     fakeRequest.withSession(SessionKeys.sessionId -> "fakesessionid")
-      .withHeaders((csrfConfig.headerName, token)).withFormUrlEncodedBody(data:_*).withCSRFToken
+      .withHeaders((csrfConfig.headerName, token)).withFormUrlEncodedBody(data: _*).withCSRFToken
   }
 
-  def requestWithUrlEncodedBody(data: (String, String)*) = addTokenWithUrlEncodedBody(authRequest)(data:_*)
+  def requestWithUrlEncodedBody(data: (String, String)*) = addTokenWithUrlEncodedBody(authRequest)(data: _*)
 
-  def addTokenWithHeaders[T](fakeRequest: FakeRequest[T])(data: (String,String)*) = {
+  def addTokenWithHeaders[T](fakeRequest: FakeRequest[T])(data: (String, String)*) = {
     import play.api.test.CSRFTokenHelper._
 
-    val csrfConfig     = app.injector.instanceOf[CSRFConfigProvider].get
-    val csrfFilter     = app.injector.instanceOf[CSRFFilter]
-    val token          = csrfFilter.tokenProvider.generateToken
+    val csrfConfig = app.injector.instanceOf[CSRFConfigProvider].get
+    val csrfFilter = app.injector.instanceOf[CSRFFilter]
+    val token = csrfFilter.tokenProvider.generateToken
 
     fakeRequest.withSession(SessionKeys.sessionId -> "fakesessionid")
-      .withHeaders((csrfConfig.headerName, token)).withHeaders(data:_*).withCSRFToken
+      .withHeaders((csrfConfig.headerName, token)).withHeaders(data: _*).withCSRFToken
   }
 
-  def requestWithHeaders(data: (String, String)*) = addTokenWithHeaders(authRequest)(data:_*)
+  def requestWithHeaders(data: (String, String)*) = addTokenWithHeaders(authRequest)(data: _*)
+
+  def addTokenWithSessionParam[T](fakeRequest: FakeRequest[T])(sessionParameter: (String, String)) = {
+    import play.api.test.CSRFTokenHelper._
+
+    val csrfConfig = app.injector.instanceOf[CSRFConfigProvider].get
+    val csrfFilter = app.injector.instanceOf[CSRFFilter]
+    val token = csrfFilter.tokenProvider.generateToken
+
+    CSRFRequest(fakeRequest.withSession(sessionParameter).withHeaders((csrfConfig.headerName, token))).withCSRFToken
+  }
 }

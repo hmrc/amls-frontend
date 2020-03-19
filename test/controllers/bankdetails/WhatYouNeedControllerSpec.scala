@@ -25,7 +25,7 @@ import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.TitleValidator
 
 class WhatYouNeedControllerSpec
@@ -60,6 +60,18 @@ class WhatYouNeedControllerSpec
 
       contentAsString(result) must include(Messages("button.continue"))
     }
+
+    "remove the itemIndex from session if there was one present" in new Fixture {
+      override val request = addTokenWithSessionParam(authRequest)(("itemIndex" -> "4"))
+
+      mockCacheFetch(Gen.listOfN(3, bankDetailsGen).sample, Some(BankDetails.key))
+
+      val result = controller.get()(request)
+
+      status(result) must be(OK)
+      session(result).get("itemIndex") mustBe None
+    }
+
 
     "configure the link href correctly," which {
       "should link to the 'has bank accounts' page" when {
