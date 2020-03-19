@@ -163,20 +163,19 @@ class StatusController @Inject()(val landingService: LandingService,
         ))
       )
       case SubmissionReady => {
-        OptionT(progressService.getSubmitRedirect(mlrRegNumber, accountTypeId, cacheId)) map (
-          url =>
-            Ok(your_registration(
-              regNo = mlrRegNumber.getOrElse(""),
-              businessName = businessNameOption,
-              yourRegistrationInfo = application_submission_ready(url, businessNameOption),
-              unreadNotifications = unreadNotifications,
-              registrationStatus = registration_status(
-                amlsRegNo = mlrRegNumber,
-                status = status
-              ),
-              feeInformation = HtmlFormat.empty
-            ))
-          ) getOrElse InternalServerError("Unable to get redirect data")
+        Future.successful(
+          Ok(your_registration(
+            regNo = mlrRegNumber.getOrElse(""),
+            businessName = businessNameOption,
+            yourRegistrationInfo = application_submission_ready(controllers.routes.RegistrationProgressController.get(), businessNameOption),
+            unreadNotifications = unreadNotifications,
+            registrationStatus = registration_status(
+              amlsRegNo = mlrRegNumber,
+              status = status
+            ),
+            feeInformation = HtmlFormat.empty
+          ))
+        )
       }
       case _ =>
         Future.successful(
@@ -357,18 +356,18 @@ class StatusController @Inject()(val landingService: LandingService,
             }
           case _ => Future.successful(
             Ok {
-            your_registration(
-              regNo = mlrRegNumber.getOrElse(""),
-              businessName = businessNameOption,
-              yourRegistrationInfo = application_renewal_due(businessNameOption, renewalDate),
-              unreadNotifications = unreadNotifications,
-              registrationStatus = registration_status(
-                amlsRegNo = mlrRegNumber,
-                status = statusInfo._1,
-                endDate = renewalDate),
-              feeInformation = fee_information(statusInfo._1),
-              withdrawOrDeregisterInformation = withdraw_or_deregister_information(statusInfo._1))
-          })
+              your_registration(
+                regNo = mlrRegNumber.getOrElse(""),
+                businessName = businessNameOption,
+                yourRegistrationInfo = application_renewal_due(businessNameOption, renewalDate),
+                unreadNotifications = unreadNotifications,
+                registrationStatus = registration_status(
+                  amlsRegNo = mlrRegNumber,
+                  status = statusInfo._1,
+                  endDate = renewalDate),
+                feeInformation = fee_information(statusInfo._1),
+                withdrawOrDeregisterInformation = withdraw_or_deregister_information(statusInfo._1))
+            })
         }
       }
     }
@@ -394,7 +393,7 @@ class StatusController @Inject()(val landingService: LandingService,
       case (false, false, true) => trade_information_no_msb_or_tcsp()
       case (true, _, false) | (_, true, false) => trade_information_msb_or_tcsp_only()
       case (true, _, true) | (_, true, true) => trade_information()
-      case (_, _, _) => throw new MatchError("Could not match activities against given options.")
+      case (_, _, _) => trade_information_find_out()
     }
 
   def countUnreadNotifications(amlsRefNo: Option[String], safeId: Option[String], accountTypeId: (String, String))(implicit headerCarrier: HeaderCarrier) = {

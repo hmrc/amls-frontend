@@ -74,10 +74,11 @@
         ) {
             @input(
                 field = f("specifyOtherReason"),
-                labelText = "withdrawal.reason.lbl.specify.other.reason"
+                labelText = "withdrawal.reason.lbl.specify.other.reason",
+                panel = true
             )
         }
 
-        @submit(false, Some(Messages("button.continue")), returnLink = false)
+        @submit(false, Some(Messages("withdrawal.reason.lbl.button")), returnLink = false)
     }
 }

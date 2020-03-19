@@ -20,21 +20,24 @@ import controllers.actions.SuccessfulAuthAction
 import models.tcsp._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.OptionValues
 import play.api.test.Helpers._
 import services.businessmatching.ServiceFlow
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class SummaryControllerSpec extends AmlsSpec {
 
-  trait Fixture extends DependencyMocks { self =>
+  trait Fixture extends DependencyMocks {
+    self =>
 
     val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
     val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
+    val mockTcsp = mock[Tcsp]
 
     val defaultCompanyServiceProviders = TcspTypes(Set(RegisteredOfficeEtc,
       CompanyFormationAgent))
@@ -68,7 +71,7 @@ class SummaryControllerSpec extends AmlsSpec {
       "CompanyFormationAgent service provider is included" in new Fixture {
 
         val modelCopy: Tcsp = model.copy(
-          tcspTypes=Some(
+          tcspTypes = Some(
             TcspTypes(
               Set(
                 CompanyFormationAgent,
@@ -98,7 +101,7 @@ class SummaryControllerSpec extends AmlsSpec {
 
       "no service providers list is given" in new Fixture {
         val modelCopy: Tcsp = model.copy(
-          tcspTypes=Some(
+          tcspTypes = Some(
             TcspTypes(
               Set()
             )
@@ -115,7 +118,7 @@ class SummaryControllerSpec extends AmlsSpec {
 
       "normal service provider list is provided" in new Fixture {
         val modelCopy: Tcsp = model.copy(
-          tcspTypes=Some(
+          tcspTypes = Some(
             TcspTypes(
               Set(TrusteeProvider,
                 RegisteredOfficeEtc,
@@ -141,17 +144,21 @@ class SummaryControllerSpec extends AmlsSpec {
   }
 
   "Get" must {
-
-
-
-
-    "load the summary page when section data is available" in new Fixture {
+    "load the summary page when section data is complete" in new Fixture {
 
       mockCacheFetch[Tcsp](Some(model))
 
       val result = controller.get()(request)
       status(result) must be(OK)
+    }
 
+    "redirect to registration progress if data is incomplete" in new Fixture with OptionValues {
+
+      mockCacheFetch[Tcsp](Some(model.copy(providedServices = None)))
+
+      val result = controller.get()(request)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get().url
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
@@ -174,7 +181,7 @@ class SummaryControllerSpec extends AmlsSpec {
 
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
-        verify(controller.dataCache).save[Tcsp](any(), any(), eqTo(model.copy(hasAccepted = true)))(any(),any())
+        verify(controller.dataCache).save[Tcsp](any(), any(), eqTo(model.copy(hasAccepted = true)))(any(), any())
 
       }
     }

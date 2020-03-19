@@ -66,20 +66,21 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
   "BusinessAppliedForPSRNumberController" when {
 
     "get is called" must {
-      "return OK with the psr_number view" in new Fixture {
+      "return OK with the psr_number view if there is MSB and TM defined" in new Fixture {
+        mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness), subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))))
 
         val result = controller.get()(request)
 
         status(result) must be(OK)
         Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.psr.number.title"))
-
       }
 
-      "return OK and display psr_number view with pre populated data" in new Fixture {
+      "return OK and display psr_number view with pre populated data if there is MSB and TM defined" in new Fixture {
         override val businessMatching = businessMatchingWithPsrGen.sample.get
 
         mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
-          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456")))))
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456")),
+          subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))))
 
 
         val result = controller.get()(request)
@@ -88,6 +89,24 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[value=true]").hasAttr("checked") must be(true)
         document.select("input[name=regNumber]").`val` mustBe "123456"
+      }
+
+      "redirect to RegistrationProgressController if there is no MSB with TM defined" in new Fixture {
+        mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(HighValueDealing), subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))))
+
+        val result = controller.get()(request)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+      }
+
+      "redirect to RegistrationProgressController if there is MSB with no TM defined" in new Fixture {
+        mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness))))
+
+        val result = controller.get()(request)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
       }
     }
 

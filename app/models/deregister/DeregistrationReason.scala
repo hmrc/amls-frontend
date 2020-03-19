@@ -41,10 +41,10 @@ object DeregistrationReason {
   import utils.MappingUtils.Implicits._
 
   private val maxTextLength = 40
-  private val specifyOtherReasonType = notEmptyStrip.withMessage("error.required.deregistration.reason.other") andThen
-    notEmpty.withMessage("error.required.deregistration.reason.other") andThen
-    maxLength(maxTextLength) andThen
-    basicPunctuationPattern()
+  private val specifyOtherReasonType = notEmptyStrip andThen
+    notEmpty.withMessage("error.required.deregistration.reason.input") andThen
+    maxLength(maxTextLength).withMessage("error.required.deregistration.reason.length") andThen
+    basicPunctuationPattern("error.required.deregistration.reason.format")
 
   implicit val formRule: Rule[UrlFormEncoded, DeregistrationReason] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._

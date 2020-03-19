@@ -71,11 +71,11 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar 
       }
       "invalid characters other reason value" in {
         WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("04"), "specifyOtherReason" -> Seq("{}"))) must
-          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("err.text.validation"))))))
+          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.withdrawal.reason.format"))))))
       }
       "other reason value has too many characters" in {
         WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("04"), "specifyOtherReason" -> Seq("a" * 41))) must
-          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.maxLength", 40))))))
+          be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.withdrawal.reason.length"))))))
       }
     }
 
@@ -87,11 +87,11 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar 
       "no other reason" which {
         "is an empty string" in {
           WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("04"), "specifyOtherReason" -> Seq(""))) must
-            be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.withdrawal.reason.other"))))))
+            be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.withdrawal.reason.input"))))))
         }
         "a string of whitespace" in {
           WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("04"), "specifyOtherReason" -> Seq("   \t"))) must
-            be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.withdrawal.reason.other"))))))
+            be(Invalid(Seq((Path \ "specifyOtherReason", Seq(ValidationError("error.required.withdrawal.reason.input"))))))
         }
         "a missing value" in {
           WithdrawalReason.formRule.validate(Map("withdrawalReason" -> Seq("04"), "specifyOtherReason" -> Seq.empty)) must

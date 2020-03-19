@@ -90,36 +90,67 @@
             classes = Seq("register-services"),
             editLinkTag = "businessactivities-edit"
         ) {
-            <ul class="list">
+          @if(activity.businessActivities.size > 1) {
+            <ul class="list-bullet">
             @activity.businessActivities.toList.sortBy(_.getMessage()).map { line =>
-                <li>@line match {
-                    case AccountancyServices => {
-                        @Messages("businessmatching.registerservices.servicename.lbl.01")
-                    }
-                    case ArtMarketParticipant => {
-                        @Messages("businessmatching.registerservices.servicename.lbl.02")
-                    }
-                    case BillPaymentServices => {
-                        @Messages("businessmatching.registerservices.servicename.lbl.03")
-                    }
-                    case EstateAgentBusinessService => {
-                        @Messages("businessmatching.registerservices.servicename.lbl.04")
-                    }
-                    case HighValueDealing => {
-                        @Messages("businessmatching.registerservices.servicename.lbl.05")
-                    }
-                    case MoneyServiceBusiness => {
-                        @Messages("businessmatching.registerservices.servicename.lbl.06")
-                    }
-                    case TelephonePaymentService => {
-                        @Messages("businessmatching.registerservices.servicename.lbl.08")
-                    }
-                    case TrustAndCompanyServices => {
-                        @Messages("businessmatching.registerservices.servicename.lbl.07")
-                    }
-                }</li>
+              <li>@line match {
+                case AccountancyServices => {
+                  @Messages("businessmatching.registerservices.servicename.lbl.01")
+                }
+                case ArtMarketParticipant => {
+                  @Messages("businessmatching.registerservices.servicename.lbl.02")
+                }
+                case BillPaymentServices => {
+                  @Messages("businessmatching.registerservices.servicename.lbl.03")
+                }
+                case EstateAgentBusinessService => {
+                  @Messages("businessmatching.registerservices.servicename.lbl.04")
+                }
+                case HighValueDealing => {
+                  @Messages("businessmatching.registerservices.servicename.lbl.05")
+                }
+                case MoneyServiceBusiness => {
+                  @Messages("businessmatching.registerservices.servicename.lbl.06")
+                }
+                case TelephonePaymentService => {
+                  @Messages("businessmatching.registerservices.servicename.lbl.08")
+                }
+                case TrustAndCompanyServices => {
+                  @Messages("businessmatching.registerservices.servicename.lbl.07")
+                }
+              }</li>
             }
             </ul>
+          } else {
+              @activity.businessActivities.toList.sortBy(_.getMessage()).map { line =>
+                  <p>@line match {
+                      case AccountancyServices => {
+                          @Messages("businessmatching.registerservices.servicename.lbl.01")
+                      }
+                      case ArtMarketParticipant => {
+                          @Messages("businessmatching.registerservices.servicename.lbl.02")
+                      }
+                      case BillPaymentServices => {
+                          @Messages("businessmatching.registerservices.servicename.lbl.03")
+                      }
+                      case EstateAgentBusinessService => {
+                          @Messages("businessmatching.registerservices.servicename.lbl.04")
+                      }
+                      case HighValueDealing => {
+                          @Messages("businessmatching.registerservices.servicename.lbl.05")
+                      }
+                      case MoneyServiceBusiness => {
+                          @Messages("businessmatching.registerservices.servicename.lbl.06")
+                      }
+                      case TelephonePaymentService => {
+                          @Messages("businessmatching.registerservices.servicename.lbl.08")
+                      }
+                      case TrustAndCompanyServices => {
+                          @Messages("businessmatching.registerservices.servicename.lbl.07")
+                      }
+                  }</p>
+              }
+          }
         }
 
         @if(activity.businessActivities.contains(MoneyServiceBusiness)) {
@@ -130,27 +161,50 @@
                     editUrl = controllers.businessmatching.routes.MsbSubSectorsController.get(true).toString,
                     editLinkTag = "msbservices-edit"
                 ) {
-                    <ul class="list">
+                    @if(services.msbServices.size > 1) {
+                        <ul class="list-bullet">
                         @services.msbServices.toList.sortBy(_.getMessage).map { svc =>
-                        <li>
-                            @svc match {
-                                case ChequeCashingNotScrapMetal => {
-                                    @Messages("businessmatching.services.list.lbl.03")
-                                }
-                                case ChequeCashingScrapMetal => {
-                                    @Messages("businessmatching.services.list.lbl.04")
-                                }
-                                case CurrencyExchange => {
-                                    @Messages("businessmatching.services.list.lbl.02")
-                                }
-                                case ForeignExchange => {
-                                    @Messages("businessmatching.services.list.lbl.05")
-                                }
-                                case TransmittingMoney => {
-                                    @Messages("businessmatching.services.list.lbl.01")
-                                }
-                        }</li>
-                    }</ul>
+                            <li>
+                                @svc match {
+                                    case ChequeCashingNotScrapMetal => {
+                                        @Messages("businessmatching.services.list.lbl.03")
+                                    }
+                                    case ChequeCashingScrapMetal => {
+                                        @Messages("businessmatching.services.list.lbl.04")
+                                    }
+                                    case CurrencyExchange => {
+                                        @Messages("businessmatching.services.list.lbl.02")
+                                    }
+                                    case ForeignExchange => {
+                                        @Messages("businessmatching.services.list.lbl.05")
+                                    }
+                                    case TransmittingMoney => {
+                                        @Messages("businessmatching.services.list.lbl.01")
+                                    }
+                                }</li>
+                        }</ul>
+                    } else {
+                        @services.msbServices.toList.sortBy(_.getMessage).map { svc =>
+                            <p>
+                                @svc match {
+                                    case ChequeCashingNotScrapMetal => {
+                                        @Messages("businessmatching.services.list.lbl.03")
+                                    }
+                                    case ChequeCashingScrapMetal => {
+                                        @Messages("businessmatching.services.list.lbl.04")
+                                    }
+                                    case CurrencyExchange => {
+                                        @Messages("businessmatching.services.list.lbl.02")
+                                    }
+                                    case ForeignExchange => {
+                                        @Messages("businessmatching.services.list.lbl.05")
+                                    }
+                                    case TransmittingMoney => {
+                                        @Messages("businessmatching.services.list.lbl.01")
+                                    }
+                                }</p>
+                        }
+                    }
                 }
 
                 @if(services.msbServices.contains(TransmittingMoney)) {
@@ -161,11 +215,19 @@
                             editLinkTag = "edit-psr-number"
                         ) {
                             <p id="psr">@psr match {
-                                case BusinessAppliedForPSRNumberNo => {
-                                    @Messages("lbl.no")
+                                case BusinessAppliedForPSRNumberYes(regNumber) => {
+                                    @Messages("lbl.yes")
                                 }
-                                case BusinessAppliedForPSRNumberYes(number) => {
-                                    @Messages("businessmatching.psr.number.lbl"): @number
+                            }</p>
+                        }
+                        @checkYourAnswersRow(
+                            question = Messages("businessmatching.psr.number.cya.title"),
+                            editUrl = controllers.businessmatching.routes.PSRNumberController.get(true).toString,
+                            editLinkTag = "edit-psr-number"
+                        ) {
+                            <p id="psr-number">@psr match {
+                                case BusinessAppliedForPSRNumberYes(regNumber) => {
+                                    @regNumber
                                 }
                             }</p>
                         }
