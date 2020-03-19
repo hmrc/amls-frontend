@@ -40,9 +40,15 @@
     }
     case SubmissionDecisionApproved | ReadyForRenewal(_) => {
         <p>
-            @endDate.map { date =>
-                @Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date))@Messages("full.stop")
-                <br/>
+            @endDate match {
+                case Some(date) => {
+                    @Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date))@Messages("full.stop")
+                    <br/>
+                }
+                case _ => {
+                    @Messages("status.submissiondecisionsupervised.enddate.text.nodate")@Messages("full.stop")
+                    <br/>
+                }
             }
             @amlsRegNo.map { number =>
                 @Messages("your.registration.number", number)@Messages("full.stop")

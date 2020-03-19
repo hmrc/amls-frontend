@@ -313,6 +313,21 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       registrationStatusCell.html() must include("Registration number XBML0987654345")
     }
 
+    "contain your registration status information cell with right content for status SubmissionDecisionApproved if endDate is not available" in new ViewFixture {
+
+      def view = views.html.status.your_registration(amlsRegistrationNumber,
+        Some("business Name"),
+        Some(feeResponse),
+        yourRegistrationInfo = Html("some registration information"),
+        registrationStatus = registration_status(status = SubmissionDecisionApproved, amlsRegNo = Some("XBML0987654345"), endDate = None),
+        feeInformation = HtmlFormat.empty)
+
+      val registrationStatusCell = doc.getElementById("registration-status")
+      registrationStatusCell.getElementsByClass("heading-small").first().html() must include("Registration status")
+      registrationStatusCell.html() must include("Supervised.")
+      registrationStatusCell.html() must include("Registration number XBML0987654345")
+    }
+
     "contain your registration status information cell with right content for status SubmissionReady" in new ViewFixture {
 
       def view = views.html.status.your_registration(amlsRegistrationNumber,

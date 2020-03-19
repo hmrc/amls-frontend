@@ -924,6 +924,7 @@ status.submissiondecisionapproved.heading = Application approved
 status.submissiondecisionsupervised.heading = Supervised
 status.submissiondecisionsupervised.renewal.btn = Start your renewal
 status.submissiondecisionsupervised.enddate.text = Supervised to {0}
+status.submissiondecisionsupervised.enddate.text.nodate = Supervised
 status.submissiondecisionsupervised.success.description = Your business is registered for supervision with HMRC.
 status.submissiondecisionsupervised.renewal.advice.text = When you submit your renewal you’ll need to pay a fee for each of your trading premises.  You may also need to pay a fee for new responsible people you add.
 status.submissiondecisionapproved.description = Your application for anti-money laundering supervision has been approved.
