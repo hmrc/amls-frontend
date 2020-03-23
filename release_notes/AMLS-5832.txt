@@ -1,0 +1,1 @@
+ + [AMLS-5832] - 'Linked currency label to input'
