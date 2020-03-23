@@ -1,1 +1,0 @@
- + [AMLS-5826] - 'Bug fix: Application ready to submit button on status page goes to wrong place'
