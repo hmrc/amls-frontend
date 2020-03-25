@@ -33,15 +33,15 @@ sealed trait Service {
   val message = "estateagentbusiness.service.lbl."
   def getMessage(implicit lang: Lang): String =
     this match {
-      case Residential => Messages(s"${message}01")
-      case Commercial => Messages(s"${message}02")
-      case Auction => Messages(s"${message}03")
-      case Relocation => Messages(s"${message}04")
+      case Residential      => Messages(s"${message}01")
+      case Commercial       => Messages(s"${message}02")
+      case Auction          => Messages(s"${message}03")
+      case Relocation       => Messages(s"${message}04")
       case BusinessTransfer => Messages(s"${message}05")
-      case AssetManagement => Messages(s"${message}06")
-      case LandManagement => Messages(s"${message}07")
-      case Development => Messages(s"${message}08")
-      case SocialHousing => Messages(s"${message}09")
+      case AssetManagement  => Messages(s"${message}06")
+      case LandManagement   => Messages(s"${message}07")
+      case Development      => Messages(s"${message}08")
+      case SocialHousing    => Messages(s"${message}09")
     }
 }
 
@@ -63,6 +63,8 @@ case object SocialHousing extends Service
 
 case object Residential extends Service
 
+case object Lettings extends Service
+
 object Service {
 
   implicit val servicesFormRead = Rule[String, Service] {
@@ -75,21 +77,23 @@ object Service {
     case "07" => Valid(LandManagement)
     case "08" => Valid(Development)
     case "09" => Valid(SocialHousing)
+    case "10" => Valid(Lettings)
     case _ =>
       Invalid(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
   }
 
   implicit val servicesFormWrite =
     Write[Service, String] {
-      case Residential => "01"
-      case Commercial => "02"
-      case Auction => "03"
-      case Relocation => "04"
+      case Residential      => "01"
+      case Commercial       => "02"
+      case Auction          => "03"
+      case Relocation       => "04"
       case BusinessTransfer => "05"
-      case AssetManagement => "06"
-      case LandManagement => "07"
-      case Development => "08"
-      case SocialHousing => "09"
+      case AssetManagement  => "06"
+      case LandManagement   => "07"
+      case Development      => "08"
+      case SocialHousing    => "09"
+      case Lettings         => "10"
     }
 
   implicit val jsonServiceReads: Reads[Service] =
@@ -103,20 +107,22 @@ object Service {
       case JsString("07") => JsSuccess(LandManagement)
       case JsString("08") => JsSuccess(Development)
       case JsString("09") => JsSuccess(SocialHousing)
+      case JsString("10") => JsSuccess(Lettings)
       case _ => JsError((JsPath \ "services") -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
 
   implicit val jsonServiceWrites =
     Writes[Service] {
-      case Residential => JsString("01")
-      case Commercial => JsString("02")
-      case Auction => JsString("03")
-      case Relocation => JsString("04")
+      case Residential      => JsString("01")
+      case Commercial       => JsString("02")
+      case Auction          => JsString("03")
+      case Relocation       => JsString("04")
       case BusinessTransfer => JsString("05")
-      case AssetManagement => JsString("06")
-      case LandManagement => JsString("07")
-      case Development => JsString("08")
-      case SocialHousing => JsString("09")
+      case AssetManagement  => JsString("06")
+      case LandManagement   => JsString("07")
+      case Development      => JsString("08")
+      case SocialHousing    => JsString("09")
+      case Lettings         => JsString("10")
     }
 }
 
@@ -139,4 +145,20 @@ object Services {
   }
 
   implicit val formats = Json.format[Services]
+
+  def conv(inbound: Seq[String]): Set[Service] = {
+
+    inbound.map {
+      case "residential"            => Residential
+      case "commercial"             => Commercial
+      case "auctioneering"          => Auction
+      case "relocation"             => Relocation
+      case "businessTransfer"       => BusinessTransfer
+      case "assetManagement"        => AssetManagement
+      case "landManagement"         => LandManagement
+      case "developmentCompany"     => Development
+      case "socialHousingProvision" => SocialHousing
+      case "lettings"               => Lettings
+    }.toSet
+  }
 }
