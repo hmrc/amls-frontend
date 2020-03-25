@@ -18,20 +18,22 @@ package controllers.eab
 
 import cats.implicits._
 import cats.data.OptionT
+import com.google.common.util.concurrent.Futures.FutureCombiner
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.eab.Eab
 import play.api.libs.json._
 import play.api.mvc.MessagesControllerComponents
-import services.ProxyCacheService
+import services.{ProxyCacheService, StatusService}
 import utils.AuthAction
 
 class EabController @Inject()(proxyCacheService  : ProxyCacheService,
                               authAction         : AuthAction,
                               val cacheConnector : DataCacheConnector,
                               val ds: CommonPlayDependencies,
-                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                              val cc: MessagesControllerComponents,
+                              val statusService: StatusService) extends AmlsBaseController(ds, cc) {
 
   def get(credId: String) = Action.async {
     implicit request => {
@@ -49,6 +51,15 @@ class EabController @Inject()(proxyCacheService  : ProxyCacheService,
         }
       }
     }
+  }
+
+  def isPreSubmission(amlsRefNo: Option[String],
+                      accountTypeId: (String, String),
+                      credId: String) = Action.async(parse.json) {
+    implicit request =>
+      statusService.isPreSubmission(amlsRefNo, accountTypeId, credId) map { isPreSub =>
+        Ok(Json.obj("isPreSubmission" -> isPreSub))
+      }
   }
 
   def accept = authAction.async {
