@@ -2242,3 +2242,8 @@ input.form-control-error[type="password"],
   border:0 !important;
   white-space:nowrap !important
 }
+
+.amls-notice-banner__wrapper{
+  padding-left:0;
+  padding-right:0;
+}
