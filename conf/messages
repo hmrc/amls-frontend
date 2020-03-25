@@ -252,7 +252,7 @@ error.required.ba.option.risk.assessment = Select yes if your business has a doc
 error.required.ba.risk.assessment.format = Select how you document your risk assessment policy and procedure
 error.required.ba.business.use.accountant = Select yes if your business receives professional advice on Money Laundering Regulations and due diligence
 error.required.ba.suspicious.activity = Select yes if you have written guidance on how to identify and report suspicious activity
-error.required.ba.tax.matters = Select yes if {0} manages your tax affairs with HMRC
+error.required.ba.tax.matters = Select yes if your adviser manages your tax affairs with HMRC
 
 error.required.ba.advisor.name = Enter your adviser’s name
 error.length.ba.advisor.name = Adviser’s name must be 140 characters or less
