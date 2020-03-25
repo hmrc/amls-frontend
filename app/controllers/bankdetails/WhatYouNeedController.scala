@@ -47,6 +47,6 @@ class WhatYouNeedController @Inject()(val authAction: AuthAction,
             }
           }
 
-        result getOrElse Ok(view(routes.HasBankAccountController.get()))
+        result.map(_.removingFromSession("itemIndex")) getOrElse Ok(view(routes.HasBankAccountController.get())).removingFromSession("itemIndex")
   }
 }

@@ -35,15 +35,14 @@ class withdraw_applicationSpec extends AmlsViewSpec with MockitoSugar {
 
   "The withdraw application view" must {
     "show the correct titles and headings" in new ViewFixture {
-      doc.title must be(s"${Messages("status.withdraw.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}")
-      heading.html must be(Messages("status.withdraw.title"))
+      doc.title must be(s"${Messages("status.withdraw.empty.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}")
+      heading.html must be(Messages("Withdraw your application for The Business"))
       subHeading.html must include(Messages("summary.status"))
     }
 
     "show the correct informational content" in new ViewFixture {
       validateParagraphizedContent("status.withdraw.body-content")
-
-      doc.body().html must include(Messages("status.withdraw.registration-date.label", DateHelper.formatDate(date)))
+      doc.text() must include("If you carry out activities covered by the Money Laundering Regulations, you need to be registered with an appropriate supervisory body.")
     }
   }
 }

@@ -38,12 +38,17 @@ class YourBankAccountsController @Inject()(val dataCacheConnector: DataCacheConn
         } yield bankDetails match {
           case Some(data) =>
             val filteredBankDetails = data.zipWithIndex.visibleAccounts.reverse
-
-            Ok(views.html.bankdetails.your_bank_accounts(
+            val result = Ok(views.html.bankdetails.your_bank_accounts(
               EmptyForm,
               filteredBankDetails.incompleteAccounts,
               filteredBankDetails.completeAccounts
             ))
+
+            if(filteredBankDetails.incompleteAccounts.isEmpty) {
+              result.removingFromSession("itemIndex")
+            } else {
+              result
+            }
 
           case _ => Redirect(controllers.routes.RegistrationProgressController.get())
         }

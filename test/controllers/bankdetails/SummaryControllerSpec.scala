@@ -24,7 +24,7 @@ import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -33,8 +33,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
 
     val ukAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456789", "111111")))
-    val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some( NonUKIBANNumber("DE89370400440532013000")))
-    val nonUkAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some( NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
+    val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some(NonUKIBANNumber("DE89370400440532013000")))
+    val nonUkAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
 
 
     val controller = new SummaryController(
@@ -127,6 +127,24 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
       verify(controller.dataCacheConnector).save[Seq[BankDetails]](any(), any(),
         meq(Seq(completeModel1, completeModel2)))(any(), any())
+    }
+    "remove the itemIndex from session if there was one present" in new Fixture {
+      override val request = addTokenWithSessionParam(authRequest)(("itemIndex" -> "4"))
+
+      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount), hasAccepted = true)
+      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
+
+      val completeModel1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount), hasAccepted = true)
+      val completeModel2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban), hasAccepted = true)
+
+      val bankAccounts = Seq(model1, model2)
+
+      mockCacheFetch[Seq[BankDetails]](Some(bankAccounts))
+      mockCacheSave[Seq[BankDetails]]
+      val result = controller.post(2)(request)
+
+      status(result) must be(SEE_OTHER)
+      session(result).get("itemIndex") mustBe None
     }
   }
 }
