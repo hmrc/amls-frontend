@@ -2246,4 +2246,6 @@ input.form-control-error[type="password"],
 .amls-notice-banner__wrapper{
   padding-left:0;
   padding-right:0;
+  padding-top:25px;
+  padding-bottom:25px;
 }
