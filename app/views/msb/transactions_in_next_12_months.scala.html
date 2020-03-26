@@ -35,9 +35,9 @@
     @form(f, controllers.msb.routes.TransactionsInNext12MonthsController.post(edit)) {
 
         @input(
-            attrMinMax = AttrMinMax(attrMin = "1"),
-            attrStep = "1",
-            attrType = "number",
+            attrType = "text",
+            attrPattern = "[0-9]*",
+            inputMode = "numeric",
             field = f("txnAmount"),
             heading = "msb.transactions.expected.title",
             section = "summary.msb"
