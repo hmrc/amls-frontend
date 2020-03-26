@@ -20,20 +20,30 @@ import cats.implicits._
 import cats.data.OptionT
 import com.google.common.util.concurrent.Futures.FutureCombiner
 import connectors.DataCacheConnector
+import controllers.estateagentbusiness.routes
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.eab.Eab
+import models.estateagentbusiness.{EstateAgentBusiness, Services}
 import play.api.libs.json._
 import play.api.mvc.MessagesControllerComponents
 import services.{ProxyCacheService, StatusService}
 import utils.AuthAction
+import models.businessmatching.{EstateAgentBusinessService => EAB}
+import models.status.SubmissionStatus
+import play.api.Logger
+import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.HeaderCarrierConverter
+import utils.DateOfChangeHelper
 
 class EabController @Inject()(proxyCacheService  : ProxyCacheService,
                               authAction         : AuthAction,
                               val cacheConnector : DataCacheConnector,
                               val ds: CommonPlayDependencies,
                               val cc: MessagesControllerComponents,
-                              val statusService: StatusService) extends AmlsBaseController(ds, cc) {
+                              val statusService: StatusService,
+                              val serviceFlow: ServiceFlow) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(credId: String) = Action.async {
     implicit request => {
@@ -53,13 +63,37 @@ class EabController @Inject()(proxyCacheService  : ProxyCacheService,
     }
   }
 
-  def isPreSubmission(amlsRefNo: Option[String],
-                      accountTypeId: (String, String),
-                      credId: String) = Action.async(parse.json) {
-    implicit request =>
-      statusService.isPreSubmission(amlsRefNo, accountTypeId, credId) map { isPreSub =>
-        Ok(Json.obj("isPreSubmission" -> isPreSub))
+  def requireDateOfChange(credId: String,
+                          isSubmitted: Boolean) = Action.async(parse.json) {
+
+    implicit request => {
+
+      val jsonObject: JsObject = request.body.as[JsObject]
+      val eabData = jsonObject.value("data").as[JsObject]
+      val newServices = Eab(eabData).conv.services.getOrElse(Services(Set()))
+
+      for {
+        currentEab <- cacheConnector.fetch[EstateAgentBusiness](credId, EstateAgentBusiness.key)
+        // status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+        isNewActivity <- serviceFlow.isNewActivity(credId, EAB)
+      } yield {
+
+        Logger.debug("requireDateOfChange:isSubmitted:" + isSubmitted)
+        Logger.debug("requireDateOfChange:oldServices:" + currentEab.services)
+        Logger.debug("requireDateOfChange:newServices:" + newServices)
+        Logger.debug("requireDateOfChange:!isNewActivity:" + !isNewActivity)
+
+        if (
+          !isNewActivity & redirectToDateOfChangeNew[Services](
+            isSubmitted, currentEab.services, newServices
+          )
+        ) {
+          Ok(Json.obj("requireDateOfChange" -> "true"))
+        } else {
+          Ok(Json.obj("requireDateOfChange" -> "false"))
+        }
       }
+    }
   }
 
   def accept = authAction.async {

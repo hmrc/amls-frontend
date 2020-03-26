@@ -52,6 +52,10 @@ trait DateOfChangeHelper {
     }
   }
 
+  def redirectToDateOfChangeNew[A](isSubmitted: Boolean, a: Option[A], b: A) = {
+    !a.contains(b) && isSubmitted
+  }
+
   def isEligibleForDateOfChange(status: SubmissionStatus): Boolean = {
     status match {
       case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) => true
