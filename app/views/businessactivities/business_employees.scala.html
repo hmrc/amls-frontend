@@ -38,15 +38,15 @@
     @form(f, controllers.businessactivities.routes.HowManyEmployeesController.post(edit)) {
 
         @input(
-            attrType = "number",
+            attrType = "text",
             attrPattern = "[0-9]*",
-            attrStep = "1",
             classes = Seq("form-control-1-4"),
             field = f("employeeCount"),
             heading = "businessactivities.employees.title",
             section = "summary.businessactivities",
             labelText = "businessactivities.employees.line1.label",
-            hintText = "businessactivities.employees.line1.hint"
+            hintText = "businessactivities.employees.line1.hint",
+            inputmode = "numeric"
         )
 
         @submit(edit)
