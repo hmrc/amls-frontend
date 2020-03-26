@@ -40,9 +40,9 @@
             field = f("txnAmount"),
             heading = "renewal.msb.transfers.header",
             section = "summary.renewal",
-            attrType = "number",
-            attrMinMax = AttrMinMax(attrMin = "1"),
-            attrStep = "1"
+            attrType = "text",
+            attrPattern = "[0-9]*",
+            inputMode = "numeric"
         )
 
         @submit(returnLocation = Some("renewal"))
