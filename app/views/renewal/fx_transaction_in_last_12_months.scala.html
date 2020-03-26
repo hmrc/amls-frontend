@@ -35,13 +35,13 @@
     @form(f, controllers.renewal.routes.FXTransactionsInLast12MonthsController.post(edit)) {
 
         @input(
-            attrMinMax = AttrMinMax(attrMin = "1"),
-            attrStep = "1",
-            attrType = "number",
+            attrType = "text",
             classes = Seq("form-control-1-4"),
             field = f("fxTransaction"),
             heading = "renewal.msb.fx.transactions.expected.title",
-            section = "summary.renewal"
+            section = "summary.renewal",
+            attrPattern = "[0-9]*",
+            inputMode = "numeric"
         )
 
         @submit(edit)
