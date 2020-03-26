@@ -1,0 +1,33 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@()(implicit m:Messages, lang:Lang)
+<div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
+    <div class="govuk-form-group">
+        <label class="govuk-label" for="with-hint">
+      Can you provide more detail?
+        </label>
+        <span id="with-hint-hint" class="govuk-hint">
+      Do not include personal or financial information like your National Insurance number or credit card details.
+        </span>
+        <textarea class="govuk-textarea govuk-js-character-count" id="with-hint" name="with-hint" rows="5" aria-describedby="with-hint-info with-hint-hint"></textarea>
+    </div>
+
+    <span id="with-hint-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+    You can enter up to 200 characters
+    </span>
+
+</div>
