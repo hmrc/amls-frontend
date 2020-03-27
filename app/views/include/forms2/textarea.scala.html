@@ -25,7 +25,6 @@
     classes: Seq[String] = Seq.empty,
     cols: String = "",
     rows: String = "",
-    maxLength: String = "",
     charCount: Int = 200,
     largeWidth: Boolean = false,
     heading: String = "",
@@ -78,7 +77,6 @@
             @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}" }
             @if(cols.nonEmpty) { cols="@cols" }
             @if(rows.nonEmpty) { rows="@rows" }
-            @if(maxLength.nonEmpty) { maxlength="@maxLength" }
             @if(largeWidth) { class="textarea--3-4" }
             >@field.value</textarea>
     </div>
