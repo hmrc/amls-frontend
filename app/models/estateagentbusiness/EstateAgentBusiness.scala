@@ -16,6 +16,9 @@
 
 package models.estateagentbusiness
 
+import java.time.LocalDate
+
+import models.DateOfChange
 import models.eab.Eab
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -116,7 +119,7 @@ object EstateAgentBusiness {
   def conv(inbound: Eab) = {
 
     EstateAgentBusiness(
-      services                      = Some(Services(Services.conv(inbound.services))),
+      services                      = Some(Services(Services.conv(inbound.services), DateOfChange.conv(inbound.dateOfChange))),
       redressScheme                 = RedressScheme.conv(inbound.redressScheme),
       professionalBody              = ProfessionalBody.conv(inbound.penalisedProfessionalBody, inbound.penalisedProfessionalBodyDetail),
       penalisedUnderEstateAgentsAct = PenalisedUnderEstateAgentsAct.conv(inbound.penalisedUnderEstateAgentsAct, inbound.penalisedUnderEstateAgentsAcDetail),

@@ -42,7 +42,6 @@ class EabController @Inject()(proxyCacheService  : ProxyCacheService,
                               val cacheConnector : DataCacheConnector,
                               val ds: CommonPlayDependencies,
                               val cc: MessagesControllerComponents,
-                              val statusService: StatusService,
                               val serviceFlow: ServiceFlow) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(credId: String) = Action.async {
