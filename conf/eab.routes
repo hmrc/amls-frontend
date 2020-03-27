@@ -1,3 +1,3 @@
-GET         /get/:credId                                                       @controllers.eab.EabController.get(credId: String)
-PUT         /set/:credId                                                       @controllers.eab.EabController.set(credId: String)
-POST        /require-date-change/:credId/:isSubmitted                           @controllers.eab.EabController.requireDateOfChange(credId: String, isSubmitted: Boolean)
+GET         /get/:credId                                        @controllers.eab.EabController.get(credId: String)
+PUT         /set/:credId                                        @controllers.eab.EabController.set(credId: String)
+POST        /require-date-change/:credId/:submissionStatus      @controllers.eab.EabController.requireDateOfChange(credId: String, submissionStatus: String)

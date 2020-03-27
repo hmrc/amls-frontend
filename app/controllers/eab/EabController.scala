@@ -30,7 +30,7 @@ import play.api.mvc.MessagesControllerComponents
 import services.{ProxyCacheService, StatusService}
 import utils.AuthAction
 import models.businessmatching.{EstateAgentBusinessService => EAB}
-import models.status.SubmissionStatus
+import models.status.{ReadyForRenewal, SubmissionStatus}
 import play.api.Logger
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
@@ -64,33 +64,32 @@ class EabController @Inject()(proxyCacheService  : ProxyCacheService,
   }
 
   def requireDateOfChange(credId: String,
-                          isSubmitted: Boolean) = Action.async(parse.json) {
+                          submissionStatus: String) = Action.async(parse.json) {
 
     implicit request => {
 
-      val jsonObject: JsObject = request.body.as[JsObject]
-      val eabData = jsonObject.value("data").as[JsObject]
-      val newServices = Eab(eabData).conv.services.getOrElse(Services(Set()))
+      def newEabServices = Eab(
+        request.body.as[JsObject].value("data").as[JsObject]
+      ).services
 
       for {
-        currentEab <- cacheConnector.fetch[EstateAgentBusiness](credId, EstateAgentBusiness.key)
-        // status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+        currentEab    <- cacheConnector.fetch[Eab](credId, Eab.key)
         isNewActivity <- serviceFlow.isNewActivity(credId, EAB)
       } yield {
 
-        Logger.debug("requireDateOfChange:isSubmitted:" + isSubmitted)
-        Logger.debug("requireDateOfChange:oldServices:" + currentEab.services)
-        Logger.debug("requireDateOfChange:newServices:" + newServices)
-        Logger.debug("requireDateOfChange:!isNewActivity:" + !isNewActivity)
+        def currentServices: Option[List[String]] = {
+          val services = currentEab.getOrElse(Eab(Json.obj())).services
 
-        if (
-          !isNewActivity & redirectToDateOfChangeNew[Services](
-            isSubmitted, currentEab.services, newServices
-          )
-        ) {
-          Ok(Json.obj("requireDateOfChange" -> "true"))
+          services.isEmpty match {
+            case true  => None
+            case false => Some(services)
+          }
+        }
+
+        if (!isNewActivity & dateOfChangApplicable(submissionStatus, currentServices, newEabServices)) {
+          Ok(Json.obj("requireDateOfChange" -> true))
         } else {
-          Ok(Json.obj("requireDateOfChange" -> "false"))
+          Ok(Json.obj("requireDateOfChange" -> false))
         }
       }
     }

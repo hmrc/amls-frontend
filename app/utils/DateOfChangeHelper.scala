@@ -52,19 +52,22 @@ trait DateOfChangeHelper {
     }
   }
 
-  def redirectToDateOfChangeNew[A](isSubmitted: Boolean, a: Option[A], b: A) = {
-    !a.contains(b) && isSubmitted
-  }
-
   def isEligibleForDateOfChange(status: SubmissionStatus): Boolean = {
     status match {
       case SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_) => true
       case _ => false
     }
   }
+  def isEligibleApplicationStatus(status: String): Boolean = {
+    status.contains("Approved")
+  }
 
   def redirectToDateOfChange[A](status: SubmissionStatus, a: Option[A], b: A) =
     !a.contains(b) && isEligibleForDateOfChange(status)
+
+  def dateOfChangApplicable[A](status: String, a: Option[A], b: A) = {
+    !a.contains(b) && isEligibleApplicationStatus(status)
+  }
 
   def startDateFormFields(startDate: Option[LocalDate], fieldName: String = "activityStartDate") = {
     startDate match {
