@@ -104,6 +104,10 @@ case class Eab(data: JsObject = Json.obj(),
     (data \ "eabServicesProvided").as[List[String]]
   }
 
+  def dateOfChange = {
+    get[String](Eab.dateOfChange)
+  }
+
   def redressScheme = {
     get[String](Eab.redressScheme)
   }
