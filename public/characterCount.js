@@ -1234,11 +1234,6 @@
 
     var nodeListForEach = common.nodeListForEach;
 
-    var $buttons = document.querySelectorAll('[data-module="govuk-button"]');
-    nodeListForEach($buttons, function ($button) {
-        new button($button).init();
-    });
-
     var $characterCounts = document.querySelectorAll('[data-module="govuk-character-count"]');
     nodeListForEach($characterCounts, function ($characterCount) {
         new characterCount($characterCount).init();

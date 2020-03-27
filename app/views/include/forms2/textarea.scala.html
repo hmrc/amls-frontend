@@ -26,7 +26,7 @@
     cols: String = "",
     rows: String = "",
     maxLength: String = "",
-    charCount: Boolean = false,
+    charCount: Int = 200,
     largeWidth: Boolean = false,
     heading: String = "",
     section: String = "",
@@ -63,7 +63,7 @@
     }
 }
 
-<div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
+<div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="@charCount">
     <div class="govuk-form-group">
         @label
         @if(hintText.nonEmpty) {
@@ -84,7 +84,7 @@
     </div>
 
     <span id="with-hint-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
-        You can enter up to 200 characters
+        You can enter up to @charCount characters
     </span>
 
 </div>
