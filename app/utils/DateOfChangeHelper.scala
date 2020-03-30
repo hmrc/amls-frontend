@@ -58,16 +58,16 @@ trait DateOfChangeHelper {
       case _ => false
     }
   }
-  def isEligibleApplicationStatus(status: String): Boolean = {
+
+  private def isEligibleApplicationStatus(status: String): Boolean = {
     status.contains("Approved")
   }
 
   def redirectToDateOfChange[A](status: SubmissionStatus, a: Option[A], b: A) =
     !a.contains(b) && isEligibleForDateOfChange(status)
 
-  def dateOfChangApplicable[A](status: String, a: Option[A], b: A) = {
+  def dateOfChangApplicable[A](status: String, a: Option[A], b: A) =
     !a.contains(b) && isEligibleApplicationStatus(status)
-  }
 
   def startDateFormFields(startDate: Option[LocalDate], fieldName: String = "activityStartDate") = {
     startDate match {
