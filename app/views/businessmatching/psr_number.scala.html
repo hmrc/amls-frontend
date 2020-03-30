@@ -43,15 +43,15 @@
         @if(edit && !isPreSubmission) {
             <input type="hidden" name="appliedFor" value=true />
             @input(
-                attrMaxlength = "6",
-                attrPattern = "[0-9]{1,6}",
-                attrType = "number",
+                attrPattern = "[0-9]*",
+                attrType = "text",
                 dataAttrs = digitsOnlyAttributes,
                 field = f("regNumber"),
                 heading = "businessmatching.psr.number.title",
                 section = section,
                 hintText = "businessmatching.psr.number.hint",
-                labelText = "businessmatching.psr.number.lbl"
+                labelText = "businessmatching.psr.number.lbl",
+                inputMode = "numeric"
             )
         } else {
             @fieldsetWithErrorGroup(
@@ -72,12 +72,11 @@
                     id = target
                 ) {
                     @input(
-                        attrMaxlength = "6",
-                        attrPattern = "[0-9]{1,6}",
-                        attrType = "number",
-                        dataAttrs = digitsOnlyAttributes,
+                        attrPattern = "[0-9]*",
+                        attrType = "text",
                         field = f("regNumber"),
-                        labelText = "businessmatching.psr.number.lbl"
+                        labelText = "businessmatching.psr.number.lbl",
+                        inputMode = "numeric"
                     )
                 }
                 @radio(

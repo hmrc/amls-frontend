@@ -51,11 +51,11 @@ s"""${f("utrNumber").id}-fieldset"""
                 field = Some(f("utrNumber-panel"))
             ) {
                 @input(
-                    attrMaxlength = "10",
-                    attrPattern = "[0-9]{1,10}",
+                    attrPattern = "[0-9]*",
                     field = f("utrNumber"),
                     hintText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber.hint",
-                    labelText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber"
+                    labelText = "responsiblepeople.registeredforselfassessment.lbl.utrnumber",
+                    inputMode = "numeric"
                 )
             }
             @radio(
