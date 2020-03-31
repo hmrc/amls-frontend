@@ -97,13 +97,9 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
     def filteredTradingPremises     = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
 
-    // EstateAgentBusiness models are needed for DES interactions. I.e. API 4, 5 and 6.
-    // This method takes this Eab model (used by EAB Frontend) and converts to EstateAgentBusiness for consumption by AMLS backend
-    def convertEstateAgentBusiness = cache.getEntry[Eab](Eab.key) //.map(eab => eab.conv)
-
     SubscriptionRequest(
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
-      eabSection = convertEstateAgentBusiness,
+      eabSection = cache.getEntry[Eab](Eab.key),
       tradingPremisesSection = filteredTradingPremises,
       businessDetailsSection = cache.getEntry[BusinessDetails](BusinessDetails.key),
       bankDetailsSection = bankDetailsExceptDeleted(cache.getEntry[Seq[BankDetails]](BankDetails.key)),
