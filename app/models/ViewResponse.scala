@@ -23,6 +23,7 @@ import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
+import models.eab.Eab
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
@@ -36,7 +37,7 @@ import play.api.libs.functional.syntax._
 case class ViewResponse(
                          etmpFormBundleNumber:String,
                          businessMatchingSection: BusinessMatching,
-                         eabSection: Option[EstateAgentBusiness],
+                         eabSection: Option[Eab],
                          tradingPremisesSection: Option[Seq[TradingPremises]],
                          businessDetailsSection: BusinessDetails,
                          bankDetailsSection: Seq[BankDetails],
@@ -60,7 +61,7 @@ object ViewResponse {
   def constructReads(
                  etmpFormBundleNumber:String,
                  businessMatchingSection: BusinessMatching,
-                 eabSection: Option[EstateAgentBusiness],
+                 eabSection: Option[Eab],
                  tradingPremisesSection: Option[Seq[TradingPremises]],
                  businessDetailsSection: Option[BusinessDetails],
                  oldBusinessDetailsSection: Option[BusinessDetails],
@@ -106,7 +107,7 @@ object ViewResponse {
   implicit val jsonReads: Reads[ViewResponse] = {
     (__ \ "etmpFormBundleNumber").read[String] and
       (__ \ "businessMatchingSection").read[BusinessMatching] and
-      (__ \ "eabSection").readNullable[EstateAgentBusiness] and
+      (__ \ "eabSection").readNullable[Eab] and
       (__ \ "tradingPremisesSection").readNullable[Seq[TradingPremises]] and
       (__ \ "businessDetailsSection").readNullable[BusinessDetails] and
       (__ \ "aboutTheBusinessSection").readNullable[BusinessDetails] and
