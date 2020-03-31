@@ -30,7 +30,6 @@ import models.businessdetails.BusinessDetails
 import models.businessmatching.{BusinessMatching, BusinessActivities => BMActivities}
 import models.declaration.AddPerson
 import models.eab.Eab
-import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.{Hvd, ReceiveCashPayments}
 import models.moneyservicebusiness.{MostTransactions => _, SendTheLargestAmountsOfMoney => _, WhichCurrencies => _, _}
 import models.renewal._
