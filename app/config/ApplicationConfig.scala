@@ -81,8 +81,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   def enrolmentStoreToggle = servicesConfig.getConfBool("feature-toggle.enrolment-store", false)
 
   def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
-
-  def phase3Release2La = servicesConfig.getConfBool("feature-toggle.phase3-release2-la", false)
   
   def publicMessageBannerToggle = servicesConfig.getConfBool("feature-toggle.public-message-banner", true)
 

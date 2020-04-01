@@ -22,7 +22,6 @@ import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
-import models.estateagentbusiness.EstateAgentBusiness
 import models.asp.Asp
 import models.eab.Eab
 import models.hvd.Hvd
