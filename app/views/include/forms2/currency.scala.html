@@ -40,10 +40,28 @@
         </span>
     }
 
-    <select name="@field.name" id="@field.id" class="@classes.mkString(" ")" data-auto-complete @if(field.hasErrors){data-invalid-value="@field.value"}>
-        <option value=""></option>
-        @models.currencies.map { currency =>
-            <option value="@currency" @if(field.value.contains(currency)) {selected} >@currency</option>
-        }
-    </select>
+    <div class="autocomplete-wrapper">
+        <select name="@field.name" id="@field.id" class="@classes.mkString(" ")" data-auto-complete-currency="true" @if(field.hasErrors){data-invalid-value="@field.value"}>
+            <option value=""></option>
+            @models.currencies.map { currency =>
+                <option value="@currency" @if(field.value.contains(currency)) {selected} >@currency</option>
+            }
+        </select>
+    </div>
 </div>
+
+<script src="@routes.Assets.versioned("autocomplete/accessible-autocomplete.min.js")"></script>
+
+<script type="text/javascript">
+        var selectEls = document.querySelectorAll('[id^="@field.id"]');
+        if(selectEls.length > 0) {
+            for (var i = 0; i < selectEls.length; i++) {
+                accessibleAutocomplete.enhanceSelectElement({
+                    autoselect: true,
+                    defaultValue: selectEls[i].options[selectEls[i].options.selectedIndex].innerHTML,
+                    minLength: 1,
+                    selectElement: selectEls[i]
+                });
+            }
+        }
+</script>
