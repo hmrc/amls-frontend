@@ -25,7 +25,6 @@ import models.amp.Amp
 import models.asp.Asp
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching, _}
-import models.estateagentbusiness.{EstateAgentBusiness}
 import models.eab.Eab
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.hvd.Hvd
@@ -74,12 +73,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
         case AccountancyServices =>
           dataCacheConnector.removeByKey[Asp](credId, Asp.key)
         case EstateAgentBusinessService =>
-          //TODO AMLS-5540 - Can be removed when feature toggle for new EAB service is removed.
-          if(appConfig.phase3Release2La) {
-            dataCacheConnector.removeByKey[EstateAgentBusiness](credId, EstateAgentBusiness.key)
-          } else {
-            dataCacheConnector.removeByKey[Eab](credId, Eab.key)
-          }
+          dataCacheConnector.removeByKey[Eab](credId, Eab.key)
         case _ =>
           dataCacheConnector.fetchAllWithDefault(credId)
       }

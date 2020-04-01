@@ -24,7 +24,6 @@ import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.eab.Eab
-import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePerson
