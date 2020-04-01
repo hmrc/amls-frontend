@@ -35,11 +35,27 @@
 @import config.{ ApplicationConfig}
 @import models.businessmatching._
 
-@(f: forms.Form2[_], edit: Boolean, businessMatching: BusinessMatching)(implicit   m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
+@(f: forms.Form2[_], edit: Boolean, businessMatching: BusinessMatching, businessTypes:Option[List[String]])(implicit   m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
+
+@errorPlaceholder = {
+    @businessTypes.map { types =>
+        @if(types.size == 1) {
+            @types.head
+        } else {
+            ""
+        }
+    }
+}
 
 @header = {
     @components.back_link()
-    @errorSummary(f)
+    @businessTypes.map { types =>
+        @if(types.size == 1) {
+            @errorSummaryWithPlaceholder(f, types.head)
+        } else {
+            @errorSummary(f)
+        }
+    }
 }
 
 @supportingContent = {
@@ -51,15 +67,13 @@
                     <li>@businessType</li>
                 }
             </ul>
-        } else {
-            <p>@Messages("businessactivities.confirm-activities.subtitle_2") @types.head @Messages("businessactivities.confirm-activities.subtitle_3")</p>
         }
     }
 }
 
-@headings = {
-    @businessMatching.alphabeticalBusinessActivitiesLowerCase(false).map { types =>
-        @if(types.size > 1) {
+@heading = {
+@businessTypes.map { types =>
+    @if(types.size > 1) {
             @Messages("businessactivities.turnover.heading.multiple")
         } else {
             @Messages("businessactivities.turnover.heading", types.head)
@@ -76,10 +90,11 @@
 
         @fieldsetWithErrorGroup(
             f = f("expectedAMLSTurnover"),
-            heading = headings.toString(),
+            heading = heading.toString(),
             section = "summary.businessactivities",
             panel = false,
-            supportingContent = supportingContent
+            supportingContent = supportingContent,
+            errorGroupPlaceholder = errorPlaceholder.toString()
         ) {
             @radio(
                 f = f("expectedAMLSTurnover"),

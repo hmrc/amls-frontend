@@ -503,7 +503,7 @@ error.required.supervision.reason = Enter the reason your previous supervision e
 error.supervision.end.reason.invalid.maxlength.255 = The reason your supervision ended must be 255 characters or less
 error.supervision.end.reason.invalid = The reason your supervision ended can include letters a to z, numbers, spaces and punctuation
 
-error.required.supervision.anotherbody = Select yes if your business has ever been registered with another supervising body for anti-money laundering supervision
+error.required.supervision.anotherbody = Select yes if your business has ever been registered with another supervisory body under the Money Laundering Regulations
 error.invalid.supervision.supervisor.length.140 = Name of previous supervising body must be 140 characters or less
 error.invalid.supervision.reason = You can’t enter more than 255 characters
 error.required.supervision.business.a.member = Select yes if your business is a member of a professional body
@@ -1033,8 +1033,8 @@ howtopay.para.7 = Bacs and card payments usually take 3 working days.
 
 ############################### Progress page ###############################
 progress.title = About your business
-progress.lede = You need to add information about your business to apply for supervision. 
-progress.saved.automatically = Information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application. 
+progress.lede = You need to add information about your business to register with HMRC under the Money Laundering Regulations.
+progress.saved.automatically = Information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application.
 progress.link.edit = Edit
 progress.link.continue = Continue
 progress.continue = Section incomplete
@@ -1396,7 +1396,7 @@ businessdetails.registeredoffice.title = Is your registered office in the UK?
 businessdetails.registeredoffice.address.lbl = Address
 businessdetails.registeredoffice.postcode.lbl = Postcode
 businessdetails.registeredoffice.country.lbl = Country
-businessdetails.activity.start.date.title = When did or will your business start activities that need to be registered for anti-money laundering supervision?
+businessdetails.activity.start.date.title = When did or will your business start activities that need to be registered under the Money Laundering Regulations?
 businessdetails.activity.start.date.text = If your business is already involved in these activities, give the date it started.
 businessdetails.lettersaddress.title = Is this the right address to send you letters about your supervision?
 
@@ -1615,7 +1615,7 @@ businessmatching.services.list.lbl.03 = Cheque cashing (all businesses except sc
 businessmatching.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 businessmatching.services.list.lbl.05 = Foreign exchange
 businessmatching.cannotcontinuewiththeapplication.title = You cannot continue with your application
-businessmatching.cannotcontinuewiththeapplication.requiredinfo.first = You need to have a Payment Services Regulations (PSR) reference number to apply for anti-money laundering supervision with HM Revenue and Customs (HMRC).
+businessmatching.cannotcontinuewiththeapplication.requiredinfo.first = You need to have a Payment Services Regulations (PSR) reference number to apply to register with HMRC under the Money Laundering Regulations.
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.second = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.third = The information you have given so far in this application has been saved. You have 28 days to return and complete your application.
 
@@ -1845,7 +1845,7 @@ businessactivities.confirm-activities.title = Is your business involved in any o
 businessactivities.confirm-activities.lbl.details = Describe the other activities your business is involved in
 businessactivities.renewal.confirm-activities.lbl.details = Describe the other activities your business was involved in
 businessactivities.confirm-activities.line1.text = Is your business involved in any other activities, which are not covered by Money Laundering Regulations?
-businessactivities.confirm-activities.subtitle = You have told us you’re registering the following services for anti-money laundering supervision:
+businessactivities.confirm-activities.subtitle = You’re registering the following services:
 businessactivities.confirm-activities.subtitle_2 = You’re registering
 businessactivities.confirm-activities.subtitle_3 = for anti-money laundering supervision.
 businessactivities.confirm-activities.subtitle_4 = You have told us your business is
@@ -2300,8 +2300,8 @@ tcsp.provided_services.service.lbl.07 = Conference room
 tcsp.provided_services.service.lbl.08 = Other
 tcsp.provided_services.service.lbl.details = Services your business provides
 
-tcsp.anothertcspsupervision.title = Is your trust or company service provider registered with HMRC for anti-money laundering supervision?
-tcsp.anothertcspsupervision.header = Is your trust or company service provider registered with HMRC for anti-money laundering supervision?
+tcsp.anothertcspsupervision.title = Is your trust or company service provider registered with HMRC under the Money Laundering Regulations?
+tcsp.anothertcspsupervision.header = Is your trust or company service provider registered with HMRC under the Money Laundering Regulations?
 
 #ASP
 asp.whatyouneed.subheading = In this section you’ll be asked:
@@ -2324,9 +2324,9 @@ supervision.whatyouneed.requiredinfo.text.1 = details of any previous supervisor
 supervision.whatyouneed.requiredinfo.text.2 = if your business is a member of any professional bodies
 supervision.whatyouneed.requiredinfo.text.3 = if your business has been penalised in the past
 
-supervision.another_body.title = Has your business ever been registered with another supervising body for anti-money laundering supervision? 
+supervision.another_body.title = Has your business ever been registered with another supervisory body under the Money Laundering Regulations?
 supervision.another_body.description = This only refers to registration for anti-money laundering supervision.
-supervision.another_body.lbl.supervisor = Name of your previous supervising body for anti-money laundering supervision
+supervision.another_body.lbl.supervisor = Name of your previous supervisory body
 supervision.another_body.startDate.lbl = Start date of supervision
 supervision.another_body.startDate.hint = For example, 31 03 2008.
 supervision.another_body.endDate.lbl = End date of supervision
@@ -2594,7 +2594,7 @@ renewal.progress.continue = Continue renewal
 renewal.progress.submit.intro = You have not completed your renewal.
 renewal.progress.ready.to.submit.intro = To submit your renewal you need to complete a declaration, and pay the fees.
 renewal.progress.complete.sections.incomplete = You can submit your renewal when you have completed all the sections.
-renewal.progress.information.completed.info = You’ve added information to renew your supervision, but have not submitted your renewal.
+renewal.progress.information.completed.info = You have completed the renewal questions but have not submitted your renewal.
 renewal.progress.information.not.completed.info.part1 = You need to add information about your business to
 renewal.progress.information.not.completed.info.part2 = renew your supervision
 renewal.progress.submit.completed.intro = You have completed the renewal questions.

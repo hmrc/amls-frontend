@@ -16,6 +16,7 @@
 
 package controllers.businessactivities
 
+import cats.data.OptionT
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
@@ -24,10 +25,13 @@ import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
 import models.businessmatching._
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
-import utils.AuthAction
+import uk.gov.hmrc.http.HeaderCarrier
+import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
+import cats.implicits._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCacheConnector,
                                                 val authAction: AuthAction,
@@ -46,20 +50,21 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
             (for {
               businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
               expectedTurnover <- businessActivities.expectedAMLSTurnover
-            } yield Ok(expected_amls_turnover(Form2[ExpectedAMLSTurnover](expectedTurnover), edit, businessMatching)))
-              .getOrElse (Ok(expected_amls_turnover(EmptyForm, edit, businessMatching)))
-          }) getOrElse Ok(expected_amls_turnover(EmptyForm, edit, None))
+            } yield Ok(expected_amls_turnover(Form2[ExpectedAMLSTurnover](expectedTurnover), edit, businessMatching, businessMatching.alphabeticalBusinessActivitiesLowerCase())))
+              .getOrElse (Ok(expected_amls_turnover(EmptyForm, edit, businessMatching, businessMatching.alphabeticalBusinessActivitiesLowerCase())))
+          }) getOrElse Ok(expected_amls_turnover(EmptyForm, edit, None, None))
       }
   }
 
   def post(edit: Boolean = false) = authAction.async {
     implicit request =>
-      Form2[ExpectedAMLSTurnover](request.body) match {
+      getErrorMessage(request.credId) flatMap { errorMsg =>
+      Form2[ExpectedAMLSTurnover](request.body)(ExpectedAMLSTurnover.formRuleWithErrorMsg(errorMsg)) match {
         case f: InvalidForm =>
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
           } yield {
-            BadRequest(expected_amls_turnover(f, edit, businessMatching))
+            BadRequest(expected_amls_turnover(f, edit, businessMatching, businessMatching.alphabeticalBusinessActivitiesLowerCase()))
           }
 
         case ValidForm(_, data) =>
@@ -73,5 +78,18 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
             case false => Redirect(routes.BusinessFranchiseController.get())
           }
       }
+      }
     }
+  private def getErrorMessage(credId: String)(implicit hc: HeaderCarrier) = {
+    (for {
+      businessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
+      activities <- OptionT.fromOption[Future](businessMatching.activities)
+    } yield {
+      if (activities.businessActivities.size == 1) {
+        "error.required.renewal.ba.turnover.from.mlr.single.service"
+      } else {
+        "error.required.renewal.ba.turnover.from.mlr"
+      }
+    }) getOrElse "error.required.renewal.ba.turnover.from.mlr"
+  }
 }
