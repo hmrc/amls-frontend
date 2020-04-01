@@ -50,8 +50,17 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
             (for {
               businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
               expectedTurnover <- businessActivities.expectedAMLSTurnover
-            } yield Ok(expected_amls_turnover(Form2[ExpectedAMLSTurnover](expectedTurnover), edit, businessMatching, businessMatching.alphabeticalBusinessActivitiesLowerCase())))
-              .getOrElse (Ok(expected_amls_turnover(EmptyForm, edit, businessMatching, businessMatching.alphabeticalBusinessActivitiesLowerCase())))
+            } yield Ok(expected_amls_turnover(
+              Form2[ExpectedAMLSTurnover](expectedTurnover),
+              edit,
+              businessMatching,
+              businessMatching.alphabeticalBusinessActivitiesLowerCase()
+            ))).getOrElse (Ok(expected_amls_turnover(
+              EmptyForm,
+              edit,
+              businessMatching,
+              businessMatching.alphabeticalBusinessActivitiesLowerCase()
+            )))
           }) getOrElse Ok(expected_amls_turnover(EmptyForm, edit, None, None))
       }
   }
