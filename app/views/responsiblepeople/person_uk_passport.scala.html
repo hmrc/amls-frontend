@@ -55,7 +55,9 @@
             @input(
                 field = f("ukPassportNumber"),
                 labelText = Messages("lbl.passport.number", personName),
-                hintText = "hint.9.digits"
+                hintText = "hint.9.digits",
+                inputMode = "numeric",
+                attrPattern = "[0-9]*"
             )
         }
         @radio(

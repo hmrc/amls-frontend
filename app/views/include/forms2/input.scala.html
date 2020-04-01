@@ -36,7 +36,8 @@
     data: String = "",
     dataAttrs: Map[String, String] = Map.empty[String, String],
     heading: String = "",
-    section: String = ""
+    section: String = "",
+    inputMode: String = ""
 )(implicit m: Messages, lang: Lang)
 
 @labelSpan = {
@@ -91,5 +92,6 @@
             @if(attrPattern.nonEmpty) { pattern="@attrPattern" }
             @if(attrStep.nonEmpty) { step="@attrStep" }
             @if(dataAttrs.nonEmpty) { @dataAttrs.toDataAttributes.mkString(" ") }
-        />
+            @if(inputMode.nonEmpty) { inputmode="@inputMode" }
+    />
 </div>
