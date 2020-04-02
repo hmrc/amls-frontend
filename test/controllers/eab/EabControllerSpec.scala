@@ -87,6 +87,8 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
     completeRedressScheme ++
     completeMoneyProtectionScheme
 
+  val noEabData = Json.obj()
+
   val completeEabJson = Json.obj(
     "data"           -> completeEabData,
     "hasChanged"     -> false,
@@ -99,8 +101,9 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
     "hasAccepted"    -> false
   )
 
-  val completeEabModel = Eab(completeEabData)
-  val updatedEabModel  = Eab(updatedEabData)
+  val completeEabModel    = Eab(completeEabData)
+  val updatedEabModel     = Eab(updatedEabData)
+  val noEabModel  = Eab(noEabData)
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -256,6 +259,27 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
       val document = Json.parse(contentAsString(result))
 
       document mustBe(Json.obj("requireDateOfChange" -> true))
+    }
+
+    "return false where is not new activity and no current EAB model and status is NotYetSubmitted" in new Fixture {
+      val postRequest = FakeRequest("POST", "/")
+        .withHeaders(CONTENT_TYPE -> "application/json")
+
+        .withBody[JsValue](completeEabJson)
+
+      val status = "NotYetSubmitted"
+
+      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
+
+      when(mockCacheConnector.fetch[Eab](any(), any())(any(), any())).thenReturn(
+        Future.successful(Some(noEabModel))
+      )
+
+      val result = controller.requireDateOfChange(credId, status)(postRequest)
+
+      val document = Json.parse(contentAsString(result))
+
+      document mustBe(Json.obj("requireDateOfChange" -> false))
     }
   }
 }

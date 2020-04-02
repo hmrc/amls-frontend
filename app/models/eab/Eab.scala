@@ -101,7 +101,7 @@ case class Eab(data: JsObject = Json.obj(),
   }
 
   def services = {
-    (data \ "eabServicesProvided").as[List[String]]
+    get[List[String]](Eab.eabServicesProvided)
   }
 
   def dateOfChange = {

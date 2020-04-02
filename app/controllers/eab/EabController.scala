@@ -67,9 +67,9 @@ class EabController @Inject()(proxyCacheService  : ProxyCacheService,
 
     implicit request => {
 
-      def newEabServices = Eab(
+      def newEabServices: List[String] = Eab(
         request.body.as[JsObject].value("data").as[JsObject]
-      ).services
+      ).services.getOrElse(List())
 
       for {
         currentEab    <- cacheConnector.fetch[Eab](credId, Eab.key)
@@ -77,12 +77,7 @@ class EabController @Inject()(proxyCacheService  : ProxyCacheService,
       } yield {
 
         def currentServices: Option[List[String]] = {
-          val services = currentEab.getOrElse(Eab(Json.obj())).services
-
-          services.isEmpty match {
-            case true  => None
-            case false => Some(services)
-          }
+          currentEab.getOrElse(Eab(Json.obj())).services
         }
 
         if (!isNewActivity & dateOfChangApplicable(submissionStatus, currentServices, newEabServices)) {
