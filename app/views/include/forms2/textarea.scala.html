@@ -62,7 +62,7 @@
     }
 }
 
-<div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="@charCount">
+<div class="govuk-character-count @if(field.hasErrors) {form-field--error}" data-module="govuk-character-count" data-maxlength="@charCount">
     <div class="govuk-form-group">
         @label
         @if(hintText.nonEmpty) {
@@ -73,7 +73,7 @@
                 <span class="visuallyhidden">Error: </span>@field.error
             </span>
         }
-        <textarea class="govuk-textarea govuk-js-character-count" id="with-hint" name="@field.name" id="@field.id"
+        <textarea class="govuk-textarea govuk-js-character-count" id="@field.name" name="@field.name" id="@field.id"
             @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}" }
             @if(cols.nonEmpty) { cols="@cols" }
             @if(rows.nonEmpty) { rows="@rows" }
@@ -81,7 +81,7 @@
             >@field.value</textarea>
     </div>
 
-    <span id="with-hint-info" class="form-hint govuk-character-count__message" aria-live="polite">
+    <span id="@{field.name}-info" class="form-hint govuk-character-count__message" aria-live="polite">
         You can enter up to @charCount characters
     </span>
 
