@@ -119,7 +119,7 @@ object EstateAgentBusiness {
   def conv(inbound: Eab) = {
 
     EstateAgentBusiness(
-      services                      = Some(Services(Services.conv(inbound.services), DateOfChange.conv(inbound.dateOfChange))),
+      services                      = Some(Services(Services.conv(inbound.services.getOrElse(Seq())), DateOfChange.conv(inbound.dateOfChange))),
       redressScheme                 = RedressScheme.conv(inbound.redressScheme),
       professionalBody              = ProfessionalBody.conv(inbound.penalisedProfessionalBody, inbound.penalisedProfessionalBodyDetail),
       penalisedUnderEstateAgentsAct = PenalisedUnderEstateAgentsAct.conv(inbound.penalisedUnderEstateAgentsAct, inbound.penalisedUnderEstateAgentsAcDetail),
