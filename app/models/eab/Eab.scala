@@ -101,7 +101,11 @@ case class Eab(data: JsObject = Json.obj(),
   }
 
   def services = {
-    (data \ "eabServicesProvided").as[List[String]]
+    get[List[String]](Eab.eabServicesProvided)
+  }
+
+  def dateOfChange = {
+    get[String](Eab.dateOfChange)
   }
 
   def redressScheme = {
@@ -142,6 +146,7 @@ case class Eab(data: JsObject = Json.obj(),
   lazy val appConfig = Play.current.injector.instanceOf[ApplicationConfig]
 
   val eabServicesProvided             = JsPath \ "eabServicesProvided"
+  val dateOfChange                    = JsPath \ "dateOfChange"
   val redressScheme                   = JsPath \ "redressScheme"
   val redressSchemeDetail             = JsPath \ "redressSchemeDetail"
   val clientMoneyProtectionScheme     = JsPath \ "clientMoneyProtectionScheme"
@@ -220,6 +225,7 @@ case class Eab(data: JsObject = Json.obj(),
     import play.api.libs.json.Reads._
 
     val oldModelTransformer:Reads[JsObject] = (servicesTransform and isRedressTransform and
+      (__ \ 'data ++ dateOfChange).json.copyFrom(readPathOrReturn(__ \ 'dateOfChange, JsNull)) and
       (__ \ 'data ++ penalisedEstateAgentsAct).json.copyFrom(readPathOrReturn(__ \ 'penalisedUnderEstateAgentsAct, JsNull)) and
       (__ \ 'data ++ penalisedEstateAgentsActDetail).json.copyFrom(readPathOrReturn( __ \ 'penalisedUnderEstateAgentsActDetails, JsNull)) and
       (__ \ 'data ++ penalisedProfessionalBody).json.copyFrom(readPathOrReturn(__ \ 'penalised, JsNull)) and
