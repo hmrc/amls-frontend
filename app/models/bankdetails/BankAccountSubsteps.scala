@@ -113,9 +113,8 @@ object Account {
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
       (
-        (__ \ "sortCode").read(sortCodeType) ~
-        (__ \ "accountNumber").read(ukBankAccountNumberType)
-
+        (__ \ "accountNumber").read(ukBankAccountNumberType) ~
+        (__ \ "sortCode").read(sortCodeType)
       ) (UKAccount.apply)
   }
 

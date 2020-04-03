@@ -145,7 +145,7 @@ class AccountSpec extends PlaySpec with MockitoSugar {
         "sortCode" -> Seq("000000")
       )
 
-      Account.ukFormRead.validate(urlFormEncoded) must be(Valid(UKAccount("000000", "12345678")))
+      Account.ukFormRead.validate(urlFormEncoded) must be(Valid(UKAccount("12345678", "000000")))
     }
 
     "displaySortCode" must {
@@ -300,7 +300,7 @@ class AccountSpec extends PlaySpec with MockitoSugar {
         "sortCode" -> Seq("000000")
       )
 
-      Account.ukFormRead.validate(urlFormEncoded) must be(Valid(UKAccount("000000", "12345678")))
+      Account.ukFormRead.validate(urlFormEncoded) must be(Valid(UKAccount("12345678", "000000")))
     }
 
     "Form Write validation for UKAccount" in {
