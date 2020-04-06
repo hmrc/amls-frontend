@@ -95,10 +95,10 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
       activities <- OptionT.fromOption[Future](businessMatching.activities)
     } yield {
       if (activities.businessActivities.size == 1) {
-        "error.required.renewal.ba.turnover.from.mlr.single.service"
+        "error.required.ba.turnover.from.mlr.single"
       } else {
-        "error.required.renewal.ba.turnover.from.mlr"
+        "error.required.ba.turnover.from.mlr"
       }
-    }) getOrElse "error.required.renewal.ba.turnover.from.mlr"
+    }) getOrElse "error.required.ba.turnover.from.mlr"
   }
 }

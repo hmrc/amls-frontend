@@ -230,6 +230,7 @@ error.invalid.ba.involved.in.other.text = Other activities must be 255 character
 error.invalid.characters.ba.involved.in.other.text = Other activities can include letters a to z, spaces, and most punctuation and special characters
 error.required.ba.business.turnover = Select how much total net profit your business expects in the next 12 months
 error.required.ba.turnover.from.mlr = Select how much total net profit your business expects in the next 12 months from the services you’re registering
+error.required.ba.turnover.from.mlr.single = Select how much total net profit your business expects in the next 12 months from {0} activities
 error.required.ba.is.your.franchise = Select yes if your business is a franchise
 error.required.ba.franchise.name = Enter franchisor’s name
 error.max.length.ba.franchise.name = Franchisor’s name must be 140 characters or less
