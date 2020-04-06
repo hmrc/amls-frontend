@@ -27,7 +27,7 @@ import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.BusinessDetails
 import models.businessmatching._
-import models.estateagentbusiness.{EstateAgentBusiness, OmbudsmanServices}
+import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Renewal
@@ -44,7 +44,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.mockito.MockitoSugar
-import play.api.libs.json.JsResultException
+import play.api.libs.json.{JsResultException, Json}
 import play.api.mvc.{BodyParsers, MessagesActionBuilder, Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -53,6 +53,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.businessmatching.services
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -158,7 +159,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       val testBankDetails = Seq(BankDetails(hasChanged = hasChanged))
       val testBusinessActivities = BusinessActivities(hasChanged = hasChanged)
       val testBusinessMatching = BusinessMatching(hasChanged = hasChanged)
-      val testEstateAgentBusiness = EstateAgentBusiness(hasChanged = hasChanged)
+      val testEstateAgentBusiness = Eab(hasChanged = hasChanged)
       val testMoneyServiceBusiness = MoneyServiceBusiness(hasChanged = hasChanged)
       val testResponsiblePeople = Seq(ResponsiblePerson(hasChanged = hasChanged))
       val testSupervision = Supervision(hasChanged = hasChanged)
@@ -173,7 +174,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       when(cacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any())).thenReturn(Some(testBankDetails))
       when(cacheMap.getEntry[BusinessActivities](BusinessActivities.key)).thenReturn(Some(testBusinessActivities))
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
-      when(cacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)).thenReturn(Some(testEstateAgentBusiness))
+      when(cacheMap.getEntry[Eab](Eab.key)).thenReturn(Some(testEstateAgentBusiness))
       when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)).thenReturn(Some(testMoneyServiceBusiness))
       when(cacheMap.getEntry[Supervision](Supervision.key)).thenReturn(Some(testSupervision))
       when(cacheMap.getEntry[Tcsp](Tcsp.key)).thenReturn(Some(testTcsp))
@@ -321,7 +322,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       val testBankDetails = Seq(BankDetails(hasChanged = hasChanged))
       val testBusinessActivities = BusinessActivities(hasChanged = hasChanged)
       val testBusinessMatching = BusinessMatching(hasChanged = hasChanged)
-      val testEstateAgentBusiness = EstateAgentBusiness(hasChanged = hasChanged)
+      val testEstateAgentBusiness = Eab(hasChanged = hasChanged)
       val testMoneyServiceBusiness = MoneyServiceBusiness(hasChanged = hasChanged)
       val testResponsiblePeople = Seq(ResponsiblePerson(hasChanged = hasChanged))
       val testSupervision = Supervision(hasChanged = hasChanged)
@@ -335,7 +336,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       when(cacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any())).thenReturn(Some(testBankDetails))
       when(cacheMap.getEntry[BusinessActivities](BusinessActivities.key)).thenReturn(Some(testBusinessActivities))
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
-      when(cacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)).thenReturn(Some(testEstateAgentBusiness))
+      when(cacheMap.getEntry[Eab](Eab.key)).thenReturn(Some(testEstateAgentBusiness))
       when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)).thenReturn(Some(testMoneyServiceBusiness))
       when(cacheMap.getEntry[Supervision](Supervision.key)).thenReturn(Some(testSupervision))
       when(cacheMap.getEntry[Tcsp](Tcsp.key)).thenReturn(Some(testTcsp))
@@ -433,14 +434,22 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
     "redirect to login event page" when {
       "redress scheme is invalid" in new FixtureNoAmlsNumber {
 
-        val eabOmbudsmanServices = EstateAgentBusiness(redressScheme = Some(OmbudsmanServices))
+        val completeRedressScheme = Json.obj(
+          "redressScheme" -> "ombudsmanServices",
+          "redressSchemeDetail" -> "null"
+        )
+
+        val completeData = completeRedressScheme
+
+        val eabOmbudsmanServices = Eab(completeData)
+
         val cacheMap: CacheMap = mock[CacheMap]
         val complete: BusinessMatching = mock[BusinessMatching]
 
         when(complete.isComplete) thenReturn true
         when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
         when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
-        when(cacheMap.getEntry[EstateAgentBusiness](meq(EstateAgentBusiness.key))(any())).thenReturn(Some(eabOmbudsmanServices))
+        when(cacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(Some(eabOmbudsmanServices))
         when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
 
@@ -544,7 +553,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             "there is an invalid redress scheme" should {
               "refresh from API5 and redirect to login events controller" in new Fixture {
 
-                val eabOther = EstateAgentBusiness(redressScheme = Some(models.estateagentbusiness.Other("Other")))
+                val eabOther = Eab(Json.obj())
 
                 val testCacheMap = buildTestCacheMap(
                   hasChanged = true,
@@ -559,7 +568,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
                   .thenReturn(Future.successful(NotCompleted, None))
 
-                when(testCacheMap.getEntry[EstateAgentBusiness](meq(EstateAgentBusiness.key))(any())).thenReturn(Some(eabOther))
+                when(testCacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(Some(eabOther))
 
                 val result = controller.get()(requestWithHeaders(("test-context" -> "ESCS")))
 
@@ -604,7 +613,15 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
             "there is an invalid redress scheme" should {
               "redirect to login events" in new Fixture {
-                val eabOmbudsmanServices = EstateAgentBusiness(redressScheme = Some(OmbudsmanServices))
+
+                val completeRedressScheme = Json.obj(
+                  "redressScheme" -> "ombudsmanServices",
+                  "redressSchemeDetail" -> "null"
+                )
+
+                val completeData = completeRedressScheme
+
+                val eabOmbudsmanServices = Eab(completeData)
 
                 val testCacheMap = buildTestCacheMap(
                   hasChanged = true,
@@ -622,7 +639,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
                   .thenReturn(Future.successful(NotCompleted, None))
 
-                when(testCacheMap.getEntry[EstateAgentBusiness](meq(EstateAgentBusiness.key))(any())).thenReturn(Some(eabOmbudsmanServices))
+                when(testCacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(Some(eabOmbudsmanServices))
 
                 val result = controller.get()(request)
 
@@ -733,7 +750,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           when(businessMatching.isComplete) thenReturn true
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(businessMatching))
           when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
-          when(cacheMap.getEntry[EstateAgentBusiness](meq(EstateAgentBusiness.key))(any())).thenReturn(None)
+          when(cacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(None)
           when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
             .thenReturn(Future.successful(NotCompleted, None))
 

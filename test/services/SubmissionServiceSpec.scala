@@ -30,7 +30,6 @@ import models.businessdetails.{BusinessDetails, RegisteredOfficeUK}
 import models.businessmatching.BusinessType.SoleProprietor
 import models.businessmatching._
 import models.eab.Eab
-import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal._

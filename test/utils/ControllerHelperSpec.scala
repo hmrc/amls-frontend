@@ -18,13 +18,14 @@ package utils
 
 import forms.InvalidForm
 import models.businessactivities._
-import models.estateagentbusiness.{EstateAgentBusiness, OmbudsmanServices, PropertyRedressScheme, ThePropertyOmbudsman}
+import models.eab.Eab
 import models.responsiblepeople._
 import models.supervision._
 import org.joda.time.LocalDate
 import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.Json
 
 import scala.collection.immutable.ListMap
 
@@ -47,10 +48,32 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
     )
   }
 
-  val eabPropertyOmbudsman =  EstateAgentBusiness(redressScheme = Some(ThePropertyOmbudsman))
-  val eabPropertyRedress =  EstateAgentBusiness(redressScheme = Some(PropertyRedressScheme))
-  val eabOmbudsmanServices = EstateAgentBusiness(redressScheme = Some(OmbudsmanServices))
-  val eabOther = EstateAgentBusiness(redressScheme = Some(models.estateagentbusiness.Other("Other")))
+  val completeRedressScheme = Json.obj(
+    "redressScheme" -> "propertyOmbudsman",
+    "redressSchemeDetail" -> "null"
+  )
+
+  val completeData = completeRedressScheme
+  val eabPropertyOmbudsman = Eab(completeData,  hasAccepted = true)
+
+  val completeRedressSchemePropertyRedress = Json.obj(
+    "redressScheme" -> "propertyRedressScheme",
+    "redressSchemeDetail" -> "null"
+  )
+
+  val completeDataPropertyRedress = completeRedressSchemePropertyRedress
+  val eabPropertyRedress = Eab(completeDataPropertyRedress,  hasAccepted = true)
+
+  val completeRedressSchemeOmbudsmanServices = Json.obj(
+    "redressScheme" -> "propertyRedressScheme",
+    "redressSchemeDetail" -> "null"
+  )
+
+  val completeDataOmbudsmanServices = completeRedressSchemeOmbudsmanServices
+  val eabOmbudsmanServices = Eab(completeDataOmbudsmanServices,  hasAccepted = true)
+
+  val completeDataOther = Json.obj()
+  val eabOther = Eab(completeDataOther,  hasAccepted = true)
 
   val accountantNameCompleteModel = Some(BusinessActivities(
     whoIsYourAccountant = Some(WhoIsYourAccountant(
