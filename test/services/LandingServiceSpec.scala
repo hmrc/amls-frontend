@@ -29,7 +29,7 @@ import models.businessdetails.{BusinessDetails, CorrespondenceAddress, Correspon
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
-import models.estateagentbusiness.{Auction, EstateAgentBusiness, Residential, Services}
+import models.eab.Eab
 import models.hvd._
 import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions, SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
 import models.renewal.{CashPayments => RCashPayments, MoneySources => RMoneySources, PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, WhichCurrencies => RenWhichCurrencies, _}
@@ -70,7 +70,43 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     hasAccepted = true
   )
 
-  val eabSection = Some(EstateAgentBusiness(Some(Services(Set(Auction, Residential))), None, None, None))
+  //val eabSection = Some(EstateAgentBusiness(Some(Services(Set(Auction, Residential))), None, None, None))
+  val completeServiceList = Seq("auctioneering", "residential")
+
+  val completeServices = Json.obj("eabServicesProvided" -> completeServiceList )
+
+  val completeDateOfChange = Json.obj(
+    "dateOfChange" -> "2019-01-01"
+  )
+
+  val completeEstateAgencyActPenalty = Json.obj(
+    "penalisedEstateAgentsAct" -> true,
+    "penalisedEstateAgentsActDetail" -> "details"
+  )
+
+  val completePenalisedProfessionalBody = Json.obj(
+    "penalisedProfessionalBody" -> true,
+    "penalisedProfessionalBodyDetail" -> "details"
+  )
+
+  val completeRedressScheme = Json.obj(
+    "redressScheme" -> "propertyRedressScheme",
+    "redressSchemeDetail" -> "null"
+  )
+
+  val completeMoneyProtectionScheme = Json.obj(
+    "clientMoneyProtectionScheme" -> true
+  )
+
+  val completeData = completeServices ++
+    completeDateOfChange ++
+    completeEstateAgencyActPenalty ++
+    completePenalisedProfessionalBody ++
+    completeRedressScheme ++
+    completeMoneyProtectionScheme
+
+  val eabSection = Eab(completeData,  hasAccepted = true)
+
   val tcspTypes = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc))
   val tcspSection = Some(Tcsp(Some(tcspTypes)))
   val aspSection = Some(Asp(Some(ServicesOfBusiness(Set(BookKeeping, Accountancy))), None))
@@ -148,7 +184,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
       businessMatchingSection = BusinessMatching(),
-      eabSection = eabSection,
+      eabSection = Some(eabSection),
       tradingPremisesSection = None,
       businessDetailsSection = None,
       bankDetailsSection = Seq(None),
@@ -217,7 +253,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
       businessMatchingSection = BusinessMatching(),
-      eabSection = eabSection,
+      eabSection = Some(eabSection),
       tradingPremisesSection = None,
       businessDetailsSection = None,
       bankDetailsSection = Seq(None),
@@ -269,8 +305,8 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         eqTo(Some(viewResponse)))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessMatching.key),
         eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any())
-      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(EstateAgentBusiness.key),
-        eqTo(Some(viewResponse.eabSection.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Eab.key),
+        eqTo(Some(viewResponse.eabSection.map(eab => eab.copy(hasAccepted = true)))))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(TradingPremises.key),
         eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessDetails.key),
@@ -358,7 +394,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         eqTo(Some(viewResponse)))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessMatching.key),
         eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any())
-      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(EstateAgentBusiness.key),
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Eab.key),
         eqTo(None))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(TradingPremises.key),
         eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any())
@@ -443,7 +479,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
       businessMatchingSection = BusinessMatching(hasAccepted = true),
-      eabSection = eabSection,
+      eabSection = Some(eabSection),
       tradingPremisesSection = None,
       businessDetailsSection = None,
       bankDetailsSection = Seq(None),
@@ -491,8 +527,8 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         eqTo(Some(viewResponse)))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessMatching.key),
         eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any())
-      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(EstateAgentBusiness.key),
-        eqTo(Some(viewResponse.eabSection.copy(hasAccepted = true))))(any(), any())
+      verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Eab.key),
+        eqTo(Some(viewResponse.eabSection.map(eab => eab.copy(hasAccepted = true)))))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(TradingPremises.key),
         eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessDetails.key),

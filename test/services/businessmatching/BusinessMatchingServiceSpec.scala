@@ -26,7 +26,7 @@ import models.businessdetails.BusinessDetails
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
-import models.estateagentbusiness.{EstateAgentBusiness => Eab}
+import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.status.SubmissionDecisionApproved
