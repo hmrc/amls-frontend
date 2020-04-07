@@ -36,16 +36,21 @@
 
     @form(f, controllers.supervision.routes.SupervisionEndReasonsController.post(edit)) {
 
+        @fieldset(
+            f = f("field"),
+            heading = "supervision.supervision_end_reasons.title",
+            section = "summary.supervision",
+            panel = false
+        ) {
             @textarea(
                 field = f("endingReason"),
-                bold = false,
                 largeWidth = true,
+                bold = false,
                 cols = "30",
-                rows = "8",
-                heading = "supervision.supervision_end_reasons.title",
-                section = "summary.supervision",
+                rows = "6",
                 charCount = 255
             )
+        }
 
         @submit(edit)
     }
