@@ -70,7 +70,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     hasAccepted = true
   )
 
-  //val eabSection = Some(EstateAgentBusiness(Some(Services(Set(Auction, Residential))), None, None, None))
   val completeServiceList = Seq("auctioneering", "residential")
 
   val completeServices = Json.obj("eabServicesProvided" -> completeServiceList )
@@ -306,7 +305,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessMatching.key),
         eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Eab.key),
-        eqTo(Some(viewResponse.eabSection.map(eab => eab.copy(hasAccepted = true)))))(any(), any())
+        eqTo(viewResponse.eabSection.map(eab => eab.copy(hasAccepted = true))))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(TradingPremises.key),
         eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessDetails.key),
@@ -528,7 +527,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessMatching.key),
         eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(Eab.key),
-        eqTo(Some(viewResponse.eabSection.map(eab => eab.copy(hasAccepted = true)))))(any(), any())
+        eqTo(viewResponse.eabSection.map(eab => eab.copy(hasAccepted = true))))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(TradingPremises.key),
         eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any())
       verify(service.cacheConnector).upsertNewAuth(any(), eqTo(BusinessDetails.key),

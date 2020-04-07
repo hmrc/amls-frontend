@@ -553,7 +553,10 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             "there is an invalid redress scheme" should {
               "refresh from API5 and redirect to login events controller" in new Fixture {
 
-                val eabOther = Eab(Json.obj())
+                val completeRedressSchemeOther = Json.obj(
+                  "redressScheme" -> "other"
+                )
+                val eabOther = Eab(completeRedressSchemeOther,  hasAccepted = true)
 
                 val testCacheMap = buildTestCacheMap(
                   hasChanged = true,

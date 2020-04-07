@@ -49,31 +49,26 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
   }
 
   val completeRedressScheme = Json.obj(
-    "redressScheme" -> "propertyOmbudsman",
-    "redressSchemeDetail" -> "null"
+    "redressScheme" -> "propertyOmbudsman"
   )
-
-  val completeData = completeRedressScheme
-  val eabPropertyOmbudsman = Eab(completeData,  hasAccepted = true)
+  val eabPropertyOmbudsman = Eab(completeRedressScheme,  hasAccepted = true)
 
   val completeRedressSchemePropertyRedress = Json.obj(
-    "redressScheme" -> "propertyRedressScheme",
-    "redressSchemeDetail" -> "null"
+    "redressScheme" -> "propertyRedressScheme"
   )
-
-  val completeDataPropertyRedress = completeRedressSchemePropertyRedress
-  val eabPropertyRedress = Eab(completeDataPropertyRedress,  hasAccepted = true)
+  val eabPropertyRedress = Eab(completeRedressSchemePropertyRedress,  hasAccepted = true)
 
   val completeRedressSchemeOmbudsmanServices = Json.obj(
-    "redressScheme" -> "propertyRedressScheme",
-    "redressSchemeDetail" -> "null"
+    "redressScheme" -> "ombudsmanServices"
   )
+  val eabOmbudsmanServices = Eab(completeRedressSchemeOmbudsmanServices,  hasAccepted = true)
 
-  val completeDataOmbudsmanServices = completeRedressSchemeOmbudsmanServices
-  val eabOmbudsmanServices = Eab(completeDataOmbudsmanServices,  hasAccepted = true)
+  val completeRedressSchemeOther = Json.obj(
+    "redressScheme" -> "other"
+  )
+  val eabOther = Eab(completeRedressSchemeOther,  hasAccepted = true)
 
-  val completeDataOther = Json.obj()
-  val eabOther = Eab(completeDataOther,  hasAccepted = true)
+  val eabNoRedress = Eab(Json.obj(),  hasAccepted = true)
 
   val accountantNameCompleteModel = Some(BusinessActivities(
     whoIsYourAccountant = Some(WhoIsYourAccountant(
@@ -115,8 +110,13 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
     "hasInvalidRedressScheme" must {
 
       "return false" when {
+
         "eab is None" in {
           ControllerHelper.hasInvalidRedressScheme(None) mustEqual false
+        }
+
+        "when no redress scheme" in {
+          ControllerHelper.hasInvalidRedressScheme(Some(eabNoRedress)) mustEqual false
         }
 
         "when 'PropertyOmbudsman' is selected" in {
@@ -126,10 +126,10 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
         "when 'PropertyRedressScheme' is selected" in {
           ControllerHelper.hasInvalidRedressScheme(Some(eabPropertyRedress)) mustEqual false
         }
-
       }
 
       "return true" when {
+
         "when 'OmbudsmanServices' is selected" in {
           ControllerHelper.hasInvalidRedressScheme(Some(eabOmbudsmanServices)) mustEqual true
         }
