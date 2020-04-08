@@ -476,9 +476,9 @@ error.required.enter.addresslinefour.charcount = Address line 4 must be 35 chara
 ############################### Trust and company service providers ###############################
 
 error.required.tcsp.provided_services.services = Select which services your business provides
-error.required.tcsp.provided_services.details = Enter the services your business provides
-error.required.tcsp.provided_services.details.length = Services must be 255 characters or less
-error.required.tcsp.provided_services.details.punctuation = Services can include letters a to z, numbers, spaces and punctuation
+error.required.tcsp.provided_services.details = Enter the service your business provides
+error.required.tcsp.provided_services.details.length = Service your business provides must be 255 characters or less
+error.required.tcsp.provided_services.details.punctuation = Service can include letters a to z, numbers, spaces and punctuation
 
 error.required.tcsp.service.providers = Select the type of trust or company service provider you are
 error.required.tcsp.off.the.shelf.companies = Select yes if you only sell off-the-shelf companies
@@ -2297,8 +2297,8 @@ tcsp.provided_services.service.lbl.04 = Self-collect mailboxes
 tcsp.provided_services.service.lbl.05 = Mail forwarding
 tcsp.provided_services.service.lbl.06 = Receptionist
 tcsp.provided_services.service.lbl.07 = Conference room
-tcsp.provided_services.service.lbl.08 = Other
-tcsp.provided_services.service.lbl.details = Services your business provides
+tcsp.provided_services.service.lbl.08 = Another service
+tcsp.provided_services.service.lbl.details = Service your business provides
 
 tcsp.anothertcspsupervision.title = Is your trust or company service provider registered with HMRC for anti-money laundering supervision?
 tcsp.anothertcspsupervision.header = Is your trust or company service provider registered with HMRC for anti-money laundering supervision?
@@ -2364,8 +2364,8 @@ supervision.memberofprofessionalbody.lbl.10 = Institute of Chartered Accountants
 supervision.memberofprofessionalbody.lbl.11 = Institute of Financial Accountants
 supervision.memberofprofessionalbody.lbl.12 = International Association of Bookkeepers
 supervision.memberofprofessionalbody.lbl.13 = Law Society
-supervision.memberofprofessionalbody.lbl.14 = Other
-supervision.memberofprofessionalbody.lbl.15 = Name of professional body you’re a member of
+supervision.memberofprofessionalbody.lbl.14 = Another professional body
+supervision.memberofprofessionalbody.lbl.15 = Name of the professional body you’re a member of
 
 supervision.whichprofessionalbody.title = Which professional bodies are you a member of?
 
@@ -2472,7 +2472,7 @@ hvd.products.option.08 = Gold
 hvd.products.option.09 = Scrap metals
 hvd.products.option.10 = Mobile phones
 hvd.products.option.11 = Clothing
-hvd.products.option.12 = Other
+hvd.products.option.12 = Other things
 
 hvd.identify.linked.cash.payment.title = Are you able to automatically identify linked cash payments that come to €10,000 or more?
 hvd.identify.linked.cash.payments.subtitle = If you do not use euros you’ll need to convert the amount to the currency you use.
@@ -2636,11 +2636,11 @@ renewal.receiving.list.line2 = any single cash payment
 renewal.receiving.list.line3 = several related cash payments, including payment plans, payments on account, and deposits
 
 renewal.cash.payments.received.title = How did you receive cash payments from customers you have not met in person?
-renewal.cash.payments.received.text = You’ve told us you received cash payments of €10,000 or more in the last 12 months.
+renewal.cash.payments.received.text = You have told us you received cash payments of €10,000 or more in the last 12 months.
 renewal.cash.payments.received.lbl1 = By courier
 renewal.cash.payments.received.lbl2 = Directly into a bank account
-renewal.cash.payments.received.lbl3 = Other
-renewal.cash.payments.received.lbl3.hint = Describe how you received cash payments from customers you have not met in person
+renewal.cash.payments.received.lbl3 = Another way
+renewal.cash.payments.received.lbl3.hint = Add how you received cash payments from customers you have not met in person
 
 renewal.msb.throughput.header = What was your total throughput in the last 12 months?
 renewal.msb.throughput.info = Throughput is the total value of money you transfer, currency you exchange, and cheques you cash.
