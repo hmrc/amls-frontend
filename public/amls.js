@@ -28,6 +28,8 @@ $(window).load(function () {
           e.preventDefault();
           history.go(-1); // go(-1) needed for mobile browsers!
         })
+
+        GOVUK.shimLinksWithButtonRole.init();
 })
 
 $(function () {
