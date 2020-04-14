@@ -63,45 +63,34 @@ class ConfirmationController @Inject()(authAction: AuthAction,
         } yield result
   }
 
-  private def showRenewalConfirmation(fees: FeeResponse, breakdownRows: Future[Option[Seq[BreakdownRow]]],
-                                      status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus], credId: String)
+  private def showRenewalConfirmation(fees: FeeResponse, status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus], credId: String)
                                      (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
 
-    confirmationService.isRenewalDefined(credId) flatMap { isRenewalDefined =>
-      breakdownRows map {
-        case maybeRows@Some(rows) if fees.toPay(status, submissionRequestStatus) > 0 =>
+    confirmationService.isRenewalDefined(credId) map { isRenewalDefined =>
           if (isRenewalDefined) {
             Ok(confirm_renewal(fees.paymentReference,
               fees.totalFees,
-              rows,
               fees.toPay(status, submissionRequestStatus),
               controllers.payments.routes.WaysToPayController.get().url,
-              submissionRequestStatus.fold[Boolean](false)(_.isRenewalAmendment.getOrElse(false)))).some
+              submissionRequestStatus.fold[Boolean](false)(_.isRenewalAmendment.getOrElse(false))))
           } else {
             Ok(confirm_amendvariation(fees.paymentReference,
               fees.totalFees,
               fees.toPay(status, submissionRequestStatus),
-              maybeRows,
-              controllers.payments.routes.WaysToPayController.get().url)).some
+              controllers.payments.routes.WaysToPayController.get().url))
           }
-        case _ => None
-      }
     }
   }
 
-  private def showAmendmentVariationConfirmation(fees: FeeResponse, breakdownRows: Future[Option[Seq[BreakdownRow]]],
-                                                 status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus])
+  private def showAmendmentVariationConfirmation(fees: FeeResponse, status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus])
                                                 (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
 
-    breakdownRows map { maybeRows =>
       val amount = fees.toPay(status, submissionRequestStatus)
 
-      Ok(confirm_amendvariation(fees.paymentReference,
+      Future.successful(Ok(confirm_amendvariation(fees.paymentReference,
         Currency(fees.totalFees),
         amount,
-        maybeRows,
-        controllers.payments.routes.WaysToPayController.get().url)).some
-    }
+        controllers.payments.routes.WaysToPayController.get().url)))
   }
 
   private def resultFromStatus(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus],
@@ -112,12 +101,11 @@ class ConfirmationController @Inject()(authAction: AuthAction,
     Logger.debug(s"[$prefix][resultFromStatus] - Begin get fee response...)")
     // $COVERAGE-ON$
 
-    OptionT.liftF(feeHelper.retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier, prefix)) flatMap {
+    feeHelper.retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier, prefix) flatMap {
       case Some(fees) if fees.paymentReference.isDefined && fees.toPay(status, submissionRequestStatus) > 0 =>
         // $COVERAGE-OFF$
         Logger.debug(s"[$prefix][resultFromStatus] - Fee found)")
         // $COVERAGE-ON$
-        lazy val breakdownRows = confirmationService.getBreakdownRows(credId, status, fees)
 
         // $COVERAGE-OFF$
         Logger.debug(s"[$prefix][resultFromStatus] - fees: $fees")
@@ -125,12 +113,11 @@ class ConfirmationController @Inject()(authAction: AuthAction,
 
         status match {
           case SubmissionReadyForReview | SubmissionDecisionApproved if fees.responseType equals AmendOrVariationResponseType =>
-            OptionT(showAmendmentVariationConfirmation(fees, breakdownRows, status, submissionRequestStatus))
+            showAmendmentVariationConfirmation(fees, status, submissionRequestStatus)
           case ReadyForRenewal(_) | RenewalSubmitted(_) =>
-            OptionT(showRenewalConfirmation(fees, breakdownRows, status, submissionRequestStatus, credId))
-          case _ =>
-            OptionT.liftF(breakdownRows) map { maybeRows =>
-              Ok(confirmation_new(fees.paymentReference, fees.totalFees, maybeRows, controllers.payments.routes.WaysToPayController.get().url))
+            showRenewalConfirmation(fees, status, submissionRequestStatus, credId)
+          case _ => {
+              Future.successful(Ok(confirmation_new(fees.paymentReference, fees.totalFees, controllers.payments.routes.WaysToPayController.get().url)))
             }
         }
 
@@ -139,9 +126,10 @@ class ConfirmationController @Inject()(authAction: AuthAction,
         Logger.debug(s"[$prefix][resultFromStatus] - No fee found)")
         // $COVERAGE-ON$
         for {
-          name <- BusinessName.getBusinessNameFromAmls(amlsRegistrationNumber, accountTypeId, credId)
+          name <- BusinessName.getBusinessNameFromAmls(amlsRegistrationNumber, accountTypeId, credId).value
       } yield {
-        Ok(confirmation_no_fee(name))}
-    } getOrElse InternalServerError("Could not determine a response")
+        Ok(confirmation_no_fee(name.get))
+        }
+    } //getOrElse InternalServerError("Could not determine a response")
   }
 }
