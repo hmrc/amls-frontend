@@ -21,6 +21,8 @@
     hint: String = "",
     legendHidden: Boolean = false,
     heading: String = "",
+    heading2: Boolean = false,
+    heading2Message: String = "",
     fieldId: String = "",
     supportingContent: Html = play.twirl.api.HtmlFormat.empty
 )(implicit m: Messages)
@@ -31,9 +33,13 @@
         }
         @if(legend.nonEmpty) {
             <legend>
-                <span class="form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}">
+                @if(heading2){
+                    <h2 class="heading-medium" >@Messages(heading2Message)</h2>
+                } else {
+                    <span class="form-label@if(bold) {-bold} @if(legendHidden) { visuallyhidden}">
                     @Messages(legend)
-                </span>
+                    </span>
+                }
             </legend>
         }
 
