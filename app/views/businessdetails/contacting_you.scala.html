@@ -25,7 +25,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessdetails.contactingyou.email.title", "summary.businessdetails")
 }
 
 @main(
@@ -41,8 +40,8 @@
 
         @fieldset(
             f = f("contactingyou-fieldset"),
-            legend = "businessdetails.contactingyou.email.title",
-            legendHidden = true,
+            heading = "businessdetails.contactingyou.email.title",
+            section = "summary.businessdetails",
             panel = false
         ) {
             @input(

@@ -35,19 +35,17 @@
     @form(f, controllers.tradingpremises.routes.AgentCompanyDetailsController.post(index,edit)) {
 
         @fieldset(
-            legend = "tradingpremises.youragent.company.details.title",
-            legendHidden = true,
+            heading = "tradingpremises.youragent.company.details.title",
+            section = "summary.tradingpremises",
             panel = false,
             classes = Seq("inline"),
             f = f(s"""${f("agentCompanyName").id}-fieldset""")
         ) {
-
             @input(
                 field = f("agentCompanyName"),
                 labelText = "tradingpremises.youragent.company.name",
                 hintText = "tradingpremises.agentcompanyname.lbl.hint"
             )
-
             @input(
                 attrMaxlength = "8",
                 attrPattern = "^[a-zA-Z0-9]{1,8}$",

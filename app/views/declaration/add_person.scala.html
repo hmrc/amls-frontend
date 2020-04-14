@@ -44,7 +44,9 @@
                 panel = false,
                 f = f("declaration-addperson"),
                 legend = "declaration.addperson.title",
-                legendHidden = true
+                legendHidden = true,
+                heading2 = true,
+                heading2Message = "declaration.addperson.h2"
             ) {
                 @input(
                     field = f("firstName"),
@@ -64,14 +66,14 @@
             }
         </div>
 
-        <p class="form-hint">@Messages("lbl.select.all")</p>
-
         @businessType.map{ bt =>
             @roles_within_business(
                 f,
                 businessType = bt,
                 displayNominatedOfficer = true,
-                isDeclaration = true
+                isDeclaration = true,
+                declarationPage = true,
+                hint = "lbl.select.all"
             )
         }
 
