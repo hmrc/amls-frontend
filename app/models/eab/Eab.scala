@@ -25,8 +25,8 @@ import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class Eab(data: JsObject = Json.obj(),
-                     hasChanged: Boolean = false,
-                     hasAccepted: Boolean = false) {
+               hasChanged: Boolean = false,
+               hasAccepted: Boolean = false) {
 
   /**
     * Provides a means of setting data that will update the hasChanged flag
@@ -47,11 +47,11 @@ case class Eab(data: JsObject = Json.obj(),
 
   def isComplete: Boolean =
     isServicesComplete &&
-    isRedressSchemeComplete &&
-    isProtectionSchemeComplete &&
-    isEstateAgentActPenaltyComplete &&
-    isProfessionalBodyPenaltyComplete &&
-    hasAccepted
+      isRedressSchemeComplete &&
+      isProtectionSchemeComplete &&
+      isEstateAgentActPenaltyComplete &&
+      isProfessionalBodyPenaltyComplete &&
+      hasAccepted
 
   private[eab] def isServicesComplete: Boolean = (data \ "eabServicesProvided").as[List[String]].nonEmpty
 
@@ -104,7 +104,7 @@ case class Eab(data: JsObject = Json.obj(),
   }
 }
 
-  object Eab {
+object Eab {
 
   lazy val appConfig = Play.current.injector.instanceOf[ApplicationConfig]
 
@@ -196,10 +196,10 @@ case class Eab(data: JsObject = Json.obj(),
       (__ \ 'data ++ clientMoneyProtectionScheme).json.copyFrom(readPathOrReturn(__ \ 'clientMoneyProtection,JsNull)) and
       (__ \ 'hasAccepted).json.copyFrom((__ \ 'hasAccepted).json.pick) and
       (__ \ 'hasChanged).json.copyFrom((__ \ 'hasChanged).json.pick)
-    ) reduce
+      ) reduce
 
     val jsonReads = (
-        (__ \ "data").read[JsObject] and
+      (__ \ "data").read[JsObject] and
         (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
         (__ \ "hasAccepted" ).readNullable[Boolean].map(_.getOrElse(false))
       )(Eab.apply _)
@@ -212,12 +212,10 @@ case class Eab(data: JsObject = Json.obj(),
     import play.api.libs.functional.syntax._
     (
       (__ \ "data").write[JsObject] and
-      (__ \ "hasChanged").write[Boolean] and
-      (__ \ "hasAccepted").write[Boolean]
-    ) (unlift(Eab.unapply))
+        (__ \ "hasChanged").write[Boolean] and
+        (__ \ "hasAccepted").write[Boolean]
+      ) (unlift(Eab.unapply))
   }
 
   implicit val formatOption = Reads.optionWithNull[Eab]
 }
-
-

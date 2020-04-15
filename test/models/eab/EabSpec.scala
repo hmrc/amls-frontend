@@ -170,13 +170,13 @@ class EabSpec extends AmlsSpec {
     "data are complete" must {
       val completeOldEab = (
         oldServices ++
-        oldDateOfChange ++
-        oldRedressScheme ++
-        oldProfessionalBody ++
-        oldEstateAct ++
-        oldClientProtection ++ Json.obj(
-        "hasChanged" -> true,
-        "hasAccepted" -> true)).as[Eab]
+          oldDateOfChange ++
+          oldRedressScheme ++
+          oldProfessionalBody ++
+          oldEstateAct ++
+          oldClientProtection ++ Json.obj(
+          "hasChanged" -> true,
+          "hasAccepted" -> true)).as[Eab]
 
       checkIsComplete(completeOldEab)
     }
@@ -197,10 +197,10 @@ class EabSpec extends AmlsSpec {
     "data are incomplete" must {
       val incompleteOldEab = (
         oldServices ++
-        oldRedressScheme ++
-        Json.obj(
-        "hasChanged" -> false,
-        "hasAccepted" -> false)).as[Eab]
+          oldRedressScheme ++
+          Json.obj(
+            "hasChanged" -> false,
+            "hasAccepted" -> false)).as[Eab]
 
       checkIsComplete(incompleteOldEab,
         isEstateAgentActPenaltyComplete = false,
