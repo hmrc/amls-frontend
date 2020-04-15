@@ -16,7 +16,6 @@
 
 package models.eab
 import models.DateOfChange
-import models.DateOfChange
 import org.joda.time.LocalDate
 import play.api.libs.json._
 import utils.AmlsSpec

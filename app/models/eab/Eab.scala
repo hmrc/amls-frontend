@@ -102,6 +102,7 @@ case class Eab(data: JsObject = Json.obj(),
   def services = {
     get[List[String]](Eab.eabServicesProvided)
   }
+
 }
 
 object Eab {
