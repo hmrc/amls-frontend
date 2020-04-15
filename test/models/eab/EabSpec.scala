@@ -15,7 +15,6 @@
  */
 
 package models.eab
-
 import models.DateOfChange
 import org.joda.time.LocalDate
 import play.api.libs.json._
@@ -79,14 +78,9 @@ class EabSpec extends AmlsSpec {
     "eabServicesProvided" -> completeServiceList.filter(s => !s.equals("lettings"))
   )
 
-  val completeDateOfChange = Json.obj(
-    "dateOfChange" -> "2019-01-01"
-  )
-
   "A constructed Eab model" when {
     "data are complete" must {
       val completeData = completeServices ++
-        completeDateOfChange ++
         completeEstateAgencyActPenalty ++
         completePenalisedProfessionalBody ++
         completeRedressScheme ++
@@ -147,8 +141,6 @@ class EabSpec extends AmlsSpec {
 
     val oldServices = Json.obj("services" -> Json.arr("08", "03", "07", "02", "05", "01", "06", "09", "04" ))
 
-    val oldDateOfChange = Json.obj("dateOfChange" -> "2002-02-02")
-
     val oldProfessionalBody = Json.obj(
       "penalised" -> true,
       "professionalBody" -> "test10")
@@ -170,7 +162,6 @@ class EabSpec extends AmlsSpec {
     "data are complete" must {
       val completeOldEab = (
         oldServices ++
-        oldDateOfChange ++
         oldRedressScheme ++
         oldProfessionalBody ++
         oldEstateAct ++
@@ -184,7 +175,6 @@ class EabSpec extends AmlsSpec {
     "data are complete no redress" must {
       val completeOldEab = (
         oldServices ++
-          oldDateOfChange ++
           oldRedressSchemeNoRedress ++
           oldProfessionalBody ++
           oldEstateAct ++ Json.obj(
