@@ -18,31 +18,20 @@ package controllers.eab
 
 import cats.implicits._
 import cats.data.OptionT
-import com.google.common.util.concurrent.Futures.FutureCombiner
 import connectors.DataCacheConnector
-import controllers.estateagentbusiness.routes
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.eab.Eab
-import models.estateagentbusiness.{EstateAgentBusiness, Services}
 import play.api.libs.json._
 import play.api.mvc.MessagesControllerComponents
-import services.{ProxyCacheService, StatusService}
+import services.ProxyCacheService
 import utils.AuthAction
-import models.businessmatching.{EstateAgentBusinessService => EAB}
-import models.status.{ReadyForRenewal, SubmissionStatus}
-import play.api.Logger
-import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
-import utils.DateOfChangeHelper
 
 class EabController @Inject()(proxyCacheService  : ProxyCacheService,
                               authAction         : AuthAction,
                               val cacheConnector : DataCacheConnector,
                               val ds: CommonPlayDependencies,
-                              val cc: MessagesControllerComponents,
-                              val serviceFlow: ServiceFlow) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(credId: String) = Action.async {
     implicit request => {
@@ -57,33 +46,6 @@ class EabController @Inject()(proxyCacheService  : ProxyCacheService,
       proxyCacheService.setEab(credId, request.body).map {
         _ => {
           Ok(Json.obj("_id" -> credId))
-        }
-      }
-    }
-  }
-
-  def requireDateOfChange(credId: String,
-                          submissionStatus: String) = Action.async(parse.json) {
-
-    implicit request => {
-
-      def newEabServices: List[String] = Eab(
-        request.body.as[JsObject].value("data").as[JsObject]
-      ).services.getOrElse(List())
-
-      for {
-        currentEab    <- cacheConnector.fetch[Eab](credId, Eab.key)
-        isNewActivity <- serviceFlow.isNewActivity(credId, EAB)
-      } yield {
-
-        def currentServices: Option[List[String]] = {
-          currentEab.getOrElse(Eab(Json.obj())).services
-        }
-
-        if (!isNewActivity & dateOfChangApplicable(submissionStatus, currentServices, newEabServices)) {
-          Ok(Json.obj("requireDateOfChange" -> true))
-        } else {
-          Ok(Json.obj("requireDateOfChange" -> false))
         }
       }
     }
