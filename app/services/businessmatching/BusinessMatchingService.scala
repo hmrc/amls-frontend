@@ -89,9 +89,9 @@ class BusinessMatchingService @Inject()(
     case EstateAgentBusinessService =>
       //TODO AMLS-5540 - Can be removed when feature toggle for new EAB service is removed.
       if(appConfig.phase3Release2La) {
-        dataCacheConnector.removeByKey[EstateAgentBusiness](credId, EstateAgentBusiness.key)
-      } else {
         dataCacheConnector.removeByKey[Eab](credId, Eab.key)
+      } else {
+        dataCacheConnector.removeByKey[EstateAgentBusiness](credId, EstateAgentBusiness.key)
       }
     case HighValueDealing =>
       dataCacheConnector.removeByKey[Hvd](credId, Hvd.key)
