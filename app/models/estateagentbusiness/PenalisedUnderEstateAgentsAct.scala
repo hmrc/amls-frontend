@@ -69,13 +69,4 @@ object PenalisedUnderEstateAgentsAct {
     case PenalisedUnderEstateAgentsActNo => Json.obj("penalisedUnderEstateAgentsAct" -> false)
   }
 
-  def conv(inboundAns: Option[Boolean], inboundDetail: Option[String]): Option[PenalisedUnderEstateAgentsAct] = {
-
-    inboundAns match {
-      case Some(true)  => Some(PenalisedUnderEstateAgentsActYes(inboundDetail.getOrElse("")))
-      case Some(false) => Some(PenalisedUnderEstateAgentsActNo)
-      case _           => None
-    }
-  }
-
 }

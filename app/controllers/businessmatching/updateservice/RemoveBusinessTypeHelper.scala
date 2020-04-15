@@ -75,7 +75,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
           dataCacheConnector.removeByKey[Asp](credId, Asp.key)
         case EstateAgentBusinessService =>
           //TODO AMLS-5540 - Can be removed when feature toggle for new EAB service is removed.
-          if(appConfig.phase3Release2La) {
+          if(appConfig.standAloneEABService) {
             dataCacheConnector.removeByKey[EstateAgentBusiness](credId, EstateAgentBusiness.key)
           } else {
             dataCacheConnector.removeByKey[Eab](credId, Eab.key)
