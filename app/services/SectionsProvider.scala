@@ -75,7 +75,7 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
 
   //TODO AMLS-5540 - can be removed when the feature toggle is removed.
   private def toggleEAB(implicit cache: CacheMap) = {
-    if (config.phase3Release2La) {
+    if (config.standAloneEABService) {
       Seq(Eab.section)
     } else {
       Seq(EstateAgentBusiness.section)

@@ -82,7 +82,6 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       Some(ThePropertyOmbudsman),
       Some(EABProfessionalBodyNo),
       Some(PenalisedUnderEstateAgentsActNo),
-      None,
       false,
       false)
 

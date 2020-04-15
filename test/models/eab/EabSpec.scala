@@ -16,7 +16,6 @@
 
 package models.eab
 
-import models.estateagentbusiness._
 import play.api.libs.json._
 import utils.AmlsSpec
 
@@ -105,38 +104,6 @@ class EabSpec extends AmlsSpec {
       }
 
       checkIsComplete(constructedEab)
-
-      // EstateAgentBusiness models are needed for DES interactions. I.e. API 4, 5 and 6.
-      "builds AMLS back end submission EstateAgentBusiness Model correctly" in {
-
-        val converted = EstateAgentBusiness(
-          Some(
-            Services(
-              Set(
-                Residential,
-                Commercial,
-                SocialHousing,
-                BusinessTransfer,
-                Development,
-                AssetManagement,
-                LandManagement,
-                Auction,
-                Lettings,
-                Relocation
-              ),
-              None
-            )
-          ),
-          Some(PropertyRedressScheme),
-          Some(ProfessionalBodyYes("details")),
-          Some(PenalisedUnderEstateAgentsActYes("details")),
-          Some(ClientMoneyProtectionSchemeYes),
-          false,
-          false
-        )
-
-        constructedEab.conv mustBe converted
-      }
     }
 
     "data are incomplete" must {
@@ -188,16 +155,12 @@ class EabSpec extends AmlsSpec {
     val oldRedressSchemeNoRedress = Json.obj(
       "isRedress" -> false)
 
-    val oldClientProtection = Json.obj(
-      "clientMoneyProtection" -> false)
-
     "data are complete" must {
       val completeOldEab = (
         oldServices ++
         oldRedressScheme ++
         oldProfessionalBody ++
-        oldEstateAct ++
-        oldClientProtection ++ Json.obj(
+        oldEstateAct ++ Json.obj(
         "hasChanged" -> true,
         "hasAccepted" -> true)).as[Eab]
 
