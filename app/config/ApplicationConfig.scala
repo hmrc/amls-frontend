@@ -31,7 +31,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   }
 
   private def getConfigString(key: String) = servicesConfig.getConfString(key, throw new Exception(s"Could not find config '$key'"))
-  private def getConfigInt(key: String)    = servicesConfig.getConfInt(key, throw new Exception(s"Could not find config '$key'"))
+  private def getConfigInt(key: String) = servicesConfig.getConfInt(key, throw new Exception(s"Could not find config '$key'"))
 
   val contactFormServiceIdentifier = "AMLS"
 
@@ -81,7 +81,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   def enrolmentStoreToggle = servicesConfig.getConfBool("feature-toggle.enrolment-store", false)
 
   def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
-  
+
   def publicMessageBannerToggle = servicesConfig.getConfBool("feature-toggle.public-message-banner", true)
 
   lazy val authUrl = baseUrl("auth")
