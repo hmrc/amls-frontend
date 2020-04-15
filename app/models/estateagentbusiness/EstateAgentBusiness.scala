@@ -16,15 +16,16 @@
 
 package models.estateagentbusiness
 
+import models.eab.Eab
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import config.ApplicationConfig
 
 case class EstateAgentBusiness(
                                 services: Option[Services] = None,
                                 redressScheme: Option[RedressScheme] = None,
                                 professionalBody: Option[ProfessionalBody] = None,
                                 penalisedUnderEstateAgentsAct: Option[PenalisedUnderEstateAgentsAct] = None,
+                                clientMoneyProtectionScheme: Option[ClientMoneyProtectionScheme] = None,
                                 hasChanged : Boolean = false,
                                 hasAccepted : Boolean = false
                               ) {
@@ -53,8 +54,8 @@ case class EstateAgentBusiness(
 
   def isComplete: Boolean =
     this match {
-      case EstateAgentBusiness(Some(x), _, Some(_), Some(_), _, accepted) if !x.services.contains(Residential) => accepted
-      case EstateAgentBusiness(Some(_), Some(_), Some(_), Some(_), _, accepted) if isCompleteRedress => accepted
+      case EstateAgentBusiness(Some(x), _, Some(_), Some(_), _,_, accepted) if !x.services.contains(Residential) => accepted
+      case EstateAgentBusiness(Some(_), Some(_), Some(_), Some(_), _,_, accepted) if isCompleteRedress => accepted
       case _ => false
     }
 }
@@ -85,6 +86,7 @@ object EstateAgentBusiness {
       __.read(Reads.optionNoError[RedressScheme]) and
       __.read(Reads.optionNoError[ProfessionalBody]) and
       __.read(Reads.optionNoError[PenalisedUnderEstateAgentsAct]) and
+      __.read(Reads.optionNoError[ClientMoneyProtectionScheme]) and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
       (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
     ) (EstateAgentBusiness.apply _)
@@ -96,7 +98,8 @@ object EstateAgentBusiness {
           Json.toJson(model.services).asOpt[JsObject],
           Json.toJson(model.redressScheme).asOpt[JsObject],
           Json.toJson(model.professionalBody).asOpt[JsObject],
-          Json.toJson(model.penalisedUnderEstateAgentsAct).asOpt[JsObject]
+          Json.toJson(model.penalisedUnderEstateAgentsAct).asOpt[JsObject],
+          Json.toJson(model.clientMoneyProtectionScheme).asOpt[JsObject]
         ).flatten.fold(Json.obj()) {
           _ ++ _
         } + ("hasChanged" -> JsBoolean(model.hasChanged)) + ("hasAccepted" -> JsBoolean(model.hasAccepted))
@@ -106,4 +109,18 @@ object EstateAgentBusiness {
 
   implicit def default(aboutYou: Option[EstateAgentBusiness]): EstateAgentBusiness =
     aboutYou.getOrElse(EstateAgentBusiness())
+
+  // EstateAgentBusiness models are needed for DES interactions. I.e. API 4, 5 and 6.
+  // This method takes the Eab model (used by EAB Frontend) and converts to EstateAgentBusiness for
+  // back end (AMLS) DES interactions.
+  def conv(inbound: Eab) = {
+
+    EstateAgentBusiness(
+      services                      = Some(Services(Services.conv(inbound.services))),
+      redressScheme                 = RedressScheme.conv(inbound.redressScheme),
+      professionalBody              = ProfessionalBody.conv(inbound.penalisedProfessionalBody, inbound.penalisedProfessionalBodyDetail),
+      penalisedUnderEstateAgentsAct = PenalisedUnderEstateAgentsAct.conv(inbound.penalisedUnderEstateAgentsAct, inbound.penalisedUnderEstateAgentsAcDetail),
+      clientMoneyProtectionScheme   = ClientMoneyProtectionScheme.conv(inbound.clientMoneyProtectionScheme)
+    )
+  }
 }
