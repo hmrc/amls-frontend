@@ -16,138 +16,16 @@
 
 package services
 
-import cats.data.OptionT
-import cats.implicits._
-import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
-import models.ResponseType.AmendOrVariationResponseType
-import models._
-import models.businessmatching.BusinessMatching
-import models.confirmation.BreakdownRow
 import models.renewal.Renewal
-import models.responsiblepeople.ResponsiblePerson
-import models.status._
-import models.tradingpremises.TradingPremises
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ConfirmationService @Inject()(val cacheConnector: DataCacheConnector) extends DataCacheService {
 
-//  def getSubscription(credId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Seq[BreakdownRow]] = {
-//
-//    cacheConnector.fetchAll(credId) flatMap {
-//      maybeCache =>
-//        (for {
-//          cache <- maybeCache
-//          subscription <- cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
-//          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-//          people <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-//          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-//          businessActivities <- businessMatching.activities
-//        } yield {
-//          Future.successful(
-//            BreakdownRows.generateBreakdownRows[SubmissionResponse](
-//              subscription,
-//              Some(businessActivities),
-//              Some(premises),
-//              Some(people)
-//            )
-//          )
-//        }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
-//    }
-//  }
-//
-//  def getAmendment(credId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Option[Seq[BreakdownRow]]] = {
-//
-//    cacheConnector.fetchAll(credId) flatMap {
-//      maybeCache =>
-//        (for {
-//          cache <- maybeCache
-//          amendmentResponse <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
-//          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-//          people <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-//          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-//          businessActivities <- businessMatching.activities
-//        } yield {
-//          val filteredPremises = TradingPremises.filter(premises)
-//          Future.successful(
-//            Some(
-//              BreakdownRows.generateBreakdownRows[SubmissionResponse](
-//                amendmentResponse,
-//                Some(businessActivities),
-//                Some(filteredPremises),
-//                Some(people)
-//              )
-//            )
-//          )
-//        }) getOrElse OptionT.liftF(getSubscription(credId)).value
-//    }
-//  }
-//
-//  def getVariation(credId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Option[Seq[BreakdownRow]]] = {
-//    cacheConnector.fetchAll(credId) flatMap {
-//      maybeCache =>
-//        (for {
-//          cache <- maybeCache
-//          variationResponse <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
-//          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-//          businessActivities <- businessMatching.activities
-//        } yield {
-//          Future.successful(
-//            Some(
-//              BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](
-//                variationResponse,
-//                Some(businessActivities),
-//                None,
-//                None
-//              )
-//            )
-//          )
-//        }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
-//    }
-//  }
-//
-//  def getRenewal(credId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Option[Seq[BreakdownRow]]] = {
-//
-//    cacheConnector.fetchAll(credId) flatMap {
-//      maybeCache =>
-//        (for {
-//          cache <- maybeCache
-//          renewal <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
-//          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-//          businessActivities <- businessMatching.activities
-//        } yield {
-//          Future.successful(
-//            Some(
-//              BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](
-//                renewal,
-//                Some(businessActivities),
-//                None,
-//                None
-//              )
-//            )
-//          )
-//        }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
-//    }
-//  }
-//
   def isRenewalDefined(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
     cacheConnector.fetch[Renewal](credId, Renewal.key).map(_.isDefined)
-
-//  def getBreakdownRows(credId: String, status: SubmissionStatus, feeResponse: FeeResponse)
-//                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Seq[BreakdownRow]]] =
-//    (status match {
-//      case SubmissionReadyForReview if feeResponse.responseType equals AmendOrVariationResponseType => getAmendment(credId)
-//      case SubmissionDecisionApproved => getVariation(credId)
-//      case ReadyForRenewal(_) | RenewalSubmitted(_) => isRenewalDefined(credId) flatMap {
-//        case true => getRenewal(credId)
-//        case false => getVariation(credId)
-//      }
-//      case _ => getSubscription(credId) map (Some(_))
-//    }).recover({
-//      case _ => None
-//    })
-
 }
