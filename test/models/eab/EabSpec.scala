@@ -15,7 +15,13 @@
  */
 
 package models.eab
+<<<<<<< HEAD
 import models.DateOfChange
+=======
+
+import models.DateOfChange
+import models.estateagentbusiness._
+>>>>>>> 8a0d53f1f... Re introduce PR 1405
 import org.joda.time.LocalDate
 import play.api.libs.json._
 import utils.AmlsSpec
@@ -78,9 +84,14 @@ class EabSpec extends AmlsSpec {
     "eabServicesProvided" -> completeServiceList.filter(s => !s.equals("lettings"))
   )
 
+  val completeDateOfChange = Json.obj(
+    "dateOfChange" -> "2019-01-01"
+  )
+
   "A constructed Eab model" when {
     "data are complete" must {
       val completeData = completeServices ++
+        completeDateOfChange ++
         completeEstateAgencyActPenalty ++
         completePenalisedProfessionalBody ++
         completeRedressScheme ++
@@ -105,6 +116,41 @@ class EabSpec extends AmlsSpec {
       }
 
       checkIsComplete(constructedEab)
+<<<<<<< HEAD
+=======
+
+      // EstateAgentBusiness models are needed for DES interactions. I.e. API 4, 5 and 6.
+      "builds AMLS back end submission EstateAgentBusiness Model correctly" in {
+
+        val converted = EstateAgentBusiness(
+          Some(
+            Services(
+              Set(
+                Residential,
+                Commercial,
+                SocialHousing,
+                BusinessTransfer,
+                Development,
+                AssetManagement,
+                LandManagement,
+                Auction,
+                Lettings,
+                Relocation
+              ),
+              Some(DateOfChange(new LocalDate(2019, 1, 1)))
+            )
+          ),
+          Some(PropertyRedressScheme),
+          Some(ProfessionalBodyYes("details")),
+          Some(PenalisedUnderEstateAgentsActYes("details")),
+          Some(ClientMoneyProtectionSchemeYes),
+          false,
+          false
+        )
+
+        constructedEab.conv mustBe converted
+      }
+>>>>>>> 8a0d53f1f... Re introduce PR 1405
     }
 
     "data are incomplete" must {
@@ -141,6 +187,8 @@ class EabSpec extends AmlsSpec {
 
     val oldServices = Json.obj("services" -> Json.arr("08", "03", "07", "02", "05", "01", "06", "09", "04" ))
 
+    val oldDateOfChange = Json.obj("dateOfChange" -> "2002-02-02")
+
     val oldProfessionalBody = Json.obj(
       "penalised" -> true,
       "professionalBody" -> "test10")
@@ -162,12 +210,13 @@ class EabSpec extends AmlsSpec {
     "data are complete" must {
       val completeOldEab = (
         oldServices ++
-        oldRedressScheme ++
-        oldProfessionalBody ++
-        oldEstateAct ++
-        oldClientProtection ++ Json.obj(
-        "hasChanged" -> true,
-        "hasAccepted" -> true)).as[Eab]
+          oldDateOfChange ++
+          oldRedressScheme ++
+          oldProfessionalBody ++
+          oldEstateAct ++
+          oldClientProtection ++ Json.obj(
+          "hasChanged" -> true,
+          "hasAccepted" -> true)).as[Eab]
 
       checkIsComplete(completeOldEab)
     }
@@ -175,6 +224,7 @@ class EabSpec extends AmlsSpec {
     "data are complete no redress" must {
       val completeOldEab = (
         oldServices ++
+          oldDateOfChange ++
           oldRedressSchemeNoRedress ++
           oldProfessionalBody ++
           oldEstateAct ++ Json.obj(
@@ -187,10 +237,10 @@ class EabSpec extends AmlsSpec {
     "data are incomplete" must {
       val incompleteOldEab = (
         oldServices ++
-        oldRedressScheme ++
-        Json.obj(
-        "hasChanged" -> false,
-        "hasAccepted" -> false)).as[Eab]
+          oldRedressScheme ++
+          Json.obj(
+            "hasChanged" -> false,
+            "hasAccepted" -> false)).as[Eab]
 
       checkIsComplete(incompleteOldEab,
         isEstateAgentActPenaltyComplete = false,
