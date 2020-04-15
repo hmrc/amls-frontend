@@ -28,6 +28,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.ProxyCacheService
+import services.businessmatching.ServiceFlow
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture, CacheMocks}
 
 import scala.concurrent.Future
@@ -65,7 +66,14 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
     "residential",
     "socialHousingProvision")
 
+  val updatedServiceList = Seq(
+    "assetManagement",
+    "auctioneering",
+    "lettings",
+    "socialHousingProvision")
+
   val completeServices = Json.obj("eabServicesProvided" -> completeServiceList )
+  val updatedServices  = Json.obj("eabServicesProvided" -> updatedServiceList )
 
   val completeEabData = completeServices ++
     completeEstateAgencyActPenalty ++
@@ -73,25 +81,43 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
     completeRedressScheme ++
     completeMoneyProtectionScheme
 
+  val updatedEabData = updatedServices ++
+    completeEstateAgencyActPenalty ++
+    completePenalisedProfessionalBody ++
+    completeRedressScheme ++
+    completeMoneyProtectionScheme
+
+  val noEabData = Json.obj()
+
   val completeEabJson = Json.obj(
     "data"           -> completeEabData,
     "hasChanged"     -> false,
     "hasAccepted"    -> false
   )
 
-  val completeEabModel = Eab(completeEabData)
+  val updatedEabJson = Json.obj(
+    "data"           -> completeEabData,
+    "hasChanged"     -> false,
+    "hasAccepted"    -> false
+  )
+
+  val completeEabModel    = Eab(completeEabData)
+  val updatedEabModel     = Eab(updatedEabData)
+  val noEabModel  = Eab(noEabData)
 
   trait Fixture extends AuthorisedFixture {
     self =>
     val request         = addToken(authRequest)
     val proxyCacheService = mock[ProxyCacheService]
     val credId          = "someId"
+    val mockServiceFlow = mock[ServiceFlow]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[ProxyCacheService].to(proxyCacheService))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[ServiceFlow].to(mockServiceFlow))
       .build()
 
     val controller      = app.injector.instanceOf[EabController]
@@ -152,6 +178,108 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       verify(mockCacheConnector).save[Eab](any(), eqTo(Eab.key),
         eqTo(completeEabJson.as[Eab].copy(hasAccepted = true)))(any(), any())
+    }
+  }
+
+  "requireDateOfChange" must {
+    "return false where is new activity" in new Fixture {
+      val postRequest = FakeRequest("POST", "/")
+        .withHeaders(CONTENT_TYPE -> "application/json")
+        .withBody[JsValue](completeEabJson)
+
+      val status = "Approved"
+
+      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(true))
+
+      val result = controller.requireDateOfChange(credId, status)(postRequest)
+
+      val document = Json.parse(contentAsString(result))
+
+      document mustBe(Json.obj("requireDateOfChange" -> false))
+    }
+
+    "return false where the current list of activities does not differ from the new" in new Fixture {
+      val postRequest = FakeRequest("POST", "/")
+        .withHeaders(CONTENT_TYPE -> "application/json")
+
+        .withBody[JsValue](completeEabJson)
+
+      val status = "Approved"
+
+      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
+
+      when(mockCacheConnector.fetch[Eab](any(), any())(any(), any())).thenReturn(
+        Future.successful(Some(completeEabModel))
+      )
+
+      val result = controller.requireDateOfChange(credId, status)(postRequest)
+
+      val document = Json.parse(contentAsString(result))
+
+      document mustBe(Json.obj("requireDateOfChange" -> false))
+    }
+
+    "return false where the raw status from API9 is not Approved" in new Fixture {
+      val postRequest = FakeRequest("POST", "/")
+        .withHeaders(CONTENT_TYPE -> "application/json")
+
+        .withBody[JsValue](completeEabJson)
+
+      val status = "NotYetSubmitted"
+
+      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
+
+      when(mockCacheConnector.fetch[Eab](any(), any())(any(), any())).thenReturn(
+        Future.successful(Some(updatedEabModel))
+      )
+
+      val result = controller.requireDateOfChange(credId, status)(postRequest)
+
+      val document = Json.parse(contentAsString(result))
+
+      document mustBe(Json.obj("requireDateOfChange" -> false))
+    }
+
+    "return true where is not new activity and list of activities differs and status is Approved" in new Fixture {
+      val postRequest = FakeRequest("POST", "/")
+        .withHeaders(CONTENT_TYPE -> "application/json")
+
+        .withBody[JsValue](completeEabJson)
+
+      val status = "Approved"
+
+      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
+
+      when(mockCacheConnector.fetch[Eab](any(), any())(any(), any())).thenReturn(
+        Future.successful(Some(updatedEabModel))
+      )
+
+      val result = controller.requireDateOfChange(credId, status)(postRequest)
+
+      val document = Json.parse(contentAsString(result))
+
+      document mustBe(Json.obj("requireDateOfChange" -> true))
+    }
+
+    "return false where is not new activity and no current EAB model and status is NotYetSubmitted" in new Fixture {
+      val postRequest = FakeRequest("POST", "/")
+        .withHeaders(CONTENT_TYPE -> "application/json")
+
+        .withBody[JsValue](completeEabJson)
+
+      val status = "NotYetSubmitted"
+
+      when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
+
+      when(mockCacheConnector.fetch[Eab](any(), any())(any(), any())).thenReturn(
+        Future.successful(Some(noEabModel))
+      )
+
+      val result = controller.requireDateOfChange(credId, status)(postRequest)
+
+      val document = Json.parse(contentAsString(result))
+
+      document mustBe(Json.obj("requireDateOfChange" -> false))
     }
   }
 }
