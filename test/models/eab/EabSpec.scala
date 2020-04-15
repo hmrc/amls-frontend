@@ -15,13 +15,8 @@
  */
 
 package models.eab
-<<<<<<< HEAD
 import models.DateOfChange
-=======
-
 import models.DateOfChange
-import models.estateagentbusiness._
->>>>>>> 8a0d53f1f... Re introduce PR 1405
 import org.joda.time.LocalDate
 import play.api.libs.json._
 import utils.AmlsSpec
