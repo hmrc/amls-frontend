@@ -23,8 +23,9 @@ import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
+import models.estateagentbusiness._
 
-final case class Eab(data: JsObject = Json.obj(),
+case class Eab(data: JsObject = Json.obj(),
                      hasChanged: Boolean = false,
                      hasAccepted: Boolean = false) {
 
@@ -98,9 +99,45 @@ final case class Eab(data: JsObject = Json.obj(),
       case _ => false
     }
   }
+
+  def services = {
+    (data \ "eabServicesProvided").as[List[String]]
+  }
+
+  def redressScheme = {
+    get[String](Eab.redressScheme)
+  }
+
+  def penalisedProfessionalBody = {
+    get[Boolean](Eab.penalisedProfessionalBody)
+  }
+
+  def penalisedProfessionalBodyDetail = {
+    get[String](Eab.penalisedProfessionalBodyDetail)
+  }
+
+  def penalisedUnderEstateAgentsAct = {
+    get[Boolean](Eab.penalisedEstateAgentsAct)
+  }
+
+  def penalisedUnderEstateAgentsAcDetail = {
+    get[String](Eab.penalisedEstateAgentsActDetail)
+  }
+
+  def clientMoneyProtectionScheme = {
+    get[Boolean](Eab.clientMoneyProtectionScheme)
+  }
+
+  // EstateAgentBusiness models are needed for DES interactions. I.e. API 4, 5 and 6.
+  // This method takes this Eab model (used by EAB Frontend and converts to EstateAgentBusiness for
+  // back end (AMLS) DES interactions.
+  // AMLS Back end could be refactored in time to receive this model in place of EstateAgentBusiness.
+  def conv = {
+    EstateAgentBusiness.conv(this)
+  }
 }
 
-object Eab {
+  object Eab {
 
   lazy val appConfig = Play.current.injector.instanceOf[ApplicationConfig]
 
@@ -189,6 +226,7 @@ object Eab {
       (__ \ 'data ++ penalisedEstateAgentsActDetail).json.copyFrom(readPathOrReturn( __ \ 'penalisedUnderEstateAgentsActDetails, JsNull)) and
       (__ \ 'data ++ penalisedProfessionalBody).json.copyFrom(readPathOrReturn(__ \ 'penalised, JsNull)) and
       (__ \ 'data ++ penalisedProfessionalBodyDetail).json.copyFrom(readPathOrReturn(__ \ 'professionalBody,JsNull)) and
+      (__ \ 'data ++ clientMoneyProtectionScheme).json.copyFrom(readPathOrReturn(__ \ 'clientMoneyProtection,JsNull)) and
       (__ \ 'hasAccepted).json.copyFrom((__ \ 'hasAccepted).json.pick) and
       (__ \ 'hasChanged).json.copyFrom((__ \ 'hasChanged).json.pick)
     ) reduce
