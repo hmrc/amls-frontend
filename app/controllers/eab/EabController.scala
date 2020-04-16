@@ -20,11 +20,9 @@ import cats.implicits._
 import cats.data.OptionT
 import com.google.common.util.concurrent.Futures.FutureCombiner
 import connectors.DataCacheConnector
-import controllers.estateagentbusiness.routes
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.eab.Eab
-import models.estateagentbusiness.{EstateAgentBusiness, Services}
 import play.api.libs.json._
 import play.api.mvc.MessagesControllerComponents
 import services.{ProxyCacheService, StatusService}

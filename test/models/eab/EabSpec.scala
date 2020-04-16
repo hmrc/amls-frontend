@@ -110,41 +110,6 @@ class EabSpec extends AmlsSpec {
       }
 
       checkIsComplete(constructedEab)
-<<<<<<< HEAD
-=======
-
-      // EstateAgentBusiness models are needed for DES interactions. I.e. API 4, 5 and 6.
-      "builds AMLS back end submission EstateAgentBusiness Model correctly" in {
-
-        val converted = EstateAgentBusiness(
-          Some(
-            Services(
-              Set(
-                Residential,
-                Commercial,
-                SocialHousing,
-                BusinessTransfer,
-                Development,
-                AssetManagement,
-                LandManagement,
-                Auction,
-                Lettings,
-                Relocation
-              ),
-              Some(DateOfChange(new LocalDate(2019, 1, 1)))
-            )
-          ),
-          Some(PropertyRedressScheme),
-          Some(ProfessionalBodyYes("details")),
-          Some(PenalisedUnderEstateAgentsActYes("details")),
-          Some(ClientMoneyProtectionSchemeYes),
-          false,
-          false
-        )
-
-        constructedEab.conv mustBe converted
-      }
->>>>>>> 8a0d53f1f... Re introduce PR 1405
     }
 
     "data are incomplete" must {
