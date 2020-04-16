@@ -5,7 +5,6 @@
 ->          /bank-details                                                             bankDetails.Routes
 ->          /trading-premises                                                         tradingPremises.Routes
 ->          /responsible-people                                                       responsiblePeople.Routes
-->          /estate-agents                                                            estateAgents.Routes
 ->          /update-service                                                           updateService.Routes
 ->          /high-value-dealer                                                        hvd.Routes
 ->          /money-service-business                                                   msb.Routes

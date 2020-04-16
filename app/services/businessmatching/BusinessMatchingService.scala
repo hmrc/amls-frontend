@@ -24,7 +24,6 @@ import javax.inject.Inject
 import models.ViewResponse
 import models.asp.Asp
 import models.businessmatching._
-import models.estateagentbusiness.{EstateAgentBusiness}
 import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
@@ -87,12 +86,7 @@ class BusinessMatchingService @Inject()(
     case AccountancyServices =>
       dataCacheConnector.removeByKey[Asp](credId, Asp.key)
     case EstateAgentBusinessService =>
-      //TODO AMLS-5540 - Can be removed when feature toggle for new EAB service is removed.
-      if(appConfig.phase3Release2La) {
-        dataCacheConnector.removeByKey[Eab](credId, Eab.key)
-      } else {
-        dataCacheConnector.removeByKey[EstateAgentBusiness](credId, EstateAgentBusiness.key)
-      }
+      dataCacheConnector.removeByKey[Eab](credId, Eab.key)
     case HighValueDealing =>
       dataCacheConnector.removeByKey[Hvd](credId, Hvd.key)
     case MoneyServiceBusiness =>

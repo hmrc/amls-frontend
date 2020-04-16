@@ -23,7 +23,7 @@ import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
-import models.estateagentbusiness.EstateAgentBusiness
+import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePerson
@@ -36,7 +36,7 @@ import play.api.libs.functional.syntax._
 case class ViewResponse(
                          etmpFormBundleNumber:String,
                          businessMatchingSection: BusinessMatching,
-                         eabSection: Option[EstateAgentBusiness],
+                         eabSection: Option[Eab],
                          tradingPremisesSection: Option[Seq[TradingPremises]],
                          businessDetailsSection: BusinessDetails,
                          bankDetailsSection: Seq[BankDetails],
@@ -58,23 +58,23 @@ object ViewResponse {
   implicit val jsonWrites = Json.writes[ViewResponse]
 
   def constructReads(
-                 etmpFormBundleNumber:String,
-                 businessMatchingSection: BusinessMatching,
-                 eabSection: Option[EstateAgentBusiness],
-                 tradingPremisesSection: Option[Seq[TradingPremises]],
-                 businessDetailsSection: Option[BusinessDetails],
-                 oldBusinessDetailsSection: Option[BusinessDetails],
-                 bankDetailsSection: Seq[BankDetails],
-                 aboutYouSection: AddPerson,
-                 businessActivitiesSection: BusinessActivities,
-                 responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
-                 tcspSection: Option[Tcsp],
-                 aspSection: Option[Asp],
-                 msbSection: Option[MoneyServiceBusiness],
-                 hvdSection: Option[Hvd],
-                 ampSection: Option[Amp],
-                 supervisionSection: Option[Supervision]
-               ) =  {
+                      etmpFormBundleNumber:String,
+                      businessMatchingSection: BusinessMatching,
+                      eabSection: Option[Eab],
+                      tradingPremisesSection: Option[Seq[TradingPremises]],
+                      businessDetailsSection: Option[BusinessDetails],
+                      oldBusinessDetailsSection: Option[BusinessDetails],
+                      bankDetailsSection: Seq[BankDetails],
+                      aboutYouSection: AddPerson,
+                      businessActivitiesSection: BusinessActivities,
+                      responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
+                      tcspSection: Option[Tcsp],
+                      aspSection: Option[Asp],
+                      msbSection: Option[MoneyServiceBusiness],
+                      hvdSection: Option[Hvd],
+                      ampSection: Option[Amp],
+                      supervisionSection: Option[Supervision]
+                    ) =  {
 
     def readBusinessDetails = {
       businessDetailsSection.getOrElse(
@@ -106,7 +106,7 @@ object ViewResponse {
   implicit val jsonReads: Reads[ViewResponse] = {
     (__ \ "etmpFormBundleNumber").read[String] and
       (__ \ "businessMatchingSection").read[BusinessMatching] and
-      (__ \ "eabSection").readNullable[EstateAgentBusiness] and
+      (__ \ "eabSection").readNullable[Eab] and
       (__ \ "tradingPremisesSection").readNullable[Seq[TradingPremises]] and
       (__ \ "businessDetailsSection").readNullable[BusinessDetails] and
       (__ \ "aboutTheBusinessSection").readNullable[BusinessDetails] and
@@ -120,7 +120,7 @@ object ViewResponse {
       (__ \ "hvdSection").readNullable[Hvd] and
       (__ \ "ampSection").readNullable[Amp] and
       (__ \ "supervisionSection").readNullable[Supervision]
-  }.apply(ViewResponse.constructReads _)
+    }.apply(ViewResponse.constructReads _)
 
   implicit val formatOption = Reads.optionWithNull[ViewResponse]
 

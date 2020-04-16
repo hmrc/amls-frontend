@@ -22,7 +22,6 @@ import forms.InvalidForm
 import models.businessactivities.{BusinessActivities => BA}
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.estateagentbusiness.{EstateAgentBusiness, OmbudsmanServices, Other}
 import models.eab.Eab
 import models.renewal.CustomersOutsideUK
 import models.responsiblepeople.ResponsiblePerson.filter
@@ -44,17 +43,7 @@ object ControllerHelper {
   def hasIncompleteResponsiblePerson(rps: Option[Seq[ResponsiblePerson]]): Boolean =
     rps.exists((data: Seq[ResponsiblePerson]) => filter(data).exists(_.isComplete equals false))
 
-  //TODO - can be removed when we remove the old EAB models
-  def hasInvalidRedressScheme(eabOpt: Option[EstateAgentBusiness]): Boolean = {
-    eabOpt.exists(eab =>
-      eab.redressScheme.exists(redressScheme =>
-        redressScheme match {
-          case OmbudsmanServices | Other(_) => true
-          case _  => false
-        }))
-  }
-
-  def hasInvalidRedressSchemeNewEab(eabOpt: Option[Eab]): Boolean = {
+  def hasInvalidRedressScheme(eabOpt: Option[Eab]): Boolean = {
     eabOpt match {
       case Some(eab) => eab.isInvalidRedressScheme
       case None => false
@@ -72,11 +61,11 @@ object ControllerHelper {
 
   def getMsbServices(matching: Option[BusinessMatching]): Option[Set[BusinessMatchingMsbService]] = {
     matching flatMap { bm =>
-        bm.msbServices match {
-          case Some(service) => Some(service.msbServices)
-          case _ => None
-        }
+      bm.msbServices match {
+        case Some(service) => Some(service.msbServices)
+        case _ => None
       }
+    }
   }
 
   def getBusinessActivity(matching: Option[BusinessMatching]): Option[BusinessActivities] = {
@@ -199,11 +188,11 @@ object ControllerHelper {
   }
 
   def anotherBodyComplete(supervision: Supervision): Option[(Boolean, Boolean)] = (for {
-      anotherBody <- supervision.anotherBody
-    } yield anotherBody) match {
-      case Some(AnotherBodyNo) => Option((true, false))
-      case Some(body) => Option((body.asInstanceOf[AnotherBodyYes].isComplete(), true))
-    }
+    anotherBody <- supervision.anotherBody
+  } yield anotherBody) match {
+    case Some(AnotherBodyNo) => Option((true, false))
+    case Some(body) => Option((body.asInstanceOf[AnotherBodyYes].isComplete(), true))
+  }
 
   def isAnotherBodyYes(abCompleteAndYes: Option[(Boolean, Boolean)]) = {
     abCompleteAndYes match {

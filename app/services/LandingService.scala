@@ -29,7 +29,7 @@ import models.businesscustomer.ReviewDetails
 import models.businessdetails.BusinessDetails
 import models.businessmatching.{BusinessMatching, BusinessActivities => BMActivities}
 import models.declaration.AddPerson
-import models.estateagentbusiness.EstateAgentBusiness
+import models.eab.Eab
 import models.hvd.{Hvd, ReceiveCashPayments}
 import models.moneyservicebusiness.{MostTransactions => _, SendTheLargestAmountsOfMoney => _, WhichCurrencies => _, _}
 import models.renewal._
@@ -81,7 +81,7 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
       _                      <- cacheConnector.remove(credId) // MUST clear cash first to remove stale data and reload from API5
       appCache               <- cacheConnector.fetchAllWithDefault(credId)
       refreshedCache         <- {
-       upsertCacheEntries(appCache, viewResponse, subscriptionResponse, amendVariationResponse, amlsRefNumber, accountTypeId, credId)
+        upsertCacheEntries(appCache, viewResponse, subscriptionResponse, amendVariationResponse, amlsRefNumber, accountTypeId, credId)
       }
     } yield refreshedCache
   }
@@ -129,9 +129,8 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
     val cachedBusinessMatching = cacheConnector.upsertNewAuth[BusinessMatching](cachedViewResponse, BusinessMatching.key,
       viewResponseSection(viewResponse))
 
-    //TODO AMLS-5779 - Change to new EAB model for DES/STUBS integration
-    val cachedEstateAgentBusiness = cacheConnector.upsertNewAuth[Option[EstateAgentBusiness]](cachedBusinessMatching,
-      EstateAgentBusiness.key, eabSection(viewResponse))
+    val cachedEstateAgentBusiness = cacheConnector.upsertNewAuth[Option[Eab]](cachedBusinessMatching,
+      Eab.key, eabSection(viewResponse))
 
     val cachedTradingPremises = cacheConnector.upsertNewAuth[Option[Seq[TradingPremises]]](cachedEstateAgentBusiness, TradingPremises.key,
       tradingPremisesSection(viewResponse.tradingPremisesSection))
@@ -176,8 +175,8 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
   }
 
   private def eabSection(viewResponse: ViewResponse) = {
-    if(viewResponse.eabSection.services.nonEmpty) {
-      Some(viewResponse.eabSection.copy(hasAccepted = true))
+    if(viewResponse.eabSection.isDefined) {
+      viewResponse.eabSection.map(eab => eab.copy(hasAccepted = true))
     } else {
       None
     }
