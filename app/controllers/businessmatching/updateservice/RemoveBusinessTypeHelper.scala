@@ -158,10 +158,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
 
     val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])
 
-    val canRemoveFitProper = (
-                               current: Set[BMBusinessActivity],
-                               removing: Set[BMBusinessActivity]
-                             ) => {
+    val canRemoveFitProper = (current: Set[BMBusinessActivity], removing: Set[BMBusinessActivity]) => {
       val hasTCSP = current.contains(TrustAndCompanyServices)
       val hasMSB = current.contains(MoneyServiceBusiness)
 
