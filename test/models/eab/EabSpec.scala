@@ -92,7 +92,7 @@ class EabSpec extends AmlsSpec {
         completeRedressScheme ++
         completeMoneyProtectionScheme
 
-      val constructedEab = Eab(completeData,  hasAccepted = true)
+      val constructedEab = Eab(completeData, hasAccepted = true)
 
       val completeEab = Json.obj(
         "data" -> completeData,
