@@ -27,21 +27,23 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+    <p>@Messages("businessdetails.contactingyou.lbl")</p>
+}
+
 @main(
     title = Messages("businessdetails.contactingyou.email.title") + " - " + Messages("summary.businessdetails"),
     heading = header
 ) {
 
-    <p>@Messages("businessdetails.contactingyou.lbl")</p>
-
-
 
     @form(f, controllers.businessdetails.routes.ContactingYouController.post(edit)) {
 
-        @fieldset(
+        @fieldsetWithErrorGroup(
             f = f("contactingyou-fieldset"),
             heading = "businessdetails.contactingyou.email.title",
             section = "summary.businessdetails",
+            supportingContent = supportingContent,
             panel = false
         ) {
             @input(
