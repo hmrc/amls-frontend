@@ -16,7 +16,7 @@
 
 package views.include
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -35,10 +35,27 @@ class dateSpec extends PlaySpec with AmlsViewSpec {
     "render the ariaDescribedBy with error and hint" in new Fixture {
       val errors: Seq[(Path, Seq[ValidationError])] = Seq((Path \ "date", Seq(ValidationError("some.error", ""))))
       val formx = InvalidForm(Map("" -> Seq("")), errors)
-      val date = views.html.include.forms2.date(formx, p="date", hintText = "jhgjhgjgkjkjk")
+      val date = views.html.include.forms2.date(formx, p = "date", hintText = "jhgjhgjgkjkjk")
 
       val aria = Jsoup.parse(contentAsString(date)).getElementsByTag("fieldset").attr("aria-describedby")
       aria must not be "date-hintdate-error-notification"
+
+    }
+    "render the ariaDescribedBy with error" in new Fixture {
+      val errors: Seq[(Path, Seq[ValidationError])] = Seq((Path \ "date", Seq(ValidationError("some.error", ""))))
+      val formx = InvalidForm(Map("" -> Seq("")), errors)
+      val date = views.html.include.forms2.date(formx, p = "date")
+
+      val aria = Jsoup.parse(contentAsString(date)).getElementsByTag("fieldset").attr("aria-describedby")
+      aria must be("date-error-notification")
+
+    }
+    "render the ariaDescribedBy with hint" in new Fixture {
+      val formx = ValidForm(Map("" -> Seq("")), EmptyForm)
+      val date = views.html.include.forms2.date(formx, p = "date", hintText = "jhgjhgjgkjkjk")
+
+      val aria = Jsoup.parse(contentAsString(date)).getElementsByTag("fieldset").attr("aria-describedby")
+      aria must be("date-hint")
 
     }
   }
