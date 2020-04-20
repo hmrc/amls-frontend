@@ -35,7 +35,7 @@ class dateSpec extends PlaySpec with AmlsViewSpec {
     "render the ariaDescribedBy with error and hint" in new Fixture {
       val errors: Seq[(Path, Seq[ValidationError])] = Seq((Path \ "date", Seq(ValidationError("some.error", ""))))
       val formx = InvalidForm(Map("" -> Seq("")), errors)
-      val date = views.html.include.forms2.date(formx, p = "date", hintText = "jhgjhgjgkjkjk")
+      val date = views.html.include.forms2.date(formx, p = "date", hintText = "select all")
 
       val aria = Jsoup.parse(contentAsString(date)).getElementsByTag("fieldset").attr("aria-describedby")
       aria must be("date-hint date-error-notification")
@@ -52,7 +52,7 @@ class dateSpec extends PlaySpec with AmlsViewSpec {
     }
     "render the ariaDescribedBy with hint" in new Fixture {
       val formx = ValidForm(Map("" -> Seq("")), EmptyForm)
-      val date = views.html.include.forms2.date(formx, p = "date", hintText = "jhgjhgjgkjkjk")
+      val date = views.html.include.forms2.date(formx, p = "date", hintText = "select all")
 
       val aria = Jsoup.parse(contentAsString(date)).getElementsByTag("fieldset").attr("aria-describedby")
       aria must be("date-hint")
