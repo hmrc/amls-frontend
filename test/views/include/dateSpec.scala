@@ -38,7 +38,7 @@ class dateSpec extends PlaySpec with AmlsViewSpec {
       val date = views.html.include.forms2.date(formx, p = "date", hintText = "jhgjhgjgkjkjk")
 
       val aria = Jsoup.parse(contentAsString(date)).getElementsByTag("fieldset").attr("aria-describedby")
-      aria must not be "date-hintdate-error-notification"
+      aria must be("date-hint date-error-notification")
 
     }
     "render the ariaDescribedBy with error" in new Fixture {
