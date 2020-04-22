@@ -17,13 +17,18 @@
 package controllers.businessactivities
 
 import controllers.actions.SuccessfulAuthAction
+import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching}
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.jsoup.Jsoup
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+
+import scala.concurrent.Future
 
 class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
@@ -31,6 +36,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
     self => val request = addToken(authRequest)
 
     val controller = new WhatYouNeedController(
+      dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       statusService = mockStatusService,
@@ -42,6 +48,9 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
     "get" must {
       "redirect to InvolvedInOtherController" when {
         "creating a new submission" in new Fixture {
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))))
+
           mockApplicationStatus(SubmissionReadyForReview)
 
           val result = controller.get(request)
@@ -53,6 +62,9 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
         }
 
         "performing a variation" in new Fixture {
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))))
+
           mockApplicationStatus(SubmissionDecisionApproved)
 
           val result = controller.get(request)
@@ -64,6 +76,9 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
         }
 
         "in a renewal pending status" in new Fixture {
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))))
+
           mockApplicationStatus(ReadyForRenewal(None))
 
           val result = controller.get(request)
@@ -75,6 +90,9 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
         }
 
         "in a renewal submitted status" in new Fixture {
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+            .thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))))
+
           mockApplicationStatus(RenewalSubmitted(None))
 
           val result = controller.get(request)
@@ -83,6 +101,18 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
           val doc = Jsoup.parse(contentAsString(result))
 
           doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.InvolvedInOtherController.get().url
+        }
+      }
+      "Redirect to registration progress page" when {
+        "bm details cannot be fetched" in new Fixture {
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+            .thenReturn(Future.successful(None))
+          mockApplicationStatus(SubmissionReadyForReview)
+
+          val result = controller.get(request)
+          status(result) must be(SEE_OTHER)
+
+          redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
         }
       }
     }

@@ -17,6 +17,7 @@
 package views.businessactivities
 
 import forms.{EmptyForm, Form2}
+import models.businessmatching.{AccountancyServices, BusinessActivities}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
@@ -30,20 +31,20 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
   "What you need View" must {
     "Have the correct title" in new ViewFixture {
-      def view = views.html.businessactivities.what_you_need("/next-page")
+      def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
 
       doc.title must startWith(Messages("title.wyn"))
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.businessactivities.what_you_need("/next-page")
+      def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
 
       heading.html must be (Messages("title.wyn"))
       subHeading.html must include (Messages("summary.businessactivities"))
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.businessactivities.what_you_need("/next-page")
+      def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
 
       html must include(Messages("businessactivities.whatyouneed.line_1"))
       html must include(Messages("businessactivities.whatyouneed.line_2"))
@@ -61,7 +62,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.businessactivities.what_you_need("/next-page")
+      def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

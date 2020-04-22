@@ -16,16 +16,24 @@
 
 package controllers.businessactivities
 
+import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.EmptyForm
 import javax.inject.Inject
+import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing}
+import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import uk.gov.hmrc.auth.core.AuthConnector
-import utils.AuthAction
+import utils.{AuthAction, ControllerHelper}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessactivities._
+import views.html.deregister.deregistration_reason
+import views.html.registrationprogress.registration_progress
 
-class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
+class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                      val authConnector: AuthConnector,
                                       statusService: StatusService,
                                       authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
@@ -34,6 +42,13 @@ import scala.concurrent.Future
 
   def get = authAction.async {
     implicit request =>
-      Future.successful(Ok(what_you_need(routes.InvolvedInOtherController.get().url)))
+      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
+        (for {
+          bm <- businessMatching
+          ba <- bm.activities
+        } yield {
+          Ok(what_you_need(routes.InvolvedInOtherController.get().url, Some(ba)))
+        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+      }
   }
 }
