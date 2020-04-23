@@ -22,5 +22,5 @@
 @endDate.map { date =>
  <p>@Messages("status.renewal.due", DateHelper.formatDate(date))</p>
 }
-<a href="@controllers.renewal.routes.WhatYouNeedController.get()" id="start-renewal" class="button" type="submit">@Messages("status.renewal.due.start")
+<a href="@controllers.renewal.routes.WhatYouNeedController.get()" id="start-renewal" class="button" type="submit" draggable="false">@Messages("status.renewal.due.start")
  @if(businessName.isDefined){<span class="visually-hidden"> for @businessName.get</span>}</a>
