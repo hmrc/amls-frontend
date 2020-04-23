@@ -17,7 +17,7 @@
 package views.businessactivities
 
 import forms.{EmptyForm, Form2}
-import models.businessmatching.{AccountancyServices, BusinessActivities}
+import models.businessmatching.{AccountancyServices, BusinessActivities, MoneyServiceBusiness}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
@@ -43,8 +43,8 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
       subHeading.html must include (Messages("summary.businessactivities"))
     }
 
-    "contain the expected content elements" in new ViewFixture{
-      def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
+    "contain the expected content elements when not ASP" in new ViewFixture{
+      def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(MoneyServiceBusiness))))
 
       html must include(Messages("businessactivities.whatyouneed.line_1"))
       html must include(Messages("businessactivities.whatyouneed.line_2"))
@@ -57,6 +57,21 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
       html must include(Messages("businessactivities.whatyouneed.line_9"))
       html must include(Messages("businessactivities.whatyouneed.line_10"))
       html must include(Messages("businessactivities.whatyouneed.line_11"))
+    }
+
+    "contain the expected content elements when ASP" in new ViewFixture{
+      def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
+
+      html must include(Messages("businessactivities.whatyouneed.line_1"))
+      html must include(Messages("businessactivities.whatyouneed.line_2"))
+      html must include(Messages("businessactivities.whatyouneed.line_3"))
+      html must include(Messages("businessactivities.whatyouneed.line_4"))
+      html must include(Messages("businessactivities.whatyouneed.line_5"))
+      html must include(Messages("businessactivities.whatyouneed.line_6"))
+      html must include(Messages("businessactivities.whatyouneed.line_7"))
+      html must include(Messages("businessactivities.whatyouneed.line_8"))
+      html must include(Messages("businessactivities.whatyouneed.line_9"))
+      html must include(Messages("businessactivities.whatyouneed.line_10"))
     }
 
     "have a back link" in new ViewFixture {

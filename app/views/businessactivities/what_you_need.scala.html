@@ -34,20 +34,21 @@
     @components.user_attention_saving()
 
     <p>@Messages("businessactivities.whatyouneed.requiredinfo.heading")</p>
-
-    <ul class="list list-bullet">
-        <li>@Messages("businessactivities.whatyouneed.line_1")</li>
-        <li>@Messages("businessactivities.whatyouneed.line_2")</li>
-        <li>@Messages("businessactivities.whatyouneed.line_3")</li>
-        <li>@Messages("businessactivities.whatyouneed.line_4")</li>
-        <li>@Messages("businessactivities.whatyouneed.line_5")</li>
-        <li>@Messages("businessactivities.whatyouneed.line_6")</li>
-        <li>@Messages("businessactivities.whatyouneed.line_7")</li>
-        <li>@Messages("businessactivities.whatyouneed.line_8")</li>
-        <li>@Messages("businessactivities.whatyouneed.line_9")</li>
-        <li>@Messages("businessactivities.whatyouneed.line_10")</li>
-        <li>@Messages("businessactivities.whatyouneed.line_11")</li>
-    </ul>
+    @activities.map {ba =>
+        <ul class="list list-bullet">
+            <li>@Messages("businessactivities.whatyouneed.line_1")</li>
+            <li>@Messages("businessactivities.whatyouneed.line_2")</li>
+            <li>@Messages("businessactivities.whatyouneed.line_3")</li>
+            <li>@Messages("businessactivities.whatyouneed.line_4")</li>
+            <li>@Messages("businessactivities.whatyouneed.line_5")</li>
+            <li>@Messages("businessactivities.whatyouneed.line_6")</li>
+            <li>@Messages("businessactivities.whatyouneed.line_7")</li>
+            <li>@Messages("businessactivities.whatyouneed.line_8")</li>
+            <li>@Messages("businessactivities.whatyouneed.line_9")</li>
+            <li>@Messages("businessactivities.whatyouneed.line_10")</li>
+            @if(!ba.hasBusinessOrAdditionalActivity(AccountancyServices)){<li>@Messages("businessactivities.whatyouneed.line_11")</li>}
+        </ul>
+    }
 
     @anchor(
         attrHref = nextPageUrl,
