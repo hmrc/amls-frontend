@@ -24,7 +24,6 @@ import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching.BusinessMatching
-import models.confirmation.BreakdownRow
 import models.payments.PaymentStatuses.{Cancelled, Created, Failed}
 import models.payments._
 import models.registrationdetails.RegistrationDetails
@@ -119,8 +118,6 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
     when {
       controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
     } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
-
-    val breakdownRows = Seq.empty[BreakdownRow]
 
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
     when {

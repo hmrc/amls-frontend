@@ -302,7 +302,7 @@ class LandingController @Inject()(val landingService: LandingService,
             // $COVERAGE-OFF$
             Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: checking cacheMap for incomplete redress scheme")
             // $COVERAGE-ON$
-            val hasInvalidRedressScheme = if(config.phase3Release2La) {
+            val hasInvalidRedressScheme = if(config.standAloneEABService) {
               for {
                 eab <- cache.map(_.getEntry[Eab](Eab.key))
               } yield ControllerHelper.hasInvalidRedressSchemeNewEab(eab)
@@ -322,7 +322,7 @@ class LandingController @Inject()(val landingService: LandingService,
 
   //TODO - can be removed when we remove the old EAB models
   private def dataHasChanged(cacheMap: CacheMap) = {
-    if(config.phase3Release2La) {
+    if(config.standAloneEABService) {
       dataHasChangedNewEab(cacheMap)
     } else {
       dataHasChangedOldEab(cacheMap)

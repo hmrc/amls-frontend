@@ -2257,3 +2257,7 @@ textarea:focus {
     width: 100% !important;
   }
 }
+
+legend .heading-medium{
+  margin-top: 0;
+}

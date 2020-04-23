@@ -31,7 +31,6 @@ class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addTokenForView()
-    val businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices))))
   }
 
   "expected_amls_turnover view" must {
@@ -39,7 +38,7 @@ class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ExpectedAMLSTurnover] = Form2(ExpectedAMLSTurnover.Fifth)
 
-      def view = views.html.businessactivities.expected_amls_turnover(form2, true, None)
+      def view = views.html.businessactivities.expected_amls_turnover(form2, true, None, None)
 
       doc.title must startWith(Messages("businessactivities.turnover.title") + " - " + Messages("summary.businessactivities"))
     }
@@ -48,7 +47,7 @@ class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ExpectedAMLSTurnover] = Form2(ExpectedAMLSTurnover.Third)
 
-      def view = views.html.businessactivities.expected_amls_turnover(form2, true, businessMatching)
+      def view = views.html.businessactivities.expected_amls_turnover(form2, true, None, Some(List("accountancy service provider")))
 
       heading.html must be(Messages("businessactivities.turnover.heading", "accountancy service provider"))
       subHeading.html must include( Messages("summary.businessactivities"))
@@ -60,7 +59,7 @@ class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ExpectedAMLSTurnover] = Form2(ExpectedAMLSTurnover.Third)
 
-      def view = views.html.businessactivities.expected_amls_turnover(form2, true, businessMatching2)
+      def view = views.html.businessactivities.expected_amls_turnover(form2, true, None, Some(List("accountancy service provider", "estate agency business")))
 
       heading.html must be(Messages("businessactivities.turnover.heading.multiple"))
       subHeading.html must include( Messages("summary.businessactivities"))
@@ -74,7 +73,7 @@ class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "expectedAMLSTurnover") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessactivities.expected_amls_turnover(form2, true, None)
+      def view = views.html.businessactivities.expected_amls_turnover(form2, true, None, Some(List("some provider")))
 
       errorSummary.html() must include("not a message Key")
 
@@ -83,7 +82,7 @@ class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.expected_amls_turnover(EmptyForm, true, None)
+      def view = views.html.businessactivities.expected_amls_turnover(EmptyForm, true, None, None)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

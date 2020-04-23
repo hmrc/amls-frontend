@@ -35,7 +35,7 @@
     <li>@Messages("login-event.property-ombudsman")</li>
    </ul>
 
-   @if(appConfig.phase3Release2La) {
+   @if(appConfig.standAloneEABService) {
        @anchor(
             attrHref = appConfig.eabRedressUrl,
             attrRole = true,
@@ -53,7 +53,7 @@
    }
 
    <p>
-     <a id="skip-to-service-link" href="@controllers.routes.StatusController.get()">
+     <a id="skip-to-service-link" href="@controllers.routes.StatusController.get()" draggable="false">
         @Messages("login-event.skip-for-now")
      </a>
    </p>

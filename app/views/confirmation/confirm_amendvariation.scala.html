@@ -16,10 +16,9 @@
 
 @import include._
 @import models.confirmation._
-@import views.html.confirmation.{breakdown => breakdown_display}
 @import config.{ ApplicationConfig}
 
-@(paymentReference: Option[String], total: Currency, amountToPay: Currency, maybeBreakdown: Option[Seq[BreakdownRow]], paymentsUrl: String)(implicit request: Request[_], m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(paymentReference: Option[String], total: Currency, amountToPay: Currency, paymentsUrl: String)(implicit request: Request[_], m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main(
     title = Messages("confirmation.amendment.header") + " - " + Messages("confirmation.amendment.header.secondary")
@@ -43,10 +42,6 @@
         }
     </div>
 
-    @maybeBreakdown.map { breakdown =>
-        @breakdown_display(total, breakdown, Messages("confirmation.amendment.summary"))
-    }
-
     <div id="timelimit"><p>@Messages("confirmation.timelimit")</p></div>
 
 
@@ -54,6 +49,6 @@
         gaTag = Some("fee-reference:click:print")
     )
 
-    <p><a id='continue-pay' class="button" href="@paymentsUrl">@Messages("button.continuetopayment")</a></p>
+    <p><a id='continue-pay' class="button" href="@paymentsUrl" draggable="false">@Messages("button.continuetopayment")</a></p>
 
 }

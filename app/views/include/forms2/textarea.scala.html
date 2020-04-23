@@ -25,8 +25,7 @@
     classes: Seq[String] = Seq.empty,
     cols: String = "",
     rows: String = "",
-    maxLength: String = "",
-    charCount: Boolean = false,
+    charCount: Int = 200,
     largeWidth: Boolean = false,
     heading: String = "",
     section: String = "",
@@ -45,7 +44,7 @@
     @if(heading.nonEmpty) {
         <div class="page-header">
             <h1>
-                <label class="heading-xlarge" for="@field.id">
+                <label class="govuk-form-label" for="with-hint">
                     @Messages(heading)
                 </label>
             </h1>
@@ -57,30 +56,33 @@
         </div>
         <p>@labelSpan</p>
     } else {
-        <label class="form-label" for="@field.id">
+        <label class="govuk-form-label" for="with-hint">
             @labelSpan
         </label>
     }
 }
 
-<div class="form-group@if(charCount){ char-counter}@if(field.hasErrors) { form-field--error}" @if(charCount) {data-char-counter} @if(data){ data-reveal="@data"}>
-    @label
-    @if(hintText.nonEmpty) {
-        <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
-    }
-    @if(field.hasErrors) {
-        <span class="error-notification" id="@{field.id}-error-notification" data-journey="error - field:user input:@field.name">
-            <span class="visuallyhidden">Error: </span>@field.error
-        </span>
-    }
-    <textarea @if(charCount){data-char-field} name="@field.name" id="@field.id"
-        @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}" }
-        @if(cols.nonEmpty) { cols="@cols" }
-        @if(rows.nonEmpty) { rows="@rows" }
-        @if(maxLength.nonEmpty) { maxlength="@maxLength" }
-        @if(largeWidth) { class="textarea--3-4" }
-        >@field.value</textarea>
-    @if(charCount) {
-        <p class="char-counter-text flush js-hidden">@Messages("lbl.1200.character.limit")</p>
-    }
+<div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="@charCount">
+    <div class="govuk-form-group">
+        @label
+        @if(hintText.nonEmpty) {
+            <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
+        }
+        @if(field.hasErrors) {
+            <span class="error-notification" id="@{field.id}-error-notification" data-journey="error - field:user input:@field.name">
+                <span class="visuallyhidden">Error: </span>@field.error
+            </span>
+        }
+        <textarea class="govuk-textarea govuk-js-character-count" id="with-hint" name="@field.name" id="@field.id"
+            @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}" }
+            @if(cols.nonEmpty) { cols="@cols" }
+            @if(rows.nonEmpty) { rows="@rows" }
+            @if(largeWidth) { class="textarea--3-4" }
+            >@field.value</textarea>
+    </div>
+
+    <span id="with-hint-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+        You can enter up to @charCount characters
+    </span>
+
 </div>
