@@ -21,11 +21,15 @@
         visuallyhidden: String = "",
         returnLink: Boolean = false,
         returnLocation: Option[String] = None,
-        id: Option[String] = None
+        id: Option[String] = None,
+        draggable: Boolean = true
 )(implicit m: Messages)
     @* Current use suggests we only use the one class on anchors: button;
     may need refactoring at a later date if more are required *@
 <a href="@attrHref" id="@id.getOrElse("")"
+    @if(!draggable){
+        draggable="false"
+    }
     @if(attrRole) {
         class="button"
     }

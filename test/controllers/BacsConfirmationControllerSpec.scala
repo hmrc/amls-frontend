@@ -23,7 +23,6 @@ import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching.BusinessMatching
-import models.confirmation.BreakdownRow
 import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.status._
@@ -111,8 +110,6 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       difference = Some(115),
       createdAt = DateTime.now
     )
-
-    val breakdownRows = Seq.empty[BreakdownRow]
 
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
 

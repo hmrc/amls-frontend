@@ -113,22 +113,6 @@ class DateOfChangeHelperSpec extends AmlsSpec {
       DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](RenewalSubmitted(None), Some(originalModel), changeModel) must be(true)
     }
 
-    "dateOfChangApplicable return false when models not changed" in {
-      DateOfChangeHelperTest.dateOfChangApplicable(
-        "Approved", Some(originalModel), originalModel
-      ) must be(false)
-    }
-
-    "dateOfChangApplicable return false when status not Approved" in {
-      DateOfChangeHelperTest.dateOfChangApplicable(
-        "NotYestSubmitted", Some(originalModel), changeModel
-      ) must be(false)
-    }
-
-    "dateOfChangApplicable return true when models changed and status is Approved" in {
-      DateOfChangeHelperTest.dateOfChangApplicable(
-        "Approved", Some(originalModel), changeModel
-      ) must be(true)
-    }
   }
+
 }

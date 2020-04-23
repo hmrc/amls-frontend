@@ -56,11 +56,4 @@ object DateOfChange {
       "dateOfChange.year" -> Seq(data.dateOfChange.get(DateTimeFieldType.year()).toString)
     )
   }
-
-  def conv(inbound: Option[String]): Option[DateOfChange] ={
-    inbound match {
-      case Some(d) => Some(this(new LocalDate(d)))
-      case None    => None
-    }
-  }
 }

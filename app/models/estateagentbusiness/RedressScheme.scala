@@ -21,7 +21,6 @@ import jto.validation.{ValidationError, _}
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import models.FormTypes.basicPunctuationPattern
-import models.eab.Eab
 import play.api.libs.json._
 
 sealed trait RedressScheme
@@ -97,17 +96,6 @@ object RedressScheme {
         "propertyRedressSchemeOther" -> value
       )
     case RedressSchemedNo => Json.obj("isRedress" -> false)
-  }
-
-  def conv(inbound: Option[String]): Option[RedressScheme] = {
-
-    inbound match {
-      case Some("propertyOmbudsman")     => Some(ThePropertyOmbudsman)
-      case Some("ombudsmanServices")     => Some(OmbudsmanServices)
-      case Some("propertyRedressScheme") => Some(PropertyRedressScheme)
-      case Some("notRegistered")         => Some(RedressSchemedNo)
-      case _                             => None
-    }
   }
 }
 
