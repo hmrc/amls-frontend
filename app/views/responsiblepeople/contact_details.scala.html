@@ -25,7 +25,6 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.contact_details.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -38,9 +37,9 @@
     @form(f, controllers.responsiblepeople.routes.ContactDetailsController.post(index, edit, flow)) {
 
         @fieldset(
-            legend = "responsiblepeople.contact_details.title",
+            heading = Messages("responsiblepeople.contact_details.heading", personName),
+            section = "summary.responsiblepeople",
             f = f("contact-details"),
-            legendHidden = true,
             panel = false,
             classes = Seq("inline")
         ) {

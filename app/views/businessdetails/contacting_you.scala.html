@@ -25,7 +25,10 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("businessdetails.contactingyou.email.title", "summary.businessdetails")
+}
+
+@supportingContent = {
+    <p>@Messages("businessdetails.contactingyou.lbl")</p>
 }
 
 @main(
@@ -33,16 +36,14 @@
     heading = header
 ) {
 
-    <p>@Messages("businessdetails.contactingyou.lbl")</p>
-
-
 
     @form(f, controllers.businessdetails.routes.ContactingYouController.post(edit)) {
 
-        @fieldset(
+        @fieldsetWithErrorGroup(
             f = f("contactingyou-fieldset"),
-            legend = "businessdetails.contactingyou.email.title",
-            legendHidden = true,
+            heading = "businessdetails.contactingyou.email.title",
+            section = "summary.businessdetails",
+            supportingContent = supportingContent,
             panel = false
         ) {
             @input(
