@@ -2249,3 +2249,7 @@ input.form-control-error[type="password"],
   padding-top:25px;
   padding-bottom:25px;
 }
+
+legend .heading-medium{
+  margin-top: 0;
+}

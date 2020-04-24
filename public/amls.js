@@ -28,6 +28,12 @@ $(window).load(function () {
           e.preventDefault();
           history.go(-1); // go(-1) needed for mobile browsers!
         })
+
+        // =====================================================
+        // Use GOV.UK shim-links-with-button-role.js to trigger
+        // links with role="button" when space key is pressed
+        // =====================================================
+        GOVUK.shimLinksWithButtonRole.init();
 })
 
 $(function () {

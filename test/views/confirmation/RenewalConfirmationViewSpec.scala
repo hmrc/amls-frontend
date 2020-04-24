@@ -32,7 +32,6 @@ class RenewalConfirmationViewSpec extends AmlsViewSpec with PaymentGenerator {
     override def view = views.html.confirmation.confirm_renewal(
       Some(paymentReferenceNumber),
       Currency(100),
-      Seq.empty,
       Currency(150),
       continueHref
     )

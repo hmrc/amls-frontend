@@ -23,8 +23,7 @@ import org.scalacheck.Gen
 // scalastyle:off magic.number
 trait SubscriptionResponseGenerator extends BaseGenerator
   with AmlsReferenceNumberGenerator
-  with PaymentGenerator
-  with BreakdownGenerator {
+  with PaymentGenerator {
 
   val subscriptionFeesGen: Gen[SubscriptionFees] = for {
     paymentReference <- paymentRefGen

@@ -17,5 +17,5 @@
 @(businessName: Option[String])(implicit request: Request[_], m: Messages, lang: Lang)
 
 <p id="incomplete-description">@Messages("status.incomplete.description")</p>
-<a id="return-to-saved-application" href="@controllers.routes.RegistrationProgressController.get()" class="button">@Messages("status.incomplete.buttontext")
+<a id="return-to-saved-application" href="@controllers.routes.RegistrationProgressController.get()" class="button" draggable="false">@Messages("status.incomplete.buttontext")
  @if(businessName.isDefined){<span class="visually-hidden"> for @businessName.get</span>}</a>
