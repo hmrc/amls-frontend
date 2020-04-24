@@ -34,8 +34,8 @@
     <dd class="cya-summary-list__actions">
         @if(editUrl.nonEmpty && allowEdit) {
             <a @if(editLinkTag.nonEmpty) {id="@editLinkTag"} href="@editUrl" class="change-answer">
-                <span aria-hidden="true">@Messages("button.edit")</span>
-                <span class="visuallyhidden">@Messages("button.edit") @Messages("summary.visuallyhidden.your.answer.for") &#8220;@question&#8221;</span>
+                @Messages("button.edit")
+                <span class="visuallyhidden"> @question</span>
             </a>
         } else {
             <span class="table-placeholder">&nbsp;</span>
