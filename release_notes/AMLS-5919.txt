@@ -1,0 +1,1 @@
+ + [AMLS-5919] - 'Fix - Renewals HVD Percentage Turnover always sent to DES as 0%-20%'
