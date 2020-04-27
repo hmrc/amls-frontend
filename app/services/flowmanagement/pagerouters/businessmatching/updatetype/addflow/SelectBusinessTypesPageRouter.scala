@@ -41,9 +41,8 @@ class SelectBusinessTypesPageRouter @Inject()(val statusService: StatusService,
 
     } else {
       model.activity match {
-        case Some(TrustAndCompanyServices) => Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
         case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.SubSectorsController.get()))
-        case _ => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
+        case _ => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
       }
     }
   }

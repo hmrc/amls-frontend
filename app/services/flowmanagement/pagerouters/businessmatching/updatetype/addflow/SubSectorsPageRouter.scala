@@ -41,11 +41,9 @@ class SubSectorsPageRouter @Inject()(val statusService: StatusService,
       model.businessAppliedForPSRNumber.isDefined,
       model.areNewActivitiesAtTradingPremises) match {
       case (true, false, _, _, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
-      case (false, false, _, _, _) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
       case (true, true, false, false, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
       case (true, true, false, true, _) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
       case (false, true, false, _, _) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
-      case (_, true, _, _, Some(true)) => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
       case (true, true, _, false, Some(false)) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
       case (_, true, _, _, Some(false)) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
       case (_,_,_,_,_) => Future.successful(error(SubSectorsPageId))

@@ -36,8 +36,7 @@ class BusinessAppliedForPsrNumberPageRouter @Inject()(val statusService: StatusS
   override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     (edit, model.businessAppliedForPSRNumber) match {
-      case (true, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
-      case (false, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
+      case (_, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
       case (_, Some(BusinessAppliedForPSRNumberNo)) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
       case (_, None) => Future.successful(error(PsrNumberPageId))
     }

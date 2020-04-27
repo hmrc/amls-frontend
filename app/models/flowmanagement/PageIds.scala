@@ -20,16 +20,11 @@ sealed trait PageId
 
 case object AddMoreBusinessTypesPageId extends PageId
 case object PsrNumberPageId extends PageId
-case object FitAndProperPageId extends PageId
 case object NeedMoreInformationPageId extends PageId
 case object NoPSRPageId extends PageId
 case object SelectBusinessTypesPageId extends PageId
 case object SubSectorsPageId extends PageId
-case object TradingPremisesPageId extends PageId
 case object AddBusinessTypeSummaryPageId extends PageId
-case object WhatDoYouDoHerePageId extends PageId
-case object WhichFitAndProperPageId extends PageId
-case object WhichTradingPremisesPageId extends PageId
 case object ChangeBusinessTypesPageId extends PageId
 case object WhatBusinessTypesToRemovePageId extends PageId
 case object NeedToUpdatePageId extends PageId
