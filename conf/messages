@@ -1668,6 +1668,7 @@ businessmatching.updateservice.updateotherinformation.information.0 = You have r
 businessmatching.updateservice.updateotherinformation.information.1 = You have removed {0}.
 businessmatching.updateservice.updateotherinformation.information.2 = You’ll need to complete the business activities section.
 businessmatching.updateservice.updateotherinformation.information.3 = You’ll need to check your trading premises because of the service you have removed. You may need to update other information about your business.
+businessmatching.updateservice.updateotherinformation.information.3.multiple.services = You’ll need to check your trading premises because of the services you have removed. You may need to update other information about your business.
 businessmatching.updateservice.updateotherinformation.text = As a result some sections of your application need to be updated.
 
 
