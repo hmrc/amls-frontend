@@ -31,6 +31,14 @@
     heading = header
 ) {
 
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            @Messages("businessmatching.updateservice.newserviceinformation.info.warning")
+        </strong>
+    </div>
+
     @if(activities.size == 1) {
         @activities match {
             case list if list.contains("Accountancy service provider") => {

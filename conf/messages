@@ -1747,6 +1747,7 @@ businessmatching.updateservice.newserviceinformation.info.tcsp = You’ll need t
 businessmatching.updateservice.newserviceinformation.info.onlyasp = You’ll need to complete the accountancy service provider section.
 businessmatching.updateservice.newserviceinformation.info.onlytcsp = You’ll need to complete the trust or company service provider section.
 businessmatching.updateservice.newserviceinformation.info.supervision = supervision details
+businessmatching.updateservice.newserviceinformation.info.warning = You'll need to update your trading premises to tell us where you provide the service you have added.
 
 businessmatching.updateservice.summary.whichtradingpremises.count = You’ve chosen {0} trading premises
 businessmatching.updateservice.summary.whichtradingpremises.activities.count = You’ve chosen {0} activities at your trading premises
