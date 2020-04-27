@@ -17,7 +17,10 @@
 @import include._
 @import forms2._
 @import config.{ ApplicationConfig}
-@(index: Int, flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@import models.businessmatching.BusinessActivities
+@import models.businessmatching.MoneyServiceBusiness
+@import models.businessmatching.TrustAndCompanyServices
+@(index: Int, flow: Option[String] = None, activities: Option[BusinessActivities])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
@@ -32,19 +35,35 @@
     @components.user_attention_saving()
 
     <p>@Messages("responsiblepeople.whatyouneed.requiredinfo")</p>
+    @activities.map { ba =>
+        <ul class="list list-bullet">
+            <li>@Messages("responsiblepeople.whatyouneed.line_1")</li>
+            <li>@Messages("responsiblepeople.whatyouneed.line_2")</li>
+            <li>@Messages("responsiblepeople.whatyouneed.line_3")</li>
+            <li>@Messages("responsiblepeople.whatyouneed.line_4")</li>
+            <li>@Messages("responsiblepeople.whatyouneed.line_5")</li>
+            <li>@Messages("responsiblepeople.whatyouneed.line_6")</li>
+            <li>@Messages("responsiblepeople.whatyouneed.line_7")</li>
+            <li>@Messages("responsiblepeople.whatyouneed.line_8")</li>
+            <li>@Messages("responsiblepeople.whatyouneed.line_9")</li>
+            <li>@Messages("responsiblepeople.whatyouneed.line_10")</li>
+            <li>@Messages("responsiblepeople.whatyouneed.line_11")</li>
+            <li>@Messages("responsiblepeople.whatyouneed.line_12")</li>
+            <li>@Messages("responsiblepeople.whatyouneed.line_13")</li>
+            @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness) || ba.hasBusinessOrAdditionalActivity(TrustAndCompanyServices)){<li>@Messages("responsiblepeople.whatyouneed.line_14")</li>}
+        </ul>
+    }
 
-     <ul class="list list-bullet">
-        <li>@Messages("responsiblepeople.whatyouneed.line_1")</li>
-        <li>@Messages("responsiblepeople.whatyouneed.line_2")</li>
-        <li>@Messages("responsiblepeople.whatyouneed.line_3")</li>
-        <li>@Messages("responsiblepeople.whatyouneed.line_4")</li>
-        <li>@Messages("responsiblepeople.whatyouneed.line_5")</li>
-        <li>@Messages("responsiblepeople.whatyouneed.line_6")</li>
-        <li>@Messages("responsiblepeople.whatyouneed.line_7")</li>
-        <li>@Messages("responsiblepeople.whatyouneed.line_8")</li>
-         <li>@Messages("responsiblepeople.whatyouneed.line_9")</li>
-         <li>@Messages("responsiblepeople.whatyouneed.line_10")</li>
-         <li>@Messages("responsiblepeople.whatyouneed.line_11")</li>
+    <p>@Messages("responsiblepeople.whatyouneed.line_15")</p>
+
+    <ul class="list list-bullet">
+        <li>@Messages("responsiblepeople.whatyouneed.line_16")</li>
+        <li>@Messages("responsiblepeople.whatyouneed.line_17")</li>
+        <li>@Messages("responsiblepeople.whatyouneed.line_18")</li>
+        <li>@Messages("responsiblepeople.whatyouneed.line_19")</li>
+        <li>@Messages("responsiblepeople.whatyouneed.line_20")</li>
+        <li>@Messages("responsiblepeople.whatyouneed.line_21")</li>
+        <li>@Messages("responsiblepeople.whatyouneed.line_22")</li>
     </ul>
 
     @anchor(

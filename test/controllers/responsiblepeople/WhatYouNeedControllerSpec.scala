@@ -17,26 +17,35 @@
 package controllers.responsiblepeople
 
 import controllers.actions.SuccessfulAuthAction
+import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import utils.AmlsSpec
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.AuthorisedFixture
+
+import scala.concurrent.Future
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture {
+  trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new WhatYouNeedController (
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      dataCacheConnector = mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
   }
   "WhatYouNeedController" must {
 
     "get" must {
 
       "load the page" in new Fixture {
+        val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+        val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+
+        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(bm))
+
         val result = controller.get(1)(request)
         status(result) must be(OK)
 

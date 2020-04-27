@@ -17,15 +17,19 @@
 package controllers.responsiblepeople
 
 import com.google.inject.Inject
+import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
 
 class WhatYouNeedController @Inject () (
+                                       val dataCacheConnector: DataCacheConnector,
                                        authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
@@ -33,6 +37,13 @@ class WhatYouNeedController @Inject () (
   def get(index: Int, flow: Option[String] = None) =
     authAction.async {
       implicit request =>
-        Future.successful(Ok(what_you_need(index, flow)))
+        dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
+          (for {
+            bm <- businessMatching
+            ba <- bm.activities
+          } yield {
+            Ok(what_you_need(index, flow, Some(ba)))
+          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+        }
     }
 }
