@@ -1403,12 +1403,16 @@ businessdetails.lettersaddress.title = Is this the right address to send you let
 tradingpremises.whatyouneed.paragraph1.text = We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
 tradingpremises.whatyouneed.requiredinfo.heading = For each of your trading premises you’ll be asked things like:
 tradingpremises.whatyouneed.requiredinfo.text.1 = trading name and address
-tradingpremises.whatyouneed.requiredinfo.text.2 = what the business does from these premises
-tradingpremises.whatyouneed.requiredinfo.text.3 = date you’ll start trading from these premises
-tradingpremises.whatyouneed.requiredinfo.text.4 = if it is also a residential address
-tradingpremises.whatyouneed.agents.sub.heading = Agents
-tradingpremises.whatyouneed.agents.desc.1 = If you use agents, we also need to know where your agents trade from.
-tradingpremises.whatyouneed.agents.desc.2 = An agent is an individual or business that works on behalf of your business to provide your services. An employee is not an agent.
+tradingpremises.whatyouneed.requiredinfo.text.2 = the date you started or will start trading from these premises
+tradingpremises.whatyouneed.requiredinfo.text.3 = if it is a residential address
+tradingpremises.whatyouneed.requiredinfo.text.4 = the services your business provides at these premises
+tradingpremises.whatyouneed.requiredinfo.text.5 = which money service business activities your business does at these premises
+tradingpremises.whatyouneed.requiredinfo.text.6 = company name and registration number
+tradingpremises.whatyouneed.requiredinfo.text.7 = name and date of birth
+tradingpremises.whatyouneed.requiredinfo.text.8 = business partners
+tradingpremises.whatyouneed.agents.sub.heading = Agents’ trading premises
+tradingpremises.whatyouneed.agents.desc.1 = If you use an agent, you’ll need to tell us the type of business your agent has, for example limited company.
+tradingpremises.whatyouneed.agents.desc.2 = Depending on your agent’s business type, you may need to tell us your agent’s:
 tradingpremises.whatyouneed.agents.individual.info.heading = You’ll need the following information for each agent:
 tradingpremises.whatyouneed.agents.individual.info.text1 = your agent’s name
 tradingpremises.whatyouneed.agents.individual.info.text2 = your agent’s business structure
@@ -2271,11 +2275,13 @@ responsiblepeople.country.of.birth.heading = Was {0} born in the UK?
 responsiblepeople.country.of.birth.txt.lbl = Country {0} was born in
 
 #TCSP
-tcsp.whatyouneed.requiredinfo.heading = In this section you’ll be asked things like:
-tcsp.whatyouneed.requiredinfo.text.1 = which services you provide
-tcsp.whatyouneed.requiredinfo.text.2 = if you create complex corporate structures for clients
-tcsp.whatyouneed.requiredinfo.text.3 = if you use the services of another trust or company service provider
-tcsp.whatyouneed.requiredinfo.text.4 = your trust or company service provider’s Money Laundering Regulations number
+tcsp.whatyouneed.requiredinfo.heading = You’ll need to tell us:
+tcsp.whatyouneed.requiredinfo.text.1 = the type of trust or company service provider you are
+tcsp.whatyouneed.requiredinfo.text.2 = if you use the services of another trust or company service provider
+tcsp.whatyouneed.requiredinfo.text.3 = your trust or company service provider’s Money Laundering Regulations number, if you use another provider
+tcsp.whatyouneed.requiredinfo.text.4 = You may also need to tell us:
+tcsp.whatyouneed.requiredinfo.text.5 = if you only sell off-the-shelf companies
+tcsp.whatyouneed.requiredinfo.text.6 = which services your business provides
 
 tcsp.kind.of.service.provider.title = What type of trust or company service provider are you?
 tcsp.service.provider.lbl.01 = Nominee shareholders provider
@@ -2306,8 +2312,8 @@ tcsp.anothertcspsupervision.title = Is your trust or company service provider re
 tcsp.anothertcspsupervision.header = Is your trust or company service provider registered with HMRC for anti-money laundering supervision?
 
 #ASP
-asp.whatyouneed.subheading = In this section you’ll be asked:
-asp.whatyouneed.line_1 = which services you provide
+asp.whatyouneed.subheading = You’ll need to tell us:
+asp.whatyouneed.line_1 = which accountancy services your business provides
 asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other businesses’ tax matters
 asp.other.business.tax.matters.title = Are you registered with HMRC to handle other businesses’ tax matters?
 asp.other.business.tax.matters.agentrefno.lbl = HMRC Agent Registration Number
@@ -2321,12 +2327,16 @@ asp.service.lbl.05 = Financial or tax advice
 asp.summary.registration.number = HMRC Registration number:
 
 #Supervision
-supervision.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
-supervision.whatyouneed.requiredinfo.text.1 = details of any previous supervisors
-supervision.whatyouneed.requiredinfo.text.2 = if your business is a member of any professional bodies
-supervision.whatyouneed.requiredinfo.text.3 = if your business has been penalised in the past
+supervision.whatyouneed.requiredinfo.heading = You’ll need to tell us:
+supervision.whatyouneed.requiredinfo.text.1 = if your business has been registered with another supervisory body under the Money Laundering Regulations
+supervision.whatyouneed.requiredinfo.text.2 = which professional bodies you’re a member of, if any
+supervision.whatyouneed.requiredinfo.text.3 = if your business, or anyone in your business, has been penalised for activities covered by the Money Laundering Regulations
+supervision.whatyouneed.requiredinfo.text.4 = If you have been registered with another supervisory body, you’ll need to tell us the:
+supervision.whatyouneed.requiredinfo.text.5 = name of your previous supervisory body
+supervision.whatyouneed.requiredinfo.text.6 = dates your supervision started and ended
+supervision.whatyouneed.requiredinfo.text.7 = reason why your supervision ended
 
-supervision.another_body.title = Has your business ever been registered with another supervising body for anti-money laundering supervision? 
+supervision.another_body.title = Has your business ever been registered with another supervising body for anti-money laundering supervision?
 supervision.another_body.description = This only refers to registration for anti-money laundering supervision.
 supervision.another_body.lbl.supervisor = Name of your previous supervising body for anti-money laundering supervision
 supervision.another_body.startDate.lbl = Start date of supervision
@@ -2371,16 +2381,19 @@ supervision.memberofprofessionalbody.lbl.15 = Name of professional body you’re
 
 supervision.whichprofessionalbody.title = Which professional bodies are you a member of?
 
-msb.whatyouneed.requiredinfo.heading = In this section you’ll be asked things like:
+msb.whatyouneed.requiredinfo.heading = You’ll need to tell us:
 msb.whatyouneed.line_1 = the amount of throughput you expect in the next 12 months
-msb.whatyouneed.line_2 = if you have branches or agents in other countries
-msb.whatyouneed.line_3 = where you expect to send the largest amounts of money
-msb.whatyouneed.line_4 = which currencies you expect to supply the most of
-msb.whatyouneed.line_5 = if you deal in physical foreign currencies, and who supplies them
-msb.whatyouneed.line_6 = how many currency exchange transactions you expect to make in the next 12 months
-msb.whatyouneed.line_7 = how many foreign exchange transactions you expect to make in the next 12 months
-msb.whatyouneed.line_8 = if you use an intermediary payment service provider
-msb.whatyouneed.line_9 = where you expect to send the most transactions
+msb.whatyouneed.line_2 = which countries you have branches or agents in, if you have any
+msb.whatyouneed.line_3 = if your systems can identify linked transactions
+msb.whatyouneed.line_4 = your Intermediary Payment Service Provider’s name and Money Laundering Regulations number, if you use one
+msb.whatyouneed.line_5 = if you transfer money without using formal banking systems
+msb.whatyouneed.line_6 = the number of money transfers you expect to make in the next 12 months
+msb.whatyouneed.line_7 = which countries you expect to send the largest amounts of money to, if you send money to other countries
+msb.whatyouneed.line_8 = which countries you expect to send the most transactions to, if you send money to other countries
+msb.whatyouneed.line_9 = the number of currency exchange transactions you expect in the next 12 months
+msb.whatyouneed.line_10 = which currencies you expect to supply the most to your customers
+msb.whatyouneed.line_11 = who will supply your foreign currency, if you expect to deal in physical foreign currencies
+msb.whatyouneed.line_12 = the number foreign exchange transactions you expect in the next 12 months
 msb.services.list.heading = Select all that apply
 msb.services.list.lbl.01 = Transmitting money
 msb.services.list.lbl.02 = Currency exchange
@@ -2444,8 +2457,13 @@ msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 
 hvd.whatyouneed.requiredinfo.heading = In this section you’ll be asked things like:
 hvd.whatyouneed.line_1 = what your business will buy or sell
-hvd.whatyouneed.line_2 = if you’ll be buying or selling duty-suspended excise goods
-hvd.whatyouneed.line_3 = how your business deals with cash payments of €10,000 or more
+hvd.whatyouneed.line_2 = how you’ll sell your goods, for example auction
+hvd.whatyouneed.line_3 = the date of the first cash payment of €10,000 or more, if you have made or accepted any
+hvd.whatyouneed.line_4 = if you can identify linked cash payments of €10,000 or more
+hvd.whatyouneed.line_5 = how you’ll receive cash payments of €10,000 or more from customers you have not met in person, if you receive any
+hvd.whatyouneed.line_6 = the percentage of your turnover you expect to come from cash payments of €10,000 or more
+hvd.whatyouneed.line_7 = You may need to tell us:
+hvd.whatyouneed.line_8 = if you’ll be buying or selling duty-suspended excise goods
 
 hvd.how-will-you-sell-goods.title = How will you sell these goods?
 hvd.how-will-you-sell-goods.channels.auction = Auction

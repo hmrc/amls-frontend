@@ -43,7 +43,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
   "WhatYouNeedController" must {
 
     "load the what you need page" in new Fixture {
-      when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(None))
+      when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), None, None, None))))
         val result = controller.get(1)(request)
       status(result) mustBe OK
     }

@@ -54,10 +54,12 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     "contain the expected content elements" in new ViewFixture {
       def view = views.html.tcsp.what_you_need()
 
-      html must include(Messages("tcsp.whatyouneed.requiredinfo.text.1"))
-      html must include(Messages("tcsp.whatyouneed.requiredinfo.text.2"))
-      html must include(Messages("tcsp.whatyouneed.requiredinfo.text.3"))
-      html must include(Messages("tcsp.whatyouneed.requiredinfo.text.4"))
+      html must include(Messages("the type of trust or company service provider you are"))
+      html must include(Messages("if you use the services of another trust or company service provider"))
+      html must include(Messages("your trust or company service provider’s Money Laundering Regulations number, if you use another provider"))
+      html must include(Messages("You may also need to tell us:"))
+      html must include(Messages("if you only sell off-the-shelf companies"))
+      html must include(Messages("which services your business provides"))
     }
   }
 }
