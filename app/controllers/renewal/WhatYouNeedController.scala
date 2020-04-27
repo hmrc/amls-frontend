@@ -16,8 +16,10 @@
 
 package controllers.renewal
 
+import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.registrationprogress.{NotStarted, Section, Started}
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
@@ -28,16 +30,28 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class WhatYouNeedController @Inject()(val authAction: AuthAction,
+class WhatYouNeedController @Inject()(
+                                      val dataCacheConnector: DataCacheConnector,
+                                      val authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
                                       renewalService: RenewalService,
                                       val cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>
-      renewalService.getSection(request.credId) map {
-        case Section(_,NotStarted | Started,_,_) => Ok(what_you_need())
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
+        (for {
+          bm <- businessMatching
+          ba <- bm.activities
+        } yield { getSection(renewalService, request.credId, Some(ba))
+        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
       }
+  }
+
+  def getSection(renewalService: RenewalService, credId: String, ba: Option[BusinessActivities]) = {
+    renewalService.getSection(credId) map {
+      case Section(_,NotStarted | Started,_,_) => Ok(what_you_need(ba))
+      case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+    }
   }
 }
