@@ -26,7 +26,8 @@
     isDeclaration: Boolean,
     heading: String = "",
     section: String = "",
-    hint: String = ""
+    hint: String = "",
+    declarationPage: Boolean = false
 )(implicit request: Request[_],m:Messages, lang: Lang)
 
 @content = {
@@ -81,24 +82,38 @@
     )
 }
 
-@if(heading.nonEmpty) {
+@if(declarationPage) {
     @fieldsetWithErrorGroup(
         f = f("positions"),
-        heading = heading,
-        section = section,
-        hint = hint,
-        panel = false
+        legend = "responsiblepeople.position_within_business.title",
+        legendHidden = true,
+        panel = false,
+        additionalHeading = true,
+        additionalHeadingText = "responsiblepeople.position_within_business.h2",
+        hint = hint
     ) {
         @content
     }
 } else {
-    @fieldset(
-        f = f("positions"),
-        legend = "responsiblepeople.position_within_business.title",
-        legendHidden = true,
-        panel = false
-    ) {
-        @content
+    @if(heading.nonEmpty) {
+        @fieldsetWithErrorGroup(
+            f = f("positions"),
+            heading = heading,
+            section = section,
+            hint = hint,
+            panel = false
+        ) {
+            @content
+        }
+    } else {
+        @fieldset(
+            f = f("positions"),
+            legend = "responsiblepeople.position_within_business.title",
+            legendHidden = true,
+            panel = false
+        ) {
+            @content
+        }
     }
 }
 

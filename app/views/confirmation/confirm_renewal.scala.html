@@ -16,10 +16,9 @@
 
 @import include._
 @import models.confirmation._
-@import views.html.confirmation.{breakdown => breakdown_display}
 @import config.{ ApplicationConfig}
 
-@(paymentReference: Option[String], total: Currency, breakdown: Seq[BreakdownRow], amountToPay: Currency, paymentsUrl: String, isRenewalAmendment: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(paymentReference: Option[String], total: Currency, amountToPay: Currency, paymentsUrl: String, isRenewalAmendment: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @subHeading = {
     @if(isRenewalAmendment){
@@ -49,14 +48,12 @@
         }
     </div>
 
-    @breakdown_display(total, breakdown, Messages("confirmation.renewal.summary"))
-
     <div id="timelimit"><p>@Messages("confirmation.timelimit")</p></div>
 
     @printLink(linkId = "confirmation-print",
         gaTag = Some("fee-reference:click:print")
     )
 
-    <p><a id='continue-pay' class="button" href="@paymentsUrl">@Messages("button.continuetopayment")</a></p>
+    <p><a id='continue-pay' class="button" href="@paymentsUrl" draggable="false">@Messages("button.continuetopayment")</a></p>
 
 }

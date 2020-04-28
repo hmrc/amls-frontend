@@ -1,1 +1,0 @@
- + [AMLS-5096] - 'Bug fix for aria described by whitespace'
