@@ -46,32 +46,32 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     "contain the expected content elements when not ASP" in new ViewFixture{
       def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(MoneyServiceBusiness))))
 
-      html must include(Messages("businessactivities.whatyouneed.line_1"))
-      html must include(Messages("businessactivities.whatyouneed.line_2"))
-      html must include(Messages("businessactivities.whatyouneed.line_3"))
-      html must include(Messages("businessactivities.whatyouneed.line_4"))
-      html must include(Messages("businessactivities.whatyouneed.line_5"))
-      html must include(Messages("businessactivities.whatyouneed.line_6"))
-      html must include(Messages("businessactivities.whatyouneed.line_7"))
-      html must include(Messages("businessactivities.whatyouneed.line_8"))
-      html must include(Messages("businessactivities.whatyouneed.line_9"))
-      html must include(Messages("businessactivities.whatyouneed.line_10"))
-      html must include(Messages("businessactivities.whatyouneed.line_11"))
+      html must include(Messages("about any business activities that are not covered by the Money Laundering Regulations"))
+      html must include(Messages("the net profit you expect in the next 12 months, if you also carry out activities not covered by the regulations"))
+      html must include(Messages("the net profit you expect in the next 12 months from the services you’re registering"))
+      html must include(Messages("the franchisor’s name, if your business is a franchise"))
+      html must include(Messages("how many people work on activities covered by the Money Laundering Regulations"))
+      html must include(Messages("how many people work for the business"))
+      html must include(Messages("how you record customer transactions"))
+      html must include(Messages("if you have written guidance on how to identify and report suspicious activity"))
+      html must include(Messages("if your business has registered with the National Crime Agency (NCA)"))
+      html must include(Messages("how you document your risk assessment policy and procedure, if your business has on"))
+      html must include(Messages("about your professional adviser for Money Laundering Regulations, if you have one"))
     }
 
     "contain the expected content elements when ASP" in new ViewFixture{
       def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
 
-      html must include(Messages("businessactivities.whatyouneed.line_1"))
-      html must include(Messages("businessactivities.whatyouneed.line_2"))
-      html must include(Messages("businessactivities.whatyouneed.line_3"))
-      html must include(Messages("businessactivities.whatyouneed.line_4"))
-      html must include(Messages("businessactivities.whatyouneed.line_5"))
-      html must include(Messages("businessactivities.whatyouneed.line_6"))
-      html must include(Messages("businessactivities.whatyouneed.line_7"))
-      html must include(Messages("businessactivities.whatyouneed.line_8"))
-      html must include(Messages("businessactivities.whatyouneed.line_9"))
-      html must include(Messages("businessactivities.whatyouneed.line_10"))
+      html must include(Messages("about any business activities that are not covered by the Money Laundering Regulations"))
+      html must include(Messages("the net profit you expect in the next 12 months, if you also carry out activities not covered by the regulations"))
+      html must include(Messages("the net profit you expect in the next 12 months from the services you’re registering"))
+      html must include(Messages("the franchisor’s name, if your business is a franchise"))
+      html must include(Messages("how many people work on activities covered by the Money Laundering Regulations"))
+      html must include(Messages("how many people work for the business"))
+      html must include(Messages("how you record customer transactions"))
+      html must include(Messages("if you have written guidance on how to identify and report suspicious activity"))
+      html must include(Messages("if your business has registered with the National Crime Agency (NCA)"))
+      html must include(Messages("how you document your risk assessment policy and procedure, if your business has on"))
     }
 
     "have a back link" in new ViewFixture {

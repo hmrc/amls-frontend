@@ -50,7 +50,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.responsiblepeople.what_you_need(1, None, None)
+      def view = views.html.responsiblepeople.what_you_need(1, None, Some(BusinessActivities(Set(MoneyServiceBusiness))))
 
       html must include(Messages("responsiblepeople.whatyouneed.requiredinfo"))
 

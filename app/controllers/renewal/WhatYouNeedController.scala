@@ -15,42 +15,40 @@
  */
 
 package controllers.renewal
-
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.{BusinessActivities, BusinessMatching, BusinessMatchingMsbServices}
 import models.registrationprogress.{NotStarted, Section, Started}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{MessagesControllerComponents, Request}
 import services.RenewalService
 import utils.AuthAction
 import views.html.renewal._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
-
 @Singleton
 class WhatYouNeedController @Inject()(
-                                      val dataCacheConnector: DataCacheConnector,
-                                      val authAction: AuthAction,
-                                      val ds: CommonPlayDependencies,
-                                      renewalService: RenewalService,
-                                      val cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) {
-
+                                       val dataCacheConnector: DataCacheConnector,
+                                       val authAction: AuthAction,
+                                       val ds: CommonPlayDependencies,
+                                       renewalService: RenewalService,
+                                       val cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) {
   def get = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
         (for {
-          bm <- businessMatching
-          ba <- bm.activities
-        } yield { getSection(renewalService, request.credId, Some(ba))
-        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+          cache <- OptionT(dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key))
+          ba <- OptionT.fromOption[Future](cache.activities)
+          section <- OptionT.liftF(getSection(renewalService, request.credId, Some(ba), cache.msbServices))
+        } yield {
+          section
+        }).getOrElse(Redirect(controllers.routes.RegistrationProgressController.get()))
   }
-
-  def getSection(renewalService: RenewalService, credId: String, ba: Option[BusinessActivities]) = {
+  def getSection(renewalService: RenewalService, credId: String, ba: Option[BusinessActivities], msbActivities: Option[BusinessMatchingMsbServices])(implicit request: Request[_]) = {
     renewalService.getSection(credId) map {
-      case Section(_,NotStarted | Started,_,_) => Ok(what_you_need(ba))
+      case Section(_, NotStarted | Started, _, _) => Ok(what_you_need(ba, msbActivities))
       case _ => Redirect(controllers.routes.RegistrationProgressController.get())
     }
   }

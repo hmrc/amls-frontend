@@ -49,7 +49,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "load the what you need page when msb selected as an option in business matching" in new Fixture {
-      val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+      val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness))
       val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
 
       when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(bm))

@@ -49,9 +49,10 @@
             <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.4")</li>
         }
         @msbServices.map { msb =>
-                @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness) && msb.msbServices.size > 1) {
-                    <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.5")</li>
-                }
+            @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness) && msb.msbServices.size > 1) {
+                <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.5")</li>
+            }
+        }
 
 
         @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness)) {
@@ -75,10 +76,8 @@
                 returnLink = true,
                 id = Some("tpwhatyouneed-button")
             )
-        }
+        } else {
         </ul>
-        }
-    }
         @if(index == 1) {
             @anchor(
                 attrHref = controllers.tradingpremises.routes.ConfirmAddressController.get(index).toString,
@@ -97,3 +96,5 @@
             )
         }
     }
+}
+}
