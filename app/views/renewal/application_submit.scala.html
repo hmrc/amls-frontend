@@ -51,7 +51,6 @@
             @anchor(
                 attrHref = controllers.renewal.routes.SummaryController.get().url,
                 linkText = Messages("renewal.progress.edit"),
-                visuallyhidden = Messages("renewal.progress.edit"),
                 id=Some("renewal-progress-edit")
             )
         </p>
@@ -63,7 +62,6 @@
                         attrHref = controllers.renewal.routes.SummaryController.get().url,
                         linkText = Messages("renewal.progress.continue"),
                         attrRole = true,
-                        visuallyhidden = Messages("renewal.progress.continue"),
                         id=Some("renewal-progress-continue")
                     )
                 }
@@ -72,7 +70,6 @@
                         attrHref = controllers.renewal.routes.WhatYouNeedController.get().url,
                         linkText = Messages("renewal.progress.continue"),
                         attrRole = true,
-                        visuallyhidden = Messages("renewal.progress.continue"),
                         id=Some("renewal-progress-continue")
                     )
                 }
