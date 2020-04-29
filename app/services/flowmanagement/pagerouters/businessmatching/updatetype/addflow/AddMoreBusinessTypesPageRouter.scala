@@ -16,17 +16,16 @@
 
 package services.flowmanagement.pagerouters.addflow
 
-import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
-import models.flowmanagement.{AddMoreBusinessTypesPageId, AddBusinessTypeFlowModel, PageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, AddMoreBusinessTypesPageId}
 import play.api.mvc.Result
-import play.api.mvc.Results.{InternalServerError, Redirect}
+import play.api.mvc.Results.Redirect
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -40,23 +39,12 @@ class AddMoreBusinessTypesPageRouter @Inject()(val statusService: StatusService,
     model.addMoreActivities match {
       case Some(true) =>
         Future.successful(Redirect(addRoutes.SelectBusinessTypeController.get(edit)))
+      case Some(false) =>
+        Future.successful(Redirect(addRoutes.NeedMoreInformationController.get()))
       case _ =>
-        newServiceInformationRedirect(credId) getOrElse error(AddMoreBusinessTypesPageId)
+        error(AddMoreBusinessTypesPageId)
     }
   }
-
-  private def newServiceInformationRedirect(credId:String)(implicit hc: HeaderCarrier, ec: ExecutionContext) =
-    businessMatchingService.getAdditionalBusinessActivities(credId) map { activities =>
-      if (!activities.forall {
-        case BillPaymentServices | TelephonePaymentService => true
-        case _ => false
-      }) {
-        Redirect(addRoutes.NeedMoreInformationController.get())
-      } else {
-        Redirect(controllers.routes.RegistrationProgressController.get())
-      }
-    }
-
 }
 
 
