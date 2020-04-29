@@ -29,10 +29,10 @@ import views.html.responsiblepeople._
 import scala.concurrent.Future
 
 class WhatYouNeedController @Inject () (
-                                       val dataCacheConnector: DataCacheConnector,
-                                       authAction: AuthAction,
-                                       val ds: CommonPlayDependencies,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                        val dataCacheConnector: DataCacheConnector,
+                                        authAction: AuthAction,
+                                        val ds: CommonPlayDependencies,
+                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(index: Int, flow: Option[String] = None) =
     authAction.async {
@@ -43,7 +43,7 @@ class WhatYouNeedController @Inject () (
             ba <- bm.activities
           } yield {
             Ok(what_you_need(index, flow, Some(ba)))
-          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+          }) getOrElse(InternalServerError("Unable to retrieve business activities"))
         }
     }
 }

@@ -58,11 +58,13 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
       contentAsString(result) must include(Messages("tradingpremises.whatyouneed.agents.sub.heading"))
 
     }
-  }
 
-//  it must {
-//    "use correct services" in new Fixture {
-//      WhatYouNeedController.authConnector must be(AMLSAuthConnector)
-//    }
-//  }
+    "Throw an error when data cannot be fetched" in new Fixture {
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+        .thenReturn(Future.successful(None))
+
+      val result = controller.get(1)(request)
+      status(result) must be(INTERNAL_SERVER_ERROR)
+    }
+  }
 }

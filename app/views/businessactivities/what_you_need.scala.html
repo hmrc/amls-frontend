@@ -19,6 +19,7 @@
 @import config.{ ApplicationConfig}
 @import models.businessmatching.BusinessActivities
 @import models.businessmatching.AccountancyServices
+
 @(nextPageUrl: String, activities: Option[BusinessActivities])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
@@ -46,7 +47,9 @@
             <li>@Messages("businessactivities.whatyouneed.line_8")</li>
             <li>@Messages("businessactivities.whatyouneed.line_9")</li>
             <li>@Messages("businessactivities.whatyouneed.line_10")</li>
-            @if(!ba.hasBusinessOrAdditionalActivity(AccountancyServices)){<li>@Messages("businessactivities.whatyouneed.line_11")</li>}
+            @if(!ba.hasBusinessOrAdditionalActivity(AccountancyServices)) {
+                <li>@Messages("businessactivities.whatyouneed.line_11")</li>
+            }
         </ul>
     }
 

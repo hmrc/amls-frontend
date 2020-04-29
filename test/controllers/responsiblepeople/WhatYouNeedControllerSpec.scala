@@ -18,6 +18,7 @@ package controllers.responsiblepeople
 
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
+import models.status.SubmissionReadyForReview
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
@@ -54,6 +55,15 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           Messages("title.amls") + " - " + Messages("title.gov")
 
         contentAsString(result) must include(pageTitle)
+      }
+    }
+    "Throw an error" when {
+      "bm details cannot be fetched" in new Fixture {
+        when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.get(1)(request)
+        status(result) must be(INTERNAL_SERVER_ERROR)
       }
     }
   }

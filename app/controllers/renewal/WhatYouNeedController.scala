@@ -36,17 +36,21 @@ class WhatYouNeedController @Inject()(
                                        val ds: CommonPlayDependencies,
                                        renewalService: RenewalService,
                                        val cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) {
+
   def get = authAction.async {
     implicit request =>
         (for {
-          cache <- OptionT(dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key))
-          ba <- OptionT.fromOption[Future](cache.activities)
-          section <- OptionT.liftF(getSection(renewalService, request.credId, Some(ba), cache.msbServices))
+          bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key))
+          ba <- OptionT.fromOption[Future](bm.activities)
+          section <- OptionT.liftF(getSection(renewalService, request.credId, Some(ba), bm.msbServices))
         } yield {
           section
-        }).getOrElse(Redirect(controllers.routes.RegistrationProgressController.get()))
+        }).getOrElse(InternalServerError("Unable to retrieve the correct data"))
   }
-  def getSection(renewalService: RenewalService, credId: String, ba: Option[BusinessActivities], msbActivities: Option[BusinessMatchingMsbServices])(implicit request: Request[_]) = {
+
+  def getSection(renewalService: RenewalService,
+                 credId: String, ba: Option[BusinessActivities],
+                 msbActivities: Option[BusinessMatchingMsbServices])(implicit request: Request[_]) = {
     renewalService.getSection(credId) map {
       case Section(_, NotStarted | Started, _, _) => Ok(what_you_need(ba, msbActivities))
       case _ => Redirect(controllers.routes.RegistrationProgressController.get())

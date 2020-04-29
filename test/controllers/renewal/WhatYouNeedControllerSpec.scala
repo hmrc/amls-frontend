@@ -85,6 +85,18 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
         status(result) must be(SEE_OTHER)
 
       }
+
+      "return INTERNAL_SERVER_ERROR if no call is returned" in new Fixture {
+        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(None))
+
+        when {
+          renewalService.getSection(meq("internalId"))(any(), any())
+        } thenReturn Future.successful(Section("renewal", Completed, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get()))
+
+        val result = controller.get()(requestWithToken)
+
+        status(result) must be(INTERNAL_SERVER_ERROR)
+      }
     }
   }
 }

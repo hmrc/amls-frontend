@@ -17,15 +17,8 @@
 @import include._
 @import forms2._
 @import config.{ ApplicationConfig}
-@import models.businessmatching.BusinessActivities
-@import models.businessmatching.ArtMarketParticipant
-@import models.businessmatching.MoneyServiceBusiness
-@import models.businessmatching.BusinessMatchingMsbServices
-@import models.businessmatching.TransmittingMoney
-@import models.businessmatching.CurrencyExchange
-@import models.businessmatching.AccountancyServices
-@import models.businessmatching.HighValueDealing
-@import models.businessmatching.ForeignExchange
+@import models.businessmatching._
+
 @(activities: Option[BusinessActivities], msbActivities: Option[BusinessMatchingMsbServices])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

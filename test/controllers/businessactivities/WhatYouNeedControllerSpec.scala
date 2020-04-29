@@ -103,16 +103,14 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
           doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.InvolvedInOtherController.get().url
         }
       }
-      "Redirect to registration progress page" when {
+      "Throw an error" when {
         "bm details cannot be fetched" in new Fixture {
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
           mockApplicationStatus(SubmissionReadyForReview)
 
           val result = controller.get(request)
-          status(result) must be(SEE_OTHER)
-
-          redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+          status(result) must be(INTERNAL_SERVER_ERROR)
         }
       }
     }

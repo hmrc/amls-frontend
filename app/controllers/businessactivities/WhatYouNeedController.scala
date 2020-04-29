@@ -48,7 +48,7 @@ import scala.concurrent.Future
           ba <- bm.activities
         } yield {
           Ok(what_you_need(routes.InvolvedInOtherController.get().url, Some(ba)))
-        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+        })getOrElse(InternalServerError("Unable to retrieve business activities"))
       }
   }
 }

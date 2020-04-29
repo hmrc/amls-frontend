@@ -39,7 +39,7 @@ class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector
           bm <- businessMatching
           ba <- bm.activities
         } yield { Ok(what_you_need(index, Some(ba), bm.msbServices))
-      })getOrElse  Redirect(controllers.routes.RegistrationProgressController.get())
+      })getOrElse(InternalServerError("Unable to retrieve correct data"))
     }
   }
 }
