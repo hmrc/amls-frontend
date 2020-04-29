@@ -45,7 +45,7 @@ class WhatYouNeedController @Inject()(
           section <- OptionT.liftF(getSection(renewalService, request.credId, Some(ba), bm.msbServices))
         } yield {
           section
-        }).getOrElse(InternalServerError("Unable to retrieve the correct data"))
+        }).getOrElse(InternalServerError("Unable to retrieve business activities"))
   }
 
   def getSection(renewalService: RenewalService,

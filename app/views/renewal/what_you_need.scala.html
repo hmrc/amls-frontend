@@ -44,20 +44,24 @@
             @if(ba.hasBusinessOrAdditionalActivity(ArtMarketParticipant)) {<li>@Messages("renewal.whatyouneed.line_4")</li>}
             @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness)) {<li>@Messages("renewal.whatyouneed.line_5")</li>}
             @msbActivities.map { msb =>
-                @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness) && msb.msbServices.contains(TransmittingMoney)) {
-                    <li>@Messages("renewal.whatyouneed.line_6")</li>
-                    <li>@Messages("renewal.whatyouneed.line_7")</li>
-                    <li>@Messages("renewal.whatyouneed.line_8")</li>
+                    @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness)) {
+                        @if(msb.msbServices.contains(TransmittingMoney)) {
+                            <li>@Messages("renewal.whatyouneed.line_6")</li>
+                            <li>@Messages("renewal.whatyouneed.line_7")</li>
+                            <li>@Messages("renewal.whatyouneed.line_8")</li>
+                        }
+
+                        @if(msb.msbServices.contains(CurrencyExchange)) {
+                            <li>@Messages("renewal.whatyouneed.line_9")</li>
+                            <li>@Messages("renewal.whatyouneed.line_10")</li>
+                            <li>@Messages("renewal.whatyouneed.line_11")</li>
+                        }
+
+                        @if(msb.msbServices.contains(ForeignExchange)) {
+                            <li>@Messages("renewal.whatyouneed.line_12")</li>
+                        }
+                    }
                 }
-                @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness) && msb.msbServices.contains(CurrencyExchange)) {
-                    <li>@Messages("renewal.whatyouneed.line_9")</li>
-                    <li>@Messages("renewal.whatyouneed.line_10")</li>
-                    <li>@Messages("renewal.whatyouneed.line_11")</li>
-                }
-                @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness) && msb.msbServices.contains(ForeignExchange)) {
-                    <li>@Messages("renewal.whatyouneed.line_12")</li>
-                }
-            }
             @if(ba.hasBusinessOrAdditionalActivity(AccountancyServices) || ba.hasBusinessOrAdditionalActivity(HighValueDealing)) {<li>@Messages("renewal.whatyouneed.line_13")</li>}
             @if(ba.hasBusinessOrAdditionalActivity(HighValueDealing)) {
                 <li>@Messages("renewal.whatyouneed.line_14")</li>
