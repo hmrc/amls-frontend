@@ -63,15 +63,14 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
         Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.businessmatching.services(f, edit, fxEnabledToggle = config.fxEnabledToggle)))
-
           case ValidForm(_, data) =>
             dataCacheConnector.update[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) {
               _.getOrElse(ChangeSubSectorFlowModel()).copy(subSectors = Some(data.msbServices))
             } flatMap {
               case Some(m@ChangeSubSectorFlowModel(Some(set), _)) if !(set contains TransmittingMoney) =>
-                helper.updateSubSectors(request.credId, m) flatMap { _ => router.getRoute(request.credId, SubSectorsPageId, m) }
+                helper.updateSubSectors(request.credId, m) flatMap { _ => router.getRoute(request.credId, SubSectorsPageId, m, edit) }
               case Some(updatedModel) =>
-                router.getRoute(request.credId, SubSectorsPageId, updatedModel)
+                router.getRoute(request.credId, SubSectorsPageId, updatedModel, edit)
             }
         }
   }
