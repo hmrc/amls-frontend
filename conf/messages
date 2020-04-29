@@ -1597,6 +1597,7 @@ businessmatching.typeofbusiness.title = What type of unincorporated association 
 businessmatching.typeofbusiness.lbl = Type of business
 businessmatching.typeofbusiness.lbl.hint = For example, association, charity, trust.
 businessmatching.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
+businessmatching.psr.number.title.post.submission = What is you business’s Payment Services Regulations number?
 businessmatching.psr.number.cya.title = PSR registration number
 businessmatching.psr.number.lbl = PSR registration number
 businessmatching.psr.number.hint = This is 6 numbers, for example 123456. You can find on your registration letter from the the Financial Conduct Authority (FCA).

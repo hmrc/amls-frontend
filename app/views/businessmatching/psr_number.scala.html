@@ -34,8 +34,12 @@
    if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation"
 }
 
+@title = @{
+    if(isPreSubmission)  "businessmatching.psr.number.title" else "businessmatching.psr.number.title.post.submission"
+}
+
 @main(
-    title = Messages("businessmatching.psr.number.title") + " - " + Messages(section),
+    title = Messages(title) + " - " + Messages(section),
     heading = header
 )  {
 
@@ -47,10 +51,9 @@
                 attrType = "text",
                 dataAttrs = digitsOnlyAttributes,
                 field = f("regNumber"),
-                heading = "businessmatching.psr.number.title",
+                heading = "businessmatching.psr.number.title.post.submission",
                 section = section,
                 hintText = "businessmatching.psr.number.hint",
-                labelText = "businessmatching.psr.number.lbl",
                 inputMode = "numeric"
             )
         } else {
