@@ -1094,7 +1094,7 @@ progress.visuallyhidden.view.updated = Updated
 progress.preapplication.canedit = Add or remove services
 progress.preapplication.readonly = Check details
 
-progress.submit.updates = Submit Updates
+progress.submit.updates = Submit updates
 progress.updates.made = To submit your updates you need to complete a declaration, and pay the fees.
 progress.updates.incomplete = You can submit your updates when you have completed all the sections.
 progress.updates.not.made = You have not made any updates
