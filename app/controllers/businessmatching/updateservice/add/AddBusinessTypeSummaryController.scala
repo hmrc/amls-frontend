@@ -53,10 +53,8 @@ class AddBusinessTypeSummaryController @Inject()(
     implicit request =>
       (for {
         flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
-        filteredTPs: Seq[(TradingPremises, Int)] <- helper.filteredTps(request.credId, flowModel) orElse OptionT.pure[Future, Seq[(TradingPremises, Int)]](Seq())
-        filteredRPs: Seq[(ResponsiblePerson, Int)] <- helper.filteredRps(request.credId, flowModel) orElse OptionT.pure[Future, Seq[(ResponsiblePerson, Int)]](Seq())
       } yield {
-        Ok(update_services_summary(EmptyForm, flowModel, filteredTPs, filteredRPs))
+        Ok(update_services_summary(EmptyForm, flowModel))
       }) getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
   }
 
@@ -65,8 +63,6 @@ class AddBusinessTypeSummaryController @Inject()(
         (for {
           model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
           activity <- OptionT.fromOption[Future](model.activity)
-                  _ <- helper.updateTradingPremises(request.credId, model)
-                  _ <- helper.updateResponsiblePeople(request.credId, model)
                   _ <- helper.updateSupervision(request.credId)
                   _ <- helper.updateBusinessMatching(request.credId, model)
                   _ <- helper.updateServicesRegister(request.credId, model)

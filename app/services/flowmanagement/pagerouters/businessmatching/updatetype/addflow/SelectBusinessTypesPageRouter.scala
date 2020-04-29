@@ -36,9 +36,8 @@ class SelectBusinessTypesPageRouter @Inject()(val statusService: StatusService,
   override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
-    if (edit && model.areNewActivitiesAtTradingPremises.isDefined) {
+    if (edit) {
       Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
-
     } else {
       model.activity match {
         case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.SubSectorsController.get()))

@@ -85,18 +85,6 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     } yield updatedModel
   }
 
-  def updateTradingPremises(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier): OptionT[Future, Seq[TradingPremises]] = for {
-
-    tradingPremises <- OptionT.liftF(tradingPremisesData(credId))
-    activity <- OptionT.fromOption[Future](model.activity)
-    indices <- OptionT.fromOption[Future](model.tradingPremisesActivities map {
-      _.index.toSeq
-    }) orElse OptionT.some(Seq.empty)
-    msbServices <- OptionT.fromOption[Future](model.tradingPremisesMsbServices) orElse OptionT.some(BusinessMatchingMsbServices(Set.empty[BusinessMatchingMsbService]))
-    newTradingPremises <- OptionT.some[Future, Seq[TradingPremises]](tradingPremisesService.updateTradingPremises(indices, tradingPremises, activity, Some(msbServices), false))
-    _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](credId, TradingPremises.key, newTradingPremises))
-  } yield tradingPremises
-
   def tradingPremisesData(credId: String)(implicit hc: HeaderCarrier): Future[Seq[TradingPremises]] =
     getData[TradingPremises](credId).map {
       _.filterNot(tp => tp.status.contains(StatusConstants.Deleted))
@@ -129,16 +117,6 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     } yield newBusinessMatching
   }
 
-  def updateResponsiblePeople(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier): OptionT[Future, Seq[ResponsiblePerson]] = {
-    val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)
-
-    OptionT(dataCacheConnector.update[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key) {
-      case Some(people) =>
-        responsiblePeopleService.updateFitAndProperFlag(people, indices, isMsbOrTcsp(model))
-      case _ => throw new RuntimeException("No responsible people found")
-    })
-  }
-
   def isMsbOrTcsp(model: AddBusinessTypeFlowModel) = {
     model.activity.contains(TrustAndCompanyServices) || model.activity.contains(MoneyServiceBusiness)
   }
@@ -151,20 +129,6 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     case Some(activities) if activities.size == 1 => Set(activities.head)
     case Some(_) => businessMatching.alphabeticalBusinessActivitiesLowerCase().getOrElse(Set.empty[String]).toSet
     case _ => Set.empty[String]
-  }
-
-  def getTp(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
-    for {
-      tradingPremises <- OptionT.liftF(tradingPremises(credId))
-      indexes: Set[Int] <- OptionT.fromOption[Future](model.tradingPremisesActivities.map(tpa => tpa.index))
-    } yield (indexes, tradingPremises)
-  }
-
-  def getRp(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
-    for {
-      responsiblePeople <- OptionT.liftF(responsiblePeople(credId))
-      indexes: Set[Int] <- OptionT.fromOption[Future](model.responsiblePeople.map(rpf => rpf.index))
-    } yield (indexes, responsiblePeople)
   }
 
   def tradingPremises(credId: String)(implicit hc: HeaderCarrier): Future[Seq[(TradingPremises, Int)]] = {
@@ -182,19 +146,4 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
       }
     }
   }
-
-  def filteredTps(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
-    for {
-      (index: Set[Int], tps: Seq[(TradingPremises, Int)]) <- getTp(credId, model)
-      filteredTps <- OptionT.pure[Future, Seq[(TradingPremises, Int)]](tps.filter { key => index.contains(key._2)})
-    } yield filteredTps
-  }
-
-  def filteredRps(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) = {
-    for {
-      (index: Set[Int], rps: Seq[(ResponsiblePerson, Int)]) <- getRp(credId, model)
-      filteredRps <- OptionT.pure[Future, Seq[(ResponsiblePerson, Int)]](rps.filter { key => index.contains(key._2)})
-    } yield filteredRps
-  }
-
 }

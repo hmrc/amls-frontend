@@ -63,12 +63,8 @@ class SelectBusinessTypeController @Inject()(
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         (for {
-          //Ensure that responsible people can be populated as required
-          responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key)) orElse OptionT.none
-          model <- OptionT(dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)(model => edit match {
-            case false => model.getOrElse(AddBusinessTypeFlowModel()).fitAndProperFromResponsiblePeople(responsiblePeople.exceptInactive)
-            case _ => model.getOrElse(AddBusinessTypeFlowModel())
-          }))
+          model <- OptionT(dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)(model =>
+           model.getOrElse(AddBusinessTypeFlowModel())))
           (names, values) <- getFormData(request.credId)
         } yield {
           val form = model.activity.fold[Form2[BusinessActivity]](EmptyForm)(a => Form2(a))
@@ -87,11 +83,7 @@ class SelectBusinessTypeController @Inject()(
           case ValidForm(_, data) =>
             dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               model =>
-                model.getOrElse(AddBusinessTypeFlowModel()) match {
-                  case m if !m.activity.contains(data) =>
-                    m.activity(data).isActivityAtTradingPremises(None).tradingPremisesActivities(None)
-                  case m => m.activity(data)
-                }
+                model.getOrElse(AddBusinessTypeFlowModel()).activity(data)
             } flatMap {
               case Some(model) => router.getRoute(request.credId, SelectBusinessTypesPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: SelectActivitiesController"))

@@ -24,7 +24,7 @@
 @import models.tradingpremises.TradingPremises
 @import models.responsiblepeople.ResponsiblePerson
 
-@(f: forms.Form2[_], flowModel: AddBusinessTypeFlowModel, tradingPremises: Seq[(TradingPremises, Int)], responsiblePeople: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_],messages:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(f: forms.Form2[_], flowModel: AddBusinessTypeFlowModel)(implicit request: Request[_],messages:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("title.cya", "summary.updateservice")
