@@ -93,6 +93,8 @@
             @if(hintText.isEmpty && field.hasErrors && attrDescribedBy.isEmpty) {aria-describedby="@if(field.hasErrors){@{field.id}-error-notification}"}
             @if(hintText.isEmpty && field.hasErrors && attrDescribedBy.nonEmpty) {aria-describedby="@if(field.hasErrors){@{field.id}-error-notification }@if(attrDescribedBy.nonEmpty){@{attrDescribedBy}-hint}"}
 
+            @if(hintText.isEmpty && !field.hasErrors && attrDescribedBy.nonEmpty) {aria-describedby="@if(attrDescribedBy.nonEmpty){@{attrDescribedBy}-hint}""}
+
             @if(attrType.nonEmpty) { type="@attrType" } else { type="text" }
             @if(attrMinMax.attrMin.nonEmpty) { min="@attrMinMax.attrMin" }
             @if(attrMinMax.attrMax.nonEmpty) { max="@attrMinMax.attrMax" }

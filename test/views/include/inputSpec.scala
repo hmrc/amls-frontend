@@ -77,5 +77,23 @@ class inputSpec extends PlaySpec with AmlsViewSpec {
       val aria = Jsoup.parse(contentAsString(input)).getElementsByTag("input").attr("aria-describedby")
       aria must be("foo-hint describe-hint")
     }
+
+    "render the ariaDescribedBy with attrDescribedBy" in {
+      val validForm = ValidForm(Map("foo" -> Seq("bar")), EmptyForm)
+      val field = validForm("foo")
+      val input = views.html.include.forms2.input(field, attrDescribedBy = "describe")
+      val aria = Jsoup.parse(contentAsString(input)).getElementsByTag("input").attr("aria-describedby")
+      aria must be("describe-hint")
+    }
+
+    "where no ariaDescribedBy params" must {
+      "not render the ariaDescribedBy" in {
+        val validForm = ValidForm(Map("foo" -> Seq("bar")), EmptyForm)
+        val field = validForm("foo")
+        val input = views.html.include.forms2.input(field)
+        val aria = Jsoup.parse(contentAsString(input)).getElementsByTag("input").attr("aria-describedby")
+        aria must be("")
+      }
+    }
   }
 }
