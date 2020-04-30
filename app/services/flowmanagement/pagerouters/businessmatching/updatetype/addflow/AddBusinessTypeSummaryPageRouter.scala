@@ -36,30 +36,15 @@ class AddBusinessTypeSummaryPageRouter @Inject()(val statusService: StatusServic
                                                  val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
 
   override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
-                       (implicit hc: HeaderCarrier,
-                            ec: ExecutionContext
-                           ): Future[Result] = {
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
     businessMatchingService.getRemainingBusinessActivities(credId) flatMap {
       case set if set.nonEmpty =>
         OptionT.some(Redirect(addRoutes.AddMoreBusinessTypesController.get()))
       case _ =>
-        serviceInformationRedirect(credId)
+        OptionT.some(Redirect(addRoutes.NeedMoreInformationController.get()))
     } getOrElse error(AddBusinessTypeSummaryPageId)
-
   }
-
-  private def serviceInformationRedirect(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext) =
-    businessMatchingService.getAdditionalBusinessActivities(credId) map { activities =>
-      if (!activities.forall {
-        case BillPaymentServices | TelephonePaymentService => true
-        case _ => false
-      }) {
-        Redirect(addRoutes.NeedMoreInformationController.get())
-      } else {
-        Redirect(controllers.routes.RegistrationProgressController.get())
-      }
-    }
 }
 
 
