@@ -31,17 +31,17 @@ import utils.UpdateServicesSummaryFixtures
 class update_services_summarySpec extends UpdateServicesSummaryFixtures {
   "The update_services_summary view" must {
     "have the correct title" in new ViewFixture {
-      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq(), Seq())
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.updateservice"))
     }
 
     "have correct heading" in new ViewFixture {
-      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq(), Seq())
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
       heading.html must be(Messages("title.cya"))
     }
 
     "have correct subHeading" in new ViewFixture {
-      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq(), Seq())
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
       subHeading.html must include(Messages("summary.updateservice"))
     }
   }
@@ -49,7 +49,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
   "for which business type you wish to register" must {
     "have a question title" in new ViewFixture {
       val addBusinessTypeFlowModel:AddBusinessTypeFlowModel  = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
-      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
       doc.body().text must include(Messages("businessmatching.updateservice.selectactivities.title"))
     }
@@ -62,7 +62,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show AccountancyServices if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.01"))
       }
@@ -71,7 +71,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show BillPaymentServices if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(BillPaymentServices))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.03"))
       }
@@ -79,7 +79,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show EstateAgentBusinessService if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(EstateAgentBusinessService))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.04"))
       }
@@ -87,7 +87,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show HighValueDealing if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.05"))
       }
@@ -95,7 +95,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show MoneyServiceBusiness if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.06"))
       }
@@ -103,7 +103,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show TrustAndCompanyServices if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.07"))
       }
@@ -111,7 +111,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show TelephonePaymentService if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(TelephonePaymentService))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.08"))
       }

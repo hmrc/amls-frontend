@@ -50,16 +50,13 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     */
   trait SimpleFlowModelViewFixture extends ViewFixture {
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
-      activity = Some(HighValueDealing),
-      areNewActivitiesAtTradingPremises = Some(true)
-    ), Seq(), Seq())
+      activity = Some(HighValueDealing)))
   }
 
   /**
     * SimpleTCSPViewFixture.
     *
     * View to include TrustAndCompanyServices.
-    * Also includes fit and proper and has a responsible person.
     */
   trait SimpleTCSPViewFixture extends ViewFixture {
     val completePersonName = Some(PersonName("Katie", None, "Test"))
@@ -67,78 +64,51 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     val completeRp1 = ResponsiblePerson(completePersonName)
     val completeRp2 = ResponsiblePerson(completePersonName2)
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
-      activity = Some(TrustAndCompanyServices),
-      fitAndProper = Some(true),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1, 2)))
-    ), Seq(), Seq((completeRp1, 1), (completeRp2, 2)))
+      activity = Some(TrustAndCompanyServices)))
   }
 
   /**
     * SimpleTCSPNoFitAndProperViewFixture.
     *
     * View to include TrustAndCompanyServices.
-    * Does not includes fit and proper and has responsible person.
     */
   trait SimpleTCSPNoFitAndProperViewFixture extends ViewFixture {
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
-      activity = Some(TrustAndCompanyServices),
-      fitAndProper = Some(false),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1, 2)))
-    ), Seq(), Seq())
+      activity = Some(TrustAndCompanyServices)
+    ))
   }
 
   /**
     * MSBViewFixture.
     *
     * View to include MoneyServiceBusiness.
-    * Has fit and proper.
-    * Has responsible people.
     * Has single CurrencyExchange sub service.
-    * Has new activities flagged at trading premises.
-    * Has MSB services at trading premises.
-    * Lists trading premises activities.
     */
   trait MSBViewFixture extends ViewFixture {
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
-      fitAndProper = Some(true),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
-      subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
-      areNewActivitiesAtTradingPremises = Some(true),
-      tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
-      tradingPremisesActivities = Some(TradingPremisesActivities(Set(1,2)))
-    ), Seq(), Seq())
+      subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+    ))
   }
 
   /**
     * MSBViewFixture.
     *
     * View to include MoneyServiceBusiness.
-    * Has fit and proper.
-    * Has responsible people.
     * Has single CurrencyExchange sub service.
-    * Does not have new activities flagged at trading premises.
     */
   trait MSBViewNoPremisesFixture extends ViewFixture {
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
-      fitAndProper = Some(true),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
-      subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
-      areNewActivitiesAtTradingPremises = Some(false)
-    ), Seq(), Seq())
+      subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+    ))
   }
 
   /**
     * MSBAllViewFixture.
     *
     * View to include MoneyServiceBusiness.
-    * Has fit and proper.
-    * Has responsible people.
     * Has all sub services.
-    * Has new activities flagged at trading premises.
-    * Has MSB services at trading premises.
-    * Lists trading premises activities.
     * Has PSR No.
     */
   trait MSBAllViewFixture extends ViewFixture {
@@ -147,8 +117,6 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     val address = Address("1", "2", None, None, "AA1 1BB", None)
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
-      fitAndProper = Some(true),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1, 2))),
       subSectors = Some(BusinessMatchingMsbServices(Set(
         TransmittingMoney,
         CurrencyExchange,
@@ -156,89 +124,51 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
         ChequeCashingNotScrapMetal,
         ChequeCashingScrapMetal)
       )),
-      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111")),
-      areNewActivitiesAtTradingPremises = Some(true),
-      tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(
-        TransmittingMoney,
-        CurrencyExchange,
-        ForeignExchange,
-        ChequeCashingNotScrapMetal,
-        ChequeCashingScrapMetal))),
-      tradingPremisesActivities = Some(TradingPremisesActivities(Set(1,2)))
-    ), Seq((TradingPremises(None, Some(YourTradingPremises("foo", address, None, Some(new LocalDate(2010, 10, 10)), None))), 1),
-           (TradingPremises(None, Some(YourTradingPremises("Bar", address, None, Some(new LocalDate(2010, 10, 10)), None))), 2)),
-      Seq((completeRp1, 1)))
+      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))))
   }
 
   /**
     * MSBSingleViewFixture.
     *
     * View to include MoneyServiceBusiness.
-    * Has fit and proper.
-    * Has responsible people.
     * Has a single sub services.
-    * Has new activities flagged at trading premises.
-    * Has MSB single service at trading premises.
-    * Lists trading premises activities.
     * Has PSR No.
     */
   trait MSBSingleViewFixture extends ViewFixture {
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
-      fitAndProper = Some(true),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1, 2))),
       subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111")),
-      areNewActivitiesAtTradingPremises = Some(true),
-      tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-      tradingPremisesActivities = Some(TradingPremisesActivities(Set(1,2)))
-    ), Seq(), Seq())
+      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))))
   }
 
   /**
     * MSBNoPSRViewFixture.
     *
     * View to include MoneyServiceBusiness.
-    * Has fit and proper.
-    * Has responsible people.
     * Has single CurrencyExchange sub service.
-    * Has new activities flagged at trading premises.
-    * Has MSB services at trading premises.
     * Has no PSR No.
     */
   trait MSBNoPSRViewFixture extends ViewFixture {
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
-      fitAndProper = Some(true),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1, 2))),
       subSectors = Some(BusinessMatchingMsbServices(Set(
         TransmittingMoney)
       )),
-      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
-      areNewActivitiesAtTradingPremises = Some(true),
-      tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-    ), Seq(), Seq())
+      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)))
   }
 
   /**
     * MSBViewFixture.
     *
     * View to include MoneyServiceBusiness.
-    * Has fit and proper.
-    * Has responsible people.
     * Has single CurrencyExchange sub service.
-    * Has new activities flagged at trading premises.
-    * Has MSB services at trading premises.
-    * Lists trading premises activities.
     * Has a PSR No.
     */
   trait SingleSubSectorPSRMSBViewFixture extends ViewFixture {
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1, 2))),
       subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111")),
-      areNewActivitiesAtTradingPremises = Some(true)
-    ), Seq(), Seq())
+      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))
+    ))
   }
 }

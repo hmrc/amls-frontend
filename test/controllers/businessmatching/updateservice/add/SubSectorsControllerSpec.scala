@@ -163,7 +163,6 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-              tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
               hasChanged = true))
         }
       }
@@ -183,7 +182,6 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
-              tradingPremisesMsbServices = None,
               hasChanged = true))
         }
       }
@@ -192,7 +190,6 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
         "anything other than money transfer has been posted when editing existing full flow with only money transfer" in new Fixture {
           mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
             hasChanged = true)
           )
 
@@ -205,7 +202,6 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
-              tradingPremisesMsbServices = None,
               hasChanged = true))
         }
       }
@@ -214,7 +210,6 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
         "anything other than money transfer has been posted when editing existing full flow with money transfer and others" in new Fixture {
           mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
             hasChanged = true)
           )
 
@@ -227,7 +222,6 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
-              tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
               hasChanged = true))
         }
       }
@@ -236,7 +230,6 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
         "anything other than money transfer has been posted when completely changing selected services" in new Fixture {
           mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))),
-            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
             hasChanged = true)
           )
 
@@ -249,7 +242,6 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
-              tradingPremisesMsbServices = None,
               hasChanged = true))
         }
       }

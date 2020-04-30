@@ -52,9 +52,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
   }
 
   "In the Add TCSP flow the getRoute method" must {
-    //Start TSCP sub-flow
-
-    "return the 'fit-and-proper' page (FitAndProperController)" when {
+    "return the 'update_services_summary' page (AddBusinessTypeSummaryController)" when {
       "the user is on the 'What Type of business ....' page (SelectActivitiesPageId)" when {
         "TCSP is selected" in new Fixture {
 
@@ -64,100 +62,14 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
         }
       }
     }
-
-//    "return the 'which-fit-and-proper' page (WhichFitAndProperController)" when {
-//      "the user is on the 'Fit and proper' page (FitAndProperPageId)" when {
-//        "TCSP is the Business Activity" when {
-//          "the answer is yes" in new Fixture {
-//            val model = AddBusinessTypeFlowModel(
-//              activity = Some(TrustAndCompanyServices),
-//              fitAndProper = Some(true))
-//            val result = await(router.getRoute("internalId", FitAndProperPageId, model))
-//
-//            result mustBe Redirect(addRoutes.WhichFitAndProperController.get(false))
-//          }
-//        }
-//      }
-//    }
-//
-//    "return the 'trading-premises' page (TradingPremisesController)" when {
-//      "the user is on the 'Fit and Proper' page (FitAndProperPageId)" when {
-//        "TCSP is the Business Activity" when {
-//          "the answer is no" in new Fixture {
-//            val model = AddBusinessTypeFlowModel(
-//              activity = Some(TrustAndCompanyServices),
-//              fitAndProper = Some(false))
-//            val result = await(router.getRoute("internalId", FitAndProperPageId, model))
-//
-//            result mustBe Redirect(addRoutes.TradingPremisesController.get(false))
-//          }
-//        }
-//      }
-//    }
-//
-//    "return the 'trading-premises' page (TradingPremisesController)" when {
-//      "the user is on the 'Which Fit and Proper' page (WhichFitAndProperPageId)" when {
-//        "TCSP is the Business Activity" in new Fixture {
-//          val result = await(router.getRoute("internalId", WhichFitAndProperPageId, model))
-//
-//          result mustBe Redirect(addRoutes.TradingPremisesController.get(false))
-//        }
-//      }
-//    }
-//
-//    "return the 'which-trading-premises' page (WhichTradingPremisesController)" when {
-//      "the user is on the 'Trading Premises' page (TradingPremisesPageId)" when {
-//        "TCSP is the Business Activity" when {
-//          "the answer is yes" in new Fixture {
-//            val model = AddBusinessTypeFlowModel(
-//              activity = Some(TrustAndCompanyServices),
-//              areNewActivitiesAtTradingPremises = Some(true))
-//
-//            val result = await(router.getRoute("internalId", TradingPremisesPageId, model))
-//
-//            result mustBe Redirect(addRoutes.WhichTradingPremisesController.get(false))
-//          }
-//        }
-//      }
-//    }
-//
-//    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
-//      "the user is on the 'Which Trading Premises' page (TradingPremisesPageId)" when {
-//        "TCSP is the Business Activity" when {
-//          "the answer is no" in new Fixture {
-//            val model = AddBusinessTypeFlowModel(
-//              activity = Some(TrustAndCompanyServices),
-//              areNewActivitiesAtTradingPremises = Some(false))
-//
-//            val result = await(router.getRoute("internalId", TradingPremisesPageId, model))
-//
-//            result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
-//          }
-//        }
-//      }
-//    }
-//
-//    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
-//      "the user is on the 'Which Trading Premises' page (WhichTradingPremisesPageId)" when {
-//        "TCSP is the Business Activity" in new Fixture {
-//          val result = await(router.getRoute("internalId", WhichTradingPremisesPageId, model))
-//
-//          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
-//        }
-//      }
-//    }
   }
 
-
   "When Editing in the TCSP Add flow, the getRoute method" must {
-
-    //edit fit and proper true
-    "return the 'which-fit-and-proper' page (WhichFitAndProperController)" when {
-      "editing the 'Fit and Proper' page (FitAndProperPageId)" when {
-        "and the answer is yes" in new Fixture {
+    "return the 'update_services_summary' page (AddBusinessTypeSummaryController)" when {
+      "editing the 'Business types' page (SelectActivitiesPageId)" when {
+        "selection is TCSP" in new Fixture {
           val model = AddBusinessTypeFlowModel(
-            activity = Some(TrustAndCompanyServices),
-            fitAndProper = Some(true))
+            activity = Some(TrustAndCompanyServices))
           val result = await(router.getRoute("internalId", SelectBusinessTypesPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
