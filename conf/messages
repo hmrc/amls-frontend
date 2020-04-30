@@ -2261,6 +2261,19 @@ responsiblepeople.new.home.date.of.change.title = When did this person move?
 responsiblepeople.new.home.is.uk.heading = Is {0}’s new home address in the UK?
 responsiblepeople.new.home.is.uk.title = Is this person’s new home address in the UK?
 
+responsiblepeople.new.home.is.uk.error.empty = Enter the date this person moved
+new.home.error.required.date.day = Date this person moved must include a day
+new.home.error.required.date.month = Date this person moved must include a month
+new.home.error.required.date.year = Date this person moved must include a year
+new.home.error.required.date.month.day = Date this person moved must include a day and month
+new.home.error.required.date.year.month = Date this person moved must include a month and year
+new.home.error.required.date.year.month.day = Enter the date this person moved
+new.home.error.required.date.year.day = Date this person moved must include a day and year
+new.home.error.required.date.1900 = Date this person moved must be after 1900
+new.home.error.required.date.future = Date this person moved must be today or in the past
+new.home.error.required.date.fake = Enter a real date for when this person moved
+
+
 responsiblepeople.new.home.heading = What is {0}’s new home address?
 responsiblepeople.new.home.title = What is this person’s new home address?
 

@@ -124,44 +124,6 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
         status(result) must be(BAD_REQUEST)
 
       }
-
-      "fail validation when input data is before activity start date" in new Fixture {
-        val postRequest = requestWithUrlEncodedBody(
-          "dateOfChange.year" -> "2010",
-          "dateOfChange.month" -> "10",
-          "dateOfChange.day" -> "01"
-        )
-
-        val position = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2011,1,1)))))
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(Seq(responsiblePeople.copy(positions = position)))))
-        when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(cacheMap))
-
-        val result = controller.post(1)(postRequest)
-
-        status(result) must be(BAD_REQUEST)
-      }
-
-      "redirect to NotFound when index is out of range" in new Fixture {
-        val postRequest = requestWithUrlEncodedBody(
-          "dateOfChange.year" -> "2010",
-          "dateOfChange.month" -> "10",
-          "dateOfChange.day" -> "01"
-        )
-
-        val position = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2011,1,1)))))
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(cacheMap))
-
-        val result = controller.post(1)(postRequest)
-
-        status(result) must be(NOT_FOUND)
-      }
-
     }
-
   }
 }
