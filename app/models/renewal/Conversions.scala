@@ -42,6 +42,7 @@ object Conversions {
           throughput = renewal.totalThroughput contramap TotalThroughput.convert,
           transactionsInNext12Months = renewal.transactionsInLast12Months contramap TransactionsInLast12Months.convert,
           sendTheLargestAmountsOfMoney = renewal.sendTheLargestAmountsOfMoney contramap SendTheLargestAmountsOfMoney.convert,
+          sendMoneyToOtherCountry = renewal.sendMoneyToOtherCountry contramap SendMoneyToOtherCountry.convert,
           mostTransactions = renewal.mostTransactions contramap MostTransactions.convert,
           ceTransactionsInNext12Months = renewal.ceTransactionsInLast12Months contramap CETransactionsInLast12Months.convert,
           whichCurrencies = renewal.whichCurrencies contramap WhichCurrencies.convert,

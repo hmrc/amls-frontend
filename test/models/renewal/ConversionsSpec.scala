@@ -97,6 +97,14 @@ class ConversionsSpec extends WordSpec with MustMatchers {
           Country("United Kingdom", "GB"), Country("France", "FR"), Country("us", "US"))))
     }
 
+    "convert the 'MSB send money to other country' model" in new Fixture {
+      val model = SendMoneyToOtherCountry(true)
+      val renewal = Renewal(sendMoneyToOtherCountry = Some(model))
+      val converted = subscriptionRequest.withRenewalData((renewal))
+
+      converted.msbSection.get.sendMoneyToOtherCountry mustBe Some(models.moneyservicebusiness.SendMoneyToOtherCountry(true))
+    }
+
     "convert the 'MSB most transactions' model" in new Fixture {
       val model = MostTransactions(Seq(Country("United Kingdom", "GB")))
       val renewal = Renewal(mostTransactions = Some(model))
