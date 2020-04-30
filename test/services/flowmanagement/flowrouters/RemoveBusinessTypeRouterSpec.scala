@@ -140,7 +140,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
     }
 
     //check your answers (2 options - option 1)
-    "return the 'progress' page (RegistrationProgressController)" when {
+    "return the 'Need to update Answers' page (NeedToUpdateController)" when {
       "the user is on the 'check your answers' page (RemoveBusinessTypesSummaryPageId)" when {
         "there is no ASP business type in the model" in new Fixture {
           val tradingPremises = Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get
@@ -154,7 +154,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
 
           val result = await(router.getRoute("internalId", RemoveBusinessTypesSummaryPageId, model))
 
-          result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
+          result mustBe Redirect(removeRoutes.NeedMoreInformationController.get())
         }
       }
     }

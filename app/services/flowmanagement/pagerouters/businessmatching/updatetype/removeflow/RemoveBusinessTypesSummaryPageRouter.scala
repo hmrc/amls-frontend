@@ -19,15 +19,14 @@ package services.flowmanagement.pagerouters.removeflow
 import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.AccountancyServices
 import models.flowmanagement.RemoveBusinessTypeFlowModel
-import models.tradingpremises.TradingPremises
 import play.api.mvc.Result
-import play.api.mvc.Results.{InternalServerError, Redirect}
+import play.api.mvc.Results.Redirect
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -36,23 +35,8 @@ class RemoveBusinessTypesSummaryPageRouter @Inject()(val statusService: StatusSe
                                                      val dataCacheConnector: DataCacheConnector) extends PageRouter[RemoveBusinessTypeFlowModel] {
 
   override def getRoute(credId: String, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
-                       (implicit hc: HeaderCarrier,
-                            ec: ExecutionContext
-                           ): Future[Result] = {
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
-    val allTpComplete = (tp: Seq[TradingPremises]) => tp.forall(_.isComplete)
-
-    dataCacheConnector.fetch[Seq[TradingPremises]](credId, TradingPremises.key) map {
-
-      case Some(tp) =>
-        model.activitiesToRemove map { m =>
-          if(m.contains(AccountancyServices) || !allTpComplete(tp)) {
-            Redirect(removeRoutes.NeedMoreInformationController.get())
-          } else {
-            Redirect(controllers.routes.RegistrationProgressController.get())
-          }
-        }  getOrElse InternalServerError("Could not do the get the route for RemoveBusinessTypesSummaryPageRouter")
-    }
-
+    Future.successful(Redirect(removeRoutes.NeedMoreInformationController.get()))
   }
 }
