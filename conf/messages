@@ -1663,12 +1663,12 @@ businessmatching.updateservice.removeactivities.summary.multibusinesses = If you
 businessmatching.updateservice.removeactivities.list.heading.multibusinesses = If you want to remove all services, you’ll need to de-register with HMRC under the Money Laundering Regulations. You can do this from your registration page.
 businessmatching.updateservice.removeactivities.button = Continue
 
-businessmatching.updateservice.updateotherinformation.heading = You need to update other information
-businessmatching.updateservice.updateotherinformation.title = You need to update other information
-businessmatching.updateservice.updateotherinformation.information.0 = You have removed the following services:
-businessmatching.updateservice.updateotherinformation.information.1 = You have removed {0}.
-businessmatching.updateservice.updateotherinformation.information.2 = You’ll need to complete the business activities section.
-businessmatching.updateservice.updateotherinformation.information.3 = You’ll need to check your trading premises because of the service you have removed. You may need to update other information about your business.
+businessmatching.updateservice.updateotherinformation.heading = Check and update your business information
+businessmatching.updateservice.updateotherinformation.title = Check and update your business information
+businessmatching.updateservice.updateotherinformation.information.0 = You’re removing the following services:
+businessmatching.updateservice.updateotherinformation.information.1 = You’re removing the following service: {0}.
+businessmatching.updateservice.updateotherinformation.information.2 = You need to answer new questions in the business activities section.
+businessmatching.updateservice.updateotherinformation.information.3 = You need to check your trading premises because of the service you’re removing. You may also need to update other business information.
 businessmatching.updateservice.updateotherinformation.information.3.multiple.services = You’ll need to check your trading premises because of the services you have removed. You may need to update other information about your business.
 businessmatching.updateservice.updateotherinformation.text = As a result some sections of your application need to be updated.
 
