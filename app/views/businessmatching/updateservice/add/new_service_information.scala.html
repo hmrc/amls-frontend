@@ -16,10 +16,11 @@
 
 @import include._
 @import forms2._
-@import config.{ ApplicationConfig}
+@import config.ApplicationConfig
 @import forms.EmptyForm
+@import models.businessmatching.BusinessMatchingMsbService
 
-@(activities: Set[String], hideSupervisionDetails:Boolean)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
+@(activities: Set[String], hideSupervisionDetails:Boolean, subsectors: Set[BusinessMatchingMsbService], isTdiOrBpspPresent: Boolean = false)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
@@ -30,51 +31,82 @@
     title = messages("businessmatching.updateservice.newserviceinformation.title") + " - " + Messages("summary.updateservice"),
     heading = header
 ) {
-
-    <div class="govuk-warning-text">
-        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-        <strong class="govuk-warning-text__text">
-            <span class="govuk-warning-text__assistive">Warning</span>
-            @Messages("businessmatching.updateservice.newserviceinformation.info.warning")
-        </strong>
-    </div>
-
     @if(activities.size == 1) {
         @activities match {
             case list if list.contains("Accountancy service provider") => {
-                @if(hideSupervisionDetails) {
-                    <p>@Messages("businessmatching.updateservice.newserviceinformation.info.onlyasp")</p>
-                } else {
-                    <p>@Messages("businessmatching.updateservice.newserviceinformation.info.asp")</p>
-                }
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
+                <ul class="list list-bullet">
+                    @activities.toList.sorted.map { ba =>
+                        <li>@Character.toLowerCase(ba.charAt(0))@ba.substring(1)</li>
+                    }
+                        <li>@Messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
+                </ul>
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.6", (activities.mkString(" ")).toLowerCase)</p>
             }
             case list if list.contains("Trust or company service provider") => {
-                @if(hideSupervisionDetails) {
-                    <p>@Messages("businessmatching.updateservice.newserviceinformation.info.onlytcsp")</p>
-                } else {
-                    <p>@Messages("businessmatching.updateservice.newserviceinformation.info.tcsp")</p>
-                }
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
+                <ul class="list list-bullet">
+                    @activities.toList.sorted.map { ba =>
+                        <li>@Character.toLowerCase(ba.charAt(0))@ba.substring(1)</li>
+                    }
+                        <li>@Messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
+                </ul>
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.6", (activities.mkString(" ")).toLowerCase)</p>
+            }
+            case list if list.contains("Money service business") && subsectors.size == 1 => {
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.1", activities.mkString(" ").toLowerCase)</p>
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.6.msb.single")</p>
+            }
+            case list if list.contains("Money service business") && subsectors.size > 1 => {
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.1", activities.mkString(" ").toLowerCase)</p>
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.6.msb.single")</p>
+            }
+            case list if isTdiOrBpspPresent => {
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.6", (activities.mkString(" ")).toLowerCase)</p>
+            }
+            case list if isTdiOrBpspPresent => {
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.6", Character.toLowerCase(activities.mkString(" ").charAt(0)) + activities.mkString(" ").substring(1))</p>
             }
             case _ => {
                 <p>@Messages("businessmatching.updateservice.newserviceinformation.info.1", (activities.mkString(" ")).toLowerCase)</p>
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.6", (activities.mkString(" ")).toLowerCase)</p>
             }
         }
+        <p>@Messages("businessmatching.updateservice.newserviceinformation.info.7")</p>
     }
 
     @if(activities.size > 1) {
-        <p>@Messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
-        <ul class="list list-bullet">
-            @activities.toList.sorted.map { ba =>
-                <li>@Character.toLowerCase(ba.charAt(0))@ba.substring(1)</li>
+        @activities match {
+            case list if isTdiOrBpspPresent &&  list.diff(Set("Bill payment service provider", "Telecommunications, digital and IT payment service provider")).size == 1 => {
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.1",
+                    (list.diff(Set("Bill payment service provider", "Telecommunications, digital and IT payment service provider")).mkString(" ")).toLowerCase)</p>
             }
-            @if((activities.contains("Trust or company service provider") || activities.contains("Accountancy service provider")) && !hideSupervisionDetails) {
-                <li>@Messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
+            case list if isTdiOrBpspPresent => {
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
+                <ul class="list list-bullet">
+                    @activities.diff(Set("Bill payment service provider", "Telecommunications, digital and IT payment service provider")).toList.sorted.map { ba =>
+                        <li>@Character.toLowerCase(ba.charAt(0))@ba.substring(1)</li>
+                    }
+                    @if((activities.contains("Trust or company service provider") || activities.contains("Accountancy service provider")) && !hideSupervisionDetails) {
+                        <li>@Messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
+                    }
+                </ul>
             }
-        </ul>
-
+            case _ => {
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
+                <ul class="list list-bullet">
+                    @activities.toList.sorted.map { ba =>
+                        <li>@Character.toLowerCase(ba.charAt(0))@ba.substring(1)</li>
+                    }
+                    @if((activities.contains("Trust or company service provider") || activities.contains("Accountancy service provider")) && !hideSupervisionDetails) {
+                        <li>@Messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
+                    }
+                </ul>
+            }
+        }
         <p>@Messages("businessmatching.updateservice.newserviceinformation.info.3")</p>
         <p>@Messages("businessmatching.updateservice.newserviceinformation.info.4")</p>
-    }
+}
 
     @form(EmptyForm, controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.post()) {
         @submit(false, Some("Continue"), false, buttonId = Some("newserviceinfo-submit"))

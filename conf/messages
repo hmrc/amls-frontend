@@ -1669,7 +1669,7 @@ businessmatching.updateservice.updateotherinformation.information.0 = You’re r
 businessmatching.updateservice.updateotherinformation.information.1 = You’re removing the following service: {0}.
 businessmatching.updateservice.updateotherinformation.information.2 = You need to answer new questions in the business activities section.
 businessmatching.updateservice.updateotherinformation.information.3 = You need to check your trading premises because of the service you’re removing. You may also need to update other business information.
-businessmatching.updateservice.updateotherinformation.information.3.multiple.services = You’ll need to check your trading premises because of the services you have removed. You may need to update other information about your business.
+businessmatching.updateservice.updateotherinformation.information.3.multiple.services = You need to check your trading premises because of the services you’re removing. You may also need to update other business information.
 businessmatching.updateservice.updateotherinformation.text = As a result some sections of your application need to be updated.
 
 
@@ -1736,14 +1736,18 @@ businessmatching.updateservice.whichfitandproper.text.info = The fit and proper 
 businessmatching.updateservice.whichfitandproper.text.info.line1 = The responsible people in your business need to pass a fit and proper test. If anyone has already passed the test before, they don’t need to do it again.
 businessmatching.updateservice.whichfitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don’t need to take any further action.
 
-businessmatching.updateservice.newserviceinformation.title = You need to update other information
-businessmatching.updateservice.newserviceinformation.heading = You need to update other information
+businessmatching.updateservice.newserviceinformation.title = Check and update your business information
+businessmatching.updateservice.newserviceinformation.heading = Check and update your business information
 businessmatching.updateservice.newserviceinformation.info.gutter = You’ve told us your business needs to register for:
-businessmatching.updateservice.newserviceinformation.info.1 = You’ll need to complete the {0} section.
-businessmatching.updateservice.newserviceinformation.info.2 = You’ll need to complete the following sections:
-businessmatching.updateservice.newserviceinformation.info.3 = You may need to update your trading premises and responsible people because of new information you have provided.
-businessmatching.updateservice.newserviceinformation.info.4 = You may need to update other information about your business.
+businessmatching.updateservice.newserviceinformation.info.1 = You need to complete the {0} section.
+businessmatching.updateservice.newserviceinformation.info.2 = You need to complete the following sections:
+businessmatching.updateservice.newserviceinformation.info.3 = You need to update your trading premises to tell us where you provide the services you’re registering.
+businessmatching.updateservice.newserviceinformation.info.4 = You may also need to update your responsible people and other business information.
 businessmatching.updateservice.newserviceinformation.info.5 = You may need to update your responsible people and other information about your business.
+businessmatching.updateservice.newserviceinformation.info.6 = You need to update your trading premises to tell us where you carry out {0} activities.
+businessmatching.updateservice.newserviceinformation.info.6.msb.single = You need to update your trading premises to tell us where you carry out the money service business activity you’re registering.
+businessmatching.updateservice.newserviceinformation.info.6.msb.multiple = You need to update your trading premises to tell us where you carry out the money service business activities you’re registering.
+businessmatching.updateservice.newserviceinformation.info.7 = You may also need to update your responsible people and other business information.
 businessmatching.updateservice.newserviceinformation.info.asp = You’ll need to complete the accountancy service provider and supervision details sections.
 businessmatching.updateservice.newserviceinformation.info.tcsp = You’ll need to complete the trust or company service provider and supervision details sections.
 businessmatching.updateservice.newserviceinformation.info.onlyasp = You’ll need to complete the accountancy service provider section.
