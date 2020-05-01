@@ -63,7 +63,12 @@ class ContactingYouPhoneController @Inject () (val dataCache: DataCacheConnector
           } yield {
             edit match {
               case true => Redirect(routes.SummaryController.get())
-              case _ => Redirect(routes.LettersAddressController.get(edit))
+              case _ => {
+                businessDetails.correspondenceAddress.isDefined match {
+                  case false => Redirect(routes.LettersAddressController.get(edit))
+                  case _     => Redirect(routes.CorrespondenceAddressIsUkController.get(edit))
+                }
+              }
             }
           }
       }

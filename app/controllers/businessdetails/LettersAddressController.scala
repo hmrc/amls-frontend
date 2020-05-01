@@ -23,6 +23,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessdetails.{BusinessDetails, LettersAddress, RegisteredOffice}
 import play.api.mvc.{MessagesControllerComponents, Result}
 import utils.AuthAction
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessdetails._
 
@@ -44,11 +45,18 @@ class LettersAddressController @Inject () (val dataCache: DataCacheConnector,
           } yield {
             (for {
               altCorrespondenceAddress <- atb.altCorrespondenceAddress
-            } yield Ok(letters_address(Form2[LettersAddress](LettersAddress(!altCorrespondenceAddress)), registeredOffice, edit)))
-              .getOrElse (Ok(letters_address(EmptyForm, registeredOffice, edit)))
+            } yield
+              hasAlternativeAddress(atb) match {
+                case true => Redirect(routes.ContactingYouPhoneController.get(edit))
+                case _ => Ok(letters_address(Form2[LettersAddress](LettersAddress(!altCorrespondenceAddress)), registeredOffice, edit))
+              }).getOrElse (Ok(letters_address(EmptyForm, registeredOffice, edit)))
+
           }) getOrElse Redirect(routes.CorrespondenceAddressIsUkController.get(edit))
       }
+  }
 
+  def hasAlternativeAddress(bd: BusinessDetails) = {
+    bd.correspondenceAddress.isDefined
   }
 
   def post(edit: Boolean = false) = authAction.async {
