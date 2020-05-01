@@ -57,7 +57,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
       html must include(Messages("about any other activities your business was involved in over the last 12 months"))
       html must include(Messages("your total net profit for the last 12 months, if your business was involved in other activities"))
       html must include(Messages("your total net profit for the last 12 months from the services you have registered"))
-      html must include(Messages("how much of your turnover you expect to come from sales of art for €10,000 or more"))
+      html must include(Messages("the percentage of your turnover that came from sales of art for €10,000 or more"))
     }
 
     "contain the expected content elements for MSB renewal" in new ViewFixture{

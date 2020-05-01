@@ -1349,7 +1349,7 @@ aboutyou.rolewithinbusiness.lbl.06 = Partner
 aboutyou.rolewithinbusiness.lbl.07 = Sole proprietor
 aboutyou.rolewithinbusiness.lbl.08 = Other
 
-businessdetails.whatyouneed.subheading = In this section you’ll be asked for things like:
+businessdetails.whatyouneed.subheading = You’ll need to tell us:
 businessdetails.whatyouneed.subheading_2 = You’ll also need:
 businessdetails.whatyouneed.line_1 = if your business is currently registered with HMRC under the Money Laundering Regulations
 businessdetails.whatyouneed.line_2 = the date your business started or will start activities that need to be registered under the Money Laundering Regulations
@@ -1404,7 +1404,7 @@ businessdetails.activity.start.date.text = If your business is already involved 
 businessdetails.lettersaddress.title = Is this the right address to send you letters about your supervision?
 
 tradingpremises.whatyouneed.paragraph1.text = We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
-tradingpremises.whatyouneed.requiredinfo.heading = For each of your trading premises you’ll be asked things like:
+tradingpremises.whatyouneed.requiredinfo.heading = For each of your trading premises you’ll need to tell us:
 tradingpremises.whatyouneed.requiredinfo.text.1 = trading name and address
 tradingpremises.whatyouneed.requiredinfo.text.2 = the date you started or will start trading from these premises
 tradingpremises.whatyouneed.requiredinfo.text.3 = if it is a residential address
@@ -1505,7 +1505,7 @@ tradingpremises.subheading = Trading premises
 tradingpremises.nodetails = Unspecified trading premises
 
 
-estateagentbusiness.whatyouneed.subheading = In this section you’ll be asked things like:
+estateagentbusiness.whatyouneed.subheading = You’ll need to tell us:
 estateagentbusiness.whatyouneed.line_1 = which estate agency services you provide
 estateagentbusiness.whatyouneed.line_2 = if you’re registered with a redress scheme
 estateagentbusiness.whatyouneed.line_3 = if your business has been penalised in the past
@@ -2471,7 +2471,7 @@ msb.services.list.lbl.02 = Currency exchange
 msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 
-hvd.whatyouneed.requiredinfo.heading = In this section you’ll be asked things like:
+hvd.whatyouneed.requiredinfo.heading = You’ll need to tell us:
 hvd.whatyouneed.line_1 = what your business will buy or sell
 hvd.whatyouneed.line_2 = how you’ll sell your goods, for example auction
 hvd.whatyouneed.line_3 = the date of the first cash payment of €10,000 or more, if you have made or accepted any
@@ -2617,11 +2617,11 @@ notifications.nmrj.title = No longer considering refusal
 notifications.nmrv.title = No longer considering revocation
 
 ############################### Renewal ###############################
-renewal.whatyouneed.requiredinfo.heading = In this section you’ll need to tell us:
+renewal.whatyouneed.requiredinfo.heading = You’ll need to tell us:
 renewal.whatyouneed.line_1 = about any other activities your business was involved in over the last 12 months
 renewal.whatyouneed.line_2 = your total net profit for the last 12 months, if your business was involved in other activities
 renewal.whatyouneed.line_3 = your total net profit for the last 12 months from the services you have registered
-renewal.whatyouneed.line_4 = how much of your turnover you expect to come from sales of art for €10,000 or more
+renewal.whatyouneed.line_4 = the percentage of your turnover that came from sales of art for €10,000 or more
 renewal.whatyouneed.line_5 = your total throughput in the last 12 months
 renewal.whatyouneed.line_6 = the number of money transfers you made in the last 12 months
 renewal.whatyouneed.line_7 = which countries you sent the largest amounts of money to, if you sent money to other countries in the last 12 months

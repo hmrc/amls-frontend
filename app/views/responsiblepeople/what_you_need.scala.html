@@ -51,7 +51,7 @@
             <li>@Messages("responsiblepeople.whatyouneed.line_11")</li>
             <li>@Messages("responsiblepeople.whatyouneed.line_12")</li>
             <li>@Messages("responsiblepeople.whatyouneed.line_13")</li>
-            @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness) || ba.hasBusinessOrAdditionalActivity(TrustAndCompanyServices)){<li>@Messages("responsiblepeople.whatyouneed.line_14")</li>}
+            @if(!ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness) || !ba.hasBusinessOrAdditionalActivity(TrustAndCompanyServices)){<li>@Messages("responsiblepeople.whatyouneed.line_14")</li>}
         </ul>
     }
 
