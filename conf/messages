@@ -1098,6 +1098,8 @@ progress.submit.updates = Submit updates
 progress.updates.made = To submit your updates you need to complete a declaration, and pay the fees.
 progress.updates.incomplete = You can submit your updates when you have completed all the sections.
 progress.updates.not.made = You have not made any updates
+progress.updates.continue = Check your status and messages
+
 progress.view.status = Submit updates
 
 progress.update.registration = Update registration
