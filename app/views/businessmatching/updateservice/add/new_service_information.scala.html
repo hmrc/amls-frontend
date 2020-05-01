@@ -20,7 +20,7 @@
 @import forms.EmptyForm
 @import models.businessmatching.BusinessMatchingMsbService
 
-@(activities: Set[String], hideSupervisionDetails:Boolean, subsectors: Set[BusinessMatchingMsbService], isTdiOrBpspPresent: Boolean = false)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
+@(activities: Set[String], hideSupervisionDetails:Boolean, subsectors: Set[BusinessMatchingMsbService], isTdiOrBpspPresent: Boolean = false, isAspOrTcspPresent: Boolean = false)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
@@ -77,7 +77,18 @@
 
     @if(activities.size > 1) {
         @activities match {
-            case list if isTdiOrBpspPresent &&  list.diff(Set("Bill payment service provider", "Telecommunications, digital and IT payment service provider")).size == 1 => {
+            case list if isTdiOrBpspPresent && isAspOrTcspPresent && list.diff(Set("Bill payment service provider", "Telecommunications, digital and IT payment service provider")).size >= 1 => {
+                <p>@Messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
+                <ul class="list list-bullet">
+                    @activities.diff(Set("Bill payment service provider", "Telecommunications, digital and IT payment service provider")).toList.sorted.map { ba =>
+                        <li>@Character.toLowerCase(ba.charAt(0))@ba.substring(1)</li>
+                    }
+                    @if(isAspOrTcspPresent && !hideSupervisionDetails) {
+                        <li>@Messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
+                    }
+                </ul>
+            }
+            case list if isTdiOrBpspPresent && list.diff(Set("Bill payment service provider", "Telecommunications, digital and IT payment service provider")).size == 1 => {
                 <p>@Messages("businessmatching.updateservice.newserviceinformation.info.1",
                     (list.diff(Set("Bill payment service provider", "Telecommunications, digital and IT payment service provider")).mkString(" ")).toLowerCase)</p>
             }
@@ -87,7 +98,7 @@
                     @activities.diff(Set("Bill payment service provider", "Telecommunications, digital and IT payment service provider")).toList.sorted.map { ba =>
                         <li>@Character.toLowerCase(ba.charAt(0))@ba.substring(1)</li>
                     }
-                    @if((activities.contains("Trust or company service provider") || activities.contains("Accountancy service provider")) && !hideSupervisionDetails) {
+                    @if(isAspOrTcspPresent && !hideSupervisionDetails) {
                         <li>@Messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
                     }
                 </ul>
@@ -98,7 +109,7 @@
                     @activities.toList.sorted.map { ba =>
                         <li>@Character.toLowerCase(ba.charAt(0))@ba.substring(1)</li>
                     }
-                    @if((activities.contains("Trust or company service provider") || activities.contains("Accountancy service provider")) && !hideSupervisionDetails) {
+                    @if(isAspOrTcspPresent && !hideSupervisionDetails) {
                         <li>@Messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
                     }
                 </ul>

@@ -22,7 +22,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BillPaymentServices, BusinessMatchingMsbService, TelephonePaymentService}
+import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatchingMsbService, TelephonePaymentService, TrustAndCompanyServices}
 import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId}
 import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
@@ -55,9 +55,14 @@ class NeedMoreInformationController @Inject()(authAction: AuthAction,
             case _ => false
           }
 
+          val isAspOrTcspPresent = activity exists {
+            case AccountancyServices | TrustAndCompanyServices => true
+            case _ => false
+          }
+
           val subSectors = model.addedSubSectors.getOrElse(Set.empty)
 
-          Ok(new_service_information(activityNames, ControllerHelper.supervisionComplete(cacheMap), subSectors, isTdiOrBpspPresent))
+          Ok(new_service_information(activityNames, ControllerHelper.supervisionComplete(cacheMap), subSectors, isTdiOrBpspPresent, isAspOrTcspPresent))
         }) getOrElse InternalServerError("Get: Unable to show New Service Information page")
   }
 

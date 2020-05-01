@@ -16,7 +16,7 @@
 
 package views.businessmatching.updateservice.add
 
-import models.businessmatching.{AccountancyServices, TrustAndCompanyServices}
+import models.businessmatching._
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
@@ -29,7 +29,7 @@ class new_service_informationSpec extends AmlsViewSpec with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addTokenForView()
 
-    def view = new_service_information(Set(AccountancyServices.getMessage()), false)
+    def view = new_service_information(Set(AccountancyServices.getMessage()), false, Set())
   }
 
   "The new_service_information view" must {
@@ -52,44 +52,60 @@ class new_service_informationSpec extends AmlsViewSpec with MustMatchers {
 
     "show the correct content" when {
 
-      "supervision section is not complete" when {
-
-        "only ASP is selected" in new ViewFixture {
-          doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.asp"))
-        }
-
-        "only TCSP is selected" in new ViewFixture {
-          override def view = new_service_information(Set(TrustAndCompanyServices.getMessage()), false)
-          doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.tcsp"))
-        }
-
-        "both ASP and TCSP are selected" in new ViewFixture {
-          override def view = new_service_information(Set(TrustAndCompanyServices.getMessage(), AccountancyServices.getMessage()), false)
-          doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
-          doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.3"))
-          doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.4"))
-          doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.2"))
-        }
+      "only ASP is selected" in new ViewFixture {
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.2"))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.6", AccountancyServices.getMessage().toLowerCase))
       }
 
-      "supervision section is complete" when {
+      "only TCSP is selected" in new ViewFixture {
+        override def view = new_service_information(Set(TrustAndCompanyServices.getMessage()), false, Set())
 
-        "both ASP and TCSP are selected" in new ViewFixture {
-          override def view = new_service_information(Set(TrustAndCompanyServices.getMessage(), AccountancyServices.getMessage()), true)
-          doc.getElementById("content").text() mustNot include(Messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
-        }
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.2"))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.6", TrustAndCompanyServices.getMessage().toLowerCase))
+      }
 
-        "only ASP is selected" in new ViewFixture {
-          override def view = new_service_information(Set(AccountancyServices.getMessage()), true)
-          doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.onlyasp"))
-          doc.getElementById("content").text() mustNot include(Messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
-        }
+      "only BPSP is selected" in new ViewFixture {
+        override def view = new_service_information(Set(BillPaymentServices.getMessage()), false, Set(), true)
 
-        "only TCSP is selected" in new ViewFixture {
-          override def view = new_service_information(Set(TrustAndCompanyServices.getMessage()), true)
-          doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.onlytcsp"))
-          doc.getElementById("content").text() mustNot include(Messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
-        }
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.6", BillPaymentServices.getMessage().toLowerCase))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.7"))
+      }
+
+      "only MSB is selected with MT" in new ViewFixture {
+        override def view = new_service_information(Set(MoneyServiceBusiness.getMessage()), false, Set(TransmittingMoney))
+
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.1", MoneyServiceBusiness.getMessage().toLowerCase))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.6.msb.single"))
+
+      }
+
+      "both ASP and TCSP are selected" in new ViewFixture {
+        override def view = new_service_information(Set(TrustAndCompanyServices.getMessage(), AccountancyServices.getMessage()), false, Set(), false, true)
+
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.2"))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.3"))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.4"))
+      }
+
+      "both TCSP and TDI are selected" in new ViewFixture {
+        override def view = new_service_information(Set(TrustAndCompanyServices.getMessage(), TelephonePaymentService.getMessage()), false, Set(), true, true)
+
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.2"))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.3"))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.4"))
+      }
+
+      "MSB, TCSP and TDI are selected" in new ViewFixture {
+        override def view = new_service_information(Set(TrustAndCompanyServices.getMessage(), TelephonePaymentService.getMessage(), MoneyServiceBusiness.getMessage()), false, Set(TransmittingMoney), true, true)
+
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.2"))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.supervision"))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.3"))
+        doc.getElementById("content").text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.4"))
       }
     }
 

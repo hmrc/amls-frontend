@@ -149,8 +149,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
     "redirect to the 'Registration Progress' page" when {
       "we're on the summary page and the user selects continue " +
-        "if all possible activities are added" +
-        " and the new activity does not require more information" in new Fixture {
+        "if all possible activities are added" in new Fixture {
         when {
           router.businessMatchingService.getRemainingBusinessActivities(any())(any(), any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
@@ -161,7 +160,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute("internalId", AddBusinessTypeSummaryPageId, AddBusinessTypeFlowModel(Some(BillPaymentServices))))
 
-        result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
+        result mustBe Redirect(addRoutes.NeedMoreInformationController.get())
       }
     }
 
