@@ -46,17 +46,13 @@ class LettersAddressController @Inject () (val dataCache: DataCacheConnector,
             (for {
               altCorrespondenceAddress <- atb.altCorrespondenceAddress
             } yield
-              hasAlternativeAddress(atb) match {
+              atb.correspondenceAddress.isDefined match {
                 case true => Redirect(routes.ContactingYouPhoneController.get(edit))
-                case _ => Ok(letters_address(Form2[LettersAddress](LettersAddress(!altCorrespondenceAddress)), registeredOffice, edit))
+                case _    => Ok(letters_address(Form2[LettersAddress](LettersAddress(!altCorrespondenceAddress)), registeredOffice, edit))
               }).getOrElse (Ok(letters_address(EmptyForm, registeredOffice, edit)))
 
           }) getOrElse Redirect(routes.CorrespondenceAddressIsUkController.get(edit))
       }
-  }
-
-  def hasAlternativeAddress(bd: BusinessDetails) = {
-    bd.correspondenceAddress.isDefined
   }
 
   def post(edit: Boolean = false) = authAction.async {
