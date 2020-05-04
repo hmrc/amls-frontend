@@ -261,7 +261,7 @@
                     editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-nonukpassport-edit"
                 ) {
-                    @nonUKPassport  match {
+                    @nonUKPassport match {
                         case NonUKPassportYes(nonUKPassportNumber) => {
                             <p>@Messages("lbl.yes")</p>
                         }
@@ -289,8 +289,22 @@
             }
 
             @person.personResidenceType.map { prt =>
+
+              @if(prt.countryOfBirth.contains(Country("United Kingdom", "GB"))){
+                  @checkYourAnswersRow(
+                      question = Messages("responsiblepeople.country.of.birth.heading", personName),
+                      editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).toString(),
+                      editLinkTag = "rp-countryofbirth-edit"
+                  ) {
+                      @if(prt.countryOfBirth.contains(Country("United Kingdom", "GB"))) {
+                          <p>@Messages("lbl.yes")</p>
+                      }else {
+                          <p>@Messages("lbl.no")</p>
+                      }
+                  }
+              }
                  @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.country_of_birth"),
+                    question = Messages("responsiblepeople.detailed_answers.country_of_birth", personName),
                     editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-countryofbirth-edit"
                 ) {
