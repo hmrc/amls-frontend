@@ -629,7 +629,7 @@
 
             @person.approvalFlags.hasAlreadyPassedFitAndProper.map { fp =>
                  @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"),
+                    question = Messages("responsiblepeople.fit_and_proper.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.FitAndProperController.get(idx, true, flow).toString,
                     editLinkTag = "fit-and-proper"
                 ) {
@@ -643,7 +643,7 @@
             @if(showApprovalSection) {
                 @person.approvalFlags.hasAlreadyPaidApprovalCheck.map { fp =>
                      @checkYourAnswersRow(
-                        question = Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName),
+                        question = Messages("responsiblepeople.approval_check.heading", personName),
                         editUrl = controllers.responsiblepeople.routes.ApprovalCheckController.get(idx, true, flow).toString(),
                         editLinkTag = "approval-check"
                     ) {
