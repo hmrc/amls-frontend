@@ -290,7 +290,6 @@
 
             @person.personResidenceType.map { prt =>
 
-              @if(prt.countryOfBirth.contains(Country("United Kingdom", "GB"))){
                   @checkYourAnswersRow(
                       question = Messages("responsiblepeople.country.of.birth.heading", personName),
                       editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).toString(),
@@ -302,39 +301,36 @@
                           <p>@Messages("lbl.no")</p>
                       }
                   }
-              }
+
                  @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.country_of_birth", personName),
                     editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).toString(),
-                    editLinkTag = "rp-countryofbirth-edit"
+                    editLinkTag = "rp-countryofbirth-answer-edit"
                 ) {
                     @prt.countryOfBirth
                 }
 
                  @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.nationality"),
+                    question = Messages("responsiblepeople.nationality.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.NationalityController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-nationality-edit"
                 ) {
-                    @prt.nationality
+                     @if(prt.nationality.contains(Country("United Kingdom", "GB"))){
+                         <p>@Messages("responsiblepeople.nationality.selection.british")</p>
+                     } else {
+                         @prt.nationality
+                     }
                 }
             }
 
             @person.contactDetails.map { cd =>
                  @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.phone_number"),
+                    question = Messages("responsiblepeople.contact_details.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString(),
-                    editLinkTag = "rp-phonenumber-edit"
+                    editLinkTag = "rp-contactDetails-edit"
                 ) {
-                    @cd.phoneNumber
-                }
-
-                @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.email"),
-                    editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString(),
-                    editLinkTag = "rp-email-edit"
-                ) {
-                    @cd.emailAddress
+                     <p>@Messages("responsiblepeople.detailed_answers.phone_number") @cd.phoneNumber</p>
+                     <p>@Messages("responsiblepeople.detailed_answers.email") @cd.emailAddress</p>
                 }
             }
 
@@ -461,10 +457,13 @@
                     editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).toString,
                     editLinkTag = "rp-positionwithinbusiness-edit"
                 ) {
-
-                    <ul class="@{if (pos.positions.size > 1) { "list list-bullet" } else { "list"}}">
-                        @pos.positions.map(p => PositionWithinBusiness.getPrettyName(p)).toList.sorted.map(p => <li>{p}</li>)
-                    </ul>
+                     @if(pos.positions.size == 1) {
+                         @pos.positions.map(p => PositionWithinBusiness.getPrettyName(p))
+                     } else {
+                         <ul class="list list-bullet">
+                            @pos.positions.map(p => PositionWithinBusiness.getPrettyName(p)).toList.sorted.map(p => <li>{p}</li>)
+                         </ul>
+                     }
                 }
 
                  @checkYourAnswersRow(
@@ -478,7 +477,7 @@
 
             @person.soleProprietorOfAnotherBusiness.map { anotherBusiness =>
                  @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.soleproprietor_for_other_business"),
+                    question = Messages("responsiblepeople.sole.proprietor.another.business.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-soleproprietor-edit"
                 ) {
