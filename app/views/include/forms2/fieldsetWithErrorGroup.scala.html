@@ -45,8 +45,10 @@
     <fieldset
             @if(f.id.nonEmpty){ id="@f.id"}
             class="@if(panel){ panel-indent}@if(jsHidden){js-hidden} @classes.mkString(" ")" @data.mkString(" ")
-            @if(hint.nonEmpty || f.hasErrors) { aria-describedby="@if(hint.nonEmpty){@{f.id}-hint}@if(f.hasErrors){@{f.id}-error-notification}"}
-    >
+            @if(hint.nonEmpty && f.hasErrors) {aria-describedby="@if(hint.nonEmpty){@{f.id}-hint }@if(f.hasErrors){@{f.id}-error-notification}"}
+            @if(hint.nonEmpty && !f.hasErrors) {aria-describedby="@if(hint.nonEmpty){@{f.id}-hint}"}
+            @if(hint.isEmpty && f.hasErrors) {aria-describedby="@if(f.hasErrors){@{f.id}-error-notification}"}
+
         @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden, heading, additionalHeading, additionalHeadingText, f.id, supportingContent = supportingContent)
         @if(f.hasErrors) {
             <span class="error-notification" id="@f.id-error-notification" data-journey="error - field:user input:@f.id">
