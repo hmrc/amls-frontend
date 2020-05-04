@@ -223,7 +223,7 @@
             }
 
             @person.ukPassport.map { ukPassport =>
-                 @checkYourAnswersRow(
+                @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.uk.passport", personName),
                     editUrl = controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true, flow).toString(),
                     editLinkTag = "uk-passport"
@@ -231,18 +231,32 @@
                     @ukPassport match {
                         case UKPassportYes(ukPassportNumber) => {
                             <p>@Messages("lbl.yes")</p>
-                            <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName): @ukPassportNumber</p>
                         }
                         case UKPassportNo => {
                             @Messages("lbl.no")
                         }
                     }
                 }
+            }
 
+            @if(person.ukPassport.fold[Boolean](false)(_ != UKPassportNo)) {
+                @person.ukPassport.map { ukPassport =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName),
+                        editUrl = controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true, flow).toString(),
+                        editLinkTag = "uk-passport-true-edit"
+                    ) {
+                        @ukPassport match {
+                            case UKPassportYes(ukPassportNumber) => {
+                                <p>@ukPassportNumber</p>
+                            }
+                        }
+                    }
+                }
             }
 
             @person.nonUKPassport.map { nonUKPassport =>
-                 @checkYourAnswersRow(
+                @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.non.uk.passport", personName),
                     editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-nonukpassport-edit"
@@ -250,10 +264,25 @@
                     @nonUKPassport  match {
                         case NonUKPassportYes(nonUKPassportNumber) => {
                             <p>@Messages("lbl.yes")</p>
-                            <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName): @nonUKPassportNumber</p>
                         }
                         case NoPassport => {
                             @Messages("lbl.no")
+                        }
+                    }
+                }
+            }
+
+            @if(person.nonUKPassport.fold[Boolean](false)(_ != NoPassport)) {
+                @person.nonUKPassport.map { nonUKPassport =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName),
+                        editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true, flow).toString(),
+                        editLinkTag = "rp-nonukpassport-true-edit"
+                    ) {
+                        @nonUKPassport match {
+                            case NonUKPassportYes(nonUKPassportNumber) => {
+                                <p>@nonUKPassportNumber</p>
+                            }
                         }
                     }
                 }
