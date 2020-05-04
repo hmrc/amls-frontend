@@ -41,10 +41,10 @@ class ContactingYouPhoneController @Inject () (val dataCache: DataCacheConnector
     implicit request =>
       for {
         businessDetails <-
-        dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+          dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
       } yield businessDetails match {
-        case Some(BusinessDetails(_,_, _, _, Some(details), _, _, _, _, _, _, _)) if details.phoneNumber.isDefined =>
-          Ok(contacting_you_phone(Form2[ContactingYouPhone](ContactingYouPhone (details.phoneNumber.getOrElse(""))), edit))
+        case Some(BusinessDetails(_, _, _, _, Some(details), _, _, _, _, _, _, _)) if details.phoneNumber.isDefined =>
+          Ok(contacting_you_phone(Form2[ContactingYouPhone](ContactingYouPhone(details.phoneNumber.getOrElse(""))), edit))
         case _ => Ok(contacting_you_phone(EmptyForm, edit))
       }
   }
@@ -58,17 +58,12 @@ class ContactingYouPhoneController @Inject () (val dataCache: DataCacheConnector
           for {
             businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
             _ <- dataCache.save[BusinessDetails](request.credId, BusinessDetails.key,
-                businessDetails.contactingYou(updateData(businessDetails.contactingYou, data))
+              businessDetails.contactingYou(updateData(businessDetails.contactingYou, data))
             )
           } yield {
             edit match {
               case true => Redirect(routes.SummaryController.get())
-              case _ => {
-                businessDetails.correspondenceAddress.isDefined match {
-                  case false => Redirect(routes.LettersAddressController.get(edit))
-                  case _     => Redirect(routes.CorrespondenceAddressIsUkController.get(edit))
-                }
-              }
+              case _ => Redirect(routes.LettersAddressController.get(edit))
             }
           }
       }

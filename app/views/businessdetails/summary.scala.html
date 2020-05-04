@@ -143,7 +143,7 @@
         }
 
         @model.altCorrespondenceAddress.map { aca =>
-          @if(!model.correspondenceAddress.isDefined) {
+
             @checkYourAnswersRow(
                 question = Messages("businessdetails.lettersaddress.title"),
                 editLinkTag = "businessdetailslettersaddress-edit",
@@ -160,7 +160,6 @@
                     case false => { @Messages("lbl.yes") }
                     }
             }
-          }
         }
 
         @model.correspondenceAddress.map { ca =>
