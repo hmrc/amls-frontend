@@ -600,13 +600,29 @@
 
             @person.training.map { tra =>
                  @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering"),
+                    question = Messages("responsiblepeople.training.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.TrainingController.get(idx, true, flow).toString,
                     editLinkTag = "rp-traininginmlre-edit"
                 ) {
                     @tra match {
-                        case TrainingYes(info) => {@info}
+                        case TrainingYes(info) => {@Messages("lbl.yes")}
                         case TrainingNo => {@Messages("lbl.no")}
+                    }
+                }
+            }
+
+            @if(person.training.fold[Boolean](false)(_ != TrainingNo)) {
+                @person.training.map { tra =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering", personName),
+                        editUrl = controllers.responsiblepeople.routes.TrainingController.get(idx, true, flow).toString,
+                        editLinkTag = "rp-traininginmlre-answer-edit"
+                    ) {
+                        @tra match {
+                            case TrainingYes(info) => {
+                                @info
+                            }
+                        }
                     }
                 }
             }
