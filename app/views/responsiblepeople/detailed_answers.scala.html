@@ -289,7 +289,6 @@
             }
 
             @person.personResidenceType.map { prt =>
-
                   @checkYourAnswersRow(
                       question = Messages("responsiblepeople.country.of.birth.heading", personName),
                       editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).toString(),
@@ -490,13 +489,29 @@
 
             @person.vatRegistered.map { vr =>
                  @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.registered_for_vat"),
+                    question = Messages("responsiblepeople.registeredforvat.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.VATRegisteredController.get(idx, true, flow).toString,
                     editLinkTag = "rp-registeredforvat-edit"
                 ) {
                     @vr match {
-                        case VATRegisteredYes(regNo) => {@regNo}
+                        case VATRegisteredYes(regNo) => {@Messages("lbl.yes")}
                         case VATRegisteredNo => {@Messages("lbl.no")}
+                    }
+                }
+            }
+
+            @if(person.vatRegistered.fold[Boolean](false)(_ != VATRegisteredNo)) {
+                @person.vatRegistered.map { vr =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.detailed_answers.registered_for_vat"),
+                        editUrl = controllers.responsiblepeople.routes.VATRegisteredController.get(idx, true, flow).toString,
+                        editLinkTag = "rp-registeredforvat-answer-edit"
+                    ) {
+                        @vr match {
+                            case VATRegisteredYes(regNo) => {
+                                @regNo
+                            }
+                        }
                     }
                 }
             }
