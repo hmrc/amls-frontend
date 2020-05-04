@@ -52,30 +52,24 @@ class NewHomeAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
 
   def post(index: Int) = authAction.async {
     implicit request =>
-      activityStartDateField(request.credId, index) flatMap {
-        case (Some(activityStartDate), personName) => {
-
-          val extraFields = Map("activityStartDate" -> Seq(activityStartDate.toString("yyyy-MM-dd")))
-
-          Form2[NewHomeDateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
+      getPersonName(request.credId, index) flatMap {
+        case personName =>
+          Form2[NewHomeDateOfChange](request.body.asFormUrlEncoded.get) match {
             case f: InvalidForm =>
               Future.successful(BadRequest(new_home_date_of_change(f, index, personName)))
-            case ValidForm(_, data) => {
+            case ValidForm(_, data) =>
               for {
                 _ <- dataCacheConnector.save[NewHomeDateOfChange](request.credId, NewHomeDateOfChange.key, data)
               } yield Redirect(controllers.responsiblepeople.address.routes.NewHomeAddressController.get(index))
-            }
+            case _ => Future.successful(NotFound(notFoundView))
           }
-        }
-        case _ => Future.successful(NotFound(notFoundView))
       }
   }
 
-  private def activityStartDateField(credId: String, index: Int)(implicit request: Request[AnyContent]) = {
+  private def getPersonName(credId: String, index: Int)(implicit request: Request[AnyContent]) = {
     getData[ResponsiblePerson](credId, index) map { x =>
-      val startDate = x.flatMap(rp => rp.positions).flatMap(p => p.startDate).map(sd => sd.startDate)
       val personName = ControllerHelper.rpTitleName(x)
-      (startDate, personName)
+      personName
     }
   }
 }

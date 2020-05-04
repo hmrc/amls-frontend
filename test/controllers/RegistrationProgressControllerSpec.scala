@@ -209,8 +209,9 @@ class RegistrationProgressControllerSpec extends AmlsSpec
               val responseF = controller.get()(request)
               status(responseF) must be(OK)
 
+              contentAsString(responseF)  must include(Messages("progress.submit.updates"))
+
               val submitForm = Jsoup.parse(contentAsString(responseF)).select(".submit-application form")
-              submitForm.text() must include(Messages("progress.submit.updates"))
               submitForm.attr("action") must be(controllers.routes.RegistrationProgressController.post().url)
               submitForm.select("button").text() must be(Messages("button.continue"))
             }
