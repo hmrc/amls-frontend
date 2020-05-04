@@ -169,7 +169,7 @@
                     @checkYourAnswersRow(
                         question = Messages("responsiblepeople.knownby.answer", personName),
                         editUrl = controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).toString(),
-                        editLinkTag = "rp-knownby-edit"
+                        editLinkTag = "rp-knownby-true-edit"
                     ) {
                         <ul class="list">
                             <li>@other.otherName</li>
@@ -189,19 +189,34 @@
 
             }
 
-            @person.personResidenceType.map { prt =>
-                 @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.uk_resident", personName),
-                    editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true, flow).toString(),
-                    editLinkTag = "rp-ukresident-edit"
-                ) {
-                    @prt.isUKResidence match {
-                        case UKResidence(nino) => {
-                            <p>@Messages("lbl.yes")</p>
-                            <p>@Messages("responsiblepeople.detailed_answers.uk_resident.nino", personName): @nino</p>
-                        }
-                        case NonUKResidence => {
-                            @Messages("lbl.no")
+          @person.personResidenceType.map { prt =>
+            @checkYourAnswersRow(
+              question = Messages("responsiblepeople.detailed_answers.uk_resident", personName),
+              editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true, flow).toString(),
+              editLinkTag = "rp-ukresident-edit"
+            ) {
+              @prt.isUKResidence match {
+                case UKResidence(nino) => {
+                  <p>@Messages("lbl.yes")</p>
+                }
+                case NonUKResidence => {
+                  @Messages("lbl.no")
+                }
+              }
+            }
+          }
+
+            @if(person.personResidenceType.fold[Boolean](false)(_.isUKResidence != NonUKResidence)) {
+                @person.personResidenceType.map { prt =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.detailed_answers.uk_resident.nino", personName),
+                        editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true, flow).toString(),
+                        editLinkTag = "rp-ukresident-true-edit"
+                    ) {
+                        @prt.isUKResidence match {
+                            case UKResidence(nino) => {
+                                <p>@nino</p>
+                            }
                         }
                     }
                 }
