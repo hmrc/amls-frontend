@@ -2042,6 +2042,7 @@ responsiblepeople.legalnamechangedate.paragraph = For example, if they got marri
 responsiblepeople.legalnamechangedate.hint =  If they have changed their name more than once, give the most recent previous name.
 responsiblepeople.knownby.title = Is this person known by any other names?
 responsiblepeople.knownby.heading = Is {0} known by any other names?
+responsiblepeople.knownby.answer = Other names {0} is known by
 responsiblepeople.registeredforselfassessment.heading = Is {0} registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.title = Is this person registered for Self Assessment?
 responsiblepeople.registeredforselfassessment.lbl.utrnumber = Self Assessment Unique Taxpayer Reference (UTR) number

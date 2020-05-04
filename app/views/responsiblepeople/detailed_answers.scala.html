@@ -157,20 +157,28 @@
                     editUrl = controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-knownby-edit"
                 ) {
-                        @other.hasOtherNames match {
-                            case Some(true) => {
-                            <ul class="list">
-                                <li>@other.otherName</li>
-                            </ul>
-                            }
-                            case Some(false) => {@Messages("lbl.no")}
-                        }
+                    @other.hasOtherNames match {
+                        case Some(true) => {@Messages("lbl.yes")}
+                        case Some(false) => {@Messages("lbl.no")}
+                    }
                 }
             }
 
+            @if(person.knownBy.fold[Boolean](false)(_.hasOtherNames.contains(true))) {
+                @person.knownBy.map { other =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.knownby.answer", personName),
+                        editUrl = controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).toString(),
+                        editLinkTag = "rp-knownby-edit"
+                    ) {
+                        <ul class="list">
+                            <li>@other.otherName</li>
+                        </ul>
+                    }
+                }
+            }
 
             @person.dateOfBirth.map { dateOfBirth =>
-
                 @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.dob", personName),
                     editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).toString(),
