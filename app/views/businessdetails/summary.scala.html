@@ -65,7 +65,7 @@
             ) {
                 @vatRegistered match {
                     case VATRegisteredNo => { @Messages("lbl.no") }
-                    case VATRegisteredYes(v) => { @Messages("lbl.yes") }
+                    case VATRegisteredYes(vatNo) => { @Messages("lbl.yes") }
                 }
             }
         }
@@ -73,13 +73,13 @@
         @model.vatRegistered.map { vatRegistered =>
             @vatRegistered match {
                 case VATRegisteredNo => {}
-                case VATRegisteredYes(v) => {
+                case VATRegisteredYes(vatNo) => {
                     @checkYourAnswersRow(
                         question = Messages("lbl.vat.reg.number"),
                         editLinkTag = "businessdetailsregisteredvat-edit",
                         editUrl = controllers.businessdetails.routes.VATRegisteredController.get(true).toString
                     ) {
-                          @v
+                          @vatNo
                     }
                 }
             }
