@@ -324,10 +324,20 @@
                     @if(prt.nationality.contains(Country("United Kingdom", "GB"))) {
                         <p>@Messages("responsiblepeople.nationality.selection.british")</p>
                     } else {
-                        @prt.nationality
+                        <p>@Messages("responsiblepeople.nationality.selection.other")</p>
                     }
                 }
-            }
+
+                @if(!prt.nationality.contains(Country("United Kingdom", "GB"))) {
+                    @checkYourAnswersRow(
+                            question = Messages("responsiblepeople.nationality.selection.other.answer", personName),
+                            editUrl = controllers.responsiblepeople.routes.NationalityController.get(idx, true, flow).toString(),
+                            editLinkTag = "rp-nationality-other-edit"
+                        ) {
+                            @prt.nationality
+                        }
+                    }
+                }
 
             @person.contactDetails.map { cd =>
                 @checkYourAnswersRow(
