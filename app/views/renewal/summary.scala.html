@@ -42,10 +42,24 @@
         ) {
             <p>@model.involvedInOtherActivities.map {
                 case InvolvedInOtherNo => { @Messages("lbl.no") }
-                case InvolvedInOtherYes(v) => { @v }
+                case InvolvedInOtherYes(v) => { @Messages("lbl.yes") }
             }</p>
         }
-    }
+
+        @if(model.involvedInOtherActivities.fold[Boolean](false) {
+            case InvolvedInOtherYes(details) => true
+            case _ => false}) {
+            @checkYourAnswersRow(
+                question = Messages("renewal.involvedinother.cya.second.title"),
+                editLinkTag = "involvedinotheractivities-edit",
+                editUrl = controllers.renewal.routes.InvolvedInOtherController.get(true).toString
+            ) {
+                <p>@model.involvedInOtherActivities.map {
+                    case InvolvedInOtherYes(v) => { @v}
+                }</p>
+            }
+        }
+      }
 
     @model.businessTurnover.map { turnover =>
         @checkYourAnswersRow(
@@ -66,30 +80,40 @@
     }
 
     @model.turnover.map { turnover =>
-        @checkYourAnswersRow(
-            question = Messages("renewal.turnover.title"),
-            editLinkTag = "turnover-edit",
-            editUrl = controllers.renewal.routes.AMLSTurnoverController.get(true).toString
-        ) {
-            <ul class="list list-bullet">
-            @activities.map {
-                case types => {
-                    @types.map{ x =>
-                        <li>@x</li>
-                    }
+        @activities.map { types =>
+            @if(types.size == 1) {
+                @checkYourAnswersRow(
+                    question = "renewal.turnover.title.single.service" ++ types.head,
+                    editLinkTag = "turnover-edit",
+                    editUrl = controllers.renewal.routes.AMLSTurnoverController.get(true).toString
+                ) {
+                    <p>@turnover match {
+                        case AMLSTurnover.First => { @Messages("businessactivities.business-turnover.lbl.01") }
+                        case AMLSTurnover.Second => { @Messages("businessactivities.business-turnover.lbl.02") }
+                        case AMLSTurnover.Third => { @Messages("businessactivities.business-turnover.lbl.03") }
+                        case AMLSTurnover.Fourth => { @Messages("businessactivities.business-turnover.lbl.04") }
+                        case AMLSTurnover.Fifth => { @Messages("businessactivities.business-turnover.lbl.05") }
+                        case AMLSTurnover.Sixth => { @Messages("businessactivities.business-turnover.lbl.06") }
+                        case AMLSTurnover.Seventh => { @Messages("businessactivities.business-turnover.lbl.07") }
+                    }</p>
+                }
+            } else {
+                @checkYourAnswersRow(
+                    question = "renewal.turnover.title",
+                    editLinkTag = "turnover-edit",
+                    editUrl = controllers.renewal.routes.AMLSTurnoverController.get(true).toString
+                ) {
+                    <p>@turnover match {
+                        case AMLSTurnover.First => { @Messages("businessactivities.business-turnover.lbl.01") }
+                        case AMLSTurnover.Second => { @Messages("businessactivities.business-turnover.lbl.02") }
+                        case AMLSTurnover.Third => { @Messages("businessactivities.business-turnover.lbl.03") }
+                        case AMLSTurnover.Fourth => { @Messages("businessactivities.business-turnover.lbl.04") }
+                        case AMLSTurnover.Fifth => { @Messages("businessactivities.business-turnover.lbl.05") }
+                        case AMLSTurnover.Sixth => { @Messages("businessactivities.business-turnover.lbl.06") }
+                        case AMLSTurnover.Seventh => { @Messages("businessactivities.business-turnover.lbl.07") }
+                    }</p>
                 }
             }
-            </ul>
-
-            <p>@turnover match {
-                case AMLSTurnover.First => { @Messages("businessactivities.business-turnover.lbl.01") }
-                case AMLSTurnover.Second => { @Messages("businessactivities.business-turnover.lbl.02") }
-                case AMLSTurnover.Third => { @Messages("businessactivities.business-turnover.lbl.03") }
-                case AMLSTurnover.Fourth => { @Messages("businessactivities.business-turnover.lbl.04") }
-                case AMLSTurnover.Fifth => { @Messages("businessactivities.business-turnover.lbl.05") }
-                case AMLSTurnover.Sixth => { @Messages("businessactivities.business-turnover.lbl.06") }
-                case AMLSTurnover.Seventh => { @Messages("businessactivities.business-turnover.lbl.07") }
-            }</p>
         }
     }
 
@@ -155,12 +179,18 @@
                     editLinkTag = "msblargestamounts-edit",
                     editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).toString
                 ) {
-                    <ul class="list list-bullet">
-                    @lom.countries.map { country =>
-                        <li>@country.name</li>
+                    @if(lom.countries.size > 1) {
+                        @lom.countries.map { country =>
+                        <ul class="list list-bullet">
+                            <li>@country.name</li>
+                            }
+                        </ul>
+                    } else {
+                        @lom.countries.map { country =>
+                          @country.name
                     }
-                    </ul>
                 }
+            }
             }
 
             @model.mostTransactions.map { mt =>
@@ -169,11 +199,17 @@
                     editLinkTag = "msbmostransactions-edit",
                     editUrl = controllers.renewal.routes.MostTransactionsController.get(edit = true).url
                 ) {
-                    <ul class="list list-bullet">
-                    @mt.countries.map { country =>
-                        <li>@country.name</li>
-                    }
+                    @if(mt.countries.size > 1) {
+                        @mt.countries.map { country =>
+                            <ul class="list list-bullet">
+                                <li>@country.name</li>
+                        }
                     </ul>
+                    } else {
+                        @mt.countries.map { country =>
+                            @country.name
+                        }
+                    }
                 }
             }
 
@@ -196,11 +232,17 @@
                     editLinkTag = "msbwhichcurrencies-edit",
                     editUrl = controllers.renewal.routes.WhichCurrenciesController.get(edit = true).toString
                 ) {
-                    <ul class="list list--comma">
-                    @wc.currencies.map { cur =>
-                        <li>@cur</li>
-                    }
+                    @if(wc.currencies.size > 1) {
+                        @wc.currencies.map { currencies =>
+                            <ul class="list list-bullet">
+                                <li>@currencies</li>
+                        }
                     </ul>
+                    } else {
+                        @wc.currencies.map { currency =>
+                            @currency
+                        }
+                    }
                 }
             }
 
@@ -225,28 +267,36 @@
 
             @model.whichCurrencies.map { wc =>
                 @wc.moneySources.map { ms =>
-                    @if(ms.bankMoneySource.isDefined | ms.wholesalerMoneySource.isDefined | ms.customerMoneySource.isDefined) {
+                @if(ms.bankMoneySource.isDefined && ms.wholesalerMoneySource.isDefined && ms.customerMoneySource.isDefined) {
+                    @checkYourAnswersRow(
+                        question = Messages("renewal.msb.money_sources.header"),
+                        editLinkTag = "msbwhichcurrencies-edit",
+                        editUrl = controllers.renewal.routes.MoneySourcesController.get(true).toString
+                    ) {
+                        <ul class="list list-bullet">
+                            <li>@Messages("renewal.msb.money_sources.bank")</li>
+                            <li>@Messages("renewal.msb.money_sources.wholesaler")</li>
+                            <li>@Messages("msb.which_currencies.source.customers")</li>
+                        </ul>
+                    }
+                } else {
+                    @if(ms.bankMoneySource.isDefined && ms.wholesalerMoneySource.isDefined) {
                         @checkYourAnswersRow(
                             question = Messages("renewal.msb.money_sources.header"),
                             editLinkTag = "msbwhichcurrencies-edit",
                             editUrl = controllers.renewal.routes.MoneySourcesController.get(true).toString
                         ) {
-                            @ms.bankMoneySource.map { bms =>
-                                <p>@Messages("renewal.msb.money_sources.bank"): @bms.bankNames</p>
-                            }
-                            @ms.wholesalerMoneySource.map { wms =>
-                                <p>@Messages("renewal.msb.money_sources.wholesaler"): @wms.wholesalerNames</p>
-                            }
-                            @ms.customerMoneySource.map { cms =>
-                                @if(cms) {
-                                    <p>@Messages("msb.which_currencies.source.customers")</p>
-                                }
-                            }
+                            <ul class="list list-bullet">
+                                <li>@Messages("renewal.msb.money_sources.bank")</li>
+                                <li>@Messages("renewal.msb.money_sources.wholesaler")</li>
+                            </ul>
                         }
                     }
                 }
             }
         }
+        }
+
 
         @if(services.msbServices.contains(ForeignExchange)) {
             @model.fxTransactionsInLast12Months.map{ trans =>
@@ -283,11 +333,17 @@
             @boa.countries.fold {
                 <p>@Messages("lbl.no")</p>
             } { branches =>
-                <ul class="list list-bullet">
+                @if(boa.countries.size > 1) {
+                    <ul class="list list-bullet">
                     @branches.map { country =>
                         <li>@country</li>
                     }
-                </ul>
+                    </ul>
+                } else {
+                    @branches.map { country =>
+                        @country
+                    }
+                }
             }
         }
     }
@@ -332,6 +388,7 @@
                 editLinkTag = "receivecashpaymentshowreceived-edit",
                 editUrl = controllers.renewal.routes.HowCashPaymentsReceivedController.get(true).toString
             ) {
+
                 <ul class="list list-bullet">
                     @if(methods.courier){
                         <li>@Messages("hvd.receiving.option.01")</li>
