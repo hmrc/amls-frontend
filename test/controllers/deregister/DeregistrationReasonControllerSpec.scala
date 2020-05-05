@@ -162,7 +162,32 @@ class DeregistrationReasonControllerSpec extends AmlsSpec {
       }
 
       "given invalid data" must {
-        "return with BAD_REQUEST" in new TestFixture {
+        "return with BAD_REQUEST with HVD" in new TestFixture {
+
+          val businessMatching = BusinessMatching(
+            activities = Some(BusinessActivities(Set(HighValueDealing)))
+          )
+
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(),any()))
+            .thenReturn(Future.successful(Some(businessMatching)))
+
+          val newRequest = requestWithUrlEncodedBody(
+            "deregistrationReason" -> "20"
+          )
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+
+        "return with BAD_REQUEST no HVD" in new TestFixture {
+
+          val businessMatching = BusinessMatching(
+            activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
+          )
+
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(),any()))
+            .thenReturn(Future.successful(Some(businessMatching)))
 
           val newRequest = requestWithUrlEncodedBody(
             "deregistrationReason" -> "20"
