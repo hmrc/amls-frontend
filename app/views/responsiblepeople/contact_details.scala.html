@@ -27,12 +27,12 @@
     @errorSummary(f)
 }
 
+@supportingContent = { <p>@Messages("responsiblepeople.contact_details.lbl", personName)</p> }
+
 @main(
     title = Messages("responsiblepeople.contact_details.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
-
-    <p>@Messages("responsiblepeople.contact_details.lbl", personName)</p>
 
     @form(f, controllers.responsiblepeople.routes.ContactDetailsController.post(index, edit, flow)) {
 
@@ -41,7 +41,8 @@
             section = "summary.responsiblepeople",
             f = f("contact-details"),
             panel = false,
-            classes = Seq("inline")
+            classes = Seq("inline"),
+            supportingContent = supportingContent
         ) {
             @input(
                 field = f("phoneNumber"),
