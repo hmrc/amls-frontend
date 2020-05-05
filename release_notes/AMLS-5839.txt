@@ -1,2 +1,0 @@
- + [AMLS-5839] - 'Changed order of error messages on UK bank page'
- + [AMLS-5831] - 'Added characterCount functionality to text areas'
