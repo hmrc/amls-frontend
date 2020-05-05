@@ -231,6 +231,47 @@
                             editLinkTag = "msbwhichcurrencies-edit",
                             editUrl = controllers.renewal.routes.MoneySourcesController.get(true).toString
                         ) {
+
+                            @if(ms.count > 1) {
+                                <ul class="list list-bullet">
+                                    @ms.bankMoneySource.map { bms =>
+                                        <li>@Messages("renewal.msb.money_sources.bank.ident")</li>
+                                     }
+                                     @ms.wholesalerMoneySource.map { wms =>
+                                        <li>@Messages("renewal.msb.money_sources.wholesaler.ident")</li>
+                                     }
+                                     @ms.customerMoneySource.map { cms =>
+                                         @if(cms) {
+                                             <li>@Messages("msb.which_currencies.source.customers")</li>
+                                         }
+                                     }
+                                </ul>
+                            } else {
+                                @ms.bankMoneySource.map { bms =>
+                                    <p>@Messages("renewal.msb.money_sources.bank.ident")</p>
+                                }
+                                @ms.wholesalerMoneySource.map { wms =>
+                                    <p>@Messages("renewal.msb.money_sources.wholesaler.ident")</p>
+                                }
+                                @ms.customerMoneySource.map { cms =>
+                                    @if(cms) {
+                                        <p>@Messages("msb.which_currencies.source.customers")</p>
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            @model.whichCurrencies.map { wc =>
+                @wc.moneySources.map { ms =>
+                    @if(ms.bankMoneySource.isDefined | ms.wholesalerMoneySource.isDefined | ms.customerMoneySource.isDefined) {
+                        @checkYourAnswersRow(
+                            question = Messages("renewal.msb.money_sources.header"),
+                            editLinkTag = "msbwhichcurrencies-edit",
+                            editUrl = controllers.renewal.routes.MoneySourcesController.get(true).toString
+                        ) {
                             @ms.bankMoneySource.map { bms =>
                                 <p>@Messages("renewal.msb.money_sources.bank"): @bms.bankNames</p>
                             }
@@ -246,6 +287,7 @@
                     }
                 }
             }
+
         }
 
         @if(services.msbServices.contains(ForeignExchange)) {

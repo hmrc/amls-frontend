@@ -36,6 +36,7 @@ case class WhichCurrencies(currencies: Seq[String],
 
   def moneySources(p: MoneySources): WhichCurrencies =
     this.copy(moneySources = Some(p))
+
 }
 
 object WhichCurrencies {
