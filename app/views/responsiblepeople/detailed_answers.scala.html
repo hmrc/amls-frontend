@@ -101,14 +101,13 @@
     <dl class="cya-summary-list">
 
         @model.map { person =>
-
             @person.personName.map { pn =>
                 @checkYourAnswersRow(
                     question = Messages("responsiblepeople.personName.title"),
                     editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-personname-edit"
                 ) {
-                        @pn.fullName
+                    @pn.fullName
                 }
             }
 
@@ -119,8 +118,12 @@
                     editLinkTag = "rp-legalname-yes-no-edit"
                 ) {
                     @ln.hasPreviousName match {
-                        case Some(false) => {@Messages("lbl.no")}
-                        case Some(true) => {@Messages("lbl.yes")}
+                        case Some(false) => {
+                            @Messages("lbl.no")
+                        }
+                        case Some(true) => {
+                            @Messages("lbl.yes")
+                        }
                     }
                 }
 
@@ -157,20 +160,32 @@
                     editUrl = controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-knownby-edit"
                 ) {
-                        @other.hasOtherNames match {
-                            case Some(true) => {
-                            <ul class="list">
-                                <li>@other.otherName</li>
-                            </ul>
-                            }
-                            case Some(false) => {@Messages("lbl.no")}
+                    @other.hasOtherNames match {
+                        case Some(true) => {
+                            @Messages("lbl.yes")
                         }
+                        case Some(false) => {
+                            @Messages("lbl.no")
+                        }
+                    }
                 }
             }
 
+            @if(person.knownBy.fold[Boolean](false)(_.hasOtherNames.contains(true))) {
+                @person.knownBy.map { other =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.knownby.answer", personName),
+                        editUrl = controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).toString(),
+                        editLinkTag = "rp-knownby-true-edit"
+                    ) {
+                        <ul class="list">
+                            <li>@other.otherName</li>
+                        </ul>
+                    }
+                }
+            }
 
             @person.dateOfBirth.map { dateOfBirth =>
-
                 @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.dob", personName),
                     editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).toString(),
@@ -182,7 +197,7 @@
             }
 
             @person.personResidenceType.map { prt =>
-                 @checkYourAnswersRow(
+                @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.uk_resident", personName),
                     editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-ukresident-edit"
@@ -190,7 +205,6 @@
                     @prt.isUKResidence match {
                         case UKResidence(nino) => {
                             <p>@Messages("lbl.yes")</p>
-                            <p>@Messages("responsiblepeople.detailed_answers.uk_resident.nino", personName): @nino</p>
                         }
                         case NonUKResidence => {
                             @Messages("lbl.no")
@@ -199,8 +213,24 @@
                 }
             }
 
+            @if(person.personResidenceType.fold[Boolean](false)(_.isUKResidence != NonUKResidence)) {
+                @person.personResidenceType.map { prt =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.detailed_answers.uk_resident.nino", personName),
+                        editUrl = controllers.responsiblepeople.routes.PersonResidentTypeController.get(idx, true, flow).toString(),
+                        editLinkTag = "rp-ukresident-true-edit"
+                    ) {
+                        @prt.isUKResidence match {
+                            case UKResidence(nino) => {
+                                <p>@nino</p>
+                            }
+                        }
+                    }
+                }
+            }
+
             @person.ukPassport.map { ukPassport =>
-                 @checkYourAnswersRow(
+                @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.uk.passport", personName),
                     editUrl = controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true, flow).toString(),
                     editLinkTag = "uk-passport"
@@ -208,26 +238,39 @@
                     @ukPassport match {
                         case UKPassportYes(ukPassportNumber) => {
                             <p>@Messages("lbl.yes")</p>
-                            <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName): @ukPassportNumber</p>
                         }
                         case UKPassportNo => {
                             @Messages("lbl.no")
                         }
                     }
                 }
+            }
 
+            @if(person.ukPassport.fold[Boolean](false)(_ != UKPassportNo)) {
+                @person.ukPassport.map { ukPassport =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName),
+                        editUrl = controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true, flow).toString(),
+                        editLinkTag = "uk-passport-true-edit"
+                    ) {
+                        @ukPassport match {
+                            case UKPassportYes(ukPassportNumber) => {
+                                <p>@ukPassportNumber</p>
+                            }
+                        }
+                    }
+                }
             }
 
             @person.nonUKPassport.map { nonUKPassport =>
-                 @checkYourAnswersRow(
+                @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.non.uk.passport", personName),
                     editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-nonukpassport-edit"
                 ) {
-                    @nonUKPassport  match {
+                    @nonUKPassport match {
                         case NonUKPassportYes(nonUKPassportNumber) => {
                             <p>@Messages("lbl.yes")</p>
-                            <p>@Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName): @nonUKPassportNumber</p>
                         }
                         case NoPassport => {
                             @Messages("lbl.no")
@@ -236,43 +279,78 @@
                 }
             }
 
+            @if(person.nonUKPassport.fold[Boolean](false)(_ != NoPassport)) {
+                @person.nonUKPassport.map { nonUKPassport =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName),
+                        editUrl = controllers.responsiblepeople.routes.PersonNonUKPassportController.get(idx, true, flow).toString(),
+                        editLinkTag = "rp-nonukpassport-true-edit"
+                    ) {
+                        @nonUKPassport match {
+                            case NonUKPassportYes(nonUKPassportNumber) => {
+                                <p>@nonUKPassportNumber</p>
+                            }
+                        }
+                    }
+                }
+            }
+
             @person.personResidenceType.map { prt =>
-                 @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.country_of_birth"),
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.country.of.birth.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-countryofbirth-edit"
+                ) {
+                    @if(prt.countryOfBirth.contains(Country("United Kingdom", "GB"))) {
+                        <p>@Messages("lbl.yes")</p>
+                    } else {
+                        <p>@Messages("lbl.no")</p>
+                    }
+                }
+
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.detailed_answers.country_of_birth", personName),
+                    editUrl = controllers.responsiblepeople.routes.CountryOfBirthController.get(idx, true, flow).toString(),
+                    editLinkTag = "rp-countryofbirth-answer-edit"
                 ) {
                     @prt.countryOfBirth
                 }
 
-                 @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.nationality"),
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.nationality.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.NationalityController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-nationality-edit"
                 ) {
-                    @prt.nationality
+                    @if(prt.nationality.contains(Country("United Kingdom", "GB"))) {
+                        <p>@Messages("responsiblepeople.nationality.selection.british")</p>
+                    } else {
+                        <p>@Messages("responsiblepeople.nationality.selection.other")</p>
+                    }
                 }
-            }
+
+                @if(!prt.nationality.contains(Country("United Kingdom", "GB"))) {
+                    @checkYourAnswersRow(
+                            question = Messages("responsiblepeople.nationality.selection.other.answer", personName),
+                            editUrl = controllers.responsiblepeople.routes.NationalityController.get(idx, true, flow).toString(),
+                            editLinkTag = "rp-nationality-other-edit"
+                        ) {
+                            @prt.nationality
+                        }
+                    }
+                }
 
             @person.contactDetails.map { cd =>
-                 @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.phone_number"),
-                    editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString(),
-                    editLinkTag = "rp-phonenumber-edit"
-                ) {
-                    @cd.phoneNumber
-                }
-
                 @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.email"),
+                    question = Messages("responsiblepeople.contact_details.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).toString(),
-                    editLinkTag = "rp-email-edit"
+                    editLinkTag = "rp-contactDetails-edit"
                 ) {
-                    @cd.emailAddress
+                    <p>@Messages("responsiblepeople.detailed_answers.phone_number") @cd.phoneNumber</p>
+                    <p>@Messages("responsiblepeople.detailed_answers.email") @cd.emailAddress</p>
                 }
             }
 
-            @person.addressHistory.flatMap(_.currentAddress).map { a=>
+            @person.addressHistory.flatMap(_.currentAddress).map { a =>
                 @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.address.UK", personName),
                     editUrl = showHide match {
@@ -291,30 +369,30 @@
 
                 @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.address", personName),
-                    editUrl =  (a.personAddress, showHide)match {
-                            case (_, true) => {
-                                controllers.responsiblepeople.address.routes.MovedAddressController.get(idx).toString
-                            }
-                            case (_:PersonAddressNonUK, false) => {
-                                controllers.responsiblepeople.address.routes.CurrentAddressNonUKController.get(idx, true, flow).toString()
-                            }
-                            case (_:PersonAddressUK, false) => {
-                                controllers.responsiblepeople.address.routes.CurrentAddressUKController.get(idx, true, flow).toString()
-                            }
-                        },
+                    editUrl = (a.personAddress, showHide) match {
+                        case (_, true) => {
+                            controllers.responsiblepeople.address.routes.MovedAddressController.get(idx).toString
+                        }
+                        case (_: PersonAddressNonUK, false) => {
+                            controllers.responsiblepeople.address.routes.CurrentAddressNonUKController.get(idx, true, flow).toString()
+                        }
+                        case (_: PersonAddressUK, false) => {
+                            controllers.responsiblepeople.address.routes.CurrentAddressUKController.get(idx, true, flow).toString()
+                        }
+                    },
                     editLinkTag = "rpaddress-edit"
 
                 ) {
                     <ul class="list">
-                        @a.personAddress.toLines.map { l => <li>@l</li> }
+                    @a.personAddress.toLines.map { l => <li>@l</li> }
                     </ul>
                 }
 
-                 @checkYourAnswersRow(
+                @checkYourAnswersRow(
                     question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
                     editUrl = controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(idx, true, flow).toString,
                     editLinkTag = "rp-timeatataddress-edit"
-                ){
+                ) {
                     @timeAtAddress(a.timeAtAddress)
                 }
             }
@@ -328,28 +406,28 @@
                     @a.personAddress.isUK
                 }
 
-                 @checkYourAnswersRow(
+                @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.address.previous", personName),
                     editUrl = a.personAddress match {
-                        case _:PersonAddressNonUK => {
+                        case _: PersonAddressNonUK => {
                             controllers.responsiblepeople.address.routes.AdditionalAddressNonUKController.get(idx, true, flow).toString()
                         }
-                        case _:PersonAddressUK => {
+                        case _: PersonAddressUK => {
                             controllers.responsiblepeople.address.routes.AdditionalAddressUKController.get(idx, true, flow).toString()
                         }
                     },
                     editLinkTag = "rp-previousaddress-edit"
                 ) {
                     <ul class="list">
-                        @a.personAddress.toLines.map { l => <li>@l</li> }
+                    @a.personAddress.toLines.map { l => <li>@l</li> }
                     </ul>
                 }
 
-                 @checkYourAnswersRow(
+                @checkYourAnswersRow(
                     question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
                     editUrl = controllers.responsiblepeople.address.routes.TimeAtAdditionalAddressController.get(idx, true, flow).toString,
                     editLinkTag = "rp-timeatpreviousaddress-edit"
-                ){
+                ) {
                     @timeAtAddress(a.timeAtAddress)
                 }
             }
@@ -363,45 +441,48 @@
                     @a.personAddress.isUK
                 }
 
-                 @checkYourAnswersRow(
+                @checkYourAnswersRow(
                     question = Messages("responsiblepeople.detailed_answers.address.other.previous", personName),
-                     editUrl = a.personAddress match {
-                         case _:PersonAddressNonUK => {
-                             controllers.responsiblepeople.address.routes.AdditionalExtraAddressNonUKController.get(idx, true, flow).toString()
-                         }
-                         case _:PersonAddressUK => {
-                             controllers.responsiblepeople.address.routes.AdditionalExtraAddressUKController.get(idx, true, flow).toString()
-                         }
-                     },
+                    editUrl = a.personAddress match {
+                        case _: PersonAddressNonUK => {
+                            controllers.responsiblepeople.address.routes.AdditionalExtraAddressNonUKController.get(idx, true, flow).toString()
+                        }
+                        case _: PersonAddressUK => {
+                            controllers.responsiblepeople.address.routes.AdditionalExtraAddressUKController.get(idx, true, flow).toString()
+                        }
+                    },
                     editLinkTag = "rp-otherpreviousaddress-edit"
                 ) {
                     <ul class="list">
-                        @a.personAddress.toLines.map { l => <li>@l</li> }
+                    @a.personAddress.toLines.map { l => <li>@l</li> }
                     </ul>
                 }
 
-                 @checkYourAnswersRow(
+                @checkYourAnswersRow(
                     question = Messages("responsiblepeople.timeataddress.address_history.heading", personName),
                     editUrl = controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController.get(idx, true, flow).toString,
                     editLinkTag = "rp-timeatotherpreviousaddress-edit"
-                ){
+                ) {
                     @timeAtAddress(a.timeAtAddress)
                 }
             }
 
             @person.positions.map { pos =>
-                 @checkYourAnswersRow(
+                @checkYourAnswersRow(
                     question = Messages("responsiblepeople.position_within_business.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessController.get(idx, true, flow).toString,
                     editLinkTag = "rp-positionwithinbusiness-edit"
                 ) {
-
-                    <ul class="@{if (pos.positions.size > 1) { "list list-bullet" } else { "list"}}">
+                    @if(pos.positions.size == 1) {
+                        @pos.positions.map(p => PositionWithinBusiness.getPrettyName(p))
+                    } else {
+                        <ul class="list list-bullet">
                         @pos.positions.map(p => PositionWithinBusiness.getPrettyName(p)).toList.sorted.map(p => <li>{p}</li>)
-                    </ul>
+                        </ul>
+                    }
                 }
 
-                 @checkYourAnswersRow(
+                @checkYourAnswersRow(
                     question = Messages("responsiblepeople.position_within_business.startDate.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-positionstartdate-edit"
@@ -411,84 +492,153 @@
             }
 
             @person.soleProprietorOfAnotherBusiness.map { anotherBusiness =>
-                 @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.soleproprietor_for_other_business"),
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.sole.proprietor.another.business.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-soleproprietor-edit"
                 ) {
                     @anotherBusiness.soleProprietorOfAnotherBusiness match {
-                        case true => {@Messages("lbl.yes")}
-                        case false => {@Messages("lbl.no")}
+                        case true => {
+                            @Messages("lbl.yes")
+                        }
+                        case false => {
+                            @Messages("lbl.no")
+                        }
                     }
                 }
             }
 
             @person.vatRegistered.map { vr =>
-                 @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.registered_for_vat"),
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.registeredforvat.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.VATRegisteredController.get(idx, true, flow).toString,
                     editLinkTag = "rp-registeredforvat-edit"
                 ) {
                     @vr match {
-                        case VATRegisteredYes(regNo) => {@regNo}
-                        case VATRegisteredNo => {@Messages("lbl.no")}
+                        case VATRegisteredYes(regNo) => {
+                            @Messages("lbl.yes")
+                        }
+                        case VATRegisteredNo => {
+                            @Messages("lbl.no")
+                        }
+                    }
+                }
+            }
+
+            @if(person.vatRegistered.fold[Boolean](false)(_ != VATRegisteredNo)) {
+                @person.vatRegistered.map { vr =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.detailed_answers.registered_for_vat"),
+                        editUrl = controllers.responsiblepeople.routes.VATRegisteredController.get(idx, true, flow).toString,
+                        editLinkTag = "rp-registeredforvat-answer-edit"
+                    ) {
+                        @vr match {
+                            case VATRegisteredYes(regNo) => {
+                                @regNo
+                            }
+                        }
                     }
                 }
             }
 
             @person.saRegistered.map { sar =>
-                 @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.registered_for_sa"),
+                @checkYourAnswersRow(
+                    question = Messages("responsiblepeople.registeredforselfassessment.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-registeredforsa-edit"
                 ) {
                     @sar match {
-                        case SaRegisteredYes(regNo) => {@regNo}
-                        case SaRegisteredNo => {@Messages("lbl.no")}
+                        case SaRegisteredYes(regNo) => {
+                            @Messages("lbl.yes")
+                        }
+                        case SaRegisteredNo => {
+                            @Messages("lbl.no")
+                        }
+                    }
+                }
+            }
+
+            @if(person.saRegistered.fold[Boolean](false)(_ != SaRegisteredNo)) {
+                @person.saRegistered.map { sar =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.detailed_answers.registered_for_sa"),
+                        editUrl = controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(idx, true, flow).toString(),
+                        editLinkTag = "rp-registeredforsa-answer-edit"
+                    ) {
+                        @sar match {
+                            case SaRegisteredYes(regNo) => {
+                                @regNo
+                            }
+                        }
                     }
                 }
             }
 
             @person.experienceTraining.map { ex =>
-                 @checkYourAnswersRow(
+                @checkYourAnswersRow(
                     question = getServicesHeading.toString(),
                     editUrl = controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).toString(),
                     editLinkTag = "rp-training-edit"
                 ) {
-                    @businessMatching.alphabeticalBusinessActivitiesLowerCase(false).map { types =>
-                        @if(types.size > 1) {
-                            <p>@Messages("responsiblepeople.experiencetraining.cya")</p>
-
-                            <ul class="list list-bullet">
-                            @types.map { businessType =>
-                                <li>@businessType</li>
-                            }
-                            </ul>
+                    @ex match {
+                        case ExperienceTrainingYes(info) => {
+                            @Messages("lbl.yes")
+                        }
+                        case ExperienceTrainingNo => {
+                            @Messages("lbl.no")
                         }
                     }
-                    @ex match {
-                        case ExperienceTrainingYes(info) => {<p>@Messages("lbl.yes")</p> <p>@info</p>}
-                        case ExperienceTrainingNo => {@Messages("lbl.no")}
+                }
+            }
+
+            @if(person.experienceTraining.fold[Boolean](false)(_ != ExperienceTrainingNo)) {
+                @person.experienceTraining.map { ex =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.detailed_answers.previous_experience.detail", personName),
+                        editUrl = controllers.responsiblepeople.routes.ExperienceTrainingController.get(idx, true, flow).toString(),
+                        editLinkTag = "rp-training-answer-edit"
+                    ) {
+                        @ex match {
+                            case ExperienceTrainingYes(info) => {
+                                @info
+                            }
+                        }
                     }
                 }
             }
 
             @person.training.map { tra =>
                  @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering"),
+                    question = Messages("responsiblepeople.training.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.TrainingController.get(idx, true, flow).toString,
                     editLinkTag = "rp-traininginmlre-edit"
                 ) {
                     @tra match {
-                        case TrainingYes(info) => {@info}
+                        case TrainingYes(info) => {@Messages("lbl.yes")}
                         case TrainingNo => {@Messages("lbl.no")}
+                    }
+                }
+            }
+
+            @if(person.training.fold[Boolean](false)(_ != TrainingNo)) {
+                @person.training.map { tra =>
+                    @checkYourAnswersRow(
+                        question = Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering", personName),
+                        editUrl = controllers.responsiblepeople.routes.TrainingController.get(idx, true, flow).toString,
+                        editLinkTag = "rp-traininginmlre-answer-edit"
+                    ) {
+                        @tra match {
+                            case TrainingYes(info) => {
+                                @info
+                            }
+                        }
                     }
                 }
             }
 
             @person.approvalFlags.hasAlreadyPassedFitAndProper.map { fp =>
                  @checkYourAnswersRow(
-                    question = Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"),
+                    question = Messages("responsiblepeople.fit_and_proper.heading", personName),
                     editUrl = controllers.responsiblepeople.routes.FitAndProperController.get(idx, true, flow).toString,
                     editLinkTag = "fit-and-proper"
                 ) {
@@ -502,7 +652,7 @@
             @if(showApprovalSection) {
                 @person.approvalFlags.hasAlreadyPaidApprovalCheck.map { fp =>
                      @checkYourAnswersRow(
-                        question = Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName),
+                        question = Messages("responsiblepeople.approval_check.heading", personName),
                         editUrl = controllers.responsiblepeople.routes.ApprovalCheckController.get(idx, true, flow).toString(),
                         editLinkTag = "approval-check"
                     ) {
