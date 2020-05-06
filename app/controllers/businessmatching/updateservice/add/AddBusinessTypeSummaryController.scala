@@ -68,7 +68,6 @@ class AddBusinessTypeSummaryController @Inject()(
                   _ <- helper.updateServicesRegister(request.credId, model)
                   _ <- helper.updateBusinessActivities(request.credId, model)
                   _ <- helper.updateHasAcceptedFlag(request.credId, model)
-                  _ <- helper.clearFlowModel(request.credId)
           route <- OptionT.liftF(router.getRoute(request.credId, AddBusinessTypeSummaryPageId, model))
         } yield {
           route
