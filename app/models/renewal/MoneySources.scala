@@ -22,6 +22,7 @@ import jto.validation.forms.UrlFormEncoded
 import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
 import models.ValidationRule
 import play.api.libs.json._
+import scala.collection.mutable.ListBuffer
 
 case class BankMoneySource(bankNames : String)
 
@@ -31,7 +32,23 @@ case object CustomerMoneySource
 
 case class MoneySources(bankMoneySource: Option[BankMoneySource] = None,
                         wholesalerMoneySource: Option[WholesalerMoneySource] = None,
-                        customerMoneySource: Option[Boolean] = None)
+                        customerMoneySource: Option[Boolean] = None) {
+
+implicit def count = {
+  val counterList =  new ListBuffer[Int]()
+
+  if(bankMoneySource.isDefined) {
+    counterList += 1
+  }
+  if(wholesalerMoneySource.isDefined) {
+    counterList += 2
+  }
+  if(customerMoneySource.isDefined) {
+    counterList += 3
+  }
+    counterList.toList.size
+  }
+}
 
 object MoneySources {
   import jto.validation.forms.Rules._
