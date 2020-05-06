@@ -69,6 +69,10 @@ class PSRNumberControllerSpec extends AmlsSpec
       mockStatusService.isPending(any())
     } thenReturn false
 
+    when {
+      mockStatusService.isPreSubmission(any())
+    } thenReturn true
+
     mockApplicationStatus(NotCompleted)
 
     val businessMatching = businessMatchingGen.sample.get
@@ -85,6 +89,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val model = BusinessMatching(
           businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("1"))
         )
+
         when {
           controller.businessMatchingService.getModel(any())(any(), any())
         } thenReturn OptionT.some[Future, BusinessMatching](model)
