@@ -69,10 +69,10 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
       val sectionChecks = Table[String, Element=>Boolean, String](
         ("title key", "check", "edit link"),
-        ("renewal.involvedinother.title",checkElementTextIncludes(_, "test text"), controllers.renewal.routes.InvolvedInOtherController.get(true).toString),
+        ("renewal.involvedinother.title",checkElementTextIncludes(_, "Yes"), controllers.renewal.routes.InvolvedInOtherController.get(true).toString),
+        ("renewal.involvedinother.cya.second.title",checkElementTextIncludes(_, "test text"), controllers.renewal.routes.InvolvedInOtherController.get(true).toString),
         ("renewal.business-turnover.title", checkElementTextIncludes(_, "£0 to £14,999"), controllers.renewal.routes.BusinessTurnoverController.get(true).toString),
         ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999"), controllers.renewal.routes.AMLSTurnoverController.get(true).toString),
-        ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet), controllers.renewal.routes.AMLSTurnoverController.get(true).toString),
         ("renewal.amp.turnover.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01"), controllers.renewal.routes.AMPTurnoverController.get(true).toString),
         ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "Yes"), controllers.renewal.routes.CustomersOutsideIsUKController.get(true).toString),
         ("renewal.customer.outside.uk.countries.title", checkElementTextIncludes(_, "United Kingdom"), controllers.renewal.routes.CustomersOutsideUKController.get(true).toString),
