@@ -113,6 +113,23 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
     }
+
+    "pre load Business matching business activities data in " +
+      "'How much total net profit does your business expect in the next 12 months, from the following activities?'" in new Fixture {
+      when(mockDataCacheConnector.fetchAll(any())(any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(activities = bmBusinessActivities)))
+      when(mockCacheMap.getEntry[Renewal](Renewal.key))
+        .thenReturn(Some(renewalModel))
+
+      val result = controller.get()(request)
+      status(result) must be(OK)
+      val document = Jsoup.parse(contentAsString(result))
+      val listElement = document.select(".cya-summary-list__row:nth-child(3) > .cya-summary-list__value > .list-bullet").get(0)
+      listElement.children().size() must be(bmBusinessActivities.fold(0)(x => x.businessActivities.size))
+
+    }
   }
 
   "POST" must {

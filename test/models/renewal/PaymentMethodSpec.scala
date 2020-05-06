@@ -20,8 +20,6 @@ import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-import scala.collection.mutable.ListBuffer
-
 class PaymentMethodSpec extends PlaySpec {
 
   "PaymentMethod" must {
@@ -35,29 +33,6 @@ class PaymentMethodSpec extends PlaySpec {
       val data = PaymentMethods(courier = true, direct = true, other = Some("foo"))
       val js = Json.toJson(data)
       js.as[PaymentMethods] mustEqual data
-    }
-
-    "count should be 3 when given all 3 attributes" in {
-      val data = PaymentMethods(courier = true, direct = true, other = Some("foo"))
-      data.count mustBe 3
-    }
-
-    "count should be 2 when user has selected any 2 options" in {
-      val data = PaymentMethods(courier = false, direct = true, other = Some("foo"))
-      val data2 = PaymentMethods(courier = true, direct = false, other = Some("foo"))
-      val data3 = PaymentMethods(courier = true, direct = true, other = None)
-      data.count mustBe 2
-      data2.count mustBe 2
-      data3.count mustBe 2
-    }
-
-    "count should be 1 when user has selected any singular option" in {
-      val data = PaymentMethods(courier = false, direct = false, other = Some("foo"))
-      val data2 = PaymentMethods(courier = true, direct = false, other = None)
-      val data3 = PaymentMethods(courier = false, direct = true, other = None)
-      data.count mustBe 1
-      data2.count mustBe 1
-      data3.count mustBe 1
     }
 
     "fail to validate when no payment method is selected" in {
