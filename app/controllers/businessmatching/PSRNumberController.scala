@@ -50,7 +50,7 @@ class PSRNumberController @Inject()(authAction: AuthAction,
         } yield {
           val form: Form2[BusinessAppliedForPSRNumber] = bm.businessAppliedForPSRNumber map
                   Form2[BusinessAppliedForPSRNumber] getOrElse EmptyForm
-          Ok(psr_number(form, edit, bm.preAppComplete, statusService.isPreSubmission(status)))
+          Ok(psr_number(form, edit, bm.preAppComplete, statusService.isPreSubmission(status), bm.businessAppliedForPSRNumber.isDefined))
         }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
    }
 

@@ -19,7 +19,7 @@
 @import config.{ ApplicationConfig}
 @import utils.HtmlElementHelpers._
 
-@(f: forms.Form2[_], edit: Boolean, showReturnLink: Boolean = true, isPreSubmission: Boolean = true)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(f: forms.Form2[_], edit: Boolean, showReturnLink: Boolean = true, isPreSubmission: Boolean = true, isPsrDefined: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @target = @{
     s"""${f("regNumber").id}-panel"""
@@ -35,7 +35,7 @@
 }
 
 @title = @{
-    if(isPreSubmission)  "businessmatching.psr.number.title" else "businessmatching.psr.number.title.post.submission"
+    if(isPreSubmission || !isPsrDefined) "businessmatching.psr.number.title" else "businessmatching.psr.number.title.post.submission"
 }
 
 @main(
@@ -44,49 +44,53 @@
 )  {
 
     @form(f, controllers.businessmatching.routes.PSRNumberController.post(edit)) {
-        @if(edit && !isPreSubmission) {
-            <input type="hidden" name="appliedFor" value=true />
-            @input(
-                attrPattern = "[0-9]*",
-                attrType = "text",
-                dataAttrs = digitsOnlyAttributes,
-                field = f("regNumber"),
-                heading = "businessmatching.psr.number.title.post.submission",
-                section = section,
-                hintText = "businessmatching.psr.number.hint",
-                inputMode = "numeric"
-            )
-        } else {
-            @fieldsetWithErrorGroup(
-                f = f("appliedFor"),
-                heading = "businessmatching.psr.number.title",
-                hint = "businessmatching.psr.number.hint",
-                section = section,
-                panel = false
-            ) {
-                @radio(
-                    f = f("appliedFor"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = s"#$target"
+
+        @(edit, isPreSubmission, isPsrDefined) match {
+            case (true, false, true) | (false, false, true) => {
+                <input type="hidden" name="appliedFor" value=true />
+                @input(
+                    attrPattern = "[0-9]*",
+                    attrType = "text",
+                    dataAttrs = digitsOnlyAttributes,
+                    field = f("regNumber"),
+                    heading = "businessmatching.psr.number.title.post.submission",
+                    section = section,
+                    hintText = "businessmatching.psr.number.hint",
+                    inputMode = "numeric"
                 )
-                @panel(
-                    field = Some(f(s"$target")),
-                    id = target
+            }
+            case (false, true, true) | (true, true, true) | (_, _, false) => {
+                @fieldsetWithErrorGroup(
+                    f = f("appliedFor"),
+                    heading = "businessmatching.psr.number.title",
+                    hint = "businessmatching.psr.number.hint",
+                    section = section,
+                    panel = false
                 ) {
-                    @input(
-                        attrPattern = "[0-9]*",
-                        attrType = "text",
-                        field = f("regNumber"),
-                        labelText = "businessmatching.psr.number.lbl",
-                        inputMode = "numeric"
+                    @radio(
+                        f = f("appliedFor"),
+                        labelText = "lbl.yes",
+                        value = "true",
+                        target = s"#$target"
+                    )
+                    @panel(
+                        field = Some(f(s"$target")),
+                        id = target
+                    ) {
+                        @input(
+                            attrPattern = "[0-9]*",
+                            attrType = "text",
+                            field = f("regNumber"),
+                            labelText = "businessmatching.psr.number.lbl",
+                            inputMode = "numeric"
+                        )
+                    }
+                    @radio(
+                        f = f("appliedFor"),
+                        labelText = "lbl.no",
+                        value = "false"
                     )
                 }
-                @radio(
-                    f = f("appliedFor"),
-                    labelText = "lbl.no",
-                    value = "false"
-                )
             }
         }
 
