@@ -95,26 +95,26 @@
 
         @bankAccount.account match {
             case Some(ba: UKAccount) => {
-                @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.accountnumber"),
-                    editUrl = controllers.bankdetails.routes.BankAccountUKController.get(index, true).toString
-                ) {
-                    @ba.accountNumber
-                }
                 @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.sortcode"),
                     editUrl = controllers.bankdetails.routes.BankAccountUKController.get(index, true).toString
                 ) {
                     @ba.displaySortCode
                 }
+                @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.accountnumber"),
+                    editUrl = controllers.bankdetails.routes.BankAccountUKController.get(index, true).toString
+                ) {
+                    @ba.accountNumber
+                }
             }
             case Some(ba: NonUKAccountNumber) => {
-                @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.accountnumber"),
+                @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.accountnumber.nonuk.title"),
                     editUrl = controllers.bankdetails.routes.BankAccountNonUKController.get(index, true).toString
                 ) {
                     @ba.accountNumber
                 }
             }
             case Some(ba: NonUKIBANNumber) => {
-                @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.iban"),
+                @checkYourAnswersRow(question = Messages("bankdetails.bankaccount.iban.title"),
                     editUrl = controllers.bankdetails.routes.BankAccountIbanController.get(index, true).toString
                 ) {
                     @ba.IBANNumber
