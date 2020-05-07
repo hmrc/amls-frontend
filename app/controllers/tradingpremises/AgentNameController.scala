@@ -131,12 +131,16 @@ class AgentNameController @Inject()(
         }
   }
 
-  private def redirectToAgentNameDateOfChange(tradingPremises: TradingPremises, name: AgentName) = {
+  private def redirectToAgentNameDateOfChange(tradingPremises: TradingPremises, agent: AgentName) = {
     def isAgentNameAndDobChanged = tradingPremises.agentName match {
-      case Some(AgentName(agentName, _, agentDateOfBirth)) if agentName == name.agentName && agentDateOfBirth == name.agentDateOfBirth => false
+      case Some(AgentName(agentName, _, agentDateOfBirth)) if isAgentDataUnchanged(agentName, agentDateOfBirth, agent) => false
       case _ => true
     }
 
     isAgentNameAndDobChanged && tradingPremises.lineId.isDefined
+  }
+
+  private def isAgentDataUnchanged(name: String, dob: Option[LocalDate], agent: AgentName) = {
+    name == agent.agentName && dob == agent.agentDateOfBirth
   }
 }
