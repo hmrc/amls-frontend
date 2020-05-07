@@ -65,7 +65,22 @@
             ) {
                 @vatRegistered match {
                     case VATRegisteredNo => { @Messages("lbl.no") }
-                    case VATRegisteredYes(v) => { @Messages("lbl.vat.reg.number") @v }
+                    case VATRegisteredYes(vatNo) => { @Messages("lbl.yes") }
+                }
+            }
+        }
+
+        @model.vatRegistered.map { vatRegistered =>
+            @vatRegistered match {
+                case VATRegisteredNo => {}
+                case VATRegisteredYes(vatNo) => {
+                    @checkYourAnswersRow(
+                        question = Messages("lbl.vat.reg.number"),
+                        editLinkTag = "businessdetailsregisteredvat-edit",
+                        editUrl = controllers.businessdetails.routes.VATRegisteredController.get(true).toString
+                    ) {
+                          @vatNo
+                    }
                 }
             }
         }
@@ -128,6 +143,7 @@
         }
 
         @model.altCorrespondenceAddress.map { aca =>
+
             @checkYourAnswersRow(
                 question = Messages("businessdetails.lettersaddress.title"),
                 editLinkTag = "businessdetailslettersaddress-edit",
@@ -156,7 +172,7 @@
 
                         @checkYourAnswersRow(
                             question = Messages("businessdetails.correspondenceaddress.isuk.title"),
-                            editLinkTag = "businessdetailscorraddress-edit",
+                            editLinkTag = "businessdetailscorraddressisuk-edit",
                             editUrl = controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get(true).toString
                         ) {
                             @Messages("businessdetails.correspondenceaddress.ukAddress")
@@ -174,7 +190,7 @@
                     case false => {
                         @checkYourAnswersRow(
                             question = Messages("businessdetails.correspondenceaddress.isuk.title"),
-                            editLinkTag = "businessdetailscorraddress-edit",
+                            editLinkTag = "businessdetailscorraddressisuk-edit",
                             editUrl = controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get(true).toString
                         ) {
                             @Messages("businessdetails.correspondenceaddress.nonUkAddress")

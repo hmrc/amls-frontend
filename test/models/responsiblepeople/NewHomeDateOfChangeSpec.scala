@@ -57,23 +57,92 @@ class NewHomeDateOfChangeSpec extends PlaySpec {
       NewHomeDateOfChange.formRule.validate(model) must be(
         Invalid(
           Seq(
-            Path \ "dateOfChange" -> Seq(ValidationError("error.future.date")))
+            Path \ "dateOfChange" -> Seq(ValidationError("new.home.error.required.date.future")))
         ))
 
     }
 
-    "fail form validation when given a date before a business activities start date" in {
+    "fail form validation when given a date with no day" in {
       val model = Map (
-        "dateOfChange.day" -> Seq("24"),
+        "dateOfChange.day" -> Seq(""),
         "dateOfChange.month" -> Seq("2"),
-        "dateOfChange.year" -> Seq("2012"),
-        "activityStartDate" -> Seq("2016-05-25")
+        "dateOfChange.year" -> Seq("2012")
       )
 
       NewHomeDateOfChange.formRule.validate(model) must be(
         Invalid(
           Seq(
-            Path \ "dateOfChange" -> Seq(ValidationError("error.expected.dateofchange.date.after.activitystartdate", "25-05-2016")))
+            Path \ "dateOfChange" -> Seq(ValidationError("new.home.error.required.date.day")))
+        ))
+    }
+
+    "fail form validation when given a date with no month" in {
+      val model = Map (
+        "dateOfChange.day" -> Seq("2"),
+        "dateOfChange.month" -> Seq(""),
+        "dateOfChange.year" -> Seq("2012")
+      )
+
+      NewHomeDateOfChange.formRule.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("new.home.error.required.date.month")))
+        ))
+    }
+
+    "fail form validation when given a date with no year" in {
+      val model = Map (
+        "dateOfChange.day" -> Seq("2"),
+        "dateOfChange.month" -> Seq("2"),
+        "dateOfChange.year" -> Seq("")
+      )
+
+      NewHomeDateOfChange.formRule.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("new.home.error.required.date.year")))
+        ))
+    }
+
+    "fail form validation when given a date with no day and month" in {
+      val model = Map (
+        "dateOfChange.day" -> Seq(""),
+        "dateOfChange.month" -> Seq(""),
+        "dateOfChange.year" -> Seq("2012")
+      )
+
+      NewHomeDateOfChange.formRule.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("new.home.error.required.date.month.day")))
+        ))
+    }
+
+    "fail form validation when given a date with no day and year" in {
+      val model = Map (
+        "dateOfChange.day" -> Seq(""),
+        "dateOfChange.month" -> Seq("2"),
+        "dateOfChange.year" -> Seq("")
+      )
+
+      NewHomeDateOfChange.formRule.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("new.home.error.required.date.year.day")))
+        ))
+    }
+
+    "fail form validation when given a date with no data" in {
+      val model = Map (
+        "dateOfChange.day" -> Seq(""),
+        "dateOfChange.month" -> Seq(""),
+        "dateOfChange.year" -> Seq("")
+      )
+
+      NewHomeDateOfChange.formRule.validate(model) must be(
+        Invalid(
+          Seq(
+            Path \ "dateOfChange" -> Seq(ValidationError("new.home.error.required.date.year.month.day")))
         ))
     }
 

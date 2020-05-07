@@ -24,7 +24,7 @@ import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseTy
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo}
 import models.businessmatching.BusinessMatching
-import models.confirmation.{BreakdownRow, Currency}
+import models.confirmation.Currency
 import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.status.{SubmissionDecisionApproved, _}
@@ -122,12 +122,6 @@ class ConfirmationControllerSpec extends AmlsSpec
       controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
     } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
 
-    val breakdownRows = Seq.empty[BreakdownRow]
-
-    when {
-      controller.confirmationService.getBreakdownRows(any(), any(), any())(any(), any())
-    } thenReturn Future.successful(Some(breakdownRows))
-
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
 
     when {
@@ -171,10 +165,6 @@ class ConfirmationControllerSpec extends AmlsSpec
 
       setupStatus(submissionStatus)
 
-      when {
-        controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReady), any())(any(), any())
-      } thenReturn Future.successful(Some(Seq.empty))
-
       val result = controller.get()(request)
 
       status(result) mustBe OK
@@ -189,10 +179,6 @@ class ConfirmationControllerSpec extends AmlsSpec
 
       setupStatus(submissionStatus)
 
-      when {
-        controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReady), any())(any(), any())
-      } thenReturn Future.successful(Some(Seq.empty))
-
       val result = controller.get()(request)
       status(result) mustBe OK
       Jsoup.parse(contentAsString(result)).title must include("Your fee and payment reference")
@@ -206,15 +192,10 @@ class ConfirmationControllerSpec extends AmlsSpec
           setupStatus(SubmissionReadyForReview)
 
           val fees = feeResponse(SubscriptionResponseType)
-          val rows = Gen.listOfN(5, breakdownRowGen).sample
 
           when {
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
           } thenReturn Future.successful(Some(fees))
-
-          when {
-            controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any())
-          } thenReturn Future.successful(rows)
 
           val result = controller.get()(request)
           status(result) mustBe OK
@@ -223,7 +204,6 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           doc.title must include(Messages("confirmation.header"))
           contentAsString(result) must include(Messages("confirmation.submission.info"))
-          contentAsString(result) must include(Messages("confirmation.breakdown.details"))
         }
 
         "does not have response data" in new Fixture {
@@ -235,10 +215,6 @@ class ConfirmationControllerSpec extends AmlsSpec
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
           } thenReturn Future.successful(Some(fees))
 
-          when {
-            controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any())
-          } thenReturn Future.successful(None)
-
           val result = controller.get()(request)
           status(result) mustBe OK
 
@@ -246,7 +222,6 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           doc.title must include(Messages("confirmation.header"))
           contentAsString(result) must include(Messages("confirmation.submission.info"))
-          contentAsString(result) must not include Messages("confirmation.breakdown.details")
         }
       }
 
@@ -256,15 +231,10 @@ class ConfirmationControllerSpec extends AmlsSpec
           setupStatus(SubmissionReadyForReview)
 
           val fees = feeResponse(AmendOrVariationResponseType)
-          val rows = Gen.listOfN(5, breakdownRowGen).sample
 
           when {
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
           } thenReturn Future.successful(Some(fees))
-
-          when {
-            controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any())
-          } thenReturn Future.successful(rows)
 
           val result = controller.get()(request)
           status(result) mustBe OK
@@ -273,7 +243,6 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           doc.title must include(Messages("confirmation.amendment.header"))
           contentAsString(result) must include(Messages("confirmation.amendment.info"))
-          contentAsString(result) must include(Messages("confirmation.breakdown.details"))
         }
 
         "does not have response data" in new Fixture {
@@ -285,10 +254,6 @@ class ConfirmationControllerSpec extends AmlsSpec
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
           } thenReturn Future.successful(Some(fees))
 
-          when {
-            controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any())
-          } thenReturn Future.successful(None)
-
           val result = controller.get()(request)
           status(result) mustBe OK
 
@@ -296,7 +261,6 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           doc.title must include(Messages("confirmation.amendment.header"))
           contentAsString(result) must include(Messages("confirmation.amendment.info"))
-          contentAsString(result) must not include Messages("confirmation.breakdown.details")
         }
       }
 
@@ -350,10 +314,6 @@ class ConfirmationControllerSpec extends AmlsSpec
           controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
         } thenReturn Future.successful(None)
 
-        when {
-          controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionReadyForReview), any())(any(), any())
-        } thenReturn Future.successful(Some(Seq.empty))
-
         val result = controller.get()(request)
         status(result) mustBe OK
 
@@ -369,10 +329,6 @@ class ConfirmationControllerSpec extends AmlsSpec
         when {
           controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
         } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType).copy(paymentReference = None)))
-
-        when {
-          controller.confirmationService.getBreakdownRows(any(), eqTo(SubmissionDecisionApproved), any())(any(), any())
-        } thenReturn Future.successful(Some(Seq.empty))
 
         val result = controller.get()(request)
         status(result) mustBe OK

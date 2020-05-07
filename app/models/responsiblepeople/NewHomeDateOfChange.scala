@@ -34,9 +34,14 @@ object NewHomeDateOfChange {
 
   implicit val format = Json.format[NewHomeDateOfChange]
 
+  val dateRule = newAllowedPastAndFutureDateRule("new.home.error.required.date",
+    "new.home.error.required.date.1900",
+    "new.home.error.required.date.future",
+    "new.home.error.required.date.fake")
+
   implicit val formRule: Rule[UrlFormEncoded, NewHomeDateOfChange] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    __.read(dateOfChangeActivityStartDateRule) map { date => NewHomeDateOfChange(Some(date)) }
+    (__ \ "dateOfChange").read(dateRule).map(date =>Some(date)) map NewHomeDateOfChange.apply
   }
 
   implicit val formWrites: Write[NewHomeDateOfChange, UrlFormEncoded] =

@@ -20,7 +20,7 @@
 @import models.confirmation._
 @import config.ApplicationConfig
 
-@(paymentReference: Option[String], total: Currency, maybeBreakdownRows: Option[Seq[BreakdownRow]], paymentsUrl: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(paymentReference: Option[String], total: Currency, paymentsUrl: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @heading("confirmation.header", "submit.registration")
@@ -42,51 +42,12 @@
         }
     </div>
 
-    @maybeBreakdownRows.map { rows =>
-        @detailsSummary(
-            summary = Messages("confirmation.breakdown.details")
-        ) {
-            <span id="tblDesc">@Messages("confirmation.breakdown")</span>
-            <table aria-describedby="tblDesc">
-                <thead>
-                    <tr>
-                        <th scope="col">@Messages("confirmation.item")</th>
-                        <th scope="col" width="15%" class="numeric">@Messages("confirmation.quantity")</th>
-                        <th scope="col" width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
-                        <th scope="col" width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
-                    </tr>
-                </thead>
-                <tbody>
-                
-                @rows.map {
-                    case BreakdownRow(label, quantity, perItem, totalFees) => {
-                        <tr>
-                            <td scope="row">@Messages(label)</td>
-                            <td class="numeric">@quantity</td>
-                            <td class="numeric">@perItem</td>
-                            <td class="numeric">@totalFees</td>
-                        </tr>
-                    }
-                }
-
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th colspan="3">@Messages("confirmation.registrationfee")</th>
-                        <td class="numeric">@total</td>
-                    </tr>
-                </tfoot>
-            </table>
-        }
-    }
-
-
     <div id="timelimit"><p>@Messages("confirmation.timelimit")</p></div>
 
     @printLink(linkId = "confirmation-print",
         gaTag = Some("fee-reference:click:print")
     )
 
-    <p><a id="payfee" class="button" href="@paymentsUrl">@Messages("button.continuetopayment")</a></p>
+    <p><a id="payfee" class="button" href="@paymentsUrl" draggable="false">@Messages("button.continuetopayment")</a></p>
 
 }

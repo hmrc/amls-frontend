@@ -41,11 +41,12 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
 
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
-      (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName), checkElementTextIncludes(_, nino)),
-      (Messages("responsiblepeople.detailed_answers.country_of_birth"), checkElementTextIncludes(_, "Uganda")),
-      (Messages("lbl.nationality"), checkElementTextIncludes(_, "United Kingdom")),
-      (Messages("responsiblepeople.detailed_answers.phone_number"), checkElementTextIncludes(_, "098765")),
-      (Messages("responsiblepeople.detailed_answers.email"), checkElementTextIncludes(_, "e@mail.com")),
+      (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName), checkElementTextIncludes(_, "Yes")),
+      (Messages("responsiblepeople.detailed_answers.uk_resident.nino", personName.fullName), checkElementTextIncludes(_, nino)),
+      (Messages("responsiblepeople.country.of.birth.heading", personName.fullName), checkElementTextIncludes(_, "No")),
+      (Messages("responsiblepeople.detailed_answers.country_of_birth", personName.fullName), checkElementTextIncludes(_, "Uganda")),
+      (Messages("responsiblepeople.nationality.heading", personName.fullName), checkElementTextIncludes(_, "British (including English, Scottish, Welsh and Northern Irish)")),
+      (Messages("responsiblepeople.contact_details.heading", personName.fullName), checkElementTextIncludes(_, "Telephone number: 098765 Email address: e@mail.com")),
       (Messages("responsiblepeople.detailed_answers.address", personName.fullName), checkElementTextOnlyIncludes(_, "addressLine1 addressLine2 addressLine3 addressLine4 postCode1")),
       (Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "0 to 5 months")),
       (Messages("responsiblepeople.detailed_answers.address.previous.UK", "firstName middleName lastName"), checkElementTextIncludes(_, "Yes")),
@@ -55,12 +56,15 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
       (Messages("responsiblepeople.position_within_business.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "Beneficial owner (holding more than 25% of shares in the business)")),
       (Messages("responsiblepeople.position_within_business.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "Nominated officer")),
       (Messages("responsiblepeople.position_within_business.startDate.heading", "firstName middleName lastName"), checkElementTextIncludes(_, "24 February 1990")),
-      (Messages("responsiblepeople.detailed_answers.soleproprietor_for_other_business"), checkElementTextIncludes(_, "Yes")),
-      (Messages("responsiblepeople.detailed_answers.registered_for_vat"), checkElementTextIncludes(_, "No")),
-      (Messages("responsiblepeople.detailed_answers.registered_for_sa"), checkElementTextIncludes(_, "Registered for Self Assessment")),
-      (Messages("responsiblepeople.experiencetraining.heading", "firstName middleName lastName", "a money service business"), checkElementTextIncludes(_, "experience")),
-      (Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering"), checkElementTextIncludes(_, "training")),
-      (Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"), checkElementTextIncludes(_, "Yes"))
+      (Messages("responsiblepeople.sole.proprietor.another.business.heading", personName.fullName), checkElementTextIncludes(_, "Yes")),
+      (Messages("responsiblepeople.registeredforvat.heading", personName.fullName), checkElementTextIncludes(_, "No")),
+      (Messages("responsiblepeople.registeredforselfassessment.heading", personName.fullName), checkElementTextIncludes(_, "Yes")),
+      (Messages("responsiblepeople.detailed_answers.registered_for_sa"), checkElementTextIncludes(_, "sa")),
+      (Messages("responsiblepeople.experiencetraining.heading", "firstName middleName lastName", "a money service business"), checkElementTextIncludes(_, "Yes")),
+      (Messages("responsiblepeople.detailed_answers.previous_experience.detail", "firstName middleName lastName"), checkElementTextIncludes(_, "experience")),
+      (Messages("responsiblepeople.training.heading", personName.fullName), checkElementTextIncludes(_, "Yes")),
+      (Messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering", personName.fullName), checkElementTextIncludes(_, "training")),
+      (Messages("responsiblepeople.fit_and_proper.heading", personName.fullName), checkElementTextIncludes(_, "Yes"))
     )
   }
 
@@ -179,8 +183,10 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
 
         override val sectionChecks = Table[String, Element => Boolean](
           ("title key", "check"),
-          (Messages("responsiblepeople.person.a.resident.heading", personName.fullName), checkElementTextIncludes(_, "No")),
-          (Messages("responsiblepeople.non.uk.passport.heading", personName.fullName), checkElementTextIncludes(_, "0000000000"))
+          (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName), checkElementTextIncludes(_, "No")),
+          (Messages("responsiblepeople.detailed_answers.uk.passport", personName.fullName), checkElementTextIncludes(_, "No")),
+          (Messages("responsiblepeople.detailed_answers.non.uk.passport", personName.fullName), checkElementTextIncludes(_, "Yes")),
+          (Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName.fullName), checkElementTextIncludes(_, "00000000"))
         )
 
         def view = {
@@ -237,10 +243,9 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
 
         override val sectionChecks = Table[String, Element => Boolean](
           ("title key", "check"),
-          (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName),
-            checkElementTextIncludes(_, "No")),
-          (Messages("responsiblepeople.detailed_answers.uk.passport", personName.fullName),
-            checkElementTextIncludes(_, s"${personName.fullName}’s passport number: 0000000000")))
+          (Messages("responsiblepeople.detailed_answers.uk_resident", personName.fullName), checkElementTextIncludes(_, "No")),
+          (Messages("responsiblepeople.detailed_answers.uk.passport", personName.fullName), checkElementTextIncludes(_, "Yes")),
+          (Messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName.fullName), checkElementTextIncludes(_, "0000000000")))
 
         def view = {
           views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, false, personName.fullName, businessMatching = businessMatching)
@@ -297,7 +302,7 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
 
         override val sectionChecks = Table[String, Element => Boolean](
           ("title key", "check"),
-          (Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName.fullName), checkElementTextIncludes(_, "Yes"))
+          (Messages("responsiblepeople.approval_check.heading", personName.fullName), checkElementTextIncludes(_, "Yes"))
         )
 
         def view = {

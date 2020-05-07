@@ -78,10 +78,10 @@ object PercentageOfCashPaymentOver15000 {
 
   implicit def convert(model: PercentageOfCashPaymentOver15000): models.hvd.PercentageOfCashPaymentOver15000 = model match {
     case PercentageOfCashPaymentOver15000.First => models.hvd.PercentageOfCashPaymentOver15000.First
-    case PercentageOfCashPaymentOver15000.Second => models.hvd.PercentageOfCashPaymentOver15000.First
-    case PercentageOfCashPaymentOver15000.Third => models.hvd.PercentageOfCashPaymentOver15000.First
-    case PercentageOfCashPaymentOver15000.Fourth => models.hvd.PercentageOfCashPaymentOver15000.First
-    case PercentageOfCashPaymentOver15000.Fifth => models.hvd.PercentageOfCashPaymentOver15000.First
+    case PercentageOfCashPaymentOver15000.Second => models.hvd.PercentageOfCashPaymentOver15000.Second
+    case PercentageOfCashPaymentOver15000.Third => models.hvd.PercentageOfCashPaymentOver15000.Third
+    case PercentageOfCashPaymentOver15000.Fourth => models.hvd.PercentageOfCashPaymentOver15000.Fourth
+    case PercentageOfCashPaymentOver15000.Fifth => models.hvd.PercentageOfCashPaymentOver15000.Fifth
     case _ => throw new Exception("Invalid PercentageOfCashPaymentOver15000")
   }
 }

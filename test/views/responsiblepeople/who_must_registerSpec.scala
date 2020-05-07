@@ -55,11 +55,11 @@ class who_must_registerSpec extends AmlsViewSpec with MustMatchers {
       def view = views.html.responsiblepeople.who_must_register(1)
 
 
-      html must include(Messages("responsiblepeople.whomustregister.line_1"))
-      html must include(Messages("responsiblepeople.whomustregister.line_2"))
-      html must include(Messages("responsiblepeople.whomustregister.line_3"))
-      html must include(Messages("responsiblepeople.whomustregister.line_4"))
-      html must include(Messages("responsiblepeople.whomustregister.line_5"))
+      html must include(Messages("owners, partners, directors, shadow directors, and designated members"))
+      html must include(Messages("the nominated officer for your business"))
+      html must include(Messages("beneficial owners or shareholders who own or control more than 25% of the business"))
+      html must include(Messages("other officers of the business, like the company secretary"))
+      html must include(Messages("senior managers of activities covered by the Money Laundering Regulations"))
     }
   }
 }

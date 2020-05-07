@@ -17,52 +17,74 @@
 @import forms.Form2
 @import include._
 @import include.forms2._
-@import config.{ ApplicationConfig}
+@import config.{ApplicationConfig}
 
-@(index: Int, msbExists: Boolean)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@import models.businessmatching.BusinessActivities
+@import models.businessmatching.BusinessMatchingMsbServices
+@import models.businessmatching.MoneyServiceBusiness
+
+@(index: Int, activities: Option[BusinessActivities], msbServices: Option[BusinessMatchingMsbServices])(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
-    @components.back_link()
-    @heading("title.wyn", "summary.tradingpremises")
+@components.back_link()
+@heading("title.wyn", "summary.tradingpremises")
 }
 
 @whatyouneed(
     title = Messages("title.wyn") + " - " + Messages("summary.tradingpremises"),
     heading = header
 ) {
-
     @components.user_attention_saving()
 
     <p>@Messages("tradingpremises.whatyouneed.requiredinfo.heading")</p>
 
     <ul class="list list-bullet">
         <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.1")</li>
+        <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.2")</li>
         <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.3")</li>
-        <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.4")</li>
-    </ul>
 
-    @if(msbExists) {
-        <h3 class="heading-medium">@Messages("tradingpremises.whatyouneed.agents.sub.heading")</h3>
-        <p>@Messages("tradingpremises.whatyouneed.agents.desc.1")</p>
-        <p>@Messages("tradingpremises.whatyouneed.agents.desc.2")</p>
-    }
 
-    @if(msbExists) {
-        @anchor(
-            attrHref = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index).toString,
-            attrRole = true,
-            linkText = Messages("button.continue"),
-            returnLink = true,
-            id=Some("tpwhatyouneed-button")
-        )
-    } else {
+    @activities.map { ba =>
+        @if(ba.businessActivities.size > 1) {
+            <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.4")</li>
+        }
+        @msbServices.map { msb =>
+            @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness) && msb.msbServices.size > 1) {
+                <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.5")</li>
+            }
+        }
+
+        @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness)) {
+            <h3 class="heading-medium">@Messages("tradingpremises.whatyouneed.agents.sub.heading")</h3>
+
+            <p>@Messages("tradingpremises.whatyouneed.agents.desc.1")</p>
+
+            <p>@Messages("tradingpremises.whatyouneed.agents.desc.2")</p>
+
+                <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.6")</li>
+                <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.7")</li>
+                <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.8")</li>
+        }
+
+        @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness)) {
+            @anchor(
+                attrHref = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index).toString,
+                attrRole = true,
+                linkText = Messages("button.continue"),
+                returnLink = true,
+                id = Some("tpwhatyouneed-button"),
+                draggable = false
+            )
+        } else {
+        </ul>
         @if(index == 1) {
             @anchor(
                 attrHref = controllers.tradingpremises.routes.ConfirmAddressController.get(index).toString,
                 attrRole = true,
                 linkText = Messages("button.continue"),
                 returnLink = true,
-                id = Some("tpwhatyouneed-button")
+                id = Some("tpwhatyouneed-button"),
+                draggable = false
             )
         } else {
             @anchor(
@@ -70,10 +92,10 @@
                 attrRole = true,
                 linkText = Messages("button.continue"),
                 returnLink = true,
-                id = Some("tpwhatyouneed-button")
+                id = Some("tpwhatyouneed-button"),
+                draggable = false
             )
         }
     }
-
-
+}
 }

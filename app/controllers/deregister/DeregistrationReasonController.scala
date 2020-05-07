@@ -47,9 +47,9 @@ class DeregistrationReasonController @Inject()(authAction: AuthAction,
           dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
             (for {
               bm <- businessMatching
-              at <- bm.activities
+              activities <- bm.activities
             } yield {
-              Ok(deregistration_reason(EmptyForm, at.businessActivities.contains(HighValueDealing)))
+              Ok(deregistration_reason(EmptyForm, activities.businessActivities.contains(HighValueDealing)))
             }) getOrElse Ok(deregistration_reason(EmptyForm))
           }
     }
@@ -58,7 +58,16 @@ class DeregistrationReasonController @Inject()(authAction: AuthAction,
   def post = authAction.async {
     implicit request =>
       Form2[DeregistrationReason](request.body) match {
-        case f:InvalidForm => Future.successful(BadRequest(deregistration_reason(f)))
+        case f: InvalidForm =>
+          dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
+            (for {
+              bm <- businessMatching
+              activities <- bm.activities
+            } yield {
+              BadRequest(deregistration_reason(f, activities.businessActivities.contains(HighValueDealing)))
+            }) getOrElse BadRequest(deregistration_reason(f))
+          }
+
         case ValidForm(_, data) => {
           val deregistrationReasonOthers = data match {
             case DeregistrationReason.Other(reason) => reason.some

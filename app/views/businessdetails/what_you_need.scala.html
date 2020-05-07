@@ -34,9 +34,11 @@
     <p>@Messages("businessdetails.whatyouneed.subheading")</p>
 
     <ul class="list list-bullet">
+        <li>@Messages("businessdetails.whatyouneed.line_1")</li>
         <li>@Messages("businessdetails.whatyouneed.line_2")</li>
         <li>@Messages("businessdetails.whatyouneed.line_3")</li>
         <li>@Messages("businessdetails.whatyouneed.line_4")</li>
+        <li>@Messages("businessdetails.whatyouneed.line_5")</li>
     </ul>
 
 
@@ -45,7 +47,8 @@
         attrRole = true,
         linkText = Messages("button.continue"),
         returnLink = true,
-        id=Some("businessdetailswhatyouneed-button")
+        id=Some("businessdetailswhatyouneed-button"),
+        draggable = false
     )
 
 }

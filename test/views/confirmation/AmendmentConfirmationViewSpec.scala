@@ -34,7 +34,6 @@ class AmendmentConfirmationViewSpec extends AmlsViewSpec with MustMatchers  with
       Some(paymentReferenceNumber),
       Currency(100),
       Currency(150),
-      Some(Seq.empty),
       continueHref
     )
   }

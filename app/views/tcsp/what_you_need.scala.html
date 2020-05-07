@@ -39,7 +39,13 @@
         <li>@Messages("tcsp.whatyouneed.requiredinfo.text.1")</li>
         <li>@Messages("tcsp.whatyouneed.requiredinfo.text.2")</li>
         <li>@Messages("tcsp.whatyouneed.requiredinfo.text.3")</li>
-        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.4")</li>
+    </ul>
+
+    <p>@Messages("tcsp.whatyouneed.requiredinfo.text.4")</p>
+
+    <ul class="list list-bullet">
+        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.5")</li>
+        <li>@Messages("tcsp.whatyouneed.requiredinfo.text.6")</li>
     </ul>
 
     @anchor(
@@ -47,7 +53,8 @@
         attrRole = true,
         linkText = Messages("button.continue"),
         returnLink = true,
-        id=Some("tcspwhatyouneed-button")
+        id=Some("tcspwhatyouneed-button"),
+        draggable = false
     )
 
 }

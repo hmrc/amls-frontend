@@ -97,6 +97,14 @@ class ConversionsSpec extends WordSpec with MustMatchers {
           Country("United Kingdom", "GB"), Country("France", "FR"), Country("us", "US"))))
     }
 
+    "convert the 'MSB send money to other country' model" in new Fixture {
+      val model = SendMoneyToOtherCountry(true)
+      val renewal = Renewal(sendMoneyToOtherCountry = Some(model))
+      val converted = subscriptionRequest.withRenewalData((renewal))
+
+      converted.msbSection.get.sendMoneyToOtherCountry mustBe Some(models.moneyservicebusiness.SendMoneyToOtherCountry(true))
+    }
+
     "convert the 'MSB most transactions' model" in new Fixture {
       val model = MostTransactions(Seq(Country("United Kingdom", "GB")))
       val renewal = Renewal(mostTransactions = Some(model))
@@ -132,12 +140,44 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       )
     }
 
-    "convert the 'HVD percentage' model" in new Fixture {
+    "convert the 'HVD percentage' model First" in new Fixture {
       val model = PercentageOfCashPaymentOver15000.First
       val renewal = Renewal(percentageOfCashPaymentOver15000 = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
 
       converted.hvdSection.get.percentageOfCashPaymentOver15000 mustBe Some(models.hvd.PercentageOfCashPaymentOver15000.First)
+    }
+
+    "convert the 'HVD percentage' model Second" in new Fixture {
+      val model = PercentageOfCashPaymentOver15000.Second
+      val renewal = Renewal(percentageOfCashPaymentOver15000 = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.hvdSection.get.percentageOfCashPaymentOver15000 mustBe Some(models.hvd.PercentageOfCashPaymentOver15000.Second)
+    }
+
+    "convert the 'HVD percentage' model Third" in new Fixture {
+      val model = PercentageOfCashPaymentOver15000.Third
+      val renewal = Renewal(percentageOfCashPaymentOver15000 = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.hvdSection.get.percentageOfCashPaymentOver15000 mustBe Some(models.hvd.PercentageOfCashPaymentOver15000.Third)
+    }
+
+    "convert the 'HVD percentage' model Fourth" in new Fixture {
+      val model = PercentageOfCashPaymentOver15000.Fourth
+      val renewal = Renewal(percentageOfCashPaymentOver15000 = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.hvdSection.get.percentageOfCashPaymentOver15000 mustBe Some(models.hvd.PercentageOfCashPaymentOver15000.Fourth)
+    }
+
+    "convert the 'HVD percentage' model Fifth" in new Fixture {
+      val model = PercentageOfCashPaymentOver15000.Fifth
+      val renewal = Renewal(percentageOfCashPaymentOver15000 = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.hvdSection.get.percentageOfCashPaymentOver15000 mustBe Some(models.hvd.PercentageOfCashPaymentOver15000.Fifth)
     }
 
     "convert the 'HVD receive cash payments' model" in new Fixture {

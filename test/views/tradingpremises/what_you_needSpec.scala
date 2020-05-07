@@ -16,6 +16,7 @@
 
 package views.tradingpremises
 
+import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatchingMsbServices, CurrencyExchange, HighValueDealing, MoneyServiceBusiness, TransmittingMoney}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
@@ -31,7 +32,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
   "what_you_need view" must {
     "have correct title, heading and back link" in new ViewFixture {
 
-      def view = views.html.tradingpremises.what_you_need(1, false)
+      def view = views.html.tradingpremises.what_you_need(1, None, None)
 
       val title = Messages("title.wyn") + " - " +
         Messages("summary.tradingpremises") + " - " +
@@ -45,10 +46,24 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
     }
 
-    "contain the expected content elements" in new ViewFixture {
-      def view = views.html.tradingpremises.what_you_need(1, false)
+    "contain the expected content elements with one service no MSB" in new ViewFixture {
+      def view = views.html.tradingpremises.what_you_need(1, Some(BusinessActivities(Set(AccountancyServices))), None)
 
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.1"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.2"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.3"))
+
+      doc.getElementsMatchingOwnText(Messages("button.continue")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("button.continue")).attr("href") must be("/anti-money-laundering/trading-premises/premises/1")
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.title")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.information")).hasText must be(true)
+    }
+
+    "contain the expected content elements with multiple services no MSB" in new ViewFixture {
+      def view = views.html.tradingpremises.what_you_need(1, Some(BusinessActivities(Set(AccountancyServices, HighValueDealing))), None)
+
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.1"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.2"))
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.3"))
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.4"))
 
@@ -58,13 +73,60 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.information")).hasText must be(true)
     }
 
-    "contain the expected content elements when msb is selected as one of the option in business activities" in new ViewFixture {
-      def view = views.html.tradingpremises.what_you_need(1, true)
-
+    "contain the expected content elements with one service being MSB with one MSB activities" in new ViewFixture {
+      def view = views.html.tradingpremises.what_you_need(1, Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))
 
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.1"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.2"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.3"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.6"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.7"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.8"))
+
+      doc.getElementsMatchingOwnText(Messages("button.continue")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.title")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.information")).hasText must be(true)
+
+      doc.getElementsMatchingOwnText(Messages("tradingpremises.whatyouneed.agents.sub.heading")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("tradingpremises.whatyouneed.agents.desc.1")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("tradingpremises.whatyouneed.agents.desc.2")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("button.continue")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("button.continue")).attr("href") must be("/anti-money-laundering/trading-premises/agent-premises/1")
+    }
+
+    "contain the expected content elements with one service being MSB with multiple MSB activities" in new ViewFixture {
+      def view = views.html.tradingpremises.what_you_need(1, Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))))
+
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.1"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.2"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.3"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.5"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.6"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.7"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.8"))
+
+      doc.getElementsMatchingOwnText(Messages("button.continue")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.title")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.information")).hasText must be(true)
+
+      doc.getElementsMatchingOwnText(Messages("tradingpremises.whatyouneed.agents.sub.heading")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("tradingpremises.whatyouneed.agents.desc.1")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("tradingpremises.whatyouneed.agents.desc.2")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("button.continue")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("button.continue")).attr("href") must be("/anti-money-laundering/trading-premises/agent-premises/1")
+    }
+
+    "contain the expected content elements with multiple services one being MSB with multiple MSB activities" in new ViewFixture {
+      def view = views.html.tradingpremises.what_you_need(1, Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))))
+
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.1"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.2"))
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.3"))
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.4"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.5"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.6"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.7"))
+      html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.8"))
 
       doc.getElementsMatchingOwnText(Messages("button.continue")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("whatYouNeed.attention.title")).hasText must be(true)

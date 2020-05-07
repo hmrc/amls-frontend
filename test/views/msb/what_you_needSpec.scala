@@ -50,20 +50,26 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "state that throughput info will be needed" in new ViewFixture {
-      html must include(Messages("msb.whatyouneed.line_1"))
+      html must include(Messages("the amount of throughput you expect in the next 12 months"))
     }
 
     "state that branches or agents in other countries will be needed" in new ViewFixture {
-      html must include(Messages("msb.whatyouneed.line_2"))
+      html must include(Messages("which countries you have branches or agents in, if you have any"))
+    }
+    "state system can identify linked transactions" in new ViewFixture {
+      html must include(Messages("if your systems can identify linked transactions"))
     }
 
     "not display info that will not be needed" in new ViewFixture {
-      html must not include Messages("msb.whatyouneed.line_3")
-      html must not include Messages("msb.whatyouneed.line_4")
-      html must not include Messages("msb.whatyouneed.line_5")
-      html must not include Messages("msb.whatyouneed.line_6")
-      html must not include Messages("msb.whatyouneed.line_7")
-      html must not include Messages("msb.whatyouneed.line_8")
+      html must not include Messages("your Intermediary Payment Service Provider’s name and Money Laundering Regulations number, if you use one")
+      html must not include Messages("if you transfer money without using formal banking systems")
+      html must not include Messages("the number of money transfers you expect to make in the next 12 months")
+      html must not include Messages("which countries you expect to send the largest amounts of money to, if you send money to other countries")
+      html must not include Messages("which countries you expect to send the most transactions to, if you send money to other countries")
+      html must not include Messages("the number of currency exchange transactions you expect in the next 12 months")
+      html must not include Messages("which currencies you expect to supply the most to your customers")
+      html must not include Messages("who will supply your foreign currency, if you expect to deal in physical foreign currencies")
+      html must not include Messages("the number foreign exchange transactions you expect in the next 12 months")
     }
 
     "Transmitting Money is a selected MSB subservice" when {
@@ -71,12 +77,12 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
         override def view = views.html.msb.what_you_need(BusinessMatchingMsbServices(Set(TransmittingMoney)))
       }
 
-      "state that where you expect to send money/transactions will be needed" in new TMViewFixture {
-        html must include(Messages("msb.whatyouneed.line_3"))
-      }
-
-      "state that IPSP info will be needed" in new TMViewFixture {
-        html must include(Messages("msb.whatyouneed.line_8"))
+      "provide correct content for TM" in new TMViewFixture {
+        html must include(Messages("your Intermediary Payment Service Provider’s name and Money Laundering Regulations number, if you use one"))
+        html must include(Messages("if you transfer money without using formal banking systems"))
+        html must include(Messages("the number of money transfers you expect to make in the next 12 months"))
+        html must include(Messages("which countries you expect to send the largest amounts of money to, if you send money to other countries"))
+        html must include(Messages("which countries you expect to send the most transactions to, if you send money to other countries"))
       }
     }
 
@@ -85,16 +91,10 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
         override def view = views.html.msb.what_you_need(BusinessMatchingMsbServices(Set(CurrencyExchange)))
       }
 
-      "state which currencies you supply most of will be needed" in new CXViewFixture {
-        html must include(Messages("msb.whatyouneed.line_4"))
-      }
-
-      "state if you deal in physical foreign currencies will be needed" in new CXViewFixture {
-        html must include(Messages("msb.whatyouneed.line_5"))
-      }
-
-      "state currency exchange transactions info will be needed" in new CXViewFixture {
-        html must include(Messages("msb.whatyouneed.line_6"))
+      "provide correct content for currencyExchange" in new CXViewFixture {
+        html must include(Messages("the number of currency exchange transactions you expect in the next 12 months"))
+        html must include(Messages("which currencies you expect to supply the most to your customers"))
+        html must include(Messages("who will supply your foreign currency, if you expect to deal in physical foreign currencies"))
       }
     }
 
@@ -104,7 +104,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
       }
 
       "state foreign exchange transactions info will be needed" in new FXViewFixture {
-        html must include(Messages("msb.whatyouneed.line_7"))
+        html must include(Messages("the number foreign exchange transactions you expect in the next 12 months"))
       }
     }
   }
