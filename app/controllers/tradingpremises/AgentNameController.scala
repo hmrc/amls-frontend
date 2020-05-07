@@ -132,6 +132,11 @@ class AgentNameController @Inject()(
   }
 
   private def redirectToAgentNameDateOfChange(tradingPremises: TradingPremises, name: AgentName) = {
-    !tradingPremises.agentName.contains(name) && tradingPremises.lineId.isDefined
+    def isAgentNameAndDobChanged = tradingPremises.agentName match {
+      case Some(AgentName(agentName, _, agentDateOfBirth)) if agentName == name.agentName && agentDateOfBirth == name.agentDateOfBirth => false
+      case _ => true
+    }
+
+    isAgentNameAndDobChanged && tradingPremises.lineId.isDefined
   }
 }
