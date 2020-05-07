@@ -21,7 +21,7 @@ import cats.implicits._
 import models.asp.Asp
 import models.businessmatching._
 import models.businessmatching.updateservice.UpdateService
-import models.estateagentbusiness.EstateAgentBusiness
+import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => MsbModel}
 import models.tcsp.Tcsp
@@ -66,9 +66,9 @@ class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with 
     when(tcspModel.isComplete) thenReturn false
     mockCacheGetEntry[Tcsp](Some(tcspModel), Tcsp.key)
 
-    val eabModel = mock[EstateAgentBusiness]
+    val eabModel = mock[Eab]
     when(eabModel.isComplete) thenReturn false
-    mockCacheGetEntry[EstateAgentBusiness](Some(eabModel), EstateAgentBusiness.key)
+    mockCacheGetEntry[Eab](Some(eabModel), Eab.key)
 
     val aspModel = mock[Asp]
     when(aspModel.isComplete) thenReturn false

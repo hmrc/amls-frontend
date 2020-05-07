@@ -27,7 +27,7 @@ import models.businessactivities.BusinessActivities
 import models.businessdetails.BusinessDetails
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
-import models.estateagentbusiness.EstateAgentBusiness
+import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePerson
@@ -63,7 +63,7 @@ class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: Da
       _ <- fn(credId, Amp.key, response.amp)
       _ <- fn(credId, Supervision.key, response.supervision)
       _ <- fn(credId, BusinessDetails.key, response.businessDetails)
-      _ <- fn(credId, EstateAgentBusiness.key, response.estateAgencyBusiness)
+      _ <- fn(credId, Eab.key, response.estateAgencyBusiness)
       _ <- fn(credId, SubscriptionResponse.key, response.Subscription)
       _ <- fn(credId, AmendVariationRenewalResponse.key, response.amendVariationResponse)
       _ <- fn(credId, DataImport.key, response.dataImport)

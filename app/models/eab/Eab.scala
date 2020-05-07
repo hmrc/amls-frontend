@@ -23,7 +23,6 @@ import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
-import models.estateagentbusiness._
 
 case class Eab(data: JsObject = Json.obj(),
                hasChanged: Boolean = false,
@@ -102,42 +101,6 @@ case class Eab(data: JsObject = Json.obj(),
 
   def services = {
     get[List[String]](Eab.eabServicesProvided)
-  }
-
-  def dateOfChange = {
-    get[String](Eab.dateOfChange)
-  }
-
-  def redressScheme = {
-    get[String](Eab.redressScheme)
-  }
-
-  def penalisedProfessionalBody = {
-    get[Boolean](Eab.penalisedProfessionalBody)
-  }
-
-  def penalisedProfessionalBodyDetail = {
-    get[String](Eab.penalisedProfessionalBodyDetail)
-  }
-
-  def penalisedUnderEstateAgentsAct = {
-    get[Boolean](Eab.penalisedEstateAgentsAct)
-  }
-
-  def penalisedUnderEstateAgentsAcDetail = {
-    get[String](Eab.penalisedEstateAgentsActDetail)
-  }
-
-  def clientMoneyProtectionScheme = {
-    get[Boolean](Eab.clientMoneyProtectionScheme)
-  }
-
-  // EstateAgentBusiness models are needed for DES interactions. I.e. API 4, 5 and 6.
-  // This method takes this Eab model (used by EAB Frontend and converts to EstateAgentBusiness for
-  // back end (AMLS) DES interactions.
-  // AMLS Back end could be refactored in time to receive this model in place of EstateAgentBusiness.
-  def conv = {
-    EstateAgentBusiness.conv(this)
   }
 }
 

@@ -18,13 +18,14 @@ package utils
 
 import forms.InvalidForm
 import models.businessactivities._
-import models.estateagentbusiness.{EstateAgentBusiness, OmbudsmanServices, PropertyRedressScheme, ThePropertyOmbudsman}
+import models.eab.Eab
 import models.responsiblepeople._
 import models.supervision._
 import org.joda.time.LocalDate
 import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.Json
 
 import scala.collection.immutable.ListMap
 
@@ -47,10 +48,27 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
     )
   }
 
-  val eabPropertyOmbudsman =  EstateAgentBusiness(redressScheme = Some(ThePropertyOmbudsman))
-  val eabPropertyRedress =  EstateAgentBusiness(redressScheme = Some(PropertyRedressScheme))
-  val eabOmbudsmanServices = EstateAgentBusiness(redressScheme = Some(OmbudsmanServices))
-  val eabOther = EstateAgentBusiness(redressScheme = Some(models.estateagentbusiness.Other("Other")))
+  val completeRedressScheme = Json.obj(
+    "redressScheme" -> "propertyOmbudsman"
+  )
+  val eabPropertyOmbudsman = Eab(completeRedressScheme,  hasAccepted = true)
+
+  val completeRedressSchemePropertyRedress = Json.obj(
+    "redressScheme" -> "propertyRedressScheme"
+  )
+  val eabPropertyRedress = Eab(completeRedressSchemePropertyRedress,  hasAccepted = true)
+
+  val completeRedressSchemeOmbudsmanServices = Json.obj(
+    "redressScheme" -> "ombudsmanServices"
+  )
+  val eabOmbudsmanServices = Eab(completeRedressSchemeOmbudsmanServices,  hasAccepted = true)
+
+  val completeRedressSchemeOther = Json.obj(
+    "redressScheme" -> "other"
+  )
+  val eabOther = Eab(completeRedressSchemeOther,  hasAccepted = true)
+
+  val eabNoRedress = Eab(Json.obj(),  hasAccepted = true)
 
   val accountantNameCompleteModel = Some(BusinessActivities(
     whoIsYourAccountant = Some(WhoIsYourAccountant(
@@ -92,8 +110,13 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
     "hasInvalidRedressScheme" must {
 
       "return false" when {
+
         "eab is None" in {
           ControllerHelper.hasInvalidRedressScheme(None) mustEqual false
+        }
+
+        "when no redress scheme" in {
+          ControllerHelper.hasInvalidRedressScheme(Some(eabNoRedress)) mustEqual false
         }
 
         "when 'PropertyOmbudsman' is selected" in {
@@ -103,10 +126,10 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
         "when 'PropertyRedressScheme' is selected" in {
           ControllerHelper.hasInvalidRedressScheme(Some(eabPropertyRedress)) mustEqual false
         }
-
       }
 
       "return true" when {
+
         "when 'OmbudsmanServices' is selected" in {
           ControllerHelper.hasInvalidRedressScheme(Some(eabOmbudsmanServices)) mustEqual true
         }
@@ -121,7 +144,7 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
 
       "return false" when {
         "responsiblePerson seq is None" in {
-            ControllerHelper.hasIncompleteResponsiblePerson(None) mustEqual false
+          ControllerHelper.hasIncompleteResponsiblePerson(None) mustEqual false
         }
 
         "all responsiblePerson are complete" in {
@@ -262,11 +285,11 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
 
         val formData: ListMap[String, Seq[String]] =
           ListMap(("csrfToken", csrfToken),
-              ("currencies[0]", Seq("")),
-              ("currencies[1]", Seq("value1")),
-              ("currencies[2]", Seq("")),
-              ("currencies[3]", Seq("value2")),
-              ("currencies[4]", Seq("value3")))
+            ("currencies[0]", Seq("")),
+            ("currencies[1]", Seq("value1")),
+            ("currencies[2]", Seq("")),
+            ("currencies[3]", Seq("value2")),
+            ("currencies[4]", Seq("value3")))
 
         val form = InvalidForm(data = formData, Seq())
         val updatedForm: InvalidForm = ControllerHelper.stripEmptyValuesFromFormWithArray(form, "currencies")

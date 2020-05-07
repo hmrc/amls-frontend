@@ -25,7 +25,6 @@ import models.amp.Amp
 import models.asp.Asp
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching, _}
-import models.estateagentbusiness.{EstateAgentBusiness}
 import models.eab.Eab
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.hvd.Hvd
@@ -63,7 +62,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
 
     def removeActivity(activity: BMBusinessActivity): Future[CacheMap] = {
       activity match {
-         case ArtMarketParticipant =>
+        case ArtMarketParticipant =>
           dataCacheConnector.removeByKey[Amp](credId, Amp.key)
         case MoneyServiceBusiness =>
           dataCacheConnector.removeByKey[MSBSection](credId, MSBSection.key)
@@ -74,12 +73,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
         case AccountancyServices =>
           dataCacheConnector.removeByKey[Asp](credId, Asp.key)
         case EstateAgentBusinessService =>
-          //TODO AMLS-5540 - Can be removed when feature toggle for new EAB service is removed.
-          if(appConfig.phase3Release2La) {
-            dataCacheConnector.removeByKey[Eab](credId, Eab.key)
-          } else {
-            dataCacheConnector.removeByKey[EstateAgentBusiness](credId, EstateAgentBusiness.key)
-          }
+          dataCacheConnector.removeByKey[Eab](credId, Eab.key)
         case _ =>
           dataCacheConnector.fetchAllWithDefault(credId)
       }
@@ -164,15 +158,12 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
 
     val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])
 
-    val canRemoveFitProper = (
-      current: Set[BMBusinessActivity],
-      removing: Set[BMBusinessActivity]
-    ) => {
+    val canRemoveFitProper = (current: Set[BMBusinessActivity], removing: Set[BMBusinessActivity]) => {
       val hasTCSP = current.contains(TrustAndCompanyServices)
       val hasMSB = current.contains(MoneyServiceBusiness)
 
       (removing.contains(MoneyServiceBusiness) && !hasTCSP) ||
-      (removing.contains(TrustAndCompanyServices) && !hasMSB)
+        (removing.contains(TrustAndCompanyServices) && !hasMSB)
     }
 
     for {
@@ -191,7 +182,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
   }
 
   def dateOfChangeApplicable(credId: String, activitiesToRemove: Set[BMBusinessActivity])
-                          (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Boolean] = {
+                            (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Boolean] = {
     for {
       recentlyAdded <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](credId, ServiceChangeRegister.key)) orElse OptionT.some(ServiceChangeRegister())
       addedActivities <- OptionT.fromOption[Future](recentlyAdded.addedActivities) orElse OptionT.some(Set.empty)

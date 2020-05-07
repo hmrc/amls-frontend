@@ -27,7 +27,7 @@ import models.businessdetails._
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7.{BeneficialShareholder, RoleWithinBusinessRelease7}
-import models.estateagentbusiness.{ProfessionalBodyNo => EABProfessionalBodyNo, _}
+import models.eab.Eab
 import models.hvd._
 import models.moneyservicebusiness._
 import models.responsiblepeople.ResponsiblePerson
@@ -77,14 +77,42 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
     )
 
     val businessMatching = businessMatchingGen.sample.get
-    val estateAgentBusiness = new EstateAgentBusiness(
-      Some(Services(Set(Commercial))),
-      Some(ThePropertyOmbudsman),
-      Some(EABProfessionalBodyNo),
-      Some(PenalisedUnderEstateAgentsActNo),
-      None,
-      false,
-      false)
+
+    val completeServiceList = Seq("auctioneering", "residential")
+
+    val completeServices = Json.obj("eabServicesProvided" -> completeServiceList )
+
+    val completeDateOfChange = Json.obj(
+      "dateOfChange" -> "2019-01-01"
+    )
+
+    val completeEstateAgencyActPenalty = Json.obj(
+      "penalisedEstateAgentsAct" -> true,
+      "penalisedEstateAgentsActDetail" -> "details"
+    )
+
+    val completePenalisedProfessionalBody = Json.obj(
+      "penalisedProfessionalBody" -> true,
+      "penalisedProfessionalBodyDetail" -> "details"
+    )
+
+    val completeRedressScheme = Json.obj(
+      "redressScheme" -> "propertyRedressScheme",
+      "redressSchemeDetail" -> "null"
+    )
+
+    val completeMoneyProtectionScheme = Json.obj(
+      "clientMoneyProtectionScheme" -> true
+    )
+
+    val completeData = completeServices ++
+      completeDateOfChange ++
+      completeEstateAgencyActPenalty ++
+      completePenalisedProfessionalBody ++
+      completeRedressScheme ++
+      completeMoneyProtectionScheme
+
+    val estateAgentBusiness = Eab(completeData,  hasAccepted = true)
 
     val tradingPremises = Seq(tradingPremisesGen.sample.get, tradingPremisesGen.sample.get)
 
@@ -158,8 +186,8 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
         Seq("USD", "GBP", "EUR"),
         Some(UsesForeignCurrenciesYes),
         Some(MoneySources(Some(BankMoneySource("bank names")),
-        Some(WholesalerMoneySource("Wholesaler Names")),
-        Some(true)))
+          Some(WholesalerMoneySource("Wholesaler Names")),
+          Some(true)))
       )),
       sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
       fundsTransfer = Some(FundsTransfer(true)),
@@ -268,7 +296,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
         mockCacheSave[Hvd]
         mockCacheSave[Supervision]
         mockCacheSave[BusinessDetails]
-        mockCacheSave[EstateAgentBusiness]
+        mockCacheSave[Eab]
         mockCacheSave[SubscriptionResponse]
         mockCacheSave[AmendVariationRenewalResponse]
         mockCacheSave[DataImport]
@@ -288,7 +316,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
         verify(mockCacheConnector).save[Hvd](any(), eqTo(Hvd.key), any())(any(), any())
         verify(mockCacheConnector).save[Supervision](any(), eqTo(Supervision.key), any())(any(), any())
         verify(mockCacheConnector).save[BusinessDetails](any(), eqTo(BusinessDetails.key), any())(any(), any())
-        verify(mockCacheConnector).save[EstateAgentBusiness](any(), eqTo(EstateAgentBusiness.key), any())(any(), any())
+        verify(mockCacheConnector).save[Eab](any(), eqTo(Eab.key), any())(any(), any())
         verify(mockCacheConnector).save[SubscriptionResponse](any(), eqTo(SubscriptionResponse.key), any())(any(), any())
         verify(mockCacheConnector).save[AmendVariationRenewalResponse](any(), eqTo(AmendVariationRenewalResponse.key), any())(any(), any())
         verify(mockCacheConnector).save[DataImport](any(), eqTo(DataImport.key), eqTo(dataImport))(any(), any())

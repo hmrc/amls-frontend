@@ -23,7 +23,7 @@ import models.businessactivities.BusinessActivities
 import models.businessdetails.BusinessDetails
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
-import models.estateagentbusiness.EstateAgentBusiness
+import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePerson
@@ -35,11 +35,10 @@ import play.api.libs.json._
 
 import scala.collection.Seq
 
-//TODO AMLS-5779 - Change to new EAB model for DES/STUBS integration
 case class UpdateMongoCacheResponse(dataImport: Option[DataImport],
                                     view: Option[ViewResponse],
                                     businessMatching: Option[BusinessMatching],
-                                    estateAgencyBusiness: Option[EstateAgentBusiness],
+                                    estateAgencyBusiness: Option[Eab],
                                     tradingPremises: Option[Seq[TradingPremises]],
                                     businessDetails: Option[BusinessDetails],
                                     bankDetails: Option[Seq[BankDetails]],
@@ -62,8 +61,8 @@ object UpdateMongoCacheResponse {
   implicit val writes = Json.writes[UpdateMongoCacheResponse]
 
   def readLegacyField[T](key: String, oldKey: String)(implicit r: Reads[T]): Reads[Option[T]] =
-      {
-        (__ \ key).read[T] orElse (__ \ oldKey).read[T]
+    {
+      (__ \ key).read[T] orElse (__ \ oldKey).read[T]
       }.map(Option(_)) orElse constant[Option[T]](None)
 
   implicit val reads: Reads[UpdateMongoCacheResponse] = {
@@ -71,7 +70,7 @@ object UpdateMongoCacheResponse {
       (__ \ DataImport.key).readNullable[DataImport] ~
         readLegacyField[ViewResponse](ViewResponse.key, "view") ~
         readLegacyField[BusinessMatching](BusinessMatching.key, "businessMatching") ~
-        readLegacyField[EstateAgentBusiness](EstateAgentBusiness.key, "estateAgencyBusiness") ~
+        readLegacyField[Eab](Eab.key, "estateAgencyBusiness") ~
         readLegacyField[Seq[TradingPremises]](TradingPremises.key, "tradingPremises") ~
         readLegacyField[BusinessDetails](BusinessDetails.key, "aboutTheBusiness") ~
         readLegacyField[Seq[BankDetails]](BankDetails.key, "bankDetails") ~
@@ -89,5 +88,3 @@ object UpdateMongoCacheResponse {
       ) (UpdateMongoCacheResponse.apply _)
   }
 }
-
-
