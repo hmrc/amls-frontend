@@ -126,7 +126,7 @@ class AgentNameController @Inject()(
                 _ <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
                   tp.agentName(tradingPremises.agentName.get.copy(dateOfChange = Some(dateOfChange)))
                 }
-              } yield Redirect(routes.DetailedAnswersController.get(1))
+              } yield Redirect(routes.DetailedAnswersController.get(index))
           }
         }
   }
