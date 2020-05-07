@@ -68,7 +68,8 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks{
 
       val sectionChecks = Table[String, Element => Boolean](
         ("title key", "check"),
-        ("supervision.another_body.title",checkElementTextIncludes(_, "Company A")),
+        ("supervision.another_body.title",checkElementTextIncludes(_, "lbl.yes")),
+        ("supervision.another_body.lbl.supervisor",checkElementTextIncludes(_, "Company A")),
         ("supervision.supervision_start.title",checkElementTextIncludes(_, "24 February 1990")),
         ("supervision.supervision_end.title",checkElementTextIncludes(_, "24 February 1998")),
         ("supervision.supervision_end_reasons.title",checkElementTextIncludes(_, "Ending reason")),
@@ -76,10 +77,10 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks{
         ("supervision.whichprofessionalbody.title",checkElementTextIncludes(_,
           "supervision.memberofprofessionalbody.lbl.01",
           "supervision.memberofprofessionalbody.lbl.02",
-          "supervision.memberofprofessionalbody.lbl.14",
           "anotherProfessionalBody"
         )),
-        ("supervision.penalisedbyprofessional.title",checkElementTextIncludes(_, "details"))
+        ("supervision.penalisedbyprofessional.title",checkElementTextIncludes(_, "lbl.yes")),
+        ("supervision.penalisedbyprofessional.details.lbl",checkElementTextIncludes(_, "details"))
       )
 
       forAll(sectionChecks) { (key, check) => {
@@ -113,10 +114,10 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks{
         ("supervision.whichprofessionalbody.title",checkElementTextIncludes(_,
           "supervision.memberofprofessionalbody.lbl.01",
           "supervision.memberofprofessionalbody.lbl.02",
-          "supervision.memberofprofessionalbody.lbl.14",
           "anotherProfessionalBody"
         )),
-        ("supervision.penalisedbyprofessional.title",checkElementTextIncludes(_, "details"))
+        ("supervision.penalisedbyprofessional.title",checkElementTextIncludes(_, "lbl.yes")),
+        ("supervision.penalisedbyprofessional.details.lbl",checkElementTextIncludes(_, "details"))
       )
 
       forAll(sectionChecks) { (key, check) => {
