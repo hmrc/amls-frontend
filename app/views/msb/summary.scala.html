@@ -307,24 +307,66 @@
             @model.whichCurrencies.map { wc =>
                 @wc.moneySources.map { ms =>
                     @if(ms.bankMoneySource.isDefined | ms.wholesalerMoneySource.isDefined | ms.customerMoneySource.isDefined){
+
                         @checkYourAnswersRow(
                             question = Messages("msb.supply_foreign_currencies.title"),
                             editLinkTag = "moneysources-edit",
                             editUrl = controllers.msb.routes.MoneySourcesController.get(true).toString
                         ) {
-                            @ms.bankMoneySource.map { bms =>
-                                <p>@Messages("msb.bank.names"): @bms.bankNames</p>
+                            @if(ms.size == 1) {
+                                    @ms.bankMoneySource.map { bms =>
+                                        @Messages("msb.which_currencies.source.banks")
+                                    }
+                                    @ms.wholesalerMoneySource.map { wms =>
+                                        @Messages("msb.which_currencies.source.wholesalers")
+                                    }
+                                    @ms.customerMoneySource.map { cms =>
+                                        @if(cms) {
+                                            @Messages("msb.which_currencies.source.customers")
+                                        }
+                                    }
+                                </ul>
+                            } else{
+                                <ul class="list list-bullet">
+                                    @ms.bankMoneySource.map { bms =>
+                                        <li>@Messages("msb.which_currencies.source.banks")</li>
+                                    }
+                                    @ms.wholesalerMoneySource.map { wms =>
+                                        <li>@Messages("msb.which_currencies.source.wholesalers")</li>
+                                    }
+                                    @ms.customerMoneySource.map { cms =>
+                                        @if(cms) {
+                                            <li>@Messages("msb.which_currencies.source.customers")</li>
+                                        }
+                                    }
+                                </ul>
                             }
-                            @ms.wholesalerMoneySource.map { wms =>
-                                <p>@Messages("msb.wholesaler.names"): @wms.wholesalerNames</p>
-                            }
-                            @ms.customerMoneySource.map { cms =>
-                                @if(cms) {
-                                    <p>@Messages("msb.which_currencies.source.customers")</p>
+                        }
+
+                        @if(ms.bankMoneySource.isDefined){
+                            @checkYourAnswersRow(
+                                question = Messages("msb.bank.names"),
+                                editLinkTag = "moneysources-banks-edit",
+                                editUrl = controllers.msb.routes.MoneySourcesController.get(true).toString
+                            ) {
+                                @ms.bankMoneySource.map { bms =>
+                                    @bms.bankNames
                                 }
                             }
                         }
-                }
+
+                        @if(ms.wholesalerMoneySource.isDefined){
+                            @checkYourAnswersRow(
+                                question = Messages("msb.wholesaler.names"),
+                                editLinkTag = "moneysources-wholesalers-edit",
+                                editUrl = controllers.msb.routes.MoneySourcesController.get(true).toString
+                            ) {
+                                @ms.wholesalerMoneySource.map { wms =>
+                                    @wms.wholesalerNames
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
