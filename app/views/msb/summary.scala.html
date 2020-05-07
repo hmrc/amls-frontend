@@ -92,10 +92,14 @@
                             editLinkTag = "msbwhichcountries-edit",
                             editUrl = controllers.msb.routes.BranchesOrAgentsWhichCountriesController.get(true).toString
                         ) {
-                            @boa.branches.map { branches =>
-                                <ul class="list list-bullet">
-                                    @branches.branches.map { country => <li>@country</li> }
-                                </ul>
+                            @boa.branches.map { b =>
+                                @if(b.branches.size == 1){
+                                    @b.branches.head
+                                }else {
+                                    <ul class="list list-bullet">
+                                        @b.branches.map { country => <li>@country</li> }
+                                    </ul>
+                                }
                             }
                         }
                     }
@@ -132,11 +136,38 @@
                         case BusinessUseAnIPSPNo => {
                             <p>@Messages("lbl.no")</p>
                         }
-                        case BusinessUseAnIPSPYes(name, reference) => {
-                            <ul class="list">
-                                <li>@Messages("msb.summary.ipsp-name"): @name</li>
-                                <li>@Messages("msb.summary.ipsp-registration-number"): @reference</li>
-                            </ul>
+                        case BusinessUseAnIPSPYes(_, _) => {
+                            <p>@Messages("lbl.yes")</p>
+                        }
+                    }
+                }
+            }
+
+            @if(model.businessUseAnIPSP.fold[Boolean](false)(_ != BusinessUseAnIPSPNo)) {
+                @model.businessUseAnIPSP.map { ipsp =>
+                    @checkYourAnswersRow(
+                        question = Messages("msb.summary.ipsp-name"),
+                        editLinkTag = "msbipsp-name-edit",
+                        editUrl = controllers.msb.routes.BusinessUseAnIPSPController.get(true).toString
+                    ) {
+                        @ipsp match {
+                            case BusinessUseAnIPSPYes(name, reference) => {
+                                @name
+                            }
+                        }
+                    }
+                }
+
+                @model.businessUseAnIPSP.map { ipsp =>
+                    @checkYourAnswersRow(
+                        question = Messages("msb.summary.ipsp-registration-number"),
+                        editLinkTag = "msbipsp-number-edit",
+                        editUrl = controllers.msb.routes.BusinessUseAnIPSPController.get(true).toString
+                    ) {
+                        @ipsp match {
+                            case BusinessUseAnIPSPYes(name, reference) => {
+                                @reference
+                            }
                         }
                     }
                 }
@@ -192,11 +223,15 @@
                             editLinkTag = "msbsendlargestamounts-edit",
                             editUrl = controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
                         ) {
-                            <ul class="list list-bullet">
-                            @lom.countries.map { country =>
-                                <li>@country.name</li>
+                            @if(lom.countries.size == 1){
+                                @lom.countries.head.name
+                            }else {
+                                <ul class="list list-bullet">
+                                    @lom.countries.map { country =>
+                                        <li>@country.name</li>
+                                    }
+                                </ul>
                             }
-                            </ul>
                         }
                     }
 
@@ -206,11 +241,15 @@
                             editLinkTag = "msbmosttransactions-edit",
                             editUrl = controllers.msb.routes.MostTransactionsController.get(true).toString
                         ) {
-                            <ul class="list list-bullet">
-                            @mt.countries.map { country =>
-                                <li>@country.name</li>
+                            @if(mt.countries.size == 1) {
+                                @mt.countries.head.name
+                            }else {
+                                <ul class="list list-bullet">
+                                    @mt.countries.map { country =>
+                                        <li>@country.name</li>
+                                    }
+                                </ul>
                             }
-                            </ul>
                         }
                     }
                 }
@@ -234,11 +273,15 @@
                     editLinkTag = "msbwhichcurrencies-edit",
                     editUrl = controllers.msb.routes.WhichCurrenciesController.get(true).toString
                 ) {
-                    <ul class="list list--comma">
-                    @wc.currencies.map { cur =>
-                        <li>@cur</li>
+                    @if(wc.currencies.size == 1){
+                        @wc.currencies.head
+                    }else {
+                        <ul class="list list-bullet">
+                            @wc.currencies.map { cur =>
+                                <li>@cur</li>
+                            }
+                        </ul>
                     }
-                    </ul>
                 }
             }
 
