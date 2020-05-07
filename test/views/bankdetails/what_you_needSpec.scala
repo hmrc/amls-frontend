@@ -48,10 +48,12 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
       html must include(Messages("bankdetails.whatyouneed.line_1"))
       html must include(Messages("bankdetails.whatyouneed.line_2"))
       html must include(Messages("bankdetails.whatyouneed.line_3"))
+      html must include(Messages("bankdetails.whatyouneed.line_4"))
     }
 
-    "provide the expected hint" in new ViewFixture {
-      html must include(Messages("bankdetails.whatyouneed.enter_details_hint"))
+    "provide the expected paragraphs" in new ViewFixture {
+      html must include(Messages("bankdetails.whatyouneed.p.01"))
+      html must include(Messages("bankdetails.whatyouneed.p.02"))
     }
   }
 }

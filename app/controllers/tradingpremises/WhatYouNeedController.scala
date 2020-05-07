@@ -34,10 +34,12 @@ class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector
 
   def get(index: Int) = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map {
-        response =>
-        Ok(what_you_need(index, ControllerHelper.isMSBSelected(response)))
-      }
+      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
+        (for {
+          bm <- businessMatching
+          ba <- bm.activities
+        } yield { Ok(what_you_need(index, Some(ba), bm.msbServices))
+      })getOrElse(InternalServerError("Unable to retrieve business activities"))
+    }
   }
-
 }

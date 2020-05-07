@@ -46,8 +46,11 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     "contain the expected content elements" in new ViewFixture{
       def view = views.html.businessdetails.what_you_need()
 
-      html must include(Messages("businessdetails.whatyouneed.line_2"))
-      html must include(Messages("businessdetails.whatyouneed.line_3"))
+      html must include(Messages("if your business is currently registered with HMRC under the Money Laundering Regulations"))
+      html must include(Messages("the date your business started or will start activities that need to be registered under the Money Laundering Regulations"))
+      html must include(Messages("your VAT registration number, if you’re registered for VAT in the UK"))
+      html must include(Messages("the address for your registered office or main place of business"))
+      html must include(Messages("a contact email address, telephone number, and postal address"))
     }
 
     "have a back link" in new ViewFixture {

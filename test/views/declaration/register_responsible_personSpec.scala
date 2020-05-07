@@ -57,11 +57,11 @@ class register_responsible_personSpec extends AmlsViewSpec with MustMatchers {
       html must include(Messages("subheading"))
 
       html must include(Messages("declaration.register.responsible.person.text"))
-      html must include(Messages("declaration.register.responsible.person.line_1"))
-      html must include(Messages("declaration.register.responsible.person.line_2"))
-      html must include(Messages("declaration.register.responsible.person.line_3"))
-      html must include(Messages("declaration.register.responsible.person.line_4"))
-      html must include(Messages("declaration.register.responsible.person.line_5"))
+      html must include(Messages("owners, partners, directors, shadow directors, and designated members"))
+      html must include(Messages("the nominated officer for your business"))
+      html must include(Messages("beneficial owners or shareholders who own or control more than 25% of the business"))
+      html must include(Messages("other officers of the business, like the company secretary"))
+      html must include(Messages("senior managers of activities covered by the Money Laundering Regulations"))
     }
   }
 }
