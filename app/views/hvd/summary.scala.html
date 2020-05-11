@@ -42,24 +42,15 @@
                 editLinkTag = "hvdproducts-edit"
             ) {
 
-                <ul class="list list-bullet">
-                    @p.sorted.map { i =>
-                        <li>@i match {
-                            case Alcohol => {@Messages("hvd.products.option.01")}
-                            case Tobacco => {@Messages("hvd.products.option.02")}
-                            case Antiques => {@Messages("hvd.products.option.03")}
-                            case Cars => {@Messages("hvd.products.option.04")}
-                            case OtherMotorVehicles => {@Messages("hvd.products.option.05")}
-                            case Caravans => {@Messages("hvd.products.option.06")}
-                            case Jewellery => {@Messages("hvd.products.option.07")}
-                            case Gold => {@Messages("hvd.products.option.08")}
-                            case ScrapMetals => {@Messages("hvd.products.option.09")}
-                            case MobilePhones => {@Messages("hvd.products.option.10")}
-                            case Clothing => {@Messages("hvd.products.option.11")}
-                            case Other(x) => {@x}
-                        }</li>
-                    }
-                </ul>
+                @if(p.items.size == 1){
+                    @p.items.head.getMessage
+                }else {
+                    <ul class="list list-bullet">
+                        @p.sorted.map { i =>
+                            <li>@i.getMessage</li>
+                        }
+                    </ul>
+                }
             }
 
             @if(p.items.contains(Alcohol) | p.items.contains(Tobacco)) {
@@ -85,15 +76,15 @@
                 editUrl = controllers.hvd.routes.HowWillYouSellGoodsController.get(true).toString,
                 editLinkTag = "hvdsellgoods-edit"
             ) {
-                <ul class="list list-bullet">
-                    @goods.channels.map { i =>
-                        <li>@i match {
-                        case Retail => {@Messages("hvd.how-will-you-sell-goods.channels.retail")}
-                        case Wholesale => {@Messages("hvd.how-will-you-sell-goods.channels.wholesale")}
-                        case Auction => {@Messages("hvd.how-will-you-sell-goods.channels.auction")}
-                        }</li>
-                    }
-                </ul>
+                @if(goods.channels.size == 1){
+                    @goods.channels.head.getMessage
+                }else{
+                    <ul class="list list-bullet">
+                        @goods.channels.map { i =>
+                            <li>@i.getMessage</li>
+                        }
+                    </ul>
+                }
             }
         }
 
@@ -158,23 +149,31 @@
                 editLinkTag = "hvdcashpaymentmethods-edit",
                 editUrl = controllers.hvd.routes.ExpectToReceiveCashPaymentsController.get(true).toString
             ) {
-                <ul class="list list-bullet">
-                    @pm match {
-                        case PaymentMethods(false, false, None) => {     <li>Unknown</li> }
-                        case PaymentMethods(false, false, Some(txt)) => {<li>@txt</li> }
-                        case PaymentMethods(false, true, None) => {      <li>@Messages("hvd.receiving.option.02")</li> }
-                        case PaymentMethods(false, true, Some(txt)) => { <li>@Messages("hvd.receiving.option.02")</li>
-                                                                         <li>@txt</li> }
-                        case PaymentMethods(true, false, None) => {      <li>@Messages("hvd.receiving.option.01")</li> }
-                        case PaymentMethods(true, false, Some(txt)) => { <li>@Messages("hvd.receiving.option.01")</li>
-                                                                         <li>@txt</li> }
-                        case PaymentMethods(true, true, None) => {       <li>@Messages("hvd.receiving.option.01")</li>
-                                                                         <li>@Messages("hvd.receiving.option.02")</li> }
-                        case PaymentMethods(true, true, Some(txt)) => {  <li>@Messages("hvd.receiving.option.01")</li>
-                                                                         <li>@Messages("hvd.receiving.option.02")</li>
-                                                                         <li>@txt</li> }
+                @pm match {
+                    case PaymentMethods(false, false, None) => { Unknown }
+                    case PaymentMethods(false, false, Some(txt)) => { @txt }
+                    case PaymentMethods(false, true, None) => { @Messages("hvd.receiving.option.02") }
+                    case PaymentMethods(true, false, None) => { @Messages("hvd.receiving.option.01") }
+                    case multiple => {
+                        <ul class="list list-bullet">
+                        @multiple match {
+                            case PaymentMethods(false, true, Some(txt)) => {
+                                <li>@Messages("hvd.receiving.option.02")</li>
+                                <li>@txt</li> }
+                            case PaymentMethods(true, false, Some(txt)) => {
+                                <li>@Messages("hvd.receiving.option.01")</li>
+                                <li>@txt</li> }
+                            case PaymentMethods(true, true, None) => {
+                                <li>@Messages("hvd.receiving.option.01")</li>
+                                <li>@Messages("hvd.receiving.option.02")</li> }
+                            case PaymentMethods(true, true, Some(txt)) => {
+                                <li>@Messages("hvd.receiving.option.01")</li>
+                                <li>@Messages("hvd.receiving.option.02")</li>
+                                <li>@txt</li> }
                         }
-                </ul>
+                        </ul>
+                    }
+                }
             }
         }
 
