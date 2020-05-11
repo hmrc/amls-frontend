@@ -42,15 +42,9 @@
                 @servicesOfBusiness.services.head.getMessage
             }else {
                 <ul class="list list-bullet">
-                @servicesOfBusiness.services.toList.sortBy(_.getMessage).map { line =>
-                    <li>@line match {
-                        case Accountancy => {@Messages("asp.service.lbl.01")}
-                        case PayrollServices => {@Messages("asp.service.lbl.02")}
-                        case BookKeeping => {@Messages("asp.service.lbl.03")}
-                        case Auditing => {@Messages("asp.service.lbl.04")}
-                        case FinancialOrTaxAdvice => {@Messages("asp.service.lbl.05")}
-                    }</li>
-                }
+                    @servicesOfBusiness.services.toList.sortBy(_.getMessage).map { line =>
+                        <li>@line.getMessage</li>
+                    }
                 </ul>
             }
         }
