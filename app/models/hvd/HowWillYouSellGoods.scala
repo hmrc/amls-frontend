@@ -66,27 +66,6 @@ trait HowWillYouSellGoods0 {
     implicitly
   }
 
-//  val jsonR: Reads[HowWillYouSellGoods] =
-//    import jto.validation.forms.Rules._
-//    import utils.MappingUtils.Implicits._
-//
-//    (__ \ "salesChannels").read(Seq[String]).flatMap {s: Set[String] =>
-//      s.map {
-//          case "Retail" => Reads(_ => JsSuccess(Retail)) map identity[SalesChannel]
-//          case "Wholesale" =>  Reads(_ => JsSuccess(Wholesale)) map identity[SalesChannel]
-//          case "Auction" =>  Reads(_ => JsSuccess(Auction)) map identity[SalesChannel]
-//      }.foldLeft[Reads[Set[SalesChannel]]](
-//        Reads[Set[SalesChannel]](_ => JsSuccess(Set.empty))
-//      ) {
-//        (result, data) =>
-//          data flatMap { m =>
-//            result.map { n =>
-//              n + m
-//            }
-//          }
-//      }
-//    } map HowWillYouSellGoods.apply
-
   implicit val jsonReads: Reads[HowWillYouSellGoods] =
     (__ \ "salesChannels").read[Set[String]].flatMap { x: Set[String] =>
       x.map {
