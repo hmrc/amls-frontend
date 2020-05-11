@@ -825,16 +825,18 @@ unauthorised.role.content = Your account doesn’t have enough access rights to 
 
 ############################### Start Page ###############################
 start.title = Manage your anti-money laundering supervision
-start.line1 = Use this service to register with HM Revenue and Customs (HMRC) for supervision under the Money Laundering regulations.
-start.line2 = If you’re already registered you can update your information, de-register or renew your registration.
-start.line3 = You need to be signed into your Government Gateway account to access the service. If you don’t have an account you can <a href="https://www.tax.service.gov.uk/government-gateway-registration-frontend?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend">sign up for Government Gateway</a> as part of your registration. Keep your Government Gateway ID number in a safe place as you will need it each time you use the service.
-
 start.button.text = Sign in
-start.before.heading = Before you register
-start.before.line1 = You’ll need to pay <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees">fees for anti-money laundering supervision</a>. You can pay by Bacs or by debit or corporate credit card after you submit your information. HMRC will review your submission after we have received payment.
-start.utr.heading = Unique Taxpayer Reference (UTR) number
-start.utr.heading1 = Registration fees
-start.utr.line1 = If we can’t find your business automatically, we’ll ask for your UTR. This is a 10 digit number that you can find on previous tax returns and other documents from HMRC. It may be labelled ‘Tax Reference’, ‘UTR’ or ‘Official Use’.
+start.line.1 = Use this service to:
+start.line.2 = apply to register with HMRC under the Money Laundering Regulations
+start.line.3 = check or update your business information
+start.line.4 = check messages about your registration
+start.line.5 = renew your registration
+start.line.6 = deregister, if you no longer need to be registered under the Money Laundering Regulations
+start.line.7 = To sign in, you need a Government Gateway user ID and password. If you do not have a user ID, you can create one when you first register.
+start.line.8 = Before you start
+start.line.9 = Check our <a href="https://www.gov.uk/topic/business-tax/money-laundering-regulations">Money Laundering Regulations guidance</a> before applying to register.
+start.line.10 = Check <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees">fees for anti-money laundering supervision</a>.
+start.line.11 = You should sign out when leaving the service.
 
 ############################### Status page ###############################
 status.title = Your registration

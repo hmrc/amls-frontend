@@ -16,9 +16,8 @@
 
 package views
 
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
-import play.api.i18n.Messages
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 
 class startSpec extends AmlsViewSpec with MustMatchers {
 
@@ -28,28 +27,42 @@ class startSpec extends AmlsViewSpec with MustMatchers {
 
   "Landing Page View" must {
 
-    "Have the correct title" in new ViewFixture {
+    "have the correct title" in new ViewFixture {
       def view = views.html.start()
-      doc.title must startWith(Messages("start.title"))
+
+      doc.title must startWith("Manage your anti-money laundering supervision")
     }
 
-    "Have the correct Headings" in new ViewFixture{
+    "have the correct Headings" in new ViewFixture {
       def view = views.html.start()
 
-      heading.html must be (Messages("start.title"))
-
+      heading.html must be("Manage your anti-money laundering supervision")
     }
 
-    "contain the expected content elements" in new ViewFixture{
+    "contain the expected content elements" in new ViewFixture {
       def view = views.html.start()
 
-      html must include(Messages("start.line1"))
-      html must include(Messages("start.line2"))
-      html must include(Messages("start.line3"))
-      html must include(Messages("start.before.heading"))
-      html must include(Messages("start.utr.line1"))
-      html must include(Messages("start.before.line1"))
+      html must include("Use this service to:")
+      html must include("apply to register with HMRC under the Money Laundering Regulations")
+      html must include("check or update your business information")
+      html must include("check messages about your registration")
+      html must include("renew your registration")
+      html must include("deregister, if you no longer need to be registered under the Money Laundering Regulations")
+      html must include("To sign in, you need a Government Gateway user ID and password. If you do not have a user ID, you can create one when you first register.")
 
+      doc.getElementsByClass("button button--get-started").text() mustBe "Sign in"
+      doc.getElementsByClass("heading-medium").text() mustBe "Before you start"
+
+      html must include("Check our <a href=\"https://www.gov.uk/topic/business-tax/money-laundering-regulations\">Money Laundering Regulations guidance</a> before applying to register.")
+      html must include("Check <a href=\"https://www.gov.uk/guidance/money-laundering-regulations-registration-fees\">fees for anti-money laundering supervision</a>.")
+      html must include("You should sign out when leaving the service.")
+    }
+
+    "contain the expected links" in new ViewFixture {
+      def view = views.html.start()
+
+      doc.getElementsContainingOwnText("Money Laundering Regulations guidance").first().attr("href") mustBe "https://www.gov.uk/topic/business-tax/money-laundering-regulations"
+      doc.getElementsContainingOwnText("fees for anti-money laundering supervision").first().attr("href") mustBe "https://www.gov.uk/guidance/money-laundering-regulations-registration-fees"
     }
   }
 }

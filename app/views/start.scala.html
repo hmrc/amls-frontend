@@ -28,16 +28,23 @@
     heading = header,
     userLoggedIn = false
 ) {
-    <p>@Messages("start.line1")</p>
-    <p>@Messages("start.line2")</p>
-    <p>@Html(Messages("start.line3", "<a href=\"/\">here</a>"))</p>
+    <p>@Messages("start.line.1")</p>
+
+    <ul class="list list-bullet">
+        <li>@Messages("start.line.2")</li>
+        <li>@Messages("start.line.3")</li>
+        <li>@Messages("start.line.4")</li>
+        <li>@Messages("start.line.5")</li>
+        <li>@Messages("start.line.6")</li>
+    </ul>
+
+    <p>@Messages("start.line.7")</p>
 
     <a class="button button--get-started" href="@controllers.routes.LandingController.get()" role="button" draggable="false">@Messages("start.button.text")</a>
 
-    <p class="heading-medium">@Messages("start.before.heading")</p>
+    <p class="heading-medium">@Messages("start.line.8")</p>
 
-    <p class="heading-small">@Messages("start.utr.heading1")</p>
-    <p>@Html(Messages("start.before.line1", "<a href=\"/\">here</a>"))</p>
-    <p class="heading-small">@Messages("start.utr.heading")</p>
-    <p>@Messages("start.utr.line1")</p>
+    <p>@Html(Messages("start.line.9"))</p>
+    <p>@Html(Messages("start.line.10"))</p>
+    <p>@Messages("start.line.11")</p>
 }
