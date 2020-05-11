@@ -16,17 +16,23 @@
 
 package models.hvd
 
+import connectors.DataCacheConnector
+import controllers.actions.SuccessfulAuthAction
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.Application
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import utils.AuthAction
 
 
-class ProductsSpec extends PlaySpec with MockitoSugar {
+class ProductsSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerTest {
 
   "Products" must {
-
     "sort itemtypes alphabetically" when {
       "other value is defined" in {
         val products = Products(Set(Alcohol, Tobacco, Antiques, Cars, OtherMotorVehicles,
@@ -99,7 +105,6 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
       Products.formRule.validate(model) must
         be(Invalid(List(( Path \ "otherDetails", Seq(ValidationError("error.invalid.hvd.business.sell.other.details"))))))
     }
-
 
     "fail validation when none of the check boxes are selected" when {
       List(
@@ -197,6 +202,59 @@ class ProductsSpec extends PlaySpec with MockitoSugar {
         Json.obj("products" -> Json.arr("02", "12"),
           "otherDetails" -> "test657"
         ))
+      }
+    }
+
+    "getMessage" must {
+      import play.api.i18n._
+      implicit val lang = Lang("en-US")
+
+      "return correct text for Alcohol" in {
+        Alcohol.getMessage must be("Alcohol")
+      }
+
+      "return correct text for Tobacco" in {
+        Tobacco.getMessage must be("Tobacco")
+      }
+
+      "return correct text for Antiques" in {
+        Antiques.getMessage must be("Antiques")
+      }
+
+      "return correct text for Cars" in {
+        Cars.getMessage must be("Cars")
+      }
+
+      "return correct text for OtherMotorVehicles" in {
+        OtherMotorVehicles.getMessage must be("Motor vehicles (except cars)")
+      }
+
+      "return correct text for Caravans" in {
+        Caravans.getMessage must be("Caravans")
+      }
+
+      "return correct text for Jewellery" in {
+        Jewellery.getMessage must be("Jewellery")
+      }
+
+      "return correct text for Gold" in {
+        Gold.getMessage must be("Gold")
+      }
+
+      "return correct text for ScrapMetals" in {
+        ScrapMetals.getMessage must be("Scrap metals")
+      }
+
+      "return correct text for MobilePhones" in {
+        MobilePhones.getMessage must be("Mobile phones")
+      }
+
+      "return correct text for Clothing" in {
+        Clothing.getMessage must be("Clothing")
+      }
+
+      "return correct text for Other" in {
+        Other("Something else").getMessage must be("Something else")
       }
     }
   }
