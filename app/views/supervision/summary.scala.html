@@ -52,6 +52,14 @@
                 editLinkTag = "supervisionanotherbody-edit-name",
                 editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
             ) {
+                @Messages("lbl.yes")
+            }
+
+            @checkYourAnswersRow(
+                question = Messages("supervision.another_body.lbl.supervisor"),
+                editLinkTag = "supervisionanotherbody-edit-name",
+                editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
+            ) {
                 @supervisorName
             }
 
@@ -99,9 +107,31 @@
             editLinkTag = "supervisionwhichbody-edit",
             editUrl = controllers.supervision.routes.WhichProfessionalBodyController.get(true).toString
         ) {
-            <ul class="list list-bullet">
+            @if(businessType.businessTypes.toList.size > 1) {
+                <ul class="list list-bullet">
+                    @businessType.businessTypes.toList.sortBy(_.getMessage).map { x =>
+                        <li>@x match {
+                            case AccountingTechnicians => {@Messages("supervision.memberofprofessionalbody.lbl.01")}
+                            case CharteredCertifiedAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.02")}
+                            case InternationalAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.03")}
+                            case TaxationTechnicians => {@Messages("supervision.memberofprofessionalbody.lbl.04")}
+                            case ManagementAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.05")}
+                            case InstituteOfTaxation => {@Messages("supervision.memberofprofessionalbody.lbl.06")}
+                            case Bookkeepers => {@Messages("supervision.memberofprofessionalbody.lbl.07")}
+                            case AccountantsIreland => {@Messages("supervision.memberofprofessionalbody.lbl.08")}
+                            case AccountantsScotland => {@Messages("supervision.memberofprofessionalbody.lbl.09")}
+                            case AccountantsEnglandandWales => {@Messages("supervision.memberofprofessionalbody.lbl.10")}
+                            case FinancialAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.11")}
+                            case AssociationOfBookkeepers => {@Messages("supervision.memberofprofessionalbody.lbl.12")}
+                            case LawSociety => {@Messages("supervision.memberofprofessionalbody.lbl.13")}
+                            case Other(details) => {@details}
+                        }
+                    </li>
+                    }
+                </ul>
+            } else {
                 @businessType.businessTypes.toList.sortBy(_.getMessage).map { x =>
-                    <li>@x match {
+                    @x match {
                         case AccountingTechnicians => {@Messages("supervision.memberofprofessionalbody.lbl.01")}
                         case CharteredCertifiedAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.02")}
                         case InternationalAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.03")}
@@ -115,11 +145,10 @@
                         case FinancialAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.11")}
                         case AssociationOfBookkeepers => {@Messages("supervision.memberofprofessionalbody.lbl.12")}
                         case LawSociety => {@Messages("supervision.memberofprofessionalbody.lbl.13")}
-                        case Other(details) => {@Messages("supervision.memberofprofessionalbody.lbl.14"): @details}
+                        case Other(details) => {@details}
                         }
-                    </li>
                     }
-            </ul>
+                }
         }
     }
 
@@ -128,11 +157,24 @@
         editLinkTag = "supervisionpenalised-edit",
         editUrl = controllers.supervision.routes.PenalisedByProfessionalController.get(true).toString
     ) {
-        <p>@model.professionalBody.map {
-            case ProfessionalBodyNo => { @Messages("lbl.no") }
-            case ProfessionalBodyYes(v) => { @v }
-        }</p>
+        @model.professionalBody.map {
+            case ProfessionalBodyNo     => { @Messages("lbl.no") }
+            case ProfessionalBodyYes(v) => { @Messages("lbl.yes") }
+        }
     }
+
+    @model.professionalBody.map {
+        case ProfessionalBodyNo     => {  }
+        case ProfessionalBodyYes(v) => {
+            @checkYourAnswersRow(
+                question = Messages("supervision.penalisedbyprofessional.details.lbl"),
+                editLinkTag = "supervisionpenalised-edit",
+                editUrl = controllers.supervision.routes.PenalisedByProfessionalController.get(true).toString
+            ) {
+                @v
+            }
+        }
+     }
 
     </dl>
 
