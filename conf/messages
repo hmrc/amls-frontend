@@ -1612,7 +1612,8 @@ businessmatching.cannotcontinuewiththeapplication.heading = You can’t continue
 businessmatching.summary.icon.title = You’re applying to register the following business with HMRC under the Money Laundering Regulations.
 businessmatching.summary.business.address.lbl = Your business
 businessmatching.button.confirm.start = Confirm and start application
-businessmatching.confirm.postcode.title = Confirm the postcode for your business
+businessmatching.confirm.postcode.title = What is your business’s postcode?
+businessmatching.confirm.postcode.error.empty = Enter your business’s postcode
 
 
 businessmatching.summary.noedit.anchortext = Return to about your business

@@ -29,7 +29,7 @@ object ConfirmPostcode {
 
   implicit val formReads: Rule[UrlFormEncoded, ConfirmPostcode] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    (__ \ "postCode").read(postcodeType) map ConfirmPostcode.apply
+    (__ \ "postCode").read(postcodeTypeWithMsg("businessmatching.confirm.postcode.error.empty")) map ConfirmPostcode.apply
   }
 
   implicit val formWrites: Write[ConfirmPostcode, UrlFormEncoded] = Write {
