@@ -44,17 +44,18 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   private val ukAddress = RegisteredOfficeUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
+  private val nonUkAddress = RegisteredOfficeNonUK("line1", "line2", Some("line3"), Some("line4"), Country("United States of America", "US"))
   private val businessDetails = BusinessDetails(None, None, None, None, None, None, Some(ukAddress), None)
   val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
     Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "ghghg")
+  val reviewDtlsNonUk = reviewDtls.copy(
+    businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), None, Country("United States of America", "US")))
   val bm = BusinessMatching(Some(reviewDtls))
   val emptyCache = CacheMap("", Map.empty)
 
 
   "ConfirmRegisteredOfficeController" must {
-
     "Get Option:" must {
-
       "load register Office" in new Fixture {
 
         when(controller.dataCache.fetch[BusinessMatching](any(), meq(BusinessMatching.key))
@@ -96,9 +97,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "Post" must {
-
-      "successfully redirect to the page on selection of 'Yes' [this is registered address]" in new Fixture {
-
+      "successfully redirect to the page on selection of 'Yes' [this is registered address] for UK address" in new Fixture {
         val newRequest = requestWithUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
@@ -119,6 +118,29 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
         verify(
           controller.dataCache).save[BusinessDetails](any(), any(),
           meq(businessDetails.copy(registeredOffice = Some(ukAddress))))(any(), any())
+      }
+
+      "successfully redirect to the page on selection of 'Yes' [this is registered address] for non-UK address" in new Fixture {
+        val newRequest = requestWithUrlEncodedBody(
+          "isRegOfficeOrMainPlaceOfBusiness" -> "true"
+        )
+
+        val mockCacheMap = mock[CacheMap]
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(Some(reviewDtlsNonUk))))
+        when(controller.dataCache.save[BusinessMatching](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+          .thenReturn(Some(businessDetails))
+        when(controller.dataCache.fetchAll(any[String])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.ContactingYouController.get().url))
+        verify(
+          controller.dataCache).save[BusinessDetails](any(), any(),
+          meq(businessDetails.copy(registeredOffice = Some(nonUkAddress))))(any(), any())
       }
 
       "successfully redirect to the page on selection of Option 'No' [this is not registered address]" in new Fixture {
