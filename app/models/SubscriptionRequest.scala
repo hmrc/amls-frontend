@@ -22,8 +22,8 @@ import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
-import models.estateagentbusiness.EstateAgentBusiness
 import models.asp.Asp
+import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePerson
@@ -36,7 +36,7 @@ import scala.collection.Seq
 
 case class SubscriptionRequest(
                                 businessMatchingSection: Option[BusinessMatching],
-                                eabSection: Option[EstateAgentBusiness],
+                                eabSection: Option[Eab],
                                 tradingPremisesSection: Option[Seq[TradingPremises]],
                                 businessDetailsSection: Option[BusinessDetails],
                                 bankDetailsSection: Option[Seq[BankDetails]],

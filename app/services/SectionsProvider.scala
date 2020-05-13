@@ -25,7 +25,6 @@ import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching._
-import models.estateagentbusiness.{EstateAgentBusiness}
 import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
@@ -66,20 +65,11 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
     val tcsp = if (activities.contains(TrustAndCompanyServices)) Seq(Tcsp.section) else Seq.empty
     val supervision = if (asp.nonEmpty || tcsp.nonEmpty) Seq(Supervision.section) else Seq.empty
     val amp = if (activities.contains(ArtMarketParticipant)) Seq(Amp.section) else Seq.empty
-    val eab = if (activities.contains(EstateAgentBusinessService)) toggleEAB else Seq.empty
+    val eab = if (activities.contains(EstateAgentBusinessService)) Seq(Eab.section) else Seq.empty
     val hvd = if (activities.contains(HighValueDealing)) Seq(Hvd.section) else Seq.empty
     val msb = if (activities.contains(MoneyServiceBusiness) && msbServices.isDefined) Seq(Msb.section) else Seq.empty
 
     asp ++ tcsp ++ supervision ++ amp ++ eab ++ hvd ++ msb
-  }
-
-  //TODO AMLS-5540 - can be removed when the feature toggle is removed.
-  private def toggleEAB(implicit cache: CacheMap) = {
-    if (config.standAloneEABService) {
-      Seq(Eab.section)
-    } else {
-      Seq(EstateAgentBusiness.section)
-    }
   }
 
   private def dependentSections(implicit cache: CacheMap): Seq[Section] =

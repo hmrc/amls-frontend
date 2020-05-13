@@ -16,6 +16,8 @@
 
 package models.eab
 
+import models.DateOfChange
+import org.joda.time.LocalDate
 import play.api.libs.json._
 import utils.AmlsSpec
 
@@ -77,15 +79,20 @@ class EabSpec extends AmlsSpec {
     "eabServicesProvided" -> completeServiceList.filter(s => !s.equals("lettings"))
   )
 
+  val completeDateOfChange = Json.obj(
+    "dateOfChange" -> "2019-01-01"
+  )
+
   "A constructed Eab model" when {
     "data are complete" must {
       val completeData = completeServices ++
+        completeDateOfChange ++
         completeEstateAgencyActPenalty ++
         completePenalisedProfessionalBody ++
         completeRedressScheme ++
         completeMoneyProtectionScheme
 
-      val constructedEab = Eab(completeData,  hasAccepted = true)
+      val constructedEab = Eab(completeData, hasAccepted = true)
 
       val completeEab = Json.obj(
         "data" -> completeData,
@@ -140,6 +147,8 @@ class EabSpec extends AmlsSpec {
 
     val oldServices = Json.obj("services" -> Json.arr("08", "03", "07", "02", "05", "01", "06", "09", "04" ))
 
+    val oldDateOfChange = Json.obj("dateOfChange" -> "2002-02-02")
+
     val oldProfessionalBody = Json.obj(
       "penalised" -> true,
       "professionalBody" -> "test10")
@@ -155,14 +164,19 @@ class EabSpec extends AmlsSpec {
     val oldRedressSchemeNoRedress = Json.obj(
       "isRedress" -> false)
 
+    val oldClientProtection = Json.obj(
+      "clientMoneyProtection" -> false)
+
     "data are complete" must {
       val completeOldEab = (
         oldServices ++
-        oldRedressScheme ++
-        oldProfessionalBody ++
-        oldEstateAct ++ Json.obj(
-        "hasChanged" -> true,
-        "hasAccepted" -> true)).as[Eab]
+          oldDateOfChange ++
+          oldRedressScheme ++
+          oldProfessionalBody ++
+          oldEstateAct ++
+          oldClientProtection ++ Json.obj(
+          "hasChanged" -> true,
+          "hasAccepted" -> true)).as[Eab]
 
       checkIsComplete(completeOldEab)
     }
@@ -170,6 +184,7 @@ class EabSpec extends AmlsSpec {
     "data are complete no redress" must {
       val completeOldEab = (
         oldServices ++
+          oldDateOfChange ++
           oldRedressSchemeNoRedress ++
           oldProfessionalBody ++
           oldEstateAct ++ Json.obj(
@@ -182,10 +197,10 @@ class EabSpec extends AmlsSpec {
     "data are incomplete" must {
       val incompleteOldEab = (
         oldServices ++
-        oldRedressScheme ++
-        Json.obj(
-        "hasChanged" -> false,
-        "hasAccepted" -> false)).as[Eab]
+          oldRedressScheme ++
+          Json.obj(
+            "hasChanged" -> false,
+            "hasAccepted" -> false)).as[Eab]
 
       checkIsComplete(incompleteOldEab,
         isEstateAgentActPenaltyComplete = false,

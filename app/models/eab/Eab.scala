@@ -24,9 +24,9 @@ import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-final case class Eab(data: JsObject = Json.obj(),
-                     hasChanged: Boolean = false,
-                     hasAccepted: Boolean = false) {
+case class Eab(data: JsObject = Json.obj(),
+               hasChanged: Boolean = false,
+               hasAccepted: Boolean = false) {
 
   /**
     * Provides a means of setting data that will update the hasChanged flag
@@ -47,11 +47,11 @@ final case class Eab(data: JsObject = Json.obj(),
 
   def isComplete: Boolean =
     isServicesComplete &&
-    isRedressSchemeComplete &&
-    isProtectionSchemeComplete &&
-    isEstateAgentActPenaltyComplete &&
-    isProfessionalBodyPenaltyComplete &&
-    hasAccepted
+      isRedressSchemeComplete &&
+      isProtectionSchemeComplete &&
+      isEstateAgentActPenaltyComplete &&
+      isProfessionalBodyPenaltyComplete &&
+      hasAccepted
 
   private[eab] def isServicesComplete: Boolean = (data \ "eabServicesProvided").as[List[String]].nonEmpty
 
@@ -98,6 +98,10 @@ final case class Eab(data: JsObject = Json.obj(),
       case _ => false
     }
   }
+
+  def services = {
+    get[List[String]](Eab.eabServicesProvided)
+  }
 }
 
 object Eab {
@@ -105,6 +109,7 @@ object Eab {
   lazy val appConfig = Play.current.injector.instanceOf[ApplicationConfig]
 
   val eabServicesProvided             = JsPath \ "eabServicesProvided"
+  val dateOfChange                    = JsPath \ "dateOfChange"
   val redressScheme                   = JsPath \ "redressScheme"
   val redressSchemeDetail             = JsPath \ "redressSchemeDetail"
   val clientMoneyProtectionScheme     = JsPath \ "clientMoneyProtectionScheme"
@@ -183,16 +188,18 @@ object Eab {
     import play.api.libs.json.Reads._
 
     val oldModelTransformer:Reads[JsObject] = (servicesTransform and isRedressTransform and
+      (__ \ 'data ++ dateOfChange).json.copyFrom(readPathOrReturn(__ \ 'dateOfChange, JsNull)) and
       (__ \ 'data ++ penalisedEstateAgentsAct).json.copyFrom(readPathOrReturn(__ \ 'penalisedUnderEstateAgentsAct, JsNull)) and
       (__ \ 'data ++ penalisedEstateAgentsActDetail).json.copyFrom(readPathOrReturn( __ \ 'penalisedUnderEstateAgentsActDetails, JsNull)) and
       (__ \ 'data ++ penalisedProfessionalBody).json.copyFrom(readPathOrReturn(__ \ 'penalised, JsNull)) and
       (__ \ 'data ++ penalisedProfessionalBodyDetail).json.copyFrom(readPathOrReturn(__ \ 'professionalBody,JsNull)) and
+      (__ \ 'data ++ clientMoneyProtectionScheme).json.copyFrom(readPathOrReturn(__ \ 'clientMoneyProtection,JsNull)) and
       (__ \ 'hasAccepted).json.copyFrom((__ \ 'hasAccepted).json.pick) and
       (__ \ 'hasChanged).json.copyFrom((__ \ 'hasChanged).json.pick)
-    ) reduce
+      ) reduce
 
     val jsonReads = (
-        (__ \ "data").read[JsObject] and
+      (__ \ "data").read[JsObject] and
         (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
         (__ \ "hasAccepted" ).readNullable[Boolean].map(_.getOrElse(false))
       )(Eab.apply _)
@@ -205,12 +212,10 @@ object Eab {
     import play.api.libs.functional.syntax._
     (
       (__ \ "data").write[JsObject] and
-      (__ \ "hasChanged").write[Boolean] and
-      (__ \ "hasAccepted").write[Boolean]
-    ) (unlift(Eab.unapply))
+        (__ \ "hasChanged").write[Boolean] and
+        (__ \ "hasAccepted").write[Boolean]
+      ) (unlift(Eab.unapply))
   }
 
   implicit val formatOption = Reads.optionWithNull[Eab]
 }
-
-

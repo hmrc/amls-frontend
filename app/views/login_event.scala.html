@@ -35,22 +35,12 @@
     <li>@Messages("login-event.property-ombudsman")</li>
    </ul>
 
-   @if(appConfig.standAloneEABService) {
        @anchor(
             attrHref = appConfig.eabRedressUrl,
             attrRole = true,
             linkText = Messages("login-event.update-now"),
             id=Some("update-now-link")
        )
-   } else {
-         <! -- TODO AMLS-5540 - Can be removed when feature toggle for new EAB service is removed. -->
-         @anchor(
-             attrHref = controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true).toString,
-             attrRole = true,
-             linkText = Messages("login-event.update-now"),
-             id=Some("update-now-link")
-         )
-   }
 
    <p>
      <a id="skip-to-service-link" href="@controllers.routes.StatusController.get()" draggable="false">
