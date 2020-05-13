@@ -16,6 +16,7 @@
 
 package models.businessmatching
 
+import connectors.BusinessMatchingAddress
 import models.Country
 import models.businesscustomer.ReviewDetails
 import models.businesscustomer.Address
@@ -49,15 +50,12 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
   )
 
   "Review Details Model" must {
-
     "validate correctly with a `Some` business type" in {
-
       Json.fromJson[ReviewDetails](json) mustEqual JsSuccess(model)
       Json.toJson(model) mustEqual (json)
     }
 
     "validate successfully with an invalid business type" in {
-
       val model = suite.model.copy(
         businessType = None
       )
@@ -77,7 +75,6 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
     }
 
     "validate correctly with a `None` business type" in {
-
       val model = suite.model.copy(businessType = None)
 
       val json = Json.obj(
@@ -91,6 +88,84 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
       )
 
       Json.fromJson[ReviewDetails](json) mustEqual JsSuccess(model)
+    }
+  }
+
+  "Review details convert method" must {
+    "properly convert valid UK business matching address model to business customer address model" in {
+      val bmAddressModel = BusinessMatchingAddress(
+        "Address line1",
+        "Address line 2",
+        Some("Address line 3"),
+        Some("Address line4"),
+        Some("AA11AA"), "GB")
+
+      val expectedAddressModel = Address(
+        "Address line1",
+        "Address line 2",
+        Some("Address line 3"),
+        Some("Address line4"),
+        Some("AA11AA"),
+        Country("United Kingdom", "GB"))
+
+      ReviewDetails.convert(bmAddressModel) mustBe(expectedAddressModel)
+    }
+
+    "properly convert valid non-UK business matching address model to business customer address model" in {
+      val bmAddressModel = BusinessMatchingAddress(
+        "Address line1",
+        "Address line 2",
+        Some("Address line 3"),
+        Some("Address line4"),
+        None, "US")
+
+      val expectedAddressModel = Address(
+        "Address line1",
+        "Address line 2",
+        Some("Address line 3"),
+        Some("Address line4"),
+        None,
+        Country("United States of America", "US"))
+
+      ReviewDetails.convert(bmAddressModel) mustBe(expectedAddressModel)
+    }
+
+    "properly convert business matching address model with not existing country code to business customer address model" in {
+      val bmAddressModel = BusinessMatchingAddress(
+        "Address line1",
+        "Address line 2",
+        Some("Address line 3"),
+        Some("Address line4"),
+        None, "XYZ")
+
+      val expectedAddressModel = Address(
+        "Address line1",
+        "Address line 2",
+        Some("Address line 3"),
+        Some("Address line4"),
+        None,
+        Country("", "XYZ"))
+
+      ReviewDetails.convert(bmAddressModel) mustBe(expectedAddressModel)
+    }
+
+    "properly convert business matching address model with missing country code to business customer address model" in {
+      val bmAddressModel = BusinessMatchingAddress(
+        "Address line1",
+        "Address line 2",
+        Some("Address line 3"),
+        Some("Address line4"),
+        None, "")
+
+      val expectedAddressModel = Address(
+        "Address line1",
+        "Address line 2",
+        Some("Address line 3"),
+        Some("Address line4"),
+        None,
+        Country("", ""))
+
+      ReviewDetails.convert(bmAddressModel) mustBe(expectedAddressModel)
     }
   }
 }
