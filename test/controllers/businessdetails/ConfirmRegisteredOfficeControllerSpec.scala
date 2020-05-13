@@ -169,6 +169,33 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
       }
 
+      "successfully redirect to the page on selection of Option 'Yes' [this is registered address] and review details is None" in new Fixture {
+
+        val newRequest = requestWithUrlEncodedBody(
+          "isRegOfficeOrMainPlaceOfBusiness" -> "true"
+        )
+
+        val mockCacheMap = mock[CacheMap]
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(None)))
+        when(controller.dataCache.save[BusinessMatching](any(), any(), any())(any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+          .thenReturn(Some(businessDetails))
+        when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
+        verify(
+          controller.dataCache).save[BusinessDetails](any(), any(),
+          meq(businessDetails.copy(registeredOffice = None)))(any(), any()
+        )
+
+      }
+
+
       "on post invalid data" in new Fixture {
 
         val newRequest = requestWithUrlEncodedBody(

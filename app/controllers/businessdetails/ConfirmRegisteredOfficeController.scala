@@ -38,22 +38,22 @@ class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConn
                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def updateBMAddress(bm: BusinessMatching): Option[RegisteredOffice] = {
-    bm.reviewDetails.fold[Option[RegisteredOffice]](None)(dtls =>
-      if(dtls.businessAddress.postcode.isDefined) {
+    bm.reviewDetails.fold[Option[RegisteredOffice]](None)(rd =>
+      if(rd.businessAddress.postcode.isDefined) {
         Some(RegisteredOfficeUK(
-          dtls.businessAddress.line_1,
-          dtls.businessAddress.line_2,
-          dtls.businessAddress.line_3,
-          dtls.businessAddress.line_4,
-          dtls.businessAddress.postcode.getOrElse("")
+          rd.businessAddress.line_1,
+          rd.businessAddress.line_2,
+          rd.businessAddress.line_3,
+          rd.businessAddress.line_4,
+          rd.businessAddress.postcode.getOrElse("")
         ))
       } else {
         Some(RegisteredOfficeNonUK(
-          dtls.businessAddress.line_1,
-          dtls.businessAddress.line_2,
-          dtls.businessAddress.line_3,
-          dtls.businessAddress.line_4,
-          dtls.businessAddress.country
+          rd.businessAddress.line_1,
+          rd.businessAddress.line_2,
+          rd.businessAddress.line_3,
+          rd.businessAddress.line_4,
+          rd.businessAddress.country
         ))
       }
     )
@@ -105,7 +105,7 @@ class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConn
             }
 
             dataCache.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.copy(registeredOffice = address)) map { _ =>
-              if (data.isRegOfficeOrMainPlaceOfBusiness) {
+              if (data.isRegOfficeOrMainPlaceOfBusiness && address.isDefined) {
                 Redirect(routes.ContactingYouController.get(edit))
               } else {
                 Redirect(routes.RegisteredOfficeIsUKController.get(edit))
