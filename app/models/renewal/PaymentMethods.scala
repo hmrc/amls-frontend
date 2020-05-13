@@ -20,31 +20,11 @@ import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, ValidationError, Write, _}
 import play.api.libs.json.{Json, Reads, Writes}
-import scala.collection.mutable.ListBuffer
 
 
 case class PaymentMethods(courier: Boolean,
                          direct: Boolean,
-                         other: Option[String]) {
-
-  implicit def count = {
-    val counterList =  new ListBuffer[Int]()
-
-    if(courier) {
-      counterList += 1
-    }
-
-    if(direct) {
-      counterList += 2
-    }
-
-    if(other.isDefined) {
-      counterList += 3
-    }
-
-    counterList.toList.size
-  }
-}
+                         other: Option[String])
 
 sealed trait PaymentMethods0 {
 

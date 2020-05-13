@@ -47,7 +47,7 @@ class MoneySourcesSpec extends AmlsSpec {
           Some(WholesalerMoneySource("Wholesaler names")),
           Some(true)
         )
-        data.count mustBe 3
+        data.size mustBe 3
       }
 
       "show 2 when user has selected any 2 options" in {
@@ -66,9 +66,9 @@ class MoneySourcesSpec extends AmlsSpec {
           Some(WholesalerMoneySource("Wholesaler names")),
           None
         )
-        data.count mustBe 2
-        data2.count mustBe 2
-        data3.count mustBe 2
+        data.size mustBe 2
+        data2.size mustBe 2
+        data3.size mustBe 2
       }
 
       "show 1 when user has selected any singular option" in {
@@ -87,9 +87,9 @@ class MoneySourcesSpec extends AmlsSpec {
           Some(WholesalerMoneySource("Wholesaler names")),
           None
         )
-        data.count mustBe 1
-        data2.count mustBe 1
-        data3.count mustBe 1
+        data.size mustBe 1
+        data2.size mustBe 1
+        data3.size mustBe 1
       }
     }
     "successfully validate" when {
