@@ -38,20 +38,21 @@
     <ul class="list list-bullet">
         <li>@Messages("msb.whatyouneed.line_1")</li>
         <li>@Messages("msb.whatyouneed.line_2")</li>
+        <li>@Messages("msb.whatyouneed.line_3")</li>
         @if(services.msbServices.contains(TransmittingMoney)) {
-            <li>@Messages("msb.whatyouneed.line_3")</li>
-            <li>@Messages("msb.whatyouneed.line_9")</li>
-        }
-        @if(services.msbServices.contains(CurrencyExchange)) {
             <li>@Messages("msb.whatyouneed.line_4")</li>
             <li>@Messages("msb.whatyouneed.line_5")</li>
             <li>@Messages("msb.whatyouneed.line_6")</li>
+            <li>@Messages("msb.whatyouneed.line_7")</li>
+            <li>@Messages("msb.whatyouneed.line_8")</li>
+        }
+        @if(services.msbServices.contains(CurrencyExchange)) {
+            <li>@Messages("msb.whatyouneed.line_9")</li>
+            <li>@Messages("msb.whatyouneed.line_10")</li>
+            <li>@Messages("msb.whatyouneed.line_11")</li>
         }
         @if(services.msbServices.contains(ForeignExchange)) {
-            <li>@Messages("msb.whatyouneed.line_7")</li>
-        }
-        @if(services.msbServices.contains(TransmittingMoney)) {
-            <li>@Messages("msb.whatyouneed.line_8")</li>
+            <li>@Messages("msb.whatyouneed.line_12")</li>
         }
     </ul>
 

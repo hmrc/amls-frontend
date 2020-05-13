@@ -73,19 +73,25 @@
 
             @model.agentName.map { x =>
                 @checkYourAnswersRow(
-                    question = Messages("tradingpremises.agentname.title"),
+                    question = Messages("tradingpremises.agentname.name.title"),
                     editLinkTag = "tradingpremisesagentnametitle-edit",
                     editUrl = controllers.tradingpremises.routes.AgentNameController.get(index, true).toString
                 ) {
+                    @x.agentName
+                }
 
-                    <p>@x.agentName,
+                @if(x.agentDateOfBirth.isDefined) {
+                    @checkYourAnswersRow(
+                        question = Messages("tradingpremises.agentname.dob.title"),
+                        editLinkTag = "tradingpremisesagentdobtitle-edit",
+                        editUrl = controllers.tradingpremises.routes.AgentNameController.get(index, true).toString
+                    ) {
                         @x.agentDateOfBirth match {
-                            case Some(y) => {born @DateHelper.formatDate(y)
+                            case Some(y) => {
+                                @DateHelper.formatDate(y)
+                            }
+                        }
                     }
-                    case None => {}
-                    }
-                    </p>
-
                 }
             }
 
@@ -112,19 +118,12 @@
             }
 
             @checkYourAnswersRow(
-                question = Messages("tradingpremises.summary.tradingname"),
-                editLinkTag = "tradingpremisessummarytradingname-edit",
+                question = Messages("tradingpremises.yourtradingpremises.title"),
+                editLinkTag = "tradingpremisesdetails-edit",
                 editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
             ) {
-                <p>@yta.tradingName</p>
-            }
-
-            @checkYourAnswersRow(
-                question = Messages("tradingpremises.summary.address"),
-                editLinkTag = "tradingpremisedsummaryaddress-edit",
-                editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
-            ) {
-                <p>@yta.tradingPremisesAddress.toLines.map { l =>
+                <p>@yta.tradingName <br />
+                @yta.tradingPremisesAddress.toLines.map { l =>
                     @l <br />
                 }</p>
             }
@@ -163,11 +162,15 @@
                         controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).toString
                     } else ""
                 ) {
-                    <ul class="list">
-                    @ba.activities.toList.sortBy(_.toString).map { a =>
-                        <li>@a.getMessage()</li>
+                    @if(ba.activities.size == 1){
+                        @ba.activities.head.getMessage()
+                    } else {
+                        <ul class="list-bullet">
+                        @ba.activities.toList.sortBy(_.toString).map { a =>
+                            <li>@a.getMessage()</li>
+                        }
+                        </ul>
                     }
-                    </ul>
                 }
             }
 
@@ -179,27 +182,31 @@
                         controllers.tradingpremises.routes.MSBServicesController.get(index, true).toString
                     } else ""
                 ) {
+                    @if(msb.services.size == 1) {
+                        @msb.services.head.getMessage
+                    } else {
+                        <ul class="list-bullet">
+                        @msb.services.toList.sortBy(_.getMessage).map { line =>
+                            <li>@line match {
+                                case TransmittingMoney => {
+                                    @Messages("msb.services.list.lbl.01")
+                                }
+                                case CurrencyExchange => {
+                                    @Messages("msb.services.list.lbl.02")
+                                }
+                                case ChequeCashingNotScrapMetal => {
+                                    @Messages("msb.services.list.lbl.03")
+                                }
+                                case ChequeCashingScrapMetal => {
+                                    @Messages("msb.services.list.lbl.04")
+                                }
+                                case ForeignExchange => {
+                                    @Messages("msb.services.list.lbl.05")
+                                }
+                            }</li>
+                        }</ul>
+                    }
 
-                    <ul class="list">
-                    @msb.services.toList.sortBy(_.getMessage).map { line =>
-                        <li>@line match {
-                            case TransmittingMoney => {
-                                @Messages("msb.services.list.lbl.01")
-                            }
-                            case CurrencyExchange => {
-                                @Messages("msb.services.list.lbl.02")
-                            }
-                            case ChequeCashingNotScrapMetal => {
-                                @Messages("msb.services.list.lbl.03")
-                            }
-                            case ChequeCashingScrapMetal => {
-                                @Messages("msb.services.list.lbl.04")
-                            }
-                            case ForeignExchange => {
-                                @Messages("msb.services.list.lbl.05")
-                            }
-                        }</li>
-                    }</ul>
                 }
             }
         }

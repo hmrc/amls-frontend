@@ -43,7 +43,7 @@ sealed trait TestHelper extends AmlsSummaryViewSpec {
     Some(new LocalDate(1990, 2, 24))
   )
   val businessStructure = SoleProprietor
-  val agentName = AgentName("test")
+  val agentName = AgentName(agentName = "test", agentDateOfBirth = Some(new LocalDate(1990, 2, 24)))
   val agentCompanyName = AgentCompanyDetails("test", Some("12345678"))
   val agentPartnership = AgentPartnership("test")
   val wdbd = WhatDoesYourBusinessDo(
@@ -78,14 +78,15 @@ class summary_detailsSpec extends TestHelper with TableDrivenPropertyChecks {
   "The summary details page" must {
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
-      ("tradingpremises.summary.address", checkElementTextIncludes(_, "Trading address 1 2 asdfasdf")),
+      ("tradingpremises.yourtradingpremises.title", checkElementTextIncludes(_, "foo 1 2 asdfasdf")),
       ("tradingpremises.startDate.title", checkElementTextIncludes(_, DateHelper.formatDate(new LocalDate(1990, 2, 24)))),
       ("tradingpremises.isResidential.title", checkElementTextIncludes(_, "lbl.yes")),
       ("tradingpremises.whatdoesyourbusinessdo.title", checkElementTextOnlyIncludes(_, "Bill payment service provider", "Estate agency business", "Money service business")),
       ("tradingpremises.msb.services.title", checkElementTextIncludes(_, "Transmitting money","Currency exchange")),
       ("tradingpremises.agent.premises.title", checkElementTextIncludes(_, "lbl.yes")),
       ("tradingpremises.businessStructure.title", checkElementTextIncludes(_, "businessType.lbl.01")),
-      ("tradingpremises.agentname.title", checkElementTextIncludes(_, "test")),
+      ("tradingpremises.agentname.name.title", checkElementTextIncludes(_, "test")),
+      ("tradingpremises.agentname.dob.title", checkElementTextIncludes(_, DateHelper.formatDate(new LocalDate(1990, 2, 24)))),
       ("tradingpremises.agentpartnership.title", checkElementTextIncludes(_, "test")),
       ("tradingpremises.youragent.company.name", checkElementTextIncludes(_, "test"))
     )
