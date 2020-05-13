@@ -23,6 +23,14 @@ import play.api.libs.json._
 
 case class Country(name: String, code: String) {
   override def toString: String = name
+
+  def isUK = {
+    this == Country("United Kingdom", "GB")
+  }
+
+  def isEmpty = {
+    this == Country("", "")
+  }
 }
 
 object Country {

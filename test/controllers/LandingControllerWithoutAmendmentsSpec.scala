@@ -193,7 +193,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
       "the landing service has no saved form and " when {
 
-        "the landing service has valid review details" in new Fixture {
+        "the landing service has valid review details with UK postcode" in new Fixture {
 
           val details = Some(ReviewDetails(businessName = "Test",
             businessType = None,
@@ -211,7 +211,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           verify(controllerNoAmlsNumber.auditConnector).sendExtendedEvent(any[ExtendedDataEvent])(any(), any())
         }
 
-        "the landing service has review details with invalid postcode" in new Fixture {
+        "the landing service has review details with invalid UK postcode" in new Fixture {
 
           val details = Some(ReviewDetails(businessName = "Test",
             businessType = None,
@@ -226,6 +226,55 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.businessmatching.routes.ConfirmPostCodeController.get().url)
         }
+
+        "the landing service has review details without UK postcode" in new Fixture {
+
+          val details = Some(ReviewDetails(businessName = "Test",
+            businessType = None,
+            businessAddress = Address("Line 1", "Line 2", None, None, None, Country("United Kingdom", "GB")),
+            safeId = ""))
+
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
+          when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
+          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+
+          val result = controllerNoAmlsNumber.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.ConfirmPostCodeController.get().url)
+        }
+
+        "the landing service has review details without postcode but other country" in new Fixture {
+
+          val details = Some(ReviewDetails(businessName = "Test",
+            businessType = None,
+            businessAddress = Address("Line 1", "Line 2", None, None, None, Country("USA", "US")),
+            safeId = ""))
+
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
+          when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
+          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+
+          val result = controllerNoAmlsNumber.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.BusinessTypeController.get().url)
+        }
+
+        "the landing service has review details without postcode and country" in new Fixture {
+
+          val details = Some(ReviewDetails(businessName = "Test",
+            businessType = None,
+            businessAddress = Address("Line 1", "Line 2", None, None, None, Country("", "")),
+            safeId = ""))
+
+          when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
+          when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
+          when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+
+          val result = controllerNoAmlsNumber.get()(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.routes.ConfirmPostCodeController.get().url)
+        }
+
 
         "the landing service has no valid review details" in new Fixture {
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
