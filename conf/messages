@@ -180,7 +180,7 @@ error.required.atb.registered.for.vat = Select yes if your business is registere
 error.required.atb.corporation.tax = Select yes if your business is registered for Corporation Tax
 error.required.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
 error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax reference number
-error.required.atb.lettersaddress = Select yes if this is the right address to send you letters about your supervision
+error.required.atb.lettersaddress = Select yes if the address to send you letters is the same as your registered office
 error.mismatch.atb.email = The email addresses you’ve entered do not match
 error.required.email = Enter your business email address
 error.invalid.email = Enter an email address in the correct format, like myname@example.com
@@ -1403,7 +1403,7 @@ businessdetails.registeredoffice.postcode.lbl = Postcode
 businessdetails.registeredoffice.country.lbl = Country
 businessdetails.activity.start.date.title = When did or will your business start activities that need to be registered under the Money Laundering Regulations?
 businessdetails.activity.start.date.text = If your business is already involved in these activities, give the date it started.
-businessdetails.lettersaddress.title = Is this the right address to send you letters about your supervision?
+businessdetails.lettersaddress.title = Is the address to send you letters the same as your registered office?
 
 tradingpremises.whatyouneed.paragraph1.text = We need to know where you trade from, and where your agents trade from. An agent is an individual or business that works on behalf of your business, to offer your services.
 tradingpremises.whatyouneed.requiredinfo.heading = For each of your trading premises you’ll need to tell us:
