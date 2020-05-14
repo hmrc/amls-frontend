@@ -43,7 +43,7 @@ class TcspServiceSpec extends AmlsSpec {
       MailForwarding.getMessage must be (Messages(message + "05"))
       Receptionist.getMessage must be (Messages(message + "06"))
       ConferenceRooms.getMessage must be (Messages(message + "07"))
-      Other("test").getMessage must be (Messages(message + "08") + ":" + " test")
+      Other("test").getMessage must be ("test")
     }
 
   }
