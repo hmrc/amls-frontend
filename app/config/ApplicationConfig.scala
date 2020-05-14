@@ -62,7 +62,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   // TODO: EAB TO BE ADDED TO CONFIG
   lazy val eabWhatYouNeedUrl = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/what-you-need"
   lazy val eabSummaryUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/check-your-answers"
-  lazy val eabRedressUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.redress-url", "")}/change-redress-scheme"
+  lazy val eabRedressUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/change-redress-scheme"
 
   def businessCustomerUrl = getConfigString("business-customer.url")
   
