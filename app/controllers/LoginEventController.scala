@@ -32,7 +32,7 @@ class LoginEventController @Inject()(authAction: AuthAction,
                                      val cc: MessagesControllerComponents,
                                      applicationConfig: ApplicationConfig) extends AmlsBaseController(ds, cc) {
 
-  val redirectCallType       = "GET"
+  val redirectCallType = "GET"
 
   def get: Action[AnyContent] = authAction.async {
     implicit request => Future(Ok(login_event(generateRedirect(applicationConfig.eabRedressUrl))))
