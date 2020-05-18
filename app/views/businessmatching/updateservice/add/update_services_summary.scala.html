@@ -16,7 +16,7 @@
 
 @import include._
 @import forms2._
-@import config.{ ApplicationConfig}
+@import config.{ApplicationConfig}
 @import models.businessmatching._
 @import config.{ApplicationConfig => appConfig}
 @import controllers.businessmatching.updateservice.add.routes
@@ -24,10 +24,10 @@
 @import models.tradingpremises.TradingPremises
 @import models.responsiblepeople.ResponsiblePerson
 
-@(f: forms.Form2[_], flowModel: AddBusinessTypeFlowModel)(implicit request: Request[_],messages:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(f: forms.Form2[_], flowModel: AddBusinessTypeFlowModel)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
-    @heading("title.cya", "summary.updateservice")
+@heading("title.cya", "summary.updateservice")
 }
 
 @main(
@@ -37,53 +37,87 @@
 
     <dl class="cya-summary-list">
 
-    @checkYourAnswersRow(
-        question = Messages("businessmatching.updateservice.selectactivities.title"),
-        editUrl = routes.SelectBusinessTypeController.get(edit = true).url,
-        editLinkTag = "selectactivities-edit"
-    ) {
-        <p id="activity-name">@(flowModel.activityName.getOrElse(""))</p>
-    }
+        @checkYourAnswersRow(
+            question = Messages("businessmatching.updateservice.selectactivities.title"),
+            editUrl = routes.SelectBusinessTypeController.get(edit = true).url,
+            editLinkTag = "selectactivities-edit"
+        ) {
+            <p id="activity-name">@(flowModel.activityName.getOrElse(""))</p>
+        }
 
-    @if(flowModel.activity.equals(Some(MoneyServiceBusiness))) {
-        @flowModel.subSectors.map { services =>
-            @checkYourAnswersRow(
-                question = Messages("businessmatching.updateservice.msb.services.title"),
-                editUrl = routes.SubSectorsController.get(true).toString,
-                allowEdit = true,
-                editLinkTag="msbservices-edit"
-            ) {
-                <ul id="msb-service" class="list list-bullet">
-                    @services.msbServices.toList.sortBy(_.getMessage).map { svc =>
-                    <li>@svc match {
-                        case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
-                        case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
-                        case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
-                        case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
-                        case ForeignExchange => {@Messages("businessmatching.services.list.lbl.05")}
-                        }</li>
+        @if(flowModel.activity.contains(MoneyServiceBusiness)) {
+            @flowModel.subSectors.map { services =>
+                @checkYourAnswersRow(
+                    question = Messages("businessmatching.updateservice.msb.services.title"),
+                    editUrl = routes.SubSectorsController.get(true).toString,
+                    allowEdit = true,
+                    editLinkTag = "msbservices-edit"
+                ) {
+                    @if(services.msbServices.size == 1) {
+                        @services.msbServices.head.getMessage
+                    } else {
+                        <ul id="msb-service" class="list list-bullet">
+                        @services.msbServices.toList.sortBy(_.getMessage).map { svc =>
+                            <li>@svc match {
+                                case TransmittingMoney => {
+                                    @Messages("businessmatching.services.list.lbl.01")
+                                }
+                                case CurrencyExchange => {
+                                    @Messages("businessmatching.services.list.lbl.02")
+                                }
+                                case ChequeCashingNotScrapMetal => {
+                                    @Messages("businessmatching.services.list.lbl.03")
+                                }
+                                case ChequeCashingScrapMetal => {
+                                    @Messages("businessmatching.services.list.lbl.04")
+                                }
+                                case ForeignExchange => {
+                                    @Messages("businessmatching.services.list.lbl.05")
+                                }
+                            }</li>
+                        }
+                        </ul>
                     }
-                </ul>
                 }
 
                 @if(services.msbServices.contains(TransmittingMoney)) {
-                @flowModel.businessAppliedForPSRNumber.map { psr =>
-                @checkYourAnswersRow(
-                    question = Messages("businessmatching.psr.number.title"),
-                    editUrl = routes.BusinessAppliedForPSRNumberController.get(true).toString,
-                    editLinkTag="psr-edit",
-                    allowEdit = true
-                )   {
-                        <p id="psr">@psr match {
-                            case BusinessAppliedForPSRNumberNo => {@Messages("lbl.no")}
-                            case BusinessAppliedForPSRNumberYes(number) => {@Messages("businessmatching.psr.number.lbl"): @number}
-                        }</p>
+                    @flowModel.businessAppliedForPSRNumber.map { psr =>
+                        @checkYourAnswersRow(
+                            question = Messages("businessmatching.psr.number.title"),
+                            editUrl = routes.BusinessAppliedForPSRNumberController.get(true).toString,
+                            editLinkTag = "psr-edit",
+                            allowEdit = true
+                        ) {
+                            <p id="psr">@psr match {
+                                case BusinessAppliedForPSRNumberNo => {
+                                    @Messages("lbl.no")
+                                }
+                                case BusinessAppliedForPSRNumberYes(number) => {
+                                    @Messages("lbl.yes")
+                                }
+                            }</p>
+                        }
+                    }
+
+                    @if(flowModel.businessAppliedForPSRNumber.fold[Boolean](false)(_ != BusinessAppliedForPSRNumberNo)) {
+                        @flowModel.businessAppliedForPSRNumber.map { psr =>
+                            @checkYourAnswersRow(
+                                question = Messages("businessmatching.psr.number.lbl"),
+                                editUrl = routes.BusinessAppliedForPSRNumberController.get(true).toString,
+                                editLinkTag = "psr-answer-edit",
+                                allowEdit = true
+                            ) {
+                                <p id="psr-number">@psr match {
+                                    case BusinessAppliedForPSRNumberYes(number) => {
+                                        @number
+                                    }
+                                }</p>
+                            }
+                        }
                     }
                 }
             }
         }
-    }
-
     </dl>
 
     @form(f, controllers.businessmatching.updateservice.add.routes.AddBusinessTypeSummaryController.post()) {
