@@ -182,8 +182,12 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
         Option(doc.getElementById("psr-edit")).isDefined mustBe true
       }
 
+      "have Yes answer to PSR number question" in new MSBAllViewFixture {
+        doc.getElementById("psr").text mustBe Messages("lbl.yes")
+      }
+
       "have a PSR number" in new MSBAllViewFixture {
-        doc.getElementById("psr").text mustBe Messages("businessmatching.psr.number.lbl") + ": 111111"
+        doc.getElementById("psr-number").text mustBe "111111"
       }
 
       "have answered no to do I have a PSR number " in new MSBNoPSRViewFixture {

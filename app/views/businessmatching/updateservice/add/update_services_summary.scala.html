@@ -54,10 +54,10 @@
                     editLinkTag = "msbservices-edit"
                 ) {
                     @if(services.msbServices.size == 1) {
-                        @services.msbServices.head.getMessage
+                        <p id="msb-service">@services.msbServices.head.getMessage</p>
                     } else {
                         <ul id="msb-service" class="list list-bullet">
-                        @services.msbServices.toList.sortBy(_.getMessage).map { svc =>
+                            @services.msbServices.toList.sortBy(_.getMessage).map { svc =>
                             <li>@svc match {
                                 case TransmittingMoney => {
                                     @Messages("businessmatching.services.list.lbl.01")
