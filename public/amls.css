@@ -2261,3 +2261,7 @@ textarea:focus {
 legend .heading-medium{
   margin-top: 0;
 }
+
+.govuk-hint.govuk-character-count__message {
+  color: #6f777b;
+}
