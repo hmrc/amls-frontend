@@ -168,6 +168,6 @@
     insideHeader,
     play.twirl.api.HtmlFormat.empty,
     play.twirl.api.HtmlFormat.empty,
-    Some(uiLayouts.footer_links()),
+    Some(uiLayouts.footer_links(accessibilityFooterUrl=Some(controllers.accessibility.routes.AccessibilityStatementController.get().url))),
     true
 )(content)

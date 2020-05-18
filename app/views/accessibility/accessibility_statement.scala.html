@@ -1,0 +1,35 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import include._
+@import utils.Strings._
+
+@(url: String)(implicit request: Request[_], m: Messages, appConfig: ApplicationConfig, lang: Lang)
+
+@header = {
+    @heading("accessibility.statement.title")
+}
+
+@main(m("accessibility.statement"), heading = header, showGetHelpForm = false) {
+
+    @m("accessibility.statement.content").paragraphizeH
+
+    <h1>Reporting accessibility problems with this service</h1>
+
+    <a href=@url>accessibility problem</a>
+
+}
