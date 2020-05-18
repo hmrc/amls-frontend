@@ -135,17 +135,21 @@
             }
         }
 
-        @model.servicesOfAnotherTCSP.map {
-            case ServicesOfAnotherTCSPYes(v) => {
-                @checkYourAnswersRow(
-                    question = Messages("tcsp.anothertcspsupervision.cya.additional.header"),
-                    editLinkTag = "anothertcspsupervision-edit",
-                    editUrl = controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).toString
-                ) {
-                    @Messages("tcsp.cya.mlrregno"): @v
+        @model.servicesOfAnotherTCSP.map { s:ServicesOfAnotherTCSP =>
+            @if(s != ServicesOfAnotherTCSPNo) {
+                    @checkYourAnswersRow(
+                        question = Messages("tcsp.anothertcspsupervision.cya.additional.header"),
+                        editLinkTag = "anothertcspsupervision-edit",
+                        editUrl = controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).toString
+                    ) {
+                        @s match {
+                            case ServicesOfAnotherTCSPYes(v) => {
+                                @Messages("tcsp.cya.mlrregno"): @v
+                            }
+                        }
+                    }
                 }
             }
-        }
 
     </dl>
 
