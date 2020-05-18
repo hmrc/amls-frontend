@@ -37,13 +37,15 @@ class AccessibilityStatementController @Inject()(authAction: AuthAction,
   def get = authAction.async {
       implicit request =>
 
-        val baseUrl = config.accessibilityStatementUrlUnauthenticated
+        val service = "AMLS"
+
+        val baseUrl = config.accessibilityStatementUrl
 
         val pageUrl = Uri(request.headers.get("referer").getOrElse(
           controllers.accessibility.routes.AccessibilityStatementController.get().url
         ))
 
-        val accessibilityUrl = s"${baseUrl}?service=amls&userAction=${
+        val accessibilityUrl = s"${baseUrl}?service=$service&userAction=${
           URLEncoder.encode(pageUrl.path.toString(), "UTF-8")
         }"
 

@@ -26,10 +26,10 @@
 
 @main(m("accessibility.statement"), heading = header, showGetHelpForm = false) {
 
-    @m("accessibility.statement.content").paragraphizeH
+    @m("accessibility.statement.content.here").paragraphizeH
 
-    <h1>Reporting accessibility problems with this service</h1>
+    <h1>@m("accessibility.statement.title.report.problem")</h1>
 
-    <a href=@url target="_blank">accessibility problem</a>
+    <a href=@url target="_blank">@m("accessibility.problem")</a>
 
 }
