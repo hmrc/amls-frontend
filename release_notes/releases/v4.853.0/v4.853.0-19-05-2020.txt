@@ -1,0 +1,3 @@
+ + [AMLS-5779] - 'Phase 3 Letting Agents DES Integration'
+ + [AMLS-5848] - 'Remove old EAB models and specs and integrate based on new EAB model'
+ + [AMLS-5850] - 'Add missing date of change to EAB service and integrate with AMLS FE, BE and DES submission'
