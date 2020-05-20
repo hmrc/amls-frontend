@@ -34,7 +34,6 @@ import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-
 class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture {
@@ -85,9 +84,35 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
       val result = controller.post()(postRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.BusinessTypeController.get().url))
+
+      verify(controller.dataCacheConnector).save[BusinessMatching](any(), meq(BusinessMatching.key), meq(updatedModel))(any(), any())
     }
 
-    "update ReviewDetails as none when business matching-> reviewDetails is empty" in new Fixture {
+    "update ReviewDetails with valid input post code and UK as country" in new Fixture {
+      val postRequest = requestWithUrlEncodedBody(
+        "postCode" -> "BB1 1BB"
+      )
+
+      val businessMatchingWithEmptyCountry = businessMatching.copy(
+        reviewDetails = Some(reviewDtls.copy(
+          businessAddress = businessAddress.copy(
+            country = Country("", "")))))
+
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(businessMatchingWithEmptyCountry)))
+
+      val updatedModel = businessMatching.copy(reviewDetails = Some(reviewDtls.copy(businessAddress = businessAddress.copy(postcode = Some("BB1 1BB")))))
+      when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), meq(updatedModel))
+        (any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(postRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.BusinessTypeController.get().url))
+
+      verify(controller.dataCacheConnector).save[BusinessMatching](any(), meq(BusinessMatching.key), meq(updatedModel))(any(), any())
+    }
+
+    "update ReviewDetails as none when business matching -> reviewDetails is empty" in new Fixture {
       val postRequest = requestWithUrlEncodedBody(
         "postCode" -> "BB1 1BB"
       )

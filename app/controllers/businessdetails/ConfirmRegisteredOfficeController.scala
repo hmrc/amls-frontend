@@ -23,7 +23,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businesscustomer.Address
-import models.businessdetails.{BusinessDetails, ConfirmRegisteredOffice, RegisteredOffice, RegisteredOfficeUK}
+import models.businessdetails._
 import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
@@ -37,15 +37,26 @@ class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConn
                                                     val ds: CommonPlayDependencies,
                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
-
   def updateBMAddress(bm: BusinessMatching): Option[RegisteredOffice] = {
-    bm.reviewDetails.fold[Option[RegisteredOffice]](None)(dtls => Some(RegisteredOfficeUK(
-      dtls.businessAddress.line_1,
-      dtls.businessAddress.line_2,
-      dtls.businessAddress.line_3,
-      dtls.businessAddress.line_4,
-      dtls.businessAddress.postcode.getOrElse("")
-    )))
+    bm.reviewDetails.fold[Option[RegisteredOffice]](None)(rd =>
+      if(rd.businessAddress.postcode.isDefined) {
+        Some(RegisteredOfficeUK(
+          rd.businessAddress.line_1,
+          rd.businessAddress.line_2,
+          rd.businessAddress.line_3,
+          rd.businessAddress.line_4,
+          rd.businessAddress.postcode.getOrElse("")
+        ))
+      } else {
+        Some(RegisteredOfficeNonUK(
+          rd.businessAddress.line_1,
+          rd.businessAddress.line_2,
+          rd.businessAddress.line_3,
+          rd.businessAddress.line_4,
+          rd.businessAddress.country
+        ))
+      }
+    )
   }
 
   def getAddress(businessMatching: Future[Option[BusinessMatching]]): Future[Option[Address]] = {
@@ -94,7 +105,7 @@ class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConn
             }
 
             dataCache.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.copy(registeredOffice = address)) map { _ =>
-              if (data.isRegOfficeOrMainPlaceOfBusiness) {
+              if (data.isRegOfficeOrMainPlaceOfBusiness && address.isDefined) {
                 Redirect(routes.ContactingYouController.get(edit))
               } else {
                 Redirect(routes.RegisteredOfficeIsUKController.get(edit))

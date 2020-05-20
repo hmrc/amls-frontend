@@ -204,11 +204,18 @@ class LandingController @Inject()(val landingService: LandingService,
             landingService.updateReviewDetails(rd, credId) map { _ => {
               auditConnector.sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
 
-              FormTypes.postcodeType.validate(rd.businessAddress.postcode.getOrElse("")) match {
-                case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
-                case Invalid(_) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
+              (rd.businessAddress.postcode, rd.businessAddress.country) match {
+                  case (Some(postcode), Country("United Kingdom", "GB")) => {
+                    FormTypes.postcodeType.validate(postcode) match {
+                      case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
+                      case Invalid(_) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
+                    }
+                  }
+                  case (_, Country("United Kingdom", "GB")) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
+                  case (_, country) if !country.isUK && !country.isEmpty => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
+                  case (_, _) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
+                }
               }
-            }
             }
           case (None, None) =>
             // $COVERAGE-OFF$

@@ -38,7 +38,7 @@ class ConfirmPostcodeSpec extends PlaySpec with MockitoSugar {
       "fail validation" when {
         "missing a mandatory field represented by an empty string" in {
           val result = ConfirmPostcode.formReads.validate(Map("postCode" -> Seq("")))
-          result mustBe Invalid(Seq((Path \ "postCode") -> Seq(ValidationError("error.required.postcode"))))
+          result mustBe Invalid(Seq((Path \ "postCode") -> Seq(ValidationError("businessmatching.confirm.postcode.error.empty"))))
         }
         "missing a mandatory field represented by an empty Map" in {
           val result = ConfirmPostcode.formReads.validate(Map.empty)
