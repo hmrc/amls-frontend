@@ -32,23 +32,21 @@
 
     <dl class="cya-summary-list">
 
-    @model.services.map { a =>
+    @model.services.map { servicesOfBusiness =>
         @checkYourAnswersRow(
             question = Messages("asp.services.title"),
             editUrl = controllers.asp.routes.ServicesOfBusinessController.get(true).toString,
             editLinkTag = "aspservices-edit"
         ) {
-            <ul class="list list-bullet">
-            @a.services.toList.sortBy(_.getMessage).map { line =>
-                <li>@line match {
-                    case Accountancy => {@Messages("asp.service.lbl.01")}
-                    case PayrollServices => {@Messages("asp.service.lbl.02")}
-                    case BookKeeping => {@Messages("asp.service.lbl.03")}
-                    case Auditing => {@Messages("asp.service.lbl.04")}
-                    case FinancialOrTaxAdvice => {@Messages("asp.service.lbl.05")}
-                }</li>
+            @if(servicesOfBusiness.services.size == 1){
+                @servicesOfBusiness.services.head.getMessage
+            }else {
+                <ul class="list list-bullet">
+                    @servicesOfBusiness.services.toList.sortBy(_.getMessage).map { line =>
+                        <li>@line.getMessage</li>
+                    }
+                </ul>
             }
-            </ul>
         }
     }
 
