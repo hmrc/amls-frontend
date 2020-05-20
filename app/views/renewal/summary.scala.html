@@ -365,10 +365,10 @@
             @boa.countries.fold {
                 <p>@Messages("lbl.no")</p>
             } { branches =>
-                @if(boa.countries.size > 1) {
+                @if(branches.size > 1) {
                     <ul class="list list-bullet">
                     @branches.map { country =>
-                        <li>@country</li>
+                        <li>@country.name</li>
                     }
                     </ul>
                 } else {

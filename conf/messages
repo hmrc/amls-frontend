@@ -2674,7 +2674,7 @@ progress.renewal.time = 7 and 10
 renewal.amp.turnover.title = How much of your turnover for the last 12 months came from sales of art for €10,000 or more?
 
 renewal.involvedinother.title = Was your business involved in any other activities in the last 12 months?
-renewal.involvedinother.second.title = Describe the other activities your business was involved in
+renewal.involvedinother.cya.second.title = Describe the other activities your business was involved in
 renewal.involvedinother.example = Other activities include things like:
 renewal.involvedinother.listline1 = running a newsagent’s
 renewal.involvedinother.listline2 = recruitment
