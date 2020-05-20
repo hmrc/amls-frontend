@@ -104,4 +104,4 @@ POST        /update-information/add-or-remove-services                          
 
 GET         /login-event/redress-scheme                                               @controllers.LoginEventController.get()
 
-GET         /accessibility/statement                                                  @controllers.accessibility.AccessibilityStatementController.get()
+GET         /accessibility-statement                                                  @controllers.accessibility.AccessibilityStatementController.get()
