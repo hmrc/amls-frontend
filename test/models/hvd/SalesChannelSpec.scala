@@ -16,21 +16,25 @@
 
 package models.hvd
 
-import play.api.i18n.{Messages, Lang}
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
 
-sealed trait SalesChannel {
-  def getMessage(implicit lang: Lang): String = this match {
-    case Retail => Messages("hvd.how-will-you-sell-goods.channels.retail")
-    case Wholesale => Messages("hvd.how-will-you-sell-goods.channels.wholesale")
-    case Auction => Messages("hvd.how-will-you-sell-goods.channels.auction")
+
+class SalesChannelSpec extends WordSpec with MustMatchers with GuiceOneAppPerTest {
+  import play.api.i18n._
+  implicit val lang = Lang("en-US")
+
+  "getMessage" must {
+    "return correct text for Retail" in {
+      Retail.getMessage must be("Retail")
+    }
+
+    "return correct text for Wholesale" in {
+      Wholesale.getMessage must be("Wholesale")
+    }
+
+    "return correct text for Auction" in {
+      Auction.getMessage must be("Auction")
+    }
   }
 }
-
-case object Retail extends SalesChannel
-
-case object Wholesale extends SalesChannel
-
-case object Auction extends SalesChannel
-

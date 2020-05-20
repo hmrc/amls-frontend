@@ -25,6 +25,9 @@ import play.api.libs.json.Reads.StringReads
 import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 import cats.data.Validated.{Invalid, Valid}
+import play.api.i18n.{Messages, Lang}
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 case class Products(items: Set[ItemType]) {
 
@@ -58,6 +61,21 @@ sealed trait ItemType {
       case Clothing => "11"
       case Other(_) => "12"
     }
+
+  def getMessage(implicit lang: Lang): String = this match {
+    case Alcohol => Messages("hvd.products.option.01")
+    case Tobacco => Messages("hvd.products.option.02")
+    case Antiques => Messages("hvd.products.option.03")
+    case Cars => Messages("hvd.products.option.04")
+    case OtherMotorVehicles => Messages("hvd.products.option.05")
+    case Caravans => Messages("hvd.products.option.06")
+    case Jewellery => Messages("hvd.products.option.07")
+    case Gold => Messages("hvd.products.option.08")
+    case ScrapMetals => Messages("hvd.products.option.09")
+    case MobilePhones => Messages("hvd.products.option.10")
+    case Clothing => Messages("hvd.products.option.11")
+    case Other(x) => x
+  }
 }
 
 case object Alcohol extends ItemType
