@@ -69,10 +69,10 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
       val sectionChecks = Table[String, Element=>Boolean, String](
         ("title key", "check", "edit link"),
-        ("renewal.involvedinother.title",checkElementTextIncludes(_, "test text"), controllers.renewal.routes.InvolvedInOtherController.get(true).toString),
+        ("renewal.involvedinother.title",checkElementTextIncludes(_, "Yes"), controllers.renewal.routes.InvolvedInOtherController.get(true).toString),
+        ("renewal.involvedinother.cya.second.title",checkElementTextIncludes(_, "test text"), controllers.renewal.routes.InvolvedInOtherController.get(true).toString),
         ("renewal.business-turnover.title", checkElementTextIncludes(_, "£0 to £14,999"), controllers.renewal.routes.BusinessTurnoverController.get(true).toString),
         ("renewal.turnover.title", checkElementTextIncludes(_, "£0 to £14,999"), controllers.renewal.routes.AMLSTurnoverController.get(true).toString),
-        ("renewal.turnover.title", checkListContainsItems(_, fullActivitiesSet), controllers.renewal.routes.AMLSTurnoverController.get(true).toString),
         ("renewal.amp.turnover.title", checkElementTextIncludes(_, "hvd.percentage.lbl.01"), controllers.renewal.routes.AMPTurnoverController.get(true).toString),
         ("renewal.customer.outside.uk.title", checkElementTextIncludes(_, "Yes"), controllers.renewal.routes.CustomersOutsideIsUKController.get(true).toString),
         ("renewal.customer.outside.uk.countries.title", checkElementTextIncludes(_, "United Kingdom"), controllers.renewal.routes.CustomersOutsideUKController.get(true).toString),
@@ -84,6 +84,8 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
         ("renewal.msb.largest.amounts.title", checkElementTextIncludes(_, "France"), controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(true).toString),
         ("renewal.msb.most.transactions.title", checkElementTextIncludes(_, "United Kingdom"), controllers.renewal.routes.MostTransactionsController.get(true).toString),
         ("renewal.msb.whichcurrencies.header", checkElementTextIncludes(_, "EUR"), controllers.renewal.routes.WhichCurrenciesController.get(true).toString),
+        ("msb.which_currencies.source.which_banks", checkElementTextIncludes(_, "testBank"), controllers.renewal.routes.MoneySourcesController.get(true).toString),
+        ("msb.which_currencies.source.which_wholesalers", checkElementTextIncludes(_, "testWholeSaler"), controllers.renewal.routes.MoneySourcesController.get(true).toString),
         ("renewal.msb.ce.transactions.expected.title", checkElementTextIncludes(_, "123"), controllers.renewal.routes.CETransactionsInLast12MonthsController.get(true).toString),
         ("renewal.msb.fx.transactions.expected.title", checkElementTextIncludes(_, "12"), controllers.renewal.routes.FXTransactionsInLast12MonthsController.get(true).toString)
       )
@@ -99,7 +101,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
           Some(PercentageOfCashPaymentOver15000.First),
           Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
           Some(TotalThroughput("01")),
-          Some(WhichCurrencies(Seq("EUR"),None,Some(MoneySources(None,None,None)))),
+          Some(WhichCurrencies(Seq("EUR"),None,Some(MoneySources(Some(BankMoneySource("testBank")),Some(WholesalerMoneySource("testWholeSaler")),None)))),
           Some(TransactionsInLast12Months("1500")),
           Some(SendTheLargestAmountsOfMoney(Seq(Country("France", "FR")))),
           Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),

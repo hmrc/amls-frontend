@@ -40,6 +40,58 @@ class MoneySourcesSpec extends AmlsSpec {
   }
 
   "MoneySources" must {
+    "count the amount of attribute a use has selected" when {
+      "given all 3 attributes" in {
+        val data = MoneySources(
+          Some(BankMoneySource("Bank names")),
+          Some(WholesalerMoneySource("Wholesaler names")),
+          Some(true)
+        )
+        data.size mustBe 3
+      }
+
+      "show 2 when user has selected any 2 options" in {
+        val data = MoneySources(
+          None,
+          Some(WholesalerMoneySource("Wholesaler names")),
+          Some(true)
+        )
+        val data2 = MoneySources(
+          Some(BankMoneySource("Bank names")),
+          None,
+          Some(true)
+        )
+        val data3 = MoneySources(
+          Some(BankMoneySource("Bank names")),
+          Some(WholesalerMoneySource("Wholesaler names")),
+          None
+        )
+        data.size mustBe 2
+        data2.size mustBe 2
+        data3.size mustBe 2
+      }
+
+      "show 1 when user has selected any singular option" in {
+        val data = MoneySources(
+          None,
+          None,
+          Some(true)
+        )
+        val data2 = MoneySources(
+          Some(BankMoneySource("Bank names")),
+          None,
+          None
+        )
+        val data3 = MoneySources(
+          None,
+          Some(WholesalerMoneySource("Wholesaler names")),
+          None
+        )
+        data.size mustBe 1
+        data2.size mustBe 1
+        data3.size mustBe 1
+      }
+    }
     "successfully validate" when {
       "bank money source selected" in new Fixture {
         val form =  Map(
