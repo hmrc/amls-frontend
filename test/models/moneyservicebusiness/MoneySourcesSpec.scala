@@ -218,6 +218,24 @@ class MoneySourcesSpec extends AmlsSpec {
         MoneySources.formRule.validate(form) must be(expected)
       }
     }
+
+    "have size method which" when {
+      "called with complete model will return 3" in new Fixture {
+        completeModel.size mustBe 3
+      }
+
+      "called with model containing two options will return 2" in new Fixture {
+        completeModel.copy(bankMoneySource = None).size mustBe 2
+      }
+
+      "called with model containing one option will return 1" in new Fixture {
+        completeModel.copy(bankMoneySource = None, wholesalerMoneySource = None).size mustBe 1
+      }
+
+      "called with empty model will return 0" in new Fixture {
+        MoneySources().size mustBe 0
+      }
+    }
   }
 
   "Json reads and writes" must {

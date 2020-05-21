@@ -400,4 +400,53 @@ $(function () {
         }
     })
   })
+
+    $('[data-gov-currency-autocomplete]').each(function() {
+        var selectFieldName = $(this).attr('id').replace('[', '\\[').replace(']', '\\]');
+        var nonSelectFieldName = selectFieldName.replace('-select','');
+
+        var selectField = $('#' + selectFieldName)
+        var nonSelectField = $('#' + nonSelectFieldName)
+
+        nonSelectField.keydown(function(e) {
+            if (e.keyCode === 13 && $(this).val() === '') {
+                selectField.val('')
+            }
+        }).keyup(function() {
+            var menu = $('.autocomplete__menu')
+            if (menu.text() === 'No results found') {
+                selectField.val('')
+            }
+        }).attr('name', nonSelectFieldName + '-autocomp');
+
+        $('body')
+            .on('mouseup', ".autocomplete__option > strong", function(e){
+                e.preventDefault();
+                $(this).parent().trigger('click')
+            }).on('click', '.autocomplete__option', function(evt) {
+            evt.preventDefault()
+            var e = jQuery.Event('keydown');
+            e.keyCode = 13;
+            $(this).closest('.autocomplete__wrapper').trigger(e);
+        })
+
+        $("button[name='submit']").click(function(){
+
+            var selectedOption = $('#' + selectFieldName + ' option:selected')
+
+            if(nonSelectField.val() === '')
+                selectField.val('');
+
+            if (selectField.val() === "" && nonSelectField.val() !== "" || selectedOption.text() !== nonSelectField.val())
+                addOption(nonSelectField.val())
+
+            function addOption(value) {
+                $("<option data-added='true'>")
+                    .attr("value", value)
+                    .text(value)
+                    .prop("selected", true)
+                    .appendTo($('#' + selectFieldName))
+            }
+        })
+    })
 });

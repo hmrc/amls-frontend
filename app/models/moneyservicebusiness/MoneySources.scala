@@ -31,7 +31,10 @@ case object CustomerMoneySource
 
 case class MoneySources(bankMoneySource: Option[BankMoneySource] = None,
                          wholesalerMoneySource: Option[WholesalerMoneySource] = None,
-                         customerMoneySource: Option[Boolean] = None)
+                         customerMoneySource: Option[Boolean] = None) {
+
+  def size = List(this.bankMoneySource, this.wholesalerMoneySource, this.customerMoneySource).flatten.size
+}
 
 object MoneySources {
   import jto.validation.forms.Rules._

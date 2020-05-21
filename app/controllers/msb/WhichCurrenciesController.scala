@@ -50,6 +50,7 @@ class WhichCurrenciesController @Inject() (authAction: AuthAction,
       }
     }
   }
+
   def post(edit: Boolean = false) = authAction.async {
     implicit request => {
       Form2[WhichCurrencies](request.body) match {
