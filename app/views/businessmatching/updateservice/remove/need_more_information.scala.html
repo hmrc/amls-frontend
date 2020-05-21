@@ -36,6 +36,7 @@
             <p>@Messages("businessmatching.updateservice.updateotherinformation.information.2")</p>
             <p>@Messages("businessmatching.updateservice.updateotherinformation.information.3")</p>
         }
+
         case list if list.contains("Accountancy service provider") && (list.size > 1) => {
             <p>@Messages("businessmatching.updateservice.updateotherinformation.information.0")</p>
                 <ul class="list list-bullet">
@@ -44,12 +45,14 @@
             }
                 </ul>
             <p>@Messages("businessmatching.updateservice.updateotherinformation.information.2")</p>
-            <p>@Messages("businessmatching.updateservice.updateotherinformation.information.3")</p>
+            <p>@Messages("businessmatching.updateservice.updateotherinformation.information.3.multiple.services")</p>
         }
+
         case list if !list.contains("Accountancy service provider") && (list.size == 1) => {
-            <p>@Messages("businessmatching.updateservice.updateotherinformation.information.1", (activities.mkString(" ").toLowerCase))</p>
+            <p>@Messages("businessmatching.updateservice.updateotherinformation.information.1", Character.toLowerCase(activities.mkString(" ").charAt(0)) + activities.mkString(" ").substring(1))</p>
             <p>@Messages("businessmatching.updateservice.updateotherinformation.information.3")</p>
         }
+
         case list if !list.contains("Accountancy service provider") && (list.size > 1) => {
             <p>@Messages("businessmatching.updateservice.updateotherinformation.information.0")</p>
                 <ul class="list list-bullet">
@@ -57,7 +60,7 @@
                         <li>@Character.toLowerCase(ba.charAt(0))@ba.substring(1)</li>
             }
                 </ul>
-            <p>@Messages("businessmatching.updateservice.updateotherinformation.information.3")</p>
+            <p>@Messages("businessmatching.updateservice.updateotherinformation.information.3.multiple.services")</p>
         }
 
     }

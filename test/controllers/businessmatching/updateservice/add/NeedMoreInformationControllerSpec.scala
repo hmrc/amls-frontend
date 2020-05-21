@@ -68,6 +68,8 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
 
   "post is called" must {
     "return OK with registration progress view" in new Fixture {
+      mockCacheRemoveByKey[ServiceChangeRegister]
+
       val result = controller.post()(request)
 
       status(result) mustBe SEE_OTHER

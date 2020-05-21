@@ -31,17 +31,17 @@ import utils.UpdateServicesSummaryFixtures
 class update_services_summarySpec extends UpdateServicesSummaryFixtures {
   "The update_services_summary view" must {
     "have the correct title" in new ViewFixture {
-      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq(), Seq())
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.updateservice"))
     }
 
     "have correct heading" in new ViewFixture {
-      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq(), Seq())
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
       heading.html must be(Messages("title.cya"))
     }
 
     "have correct subHeading" in new ViewFixture {
-      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(), Seq(), Seq())
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
       subHeading.html must include(Messages("summary.updateservice"))
     }
   }
@@ -49,7 +49,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
   "for which business type you wish to register" must {
     "have a question title" in new ViewFixture {
       val addBusinessTypeFlowModel:AddBusinessTypeFlowModel  = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
-      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
       doc.body().text must include(Messages("businessmatching.updateservice.selectactivities.title"))
     }
@@ -62,7 +62,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show AccountancyServices if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.01"))
       }
@@ -71,7 +71,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show BillPaymentServices if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(BillPaymentServices))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.03"))
       }
@@ -79,7 +79,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show EstateAgentBusinessService if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(EstateAgentBusinessService))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.04"))
       }
@@ -87,7 +87,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show HighValueDealing if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.05"))
       }
@@ -95,7 +95,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show MoneyServiceBusiness if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.06"))
       }
@@ -103,7 +103,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show TrustAndCompanyServices if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.07"))
       }
@@ -111,7 +111,7 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
       "show TelephonePaymentService if present" in new ViewFixture {
         val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(TelephonePaymentService))
 
-        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel, Seq(), Seq())
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
         doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.08"))
       }
@@ -194,156 +194,10 @@ class update_services_summarySpec extends UpdateServicesSummaryFixtures {
         Option(doc.getElementById("psr")).isDefined mustBe false
       }
     }
-
-    "for what will your business do at these premises" must {
-      "have a question title" in new MSBViewFixture {
-        doc.body().text must include(Messages("businessmatching.updateservice.whatdoyoudohere.heading"))
-      }
-
-      "for the edit link display when business does more than one type of MSB subservice" in new MSBAllViewFixture {
-        Option(doc.getElementById("whatdoyoudohere-edit")).isDefined mustBe true
-      }
-
-      "for the edit link not display when business does only one type of MSB subservice" in new SingleSubSectorPSRMSBViewFixture {
-        Option(doc.getElementById("whatdoyoudohere-edit")).isDefined mustBe false
-      }
-
-      "for all tp msb services" must {
-        "show msb service TransmittingMoney" in new MSBAllViewFixture {
-          doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.01"))
-        }
-
-        "show msb service CurrencyExchange" in new MSBAllViewFixture {
-          doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.02"))
-        }
-
-        "show msb service ChequeCashingNotScrapMetal" in new MSBAllViewFixture {
-          doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.03"))
-        }
-
-        "show msb service ChequeCashingScrapMetal" in new MSBAllViewFixture {
-          doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.04"))
-        }
-
-        "show msb service ForeignExchange" in new MSBAllViewFixture {
-          doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.05"))
-        }
-      }
-
-      "for a single tp msb service" must {
-        "show msb service TransmittingMoney" in new MSBSingleViewFixture {
-          doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.01"))
-        }
-
-        "show msb service CurrencyExchange" in new MSBSingleViewFixture {
-          doc.getElementById("tp-msb-services").text must not include(Messages("businessmatching.updateservice.msb.services.list.lbl.02"))
-        }
-
-        "show msb service ChequeCashingNotScrapMetal" in new MSBSingleViewFixture {
-          doc.getElementById("tp-msb-services").text must not include(Messages("businessmatching.updateservice.msb.services.list.lbl.03"))
-        }
-
-        "show msb service ChequeCashingScrapMetal" in new MSBSingleViewFixture {
-          doc.getElementById("tp-msb-services").text must not include(Messages("businessmatching.updateservice.msb.services.list.lbl.04"))
-        }
-
-        "show msb service ForeignExchange" in new MSBSingleViewFixture {
-          doc.getElementById("tp-msb-services").text must not include(Messages("businessmatching.updateservice.msb.services.list.lbl.05"))
-        }
-      }
-    }
-
-    "for have any of your responsible people have passed the HMRC fit and proper test" must {
-      "have a question title" in new MSBViewFixture {
-        doc.body().text must include(Messages("businessmatching.updateservice.fitandproper.heading", Messages("businessmatching.registerservices.servicename.lbl.06")))
-        doc.getElementById("fit-and-proper").text mustBe Messages("lbl.yes")
-      }
-
-      "show edit link" in new MSBViewFixture {
-        Option(doc.getElementById("fitandproper-edit")).isDefined mustBe true
-      }
-
-      "which responsible people have passed the HMRC fit and proper test" must {
-        "have a question title" in new MSBAllViewFixture {
-          doc.body().text must include(Messages("businessmatching.updateservice.whichfitandproper.heading"))
-          doc.getElementById("responsible-person").text mustBe Messages("Katie Test")
-        }
-
-        "show edit link" in new MSBViewFixture {
-          Option(doc.getElementById("whichfitandproper-edit")).isDefined mustBe true
-        }
-      }
-    }
   }
 
   "if not msb" in new SimpleFlowModelViewFixture {
     doc.body().text must not include(Messages("businessmatching.services.title"))
-  }
-
-  "if adding TCSP, for have any of your responsible people have passed the HMRC fit and proper test" must {
-    "have a question title" in new SimpleTCSPViewFixture {
-      doc.body().text must include(Messages("businessmatching.updateservice.fitandproper.heading"))
-      doc.getElementById("fit-and-proper").text mustBe Messages("lbl.yes")
-    }
-
-    "show edit link" in new SimpleTCSPViewFixture {
-      Option(doc.getElementById("fitandproper-edit")).isDefined mustBe true
-    }
-
-    "which responsible people have passed the HMRC fit and proper test" must {
-      "have a question title" in new SimpleTCSPViewFixture {
-        doc.body().text must include(Messages("businessmatching.updateservice.whichfitandproper.heading"))
-        doc.getElementById("responsible-person").text mustBe Messages("Katie Test David Test")
-      }
-
-      "show edit link" in new SimpleTCSPViewFixture {
-        Option(doc.getElementById("whichfitandproper-edit")).isDefined mustBe true
-      }
-    }
-
-    "if no fit and proper then no responsible people section" in new SimpleTCSPNoFitAndProperViewFixture {
-      Option(doc.getElementById("fit-and-proper-count")).isDefined mustBe false
-      doc.getElementById("fit-and-proper").text mustBe Messages("lbl.no")
-    }
-  }
-
-  "if not msb or tcsp then no fit and proper section" in new SimpleFlowModelViewFixture {
-    Option(doc.getElementById("fit-and-proper")).isDefined mustBe false
-    Option(doc.getElementById("fit-and-proper-count")).isDefined mustBe false
-  }
-
-  "for will you do this business type at trading premises" must {
-    "have a question title" in new MSBViewFixture {
-      doc.body().text must include(Messages("businessmatching.updateservice.tradingpremises.summary", Messages("businessmatching.registerservices.servicename.lbl.06.phrased")))
-    }
-
-    "show edit link" in new MSBViewFixture {
-      Option(doc.getElementById("tradingpremises-edit")).isDefined mustBe true
-    }
-
-    "state no registered trading premises" in new MSBViewNoPremisesFixture {
-      doc.getElementById("tp-premises-activities").text mustBe Messages("lbl.no")
-    }
-
-    "not show premises details sections" in new MSBViewNoPremisesFixture {
-      Option(doc.getElementById("tp-premises-activities-count")).isDefined mustBe false
-      Option(doc.getElementById("tp-msb-services")).isDefined mustBe false
-    }
-  }
-
-  "if doing business type at trading premises, for which premises will you do this business type from" must {
-    "have a question title" in new MSBAllViewFixture {
-      doc.body().text must include(Messages("businessmatching.updateservice.whichtradingpremises.heading", Messages("businessmatching.registerservices.servicename.lbl.06.phrased")))
-    }
-
-    "show edit link" in new MSBAllViewFixture {
-      Option(doc.getElementById("whichtradingpremises-edit")).isDefined mustBe true
-    }
-
-    "show the message and count" in new MSBAllViewFixture {
-      doc.getElementsByClass("trading-premises-list").first().child(0).html() must include(Messages("foo, 1, 2, AA1 1BB"))
-      doc.getElementsByClass("trading-premises-list").first().child(1).html() must include(Messages("Bar, 1, 2, AA1 1BB"))
-    }
   }
 
   "The page have a submit button with correct text" in new MSBAllViewFixture {

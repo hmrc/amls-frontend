@@ -50,14 +50,12 @@ class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnect
               renewalComplete <- DeclarationHelper.renewalComplete(renewalService, request.credId)
               status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
             } yield status match {
-              case ReadyForRenewal(_) if renewalComplete => Ok(
-                views.html.declaration.declare("declaration.declaration.amendment.title", "submit.renewal.application", name, false))
-              case ReadyForRenewal(_) | SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_) => Ok(
-                views.html.declaration.declare("declaration.declaration.amendment.title", "submit.amendment.application", name, true))
+              case ReadyForRenewal(_) if renewalComplete =>
+                Ok(views.html.declaration.declare("declaration.declaration.amendment.title", "submit.renewal.application", name, false))
+              case ReadyForRenewal(_) | SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_) =>
+                Ok(views.html.declaration.declare("declaration.declaration.amendment.title", "submit.amendment.application", name, true))
               case _ =>
-                println("statussssssssssss" + status)
-                Ok(
-                views.html.declaration.declare("declaration.declaration.amendment.title", "submit.registration", name, false))
+                Ok(views.html.declaration.declare("declaration.declaration.amendment.title", "submit.registration", name, false))
             }
           }
           case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)

@@ -19,7 +19,6 @@ package services.flowmanagement.flowrouters
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import controllers.{routes => rootRoutes}
 import models.businessmatching._
-import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
 import models.flowmanagement._
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
@@ -42,23 +41,17 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       businessMatchingService = mockBusinessMatchingService,
       addMoreActivitiesPageRouter = new AddMoreBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
       businessAppliedForPSRNumberPageRouter = new BusinessAppliedForPsrNumberPageRouter(mockStatusService, mockBusinessMatchingService),
-      fitAndProperPageRouter = new FitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
       newServicesInformationPageRouter = new NeedMoreInformationPageRouter(),
       noPSRPageRouter = new NoPSRPageRouter(mockStatusService, mockBusinessMatchingService),
       selectActivitiesPageRouter = new SelectBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
       subServicesPageRouter = new SubSectorsPageRouter(mockStatusService, mockBusinessMatchingService),
-      tradingPremisesPageRouter = new TradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService),
-      updateServicesSummaryPageRouter = new AddBusinessTypeSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
-      whatDoYouDoHerePageRouter = new WhatDoYouDoHerePageRouter(mockStatusService, mockBusinessMatchingService),
-      whichFitAndProperPageRouter = new WhichFitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
-      whichTradingPremisesPageRouter = new WhichTradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService)
-
+      updateServicesSummaryPageRouter = new AddBusinessTypeSummaryPageRouter(mockStatusService, mockBusinessMatchingService)
     )
   }
 
   "In the Add MSB flow the getRoute method" must {
-    //Start MSB sub-flow
 
+    //Start MSB sub-flow
     "return the 'msb_subservice' page (SubServiceController)" when {
       "the user is on the 'What Type of business ....' page (SelectActivitiesPageId)" when {
         "MSB is selected" in new Fixture {
@@ -83,7 +76,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-    "return the 'fit_and_proper' page (FitAndProperController)" when {
+    "return the 'update_services_summary' page (AddBusinessTypeSummaryController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
         "MSB is the Business Activity and subservices does not contain TransmittingMoney" in new Fixture {
           val model = AddBusinessTypeFlowModel(
@@ -91,7 +84,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model))
 
-          result mustBe Redirect(addRoutes.FitAndProperController.get(false))
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -110,7 +103,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-    "return the 'FitAndProper' page (FitAndProperController)" when {
+    "return the 'update_services_summary' page (AddBusinessTypeSummaryController)" when {
       "the user is on the 'psr_number' page (BusinessAppliedForPSRNumberPageId)" when {
         "the answer is yes and MSB is the Business Activity" in new Fixture {
           val model = AddBusinessTypeFlowModel(
@@ -119,12 +112,12 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
 
           val result = await(router.getRoute("internalId", PsrNumberPageId, model))
 
-          result mustBe Redirect(addRoutes.FitAndProperController.get(false))
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
 
-    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
+    "return the 'About your business' page (RegistrationProgressController)" when {
       "the user is on the 'no_psr' page (NoPSRPageId)" when {
         "MSB is the Business Activity" in new Fixture {
           val result = await(router.getRoute("internalId", NoPSRPageId, model))
@@ -134,115 +127,10 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-    "return the 'which-fit-and-proper' page (WhichFitAndProperController)" when {
-      "the user is on the 'Fit and proper' page (FitAndProperPageId)" when {
-        "MSB is the Business Activity" when {
-          "the answer is yes" in new Fixture {
-            val model = AddBusinessTypeFlowModel(
-              activity = Some(MoneyServiceBusiness),
-              fitAndProper = Some(true))
-            val result = await(router.getRoute("internalId", FitAndProperPageId, model))
-
-            result mustBe Redirect(addRoutes.WhichFitAndProperController.get(false))
-          }
-        }
-      }
-    }
-
-    "return the 'trading-premises' page (TradingPremisesController)" when {
-      "the user is on the 'Fit and Proper' page (FitAndProperPageId)" when {
-        "MSB is the Business Activity" when {
-          "the answer is no" in new Fixture {
-            val model = AddBusinessTypeFlowModel(
-              activity = Some(MoneyServiceBusiness),
-              fitAndProper = Some(false))
-            val result = await(router.getRoute("internalId", FitAndProperPageId, model))
-
-            result mustBe Redirect(addRoutes.TradingPremisesController.get(false))
-          }
-        }
-      }
-    }
-
-    "return the 'trading-premises' page (TradingPremisesController)" when {
-      "the user is on the 'Which Fit and Proper' page (WhichFitAndProperPageId)" when {
+    "return the 'update_services_summary' page (AddBusinessTypeSummaryController)" when {
+      "the user is on the 'subsectors page' page (SubSectorsPageId)" when {
         "MSB is the Business Activity" in new Fixture {
-          val result = await(router.getRoute("internalId", WhichFitAndProperPageId, model))
-
-          result mustBe Redirect(addRoutes.TradingPremisesController.get(false))
-        }
-      }
-    }
-
-    "return the 'which-trading-premises' page (WhichTradingPremisesController)" when {
-      "the user is on the 'Trading Premises' page (TradingPremisesPageId)" when {
-        "MSB is the Business Activity" when {
-          "the answer is yes" in new Fixture {
-            val model = AddBusinessTypeFlowModel(
-              activity = Some(MoneyServiceBusiness),
-              areNewActivitiesAtTradingPremises = Some(true))
-
-            val result = await(router.getRoute("internalId", TradingPremisesPageId, model))
-
-            result mustBe Redirect(addRoutes.WhichTradingPremisesController.get(false))
-          }
-        }
-      }
-    }
-
-    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
-      "the user is on the 'Trading Premises' page (TradingPremisesPageId)" when {
-        "MSB is the Business Activity" when {
-          "the answer is no" in new Fixture {
-            val model = AddBusinessTypeFlowModel(
-              activity = Some(MoneyServiceBusiness),
-              areNewActivitiesAtTradingPremises = Some(false))
-
-            val result = await(router.getRoute("internalId", TradingPremisesPageId, model))
-
-            result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
-          }
-        }
-      }
-    }
-
-    "return the 'What do you do here' page (WhatDoYouDoHereController)" when {
-      "the user is on the 'which trading premises' page (WhichTradingPremisesPageId)" when {
-        "MSB is the Business Activity" when {
-          " the user has selected more than 1 subservice" in new Fixture {
-            val model = AddBusinessTypeFlowModel(
-              activity = Some(MoneyServiceBusiness),
-              subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
-
-            val result = await(router.getRoute("internalId", WhichTradingPremisesPageId, model))
-
-            result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get())
-          }
-        }
-      }
-    }
-
-    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
-      "the user is on the 'which trading premises' page (WhichTradingPremisesPageId)" when {
-        "MSB is the Business Activity" when {
-          " the user has selected 1 subservice" in new Fixture {
-            val model = AddBusinessTypeFlowModel(
-              activity = Some(MoneyServiceBusiness),
-              subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
-
-            val result = await(router.getRoute("internalId", WhichTradingPremisesPageId, model))
-
-            result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
-          }
-        }
-      }
-    }
-
-
-    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
-      "the user is on the 'What do you do here' page (WhatDoYouDoHerePageId)" when {
-        "MSB is the Business Activity" in new Fixture {
-          val result = await(router.getRoute("internalId", WhatDoYouDoHerePageId, model))
+          val result = await(router.getRoute("internalId", SubSectorsPageId, model))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
@@ -250,34 +138,17 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
     }
   }
 
-//Edit mode MSB sub-flow
-
+  //Edit mode MSB sub-flow
   "When Editing in the MSB Add flow, the getRoute method" must {
 
-//    Edit Subservices
-    "return the 'What Do You Do Here' page (WhatDoYouDoHereController)" when {
+    //Edit Subservices
+    "return the 'CYA' page (AddBusinessTypeSummaryController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
-        "MSB is the Business Activity and subservices does not contain TransmittingMoney and it of size > 1" in new Fixture {
+        "MSB is the Business Activity and subservices contains TransmittingMoney and PSRNumber" in new Fixture {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
-            areNewActivitiesAtTradingPremises = Some(true),
-            subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal, CurrencyExchange))),
-            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
-          val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get(true))
-        }
-      }
-    }
-
-    "return the 'CYA' page (UpdateServicesSummaryController)" when {
-      "the user is on the 'msb_subservice' page (SubServicePageId)" when {
-        "MSB is the Business Activity and subservices does not contain TransmittingMoney and MSB at TP is false and it of size > 1" in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            areNewActivitiesAtTradingPremises = Some(false),
-            subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal, CurrencyExchange))),
-            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
+            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa")))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
@@ -285,75 +156,25 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-    "return the 'What Do You Do Here' page (WhatDoYouDoHereController)" when {
+    "return the 'PSR Number' page (BusinessAppliedForPSRNumberController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
-        "MSB is the Business Activity and subservices contains TransmittingMoney and PSRNumber and TP MSB activities is defined and it of size > 1" in new Fixture {
+        "MSB is the Business Activity and subservices contains TransmittingMoney and PSR is not defined" in new Fixture {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
-            areNewActivitiesAtTradingPremises = Some(true),
-            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa")),
-            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
-          val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get(true))
-        }
-      }
-    }
-
-    "return the 'CYA' page (UpdateServicesSummaryController)" when {
-      "the user is on the 'msb_subservice' page (SubServicePageId)" when {
-        "MSB is the Business Activity and subservices contains TransmittingMoney and PSRNumber and MSB at TP is false and it of size > 1" in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            areNewActivitiesAtTradingPremises = Some(false),
-            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa")),
-            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
-          val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
-        }
-      }
-    }
-
-    "return the 'What Do You Do Here' page (WhatDoYouDoHereController)" when {
-      "the user is on the 'msb_subservice' page (SubServicePageId)" when {
-        "MSB is the Business Activity and subservices contains TransmittingMoney and PSR is not defined and it of size > 1" in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            areNewActivitiesAtTradingPremises = Some(true),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get(true))
+          result mustBe Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(true))
         }
       }
     }
 
-    "return the 'What Do You Do Here' page (WhatDoYouDoHereController)" when {
+    "return the 'CYA' page (AddBusinessTypeSummaryController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
-        "MSB is the Business Activity and subservices does not contain TransmittingMoney and TP MSB Services is not defined and it of size > 1" in new Fixture {
+        "MSB is the Business Activity and subservices does not contain TransmittingMoney" in new Fixture {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
-            areNewActivitiesAtTradingPremises = Some(true),
-            subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ChequeCashingScrapMetal))),
-            tradingPremisesMsbServices = None)
-          val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get(true))
-        }
-      }
-    }
-
-    "return the 'CYA' page (UpdateServicesSummaryController)" when {
-      "the user is on the 'msb_subservice' page (SubServicePageId)" when {
-        "MSB is the Business Activity and subservices does not contain TransmittingMoney and TP MSB Services is not defined and MSB is at TP is false and it of size > 1" in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            areNewActivitiesAtTradingPremises = Some(false),
-            subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ChequeCashingScrapMetal))),
-            tradingPremisesMsbServices = None)
+            subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ChequeCashingScrapMetal))))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
@@ -361,31 +182,13 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-    "return the 'What Do You Do Here' page (WhatDoYouDoHereController)" when {
+    "return the 'Check your answers' page (AddBusinessTypeSummaryController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
-        "MSB is the Business Activity and subservices does contains TransmittingMoney, PSR is defined, and TP MSB Services is not defined and it of size > 1" in new Fixture {
+        "MSB is the Business Activity and subservices does contains TransmittingMoney, PSR is defined" in new Fixture {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("bbbbb")),
-            areNewActivitiesAtTradingPremises = Some(true),
-            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-            tradingPremisesMsbServices = None)
-          val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get(true))
-        }
-      }
-    }
-
-    "return the 'CYA' page (UpdateServicesSummaryController)" when {
-      "the user is on the 'msb_subservice' page (SubServicePageId)" when {
-        "MSB is the Business Activity and subservices does contains TransmittingMoney, PSR is defined, and MSB at TP is false and it of size > 1" in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("bbbbb")),
-            areNewActivitiesAtTradingPremises = Some(false),
-            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-            tradingPremisesMsbServices = None)
+            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
@@ -393,14 +196,27 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-    "return the 'Check Your Answers' page (UpdateServicesSummaryController)" when {
+    "return the 'CYA' page (AddBusinessTypeSummaryController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
-        "MSB is the Business Activity and subservices is TransmittingMoney and PSRNumber and TP MSB activities is defined" in new Fixture {
+        "MSB is the Business Activity and subservices does contains TransmittingMoney, PSR is defined" in new Fixture {
+          val model = AddBusinessTypeFlowModel(
+            activity = Some(MoneyServiceBusiness),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("bbbbb")),
+            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))))
+          val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
+
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
+        }
+      }
+    }
+
+    "return the 'Check Your Answers' page (AddBusinessTypeSummaryController)" when {
+      "the user is on the 'msb_subservice' page (SubServicePageId)" when {
+        "MSB is the Business Activity and subservices is TransmittingMoney and PSRNumber is defined" in new Fixture {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa")),
-            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa")))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
@@ -408,7 +224,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-    "return the 'Check Your Answers' page (UpdateServicesSummaryController)" when {
+    "return the 'Check Your Answers' page (AddBusinessTypeSummaryController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
         "MSB is the Business Activity and subservices is size 1" in new Fixture {
           val model = AddBusinessTypeFlowModel(
@@ -436,10 +252,9 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
 
     "return the 'Business Applied For PSR Number' page (BusinessAppliedForPSRNumber)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
-        "MSB is the Business Activity and subservices is TransmittingMoney and PSR is not defined and MSB at TP is false" in new Fixture {
+        "MSB is the Business Activity and subservices is TransmittingMoney and PSR is None" in new Fixture {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
-            areNewActivitiesAtTradingPremises = Some(false),
             businessAppliedForPSRNumber = None,
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
@@ -449,15 +264,14 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-//edit Business Applied For PSR Number true
-    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
+    //edit Business Applied For PSR Number true
+    "return the 'update_services_summary' page (AddBusinessTypeSummaryController)" when {
       "editing the 'Business PSR Number' page (BusinessAppliedForPSRNumberPageId)" when {
         "the answer is yes" in new Fixture {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("bbbbb")),
-            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
+            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))))
           val result = await(router.getRoute("internalId", PsrNumberPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
@@ -465,149 +279,16 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-//edit Business Applied For PSR Number false
+    //edit Business Applied For PSR Number false
     "return the 'no-psr' page (NoPsrController)" when {
       "the user is on the 'psr_number' page (BusinessAppliedForPSRNumberPageId)" when {
         "the answer is yes" in new Fixture {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo))
-          val result = await(router.getRoute("internalId", PsrNumberPageId, model, edit = true))
+          val result = await(router.getRoute("internalId", PsrNumberPageId, model))
 
           result mustBe Redirect(addRoutes.NoPsrController.get())
-        }
-      }
-    }
-
-//edit fit and proper true
-    "return the 'which-fit-and-proper' page (WhichFitAndProperController)" when {
-      "editing the 'Fit and Proper' page (FitAndProperPageId)" when {
-        "the answer is yes" in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            fitAndProper = Some(true))
-          val result = await(router.getRoute("internalId", FitAndProperPageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.WhichFitAndProperController.get(true))
-        }
-      }
-    }
-
-//edit fit and proper false
-    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-      "editing the 'Fit and Proper' page (FitAndProperPageId)" when {
-        "the answer is no " in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            fitAndProper = Some(false))
-          val result = await(router.getRoute("internalId", FitAndProperPageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
-        }
-      }
-    }
-
-//edit which fit and proper
-    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-      "editing the 'Which Fit and Proper' page (WhichFitAndProperPageId)" when {
-        "responsible people have been selected" in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            fitAndProper = Some(true),
-            responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 3))))
-          val result = await(router.getRoute("internalId", WhichFitAndProperPageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
-        }
-      }
-    }
-
-//edit Trading Premises true
-    "return the 'which-trading-premises' page (WhichTradingPremisesController)" when {
-      "editing the 'Trading Premises' page (TradingPremisesPageId)" when {
-        "and the answer is yes" in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            areNewActivitiesAtTradingPremises = Some(true))
-          val result = await(router.getRoute("internalId", TradingPremisesPageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.WhichTradingPremisesController.get(true))
-        }
-      }
-    }
-
-//edit Trading Premises false
-    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-      "editing the 'Trading Premises' page (TradingPremisesPageId)" when {
-        " and the answer is no " in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            areNewActivitiesAtTradingPremises = Some(false))
-          val result = await(router.getRoute("internalId", TradingPremisesPageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
-        }
-      }
-    }
-
-//edit which Trading Premises
-    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-      "editing the 'Which Trading Premises' page (WhichTradingPremisesPageId)" when {
-        "there is 1 MSB subservice selected" in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            areNewActivitiesAtTradingPremises = Some(true),
-            subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
-            tradingPremisesActivities = Some(TradingPremisesActivities(Set(0, 1, 2, 3))))
-
-          val result = await(router.getRoute("internalId", WhichTradingPremisesPageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
-        }
-      }
-    }
-
-    "return the 'What do you do here' page (WhatDoYouDoHereController)" when {
-      "the user is editing the 'which trading premises' page (WhichTradingPremisesPageId)" when {
-        "the user has selected more than 1 subservice" in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))),
-            tradingPremisesActivities = Some(TradingPremisesActivities(Set(0, 1, 2, 3))))
-
-          val result = await(router.getRoute("internalId", WhichTradingPremisesPageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get(true))
-
-        }
-      }
-    }
-
-    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-      "editing the 'What do you do here' page (WhatDoYouDoHerePageId)" in new Fixture {
-        val model = AddBusinessTypeFlowModel(
-          activity = Some(MoneyServiceBusiness),
-          areNewActivitiesAtTradingPremises = Some(false))
-        val result = await(router.getRoute("internalId", WhatDoYouDoHerePageId, model, edit = true))
-
-        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
-
-      }
-    }
-
-    "return the 'What's your PSR Number' page (BusinessAppliedForPSRNumberController)" when {
-      "editing the 'What do you do here' page (WhatDoYouDoHerePageId)" when {
-        "MSB services contains TransmittingMoney and PSR is not defined" in new Fixture {
-          val model = AddBusinessTypeFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            businessAppliedForPSRNumber = None,
-            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-            areNewActivitiesAtTradingPremises = Some(false))
-          val result = await(router.getRoute("internalId", WhatDoYouDoHerePageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(true))
-
         }
       }
     }

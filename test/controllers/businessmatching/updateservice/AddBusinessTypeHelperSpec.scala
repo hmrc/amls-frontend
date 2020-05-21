@@ -240,35 +240,9 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
     }
   }
 
-  "updateResponsiblePeople" must {
-    "set the fit and proper flag on the right people according to the indices" when {
-      "adding a non TCSP and MSB business type" in new Fixture {
-        val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
-          _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
-        }
-
-        val updatedPeople = people map { _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))) }
-
-        mockCacheUpdate(Some(ResponsiblePerson.key), people)
-
-        val model = AddBusinessTypeFlowModel(
-          Some(BillPaymentServices),
-          fitAndProper = Some(true),
-          responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 4, 5)))
-        )
-
-        when {
-          responsiblePeopleService.updateFitAndProperFlag(any(), any(), any())
-        } thenReturn updatedPeople
-
-        SUT.updateResponsiblePeople("internalId", model).returnsSome(updatedPeople)
-      }
-    }
-  }
-
   "clearFlowModel" must {
     "set an empty model back into the cache" in new Fixture {
-      mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(Some(HighValueDealing), fitAndProper = Some(true)))
+      mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(Some(HighValueDealing)))
 
       SUT.clearFlowModel("internalId").returnsSome(AddBusinessTypeFlowModel())
     }

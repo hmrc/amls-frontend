@@ -32,7 +32,6 @@ class NeedToUpdatePageRouter extends PageRouter[RemoveBusinessTypeFlowModel] {
                        (implicit hc: HeaderCarrier, ec: ExecutionContext ): Future[Result] = {
 
     Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-
   }
 }
 

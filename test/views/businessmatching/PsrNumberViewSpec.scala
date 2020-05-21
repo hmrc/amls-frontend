@@ -46,10 +46,10 @@ class PsrNumberViewSpec extends AmlsViewSpec {
 
             val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-            def view = views.html.businessmatching.psr_number(form2, edit = true, isPreSubmission = false)
+            def view = views.html.businessmatching.psr_number(form2, edit = true, isPreSubmission = false, isPsrDefined = true)
 
-            doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.updateinformation"))
-            heading.html must include(Messages("businessmatching.psr.number.title"))
+            doc.title must startWith(Messages("businessmatching.psr.number.title.post.submission") + " - " + Messages("summary.updateinformation"))
+            heading.html must include(Messages("businessmatching.psr.number.title.post.submission"))
             subHeading.html must include(Messages("summary.updateinformation"))
 
         }
@@ -85,7 +85,16 @@ class PsrNumberViewSpec extends AmlsViewSpec {
         "hide the Yes/No selection when editing an inputted PSR number and not in-presubmission mode" in new ViewFixture {
             val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-            override def view = views.html.businessmatching.psr_number(form2, edit = true, isPreSubmission = false)
+            override def view = views.html.businessmatching.psr_number(form2, edit = true, isPreSubmission = false, isPsrDefined = true)
+
+            doc.body().text() must not include "Yes"
+            doc.body().text() must not include "No"
+        }
+
+        "hide the Yes/No selection when editing an inputted PSR number and not in-presubmission mode and not in edit mode" in new ViewFixture {
+            val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
+
+            override def view = views.html.businessmatching.psr_number(form2, edit = false, isPreSubmission = false, isPsrDefined = true)
 
             doc.body().text() must not include "Yes"
             doc.body().text() must not include "No"

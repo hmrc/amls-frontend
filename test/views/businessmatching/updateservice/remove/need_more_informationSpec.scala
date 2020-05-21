@@ -59,7 +59,7 @@ class need_more_informationSpec extends AmlsViewSpec with MustMatchers {
 
       doc.body().text() must include(Messages("businessmatching.updateservice.updateotherinformation.information.0"))
       doc.body().text() must include(Messages("businessmatching.updateservice.updateotherinformation.information.2"))
-      doc.body().text() must include(Messages("businessmatching.updateservice.updateotherinformation.information.3"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.updateotherinformation.information.3.multiple.services"))
     }
 
     "have the correct button" in new ViewFixture {

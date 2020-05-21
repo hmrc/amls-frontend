@@ -70,16 +70,11 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
     )
 
     val flowModel = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
-        areNewActivitiesAtTradingPremises = Some(true),
-        tradingPremisesActivities = Some(TradingPremisesActivities(Set(1))),
         addMoreActivities = None,
-        fitAndProper = Some(true),
-        responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
         hasChanged = true,
         hasAccepted = false,
         businessAppliedForPSRNumber = None,
-        subSectors = None,
-        tradingPremisesMsbServices = None
+        subSectors = None
     )
 
     mockCacheFetch[AddBusinessTypeFlowModel](Some(flowModel))
@@ -92,19 +87,6 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
 
     "get is called" must {
       "return OK with update_service_summary view" in new Fixture {
-
-        val responsiblePeople: Seq[ResponsiblePerson] = Gen.listOfN(5, responsiblePersonGen).sample.get
-
-        val tradingPremises: Seq[TradingPremises] = Gen.listOfN(5, tradingPremisesGen).sample.get
-
-        when {
-          controller.helper.filteredTps(any(), eqTo(flowModel))(any())
-        } thenReturn OptionT.fromOption[Future](Some(tradingPremises.zipWithIndex))
-
-        when {
-          controller.helper.filteredRps(any(), eqTo(flowModel))(any())
-        } thenReturn OptionT.fromOption[Future](Some(responsiblePeople.zipWithIndex))
-
         val result = controller.get()(request)
 
         status(result) must be(OK)
@@ -135,10 +117,6 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
         )
 
         when {
-          controller.helper.updateTradingPremises(any(), eqTo(flowModel))(any())
-        } thenReturn OptionT.fromOption[Future](Some(modifiedTradingPremises))
-
-        when {
           controller.helper.updateBusinessMatching(any(), any())(any())
         } thenReturn OptionT.fromOption[Future](Some(businessMatchingModel))
 
@@ -161,10 +139,6 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
         when {
           controller.helper.updateSupervision(any())(any())
         } thenReturn OptionT.some[Future, Supervision](Supervision())
-
-        when {
-          controller.helper.updateResponsiblePeople(any(), any())(any())
-        } thenReturn OptionT.some[Future, Seq[ResponsiblePerson]](Seq.empty)
 
         when {
           controller.helper.clearFlowModel(any())(any())
