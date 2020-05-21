@@ -23,7 +23,7 @@ import jto.validation.ValidationError
 import play.api.libs.json.Json
 
 
-class HowWillYouSellGoodsSpec extends WordSpec with MustMatchers{
+class HowWillYouSellGoodsSpec extends WordSpec with MustMatchers {
 
   val fullData = HowWillYouSellGoods(Set(Wholesale, Retail, Auction))
   val fullForm = Map (

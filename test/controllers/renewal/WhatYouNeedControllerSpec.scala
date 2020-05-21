@@ -17,6 +17,7 @@
 package controllers.renewal
 
 import controllers.actions.SuccessfulAuthAction
+import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
 import models.registrationprogress.{Completed, NotStarted, Section}
 import models.renewal.Renewal
 import org.mockito.Matchers.{any, eq => meq}
@@ -26,7 +27,7 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.AmlsSpec
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -34,12 +35,13 @@ import scala.concurrent.Future
 
 class WhatYouNeedControllerSpec extends AmlsSpec {
 
-  trait Fixture {
+  trait Fixture extends DependencyMocks {
     self =>
 
     val renewalService = mock[RenewalService]
 
     val controller = new WhatYouNeedController(
+      dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       renewalService = renewalService,
@@ -50,6 +52,10 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
     "get" must {
 
       "load the page" in new Fixture {
+        val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+        val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+
+        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(bm))
 
         when {
           renewalService.getSection(any())(any[HeaderCarrier], any())
@@ -66,6 +72,10 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
       }
 
       "redirect to progress page if renewal has been started" in new Fixture {
+        val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+        val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+
+        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(bm))
 
         when {
           renewalService.getSection(meq("internalId"))(any(), any())
@@ -74,6 +84,18 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
         val result = controller.get(requestWithToken)
         status(result) must be(SEE_OTHER)
 
+      }
+
+      "return INTERNAL_SERVER_ERROR if no call is returned" in new Fixture {
+        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(None))
+
+        when {
+          renewalService.getSection(meq("internalId"))(any(), any())
+        } thenReturn Future.successful(Section("renewal", Completed, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get()))
+
+        val result = controller.get()(requestWithToken)
+
+        status(result) must be(INTERNAL_SERVER_ERROR)
       }
     }
   }

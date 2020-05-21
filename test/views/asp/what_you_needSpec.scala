@@ -52,8 +52,9 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     "contain the expected content elements" in new ViewFixture{
       def view = views.html.asp.what_you_need()
 
-      html must include(Messages("asp.whatyouneed.line_1"))
-      html must include(Messages("asp.whatyouneed.line_2"))
+      html must include(Messages("You’ll need to tell us:"))
+      html must include(Messages("which accountancy services your business provides"))
+      html must include(Messages("if you’re registered with HMRC to handle other businesses’ tax matters"))
     }
   }
 }

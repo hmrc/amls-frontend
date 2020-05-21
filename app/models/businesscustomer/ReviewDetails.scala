@@ -61,8 +61,13 @@ object ReviewDetails {
 
   implicit val writes = Json.writes[ReviewDetails]
 
-  implicit def convert(addr: BusinessMatchingAddress): Address =
-    Address(addr.line_1, addr.line_2, addr.line_3, addr.line_4, addr.postcode, Country("", addr.country))
+  implicit def convert(addr: BusinessMatchingAddress): Address = {
+      val country = models.countries collectFirst {
+        case country@Country(_, code) if code == addr.country => country
+      } getOrElse Country("", addr.country)
+
+      Address(addr.line_1, addr.line_2, addr.line_3, addr.line_4, addr.postcode, country)
+    }
 
   implicit def convert(details: BusinessMatchingReviewDetails): ReviewDetails = {
     ReviewDetails(details.businessName, Functor[Option].lift(toBusinessType)(details.businessType), details.businessAddress, details.safeId, details.utr)

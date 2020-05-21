@@ -31,7 +31,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   }
 
   private def getConfigString(key: String) = servicesConfig.getConfString(key, throw new Exception(s"Could not find config '$key'"))
-  private def getConfigInt(key: String) = servicesConfig.getConfInt(key, throw new Exception(s"Could not find config '$key'"))
+  private def getConfigInt(key: String)    = servicesConfig.getConfInt(key, throw new Exception(s"Could not find config '$key'"))
 
   val contactFormServiceIdentifier = "AMLS"
 
@@ -62,7 +62,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   // TODO: EAB TO BE ADDED TO CONFIG
   lazy val eabWhatYouNeedUrl = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/what-you-need"
   lazy val eabSummaryUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/check-your-answers"
-  lazy val eabRedressUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/change-redress-scheme"
+  lazy val eabRedressUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.redress-url", "")}/change-redress-scheme"
 
   def businessCustomerUrl = getConfigString("business-customer.url")
   
@@ -81,10 +81,8 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   def enrolmentStoreToggle = servicesConfig.getConfBool("feature-toggle.enrolment-store", false)
 
   def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
-
+  
   def publicMessageBannerToggle = servicesConfig.getConfBool("feature-toggle.public-message-banner", true)
-
-  def standAloneEABService = servicesConfig.getConfBool("feature-toggle.stand-alone-eab-service", false)
 
   lazy val authUrl = baseUrl("auth")
 

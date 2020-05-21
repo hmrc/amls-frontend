@@ -20,10 +20,12 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.Country
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessMatching, ConfirmPostcode}
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.confirm_postcode
 
@@ -43,7 +45,7 @@ class ConfirmPostCodeController @Inject()(authAction: AuthAction,
 
   def updateReviewDetails(reviewDetails: Option[ReviewDetails], postCodeModel: ConfirmPostcode): Option[models.businesscustomer.ReviewDetails] = {
     reviewDetails.fold[Option[ReviewDetails]](None) { dtls =>
-      val updatedAddr = dtls.businessAddress.copy(postcode = Some(postCodeModel.postCode))
+      val updatedAddr = dtls.businessAddress.copy(postcode = Some(postCodeModel.postCode), country = Country("United Kingdom", "GB"))
       Some(dtls.copy(businessAddress = updatedAddr))
     }
   }
@@ -56,7 +58,8 @@ class ConfirmPostCodeController @Inject()(authAction: AuthAction,
           case ValidForm(_, data) =>
             for {
               bm <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-              _ <- dataCacheConnector.save[BusinessMatching](request.credId, BusinessMatching.key, bm.copy(reviewDetails = updateReviewDetails(bm.reviewDetails, data)))
+              _ <- dataCacheConnector.save[BusinessMatching](request.credId, BusinessMatching.key,
+                bm.copy(reviewDetails = updateReviewDetails(bm.reviewDetails, data)))
             } yield {
               Redirect(routes.BusinessTypeController.get())
             }

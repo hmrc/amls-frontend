@@ -30,7 +30,6 @@ import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessdetails.BusinessDetails
 import models.businessmatching.BusinessMatching
-import models.estateagentbusiness.{EstateAgentBusiness}
 import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
@@ -205,11 +204,18 @@ class LandingController @Inject()(val landingService: LandingService,
             landingService.updateReviewDetails(rd, credId) map { _ => {
               auditConnector.sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
 
-              FormTypes.postcodeType.validate(rd.businessAddress.postcode.getOrElse("")) match {
-                case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
-                case Invalid(_) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
+              (rd.businessAddress.postcode, rd.businessAddress.country) match {
+                  case (Some(postcode), Country("United Kingdom", "GB")) => {
+                    FormTypes.postcodeType.validate(postcode) match {
+                      case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
+                      case Invalid(_) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
+                    }
+                  }
+                  case (_, Country("United Kingdom", "GB")) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
+                  case (_, country) if !country.isUK && !country.isEmpty => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
+                  case (_, _) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
+                }
               }
-            }
             }
           case (None, None) =>
             // $COVERAGE-OFF$
@@ -302,16 +308,11 @@ class LandingController @Inject()(val landingService: LandingService,
             // $COVERAGE-OFF$
             Logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: checking cacheMap for incomplete redress scheme")
             // $COVERAGE-ON$
-            val hasInvalidRedressScheme = if(config.standAloneEABService) {
-              for {
-                eab <- cache.map(_.getEntry[Eab](Eab.key))
-              } yield ControllerHelper.hasInvalidRedressSchemeNewEab(eab)
-            } else {
-              //TODO - can be removed when we remove the old EAB models
-              for {
-                eab <- cache.map(_.getEntry[EstateAgentBusiness](EstateAgentBusiness.key))
-              } yield ControllerHelper.hasInvalidRedressScheme(eab)
-            }
+
+            val hasInvalidRedressScheme = for {
+              eab <- cache.map(_.getEntry[Eab](Eab.key))
+            } yield ControllerHelper.hasInvalidRedressScheme(eab)
+
             // $COVERAGE-OFF$
             Logger.debug(s"[AMLSLandingController][hasIncompleteRedressScheme]: eab.isRedressInvalid = ${hasInvalidRedressScheme.contains(true)}")
             // $COVERAGE-ON$
@@ -320,63 +321,7 @@ class LandingController @Inject()(val landingService: LandingService,
     }
   }
 
-  //TODO - can be removed when we remove the old EAB models
   private def dataHasChanged(cacheMap: CacheMap) = {
-    if(config.standAloneEABService) {
-      dataHasChangedNewEab(cacheMap)
-    } else {
-      dataHasChangedOldEab(cacheMap)
-    }
-  }
-
-  //TODO - can be removed when we remove the old EAB models
-  private def dataHasChangedOldEab(cacheMap: CacheMap) = {
-    Seq(
-      cacheMap.getEntry[Asp](Asp.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.getEntry[Amp](Amp.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.getEntry[BusinessDetails](BusinessDetails.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.getEntry[Seq[BankDetails]](BankDetails.key).fold(false) {
-        _.exists(_.hasChanged)
-      },
-      cacheMap.getEntry[BusinessActivities](BusinessActivities.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.getEntry[BusinessMatching](BusinessMatching.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).fold(false) {
-        _.exists(_.hasChanged)
-      },
-      cacheMap.getEntry[Supervision](Supervision.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.getEntry[Tcsp](Tcsp.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.getEntry[Seq[TradingPremises]](TradingPremises.key).fold(false) {
-        _.exists(_.hasChanged)
-      },
-      cacheMap.getEntry[Hvd](Hvd.key).fold(false) {
-        _.hasChanged
-      },
-      cacheMap.getEntry[Renewal](Renewal.key).fold(false) {
-        _.hasChanged
-      }
-    ).exists(identity)
-  }
-  private def dataHasChangedNewEab(cacheMap: CacheMap) = {
     Seq(
       cacheMap.getEntry[Asp](Asp.key).fold(false) {
         _.hasChanged

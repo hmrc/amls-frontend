@@ -20,7 +20,7 @@ import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import models.asp.Asp
 import models.businessmatching.{BillPaymentServices, BusinessActivities => BMBusinessActivities, _}
-import models.estateagentbusiness.EstateAgentBusiness
+import models.eab.Eab
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBSection}
@@ -68,7 +68,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
           mockCacheRemoveByKey[Hvd]
           mockCacheRemoveByKey[Tcsp]
           mockCacheRemoveByKey[Asp]
-          mockCacheRemoveByKey[EstateAgentBusiness]
+          mockCacheRemoveByKey[Eab]
 
           val result = helper.removeSectionData("internalId", activitiesToRemove).value
 
@@ -158,13 +158,13 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
           val testTradingPremises = Seq(TradingPremises(
             whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(
-            activities = Set(
-            HighValueDealing,
-            AccountancyServices,
-            EstateAgentBusinessService,
-            MoneyServiceBusiness,
-            TrustAndCompanyServices,
-            BillPaymentServices)))))
+              activities = Set(
+                HighValueDealing,
+                AccountancyServices,
+                EstateAgentBusinessService,
+                MoneyServiceBusiness,
+                TrustAndCompanyServices,
+                BillPaymentServices)))))
 
           val newTradingPremises = Seq(TradingPremises(
             whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(
@@ -247,4 +247,3 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
     }
   }
 }
-

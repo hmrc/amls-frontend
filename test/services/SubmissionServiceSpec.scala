@@ -29,7 +29,7 @@ import models.businesscustomer.ReviewDetails
 import models.businessdetails.{BusinessDetails, RegisteredOfficeUK}
 import models.businessmatching.BusinessType.SoleProprietor
 import models.businessmatching._
-import models.estateagentbusiness.EstateAgentBusiness
+import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal._
@@ -149,7 +149,7 @@ class SubmissionServiceSpec extends AmlsSpec
     mockCacheGetEntry[MoneyServiceBusiness](Some(MoneyServiceBusiness()), MoneyServiceBusiness.key)
     mockCacheGetEntry[Hvd](Some(Hvd()), Hvd.key)
     mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
-    mockCacheGetEntry[EstateAgentBusiness](Some(mock[EstateAgentBusiness]), EstateAgentBusiness.key)
+    mockCacheGetEntry[Eab](Some(mock[Eab]), Eab.key)
     mockCacheGetEntry[BusinessDetails](Some(businessDetails), BusinessDetails.key)
     mockCacheGetEntry[Seq[BankDetails]](Some(Seq(BankDetails())), BankDetails.key)
     mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(responsiblePersonGen.sample.get)), ResponsiblePerson.key)
@@ -303,7 +303,9 @@ class SubmissionServiceSpec extends AmlsSpec
         ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),
         transactionsInLast12Months = Some(TransactionsInLast12Months("2500")),
         percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-        receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other"))))))
+        receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
+        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+        fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("10"))
       )
 
       val result = await(submissionService.renewal("12345678", Some(amlsRegistrationNumber), ("accType", "id"), renewal))
@@ -322,8 +324,10 @@ class SubmissionServiceSpec extends AmlsSpec
 
       submission.msbSection mustBe defined
       submission.msbSection.get.throughput mustBe defined
+      submission.msbSection.get.sendMoneyToOtherCountry mustBe defined
       submission.msbSection.get.mostTransactions mustBe defined
       submission.msbSection.get.sendTheLargestAmountsOfMoney mustBe defined
+      submission.msbSection.get.fxTransactionsInNext12Months mustBe defined
       submission.msbSection.get.whichCurrencies mustBe defined
       submission.msbSection.get.ceTransactionsInNext12Months mustBe defined
       submission.msbSection.get.transactionsInNext12Months mustBe defined

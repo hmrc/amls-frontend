@@ -126,12 +126,21 @@ class AgentNameController @Inject()(
                 _ <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
                   tp.agentName(tradingPremises.agentName.get.copy(dateOfChange = Some(dateOfChange)))
                 }
-              } yield Redirect(routes.DetailedAnswersController.get(1))
+              } yield Redirect(routes.DetailedAnswersController.get(index))
           }
         }
   }
 
-  private def redirectToAgentNameDateOfChange(tradingPremises: TradingPremises, name: AgentName) = {
-    !tradingPremises.agentName.contains(name) && tradingPremises.lineId.isDefined
+  private def redirectToAgentNameDateOfChange(tradingPremises: TradingPremises, agent: AgentName) = {
+    def isAgentNameAndDobChanged = tradingPremises.agentName match {
+      case Some(AgentName(agentName, _, agentDateOfBirth)) if isAgentDataUnchanged(agentName, agentDateOfBirth, agent) => false
+      case _ => true
+    }
+
+    isAgentNameAndDobChanged && tradingPremises.lineId.isDefined
+  }
+
+  private def isAgentDataUnchanged(name: String, dob: Option[LocalDate], agent: AgentName) = {
+    name == agent.agentName && dob == agent.agentDateOfBirth
   }
 }

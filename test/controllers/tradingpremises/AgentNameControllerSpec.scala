@@ -218,6 +218,27 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
         }
       }
 
+      "go to the check your answers page in edit mode" when {
+        "the agent name has been not changed and submission is successful" in new Fixture {
+
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse.copy(lineId = Some(1)))))
+
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
+
+          val newRequest = requestWithUrlEncodedBody(
+            "agentName" -> "test",
+            "agentDateOfBirth.day" -> "24",
+            "agentDateOfBirth.month" -> "2",
+            "agentDateOfBirth.year" -> "1990")
+
+          val result = controller.post(1, true)(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+        }
+      }
+
       "redirect to WhereAreTradingPremises Page" when {
         "status is SubmissionDecisionApproved" in new Fixture {
 
@@ -239,8 +260,6 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
         }
       }
 
-
-
       "return view for Date of Change" in new Fixture {
         implicit val ec:ExecutionContext = app.injector.instanceOf[ExecutionContext]
         val result = controller.dateOfChange(1)(request)
@@ -248,7 +267,6 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       }
 
       "handle the date of change form post" when {
-
         "given valid data for a agent name" in new Fixture {
 
           val postRequest = requestWithUrlEncodedBody(
@@ -318,7 +336,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
 
   val businessStructure = SoleProprietor
-  val testAgentName = AgentName("test")
+  val testAgentName = AgentName(agentName = "test", agentDateOfBirth = Some(date))
   val testAgentCompanyName = AgentCompanyDetails("test", Some("12345678"))
   val testAgentPartnership = AgentPartnership("test")
   val wdbd = WhatDoesYourBusinessDo(

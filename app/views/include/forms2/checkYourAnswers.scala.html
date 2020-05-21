@@ -31,7 +31,7 @@
     @if(editUrl.nonEmpty && allowEdit) {
         <footer class="group">
             <p>
-                <a @if(editLinkTag.nonEmpty) {id="@editLinkTag"} href="@editUrl" class="change-answer"><span aria-hidden="true">@Messages("button.edit")</span> <span class="visuallyhidden">@Messages("button.edit") @Messages("summary.visuallyhidden.your.answer.for") &#8220;@question&#8221;</span></a>
+                <a @if(editLinkTag.nonEmpty) {id="@editLinkTag"} href="@editUrl" class="change-answer">@Messages("button.edit")<span class="visuallyhidden"> @question</span></a>
             </p>
         </footer>
     }

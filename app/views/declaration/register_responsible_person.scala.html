@@ -28,13 +28,10 @@
 
 @whatyouneed(
     title = Messages("declaration.register.responsible.person.title") + " - " + Messages(subtitle),
-    heading = header,
-    sidebar = sidebar
+    heading = header
 ) {
 
     <p>@Messages("declaration.register.responsible.person.description")</p>
-
-    <h2>@Messages("declaration.register.responsible.person.title")</h2>
 
     <p>@Messages("declaration.register.responsible.person.text")</p>
 
@@ -55,11 +52,4 @@
         draggable = false
     )
 
-}
-
-@sidebar = {
-    <div class="user-attention">
-        <h2 class="heading-small">@Messages("main.sidebar.title")</h2>
-        <p>@Messages("main.sidebar.information")</p>
-    </div>
 }

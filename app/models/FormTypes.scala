@@ -146,8 +146,10 @@ object FormTypes {
   def validateAddress(line: String) = maxLength(maxAddressLength).withMessage(s"error.max.length.address.$line") andThen addressTypePatternWithMessage(s"error.text.validation.address.$line")
 
   private val postcodeRequired = required("error.required.postcode")
+  def postcodeRequiredWithMessage(errorMessage: String) = required(errorMessage)
 
   val postcodeType = postcodeRequired andThen postcodePattern
+  def postcodeTypeWithMsg(errorMessage: String) = postcodeRequiredWithMessage(errorMessage) andThen postcodePattern
 
 
   /** Contact Details Rules **/

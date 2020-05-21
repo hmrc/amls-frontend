@@ -65,7 +65,22 @@
             ) {
                 @vatRegistered match {
                     case VATRegisteredNo => { @Messages("lbl.no") }
-                    case VATRegisteredYes(v) => { @Messages("lbl.vat.reg.number") @v }
+                    case VATRegisteredYes(vatNo) => { @Messages("lbl.yes") }
+                }
+            }
+        }
+
+        @model.vatRegistered.map { vatRegistered =>
+            @vatRegistered match {
+                case VATRegisteredNo => {}
+                case VATRegisteredYes(vatNo) => {
+                    @checkYourAnswersRow(
+                        question = Messages("lbl.vat.reg.number"),
+                        editLinkTag = "businessdetailsregisteredvat-edit",
+                        editUrl = controllers.businessdetails.routes.VATRegisteredController.get(true).toString
+                    ) {
+                          @vatNo
+                    }
                 }
             }
         }
@@ -128,64 +143,64 @@
         }
 
         @model.altCorrespondenceAddress.map { aca =>
+
             @checkYourAnswersRow(
                 question = Messages("businessdetails.lettersaddress.title"),
                 editLinkTag = "businessdetailslettersaddress-edit",
                 editUrl = controllers.businessdetails.routes.LettersAddressController.get(true).toString
             ) {
-                @model.registeredOffice.map { a =>
-                @a.toLines.map { line =>
-                    @line<br />
-                    }
-                }
-
                 @aca match {
-                    case true => { @Messages("lbl.no") }
-                    case false => { @Messages("lbl.yes") }
-                    }
-            }
-        }
-
-        @model.correspondenceAddress.map { ca =>
-
-            @ca.isUk.map { isUk =>
-
-                @isUk match {
-
                     case true => {
-
-                        @checkYourAnswersRow(
-                            question = Messages("businessdetails.correspondenceaddress.isuk.title"),
-                            editLinkTag = "businessdetailscorraddress-edit",
-                            editUrl = controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get(true).toString
-                        ) {
-                            @Messages("businessdetails.correspondenceaddress.ukAddress")
-                        }
-
-                        @checkYourAnswersRow(
-                            question = Messages("businessdetails.correspondenceaddress.title"),
-                            editLinkTag = "businessdetailscorraddress-edit",
-                            classes = Seq("check-your-answers__last"),
-                            editUrl = controllers.businessdetails.routes.CorrespondenceAddressUkController.get(true).toString
-                        ) {
-                            @ca.ukAddress.map { d => @d.toLines.map { line => @line<br /> } }
-                        }
+                        @Messages("lbl.no")
                     }
                     case false => {
-                        @checkYourAnswersRow(
-                            question = Messages("businessdetails.correspondenceaddress.isuk.title"),
-                            editLinkTag = "businessdetailscorraddress-edit",
-                            editUrl = controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get(true).toString
-                        ) {
-                            @Messages("businessdetails.correspondenceaddress.nonUkAddress")
-                        }
-                        @checkYourAnswersRow(
-                            question = Messages("businessdetails.correspondenceaddress.title"),
-                            editLinkTag = "businessdetailscorraddress-edit",
-                            classes = Seq("check-your-answers__last"),
-                            editUrl = controllers.businessdetails.routes.CorrespondenceAddressNonUkController.get(true).toString
-                        ) {
-                            @ca.nonUkAddress.map { d => @d.toLines.map { line => @line<br /> } }
+                        @Messages("lbl.yes")
+                    }
+                }
+            }
+            @if(aca) {
+                @model.correspondenceAddress.map { ca =>
+
+                    @ca.isUk.map { isUk =>
+
+                        @isUk match {
+
+                            case true => {
+
+                                @checkYourAnswersRow(
+                                    question = Messages("businessdetails.correspondenceaddress.isuk.title"),
+                                    editLinkTag = "businessdetailscorraddressisuk-edit",
+                                    editUrl = controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get(true).toString
+                                ) {
+                                    @Messages("businessdetails.correspondenceaddress.ukAddress")
+                                }
+
+                                @checkYourAnswersRow(
+                                    question = Messages("businessdetails.correspondenceaddress.title"),
+                                    editLinkTag = "businessdetailscorraddress-edit",
+                                    classes = Seq("check-your-answers__last"),
+                                    editUrl = controllers.businessdetails.routes.CorrespondenceAddressUkController.get(true).toString
+                                ) {
+                                    @ca.ukAddress.map { d => @d.toLines.map { line => @line <br /> } }
+                                }
+                            }
+                            case false => {
+                                @checkYourAnswersRow(
+                                    question = Messages("businessdetails.correspondenceaddress.isuk.title"),
+                                    editLinkTag = "businessdetailscorraddressisuk-edit",
+                                    editUrl = controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get(true).toString
+                                ) {
+                                    @Messages("businessdetails.correspondenceaddress.nonUkAddress")
+                                }
+                                @checkYourAnswersRow(
+                                    question = Messages("businessdetails.correspondenceaddress.title"),
+                                    editLinkTag = "businessdetailscorraddress-edit",
+                                    classes = Seq("check-your-answers__last"),
+                                    editUrl = controllers.businessdetails.routes.CorrespondenceAddressNonUkController.get(true).toString
+                                ) {
+                                    @ca.nonUkAddress.map { d => @d.toLines.map { line => @line <br /> } }
+                                }
+                            }
                         }
                     }
                 }

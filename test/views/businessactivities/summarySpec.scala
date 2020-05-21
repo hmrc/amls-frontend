@@ -55,17 +55,22 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
-      ("businessactivities.confirm-activities.title",checkElementTextIncludes(_, "OtherActivities")),
+      ("businessactivities.confirm-activities.title",checkElementTextIncludes(_, "lbl.yes")),
+      ("businessactivities.confirm-activities.lbl.details",checkElementTextIncludes(_, "OtherActivities")),
       ("businessactivities.business-turnover.title",checkElementTextIncludes(_, "businessactivities.business-turnover.lbl.01")),
 
       (Messages("businessactivities.turnover.heading", "money service business"),checkElementTextIncludes(_, "businessactivities.turnover.lbl.01")),
 
-      ("businessactivities.businessfranchise.title",checkElementTextIncludes(_, "FranchiseName")),
+      ("businessactivities.businessfranchise.title",checkElementTextIncludes(_, "lbl.yes")),
+      ("businessactivities.businessfranchise.lbl.franchisename",checkElementTextIncludes(_, "FranchiseName")),
+
       ("businessactivities.employees.line1.cya",checkElementTextIncludes(_, "123")),
       ("businessactivities.employees.line2.cya",checkElementTextIncludes(_, "456")),
       ("businessactivities.keep.customer.records.title", checkElementTextIncludes(_, "lbl.yes")),
       ("businessactivities.do.keep.records",
-        checkElementTextIncludes(_, "businessactivities.transactiontype.lbl.01", "businessactivities.transactiontype.lbl.02", "businessactivities.transactiontype.lbl.03", "SoftwareName")),
+        checkElementTextIncludes(_, "businessactivities.transactiontype.lbl.01", "businessactivities.transactiontype.lbl.02", "businessactivities.transactiontype.lbl.03")),
+      ("businessactivities.name.software.pkg.lbl",
+        checkElementTextIncludes(_, "SoftwareName")),
       ("businessactivities.identify-suspicious-activity.title",checkElementTextIncludes(_, "lbl.yes")),
       ("businessactivities.ncaRegistered.title",checkElementTextIncludes(_, "lbl.yes")),
       ("businessactivities.riskassessment.policy.title", checkElementTextIncludes(_, "lbl.yes")),

@@ -36,6 +36,13 @@ object SendMoneyToOtherCountry {
   implicit val formWrites: Write[SendMoneyToOtherCountry, UrlFormEncoded] = Write {x =>
     "money" -> x.money.toString
   }
+
+  def convert(model: SendMoneyToOtherCountry): models.moneyservicebusiness.SendMoneyToOtherCountry = {
+    model match {
+      case SendMoneyToOtherCountry(true) => models.moneyservicebusiness.SendMoneyToOtherCountry(true)
+      case _ => models.moneyservicebusiness.SendMoneyToOtherCountry(false)
+    }
+  }
 }
 
 

@@ -29,7 +29,7 @@ import models.businessactivities.BusinessActivities
 import models.businessdetails.{BusinessDetails, RegisteredOfficeUK}
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
-import models.estateagentbusiness.EstateAgentBusiness
+import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Conversions._
@@ -91,17 +91,15 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     }
   }
 
-  //TODO AMLS-5779 - provide an override for new EAB object
   private def createSubscriptionRequest(cache: CacheMap)
                                               (implicit hc: HeaderCarrier, ec: ExecutionContext): SubscriptionRequest = {
 
     def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
-
-    def filteredTradingPremises = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
+    def filteredTradingPremises     = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
 
     SubscriptionRequest(
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
-      eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
+      eabSection = cache.getEntry[Eab](Eab.key),
       tradingPremisesSection = filteredTradingPremises,
       businessDetailsSection = cache.getEntry[BusinessDetails](BusinessDetails.key),
       bankDetailsSection = bankDetailsExceptDeleted(cache.getEntry[Seq[BankDetails]](BankDetails.key)),

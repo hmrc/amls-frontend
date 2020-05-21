@@ -40,11 +40,12 @@ class ContactingYouPhoneController @Inject () (val dataCache: DataCacheConnector
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
       for {
-        businessDetails <-
-        dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+        businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
       } yield businessDetails match {
-        case Some(BusinessDetails(_,_, _, _, Some(details), _, _, _, _, _, _, _)) if details.phoneNumber.isDefined =>
-          Ok(contacting_you_phone(Form2[ContactingYouPhone](ContactingYouPhone (details.phoneNumber.getOrElse(""))), edit))
+        case Some(BusinessDetails(_, _, _, _, Some(details), _, _, _, _, _, _, _)) if details.phoneNumber.isDefined =>
+          Ok(
+            contacting_you_phone(Form2[ContactingYouPhone](ContactingYouPhone(details.phoneNumber.getOrElse(""))), edit)
+          )
         case _ => Ok(contacting_you_phone(EmptyForm, edit))
       }
   }
@@ -57,8 +58,10 @@ class ContactingYouPhoneController @Inject () (val dataCache: DataCacheConnector
         case ValidForm(_, data) =>
           for {
             businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
-            _ <- dataCache.save[BusinessDetails](request.credId, BusinessDetails.key,
-                businessDetails.contactingYou(updateData(businessDetails.contactingYou, data))
+            _ <- dataCache.save[BusinessDetails](
+              request.credId, BusinessDetails.key, businessDetails.contactingYou(
+                updateData(businessDetails.contactingYou, data)
+              )
             )
           } yield {
             edit match {

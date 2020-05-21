@@ -50,8 +50,23 @@
             editLinkTag = "involvedinother-edit"
         ) {
             @model.involvedInOther.map {
-                case InvolvedInOtherNo => { @Messages("lbl.no") }
-                case InvolvedInOtherYes(v) => { @v }
+                case InvolvedInOtherNo            => { @Messages("lbl.no") }
+                case InvolvedInOtherYes(activity) => { @Messages("lbl.yes") }
+            }
+        }
+
+        @model.involvedInOther.map {
+            case InvolvedInOtherNo            => {}
+            case InvolvedInOtherYes(activity) => {
+
+                @checkYourAnswersRow(
+                    question = Messages("businessactivities.confirm-activities.lbl.details"),
+                    editUrl = controllers.businessactivities.routes.InvolvedInOtherController.get(true).toString,
+                    editLinkTag = "involvedinother-edit"
+                ) {
+                    @activity
+                }
+
             }
         }
 
@@ -79,13 +94,6 @@
                 editUrl = controllers.businessactivities.routes.ExpectedAMLSTurnoverController.get(true).toString,
                 editLinkTag = "expectedamlsturnover-edit"
             ) {
-                <ul id="businessactivities-list" class="list list-bullet">
-                    @bmBusinessActivities.alphabeticalBusinessTypes().map { businessActivities =>
-                        @businessActivities.map { ba =>
-                            <li>@ba</li>
-                        }
-                    }
-                </ul>
 
                 <p>@turnover match {
                     case ExpectedAMLSTurnover.First => { @Messages("businessactivities.business-turnover.lbl.01") }
@@ -105,8 +113,21 @@
             editLinkTag = "businessfranchise-edit"
         ) {
             @model.businessFranchise.map {
-                case BusinessFranchiseNo => { @Messages("lbl.no") }
-                case BusinessFranchiseYes(name) => { @name }
+                case BusinessFranchiseNo        => { @Messages("lbl.no") }
+                case BusinessFranchiseYes(name) => { @Messages("lbl.yes") }
+            }
+        }
+
+        @model.businessFranchise.map {
+            case BusinessFranchiseNo => {}
+            case BusinessFranchiseYes(name) => {
+                @checkYourAnswersRow(
+                    question = Messages("businessactivities.businessfranchise.lbl.franchisename"),
+                    editUrl = controllers.businessactivities.routes.BusinessFranchiseController.get(true).toString,
+                    editLinkTag = "businessfranchise-edit"
+                ) {
+                    @name
+                }
             }
         }
 
@@ -147,17 +168,45 @@
                 editUrl = controllers.businessactivities.routes.TransactionTypesController.get(true).toString,
                 editLinkTag = "howrecordskept-edit"
             ) {
-                    <ul class="list list-bullet">
+                    @if(t.types.size > 1) {
+                        <ul class="list list-bullet">
+                            @t.types.map { x =>
+                            <li>@x match {
+                                case Paper => {@Messages("businessactivities.transactiontype.lbl.01")}
+                                case DigitalSpreadsheet => {@Messages("businessactivities.transactiontype.lbl.02")}
+                                case DigitalSoftware(software) => {@Messages("businessactivities.transactiontype.lbl.03")}
+                            }</li>
+                        }
+                        </ul>
+                    } else {
                         @t.types.map { x =>
-                        <li>@x match {
-                            case Paper => {@Messages("businessactivities.transactiontype.lbl.01")}
-                            case DigitalSpreadsheet => {@Messages("businessactivities.transactiontype.lbl.02")}
-                            case DigitalSoftware(software) => {@Messages("businessactivities.transactiontype.lbl.03"): @software}
-                        }</li>
+                            @x match {
+                                case Paper => {@Messages("businessactivities.transactiontype.lbl.01")}
+                                case DigitalSpreadsheet => {@Messages("businessactivities.transactiontype.lbl.02")}
+                                case DigitalSoftware(software) => {@Messages("businessactivities.transactiontype.lbl.03")}
+                            }
+                        }
                     }
-                    </ul>
+                }
+        }
+
+        @model.transactionRecordTypes.map { t =>
+            @t.types.map { x =>
+
+                @x match {
+                    case DigitalSoftware(software) => {
+                        @checkYourAnswersRow(
+                            question = Messages("businessactivities.name.software.pkg.lbl"),
+                            editUrl = controllers.businessactivities.routes.TransactionTypesController.get(true).toString,
+                            editLinkTag = "howrecordskept-edit"
+                        ) {
+                            @software
+                        }
+                    }
+                    case _ => {}
                 }
             }
+        }
 
         @checkYourAnswersRow(
             question = Messages("businessactivities.identify-suspicious-activity.title"),
@@ -208,12 +257,20 @@
                     editUrl = controllers.businessactivities.routes.DocumentRiskAssessmentController.get(true).toString,
                     editLinkTag = "documentriskassessment-edit"
                 ) {
+
+                    @if(v.size > 1) {
                     <ul class="list list-bullet">
                         @v.map {
                             case Digital => { <li>@Messages("businessactivities.RiskAssessmentType.lbl.02")</li> }
                             case PaperBased => { <li>@Messages("businessactivities.RiskAssessmentType.lbl.01")</li> }
                         }
                     </ul>
+                    } else {
+                        @v.map {
+                            case Digital    => { @Messages("businessactivities.RiskAssessmentType.lbl.02") }
+                            case PaperBased => { @Messages("businessactivities.RiskAssessmentType.lbl.01") }
+                        }
+                    }
                 }
             }
         }
@@ -245,7 +302,12 @@
                                     ) {
                                         @accountant.names.map { names =>
                                             @if(!names.accountantsName.isEmpty) {
-                                                Name: @names.accountantsName<br/>
+
+                                                @if(!names.accountantsTradingName.isEmpty) {
+                                                    Name: @names.accountantsName<br/>
+                                                } else {
+                                                    @names.accountantsName<br/>
+                                                }
                                             }
 
                                             @if(!names.accountantsTradingName.isEmpty) {

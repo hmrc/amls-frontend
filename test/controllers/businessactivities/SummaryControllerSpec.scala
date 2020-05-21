@@ -159,30 +159,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         document.getElementById("expectedamlsturnover-edit").html() must include(Messages("button.edit"))
       }
     }
-
-    "pre load Business matching business activities data in " +
-      "'How much total net profit does your business expect in the next 12 months, from the following activities?'" in new Fixture {
-
-      when(controller.dataCache.fetchAll(any())(any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(activities = bmBusinessActivities)))
-
-      when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
-        .thenReturn(Some(completeModel))
-
-      when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
-        .thenReturn(Future.successful(NotCompleted))
-
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      val document = Jsoup.parse(contentAsString(result))
-
-      val listElement = document.getElementById("businessactivities-list")
-      listElement.children().size() must be(bmBusinessActivities.fold(0)(x => x.businessActivities.size))
-
-    }
   }
 
   "post is called" must {

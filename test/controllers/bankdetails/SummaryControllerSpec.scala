@@ -88,7 +88,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) must be(OK)
       contentAsString(result) must include("My IBAN Account")
       contentAsString(result) must include("DE89370400440532013000")
-      contentAsString(result) must include(Messages("bankdetails.bankaccount.iban"))
+      contentAsString(result) must include(Messages("bankdetails.bankaccount.iban.title"))
       contentAsString(result) mustNot include("My Personal Account")
     }
   }
