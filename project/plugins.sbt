@@ -21,7 +21,7 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
 
 addSbtPlugin("org.brianmckenna" % "sbt-wartremover" % "0.11")
 
-addSbtPlugin("uk.gov.hmrc" % "sbt-artifactory" % "1.0.0")
+addSbtPlugin("uk.gov.hmrc" % "sbt-artifactory" % "1.2.0")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.1.2")
 
