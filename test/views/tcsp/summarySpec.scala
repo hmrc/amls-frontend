@@ -68,7 +68,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks wit
           "tcsp.provided_services.service.lbl.07",
           "sfasfasef"))),
         ("tcsp.servicesOfAnotherTcsp.title", checkElementTextIncludes(_, "lbl.yes")),
-        ("tcsp.anothertcspsupervision.cya.additional.header", checkElementTextIncludes(_, s"Money Laundering Regulation reference number: $amlsRegistrationNumber"))
+        ("tcsp.anothertcspsupervision.cya.additional.header", checkElementTextIncludes(_, s"$amlsRegistrationNumber"))
       )
 
       def view = {
