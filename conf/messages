@@ -2782,3 +2782,57 @@ login-event.skip-for-now = Skip for now and continue to the service
 
 ############################### SiteBack ###############################
 site.back = Back
+
+############################### Accessibility ###############################
+accessibility.statement.title = Accessibility statement for Manage your anti-money laundering supervision
+accessibility.statement.paragraph.one = This accessibility statement explains how accessible this service is, what to do if you have difficulty using it, and how to report accessibility problems with the service.
+accessibility.statement.paragraph.two.start = This service is part of the wider GOV.UK website. There is a separate
+accessibility.statement.paragraph.two.link = accessibility statement
+accessibility.statement.paragraph.two.end = for the main GOV.UK website.
+accessibility.statement.paragraph.three = This page only contains information about the Manage your anti-money laundering supervision service, available at
+accessibility.statement.paragraph.three.link = www.tax.service.gov.uk/anti-money-laundering
+accessibility.statement.paragraph.four = You can use this service to apply to register under the Money Laundering Regulations, renew a registration, and manage your account.
+accessibility.statement.paragraph.five = You can also use this service to withdraw your application or deregister your business, if you no longer need to be registered under the Money Laundering Regulations.
+accessibility.statement.paragraph.six = This service is run by HM Revenue and Customs (HMRC). We want as many people as possible to be able to use this service. This means you should be able to:
+accessibility.statement.paragraph.seven = We have also made the text in the service as simple as possible to understand.
+accessibility.statement.paragraph.eight = has advice on making your device easier to use if you have a disability.
+accessibility.statement.paragraph.eight.link = AbilityLink
+accessibility.statement.paragraph.nine = This service is fully compliant with the
+accessibility.statement.paragraph.nine.link = Web Content Accessibility Guidelines version 2.1 AA standard
+accessibility.statement.paragraph.ten = There are no known accessibility issues within this service.
+accessibility.statement.paragraph.eleven = If you have difficulty using this service, contact us by:
+accessibility.statement.paragraph.twelve = We are always looking to improve the accessibility of this service. If you find any problems that are not listed on this page or think we are not meeting accessibility requirements,
+accessibility.statement.paragraph.twelve.link = report the accessibility problem
+accessibility.statement.paragraph.thirteen1 = The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ‘accessibility regulations’). If you are not happy with how we respond to your complaint,
+accessibility.statement.paragraph.thirteen2 = or the
+accessibility.statement.paragraph.thirteen3 = if you live in Northern Ireland
+accessibility.statement.paragraph.thirteen.link1 = contact the Equality Advisory and Support Service (EASS)
+accessibility.statement.paragraph.thirteen.link2 = Equality Commission for Northern Ireland (ECNI)
+accessibility.statement.paragraph.fourteen = We provide a text relay service if you are deaf, hearing impaired or have a speech impediment.
+accessibility.statement.paragraph.fifteen = We can provide a British Sign Language (BSL) interpreter, or you can arrange a visit from an HMRC advisor to help you complete the service.
+accessibility.statement.paragraph.sixteen = Find out how to
+accessibility.statement.paragraph.sixteen.link = contact us
+accessibility.statement.paragraph.seventeen = HMRC is committed to making this service accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.
+accessibility.statement.paragraph.eighteen = This service is fully compliant with the
+accessibility.statement.paragraph.eighteen.link = Web Content Accessibility Guidelines version 2.1 AA standard
+accessibility.statement.paragraph.nineteen = The service was last tested on Monday 11 May 2020 and was checked for compliance with WCAG 2.1 AA.
+accessibility.statement.paragraph.twenty = The service was built using parts that were tested by the Digital Accessibility Centre. The full service was tested by HMRC and included disabled users.
+accessibility.statement.paragraph.twentyone =
+
+
+accessibility.statement.listitem1 = change colours, contrast levels and fonts
+accessibility.statement.listitem2 = zoom in up to 300% without the text spilling off the screen
+accessibility.statement.listitem3 = get from the start of the service to the end using just a keyboard
+accessibility.statement.listitem4 = get from the start of the service to the end using speech recognition software
+accessibility.statement.listitem5 = listen to the service using a screen reader (including the most recent versions of JAWS, NVDA and VoiceOver)
+accessibility.statement.listitem6 = email: MLRCIT@hmrc.gov.uk
+accessibility.statement.listitem7 = telephone: 0300 200 3700
+
+accessibility.statement.heading.one = Using this service
+accessibility.statement.heading.two = How accessible this service is
+accessibility.statement.heading.three = What to do if you have difficulty using this service
+accessibility.statement.heading.four = Reporting accessibility problems with this service
+accessibility.statement.heading.five = What to do if you are not happy with how we respond to your complaint
+accessibility.statement.heading.six = Contacting us by phone or getting a visit from us in person
+accessibility.statement.heading.seven = Technical information about this service’s accessibility
+accessibility.statement.heading.eight = How we tested this service
