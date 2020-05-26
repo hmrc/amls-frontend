@@ -2836,3 +2836,6 @@ accessibility.statement.heading.five = What to do if you are not happy with how 
 accessibility.statement.heading.six = Contacting us by phone or getting a visit from us in person
 accessibility.statement.heading.seven = Technical information about this service’s accessibility
 accessibility.statement.heading.eight = How we tested this service
+
+############################### Footer ###############################
+footer.links.accessibility.text = Accessibility statement
