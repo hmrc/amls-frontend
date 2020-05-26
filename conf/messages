@@ -2361,6 +2361,7 @@ tcsp.provided_services.service.lbl.details = Service your business provides
 
 tcsp.anothertcspsupervision.title = Is your trust or company service provider registered with HMRC under the Money Laundering Regulations?
 tcsp.anothertcspsupervision.header = Is your trust or company service provider registered with HMRC under the Money Laundering Regulations?
+tcsp.anothertcspsupervision.cya.additional.header = Trust or company service provider’s Money Laundering Regulations number
 
 #ASP
 asp.whatyouneed.subheading = You’ll need to tell us:
