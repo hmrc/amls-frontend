@@ -73,7 +73,7 @@
                 <span class="visuallyhidden">Error: </span>@field.error
             </span>
         }
-        <textarea class="govuk-textarea govuk-js-character-count" id="with-hint" name="@field.name" id="@field.id"
+        <textarea class="govuk-textarea govuk-js-character-count" name="@field.name" id="@field.id"
             @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}" }
             @if(cols.nonEmpty) { cols="@cols" }
             @if(rows.nonEmpty) { rows="@rows" }

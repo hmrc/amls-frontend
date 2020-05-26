@@ -36,7 +36,7 @@
 
     @form(f, controllers.supervision.routes.SupervisionEndReasonsController.post(edit)) {
 
-      @fieldset(
+      @fieldsetWithErrorGroup(
           f = f("endingReason-fieldset"),
           heading = "supervision.supervision_end_reasons.title",
           section = "summary.supervision",
