@@ -62,7 +62,6 @@ case class Supervision(
     case Supervision(None, None, None, None, _, _) => true
     case _ => false
   }
-
 }
 
 object Supervision {
