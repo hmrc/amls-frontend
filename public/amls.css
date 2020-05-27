@@ -389,8 +389,6 @@ div.hide-if-desktop > .messaging {
   display:none;
 }
 
-
-/* -- TODO: fix this – IE10+ needs a chevron kick
 @media all and
   (-ms-high-contrast: none) and (max-width: 640px),
   (-ms-high-contrast: active) and (max-width: 640px) {
