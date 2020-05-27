@@ -1455,7 +1455,7 @@ details {
 @media (min-width: 641px) {
   .form-control,
   .panel-indent .form-control {
-    width: 50%
+    width: 100%
   }
 }
 
@@ -2264,4 +2264,12 @@ legend .heading-medium{
 
 .govuk-hint.govuk-character-count__message {
   color: #6f777b;
+}
+
+.form-field--error .form-control {
+  border: 4px solid #d4351c;
+}
+
+.form-control--full-width {
+  width: 100%;
 }
