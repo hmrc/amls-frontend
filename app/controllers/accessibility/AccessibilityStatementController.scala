@@ -21,20 +21,20 @@ import java.net.URLEncoder
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.headers.Referer
 import config.ApplicationConfig
-import controllers.{AmlsBaseController, CommonPlayDependencies}
+import controllers.{AmlsBaseController, CommonPlayDependencies, MessagesRequestHelper}
 import javax.inject.Inject
-import play.api.mvc.{Call, MessagesControllerComponents}
+import play.api.mvc.{BodyParsers, Call, MessagesControllerComponents}
 import utils.AuthAction
 import views.html.accessibility._
 
 import scala.concurrent.Future
 
-class AccessibilityStatementController @Inject()(authAction: AuthAction,
-                                                 val ds: CommonPlayDependencies,
+class AccessibilityStatementController @Inject()(val ds: CommonPlayDependencies,
                                                  val cc: MessagesControllerComponents,
-                                                 config: ApplicationConfig) extends AmlsBaseController(ds, cc) {
+                                                 config: ApplicationConfig,
+                                                 parser: BodyParsers.Default) extends AmlsBaseController(ds, cc) with MessagesRequestHelper {
 
-  def get = authAction.async {
+  def get = messagesAction(parser).async {
       implicit request =>
 
         val service = "AMLS"
