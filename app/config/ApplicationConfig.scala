@@ -87,6 +87,8 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   
   def publicMessageBannerToggle = servicesConfig.getConfBool("feature-toggle.public-message-banner", true)
 
+  def accessibilityStatementToggle = servicesConfig.getConfBool("feature-toggle.accessibility-statement", true)
+
   lazy val authUrl = baseUrl("auth")
 
   def enrolmentStoreUrl = baseUrl("tax-enrolments")
@@ -127,6 +129,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
 
   lazy val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
 
-  val accessibilityStatementUpdated = "11 May 2020"
-  val accessibilityStatementLastTested = "15 May 2020"
+
+  def accessibilityStatementUpdated = servicesConfig.getConfString("accessibility-statement.updated", "11th May 2020")
+  def accessibilityStatementTested = servicesConfig.getConfString("accessibility-statement.tested", "15th May 2020")
 }

@@ -146,6 +146,14 @@
     </main>
 }
 
+@footerLinks = {
+    @if(appConfig.accessibilityStatementToggle) {
+        @uiLayouts.footer_links(accessibilityFooterUrl=Some(controllers.accessibility.routes.AccessibilityStatementController.get().url))
+    } else {
+        @uiLayouts.footer_links()
+    }
+}
+
 @hmrcGovUkTemplate(
     Some(views.ViewUtils.errorPrefix(mainContent) + title + " - " + Messages("title.amls") + " - " + Messages("title.gov")),
     bodyClasses
@@ -155,6 +163,6 @@
     insideHeader,
     play.twirl.api.HtmlFormat.empty,
     play.twirl.api.HtmlFormat.empty,
-    Some(uiLayouts.footer_links(accessibilityFooterUrl=Some(controllers.accessibility.routes.AccessibilityStatementController.get().url))),
+    Some(footerLinks),
     true
 )(content)
