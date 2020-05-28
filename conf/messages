@@ -2815,10 +2815,9 @@ accessibility.statement.paragraph.sixteen.link = contact us
 accessibility.statement.paragraph.seventeen = HMRC is committed to making this service accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.
 accessibility.statement.paragraph.eighteen = This service is fully compliant with the
 accessibility.statement.paragraph.eighteen.link = Web Content Accessibility Guidelines version 2.1 AA standard
-accessibility.statement.paragraph.nineteen = The service was last tested on Monday 11 May 2020 and was checked for compliance with WCAG 2.1 AA.
+accessibility.statement.paragraph.nineteen = The service was last tested on Monday {0} and was checked for compliance with WCAG 2.1 AA.
 accessibility.statement.paragraph.twenty = The service was built using parts that were tested by the Digital Accessibility Centre. The full service was tested by HMRC and included disabled users.
-accessibility.statement.paragraph.twentyone =
-
+accessibility.statement.paragraph.twentyone = This page was prepared on 15 May 2020. It was last updated on {0}.
 
 accessibility.statement.listitem1 = change colours, contrast levels and fonts
 accessibility.statement.listitem2 = zoom in up to 300% without the text spilling off the screen

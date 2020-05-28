@@ -21,14 +21,14 @@
 @(url: String)(implicit request: Request[_], m: Messages, appConfig: ApplicationConfig, lang: Lang)
 
 @header = {
-    @heading("accessibility.statement.title")
     @components.back_link()
+    @heading("accessibility.statement.title")
 }
 
 @main(m("accessibility.statement.title"), heading = header, showGetHelpForm = false) {
 
     <p>@Messages("accessibility.statement.paragraph.one")</p>
-    <p>@Messages("accessibility.statement.paragraph.two.start") <a href="https://www.gov.uk/help/accessibility">@Messages("accessibility.statement.paragraph.two.link")</a>@Messages("accessibility.statement.paragraph.two.end")</p>
+    <p>@Messages("accessibility.statement.paragraph.two.start") <a href="https://www.gov.uk/help/accessibility">@Messages("accessibility.statement.paragraph.two.link")</a> @Messages("accessibility.statement.paragraph.two.end")</p>
     <p>@Messages("accessibility.statement.paragraph.three") <a href="https://www.tax.service.gov.uk/anti-money-laundering">@Messages("accessibility.statement.paragraph.three.link")</a></p>
 
     <h2>@Messages("accessibility.statement.heading.one")</h2>
@@ -61,7 +61,7 @@
 
     <h2>@Messages("accessibility.statement.heading.five")</h2>
     <p>@Messages("accessibility.statement.paragraph.thirteen1") <a href="https://www.equalityadvisoryservice.com/">@Messages("accessibility.statement.paragraph.thirteen.link1")</a>
-        @Messages("accessibility.statement.paragraph.thirteen2") <a href="https://www.equalityni.org/Home">@Messages("accessibility.statement.paragraph.thirteen.link2")></a>
+        @Messages("accessibility.statement.paragraph.thirteen2") <a href="https://www.equalityni.org/Home">@Messages("accessibility.statement.paragraph.thirteen.link2")</a>
          @Messages("accessibility.statement.paragraph.thirteen3")</p>
 
     <h2>@Messages("accessibility.statement.heading.six")</h2>
@@ -74,12 +74,8 @@
     <p>@Messages("accessibility.statement.paragraph.eighteen") <a href="https://www.w3.org/TR/WCAG21/">@Messages("accessibility.statement.paragraph.eighteen.link")</a> </p>
 
     <h2>@Messages("accessibility.statement.heading.eight")</h2>
-    <p>@Messages("accessibility.statement.paragraph.nineteen")</p>
+    <p>@Messages("accessibility.statement.paragraph.nineteen", s"${appConfig.accessibilityStatementUpdated}")</p>
     <p>@Messages("accessibility.statement.paragraph.twenty")</p>
-    <p>@Messages("accessibility.statement.paragraph.twentyone")</p>
-
-    <h1>@m("accessibility.statement.title.report.problem")</h1>
-
-    <a href=@url target="_blank">@m("accessibility.problem")</a>
+    <p>@Messages("accessibility.statement.paragraph.twentyone", s"${appConfig.accessibilityStatementLastTested}"))</p>
 
 }

@@ -126,4 +126,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
 
   lazy val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
+
+  val accessibilityStatementUpdated = "11 May 2020"
+  val accessibilityStatementLastTested = "15 May 2020"
 }

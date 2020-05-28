@@ -18,6 +18,7 @@ package views.accessibility
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 
@@ -77,10 +78,29 @@ class accessibilityStatementSpec extends AmlsViewSpec with MustMatchers  {
       html must include("We are always looking to improve the accessibility of this service. If you find any problems that are not listed on this page or think we are not meeting accessibility requirements,")
       html must include("report the accessibility problem")
       html must include("The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ‘accessibility regulations’). If you are not happy with how we respond to your complaint,")
-      html must include("")
-      html must include("")
-      html must include("")
-      html must include("")
+      html must include("if you live in Northern Ireland")
+      html must include("contact the Equality Advisory and Support Service (EASS)")
+      html must include("Equality Commission for Northern Ireland (ECNI)")
+      html must include("We provide a text relay service if you are deaf, hearing impaired or have a speech impediment.")
+      html must include("We can provide a British Sign Language (BSL) interpreter, or you can arrange a visit from an HMRC advisor to help you complete the service.")
+      html must include("Find out how to")
+      html must include("contact us")
+      html must include("HMRC is committed to making this service accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.")
+      html must include("This service is fully compliant with the")
+      html must include("Web Content Accessibility Guidelines version 2.1 AA standard")
+      html must include("The service was built using parts that were tested by the Digital Accessibility Centre. The full service was tested by HMRC and included disabled users.")
+    }
+
+    "have correct list content" in new ViewFixture {
+      def view = views.html.accessibility.accessibility_statement("")
+
+      html must include("change colours, contrast levels and fonts")
+      html must include("zoom in up to 300% without the text spilling off the screen")
+      html must include("get from the start of the service to the end using just a keyboard")
+      html must include("get from the start of the service to the end using speech recognition software")
+      html must include("listen to the service using a screen reader (including the most recent versions of JAWS, NVDA and VoiceOver)")
+      html must include("email: MLRCIT@hmrc.gov.uk")
+      html must include("telephone: 0300 200 3700")
     }
   }
 }
