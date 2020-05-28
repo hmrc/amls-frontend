@@ -1,1 +1,0 @@
- + [AMLS-5925] - 'Address for letters content update'
