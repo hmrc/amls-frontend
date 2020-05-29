@@ -19,7 +19,7 @@ package services
 import config.ApplicationConfig
 import connectors.{EnrolmentStubConnector, TaxEnrolmentsConnector}
 import javax.inject.Inject
-import models.enrolment.{AmlsEnrolmentKey, TaxEnrolment}
+import models.enrolment.{AmlsEnrolmentKey, TaxEnrolment, TaxEnrolmentSafeId}
 import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
@@ -70,10 +70,11 @@ class AuthEnrolmentsService @Inject()(val enrolmentStore: TaxEnrolmentsConnector
     }
   }
 
-  def enrol(amlsRegistrationNumber: String, postcode: String, groupId: Option[String], credId: String)
+  def enrol(amlsRegistrationNumber: String, postcode: String, groupId: Option[String], credId: String, safeId: String)
            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
-    enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolment(credId, postcode), groupId)
+    //enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolment(credId, postcode), groupId)
+    enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolmentSafeId(credId, safeId), groupId)
   }
 
   def deEnrol(amlsRegistrationNumber: String, groupId: Option[String])

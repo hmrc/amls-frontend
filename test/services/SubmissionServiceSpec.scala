@@ -190,7 +190,7 @@ class SubmissionServiceSpec extends AmlsSpec
           } thenReturn Future.successful(subscriptionResponse)
 
           when {
-            submissionService.authEnrolmentsService.enrol(any(), any(), any(), any())(any(), any())
+            submissionService.authEnrolmentsService.enrol(any(), any(), any(), any(), any())(any(), any())
           } thenReturn Future.successful(HttpResponse(OK))
 
           whenReady(submissionService.subscribe("12345678", ("accType", "id"), Some("GROUP_ID"))) {
@@ -213,7 +213,7 @@ class SubmissionServiceSpec extends AmlsSpec
           await(submissionService.subscribe("12345678", ("accType", "id"), Some("GROUP_ID")))
         }
 
-        verify(submissionService.authEnrolmentsService, never).enrol(any(), any(), any(), any())(any(), any())
+        verify(submissionService.authEnrolmentsService, never).enrol(any(), any(), any(), any(), any())(any(), any())
       }
 
       "throw the original error if 422 encountered without a json body" in new Fixture {
@@ -227,7 +227,7 @@ class SubmissionServiceSpec extends AmlsSpec
           await(submissionService.subscribe("12345678", ("accType", "id"), Some("GROUP_ID")))
         }
 
-        verify(submissionService.authEnrolmentsService, never).enrol(any(), any(), any(), any())(any(), any())
+        verify(submissionService.authEnrolmentsService, never).enrol(any(), any(), any(), any(), any())(any(), any())
       }
 
       "throw the original error if something other than a duplicate subscription is encountered" in new Fixture {
@@ -241,7 +241,7 @@ class SubmissionServiceSpec extends AmlsSpec
           await(submissionService.subscribe("12345678", ("accType", "id"), Some("GROUP_ID")))
         }
 
-        verify(submissionService.authEnrolmentsService, never).enrol(any(), any(), any(), any())(any(), any())
+        verify(submissionService.authEnrolmentsService, never).enrol(any(), any(), any(), any(), any())(any(), any())
       }
 
     }
