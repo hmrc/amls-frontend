@@ -58,6 +58,10 @@ case class Supervision(
     case _ => false
   }
 
+  def isEmpty: Boolean = this match {
+    case Supervision(None, None, None, None, _, _) => true
+    case _ => false
+  }
 }
 
 object Supervision {
@@ -65,13 +69,11 @@ object Supervision {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "supervision"
     val notStarted = Section(messageKey, NotStarted, false, controllers.supervision.routes.WhatYouNeedController.get())
+
     cache.getEntry[Supervision](key).fold(notStarted) {
-      model =>
-        if (model.isComplete) {
-          Section(messageKey, Completed, model.hasChanged, controllers.supervision.routes.SummaryController.get())
-        } else {
-          Section(messageKey, Started, model.hasChanged, controllers.supervision.routes.WhatYouNeedController.get())
-        }
+      case model@m if m.isComplete => Section(messageKey, Completed, model.hasChanged, controllers.supervision.routes.SummaryController.get())
+      case m if m.isEmpty => notStarted
+      case model => Section(messageKey, Started, model.hasChanged, controllers.supervision.routes.WhatYouNeedController.get())
     }
   }
 

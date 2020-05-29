@@ -49,6 +49,26 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
       implicit val cache = mock[CacheMap]
 
+      "return a NotStarted Section when there is no model in the cache" in {
+
+        val notStartedSection = Section("supervision", NotStarted, false,  controllers.supervision.routes.WhatYouNeedController.get())
+
+        when(cache.getEntry[Supervision]("supervision")) thenReturn None
+
+        Supervision.section must be(notStartedSection)
+
+      }
+
+      "return a NotStarted Section when there is empty model in cache (everything None, except non optionals)" in {
+
+        val notStartedSection = Section("supervision", NotStarted, false,  controllers.supervision.routes.WhatYouNeedController.get())
+
+        when(cache.getEntry[Supervision]("supervision")) thenReturn Some(Supervision())
+
+        Supervision.section must be(notStartedSection)
+
+      }
+
       "return a NotStarted Section when model is empty" in {
 
         val notStartedSection = Section("supervision", NotStarted, false,  controllers.supervision.routes.WhatYouNeedController.get())
