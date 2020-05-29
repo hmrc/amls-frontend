@@ -47,7 +47,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   val betaFeedbackUrl = getConfigString("contact-frontend.beta-feedback-url.authenticated")
   val betaFeedbackUnauthenticatedUrl = getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 
-  val accessibilityStatementUrl = getConfigString("contact-frontend.accessibility-statement-url.accessibility-statement-url")
+  val accessibilityStatementUrl = getConfigString("contact-frontend.accessibility-statement-url")
 
   lazy val loginUrl = getConfigString("login.url")
   def logoutUrl = getConfigString("logout.url")
