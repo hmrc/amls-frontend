@@ -58,7 +58,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[_] =
 
     if (config.enrolmentStoreToggle) {
-      authEnrolmentsService.enrol(amlsRegistrationNumber, postcode, groupId, credId, safeId)
+      authEnrolmentsService.enrol(amlsRegistrationNumber, postcode, groupId, credId)
     } else {
       ggService.enrol(amlsRegistrationNumber, safeId, postcode)
     }
