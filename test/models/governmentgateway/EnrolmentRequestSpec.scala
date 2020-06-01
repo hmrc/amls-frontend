@@ -24,9 +24,7 @@ import play.api.libs.json.Json
 
 class EnrolmentRequestSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar {
 
-  override implicit lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.gg-knownfacts-postcode" -> true)
-    .build()
+  override implicit lazy val app = new GuiceApplicationBuilder().build()
 
   "EnrolmentRequest" must {
 
