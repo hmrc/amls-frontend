@@ -94,6 +94,6 @@ echo "Copied checksums files in ./conf/notifications/..."
 sed -i '' "s/${previouspackageversion}\"/${previouspackageversion}\",\"${newpackageversion}\"/g" ./test/NotificationsCheckSumSpec.scala
 
 echo "Added $newpackageversion to ./test/NotificationsCheckSumSpec.scala"
-echo "TODO: checksums for services will have to be updated"
+echo "Attention: checksums for services will have to be updated!"
 
 echo "Upversion complete"
