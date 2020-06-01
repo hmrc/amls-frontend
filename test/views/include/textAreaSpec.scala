@@ -33,8 +33,9 @@ class textAreaSpec extends PlaySpec with AmlsViewSpec {
     "render the correct hint text value when text is entered" in new Fixture {
       val result: String = textarea(ValidField(Path(List(KeyPathNode("key"))), Seq(""))).toString()
       val html: Document = Jsoup.parse(result)
+      println(html)
 
-      val hintText: String = html.getElementById("with-hint-info").text()
+      val hintText: String = html.getElementById("key-info").text()
 
       hintText mustBe "You can enter up to 200 characters"
     }
