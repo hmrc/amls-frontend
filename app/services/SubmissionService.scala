@@ -92,7 +92,6 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
   }
 
   private def getPostcodeFromTP(subscriptionRequest: SubscriptionRequest) = {
-    subscriptionRequest.tradingPremisesSection.get.head.yourTradingPremises.get.tradingPremisesAddress.postcode
 
     subscriptionRequest.tradingPremisesSection match {
       case Some(tpSection) => {
