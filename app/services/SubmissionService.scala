@@ -83,12 +83,27 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
       _ <- saveResponse(credId, subscription, SubscriptionResponse.key)
       _ <- enrol(safeId, subscription.amlsRefNo, request.businessDetailsSection.fold("")(_.registeredOffice match {
         case Some(o: RegisteredOfficeUK) => o.postCode
-        case _ => ""
+        case _ => getPostcodeFromTP(request)
       }), groupId, credId)
     } yield subscription) recoverWith {
       case e: Upstream4xxResponse if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
         Future.failed(SubscriptionErrorResponse.from(e).fold[Throwable](e)(r => DuplicateSubscriptionException(r.message)))
     }
+  }
+
+  private def getPostcodeFromTP(subscriptionRequest: SubscriptionRequest) = {
+    subscriptionRequest.tradingPremisesSection.get.head.yourTradingPremises.get.tradingPremisesAddress.postcode
+
+    subscriptionRequest.tradingPremisesSection match {
+      case Some(tpSection) => {
+        tpSection.head.yourTradingPremises.map(x => x.tradingPremisesAddress) match {
+          case Some(address) => address.postcode
+          case None => throw new MatchError("Could not locate first trading premises address")
+        }
+      }
+      case None    => throw new MatchError("Could not locate first trading premises")
+    }
+
   }
 
   private def createSubscriptionRequest(cache: CacheMap)
