@@ -212,8 +212,6 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
       "show fees is false" when {
         "business is a partnership and there are 2 partners and 1 nominated officer" in new Fixture {
 
-          override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
-
           val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
           val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
           val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
@@ -240,8 +238,6 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         }
 
         "business is not a partnership and at least one of the person in responsible people is the nominated officer" in new Fixture {
-
-          override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
 
           val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
           val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))

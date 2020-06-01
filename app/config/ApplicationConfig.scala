@@ -67,12 +67,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   
   lazy val mongoCacheUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.get-file-url")
 
-  // The following values are used by the Fee Guidance Controller currently toggled off with feature-toggle.show-fees
-  lazy val regFee = getConfigInt("amounts.registration")
-  lazy val premisesFee = getConfigInt("amounts.premises")
-  lazy val peopleFeeRate = getConfigInt("amounts.people")
-  lazy val approvalCheckPeopleFeeRate = getConfigInt("amounts.approval-check-rate")
-
   def amlsUrl = baseUrl("amls")
 
   def subscriptionUrl = s"$amlsUrl/amls/subscription"

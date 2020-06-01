@@ -57,9 +57,7 @@ class SubmissionServiceSpec extends AmlsSpec
   with ResponsiblePersonGenerator
   with TradingPremisesGenerator {
 
-  override lazy val app = GuiceApplicationBuilder()
-    .configure("microservice.amounts.registration" -> 100)
-    .build()
+  override lazy val app = GuiceApplicationBuilder().build()
 
   trait Fixture extends DependencyMocks {
 
