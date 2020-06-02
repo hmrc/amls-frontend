@@ -1,0 +1,81 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import include._
+@import utils.Strings._
+
+@(url: String)(implicit request: Request[_], m: Messages, appConfig: ApplicationConfig, lang: Lang)
+
+@header = {
+    @components.back_link()
+    @heading("accessibility.statement.title")
+}
+
+@main(m("accessibility.statement.title"), heading = header, showGetHelpForm = false) {
+
+    <p>@Messages("accessibility.statement.paragraph.one")</p>
+    <p>@Messages("accessibility.statement.paragraph.two.start") <a href="https://www.gov.uk/help/accessibility">@Messages("accessibility.statement.paragraph.two.link")</a> @Messages("accessibility.statement.paragraph.two.end")</p>
+    <p>@Messages("accessibility.statement.paragraph.three") <a href="https://www.tax.service.gov.uk/anti-money-laundering">@Messages("accessibility.statement.paragraph.three.link")</a>@Messages("full.stop")</p>
+
+    <h2>@Messages("accessibility.statement.heading.one")</h2>
+    <p>@Messages("accessibility.statement.paragraph.four")</p>
+    <p>@Messages("accessibility.statement.paragraph.five")</p>
+    <p>@Messages("accessibility.statement.paragraph.six")</p>
+        <ul class="list list-bullet">
+            <li>@Messages("accessibility.statement.listitem1")</li>
+            <li>@Messages("accessibility.statement.listitem2")</li>
+            <li>@Messages("accessibility.statement.listitem3")</li>
+            <li>@Messages("accessibility.statement.listitem4")</li>
+            <li>@Messages("accessibility.statement.listitem5")</li>
+        </ul>
+    <p>@Messages("accessibility.statement.paragraph.seven")</p>
+    <p><a href="https://mcmw.abilitynet.org.uk/">@Messages("accessibility.statement.paragraph.eight.link")</a> @Messages("accessibility.statement.paragraph.eight")</p>
+
+    <h2>@Messages("accessibility.statement.heading.two")</h2>
+    <p>@Messages("accessibility.statement.paragraph.nine") <a href="https://www.w3.org/TR/WCAG21/">@Messages("accessibility.statement.paragraph.nine.link")</a>@Messages("full.stop")</p>
+    <p>@Messages("accessibility.statement.paragraph.ten")</p>
+
+    <h2>@Messages("accessibility.statement.heading.three")</h2>
+    <p>@Messages("accessibility.statement.paragraph.eleven")</p>
+        <ul class="list list-bullet">
+            <li>@Messages("accessibility.statement.listitem6")</li>
+            <li>@Messages("accessibility.statement.listitem7")</li>
+        </ul>
+
+    <h2>@Messages("accessibility.statement.heading.four")</h2>
+    <p>@Messages("accessibility.statement.paragraph.twelve") <a href="https://www.tax.service.gov.uk/contact/accessibility-unauthenticated" target="_blank">@Messages("accessibility.statement.paragraph.twelve.link")</a>@Messages("full.stop")</p>
+
+    <h2>@Messages("accessibility.statement.heading.five")</h2>
+    <p>@Messages("accessibility.statement.paragraph.thirteen1") <a href="https://www.equalityadvisoryservice.com/">@Messages("accessibility.statement.paragraph.thirteen.link1")</a>
+        @Messages("accessibility.statement.paragraph.thirteen2") <a href="https://www.equalityni.org/Home">@Messages("accessibility.statement.paragraph.thirteen.link2")</a>
+         @Messages("accessibility.statement.paragraph.thirteen3")</p>
+
+    <h2>@Messages("accessibility.statement.heading.six")</h2>
+    <p>@Messages("accessibility.statement.paragraph.fourteen")</p>
+    <p>@Messages("accessibility.statement.paragraph.fifteen")</p>
+    <p>@Messages("accessibility.statement.paragraph.sixteen") <a href="https://www.gov.uk/dealing-hmrc-additional-needs">@Messages("accessibility.statement.paragraph.sixteen.link")</a>@Messages("full.stop")</p>
+
+    <h2>@Messages("accessibility.statement.heading.seven")</h2>
+    <p>@Messages("accessibility.statement.paragraph.seventeen")</p>
+    <p>@Messages("accessibility.statement.paragraph.eighteen") <a href="https://www.w3.org/TR/WCAG21/">@Messages("accessibility.statement.paragraph.eighteen.link")</a>@Messages("full.stop")</p>
+
+    <h2>@Messages("accessibility.statement.heading.eight")</h2>
+    <p>@Messages("accessibility.statement.paragraph.nineteen", s"${appConfig.accessibilityStatementUpdated}")</p>
+    <p>@Messages("accessibility.statement.paragraph.twenty")</p>
+    <p>@Messages("accessibility.statement.paragraph.twentyone", s"${appConfig.accessibilityStatementTested}")</p>
+
+}
