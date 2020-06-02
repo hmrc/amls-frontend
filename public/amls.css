@@ -2294,3 +2294,8 @@ legend .heading-medium{
   padding: unset;
   margin: 5px 0;
 }
+
+.govuk-character-count .govuk-textarea:focus {
+  border: 2px solid #0b0c0c;
+  outline: 3px solid #fd0;
+}
