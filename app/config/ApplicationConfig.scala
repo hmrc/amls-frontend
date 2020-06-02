@@ -47,6 +47,8 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   val betaFeedbackUrl = getConfigString("contact-frontend.beta-feedback-url.authenticated")
   val betaFeedbackUnauthenticatedUrl = getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 
+  val accessibilityStatementUrl = getConfigString("contact-frontend.accessibility-statement-url")
+
   lazy val loginUrl = getConfigString("login.url")
   def logoutUrl = getConfigString("logout.url")
   lazy val loginContinue = getConfigString("login.continue")
@@ -59,7 +61,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   lazy val ampWhatYouNeedUrl = s"${servicesConfig.getConfString("amls-art-market-participant-frontend.url", "")}/what-you-need"
   lazy val ampSummaryUrl     = s"${servicesConfig.getConfString("amls-art-market-participant-frontend.url", "")}/check-your-answers"
 
-  // TODO: EAB TO BE ADDED TO CONFIG
   lazy val eabWhatYouNeedUrl = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/what-you-need"
   lazy val eabSummaryUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.url", "")}/check-your-answers"
   lazy val eabRedressUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.redress-url", "")}/change-redress-scheme"
@@ -77,6 +78,8 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
   
   def publicMessageBannerToggle = servicesConfig.getConfBool("feature-toggle.public-message-banner", true)
+
+  def accessibilityStatementToggle = servicesConfig.getConfBool("feature-toggle.accessibility-statement", true)
 
   lazy val authUrl = baseUrl("auth")
 
@@ -117,4 +120,8 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
 
   lazy val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
+
+
+  def accessibilityStatementUpdated = servicesConfig.getConfString("accessibility-statement.updated", "11th May 2020")
+  def accessibilityStatementTested = servicesConfig.getConfString("accessibility-statement.tested", "15th May 2020")
 }
