@@ -40,6 +40,7 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.tradingpremises.TradingPremises.FilterUtils
+import play.api.Logger
 import play.api.http.Status.UNPROCESSABLE_ENTITY
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -83,7 +84,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
       _ <- saveResponse(credId, subscription, SubscriptionResponse.key)
       _ <- enrol(safeId, subscription.amlsRefNo, request.businessDetailsSection.fold("")(_.registeredOffice match {
         case Some(o: RegisteredOfficeUK) => o.postCode
-        case _ => getPostcodeFromTP(request)
+        case _                           => getPostcodeFromTPSection(request)
       }), groupId, credId)
     } yield subscription) recoverWith {
       case e: Upstream4xxResponse if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
@@ -91,18 +92,16 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     }
   }
 
-  private def getPostcodeFromTP(subscriptionRequest: SubscriptionRequest) = {
+  private def getPostcodeFromTPSection(subscriptionRequest: SubscriptionRequest) = {
 
     subscriptionRequest.tradingPremisesSection match {
-      case Some(tpSection) => {
+      case Some(tpSection) =>
         tpSection.head.yourTradingPremises.map(x => x.tradingPremisesAddress) match {
           case Some(address) => address.postcode
           case None => throw new MatchError("Could not locate first trading premises address")
         }
-      }
-      case None    => throw new MatchError("Could not locate first trading premises")
+      case _ => throw new MatchError("Could not locate first trading premises")
     }
-
   }
 
   private def createSubscriptionRequest(cache: CacheMap)

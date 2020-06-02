@@ -23,6 +23,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.BusinessType.LimitedCompany
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.registrationdetails.RegistrationDetails
 import models.tradingpremises.{TradingPremises, YourTradingPremises}
@@ -61,6 +62,22 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
       cc = mockMcc
     )
 
+    val ukReviewDetails = ReviewDetails(
+      "BusinessName",
+      Some(LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+      "ghghg",
+      Some("sdsw")
+    )
+
+    val nonUkReviewDetails = ReviewDetails(
+      "BusinessName",
+      Some(LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), None, Country("United States", "US")),
+      "ghghg",
+      Some("sdsw")
+    )
+
     when {
       enrolments.amlsRegistrationNumber(any(), any())(any(), any())
     } thenReturn Future.successful(Some(applicationReference))
@@ -78,13 +95,13 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
         "YourTradingPremises is not set" in new Fixture {
           val tp = tradingPremisesGen.sample.get.copy(yourTradingPremises = None)
 
-          mockCacheGetEntry(Some(bm), BusinessMatching.key)
+          mockCacheGetEntry(Some(bm.copy(reviewDetails = Some(ukReviewDetails))), BusinessMatching.key)
           mockCacheGetEntry(Some(Seq(tp)), TradingPremises.key)
 
           val result = controller.get(1)(request)
 
           status(result) must be(OK)
-          contentAsString(result) must include(Messages(bm.reviewDetails.get.businessAddress.line_1))
+          contentAsString(result) must include(Messages(ukReviewDetails.businessAddress.line_1))
         }
       }
 
@@ -99,6 +116,17 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
 
         "business matching -> review details is empty" in new Fixture {
           mockCacheGetEntry(Some(bm.copy(reviewDetails = None)), BusinessMatching.key)
+
+          val result = controller.get(1)(request)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.WhereAreTradingPremisesController.get(1).url))
+        }
+
+        "business matching -> address is non UK" in new Fixture {
+
+          mockCacheGetEntry(None, TradingPremises.key)
+          mockCacheGetEntry(Some(bm.copy(reviewDetails = Some(nonUkReviewDetails))), BusinessMatching.key)
 
           val result = controller.get(1)(request)
 

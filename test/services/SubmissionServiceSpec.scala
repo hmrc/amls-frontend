@@ -26,7 +26,7 @@ import models.amp.Amp
 import models.bankdetails.BankDetails
 import models.businessactivities.{BusinessActivities => BusActivities}
 import models.businesscustomer.ReviewDetails
-import models.businessdetails.{BusinessDetails, RegisteredOfficeUK}
+import models.businessdetails.{BusinessDetails, RegisteredOfficeNonUK, RegisteredOfficeUK}
 import models.businessmatching.BusinessType.SoleProprietor
 import models.businessmatching._
 import models.eab.Eab
@@ -34,7 +34,7 @@ import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal._
 import models.responsiblepeople.ResponsiblePerson
-import models.tradingpremises.TradingPremises
+import models.tradingpremises.{Address, RegisteringAgentPremises, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -175,6 +175,45 @@ class SubmissionServiceSpec extends AmlsSpec
           whenReady(submissionService.subscribe("12345678", ("accType", "id"), Some("GROUP_ID"))) { response =>
             response mustBe subscriptionResponse
             verify(submissionService.ggService).enrol(eqTo("amlsRef"), eqTo(safeId), eqTo("postcode"))(any(), any())
+          }
+        }
+
+        "the enrolment-store toggle is off and the registered address is non UK" in new Fixture {
+
+          when(config.enrolmentStoreToggle) thenReturn false
+
+          val date     = new LocalDate(1990, 2, 24)
+          val address  = Address("1", "2", None, None, "postcode1")
+          val address1 = Address("1", "2", None, None, "postcode2")
+
+          val ytp  = YourTradingPremises("tradingName1", address, Some(true), Some(date))
+          val ytp1 = YourTradingPremises("tradingName2", address1, Some(true), Some(date))
+
+          val tp1 = TradingPremises(
+            Some(RegisteringAgentPremises(false)), Some(ytp), None, None, None, None, None, None, false
+          )
+
+          val tp2 = TradingPremises(
+            Some(RegisteringAgentPremises(false)), Some(ytp1), None, None, None, None, None, None, false
+          )
+
+          mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(tp1, tp2)), TradingPremises.key)
+
+          when {
+            businessDetails.registeredOffice
+          } thenReturn Some(RegisteredOfficeNonUK("Line 1", "Line 2", None, None, Country("United States", "US"), None))
+
+          when {
+            submissionService.amlsConnector.subscribe(any(), eqTo(safeId), any())(any(), any(), any(), any())
+          } thenReturn Future.successful(subscriptionResponse)
+
+          when {
+            submissionService.ggService.enrol(any(), any(), any())(any(), any())
+          } thenReturn Future.successful(enrolmentResponse)
+
+          whenReady(submissionService.subscribe("12345678", ("accType", "id"), Some("GROUP_ID"))) { response =>
+            response mustBe subscriptionResponse
+            verify(submissionService.ggService).enrol(eqTo("amlsRef"), eqTo(safeId), eqTo("postcode1"))(any(), any())
           }
         }
       }

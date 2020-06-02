@@ -59,8 +59,9 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
         } yield {
           getData[TradingPremises](cache, index) map {
             case x if x.yourTradingPremises.isDefined => redirect
-            case _ => ok(address)
-          } getOrElse ok(address)
+            case _ if address.country.code == "GB"    => ok(address)
+            case _                                    => redirect
+          } getOrElse redirect
         }
       } getOrElse redirect
   }
