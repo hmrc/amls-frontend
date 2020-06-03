@@ -2326,13 +2326,17 @@ legend .heading-medium{
   -webkit-appearance: none;
 }
 
-.govuk-character-count .govuk-textarea.govuk-textarea--error.form-control--full-width {
+.govuk-character-count .govuk-textarea.govuk-textarea--error.form-control--full-width,
+.govuk-character-count.form-field--error .govuk-textarea.govuk-js-character-count.form-control--full-width,
+.form-field--error .govuk-character-count .govuk-textarea.govuk-js-character-count.form-control--full-width {
   border: 4px solid #d4351c;
   outline-offset: unset;
   padding: 3px;
 }
 
-.govuk-character-count .govuk-textarea.govuk-textarea--error.form-control--full-width:focus {
+.govuk-character-count .govuk-textarea.govuk-textarea--error.form-control--full-width:focus,
+.govuk-character-count.form-field--error .govuk-textarea.govuk-js-character-count.form-control--full-width:focus,
+.form-field--error .govuk-character-count .govuk-textarea.govuk-js-character-count.form-control--full-width:focus {
   padding: 3px;
   border-color: #0b0c0c;
   -webkit-box-shadow: none;
