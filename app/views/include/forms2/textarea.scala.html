@@ -26,10 +26,10 @@
     cols: String = "",
     rows: String = "",
     charCount: Int = 200,
-    largeWidth: Boolean = false,
     heading: String = "",
     section: String = "",
-    data: String = ""
+    data: String = "",
+    headingIsLabel: Boolean = false
 )(implicit m: Messages, lang: Lang)
 
 @labelSpan = {
@@ -44,7 +44,7 @@
     @if(heading.nonEmpty) {
         <div class="page-header">
             <h1>
-                <label class="govuk-form-label" for="with-hint">
+                <label class="heading-xlarge" for="@field.id">
                     @Messages(heading)
                 </label>
             </h1>
@@ -54,35 +54,35 @@
                 </p>
             }
         </div>
-        <p>@labelSpan</p>
-    } else {
-        <label class="govuk-form-label" for="with-hint">
-            @labelSpan
-        </label>
     }
 }
+<div class="form-group @if(field.hasErrors && !headingIsLabel) {form-field--error}">
+    @label
+    <div class="govuk-character-count @if(field.hasErrors && headingIsLabel) {form-field--error}" data-module="govuk-character-count" data-maxlength="@charCount">
+        <div class="govuk-form-group">
+            @if(labelText.nonEmpty){
+                <label class="form-label" for="@field.id">
+                    @labelSpan
+                </label>
+            }
+            @if(hintText.nonEmpty) {
+                <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
+            }
+            @if(field.hasErrors) {
+                <span class="error-notification" id="@{field.id}-error-notification" data-journey="error - field:user input:@field.name">
+                    <span class="visuallyhidden">Error: </span>@field.error
+                </span>
+            }
+            <textarea class="govuk-textarea govuk-js-character-count form-control form-control--full-width" name="@field.name" id="@field.id"
+                @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}" }
+                @if(cols.nonEmpty) { cols="@cols" }
+                @if(rows.nonEmpty) { rows="@rows" }
+                >@field.value</textarea>
+        </div>
 
-<div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="@charCount">
-    <div class="govuk-form-group">
-        @label
-        @if(hintText.nonEmpty) {
-            <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
-        }
-        @if(field.hasErrors) {
-            <span class="error-notification" id="@{field.id}-error-notification" data-journey="error - field:user input:@field.name">
-                <span class="visuallyhidden">Error: </span>@field.error
-            </span>
-        }
-        <textarea class="govuk-textarea govuk-js-character-count" id="with-hint" name="@field.name" id="@field.id"
-            @if(hintText.nonEmpty || field.hasErrors) { aria-describedby="@if(hintText.nonEmpty) {@{field.id}-hint} @if(field.hasErrors) {@{field.id}-error-notification}" }
-            @if(cols.nonEmpty) { cols="@cols" }
-            @if(rows.nonEmpty) { rows="@rows" }
-            @if(largeWidth) { class="textarea--3-4" }
-            >@field.value</textarea>
+        <span id="@field.id-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+            You can enter up to @charCount characters
+        </span>
+
     </div>
-
-    <span id="with-hint-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
-        You can enter up to @charCount characters
-    </span>
-
 </div>
