@@ -1,1 +1,0 @@
- + [AMLS-cleanup] - 'Removed not necessary config values from ApplicationConfig and non-existing toggle from specs'
