@@ -31,9 +31,9 @@ object CountryOfBirth {
     Rule {
       case "" => Invalid(Seq(Path -> Seq(ValidationError("error.required.rp.birth.country"))))
       case "GB" => Invalid(Seq(Path -> Seq(ValidationError("error.required.enter.valid.non.uk"))))
-      case code =>
+      case country =>
         countries.collectFirst {
-          case e @ Country(_, c) if c == code =>
+          case e @ Country(name, code) if code == country || name.toLowerCase == country.toLowerCase =>
             Valid(e)
         } getOrElse {
           Invalid(Seq(Path -> Seq(ValidationError("error.invalid.rp.birth.country"))))

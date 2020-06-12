@@ -35,6 +35,23 @@ class CountryOfBirthSpec extends PlaySpec {
         CountryOfBirth.formRule.validate(urlFormEncoded) must be(Valid(CountryOfBirth(false, Some(Country("Albania", "AL")))))
       }
 
+      "successfully validate when the country is typed and not selected and is valid" in {
+        val urlFormEncoded = Map(
+          "bornInUk" -> Seq("false"),
+          "country" -> Seq("albania")
+        )
+        CountryOfBirth.formRule.validate(urlFormEncoded) must be(Valid(CountryOfBirth(false, Some(Country("Albania", "AL")))))
+      }
+
+      "fail to validate when the country is typed and not selected and is not valid" in {
+        val urlFormEncoded = Map(
+          "bornInUk" -> Seq("false"),
+          "country" -> Seq("albanias")
+        )
+
+        CountryOfBirth.formRule.validate(urlFormEncoded).toString.contains("error.invalid.rp.birth.country").mustBe(true)
+      }
+
       "read successfully for valid input type 'No'" in {
         val urlFormEncoded = Map(
           "bornInUk" -> Seq("true")

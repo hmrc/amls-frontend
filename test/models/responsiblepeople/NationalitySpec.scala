@@ -16,10 +16,11 @@
 
 package models.responsiblepeople
 
+import cats.data.Validated.Valid
 import models.Country
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
+import jto.validation.{Invalid, Path}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -33,13 +34,29 @@ class NationalitySpec extends PlaySpec with MockitoSugar {
       Nationality.formRule.validate(urlFormEncoded) must be(Valid(British))
     }
 
-
     "successfully pass validation for otherCountry" in {
       val urlFormEncoded = Map(
         "nationality" -> Seq("02"),
         "otherCountry" -> Seq("GB")
       )
       Nationality.formRule.validate(urlFormEncoded) must be(Valid(OtherCountry(Country("United Kingdom", "GB"))))
+    }
+
+    "successfully validate when the country is typed and not selected and is valid" in {
+      val urlFormEncoded = Map(
+        "nationality" -> Seq("02"),
+        "otherCountry" -> Seq("albania")
+      )
+      Nationality.formRule.validate(urlFormEncoded) must be(Valid(OtherCountry(Country("Albania", "AL"))))
+    }
+
+    "fail to validate when the country is typed and not selected and is not valid" in {
+      val urlFormEncoded = Map(
+        "nationality" -> Seq("02"),
+        "otherCountry" -> Seq("albanias")
+      )
+
+      Nationality.formRule.validate(urlFormEncoded).toString.contains("error.invalid.rp.nationality.country").mustBe(true)
     }
 
     "fail validation if not Other value" in {
