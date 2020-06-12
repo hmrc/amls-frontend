@@ -41,6 +41,18 @@ class BranchesOrAgentsWhichCountriesSpec extends PlaySpec with MustMatchers{
       rule.validate(form) mustBe Valid(model)
     }
 
+    "successfully validate when the country is typed and not selected and is valid" in {
+      val form: UrlFormEncoded = Map( "countries" -> Seq("United Kingdom") )
+      val model: BranchesOrAgentsWhichCountries = BranchesOrAgentsWhichCountries( Seq(Country("United Kingdom", "GB")))
+      rule.validate(form) mustBe Valid(model)
+    }
+
+    "fail to validate when the country is typed and not selected and is not valid" in {
+      val form: UrlFormEncoded = Map( "countries" -> Seq("foo") )
+
+      rule.validate(form).toString.contains("error.invalid.country").mustBe(true)
+    }
+
     "fail to validate when hasCountries is true and there are no countries selected" in {
 
       val form: UrlFormEncoded = Map(
