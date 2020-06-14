@@ -383,6 +383,12 @@ $(function () {
 
     $("button[name='submit']").click(function(){
 
+        // If not actual value as in list then return false to halt and auto update field for
+        // second submission
+        if (selectField.val() === "" && nonSelectField.val() !== "") {
+          return false;
+        }
+
         var selectedOption = $('#' + selectFieldName + ' option:selected')
 
         if(nonSelectField.val() === '')
