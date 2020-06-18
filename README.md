@@ -13,3 +13,4 @@ To run the project clone the repository and in terminal $sbt "run $PORT"
 
  * [Creating new notification template versions](documentation/template-versions.md)
  
+

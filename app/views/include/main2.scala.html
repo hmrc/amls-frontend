@@ -89,15 +89,6 @@
     )
 }
 
-@betaBanner = {
-    @uiLayouts.betaBanner(
-        userLoggedIn = userLoggedIn,
-        betaFeedbackUrl = appConfig.betaFeedbackUrl,
-        betaFeedbackUnauthenticatedUrl = appConfig.betaFeedbackUnauthenticatedUrl,
-        showFeedbackLinkInBetaBanner = true
-    )
-}
-
 @URRBanner = {
     <div id="full-width-banner" class="full-width-banner no-print">
         <section class="centered-content visible full-width-banner__container" aria-hidden="false">
@@ -148,11 +139,6 @@
         } else if(showURRBanner) {
             @URRBanner
         }
-        <div class="centered-content">
-            <div class="service-info">
-                @betaBanner
-            </div>
-        </div>
         <div id="content">
             @mainContent
         </div>
