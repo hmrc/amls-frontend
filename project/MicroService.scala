@@ -1,3 +1,4 @@
+import play.sbt.PlayImport.PlayKeys
 import play.sbt.routes.RoutesKeys._
 import sbt.Keys._
 import sbt.Tests.{Group, SubProcess}
@@ -50,6 +51,7 @@ trait MicroService {
     .settings(
       libraryDependencies ++= appDependencies,
       retrieveManaged := true,
+      PlayKeys.playDefaultPort := 9222,
       evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
       routesGenerator := InjectedRoutesGenerator,
       pipelineStages in Assets := Seq(digest)
