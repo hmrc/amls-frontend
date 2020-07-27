@@ -37,7 +37,8 @@ class NeedMoreInformationController @Inject()(authAction: AuthAction,
                                               val ds: CommonPlayDependencies,
                                               implicit val dataCacheConnector: DataCacheConnector,
                                               val router: Router[AddBusinessTypeFlowModel],
-                                              val cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) {
+                                              val cc: MessagesControllerComponents,
+                                              new_service_information: new_service_information)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

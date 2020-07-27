@@ -40,7 +40,8 @@ class PSRNumberController @Inject()(authAction: AuthAction,
                                     val businessMatchingService: BusinessMatchingService,
                                     val router: Router[ChangeSubSectorFlowModel],
                                     val helper: ChangeSubSectorHelper,
-                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                    val cc: MessagesControllerComponents,
+                                    psr_number: psr_number) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

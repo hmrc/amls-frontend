@@ -37,7 +37,8 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
                                                 val authAction: AuthAction,
                                                 val ds: CommonPlayDependencies,
                                                 implicit val statusService: StatusService,
-                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                val cc: MessagesControllerComponents,
+                                                expected_amls_turnover: expected_amls_turnover) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

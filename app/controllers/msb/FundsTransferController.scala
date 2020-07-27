@@ -31,7 +31,8 @@ import scala.concurrent.Future
 class FundsTransferController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                           authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
-                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                          val cc: MessagesControllerComponents,
+                                          funds_transfer: funds_transfer) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

@@ -25,6 +25,7 @@ import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, DeclarationHelper}
 import play.api.mvc.MessagesControllerComponents
+import views.html.declaration.renew_registration
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -35,7 +36,8 @@ class RenewRegistrationController @Inject()(val dataCacheConnector: DataCacheCon
                                             implicit val statusService: StatusService,
                                             implicit val renewalService: RenewalService,
                                             val ds: CommonPlayDependencies,
-                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                            val cc: MessagesControllerComponents,
+                                            renew_registration: renew_registration) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
     implicit request =>
@@ -45,7 +47,7 @@ class RenewRegistrationController @Inject()(val dataCacheConnector: DataCacheCon
             val form = (for {
               renew <- renewRegistration
             } yield Form2[RenewRegistration](renew)).getOrElse(EmptyForm)
-            Ok(views.html.declaration.renew_registration(form, maybeEndDate))
+            Ok(renew_registration(form, maybeEndDate))
         }
 
       }
@@ -56,7 +58,7 @@ class RenewRegistrationController @Inject()(val dataCacheConnector: DataCacheCon
       Form2[RenewRegistration](request.body) match {
         case f: InvalidForm =>
           DeclarationHelper.statusEndDate(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { maybeEndDate =>
-            Future.successful(BadRequest(views.html.declaration.renew_registration(f, maybeEndDate)))
+            Future.successful(BadRequest(renew_registration(f, maybeEndDate)))
           }
         case ValidForm(_, data) =>
           dataCacheConnector.save[RenewRegistration](request.credId, RenewRegistration.key, data)

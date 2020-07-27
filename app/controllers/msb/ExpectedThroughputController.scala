@@ -35,7 +35,8 @@ class ExpectedThroughputController @Inject() (authAction: AuthAction,
                                               implicit val dataCacheConnector: DataCacheConnector,
                                               implicit val statusService: StatusService,
                                               implicit val serviceFlow: ServiceFlow,
-                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                              val cc: MessagesControllerComponents,
+                                              expected_throughput: expected_throughput) extends AmlsBaseController(ds, cc) {
 
 
   def get(edit: Boolean = false) = authAction.async {

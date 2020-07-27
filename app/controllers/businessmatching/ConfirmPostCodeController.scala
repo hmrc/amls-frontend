@@ -35,7 +35,8 @@ import scala.concurrent.Future
 class ConfirmPostCodeController @Inject()(authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           val dataCacheConnector: DataCacheConnector,
-                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                          val cc: MessagesControllerComponents,
+                                          confirm_postcode: confirm_postcode) extends AmlsBaseController(ds, cc) {
 
 
   def get() = authAction.async {

@@ -28,6 +28,7 @@ import services.businessmatching.ServiceFlow
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper}
+import views.html.msb.most_transactions
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,7 +40,8 @@ class MostTransactionsController @Inject()(authAction: AuthAction,
                                            implicit val statusService: StatusService,
                                            implicit val serviceFlow: ServiceFlow,
                                            val autoCompleteService: AutoCompleteService,
-                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                           val cc: MessagesControllerComponents,
+                                           most_transactions: most_transactions) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>
@@ -49,7 +51,7 @@ class MostTransactionsController @Inject()(authAction: AuthAction,
               msb <- response
               transactions <- msb.mostTransactions
             } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
-            Ok(views.html.msb.most_transactions(form, edit, autoCompleteService.getCountries))
+            Ok(most_transactions(form, edit, autoCompleteService.getCountries))
         }
   }
 
@@ -57,7 +59,7 @@ class MostTransactionsController @Inject()(authAction: AuthAction,
       implicit request =>
         Form2[MostTransactions](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.msb.most_transactions(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
+            Future.successful(BadRequest(most_transactions(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
             cacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
               val result = for {

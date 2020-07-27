@@ -41,7 +41,8 @@ class WhatDateRemovedController @Inject()(
                                            val ds: CommonPlayDependencies,
                                            val dataCacheConnector: DataCacheConnector,
                                            val router: Router[RemoveBusinessTypeFlowModel],
-                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                           val cc: MessagesControllerComponents,
+                                           date_of_change: date_of_change) extends AmlsBaseController(ds, cc) {
 
   implicit val dateWrites: Write[DateOfChange, UrlFormEncoded] =
     Write {

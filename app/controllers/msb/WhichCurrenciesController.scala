@@ -26,8 +26,9 @@ import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.ControllerHelper
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+import views.html.msb.which_currencies
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class WhichCurrenciesController @Inject() (authAction: AuthAction,
@@ -35,7 +36,8 @@ class WhichCurrenciesController @Inject() (authAction: AuthAction,
                                            implicit val dataCacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
                                            implicit val serviceFlow: ServiceFlow,
-                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                           val cc: MessagesControllerComponents,
+                                           which_currencies: which_currencies) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request => {
@@ -46,7 +48,7 @@ class WhichCurrenciesController @Inject() (authAction: AuthAction,
             currencies <- msb.whichCurrencies
           } yield Form2[WhichCurrencies](currencies)).getOrElse(EmptyForm)
 
-          Ok(views.html.msb.which_currencies(form, edit))
+          Ok(which_currencies(form, edit))
       }
     }
   }
@@ -55,7 +57,7 @@ class WhichCurrenciesController @Inject() (authAction: AuthAction,
     implicit request => {
       Form2[WhichCurrencies](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.which_currencies(alignFormDataWithValidationErrors(f), edit)))
+          Future.successful(BadRequest(which_currencies(alignFormDataWithValidationErrors(f), edit)))
         case ValidForm(_, data: WhichCurrencies) =>
               for {
                 msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)

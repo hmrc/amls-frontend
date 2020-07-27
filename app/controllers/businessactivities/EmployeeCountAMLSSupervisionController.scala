@@ -31,7 +31,8 @@ import scala.concurrent.Future
 class EmployeeCountAMLSSupervisionController @Inject() (val dataCacheConnector: DataCacheConnector,
                                                         val authAction: AuthAction,
                                                         val ds: CommonPlayDependencies,
-                                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                        val cc: MessagesControllerComponents,
+                                                        business_employees_amls_supervision: business_employees_amls_supervision) extends AmlsBaseController(ds, cc) {
 
   def updateData(howManyEmployees: Option[HowManyEmployees], data: EmployeeCountAMLSSupervision): HowManyEmployees = {
     howManyEmployees.fold[HowManyEmployees](HowManyEmployees(employeeCountAMLSSupervision = Some(data.employeeCountAMLSSupervision)))(x =>

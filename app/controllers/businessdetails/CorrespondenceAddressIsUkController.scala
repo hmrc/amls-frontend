@@ -33,7 +33,8 @@ class CorrespondenceAddressIsUkController @Inject ()(val dataConnector: DataCach
                                                      val auditConnector: AuditConnector,
                                                      val authAction: AuthAction,
                                                      val ds: CommonPlayDependencies,
-                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                     val cc: MessagesControllerComponents,
+                                                     correspondence_address_is_uk: correspondence_address_is_uk) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

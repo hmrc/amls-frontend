@@ -33,7 +33,8 @@ import scala.concurrent.Future
 class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                  val authAction: AuthAction,
                                                  val ds: CommonPlayDependencies,
-                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                 val cc: MessagesControllerComponents,
+                                                 document_risk_assessment_policy: document_risk_assessment_policy) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

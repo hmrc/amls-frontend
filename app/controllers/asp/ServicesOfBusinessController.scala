@@ -36,7 +36,8 @@ class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheCo
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val serviceFlow: ServiceFlow,
-                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                                             val cc: MessagesControllerComponents,
+                                             services_of_business: services_of_business) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

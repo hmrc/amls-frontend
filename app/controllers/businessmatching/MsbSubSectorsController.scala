@@ -31,8 +31,9 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+import views.html.businessmatching.services
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MsbSubSectorsController @Inject()(authAction: AuthAction,
@@ -43,7 +44,8 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
                                         val statusService:StatusService,
                                         val helper: ChangeSubSectorHelper,
                                         val config: ApplicationConfig,
-                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                        val cc: MessagesControllerComponents,
+                                        services: services) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>
@@ -53,8 +55,8 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
         } yield {
           val form: Form2[BusinessMatchingMsbServices] = bm.msbServices map
             Form2[BusinessMatchingMsbServices] getOrElse EmptyForm
-            Ok(views.html.businessmatching.services(form, edit, bm.preAppComplete, statusService.isPreSubmission(status), config.fxEnabledToggle))
-        }) getOrElse Ok(views.html.businessmatching.services(EmptyForm, edit, fxEnabledToggle = config.fxEnabledToggle))
+            Ok(services(form, edit, bm.preAppComplete, statusService.isPreSubmission(status), config.fxEnabledToggle))
+        }) getOrElse Ok(services(EmptyForm, edit, fxEnabledToggle = config.fxEnabledToggle))
   }
 
   def post(edit: Boolean = false) = authAction.async {
@@ -62,7 +64,7 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
         import jto.validation.forms.Rules._
         Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.businessmatching.services(f, edit, fxEnabledToggle = config.fxEnabledToggle)))
+            Future.successful(BadRequest(services(f, edit, fxEnabledToggle = config.fxEnabledToggle)))
           case ValidForm(_, data) =>
             dataCacheConnector.update[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) {
               _.getOrElse(ChangeSubSectorFlowModel()).copy(subSectors = Some(data.msbServices))

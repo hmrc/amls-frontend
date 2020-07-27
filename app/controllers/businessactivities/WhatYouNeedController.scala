@@ -37,7 +37,8 @@ class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector
                                       statusService: StatusService,
                                       authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
-                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                      val cc: MessagesControllerComponents,
+                                      what_you_need: what_you_need) extends AmlsBaseController(ds, cc) {
 import scala.concurrent.Future
 
   def get = authAction.async {

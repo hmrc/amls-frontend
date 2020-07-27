@@ -25,15 +25,17 @@ import play.api.mvc.MessagesControllerComponents
 import services.AutoCompleteService
 import utils.ControllerHelper
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+import views.html.msb.branches_or_agents_which_countries
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                          authAction: AuthAction,
                                                          val ds: CommonPlayDependencies,
                                                          val autoCompleteService: AutoCompleteService,
-                                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                         val cc: MessagesControllerComponents,
+                                                         branches_or_agents_which_countries: branches_or_agents_which_countries) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -45,7 +47,7 @@ class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector:
             branches <- boa.branches
           } yield Form2[BranchesOrAgentsWhichCountries](branches)).getOrElse(EmptyForm)
 
-          Ok(views.html.msb.branches_or_agents_which_countries(form, edit, autoCompleteService.getCountries))
+          Ok(branches_or_agents_which_countries(form, edit, autoCompleteService.getCountries))
       }
   }
 
@@ -53,7 +55,7 @@ class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector:
     implicit request =>
       Form2[BranchesOrAgentsWhichCountries](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.branches_or_agents_which_countries(
+          Future.successful(BadRequest(branches_or_agents_which_countries(
             alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           for {

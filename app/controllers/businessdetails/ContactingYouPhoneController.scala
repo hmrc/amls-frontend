@@ -31,7 +31,8 @@ import scala.concurrent.Future
 class ContactingYouPhoneController @Inject () (val dataCache: DataCacheConnector,
                                                val authAction: AuthAction,
                                                val ds: CommonPlayDependencies,
-                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                               val cc: MessagesControllerComponents,
+                                               contacting_you_phone: contacting_you_phone) extends AmlsBaseController(ds, cc) {
 
   def updateData(contactingYou: Option[ContactingYou], data: ContactingYouPhone): ContactingYou = {
     contactingYou.fold[ContactingYou](ContactingYou())(x => x.copy(phoneNumber = Some(data.phoneNumber)))

@@ -25,6 +25,7 @@ import models.SubmissionRequestStatus
 import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, FeeResponseService, RenewalService, StatusService}
 import utils.{AuthAction, DeclarationHelper}
+import views.html.payments.bank_details
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -36,7 +37,8 @@ class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector
                                       val feeResponseService: FeeResponseService,
                                       val statusService: StatusService,
                                       val cc: MessagesControllerComponents,
-                                      val renewalService: RenewalService) extends AmlsBaseController(ds, cc) {
+                                      val renewalService: RenewalService,
+                                      bank_details: bank_details) extends AmlsBaseController(ds, cc) {
 
 
   def get(isUK: Boolean = true) = authAction.async {
@@ -50,7 +52,7 @@ class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector
         paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
       } yield {
         val amount = fees.toPay(status, submissionRequestStatus)
-          Ok(views.html.payments.bank_details(isUK, amount, paymentReference, subHeading))
+          Ok(bank_details(isUK, amount, paymentReference, subHeading))
       }) getOrElse InternalServerError("Failed to retrieve submission data")
   }
 }

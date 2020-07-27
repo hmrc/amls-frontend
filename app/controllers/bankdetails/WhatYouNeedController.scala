@@ -31,7 +31,8 @@ import views.html.bankdetails._
 class WhatYouNeedController @Inject()(val authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
                                       dataCacheConnector: DataCacheConnector,
-                                      val mcc: MessagesControllerComponents) extends AmlsBaseController(ds, mcc) {
+                                      val mcc: MessagesControllerComponents,
+                                      what_you_need: what_you_need) extends AmlsBaseController(ds, mcc) {
 
   def get = authAction.async {
       implicit request =>

@@ -31,7 +31,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class HasBankAccountController @Inject()(val authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
                                          cacheConnector: DataCacheConnector,
-                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                         val cc: MessagesControllerComponents,
+                                         has_bank_account: has_bank_account) extends AmlsBaseController(ds, cc) {
 
   val router: Boolean => Call = {
     case true => routes.BankAccountNameController.getNoIndex()

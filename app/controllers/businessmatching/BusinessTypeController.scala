@@ -32,7 +32,8 @@ import scala.concurrent.Future
 class BusinessTypeController @Inject()(val dataCache: DataCacheConnector,
                                        authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                       val cc: MessagesControllerComponents,
+                                       business_type: business_type) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
     implicit request =>

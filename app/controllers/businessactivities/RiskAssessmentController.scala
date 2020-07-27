@@ -32,7 +32,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConnector,
                                           val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
-                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                          val cc: MessagesControllerComponents,
+                                          risk_assessment_policy: risk_assessment_policy) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

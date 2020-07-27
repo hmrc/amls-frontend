@@ -22,18 +22,21 @@ import models.status.{NotCompleted, SubmissionReady}
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.AuthAction
+import views.html.businessmatching.cannot_add_services
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class NoPsrController @Inject()(val authAction: AuthAction,
                                 val ds: CommonPlayDependencies,
                                 statusService: StatusService,
-                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                val cc: MessagesControllerComponents,
+                                cannot_add_services: cannot_add_services) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>
       statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
         case NotCompleted | SubmissionReady => Ok(views.html.businessmatching.cannot_continue_with_the_application())
-        case _ => Ok(views.html.businessmatching.cannot_add_services())
+        case _ => Ok(cannot_add_services())
       }
   }
 }

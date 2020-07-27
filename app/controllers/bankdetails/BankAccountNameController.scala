@@ -29,6 +29,7 @@ import play.api.mvc._
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, StatusConstants}
+import views.html.bankdetails.bank_account_name
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -39,7 +40,8 @@ class BankAccountNameController @Inject()(
                                            val ds: CommonPlayDependencies,
                                            val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
-                                           val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
+                                           val mcc: MessagesControllerComponents,
+                                           bank_account_name: bank_account_name) extends BankDetailsController(ds, mcc) {
 
   implicit def write: Write[String, UrlFormEncoded] = Write { data =>
     Map("accountName" -> Seq(data))
@@ -81,12 +83,12 @@ class BankAccountNameController @Inject()(
       } yield data match {
         case Some(x) if !x.canEdit(status) => NotFound(notFoundView)
         case Some(BankDetails(_, Some(name), _, _, _, _, _)) =>
-          Ok(views.html.bankdetails.bank_account_name(Form2[String](name), edit, Some(i)))
+          Ok(bank_account_name(Form2[String](name), edit, Some(i)))
         case Some(_) =>
-          Ok(views.html.bankdetails.bank_account_name(EmptyForm, edit, Some(i)))
+          Ok(bank_account_name(EmptyForm, edit, Some(i)))
       }
 
-      case _ => Future.successful(Ok(views.html.bankdetails.bank_account_name(EmptyForm, edit, None)))
+      case _ => Future.successful(Ok(bank_account_name(EmptyForm, edit, None)))
     }
   }
 
@@ -94,7 +96,7 @@ class BankAccountNameController @Inject()(
                         (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
     Form2[String](request.body) match {
       case f: InvalidForm =>
-        Future.successful(BadRequest(views.html.bankdetails.bank_account_name(f, edit, index)))
+        Future.successful(BadRequest(bank_account_name(f, edit, index)))
       case ValidForm(_, data) =>
         val newBankDetails = BankDetails(accountName = Some(data))
         index match {

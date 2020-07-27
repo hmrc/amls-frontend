@@ -28,8 +28,9 @@ import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+import views.html.msb.uses_foreign_currencies
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class UsesForeignCurrenciesController @Inject()(authAction: AuthAction,
@@ -37,7 +38,8 @@ class UsesForeignCurrenciesController @Inject()(authAction: AuthAction,
                                                 implicit val dataCacheConnector: DataCacheConnector,
                                                 implicit val statusService: StatusService,
                                                 implicit val serviceFlow: ServiceFlow,
-                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                val cc: MessagesControllerComponents,
+                                                uses_foreign_currencies: uses_foreign_currencies) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request => {
@@ -49,7 +51,7 @@ class UsesForeignCurrenciesController @Inject()(authAction: AuthAction,
               usesForeign <- currencies.usesForeignCurrencies
             } yield Form2[UsesForeignCurrencies](usesForeign)).getOrElse(EmptyForm)
 
-            Ok(views.html.msb.uses_foreign_currencies(form, edit))
+            Ok(uses_foreign_currencies(form, edit))
         }
       }
   }
@@ -58,7 +60,7 @@ class UsesForeignCurrenciesController @Inject()(authAction: AuthAction,
       implicit request => {
         Form2[UsesForeignCurrencies](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.msb.uses_foreign_currencies(f, edit)))
+            Future.successful(BadRequest(uses_foreign_currencies(f, edit)))
           case ValidForm(_, data: UsesForeignCurrencies) =>
             dataCacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
               val result = for {

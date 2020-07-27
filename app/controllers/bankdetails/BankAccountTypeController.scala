@@ -24,8 +24,9 @@ import models.bankdetails._
 import play.api.mvc.{MessagesControllerComponents, Request}
 import services.StatusService
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+import views.html.bankdetails.bank_account_types
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
@@ -33,7 +34,8 @@ class BankAccountTypeController @Inject()(val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           val dataCacheConnector: DataCacheConnector,
                                           val statusService: StatusService,
-                                          val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
+                                          val mcc: MessagesControllerComponents,
+                                          bank_account_types: bank_account_types) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
       implicit request => {
@@ -71,7 +73,7 @@ class BankAccountTypeController @Inject()(val authAction: AuthAction,
       }
   }
 
-  private def view(implicit request: Request[_]) = views.html.bankdetails.bank_account_types.apply _
+  private def view(implicit request: Request[_]) = bank_account_types.apply _
 
   private val router = (data: Option[BankAccountType], edit: Boolean, index: Int) => data match {
     case Some(NoBankAccountUsed) => Redirect(routes.SummaryController.get(index))

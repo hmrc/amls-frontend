@@ -35,7 +35,8 @@ import scala.concurrent.Future
 class UnableToRemoveBusinessTypesController @Inject()(authAction: AuthAction,
                                                       val ds: CommonPlayDependencies,
                                                       val dataCacheConnector: DataCacheConnector,
-                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                      val cc: MessagesControllerComponents,
+                                                      unable_to_remove_activity: unable_to_remove_activity) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

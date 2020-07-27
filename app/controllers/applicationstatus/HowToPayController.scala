@@ -28,7 +28,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class HowToPayController @Inject()(authAction: AuthAction,
                                    val ds: CommonPlayDependencies,
                                    val cc: MessagesControllerComponents,
-                                   val feeHelper: FeeHelper) extends AmlsBaseController(ds, cc) {
+                                   val feeHelper: FeeHelper,
+                                   how_to_pay: how_to_pay) extends AmlsBaseController(ds, cc) {
 
   val prefix = "[HowToPayController]"
 

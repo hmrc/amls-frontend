@@ -34,7 +34,8 @@ class SummaryController @Inject()(authAction: AuthAction,
                                   implicit val dataCache: DataCacheConnector,
                                   implicit val statusService: StatusService,
                                   implicit val serviceFlow: ServiceFlow,
-                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                  val cc: MessagesControllerComponents,
+                                  summary: summary) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

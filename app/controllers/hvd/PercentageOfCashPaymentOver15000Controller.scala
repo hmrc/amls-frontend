@@ -35,7 +35,8 @@ class PercentageOfCashPaymentOver15000Controller @Inject() (val authAction: Auth
                                                             implicit val dataCacheConnector: DataCacheConnector,
                                                             implicit val serviceFlow: ServiceFlow,
                                                             implicit val statusService: StatusService,
-                                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                            val cc: MessagesControllerComponents,
+                                                            percentage: percentage) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

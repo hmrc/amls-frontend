@@ -22,15 +22,17 @@ import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+import views.html.bankdetails.summary
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
 class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
                                   val authAction: AuthAction,
                                   val ds: CommonPlayDependencies,
-                                  val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
+                                  val mcc: MessagesControllerComponents,
+                                  summary: summary) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int) = authAction.async {
     implicit request =>
@@ -38,7 +40,7 @@ class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
         bankDetails <- getData[BankDetails](request.credId, index)
       } yield bankDetails match {
         case Some(data) =>
-          Ok(views.html.bankdetails.summary(data, index))
+          Ok(summary(data, index))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }

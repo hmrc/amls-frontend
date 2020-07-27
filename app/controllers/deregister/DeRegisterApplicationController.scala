@@ -36,7 +36,8 @@ class DeRegisterApplicationController @Inject() (authAction: AuthAction,
                                                  implicit val statusService: StatusService,
                                                  enrolments: AuthEnrolmentsService,
                                                  implicit val amls: AmlsConnector,
-                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                 val cc: MessagesControllerComponents,
+                                                 deregister_application: deregister_application) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
         implicit request =>

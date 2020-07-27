@@ -38,7 +38,8 @@ class RemoveBusinessTypesSummaryController @Inject()(authAction: AuthAction,
                                                      val dataCacheConnector: DataCacheConnector,
                                                      val helper: RemoveBusinessTypeHelper,
                                                      val router: Router[RemoveBusinessTypeFlowModel],
-                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                     val cc: MessagesControllerComponents,
+                                                     remove_activities_summary: remove_activities_summary) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request => {

@@ -28,6 +28,7 @@ import models.bankdetails.{BankAccount, BankAccountIsUk, BankDetails}
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, StatusConstants}
+import views.html.bankdetails.bank_account_account_is_uk
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,7 +39,8 @@ class BankAccountIsUKController @Inject()(val dataCacheConnector: DataCacheConne
                                           val ds: CommonPlayDependencies,
                                           val auditConnector: AuditConnector,
                                           val statusService: StatusService,
-                                          val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
+                                          val mcc: MessagesControllerComponents,
+                                          bank_account_account_is_uk: bank_account_account_is_uk) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>
@@ -47,9 +49,9 @@ class BankAccountIsUKController @Inject()(val dataCacheConnector: DataCacheConne
           status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
         } yield bankDetails match {
           case Some(x@BankDetails(_, _, Some(data), _, _, _, _)) if x.canEdit(status) =>
-            Ok(views.html.bankdetails.bank_account_account_is_uk(data.isUk.map(isUk => Form2[BankAccountIsUk](isUk)).getOrElse(EmptyForm), edit, index))
+            Ok(bank_account_account_is_uk(data.isUk.map(isUk => Form2[BankAccountIsUk](isUk)).getOrElse(EmptyForm), edit, index))
           case Some(x) if x.canEdit(status) =>
-            Ok(views.html.bankdetails.bank_account_account_is_uk(EmptyForm, edit, index))
+            Ok(bank_account_account_is_uk(EmptyForm, edit, index))
           case _ => NotFound(notFoundView)
         }
   }
@@ -64,7 +66,7 @@ class BankAccountIsUKController @Inject()(val dataCacheConnector: DataCacheConne
 
         Form2[BankAccountIsUk](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.bankdetails.bank_account_account_is_uk(f, edit, index)))
+            Future.successful(BadRequest(bank_account_account_is_uk(f, edit, index)))
           case ValidForm(_, data) =>
             updateDataStrict[BankDetails](request.credId, index) { bd =>
               bd.copy(

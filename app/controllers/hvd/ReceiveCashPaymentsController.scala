@@ -35,7 +35,8 @@ class ReceiveCashPaymentsController @Inject()(val authAction: AuthAction,
                                               implicit val cacheConnector: DataCacheConnector,
                                               implicit val serviceFlow: ServiceFlow,
                                               implicit val statusService: StatusService,
-                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                              val cc: MessagesControllerComponents,
+                                              receiving: receiving) extends AmlsBaseController(ds, cc) {
 
   val NAME = "receivePayments"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)

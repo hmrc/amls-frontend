@@ -24,15 +24,17 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, WhoIsYourAccountantName}
 import services.AutoCompleteService
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+import views.html.businessactivities.who_is_your_accountant
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class WhoIsYourAccountantNameController @Inject()(val dataCacheConnector: DataCacheConnector,
                                               val autoCompleteService: AutoCompleteService,
                                               val authAction: AuthAction,
                                               val ds: CommonPlayDependencies,
-                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                              val cc: MessagesControllerComponents,
+                                                  who_is_your_accountant: who_is_your_accountant) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -44,7 +46,7 @@ class WhoIsYourAccountantNameController @Inject()(val dataCacheConnector: DataCa
           } yield {
             Form2[WhoIsYourAccountantName](whoIsYourAccountant)
           }).getOrElse(EmptyForm)
-          Ok(views.html.businessactivities.who_is_your_accountant(form, edit))
+          Ok(who_is_your_accountant(form, edit))
       }
   }
 
@@ -52,7 +54,7 @@ class WhoIsYourAccountantNameController @Inject()(val dataCacheConnector: DataCa
     implicit request =>
       Form2[WhoIsYourAccountantName](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.businessactivities.who_is_your_accountant(f, edit)))
+          Future.successful(BadRequest(who_is_your_accountant(f, edit)))
         case ValidForm(_, data) => {
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)

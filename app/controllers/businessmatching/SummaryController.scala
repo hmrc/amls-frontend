@@ -38,7 +38,8 @@ class SummaryController @Inject()(
                                    val ds: CommonPlayDependencies,
                                    val statusService: StatusService,
                                    val businessMatchingService: BusinessMatchingService,
-                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                   val cc: MessagesControllerComponents,
+                                   summary: summary) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

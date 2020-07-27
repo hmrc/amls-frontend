@@ -43,7 +43,8 @@ class RemoveBusinessTypesController @Inject()(
                                                val businessMatchingService: BusinessMatchingService,
                                                val removeBusinessTypeHelper: RemoveBusinessTypeHelper,
                                                val router: Router[RemoveBusinessTypeFlowModel],
-                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                               val cc: MessagesControllerComponents,
+                                               remove_activities: remove_activities) extends AmlsBaseController(ds, cc) {
 
   import models.businessmatching.BusinessActivities._
 

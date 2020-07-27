@@ -23,6 +23,7 @@ import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, StatusConstants}
+import views.html.bankdetails.remove_bank_details
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -30,13 +31,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class RemoveBankDetailsController @Inject()(val authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
                                             val dataCacheConnector: DataCacheConnector,
-                                            val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
+                                            val mcc: MessagesControllerComponents,
+                                            remove_bank_details: remove_bank_details) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int) = authAction.async {
       implicit request =>
         getData[BankDetails](request.credId, index) map {
           case Some(BankDetails(_, Some(name), _, _, _, _, _)) =>
-            Ok(views.html.bankdetails.remove_bank_details(EmptyForm, index, name))
+            Ok(remove_bank_details(EmptyForm, index, name))
           case _ => NotFound(notFoundView)
         }
   }

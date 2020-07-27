@@ -35,7 +35,8 @@ import scala.concurrent.Future
 class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConnector,
                                                     val authAction: AuthAction,
                                                     val ds: CommonPlayDependencies,
-                                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                    val cc: MessagesControllerComponents,
+                                                    confirm_registered_office_or_main_place: confirm_registered_office_or_main_place) extends AmlsBaseController(ds, cc) {
 
   def updateBMAddress(bm: BusinessMatching): Option[RegisteredOffice] = {
     bm.reviewDetails.fold[Option[RegisteredOffice]](None)(rd =>

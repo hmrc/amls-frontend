@@ -32,7 +32,8 @@ class RegisteredOfficeIsUKController @Inject ()(
                                                 val dataCacheConnector: DataCacheConnector,
                                                 val authAction: AuthAction,
                                                 val ds: CommonPlayDependencies,
-                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                                                val cc: MessagesControllerComponents,
+                                                registered_office_is_uk: registered_office_is_uk) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

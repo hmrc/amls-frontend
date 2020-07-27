@@ -41,7 +41,8 @@ class CorrespondenceAddressUkController @Inject ()(val dataConnector: DataCacheC
                                                    val autoCompleteService: AutoCompleteService,
                                                    val authAction: AuthAction,
                                                    val ds: CommonPlayDependencies,
-                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                   val cc: MessagesControllerComponents,
+                                                   correspondence_address_uk: correspondence_address_uk) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

@@ -31,7 +31,8 @@ import scala.concurrent.Future
 class NCARegisteredController @Inject() (val dataCacheConnector: DataCacheConnector,
                                          val authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                         val cc: MessagesControllerComponents,
+                                         nca_registered: nca_registered) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request => {

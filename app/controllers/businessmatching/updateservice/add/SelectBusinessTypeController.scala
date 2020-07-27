@@ -49,7 +49,8 @@ class SelectBusinessTypeController @Inject()(
                                             val businessMatchingService: BusinessMatchingService,
                                             val router: Router[AddBusinessTypeFlowModel],
                                             val addHelper: AddBusinessTypeHelper,
-                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                            val cc: MessagesControllerComponents,
+                                            select_activities: select_activities) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   implicit val activityReader: Rule[UrlFormEncoded, BusinessActivity] =
     FormTypes.businessActivityRule("error.required.bm.register.service") map {

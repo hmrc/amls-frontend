@@ -35,7 +35,8 @@ class TransactionsInNext12MonthsController @Inject()(authAction: AuthAction,
                                                      implicit val dataCacheConnector: DataCacheConnector,
                                                      implicit val statusService: StatusService,
                                                      implicit val serviceFlow: ServiceFlow,
-                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                     val cc: MessagesControllerComponents,
+                                                     transactions_in_next_12_months: transactions_in_next_12_months) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

@@ -31,7 +31,8 @@ import scala.concurrent.Future
 class AccountantForAMLSRegulationsController @Inject() (val dataCacheConnector: DataCacheConnector,
                                                         val authAction: AuthAction,
                                                         val ds: CommonPlayDependencies,
-                                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                        val cc: MessagesControllerComponents,
+                                                        accountant_for_amls_regulations: accountant_for_amls_regulations) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
