@@ -18,6 +18,7 @@
 @import models.notifications._
 @import config.ApplicationConfig
 
+@this(notificationsYourMessages: notifications_your_messages)
 @(businessName: String, currentApplicationNotifications: Seq[(NotificationRow, Int)], previousApplicationNotifications: Seq[(NotificationRow, Int)] = Seq())(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
@@ -40,7 +41,7 @@
     </div>
 }
 
-@notifications_your_messages(
+@notificationsYourMessages(
     title = Messages("notifications.header"),
     heading = header
 ) {

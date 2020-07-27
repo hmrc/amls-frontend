@@ -23,6 +23,8 @@
 @import models.businessmatching._
 @import views.html.include.forms2.checkYourAnswersRow
 
+@this(main: include.main)
+
 @(f: forms.Form2[_], model: RemoveBusinessTypeFlowModel)(implicit m: Messages, r: Request[_], lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

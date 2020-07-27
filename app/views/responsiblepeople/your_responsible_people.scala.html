@@ -22,6 +22,8 @@
 @import forms.EmptyForm
 @import config.ApplicationConfig
 
+@this(main: include.main)
+
 @(responsiblePeopleComplete: Seq[(ResponsiblePerson, Int)], responsiblePeopleIncomplete: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @rpDetail(rp: ResponsiblePerson) = {

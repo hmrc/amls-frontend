@@ -18,6 +18,8 @@
 @import include._
 @import views.html.confirmation.footer
 
+@this(main: include.main)
+
 @(businessName: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @main(

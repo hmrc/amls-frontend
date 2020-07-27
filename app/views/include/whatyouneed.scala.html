@@ -15,8 +15,11 @@
  *@
 
 @import config.ApplicationConfig
-@import layouts.{govuk_template => hmrcGovUkTemplate}
-@import uk.gov.hmrc.play.views.html.{helpers => uiHelpers, layouts => uiLayouts}
+@import views.html.layouts.GovUkTemplate
+@import views.ViewHelpers
+
+@this(govUkTemplate: GovUkTemplate,
+      viewHelpers: ViewHelpers)
 
 @(
     title: String,
@@ -45,7 +48,7 @@
 }
 
 @head = {
-    @uiLayouts.head(
+    @viewHelpers.head(
         linkElem = Some(styles),
         headScripts = None
     )
@@ -57,7 +60,7 @@
 }
 
 @insideHeader = {
-    @uiLayouts.header_nav(
+    @viewHelpers.headerNav(
         navTitle = Some(Messages("title.amls")),
         navTitleLink = None,
         showBetaLink = false,
@@ -66,7 +69,7 @@
 }
 
 @bodyEnd = {
-    @uiLayouts.footer(
+    @viewHelpers.footer(
         analyticsToken = appConfig.analyticsToken,
         analyticsHost = appConfig.analyticsHost,
         ssoUrl = None,
@@ -76,7 +79,7 @@
 }
 
 @betaBanner = {
-    @uiLayouts.betaBanner(
+    @viewHelpers.betaBanner(
         userLoggedIn = userLoggedIn,
         betaFeedbackUrl = appConfig.betaFeedbackUrl,
         betaFeedbackUnauthenticatedUrl = appConfig.betaFeedbackUnauthenticatedUrl,
@@ -85,7 +88,7 @@
 }
 
 @getHelpForm = {
-    @{uiHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
+    @{viewHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
 }
 
 @content = {
@@ -121,7 +124,7 @@
     </main>
 }
 
-@hmrcGovUkTemplate(
+@govUkTemplate(
     Some(title + " - " + Messages("title.amls") + " - " + Messages("title.gov")),
     bodyClasses
 )(
@@ -130,6 +133,6 @@
     insideHeader,
     play.twirl.api.HtmlFormat.empty,
     play.twirl.api.HtmlFormat.empty,
-    Some(uiLayouts.footer_links()),
+    Some(viewHelpers.footerLinks()),
     true
 )(content)

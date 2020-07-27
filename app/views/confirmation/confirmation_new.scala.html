@@ -20,6 +20,8 @@
 @import models.confirmation._
 @import config.ApplicationConfig
 
+@this(main: include.main)
+
 @(paymentReference: Option[String], total: Currency, paymentsUrl: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

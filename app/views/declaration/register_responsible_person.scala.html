@@ -19,6 +19,8 @@
 @import config.{ ApplicationConfig}
 @import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 
+@this(whatyouneed: include.whatyouneed)
+
 @(subtitle: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

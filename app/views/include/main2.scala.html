@@ -15,8 +15,11 @@
  *@
 
 @import config.{ApplicationConfig}
-@import layouts.{govuk_template => hmrcGovUkTemplate}
-@import uk.gov.hmrc.play.views.html.{layouts => uiLayouts, helpers => uiHelpers}
+@import views.html.layouts.GovUkTemplate
+@import views.ViewHelpers
+
+@this(govUkTemplate: GovUkTemplate,
+        viewHelpers: ViewHelpers)
 
 @(
     title: String,
@@ -58,7 +61,7 @@
 }
 
 @head = {
-    @uiLayouts.head(
+    @viewHelpers.head(
         linkElem = Some(styles),
         headScripts = None
     )
@@ -70,7 +73,7 @@
 }
 
 @insideHeader = {
-    @uiLayouts.header_nav(
+    @viewHelpers.headerNav(
         navTitle = Some(Messages("title.amls")),
         navTitleLink = None,
         showBetaLink = false,
@@ -79,7 +82,7 @@
 }
 
 @bodyEnd = {
-    @uiLayouts.footer(
+    @viewHelpers.footer(
         analyticsToken = appConfig.analyticsToken,
         analyticsHost = appConfig.analyticsHost,
         ssoUrl = None,
@@ -127,7 +130,7 @@
 }
 
 @getHelpForm = {
-    @{uiHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
+    @{viewHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
 }
 
 
@@ -147,13 +150,13 @@
 
 @footerLinks = {
     @if(appConfig.accessibilityStatementToggle) {
-        @uiLayouts.footer_links(accessibilityFooterUrl=Some(controllers.accessibility.routes.AccessibilityStatementController.get().url))
+        @viewHelpers.footerLinks(accessibilityFooterUrl=Some(controllers.accessibility.routes.AccessibilityStatementController.get().url))
     } else {
-        @uiLayouts.footer_links()
+        @viewHelpers.footerLinks()
     }
 }
 
-@hmrcGovUkTemplate(
+@govUkTemplate(
     Some(title + " - " + Messages("title.amls") + " - " + Messages("title.gov")),
     bodyClasses
 )(

@@ -18,6 +18,8 @@
 @import forms2._
 @import config.{ ApplicationConfig}
 
+@this(main: include.main)
+
 @(infoText: String = "confirmation.payment.info.keep_up_to_date")(implicit messages: Messages, request: Request[_])
 
 <h2>@messages("confirmation.payment.info.heading.keep_up_to_date")</h2>

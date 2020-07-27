@@ -19,6 +19,8 @@
 @import forms2._
 @import config.ApplicationConfig
 
+@this(main: include.main)
+
 @(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

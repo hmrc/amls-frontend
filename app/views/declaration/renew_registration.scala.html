@@ -24,6 +24,8 @@
 @import config.{ ApplicationConfig}
 @import config.{ApplicationConfig => appConfig}
 
+@this(main: include.main)
+
 @(f: Form2[_], endDate: Option[LocalDate])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

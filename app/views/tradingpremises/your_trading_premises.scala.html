@@ -22,6 +22,8 @@
 @import controllers.tradingpremises.ModelHelpers._
 @import models.status._
 
+@this(main: include.main)
+
 @(f: forms.Form2[_], add: Boolean, status: SubmissionStatus, completeTp: Seq[(TradingPremises, Int)], incompleteTp: Seq[(TradingPremises, Int)])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @tpDetail(tp: TradingPremises) = {

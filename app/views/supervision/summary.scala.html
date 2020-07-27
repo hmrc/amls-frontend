@@ -22,6 +22,8 @@
 @import config.ApplicationConfig
 @import org.joda.time._
 
+@this(main: include.main)
+
 @(f: forms.Form2[_], model: Supervision)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

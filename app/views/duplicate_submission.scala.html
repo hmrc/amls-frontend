@@ -18,6 +18,8 @@
 @import utils.Strings._
 @import config.{ ApplicationConfig}
 
+@this(main: include.main)
+
 @()(implicit messages: Messages, request: Request[AnyContent], lang: Lang, appConfig: ApplicationConfig)
 
 @main(title = messages("error.submission.problem.title"), bodyClasses = Some("duplicate-submission-page")) {

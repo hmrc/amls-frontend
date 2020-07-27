@@ -23,6 +23,8 @@
 @import models.businessmatching.BusinessMatchingMsbServices
 @import models.businessmatching.MoneyServiceBusiness
 
+@this(main: include.main)
+
 @(index: Int, activities: Option[BusinessActivities], msbServices: Option[BusinessMatchingMsbServices])(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

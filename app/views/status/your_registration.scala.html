@@ -19,6 +19,8 @@
 @import include.status._
 @import play.twirl.api.HtmlFormat
 
+@this(main2: include.main2)
+
 @(regNo: String, businessName: Option[String], feeResponse: Option[FeeResponse] = None,
         displayCheckOrUpdateLink: Boolean = true, yourRegistrationInfo: Html = HtmlFormat.empty,
         unreadNotifications: Int = 0, registrationStatus: Html, feeInformation: Html, displayContactLink: Boolean = false,

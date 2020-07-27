@@ -23,6 +23,8 @@
 @import forms.EmptyForm
 @import models.businessmatching.updateservice.ServiceChangeRegister
 
+@this(main: include.main)
+
 @(model: MoneyServiceBusiness, bmMsbServices: Option[BusinessMatchingMsbServices], register: ServiceChangeRegister)(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
