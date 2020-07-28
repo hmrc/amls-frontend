@@ -35,7 +35,9 @@ class PersonNonUKPassportController @Inject()(override val messagesApi: Messages
                                               val dataCacheConnector: DataCacheConnector,
                                               authAction: AuthAction,
                                               val ds: CommonPlayDependencies,
-                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                              val cc: MessagesControllerComponents,
+                                              person_non_uk_passport: person_non_uk_passport,
+                                              implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
   def get(index:Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {

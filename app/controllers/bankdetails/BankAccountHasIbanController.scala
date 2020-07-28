@@ -39,7 +39,8 @@ class BankAccountHasIbanController @Inject()( val dataCacheConnector: DataCacheC
                                               val statusService: StatusService,
                                               val ds: CommonPlayDependencies,
                                               val mcc: MessagesControllerComponents,
-                                              bank_account_account_has_iban: bank_account_account_has_iban) extends BankDetailsController(ds, mcc) {
+                                              bank_account_account_has_iban: bank_account_account_has_iban,
+                                              implicit val error: views.html.error) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>

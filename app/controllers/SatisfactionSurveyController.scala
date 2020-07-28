@@ -24,26 +24,28 @@ import play.api.Logger
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+import views.html.satisfaction_survey
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
 class SatisfactionSurveyController @Inject()(val auditConnector: AuditConnector,
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
-                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                             val cc: MessagesControllerComponents,
+                                             satisfaction_survey: satisfaction_survey) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
-      Future.successful(Ok(views.html.satisfaction_survey(EmptyForm)))
+      Future.successful(Ok(satisfaction_survey(EmptyForm)))
   }
 
   def post(edit: Boolean = false) = authAction.async {
     implicit request => {
       Form2[SatisfactionSurvey](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.satisfaction_survey(f)))
+          Future.successful(BadRequest(satisfaction_survey(f)))
         case ValidForm(_, data) => {
           auditConnector.sendEvent(SurveyEvent(data)).onFailure {
             case e: Throwable => Logger.error(s"[SatisfactionSurveyController][post] ${e.getMessage}", e)

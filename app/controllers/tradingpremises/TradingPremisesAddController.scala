@@ -33,7 +33,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class TradingPremisesAddController @Inject()(val dataCacheConnector: DataCacheConnector,
                                              val authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
-                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                             val cc: MessagesControllerComponents,
+                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   private def isMSBSelected(cacheMap: Option[CacheMap])(implicit hc: HeaderCarrier): Boolean = {
     val test = for {

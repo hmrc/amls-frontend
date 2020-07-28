@@ -41,7 +41,8 @@ class BankAccountNameController @Inject()(
                                            val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
                                            val mcc: MessagesControllerComponents,
-                                           bank_account_name: bank_account_name) extends BankDetailsController(ds, mcc) {
+                                           bank_account_name: bank_account_name,
+                                           implicit val error: views.html.error) extends BankDetailsController(ds, mcc) {
 
   implicit def write: Write[String, UrlFormEncoded] = Write { data =>
     Map("accountName" -> Seq(data))

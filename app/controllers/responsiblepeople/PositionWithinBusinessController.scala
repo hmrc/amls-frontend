@@ -33,7 +33,9 @@ class PositionWithinBusinessController @Inject () (
                                                   val dataCacheConnector: DataCacheConnector,
                                                   authAction: AuthAction,
                                                   val ds: CommonPlayDependencies,
-                                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                  val cc: MessagesControllerComponents,
+                                                  position_within_business: position_within_business,
+                                                  implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
 

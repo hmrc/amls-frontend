@@ -21,6 +21,7 @@ import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
+import views.html.accessibility.accessibility_statement
 
 class AccessibilityStatementControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -32,7 +33,8 @@ class AccessibilityStatementControllerSpec extends AmlsSpec with MockitoSugar {
       commonDependencies,
       mockMcc,
       appConfig,
-      mock[BodyParsers.Default]
+      mock[BodyParsers.Default],
+      mock[accessibility_statement]
     )
   }
 
@@ -41,7 +43,6 @@ class AccessibilityStatementControllerSpec extends AmlsSpec with MockitoSugar {
     "on get display accessibility statement" in new Fixture {
 
       val result = controller.get()(FakeRequest().withSession())
-      println(contentAsString(result))
       status(result) mustBe OK
     }
   }

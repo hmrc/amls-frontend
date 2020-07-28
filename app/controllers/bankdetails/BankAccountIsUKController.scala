@@ -40,7 +40,8 @@ class BankAccountIsUKController @Inject()(val dataCacheConnector: DataCacheConne
                                           val auditConnector: AuditConnector,
                                           val statusService: StatusService,
                                           val mcc: MessagesControllerComponents,
-                                          bank_account_account_is_uk: bank_account_account_is_uk) extends BankDetailsController(ds, mcc) {
+                                          bank_account_account_is_uk: bank_account_account_is_uk,
+                                          implicit val error: views.html.error) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>

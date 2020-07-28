@@ -32,7 +32,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class LegalNameInputController @Inject()(val dataCacheConnector: DataCacheConnector,
                                          authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                         val cc: MessagesControllerComponents,
+                                         legal_name_input: legal_name_input,
+                                         implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
@@ -51,7 +53,7 @@ class LegalNameInputController @Inject()(val dataCacheConnector: DataCacheConnec
         Form2[PreviousName](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(views.html.responsiblepeople.legal_name_input(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+              BadRequest(legal_name_input(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {

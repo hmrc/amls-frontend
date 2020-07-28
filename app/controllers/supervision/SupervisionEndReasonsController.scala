@@ -33,7 +33,8 @@ import scala.concurrent.Future
 class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                 val authAction: AuthAction,
                                                 val ds: CommonPlayDependencies,
-                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                val cc: MessagesControllerComponents,
+                                                supervision_end_reasons: supervision_end_reasons) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

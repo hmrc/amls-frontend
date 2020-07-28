@@ -34,7 +34,8 @@ class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCac
                                                  val authAction: AuthAction,
                                                  val ds: CommonPlayDependencies,
                                                  val cc: MessagesControllerComponents,
-                                                 document_risk_assessment_policy: document_risk_assessment_policy) extends AmlsBaseController(ds, cc) {
+                                                 document_risk_assessment_policy: document_risk_assessment_policy,
+                                                 implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

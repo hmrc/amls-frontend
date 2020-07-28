@@ -32,7 +32,9 @@ class ContactDetailsController @Inject () (
                                            val dataCacheConnector: DataCacheConnector,
                                            authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
-                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                           val cc: MessagesControllerComponents,
+                                           contact_details: contact_details,
+                                           implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
@@ -52,7 +54,7 @@ class ContactDetailsController @Inject () (
         Form2[ContactDetails](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(views.html.responsiblepeople.contact_details(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+              BadRequest(contact_details(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {

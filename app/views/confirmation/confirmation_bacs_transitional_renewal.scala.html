@@ -18,7 +18,8 @@
 @import include._
 @import views.html.confirmation.footer
 
-@this(main: include.main)
+@this(main: include.main,
+      footerComponent: footer)
 
 @(businessName: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
@@ -36,6 +37,6 @@
     <p>@Messages("confirmation.payment.renewal.info.hmrc_review3")</p>
     <p>@Messages("confirmation.payment.renewal.info.hmrc_review4")</p>
 
-    @footer()
+    @footerComponent()
 
 }

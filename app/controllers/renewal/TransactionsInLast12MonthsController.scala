@@ -37,7 +37,8 @@ class TransactionsInLast12MonthsController @Inject()(
                                                       val ds: CommonPlayDependencies,
                                                       val dataCacheConnector: DataCacheConnector,
                                                       renewalService: RenewalService,
-                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                      val cc: MessagesControllerComponents,
+                                                      transactions_in_last_12_months: transactions_in_last_12_months) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

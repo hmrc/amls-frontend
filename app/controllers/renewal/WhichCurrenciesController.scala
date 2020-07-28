@@ -35,7 +35,8 @@ class WhichCurrenciesController @Inject()(val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           renewalService: RenewalService,
                                           dataCacheConnector: DataCacheConnector,
-                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                          val cc: MessagesControllerComponents,
+                                          which_currencies: which_currencies) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

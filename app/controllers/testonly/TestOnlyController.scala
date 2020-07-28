@@ -29,7 +29,8 @@ import play.api.mvc.MessagesControllerComponents
 import services.UpdateMongoCacheService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-import views.html.submission.duplicate_submission
+import views.html.confirmation._
+import views.html.submission.{duplicate_enrolment, duplicate_submission, wrong_credential_type}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -43,7 +44,15 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
                                    val authAction: AuthAction,
                                    val ds: CommonPlayDependencies,
                                    val customerCache: BusinessCustomerSessionCache,
-                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                   val cc: MessagesControllerComponents,
+                                   duplicate_enrolment: duplicate_enrolment,
+                                   duplicate_submission: duplicate_submission,
+                                   wrong_credential_type: wrong_credential_type,
+                                   payment_failure: payment_failure,
+                                   payment_confirmation: payment_confirmation,
+                                   payment_confirmation_transitional_renewal: payment_confirmation_transitional_renewal,
+                                   confirmation_bacs: confirmation_bacs,
+                                   confirmation_bacs_transitional_renewal: confirmation_bacs_transitional_renewal) extends AmlsBaseController(ds, cc) {
 
 
   def dropMongoCache = authAction.async {
@@ -75,7 +84,7 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
 
   def duplicateEnrolment = authAction.async {
     implicit request =>
-      Future.successful(Ok(views.html.submission.duplicate_enrolment()))
+      Future.successful(Ok(duplicate_enrolment()))
   }
 
   def duplicateSubmission = authAction.async {
@@ -85,7 +94,7 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
 
   def wrongCredentials = authAction.async {
     implicit request =>
-      Future.successful(Ok(views.html.submission.wrong_credential_type()))
+      Future.successful(Ok(wrong_credential_type()))
   }
 
   def getPayment(ref: String) = authAction.async {
@@ -107,27 +116,27 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
 
   def paymentFailure = authAction.async {
     implicit request =>
-      Future.successful(Ok(views.html.confirmation.payment_failure("confirmation.payment.failed.reason.failure", 100, "X123456789")))
+      Future.successful(Ok(payment_failure("confirmation.payment.failed.reason.failure", 100, "X123456789")))
   }
 
   def paymentSuccessful = authAction.async {
     implicit request =>
-      Future.successful(Ok(views.html.confirmation.payment_confirmation("Company Name", "X123456789")))
+      Future.successful(Ok(payment_confirmation("Company Name", "X123456789")))
   }
 
   def paymentSuccessfulTransitionalRenewal = authAction.async {
     implicit request =>
-      Future.successful(Ok(views.html.confirmation.payment_confirmation_transitional_renewal("Company Name", "X123456789")))
+      Future.successful(Ok(payment_confirmation_transitional_renewal("Company Name", "X123456789")))
   }
 
   def confirmationBacs = authAction.async {
     implicit request =>
-      Future.successful(Ok(views.html.confirmation.confirmation_bacs("Company Name")))
+      Future.successful(Ok(confirmation_bacs("Company Name")))
   }
 
   def confirmationBacsTransitionalRenewal = authAction.async {
     implicit request =>
-      Future.successful(Ok(views.html.confirmation.confirmation_bacs_transitional_renewal("Company Name")))
+      Future.successful(Ok(confirmation_bacs_transitional_renewal("Company Name")))
   }
 
   def populateTP = authAction.async {

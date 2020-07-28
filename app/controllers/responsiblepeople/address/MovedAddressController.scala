@@ -35,7 +35,8 @@ class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
                                        val dataCacheConnector: DataCacheConnector,
                                        authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                       val cc: MessagesControllerComponents,
+                                       moved_address: moved_address) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
   def get(index: Int) = authAction.async {

@@ -44,7 +44,10 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
                                              val amlsConnector: AmlsConnector,
                                              val cc: MessagesControllerComponents,
                                              val sectionsProvider: SectionsProvider,
-                                             who_is_registering_this_renewal: who_is_registering_this_renewal) extends AmlsBaseController(ds, cc) {
+                                             who_is_registering_this_renewal: who_is_registering_this_renewal,
+                                             who_is_registering_this_update: who_is_registering_this_update,
+                                             who_is_registering_this_registration: who_is_registering_this_registration,
+                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

@@ -35,7 +35,9 @@ class TimeAtCurrentAddressController @Inject() (val dataCacheConnector: DataCach
                                                 authAction: AuthAction,
                                                 val statusService: StatusService,
                                                 val ds: CommonPlayDependencies,
-                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                val cc: MessagesControllerComponents,
+                                                time_at_address: time_at_address,
+                                                implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 

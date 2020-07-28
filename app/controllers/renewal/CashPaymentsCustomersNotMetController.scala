@@ -36,7 +36,8 @@ class CashPaymentsCustomersNotMetController @Inject()(val dataCacheConnector: Da
                                                       val authAction: AuthAction,
                                                       val ds: CommonPlayDependencies,
                                                       val renewalService: RenewalService,
-                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                      val cc: MessagesControllerComponents,
+                                                      cash_payments_customers_not_met: cash_payments_customers_not_met) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

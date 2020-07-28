@@ -34,7 +34,9 @@ class NationalityController @Inject () (
                                        authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
                                        val autoCompleteService: AutoCompleteService,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                       val cc: MessagesControllerComponents,
+                                       nationality: nationality,
+                                       implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {

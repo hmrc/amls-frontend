@@ -49,7 +49,13 @@ class PaymentConfirmationController @Inject()(authAction: AuthAction,
                                               private[controllers] val enrolmentService: AuthEnrolmentsService,
                                               private[controllers] val auditConnector: AuditConnector,
                                               val cc: MessagesControllerComponents,
-                                              val feeHelper: FeeHelper) extends AmlsBaseController(ds, cc) {
+                                              val feeHelper: FeeHelper,
+                                              payment_confirmation_renewal: payment_confirmation_renewal,
+                                              payment_confirmation_amendvariation: payment_confirmation_amendvariation,
+                                              payment_confirmation_transitional_renewal: payment_confirmation_transitional_renewal,
+                                              payment_confirmation: payment_confirmation,
+                                              payment_failure: payment_failure
+                                             ) extends AmlsBaseController(ds, cc) {
 
   val prefix = "[PaymentConfirmationController]"
 

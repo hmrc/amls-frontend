@@ -34,7 +34,8 @@ class BusinessTurnoverController @Inject()(val dataCacheConnector: DataCacheConn
                                            val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
                                            val renewalService: RenewalService,
-                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                           val cc: MessagesControllerComponents,
+                                           business_turnover: business_turnover) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

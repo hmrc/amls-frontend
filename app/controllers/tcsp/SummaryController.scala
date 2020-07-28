@@ -38,7 +38,9 @@ class SummaryController @Inject()(
                                   val ds: CommonPlayDependencies,
                                   val serviceFlow: ServiceFlow,
                                   val statusService: StatusService,
-                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                  val cc: MessagesControllerComponents,
+                                  val summary: summary,
+                                  implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
   def sortProviders(data: Tcsp): List[String] = {
 

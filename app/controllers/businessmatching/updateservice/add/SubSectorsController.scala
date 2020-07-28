@@ -62,7 +62,7 @@ class SubSectorsController @Inject()(authAction: AuthAction,
         import jto.validation.forms.Rules._
         Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.businessmatching.updateservice.add.msb_subservices(f, edit, config.fxEnabledToggle)))
+            Future.successful(BadRequest(msb_subservices(f, edit, config.fxEnabledToggle)))
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) => {

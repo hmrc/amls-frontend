@@ -26,6 +26,7 @@ import play.api.mvc.MessagesControllerComponents
 import services.{RenewalService, SectionsProvider, StatusService, SubmissionService}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import utils.{AuthAction, DeclarationHelper}
+import views.html.submission.{bad_request, duplicate_enrolment, duplicate_submission, wrong_credential_type}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -38,7 +39,11 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
                                      authAction: AuthAction,
                                      val ds: CommonPlayDependencies,
                                      val cc: MessagesControllerComponents,
-                                     val sectionsProvider: SectionsProvider) extends AmlsBaseController(ds, cc) {
+                                     val sectionsProvider: SectionsProvider,
+                                     duplicate_enrolment: duplicate_enrolment,
+                                     duplicate_submission: duplicate_submission,
+                                     wrong_credential_type: wrong_credential_type,
+                                     bad_request: bad_request) extends AmlsBaseController(ds, cc) {
 
   private def handleRenewalAmendment(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
                                     (implicit headerCarrier: HeaderCarrier) = {
@@ -64,16 +69,16 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
         } recoverWith {
           case _: DuplicateEnrolmentException =>
             Logger.info("[SubmissionController][post] handling DuplicateEnrolmentException")
-            Future.successful(Ok(views.html.submission.duplicate_enrolment()))
+            Future.successful(Ok(duplicate_enrolment()))
           case e: DuplicateSubscriptionException =>
             Logger.info("[SubmissionController][post] handling DuplicateSubscriptionException")
-            Future.successful(Ok(views.html.submission.duplicate_submission(e.message)))
+            Future.successful(Ok(duplicate_submission(e.message)))
           case _: InvalidEnrolmentCredentialsException =>
             Logger.info("[SubmissionController][post] handling InvalidEnrolmentCredentialsException")
-            Future.successful(Ok(views.html.submission.wrong_credential_type()))
+            Future.successful(Ok(wrong_credential_type()))
           case _: BadRequestException =>
             Logger.info("[SubmissionController][post] handling BadRequestException")
-            Future.successful(Ok(views.html.submission.bad_request()))
+            Future.successful(Ok(bad_request()))
         }
         case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }

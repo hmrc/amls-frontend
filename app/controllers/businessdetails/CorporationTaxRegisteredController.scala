@@ -40,7 +40,8 @@ class CorporationTaxRegisteredController @Inject () (val dataCacheConnector: Dat
                                                      val businessMatchingConnector: BusinessMatchingConnector,
                                                      val authAction: AuthAction,
                                                      val ds: CommonPlayDependencies,
-                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                     val cc: MessagesControllerComponents,
+                                                     implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
   val failedResult = InternalServerError("Failed to update the business corporation tax number")
 

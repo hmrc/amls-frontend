@@ -31,7 +31,8 @@ import scala.concurrent.Future
 class ComplexCorpStructureCreationController @Inject()(val authAction: AuthAction,
                                                        val ds: CommonPlayDependencies,
                                                        val dataCacheConnector: DataCacheConnector,
-                                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                       val cc: MessagesControllerComponents,
+                                                       complex_corp_structure_creation: complex_corp_structure_creation) extends AmlsBaseController(ds, cc) {
 
   val NAME = "complexCorpStructureCreation"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)

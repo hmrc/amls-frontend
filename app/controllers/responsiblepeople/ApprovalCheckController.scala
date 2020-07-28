@@ -23,6 +23,7 @@ import javax.inject.Inject
 import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
+import views.html.responsiblepeople.approval_check
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -31,7 +32,9 @@ class ApprovalCheckController @Inject()(
                                          val dataCacheConnector: DataCacheConnector,
                                          authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                         val cc: MessagesControllerComponents,
+                                         approval_check: approval_check,
+                                         implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   val FIELD_NAME = "hasAlreadyPaidApprovalCheck"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELD_NAME)
@@ -41,9 +44,9 @@ class ApprovalCheckController @Inject()(
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map {
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,alreadyPassed,_,_,_,_,_,_)) if (alreadyPassed.hasAlreadyPaidApprovalCheck.isDefined) =>
-          Ok(views.html.responsiblepeople.approval_check(Form2[Boolean](alreadyPassed.hasAlreadyPaidApprovalCheck.get), edit, index, flow, personName.titleName))
+          Ok(approval_check(Form2[Boolean](alreadyPassed.hasAlreadyPaidApprovalCheck.get), edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) => {
-          Ok(views.html.responsiblepeople.approval_check(EmptyForm, edit, index, flow, personName.titleName))
+          Ok(approval_check(EmptyForm, edit, index, flow, personName.titleName))
         }
         case _ => NotFound(notFoundView)
       }
@@ -55,7 +58,7 @@ class ApprovalCheckController @Inject()(
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(views.html.responsiblepeople.approval_check(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+              BadRequest(approval_check(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {

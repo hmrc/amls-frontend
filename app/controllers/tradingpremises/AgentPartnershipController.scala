@@ -24,6 +24,7 @@ import models.tradingpremises._
 import play.api.i18n.MessagesApi
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection}
+import views.html.tradingpremises.agent_partnership
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -33,7 +34,9 @@ class AgentPartnershipController @Inject()(val dataCacheConnector: DataCacheConn
                                            val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
                                            override val messagesApi: MessagesApi,
-                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                           val cc: MessagesControllerComponents,
+                                           agent_partnership: agent_partnership,
+                                           implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
     def get(index: Int, edit: Boolean = false) = authAction.async {
       implicit request =>
@@ -43,7 +46,7 @@ class AgentPartnershipController @Inject()(val dataCacheConnector: DataCacheConn
               case Some(data) => Form2[AgentPartnership](data)
               case None => EmptyForm
             }
-            Ok(views.html.tradingpremises.agent_partnership(form, index, edit))
+            Ok(agent_partnership(form, index, edit))
           }
           case None => NotFound(notFoundView)
         }
@@ -53,7 +56,7 @@ class AgentPartnershipController @Inject()(val dataCacheConnector: DataCacheConn
     implicit request => {
       Form2[AgentPartnership](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.tradingpremises.agent_partnership(f, index,edit)))
+          Future.successful(BadRequest(agent_partnership(f, index,edit)))
         case ValidForm(_, data) => {
           for {
             result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_,tp) =>

@@ -22,7 +22,7 @@ import models.status.{NotCompleted, SubmissionReady}
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.AuthAction
-import views.html.businessmatching.cannot_add_services
+import views.html.businessmatching.{cannot_add_services, cannot_continue_with_the_application}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -30,12 +30,13 @@ class NoPsrController @Inject()(val authAction: AuthAction,
                                 val ds: CommonPlayDependencies,
                                 statusService: StatusService,
                                 val cc: MessagesControllerComponents,
-                                cannot_add_services: cannot_add_services) extends AmlsBaseController(ds, cc) {
+                                cannot_add_services: cannot_add_services,
+                                cannot_continue_with_the_application: cannot_continue_with_the_application) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>
       statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
-        case NotCompleted | SubmissionReady => Ok(views.html.businessmatching.cannot_continue_with_the_application())
+        case NotCompleted | SubmissionReady => Ok(cannot_continue_with_the_application())
         case _ => Ok(cannot_add_services())
       }
   }

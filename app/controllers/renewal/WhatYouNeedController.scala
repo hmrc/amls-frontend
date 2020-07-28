@@ -35,7 +35,8 @@ class WhatYouNeedController @Inject()(
                                        val authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
                                        renewalService: RenewalService,
-                                       val cc: MessagesControllerComponents)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) {
+                                       val cc: MessagesControllerComponents,
+                                       what_you_need: what_you_need)(implicit ec: ExecutionContext) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

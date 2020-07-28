@@ -32,7 +32,9 @@ import views.html.supervision.summary
 class SummaryController  @Inject() (val dataCacheConnector: DataCacheConnector,
                                     val authAction: AuthAction,
                                     val ds: CommonPlayDependencies,
-                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                    val cc: MessagesControllerComponents,
+                                    val summary: summary,
+                                    implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
     implicit request =>

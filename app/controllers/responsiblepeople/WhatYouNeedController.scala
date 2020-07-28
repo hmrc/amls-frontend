@@ -32,7 +32,8 @@ class WhatYouNeedController @Inject () (
                                         val dataCacheConnector: DataCacheConnector,
                                         authAction: AuthAction,
                                         val ds: CommonPlayDependencies,
-                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                        val cc: MessagesControllerComponents,
+                                        what_you_need: what_you_need) extends AmlsBaseController(ds, cc) {
 
   def get(index: Int, flow: Option[String] = None) =
     authAction.async {

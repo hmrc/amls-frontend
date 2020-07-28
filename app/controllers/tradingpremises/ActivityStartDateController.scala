@@ -25,6 +25,8 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.{MessagesControllerComponents, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection}
+import views.html.tradingpremises.activity_start_date
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
@@ -32,7 +34,9 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
                                             val authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
                                             val dataCacheConnector: DataCacheConnector,
-                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                            val cc: MessagesControllerComponents,
+                                            activity_start_date: activity_start_date,
+                                            implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -40,9 +44,9 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
           case Some(tpSection) =>
             tpSection.yourTradingPremises match {
               case Some(YourTradingPremises(_, tradingPremisesAddress, _, None, _)) =>
-                Ok(views.html.tradingpremises.activity_start_date(EmptyForm, index, edit, tradingPremisesAddress))
+                Ok(activity_start_date(EmptyForm, index, edit, tradingPremisesAddress))
               case Some(YourTradingPremises(_, tradingPremisesAddress, _, Some(startDate), _)) =>
-                Ok(views.html.tradingpremises.activity_start_date(Form2[ActivityStartDate](ActivityStartDate(startDate)), index, edit, tradingPremisesAddress))
+                Ok(activity_start_date(Form2[ActivityStartDate](ActivityStartDate(startDate)), index, edit, tradingPremisesAddress))
               case _ =>
                NotFound(notFoundView)
             }
@@ -83,7 +87,7 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
       tp <- getData[TradingPremises](credId, index)
     } yield tp.flatMap(_.yourTradingPremises) match {
       case Some(ytp) =>
-        BadRequest(views.html.tradingpremises.activity_start_date(f, index, edit, ytp.tradingPremisesAddress))
+        BadRequest(activity_start_date(f, index, edit, ytp.tradingPremisesAddress))
       case _ => NotFound(notFoundView)
     }
   }

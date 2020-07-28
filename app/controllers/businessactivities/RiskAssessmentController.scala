@@ -33,7 +33,8 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
                                           val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           val cc: MessagesControllerComponents,
-                                          risk_assessment_policy: risk_assessment_policy) extends AmlsBaseController(ds, cc) {
+                                          risk_assessment_policy: risk_assessment_policy,
+                                          implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

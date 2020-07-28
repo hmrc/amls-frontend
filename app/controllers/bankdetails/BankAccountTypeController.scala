@@ -35,7 +35,8 @@ class BankAccountTypeController @Inject()(val authAction: AuthAction,
                                           val dataCacheConnector: DataCacheConnector,
                                           val statusService: StatusService,
                                           val mcc: MessagesControllerComponents,
-                                          bank_account_types: bank_account_types) extends BankDetailsController(ds, mcc) {
+                                          bank_account_types: bank_account_types,
+                                          implicit val error: views.html.error) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
       implicit request => {

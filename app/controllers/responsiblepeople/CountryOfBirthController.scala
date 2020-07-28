@@ -35,7 +35,9 @@ class CountryOfBirthController @Inject()(authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
                                          val dataCacheConnector: DataCacheConnector,
                                          val autoCompleteService: AutoCompleteService,
-                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                         val cc: MessagesControllerComponents,
+                                         country_of_birth: country_of_birth,
+                                         implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

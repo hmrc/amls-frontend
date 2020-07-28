@@ -31,7 +31,8 @@ import scala.concurrent.Future
 class OnlyOffTheShelfCompsSoldController @Inject()(val authAction: AuthAction,
                                                    val ds: CommonPlayDependencies,
                                                    val dataCacheConnector: DataCacheConnector,
-                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                   val cc: MessagesControllerComponents,
+                                                   only_off_the_shelf_comps_sold: only_off_the_shelf_comps_sold) extends AmlsBaseController(ds, cc) {
 
   val NAME = "onlyOffTheShelfCompsSold"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)

@@ -31,6 +31,8 @@ import typeclasses.MongoKey
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
+import views.html.date_of_change
+import views.html.tradingpremises.agent_name
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -41,7 +43,10 @@ class AgentNameController @Inject()(
                                      val authAction: AuthAction,
                                      val ds: CommonPlayDependencies,
                                      val statusService: StatusService,
-                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                     val cc: MessagesControllerComponents,
+                                     agent_name: agent_name,
+                                     date_of_change: date_of_change,
+                                     implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
       implicit request =>
@@ -53,7 +58,7 @@ class AgentNameController @Inject()(
               case Some(data) => Form2[AgentName](data)
               case None => EmptyForm
             }
-            Ok(views.html.tradingpremises.agent_name(form, index, edit))
+            Ok(agent_name(form, index, edit))
           }
           case None => NotFound(notFoundView)
         }
@@ -63,7 +68,7 @@ class AgentNameController @Inject()(
       implicit request => {
         Form2[AgentName](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.tradingpremises.agent_name(f, index, edit)))
+            Future.successful(BadRequest(agent_name(f, index, edit)))
           case ValidForm(_, data) => {
             for {
               result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_, tp) =>
@@ -109,7 +114,7 @@ class AgentNameController @Inject()(
 
   def dateOfChange(index: Int) = authAction.async {
     implicit request =>
-          Future(Ok(views.html.date_of_change(EmptyForm,
+          Future(Ok(date_of_change(EmptyForm,
             "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
   }
 
@@ -118,7 +123,7 @@ class AgentNameController @Inject()(
         getData[TradingPremises](request.credId, index) flatMap { tradingPremises =>
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
             case form: InvalidForm =>
-              Future.successful(BadRequest(views.html.date_of_change(
+              Future.successful(BadRequest(date_of_change(
                 form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
                 "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
             case ValidForm(_, dateOfChange) =>

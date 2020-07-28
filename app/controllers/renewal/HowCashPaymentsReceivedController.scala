@@ -36,7 +36,8 @@ class HowCashPaymentsReceivedController @Inject()(
                                                  val authAction: AuthAction,
                                                  val ds: CommonPlayDependencies,
                                                  val renewalService: RenewalService,
-                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                 val cc: MessagesControllerComponents,
+                                                 how_cash_payments_received: how_cash_payments_received) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

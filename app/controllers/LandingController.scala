@@ -48,9 +48,10 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper}
+import views.html.start
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future}
+import scala.concurrent.Future
 
 @Singleton
 class LandingController @Inject()(val landingService: LandingService,
@@ -63,7 +64,8 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val mcc: MessagesControllerComponents,
                                   implicit override val messagesApi: MessagesApi,
                                   val config: ApplicationConfig,
-                                  parser: BodyParsers.Default) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper {
+                                  parser: BodyParsers.Default,
+                                  start: start) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper {
 
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8")
 
@@ -81,7 +83,7 @@ class LandingController @Inject()(val landingService: LandingService,
       if (isAuthorised && allowRedirect) {
         Future.successful(Redirect(controllers.routes.LandingController.get()))
       } else {
-        Future.successful(Ok(views.html.start()))
+        Future.successful(Ok(start()))
       }
   }
 

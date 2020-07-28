@@ -39,7 +39,9 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
                                               val statusService: StatusService,
                                               val authAction: AuthAction,
                                               val ds: CommonPlayDependencies,
-                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                              val cc: MessagesControllerComponents,
+                                              your_trading_premises: your_trading_premises,
+                                              implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   private def updateTradingPremises(tradingPremises: Option[Seq[TradingPremises]]) : Future[Option[Seq[TradingPremises]]] = {
     tradingPremises match {

@@ -44,7 +44,8 @@ class RenewalProgressController @Inject()(val authAction: AuthAction,
                                           val renewals: RenewalService,
                                           val businessMatchingService: BusinessMatchingService,
                                           val statusService: StatusService,
-                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                          val cc: MessagesControllerComponents,
+                                          renewal_progress: renewal_progress) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

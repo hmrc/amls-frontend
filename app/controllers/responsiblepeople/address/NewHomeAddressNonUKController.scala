@@ -35,7 +35,9 @@ class NewHomeAddressNonUKController @Inject()(authAction: AuthAction,
                                               val dataCacheConnector: DataCacheConnector,
                                               val autoCompleteService: AutoCompleteService,
                                               val ds: CommonPlayDependencies,
-                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with AddressHelper {
+                                              val cc: MessagesControllerComponents,
+                                              new_home_address_NonUK: new_home_address_NonUK,
+                                              implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with AddressHelper {
 
   def get(index: Int) = authAction.async {
     implicit request =>

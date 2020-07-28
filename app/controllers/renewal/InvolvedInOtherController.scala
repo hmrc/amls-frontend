@@ -33,7 +33,8 @@ class InvolvedInOtherController @Inject()(val dataCacheConnector: DataCacheConne
                                           val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           val renewalService: RenewalService,
-                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                          val cc: MessagesControllerComponents,
+                                          involved_in_other: involved_in_other) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

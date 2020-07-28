@@ -31,6 +31,7 @@ import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName}
+import views.html.notifications.your_messages
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -44,7 +45,9 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
                                        val amlsNotificationService: NotificationService,
                                        implicit val amlsConnector: AmlsConnector,
                                        implicit val dataCacheConnector: DataCacheConnector,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                       val cc: MessagesControllerComponents,
+                                       your_messages: your_messages,
+                                       implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
   def getMessages = authAction.async {
       implicit request =>
@@ -78,7 +81,7 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
       val previousRecordsWithIndexes = (for {
         amls <- refNumber
       } yield records.zipWithIndex.filter(_._1.amlsRegistrationNumber != amls)) getOrElse Seq()
-      Ok(views.html.notifications.your_messages(businessName, currentRecordsWithIndexes, previousRecordsWithIndexes))
+      Ok(your_messages(businessName, currentRecordsWithIndexes, previousRecordsWithIndexes))
     }) getOrElse (throw new Exception("Cannot retrieve business name"))
   }
 

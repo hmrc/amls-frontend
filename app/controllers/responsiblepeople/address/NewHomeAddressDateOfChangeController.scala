@@ -32,7 +32,9 @@ import scala.concurrent.Future
 class NewHomeAddressDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                      authAction: AuthAction,
                                                      val ds: CommonPlayDependencies,
-                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                     val cc: MessagesControllerComponents,
+                                                     new_home_date_of_change: new_home_date_of_change,
+                                                     implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int) = authAction.async {
     implicit request =>

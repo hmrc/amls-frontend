@@ -24,6 +24,7 @@ import models.tradingpremises._
 import play.api.i18n.MessagesApi
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection}
+import views.html.tradingpremises.agent_company_details
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -33,7 +34,9 @@ class AgentCompanyDetailsController @Inject()(val dataCacheConnector: DataCacheC
                                               val authAction: AuthAction,
                                               val ds: CommonPlayDependencies,
                                               override val messagesApi: MessagesApi,
-                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                              val cc: MessagesControllerComponents,
+                                              agent_company_details: agent_company_details,
+                                              implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false) = {
     authAction.async {
@@ -44,7 +47,7 @@ class AgentCompanyDetailsController @Inject()(val dataCacheConnector: DataCacheC
                 case Some(data) => Form2[AgentCompanyDetails](data)
                 case None => EmptyForm
               }
-              Ok(views.html.tradingpremises.agent_company_details(form, index, edit))
+              Ok(agent_company_details(form, index, edit))
             }
             case None => NotFound(notFoundView)
           }
@@ -55,7 +58,7 @@ class AgentCompanyDetailsController @Inject()(val dataCacheConnector: DataCacheC
       implicit request => {
         Form2[AgentCompanyDetails](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.tradingpremises.agent_company_details(f, index, edit)))
+            Future.successful(BadRequest(agent_company_details(f, index, edit)))
           case ValidForm(_, data) => {
             for {
               result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_,tp) =>

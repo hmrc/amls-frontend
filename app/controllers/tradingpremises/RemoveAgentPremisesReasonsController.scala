@@ -32,7 +32,9 @@ class RemoveAgentPremisesReasonsController @Inject () (
                                                       val dataCacheConnector: DataCacheConnector,
                                                       val authAction: AuthAction,
                                                       val ds: CommonPlayDependencies,
-                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                      val cc: MessagesControllerComponents,
+                                                      remove_agent_premises_reasons: remove_agent_premises_reasons,
+                                                      implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, complete: Boolean = false) = authAction.async {
       implicit request =>
@@ -40,7 +42,7 @@ class RemoveAgentPremisesReasonsController @Inject () (
           tp <- getData[TradingPremises](request.credId, index)
         } yield tp match {
           case (Some(tradingPremises)) => {
-            Ok(views.html.tradingpremises.remove_agent_premises_reasons(EmptyForm, index, complete))
+            Ok(remove_agent_premises_reasons(EmptyForm, index, complete))
           }
           case _ => NotFound(notFoundView)
         }

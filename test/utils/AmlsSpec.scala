@@ -52,6 +52,8 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
   implicit val ec: ExecutionContext = mock[ExecutionContext]
   implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
+  lazy val errorView = app.injector.instanceOf[views.html.error]
+
   def addToken[T](fakeRequest: FakeRequest[T]) = {
     import play.api.test.CSRFTokenHelper._
 

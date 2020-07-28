@@ -22,6 +22,7 @@ import forms._
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection}
+import views.html.responsiblepeople.fit_and_proper_notice
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,10 +31,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class FitAndProperNoticeController @Inject()(val dataCacheConnector: DataCacheConnector,
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
-                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                             val cc: MessagesControllerComponents,
+                                             fit_and_proper_notice: fit_and_proper_notice) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
-        Future(Ok(views.html.responsiblepeople.fit_and_proper_notice(EmptyForm, edit, index, flow, "")))
+        Future(Ok(fit_and_proper_notice(EmptyForm, edit, index, flow, "")))
   }
 }

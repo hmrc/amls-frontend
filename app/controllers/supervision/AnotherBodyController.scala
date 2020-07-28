@@ -32,7 +32,9 @@ import scala.concurrent.Future
 class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector,
                                       val authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
-                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                      val cc: MessagesControllerComponents,
+                                      another_body: another_body,
+                                      implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

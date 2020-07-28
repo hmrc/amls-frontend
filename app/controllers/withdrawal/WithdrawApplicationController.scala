@@ -37,7 +37,8 @@ class WithdrawApplicationController @Inject()(
                                                implicit val dc: DataCacheConnector,
                                                enrolments: AuthEnrolmentsService,
                                                implicit val statusService: StatusService,
-                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                               val cc: MessagesControllerComponents,
+                                               withdraw_application: withdraw_application) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

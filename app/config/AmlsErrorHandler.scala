@@ -21,10 +21,13 @@ import play.api.Configuration
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.mvc.Request
 import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
+import views.html.error
 
-class AmlsErrorHandler @Inject()(val messagesApi: MessagesApi, val configuration: Configuration)
+class AmlsErrorHandler @Inject()(val messagesApi: MessagesApi,
+                                 val configuration: Configuration,
+                                 val error: error)
                                 (implicit val appConfig: ApplicationConfig) extends FrontendErrorHandler {
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]) =
-    views.html.error(pageTitle, heading, message)(implicitly, implicitly, Lang.defaultLang, implicitly)
+    error(pageTitle, heading, message)(implicitly, implicitly, Lang.defaultLang, implicitly)
 }
