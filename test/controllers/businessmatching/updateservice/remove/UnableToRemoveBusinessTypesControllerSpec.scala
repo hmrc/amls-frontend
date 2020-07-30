@@ -22,6 +22,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.{contentAsString, status}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.test.Helpers._
+import views.html.businessmatching.updateservice.remove.unable_to_remove_activity
 
 class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
 
@@ -29,11 +30,12 @@ class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
     self =>
 
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[unable_to_remove_activity]
     val controller = new UnableToRemoveBusinessTypesController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
-      cc = mockMcc
+      cc = mockMcc,
+      unable_to_remove_activity = view
     )
   }
 

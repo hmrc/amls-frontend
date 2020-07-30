@@ -25,6 +25,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
+import views.html.bankdetails.summary
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -35,13 +36,14 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     val ukAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456789", "111111")))
     val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some(NonUKIBANNumber("DE89370400440532013000")))
     val nonUkAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
-
+    lazy val summaryView = app.injector.instanceOf[summary]
 
     val controller = new SummaryController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
-      mcc = mockMcc)
+      mcc = mockMcc,
+      summary = summaryView)
   }
 
   "Get" must {

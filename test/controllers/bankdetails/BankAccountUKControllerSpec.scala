@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.bankdetails.bank_account_account_uk
 
 import scala.concurrent.Future
 
@@ -43,13 +44,17 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
 
     val accountType = PersonalAccount
 
+    val bankAcc = app.injector.instanceOf[bank_account_account_uk]
+
     val controller = new BankAccountUKController(
       mockCacheConnector,
       SuccessfulAuthAction,
       mock[AuditConnector],
       mockStatusService,
       commonDependencies,
-      mockMcc
+      mockMcc,
+      bankAcc,
+      errorView
     )
 
   }

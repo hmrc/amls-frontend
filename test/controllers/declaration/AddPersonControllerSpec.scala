@@ -37,6 +37,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.declaration.add_person
 
 import scala.concurrent.Future
 
@@ -47,12 +48,13 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
 
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[add_person]
     val addPersonController = new AddPersonController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
-      cc = mockMcc
+      cc = mockMcc,
+      add_person = view
     )
 
     val emptyCache = CacheMap("", Map.empty)

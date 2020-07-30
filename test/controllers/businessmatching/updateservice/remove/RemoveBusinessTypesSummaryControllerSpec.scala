@@ -34,6 +34,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils._
 import views.TitleValidator
+import views.html.businessmatching.updateservice.remove.remove_activities_summary
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -47,13 +48,14 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
 
     val removeServiceHelper = mock[RemoveBusinessTypeHelper]
     val router = createRouter[RemoveBusinessTypeFlowModel]
-
+    lazy val view = app.injector.instanceOf[remove_activities_summary]
     val controller = new RemoveBusinessTypesSummaryController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       removeServiceHelper,
       router,
-      cc = mockMcc
+      cc = mockMcc,
+      remove_activities_summary = view
     )
   }
 

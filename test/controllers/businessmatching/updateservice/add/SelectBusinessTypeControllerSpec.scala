@@ -31,6 +31,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.businessmatching.updateservice.add.select_activities
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -43,14 +44,15 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec {
     val request = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-
+    lazy val view = app.injector.instanceOf[select_activities]
     val controller = new SelectBusinessTypeController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       router = createRouter[AddBusinessTypeFlowModel],
       addHelper = mock[AddBusinessTypeHelper],
-      cc = mockMcc
+      cc = mockMcc,
+      select_activities = view
     )
 
     when {

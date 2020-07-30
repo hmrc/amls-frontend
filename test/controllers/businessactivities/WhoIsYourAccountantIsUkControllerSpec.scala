@@ -27,6 +27,7 @@ import org.scalatest.PrivateMethodTester
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
+import views.html.businessactivities.who_is_your_accountant_is_uk_address
 
 import scala.concurrent.Future
 
@@ -36,12 +37,14 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with PrivateMethodT
     self =>
     val request = addToken(authRequest)
 
+    lazy val view = app.injector.instanceOf[who_is_your_accountant_is_uk_address]
     val controller = new WhoIsYourAccountantIsUkController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       autoCompleteService = mockAutoComplete,
       ds = commonDependencies,
-      cc = mockMcc
+      cc = mockMcc,
+      who_is_your_accountant_is_uk_address = view
     )
   }
 

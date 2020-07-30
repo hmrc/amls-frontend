@@ -33,6 +33,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.businessmatching.updateservice.add.msb_subservices
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -48,14 +49,15 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-
+    lazy val view = app.injector.instanceOf[msb_subservices]
     val controller = new SubSectorsController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
       router = createRouter[AddBusinessTypeFlowModel],
       config = config,
-      cc = mockMcc
+      cc = mockMcc,
+      msb_subservices = view
     )
 
 

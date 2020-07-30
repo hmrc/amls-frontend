@@ -28,6 +28,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
+import views.html.businessactivities.who_is_your_accountant
 
 import scala.concurrent.Future
 
@@ -39,13 +40,14 @@ class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
   trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks{
     self =>
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[who_is_your_accountant]
     val controller = new WhoIsYourAccountantNameController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       autoCompleteService = mockAutoComplete,
       ds = commonDependencies,
-      cc = mockMcc
+      cc = mockMcc,
+      who_is_your_accountant = view
     )
   }
 

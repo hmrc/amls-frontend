@@ -23,6 +23,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import views.html.bankdetails.your_bank_accounts
 
 class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -85,9 +86,14 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
       accountName = Some("Incomplete delete Fourth Account Name")
     )
 
+    lazy val bankAccountView = app.injector.instanceOf[your_bank_accounts]
+
     val controller = new YourBankAccountsController(
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies, mcc = mockMcc)
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      mcc = mockMcc,
+      your_bank_accounts = bankAccountView)
   }
 
   "Get" must {

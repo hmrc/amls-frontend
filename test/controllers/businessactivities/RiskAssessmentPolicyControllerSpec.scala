@@ -32,15 +32,20 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
+import views.html.businessactivities.risk_assessment_policy
 
 class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[risk_assessment_policy]
     val controller = new RiskAssessmentController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      risk_assessment_policy = view,
+      errorView)
   }
 
   val emptyCache = CacheMap("", Map.empty)

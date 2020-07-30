@@ -30,6 +30,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.businessactivities.identify_suspicious_activity
 
 import scala.concurrent.Future
 
@@ -37,10 +38,13 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[identify_suspicious_activity]
     val controller = new IdentifySuspiciousActivityController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      identify_suspicious_activity = view)
   }
 
   "IdentifySuspiciousActivityController" when {

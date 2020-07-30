@@ -31,6 +31,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
+import views.html.businessactivities.tax_matters
 
 import scala.concurrent.Future
 
@@ -38,10 +39,14 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[tax_matters]
     val controller = new TaxMattersController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      tax_matters = view,
+      errorView)
   }
 
   "TaxMattersController" when {

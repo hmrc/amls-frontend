@@ -33,6 +33,7 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.businessactivities.involved_in_other_name
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,12 +42,13 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
   trait Fixture {
     self => val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
-
+    lazy val view = app.injector.instanceOf[involved_in_other_name]
     val controller = new InvolvedInOtherController (
        dataCacheConnector = mock[DataCacheConnector],
        authAction = SuccessfulAuthAction, ds = commonDependencies,
        statusService = mock[StatusService],
-      cc = mockMcc
+      cc = mockMcc,
+      involved_in_other_name = view
     )
   }
 

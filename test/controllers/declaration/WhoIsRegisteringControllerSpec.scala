@@ -39,6 +39,7 @@ import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import views.html.declaration.{who_is_registering_this_registration, who_is_registering_this_renewal, who_is_registering_this_update}
 
 import scala.concurrent.Future
 
@@ -48,7 +49,9 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
     self =>
     val request = addToken(authRequest)
     val mockSectionsProvider = mock[SectionsProvider]
-
+    lazy val view1 = app.injector.instanceOf[who_is_registering_this_update]
+    lazy val view2 = app.injector.instanceOf[who_is_registering_this_renewal]
+    lazy val view3 = app.injector.instanceOf[who_is_registering_this_registration]
     val controller = new WhoIsRegisteringController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
@@ -56,7 +59,11 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
       statusService = mock[StatusService],
       renewalService = mock[RenewalService],
       cc = mockMcc,
-      sectionsProvider = mockSectionsProvider
+      sectionsProvider = mockSectionsProvider,
+      who_is_registering_this_update = view1,
+      who_is_registering_this_renewal = view2,
+      who_is_registering_this_registration = view3,
+      error = errorView
     )
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,

@@ -34,6 +34,7 @@ import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.{RenewalService, SectionsProvider}
 import utils.{AmlsSpec, DependencyMocks}
+import views.html.declaration.declare
 
 import scala.concurrent.Future
 
@@ -43,14 +44,15 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     self =>
     val request = addToken(authRequest)
     val mockSectionsProvider = mock[SectionsProvider]
-
+    lazy val view = app.injector.instanceOf[declare]
     val declarationController = new DeclarationController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mockStatusService,
       cc = mockMcc,
       sectionsProvider = mockSectionsProvider,
-      renewalService = mock[RenewalService]
+      renewalService = mock[RenewalService],
+      declare = view
     )
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",

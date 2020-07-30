@@ -24,6 +24,7 @@ import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.date_of_change
 
 class WhatDateRemovedControllerSpec extends AmlsSpec {
 
@@ -31,12 +32,13 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
     self =>
 
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[date_of_change]
     val controller = new WhatDateRemovedController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[RemoveBusinessTypeFlowModel],
-      cc = mockMcc
+      cc = mockMcc,
+      date_of_change = view
     )
   }
 

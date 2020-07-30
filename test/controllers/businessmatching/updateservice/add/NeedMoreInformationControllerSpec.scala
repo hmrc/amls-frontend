@@ -29,6 +29,7 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import utils._
+import views.html.businessmatching.updateservice.add.new_service_information
 
 class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with FutureAssertions with ScalaFutures {
 
@@ -38,13 +39,14 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
     val request = requestWithToken
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-
+    lazy val view = app.injector.instanceOf[new_service_information]
     val controller = new NeedMoreInformationController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel],
-      cc = mockMcc
+      cc = mockMcc,
+      new_service_information = view
     )
 
     val flowModel = AddBusinessTypeFlowModel(Some(AccountancyServices), Some(true))

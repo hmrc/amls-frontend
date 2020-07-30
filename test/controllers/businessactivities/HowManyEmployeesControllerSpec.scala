@@ -27,6 +27,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.businessactivities.business_employees
 
 import scala.concurrent.Future
 
@@ -34,11 +35,14 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
   trait Fixture {
     self => val request = addToken(authRequest)
+
+    lazy val view = app.injector.instanceOf[business_employees]
     val controller = new HowManyEmployeesController (
       dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
-      cc = mockMcc)
+      cc = mockMcc,
+      business_employees = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)

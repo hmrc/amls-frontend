@@ -32,6 +32,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.businessdetails.activity_start_date
 
 import scala.concurrent.Future
 
@@ -40,9 +41,14 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
+    lazy val view = app.injector.instanceOf[activity_start_date]
     val controller = new ActivityStartDateController (
       dataCache = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      activity_start_date = view,
+      errorView)
   }
 
   // scalastyle:off

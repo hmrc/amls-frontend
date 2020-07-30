@@ -28,6 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
+import views.html.businessactivities.nca_registered
 
 import scala.concurrent.Future
 
@@ -36,9 +37,13 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture {
     self => val request = addToken(authRequest)
+    lazy val view = app.injector.instanceOf[nca_registered]
     val controller = new NCARegisteredController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      nca_registered = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)

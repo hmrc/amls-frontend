@@ -37,6 +37,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.businessmatching.psr_number
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -49,7 +50,7 @@ class PSRNumberControllerSpec extends AmlsSpec
   trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[psr_number]
     val controller = new PSRNumberController(
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -58,7 +59,8 @@ class PSRNumberControllerSpec extends AmlsSpec
       mock[BusinessMatchingService],
       createRouter[ChangeSubSectorFlowModel],
       mock[ChangeSubSectorHelper],
-      cc = mockMcc
+      cc = mockMcc,
+      psr_number = view
     )
 
     when {

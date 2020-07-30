@@ -26,14 +26,21 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.{never, verify}
 import org.mockito.Matchers.{any, eq => eqTo}
+import views.html.businessactivities.transaction_types
 
 class TransactionTypesControllerSpec extends AmlsSpec
   with MustMatchers
   with BusinessActivitiesGenerator {
 
   trait Fixture extends DependencyMocks { self =>
+    lazy val view = app.injector.instanceOf[transaction_types]
     val request = addToken(authRequest)
-    val controller = new TransactionTypesController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockMcc)
+    val controller = new TransactionTypesController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      mockCacheConnector,
+      mockMcc,
+      transaction_types = view)
 
     mockCacheSave[BusinessActivities]
     mockCacheFetch(Some(BusinessActivities()))
