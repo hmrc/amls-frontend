@@ -31,6 +31,7 @@ import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.msb.which_currencies
 
 import scala.concurrent.Future
 
@@ -50,11 +51,13 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
 
     when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any(), any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
-
+    lazy val view = app.injector.instanceOf[which_currencies]
     val controller = new WhichCurrenciesController(dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
-      serviceFlow = mockServiceFlow, cc = mockMcc)
+      serviceFlow = mockServiceFlow,
+      cc = mockMcc,
+      which_currencies = view)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))

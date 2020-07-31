@@ -30,6 +30,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.msb.most_transactions
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,7 +38,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[most_transactions]
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     val controller = new MostTransactionsController(
@@ -47,7 +48,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       mockStatusService,
       mockServiceFlow,
       mockAutoComplete,
-      cc = mockMcc)
+      cc = mockMcc,
+      most_transactions = view)
 
 
 

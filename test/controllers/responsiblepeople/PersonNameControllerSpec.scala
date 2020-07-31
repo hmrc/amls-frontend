@@ -29,6 +29,7 @@ import utils.AmlsSpec
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
+import views.html.responsiblepeople.person_name
 
 import scala.concurrent.Future
 
@@ -40,10 +41,12 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[person_name]
     val personNameController = new PersonNameController (
       dataCacheConnector = mockDataCacheConnector ,
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+      person_name = view,
+      error = errorView)
   }
 
   val emptyCache = CacheMap("", Map.empty)

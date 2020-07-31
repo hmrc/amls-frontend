@@ -31,6 +31,7 @@ import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.renewal.total_throughput
 
 import scala.concurrent.Future
 
@@ -44,12 +45,13 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
     val dataCacheConnector = mock[DataCacheConnector]
     val renewal = Renewal()
     val cacheMap = mock[CacheMap]
-
+    lazy val view = app.injector.instanceOf[total_throughput]
     lazy val controller = new TotalThroughputController(
       SuccessfulAuthAction, ds = commonDependencies,
       renewalService,
       dataCacheConnector,
-      cc = mockMcc
+      cc = mockMcc,
+      total_throughput = view
     )
   }
 

@@ -33,6 +33,7 @@ import services.AutoCompleteService
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
+import views.html.responsiblepeople.nationality
 
 import scala.concurrent.Future
 
@@ -43,13 +44,15 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
     val request = addToken(authRequest)
 
     val autoCompleteService = mock[AutoCompleteService]
-
+    lazy val view = app.injector.instanceOf[nationality]
     val controller = new NationalityController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       autoCompleteService = autoCompleteService,
-      cc = mockMcc
+      cc = mockMcc,
+      nationality = view,
+      error = errorView
     )
 
     when {

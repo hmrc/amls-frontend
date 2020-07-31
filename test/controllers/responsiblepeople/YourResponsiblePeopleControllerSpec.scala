@@ -27,6 +27,7 @@ import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
+import views.html.responsiblepeople.your_responsible_people
 
 import scala.concurrent.Future
 
@@ -34,10 +35,11 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
 
     trait Fixture {
       self => val request = addToken(authRequest)
-
+      lazy val view = app.injector.instanceOf[your_responsible_people]
       val controller = new YourResponsiblePeopleController (
         dataCacheConnector = mock[DataCacheConnector],
-        authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+        authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+        your_responsible_people = view)
     }
 
     "Get" must {

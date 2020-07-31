@@ -29,6 +29,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.msb.summary
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,8 +38,16 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
-
-    val controller = new SummaryController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockStatusService, mockServiceFlow, mockMcc)
+    lazy val view = app.injector.instanceOf[summary]
+    val controller = new SummaryController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      mockCacheConnector,
+      mockStatusService,
+      mockServiceFlow,
+      mockMcc,
+      view
+      )
 
     val completeModel = MoneyServiceBusiness(
       throughput = Some(ExpectedThroughput.Second),

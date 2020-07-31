@@ -28,6 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.msb.fx_transaction_in_next_12_months
 
 import scala.concurrent.Future
 
@@ -36,12 +37,14 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
     trait Fixture extends DependencyMocks {
         self =>
         val request = addToken(authRequest)
-
+        lazy val view = app.injector.instanceOf[fx_transaction_in_next_12_months]
         val controller = new FXTransactionsInNext12MonthsController(
             authAction = SuccessfulAuthAction, ds = commonDependencies,
             dataCacheConnector = mockCacheConnector,
             statusService = mockStatusService,
-            serviceFlow = mockServiceFlow, cc = mockMcc)
+            serviceFlow = mockServiceFlow,
+          cc = mockMcc,
+          fx_transaction_in_next_12_months = view)
 
         mockIsNewActivityNewAuth(false)
         mockCacheFetch[ServiceChangeRegister](None, None)

@@ -28,6 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.msb.identify_linked_transactions
 
 import scala.concurrent.Future
 
@@ -35,7 +36,13 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     trait Fixture extends DependencyMocks {
       self => val request = addToken(authRequest)
-      val controller = new IdentifyLinkedTransactionsController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      lazy val view = app.injector.instanceOf[identify_linked_transactions]
+      val controller = new IdentifyLinkedTransactionsController(
+        mockCacheConnector,
+        authAction = SuccessfulAuthAction,
+        ds = commonDependencies,
+        cc = mockMcc,
+        identify_linked_transactions = view)
     }
 
   val cacheMap = mock[CacheMap]

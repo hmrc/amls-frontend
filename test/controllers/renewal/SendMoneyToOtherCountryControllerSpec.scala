@@ -31,6 +31,7 @@ import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.renewal.send_money_to_other_country
 
 import scala.concurrent.Future
 
@@ -45,11 +46,13 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
     lazy val mockStatusService = mock[StatusService]
     lazy val mockRenewalService = mock[RenewalService]
 
-
+    lazy val view = app.injector.instanceOf[send_money_to_other_country]
     val controller = new SendMoneyToOtherCountryController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc
+      renewalService = mockRenewalService,
+      cc = mockMcc,
+      send_money_to_other_country = view
     )
 
     when {

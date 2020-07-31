@@ -30,6 +30,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
+import views.html.date_of_change
 
 import scala.concurrent.Future
 
@@ -40,13 +41,14 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
     self => val request = addToken(authRequest)
 
     val statusService = mock[StatusService]
-
+    lazy val view = app.injector.instanceOf[date_of_change]
     val controller = new CurrentAddressDateOfChangeController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       statusService = statusService,
-      cc = mockMcc
+      cc = mockMcc,
+      date_of_change = view
     )
   }
 

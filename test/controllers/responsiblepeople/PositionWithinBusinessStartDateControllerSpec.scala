@@ -35,6 +35,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
+import views.html.responsiblepeople.position_within_business_start_date
 
 import scala.concurrent.Future
 
@@ -43,10 +44,12 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
   trait Fixture {
     self =>
       val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[position_within_business_start_date]
       val controller = new PositionWithinBusinessStartDateController (
         dataCacheConnector = mock[DataCacheConnector],
-        authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+        authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+        position_within_business_start_date = view,
+        error = errorView)
 
       object DefaultValues {
         val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)

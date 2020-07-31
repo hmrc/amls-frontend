@@ -31,6 +31,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.responsiblepeople.address.time_at_address
 
 import scala.concurrent.Future
 
@@ -43,13 +44,15 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self =>
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[time_at_address]
     val timeAtCurrentAddressController = new TimeAtCurrentAddressController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       statusService = mockStatusService,
       ds = commonDependencies,
-      cc = mockMcc
+      cc = mockMcc,
+      time_at_address = view,
+      error = errorView
     )
 
     when(timeAtCurrentAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))

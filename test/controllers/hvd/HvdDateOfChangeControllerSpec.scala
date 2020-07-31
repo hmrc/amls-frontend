@@ -30,6 +30,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper}
+import views.html.date_of_change
 
 import scala.concurrent.Future
 
@@ -38,8 +39,14 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture {
     self => val request = addToken(authRequest)
 
+    lazy val view = app.injector.instanceOf[date_of_change]
     val dataCacheConnector = mock[DataCacheConnector]
-    val controller = new HvdDateOfChangeController(dataCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    val controller = new HvdDateOfChangeController(
+      dataCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      date_of_change = view)
 
   }
 

@@ -33,6 +33,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
+import views.html.responsiblepeople.experience_training
 
 import scala.concurrent.Future
 
@@ -46,12 +47,14 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
     self => val request = addToken(authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
-
+    lazy val view = app.injector.instanceOf[experience_training]
     val controller = new ExperienceTrainingController (
       dataCacheConnector = dataCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
-      cc = mockMcc)
+      cc = mockMcc,
+      experience_training = view,
+      error = errorView)
   }
 
   val emptyCache = CacheMap("", Map.empty)

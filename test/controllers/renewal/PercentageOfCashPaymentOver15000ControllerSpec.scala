@@ -29,6 +29,7 @@ import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.renewal.percentage
 
 import scala.concurrent.Future
 
@@ -44,11 +45,12 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
-
+    lazy val view = app.injector.instanceOf[percentage]
     val controller = new PercentageOfCashPaymentOver15000Controller(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc
+      renewalService = mockRenewalService, cc = mockMcc,
+      percentage = view
     )
   }
 

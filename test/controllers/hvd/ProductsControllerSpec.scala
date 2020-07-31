@@ -28,6 +28,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
+import views.html.hvd.products
 
 class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -233,12 +234,14 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
+    lazy val view = app.injector.instanceOf[products]
     val controller = new ProductsController(mockCacheConnector,
       mockStatusService,
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockServiceFlow,
-      cc = mockMcc
+      cc = mockMcc,
+      products = view
     )
 
     mockIsNewActivityNewAuth(false)

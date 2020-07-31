@@ -28,6 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.msb.funds_transfer
 
 import scala.concurrent.Future
 
@@ -35,8 +36,13 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-
-    val controller = new FundsTransferController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[funds_transfer]
+    val controller = new FundsTransferController(
+      mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      funds_transfer = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)

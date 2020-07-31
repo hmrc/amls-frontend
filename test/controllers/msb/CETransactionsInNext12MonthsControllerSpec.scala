@@ -28,6 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.msb.ce_transaction_in_next_12_months
 
 import scala.concurrent.Future
 
@@ -36,13 +37,14 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[ce_transaction_in_next_12_months]
     val controller = new CETransactionsInNext12MonthsController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow,
-      cc = mockMcc)
+      cc = mockMcc,
+      ce_transaction_in_next_12_months = view)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, None)

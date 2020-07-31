@@ -26,6 +26,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.msb.branches_or_agents_which_countries
 
 import scala.concurrent.Future
 
@@ -34,7 +35,14 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new BranchesOrAgentsWhichCountriesController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, mockAutoComplete, mockMcc)
+    lazy val view = app.injector.instanceOf[branches_or_agents_which_countries]
+    val controller = new BranchesOrAgentsWhichCountriesController(
+      mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      mockAutoComplete,
+      mockMcc,
+      branches_or_agents_which_countries = view)
   }
 
   val modelBefore = MoneyServiceBusiness(

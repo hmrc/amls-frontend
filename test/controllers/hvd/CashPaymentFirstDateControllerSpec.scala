@@ -26,6 +26,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.hvd.cash_payment_first_date
 
 import scala.concurrent.Future
 
@@ -34,7 +35,13 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
-    val controller = new CashPaymentFirstDateController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[cash_payment_first_date]
+    val controller = new CashPaymentFirstDateController(
+      mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      cash_payment_first_date = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)

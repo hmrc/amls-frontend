@@ -31,6 +31,7 @@ import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.renewal.money_sources
 
 import scala.concurrent.Future
 
@@ -42,8 +43,14 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
     val cacheMap = mock[CacheMap]
-
-    lazy val controller = new MoneySourcesController(SuccessfulAuthAction, ds = commonDependencies, renewalService, dataCacheConnector, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[money_sources]
+    lazy val controller = new MoneySourcesController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      renewalService,
+      dataCacheConnector,
+      cc = mockMcc,
+      money_sources = view)
 
     when {
       renewalService.getRenewal(any())(any(), any())

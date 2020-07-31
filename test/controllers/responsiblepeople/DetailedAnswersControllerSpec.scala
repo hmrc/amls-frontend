@@ -38,6 +38,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.responsiblepeople.detailed_answers
 
 import scala.concurrent.Future
 
@@ -45,13 +46,15 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[detailed_answers]
     val controller = new DetailedAnswersController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       config = mock[ApplicationConfig],
-      cc = mockMcc
+      cc = mockMcc,
+      detailed_answers = view,
+      error = errorView
       )
 
     val businessMatching = BusinessMatching()

@@ -25,6 +25,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import utils._
+import views.html.responsiblepeople.legal_name
 
 
 class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
@@ -32,8 +33,10 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
   trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(self.authRequest)
     val RecordId = 1
-
-    lazy val controller = new LegalNameController(mockCacheConnector, SuccessfulAuthAction, commonDependencies, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[legal_name]
+    lazy val controller = new LegalNameController(mockCacheConnector, SuccessfulAuthAction, commonDependencies, cc = mockMcc,
+      legal_name = view,
+      error = errorView)
 
   }
 

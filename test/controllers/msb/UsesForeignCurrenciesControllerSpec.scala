@@ -31,6 +31,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.msb.uses_foreign_currencies
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,6 +45,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
+    lazy val view = app.injector.instanceOf[uses_foreign_currencies]
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
@@ -55,7 +57,9 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
     val controller = new UsesForeignCurrenciesController(dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
-      serviceFlow = mockServiceFlow, cc = mockMcc)
+      serviceFlow = mockServiceFlow,
+      cc = mockMcc,
+      uses_foreign_currencies = view)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))

@@ -30,6 +30,7 @@ import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
+import views.html.renewal.amp_turnover
 
 import scala.concurrent.Future
 
@@ -43,11 +44,12 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
-
+    lazy val view = app.injector.instanceOf[amp_turnover]
     val controller = new AMPTurnoverController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc
+      renewalService = mockRenewalService, cc = mockMcc,
+      amp_turnover = view
     )
 
     val businessMatching = BusinessMatching(

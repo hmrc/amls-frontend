@@ -28,6 +28,7 @@ import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AmlsSpec, DependencyMocks}
+import views.html.renewal.what_you_need
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -39,13 +40,14 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
     self =>
 
     val renewalService = mock[RenewalService]
-
+    lazy val view = app.injector.instanceOf[what_you_need]
     val controller = new WhatYouNeedController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       renewalService = renewalService,
-      cc = mock[MessagesControllerComponents])
+      cc = mock[MessagesControllerComponents],
+      what_you_need = view)
   }
   "WhatYouNeedController" must {
 
