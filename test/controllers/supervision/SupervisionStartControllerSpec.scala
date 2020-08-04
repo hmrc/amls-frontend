@@ -25,13 +25,19 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.supervision.supervision_start
 
 class SupervisionStartControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
-
-    val controller = new SupervisionStartController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[supervision_start]
+    val controller = new SupervisionStartController(
+      mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      supervision_start = view)
   }
 
   "SupervisionStartController" must {

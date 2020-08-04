@@ -24,11 +24,13 @@ import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.businessdetails.confirm_registered_office_or_main_place
 
 
 class confirm_registered_office_or_main_placeSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val place = app.injector.instanceOf[confirm_registered_office_or_main_place]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -39,7 +41,7 @@ class confirm_registered_office_or_main_placeSpec extends AmlsViewSpec with Must
 
       def view = {
         val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.businessdetails.confirm_registered_office_or_main_place(form2, address, true)
+        place(form2, address, true)
       }
 
       doc.title must startWith(Messages("businessdetails.confirmingyouraddress.title") + " - " + Messages("summary.businessdetails"))
@@ -51,7 +53,7 @@ class confirm_registered_office_or_main_placeSpec extends AmlsViewSpec with Must
 
       def view = {
         val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.businessdetails.confirm_registered_office_or_main_place(form2, address, true)
+        place(form2, address, true)
       }
       heading.html must be(Messages("businessdetails.confirmingyouraddress.title"))
       subHeading.html must include(Messages("summary.businessdetails"))
@@ -67,7 +69,7 @@ class confirm_registered_office_or_main_placeSpec extends AmlsViewSpec with Must
 
       def view = {
         val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.businessdetails.confirm_registered_office_or_main_place(form2, address, true)
+        place(form2, address, true)
       }
 
       errorSummary.html() must include("not a message Key")
@@ -81,7 +83,7 @@ class confirm_registered_office_or_main_placeSpec extends AmlsViewSpec with Must
       val form2: Form2[_] = EmptyForm
 
       val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-      def view = views.html.businessdetails.confirm_registered_office_or_main_place(form2, address, true)
+      def view = place(form2, address, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

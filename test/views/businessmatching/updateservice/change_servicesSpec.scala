@@ -22,6 +22,7 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessmatching.updateservice.change_services
 
 class change_servicesSpec extends AmlsViewSpec with MustMatchers {
 
@@ -29,13 +30,15 @@ class change_servicesSpec extends AmlsViewSpec with MustMatchers {
   val allowRemove = true
 
   trait ViewFixture extends Fixture {
+    lazy val change_services = app.injector.instanceOf[change_services]
     implicit val requestWithToken = addTokenForView()
-    def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set("ServiceOne"), allowAdd)
+    def view = change_services(EmptyForm, Set("ServiceOne"), allowAdd)
   }
 
   trait MultipleViewFixture extends Fixture {
+    lazy val change_services = app.injector.instanceOf[change_services]
     implicit val requestWithToken = addTokenForView()
-    def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set("ServiceOne", "ServiceTwo"), allowAdd)
+    def view = change_services(EmptyForm, Set("ServiceOne", "ServiceTwo"), allowAdd)
   }
 
   "The change_services view" must {
@@ -68,7 +71,7 @@ class change_servicesSpec extends AmlsViewSpec with MustMatchers {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq((Path \ "businessmatching.updateservice.changeServices") -> Seq(ValidationError("not a message Key"))))
 
-      override def view = views.html.businessmatching.updateservice.change_services(form2, Set.empty[String], allowAdd)
+      override def view = change_services(form2, Set.empty[String], allowAdd)
 
       errorSummary.html() must include("not a message Key")
     }

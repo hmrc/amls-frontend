@@ -30,6 +30,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
+import views.html.tradingpremises.agent_company_details
 
 import scala.concurrent.Future
 
@@ -37,8 +38,15 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
-    val controller = new AgentCompanyDetailsController (mock[DataCacheConnector], SuccessfulAuthAction, ds = commonDependencies, messagesApi, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[agent_company_details]
+    val controller = new AgentCompanyDetailsController (
+      mock[DataCacheConnector],
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      messagesApi,
+      cc = mockMcc,
+      agent_company_details = view,
+      error = errorView)
   }
 
   "AgentCompanyDetailsController" when {

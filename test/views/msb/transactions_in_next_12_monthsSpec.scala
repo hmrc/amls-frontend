@@ -18,16 +18,18 @@ package views.msb
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.moneyservicebusiness.{TransactionsInNext12Months}
+import models.moneyservicebusiness.TransactionsInNext12Months
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.msb.transactions_in_next_12_months
 
 
 class transactions_in_next_12_monthsSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val transactions_in_next_12_months = app.injector.instanceOf[transactions_in_next_12_months]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class transactions_in_next_12_monthsSpec extends AmlsViewSpec with MustMatchers 
 
     "have the back link button" in new ViewFixture {
       val form2: ValidForm[TransactionsInNext12Months] = Form2(TransactionsInNext12Months("10"))
-      def view = views.html.msb.transactions_in_next_12_months(form2, true)
+      def view = transactions_in_next_12_months(form2, true)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -43,7 +45,7 @@ class transactions_in_next_12_monthsSpec extends AmlsViewSpec with MustMatchers 
 
       val form2: ValidForm[TransactionsInNext12Months] = Form2(TransactionsInNext12Months("10"))
 
-      def view = views.html.msb.transactions_in_next_12_months(form2, true)
+      def view = transactions_in_next_12_months(form2, true)
 
       doc.title must be(Messages("msb.transactions.expected.title") +
         " - " + Messages("summary.msb") +
@@ -55,7 +57,7 @@ class transactions_in_next_12_monthsSpec extends AmlsViewSpec with MustMatchers 
 
       val form2: ValidForm[TransactionsInNext12Months] = Form2(TransactionsInNext12Months("10"))
 
-      def view = views.html.msb.transactions_in_next_12_months(form2, true)
+      def view = transactions_in_next_12_months(form2, true)
 
       heading.html must include(Messages("msb.transactions.expected.title"))
       subHeading.html must include(Messages("summary.msb"))
@@ -69,7 +71,7 @@ class transactions_in_next_12_monthsSpec extends AmlsViewSpec with MustMatchers 
           (Path \ "txnAmount") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.msb.transactions_in_next_12_months(form2, true)
+      def view = transactions_in_next_12_months(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

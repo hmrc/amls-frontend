@@ -24,11 +24,13 @@ import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.businessmatching.company_registration_number
 
 
 class company_registration_numberSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val company_registration_number = app.injector.instanceOf[company_registration_number]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -37,7 +39,7 @@ class company_registration_numberSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[CompanyRegistrationNumber] = Form2(CompanyRegistrationNumber("12345678"))
 
-      def view = views.html.businessmatching.company_registration_number(form2, edit = false, isPreSubmission = true)
+      def view = company_registration_number(form2, edit = false, isPreSubmission = true)
 
       doc.title must startWith(Messages("businessmatching.registrationnumber.title") + " - " + Messages("summary.businessmatching"))
       heading.html must include(Messages("businessmatching.registrationnumber.title"))
@@ -49,7 +51,7 @@ class company_registration_numberSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[CompanyRegistrationNumber] = Form2(CompanyRegistrationNumber("12345678"))
 
-      def view = views.html.businessmatching.company_registration_number(form2, edit = true, isPreSubmission = false)
+      def view = company_registration_number(form2, edit = true, isPreSubmission = false)
 
       doc.title must startWith(Messages("businessmatching.registrationnumber.title") + " - " + Messages("summary.updateinformation"))
       heading.html must include(Messages("businessmatching.registrationnumber.title"))
@@ -65,7 +67,7 @@ class company_registration_numberSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "companyRegistrationNumber") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessmatching.company_registration_number(form2, edit = true)
+      def view = company_registration_number(form2, edit = true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -78,19 +80,19 @@ class company_registration_numberSpec extends AmlsViewSpec with MustMatchers  {
     "hide the return to progress link when requested" in new ViewFixture {
       val form2: ValidForm[CompanyRegistrationNumber] = Form2(CompanyRegistrationNumber("12345678"))
 
-      def view = views.html.businessmatching.company_registration_number(form2, edit = true, showReturnLink = false)
+      def view = company_registration_number(form2, edit = true, showReturnLink = false)
 
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
 
     "have a back link in pre-submission mode" in new ViewFixture {
-      def view = views.html.businessmatching.company_registration_number(EmptyForm, edit = false, isPreSubmission = true)
+      def view = company_registration_number(EmptyForm, edit = false, isPreSubmission = true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have a back link in non pre-submission mode" in new ViewFixture {
-      def view = views.html.businessmatching.company_registration_number(EmptyForm, edit = false, isPreSubmission = false)
+      def view = company_registration_number(EmptyForm, edit = false, isPreSubmission = false)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

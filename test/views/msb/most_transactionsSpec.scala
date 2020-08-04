@@ -24,11 +24,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
+import views.html.msb.most_transactions
 
 
 class most_transactionsSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
+    lazy val most_transactions = app.injector.instanceOf[most_transactions]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class most_transactionsSpec extends AmlsViewSpec with MustMatchers {
 
     "have the back link button" in new ViewFixture {
       val form2: ValidForm[MostTransactions] = Form2(MostTransactions(Seq.empty[Country]))
-      def view = views.html.msb.most_transactions(form2, true, mockAutoComplete.getCountries)
+      def view = most_transactions(form2, true, mockAutoComplete.getCountries)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -44,7 +46,7 @@ class most_transactionsSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[MostTransactions] = Form2(MostTransactions(Seq.empty[Country]))
 
-      def view = views.html.msb.most_transactions(form2, true, mockAutoComplete.getCountries)
+      def view = most_transactions(form2, true, mockAutoComplete.getCountries)
 
       doc.title must be(Messages("msb.most.transactions.title") +
         " - " + Messages("summary.msb") +
@@ -56,7 +58,7 @@ class most_transactionsSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[MostTransactions] = Form2(MostTransactions(Seq.empty[Country]))
 
-      def view = views.html.msb.most_transactions(form2, true, mockAutoComplete.getCountries)
+      def view = most_transactions(form2, true, mockAutoComplete.getCountries)
 
       heading.html must be(Messages("msb.most.transactions.title"))
       subHeading.html must include(Messages("summary.msb"))
@@ -70,7 +72,7 @@ class most_transactionsSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "mostTransactionsCountries") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.msb.most_transactions(form2, true, mockAutoComplete.getCountries)
+      def view = most_transactions(form2, true, mockAutoComplete.getCountries)
 
       errorSummary.html() must include("not a message Key")
 

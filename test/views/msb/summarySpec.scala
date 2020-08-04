@@ -26,12 +26,14 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import views.Fixture
+import views.html.msb.summary
 
 import scala.collection.JavaConversions._
 
 class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
+    lazy val summary = app.injector.instanceOf[summary]
     implicit val requestWithToken = addTokenForView(FakeRequest())
 
     val fullMSB: MoneyServiceBusiness = MoneyServiceBusiness(
@@ -53,7 +55,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
   "summary view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.msb.summary(MoneyServiceBusiness(), None, ServiceChangeRegister())
+      def view = summary(MoneyServiceBusiness(), None, ServiceChangeRegister())
 
       doc.title must be(Messages("title.cya") +
         " - " + Messages("summary.msb") +
@@ -63,7 +65,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.msb.summary(MoneyServiceBusiness(), None, ServiceChangeRegister())
+      def view = summary(MoneyServiceBusiness(), None, ServiceChangeRegister())
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.msb"))
@@ -94,7 +96,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
       val msbServices: BusinessMatchingMsbServices = BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney, ForeignExchange))
 
-      def view = views.html.msb.summary(
+      def view = summary(
         fullMSB,
         Some(msbServices),
         ServiceChangeRegister()
@@ -113,26 +115,26 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
     }
 
     trait NoSubsectorsViewFixture extends ViewFixture {
-      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set())), ServiceChangeRegister())
+      def view = summary(fullMSB, Some(BusinessMatchingMsbServices(Set())), ServiceChangeRegister())
     }
 
     trait TMViewFixture extends ViewFixture {
-      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), ServiceChangeRegister())
+      def view = summary(fullMSB, Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), ServiceChangeRegister())
     }
 
     trait TMNotSendViewFixture extends ViewFixture {
-      def view = views.html.msb.summary(
+      def view = summary(
         fullMSB.copy(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))),
         Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), ServiceChangeRegister()
       )
     }
 
     trait CEViewFixture extends ViewFixture {
-      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(CurrencyExchange))), ServiceChangeRegister())
+      def view = summary(fullMSB, Some(BusinessMatchingMsbServices(Set(CurrencyExchange))), ServiceChangeRegister())
     }
 
     trait FXViewFixture extends ViewFixture {
-      def view = views.html.msb.summary(fullMSB, Some(BusinessMatchingMsbServices(Set(ForeignExchange))), ServiceChangeRegister())
+      def view = summary(fullMSB, Some(BusinessMatchingMsbServices(Set(ForeignExchange))), ServiceChangeRegister())
     }
 
     "business use an IPSP" when {

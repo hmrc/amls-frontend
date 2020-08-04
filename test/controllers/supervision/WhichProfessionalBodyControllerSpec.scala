@@ -26,15 +26,20 @@ import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.supervision.which_professional_body
 
 class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks with AuthorisedFixture { self =>
 
     val request = addToken(authRequest)
-
-    val controller = new WhichProfessionalBodyController(mockCacheConnector,
-                                                         authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[which_professional_body]
+    val controller = new WhichProfessionalBodyController(
+      mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      which_professional_body = view)
     mockCacheFetch[Supervision](Some(Supervision()))
     mockCacheSave[Supervision]
   }

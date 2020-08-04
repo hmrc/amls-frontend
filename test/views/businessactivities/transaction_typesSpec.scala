@@ -22,12 +22,14 @@ import models.businessactivities.{TransactionType, TransactionTypes}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
+import views.html.businessactivities.transaction_types
 
 class transaction_typesSpec extends AmlsViewSpec with MustMatchers {
 
   import views.Fixture
 
   trait ViewFixture extends Fixture {
+    lazy val transaction = app.injector.instanceOf[transaction_types]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class transaction_typesSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[TransactionTypes] = Form2(TransactionTypes(Set[TransactionType]()))
 
-      def view = views.html.businessactivities.transaction_types(form2, true)
+      def view = transaction(form2, true)
 
       doc.title must startWith(Messages("businessactivities.do.keep.records"))
     }
@@ -45,7 +47,7 @@ class transaction_typesSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[TransactionTypes] = Form2(TransactionTypes(Set[TransactionType]()))
 
-      def view = views.html.businessactivities.transaction_types(form2, true)
+      def view = transaction(form2, true)
 
       heading.html must be(Messages("businessactivities.do.keep.records"))
       subHeading.html must include(Messages("summary.businessactivities"))
@@ -58,7 +60,7 @@ class transaction_typesSpec extends AmlsViewSpec with MustMatchers {
       (Path \ "types") -> Seq(ValidationError("not a message Key"))
       ))
 
-      def view = views.html.businessactivities.transaction_types(form2, true)
+      def view = transaction(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -68,7 +70,7 @@ class transaction_typesSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.transaction_types(EmptyForm, true)
+      def view = transaction(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

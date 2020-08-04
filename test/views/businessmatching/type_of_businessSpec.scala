@@ -24,11 +24,13 @@ import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.businessmatching.type_of_business
 
 
 class type_of_businessSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val type_of_business = app.injector.instanceOf[type_of_business]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -37,7 +39,7 @@ class type_of_businessSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[TypeOfBusiness] = Form2(TypeOfBusiness("Business Type"))
 
-      def view = views.html.businessmatching.type_of_business(form2, true)
+      def view = type_of_business(form2, true)
 
       doc.title must startWith(Messages("businessmatching.typeofbusiness.title") + " - " + Messages("summary.businessmatching"))
     }
@@ -46,7 +48,7 @@ class type_of_businessSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[TypeOfBusiness] = Form2(TypeOfBusiness("Business Type"))
 
-      def view = views.html.businessmatching.type_of_business(form2, true)
+      def view = type_of_business(form2, true)
 
       heading.html must include(Messages("businessmatching.typeofbusiness.title"))
       subHeading.html must include(Messages("summary.businessmatching"))
@@ -60,7 +62,7 @@ class type_of_businessSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "typeOfBusiness") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessmatching.type_of_business(form2, true)
+      def view = type_of_business(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -71,7 +73,7 @@ class type_of_businessSpec extends AmlsViewSpec with MustMatchers  {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessmatching.type_of_business(EmptyForm, edit = true)
+      def view = type_of_business(EmptyForm, edit = true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

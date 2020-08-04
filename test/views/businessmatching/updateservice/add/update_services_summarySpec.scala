@@ -29,6 +29,7 @@ import views.html.businessmatching.updateservice.add._
 import utils.UpdateServicesSummaryFixtures
 
 class update_services_summarySpec extends UpdateServicesSummaryFixtures {
+  lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
   "The update_services_summary view" must {
     "have the correct title" in new ViewFixture {
       def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())

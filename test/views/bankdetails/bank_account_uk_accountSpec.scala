@@ -24,10 +24,12 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import utils.{AmlsSpec, AmlsViewSpec}
 import views.Fixture
+import views.html.bankdetails.bank_account_account_uk
 
 class bank_account_uk_accountSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val bankAccount = app.injector.instanceOf[bank_account_account_uk]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class bank_account_uk_accountSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[UKAccount] = Form2(UKAccount("", ""))
 
-      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_uk(form2, false, 0)
+      override def view: HtmlFormat.Appendable = bankAccount(form2, false, 0)
 
       doc.title() must startWith(Messages("bankdetails.bankaccount.ukaccount") + " - " + Messages("summary.bankdetails"))
     }
@@ -46,7 +48,7 @@ class bank_account_uk_accountSpec extends AmlsViewSpec with MustMatchers {
 
     val form2: ValidForm[UKAccount] = Form2(UKAccount("", ""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_uk(form2, false, 0)
+    override def view: HtmlFormat.Appendable = bankAccount(form2, false, 0)
 
     heading.html() must be(Messages("bankdetails.bankaccount.ukaccount"))
   }
@@ -55,7 +57,7 @@ class bank_account_uk_accountSpec extends AmlsViewSpec with MustMatchers {
 
     val form2: ValidForm[UKAccount] = Form2(UKAccount("", ""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_uk(form2, false, 0)
+    override def view: HtmlFormat.Appendable = bankAccount(form2, false, 0)
 
     doc.getElementsByAttributeValue("class", "link-back") must not be empty
   }
@@ -78,7 +80,7 @@ class bank_account_uk_accountSpec extends AmlsViewSpec with MustMatchers {
         (Path \ sortCodeField, Seq(ValidationError(messageKey2)))
       ))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_uk(form2, false, 0)
+    override def view: HtmlFormat.Appendable = bankAccount(form2, false, 0)
 
     errorSummary.html() must include(messageKey1)
     errorSummary.html() must include(messageKey2)

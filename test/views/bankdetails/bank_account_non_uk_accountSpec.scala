@@ -24,10 +24,12 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import utils.{AmlsSpec, AmlsViewSpec}
 import views.Fixture
+import views.html.bankdetails.bank_account_account_number_non_uk
 
 class bank_account_non_uk_accountSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val accountNumber = app.injector.instanceOf[bank_account_account_number_non_uk]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class bank_account_non_uk_accountSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
-      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_number_non_uk(form2, false, 0)
+      override def view: HtmlFormat.Appendable = accountNumber(form2, false, 0)
 
       doc.title() must startWith(Messages("bankdetails.bankaccount.accountnumber.nonuk.title") + " - " + Messages("summary.bankdetails"))
     }
@@ -46,7 +48,7 @@ class bank_account_non_uk_accountSpec extends AmlsViewSpec with MustMatchers {
 
     val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_number_non_uk(form2, false, 0)
+    override def view: HtmlFormat.Appendable = accountNumber(form2, false, 0)
 
     heading.text() must be(Messages("bankdetails.bankaccount.accountnumber.nonuk.title"))
   }
@@ -55,7 +57,7 @@ class bank_account_non_uk_accountSpec extends AmlsViewSpec with MustMatchers {
 
     val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_number_non_uk(form2, false, 0)
+    override def view: HtmlFormat.Appendable = accountNumber(form2, false, 0)
 
     doc.getElementsByAttributeValue("class", "link-back") must not be empty
   }
@@ -76,7 +78,7 @@ class bank_account_non_uk_accountSpec extends AmlsViewSpec with MustMatchers {
         (Path \ accountNumberField, Seq(ValidationError(messageKey)))
       ))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_number_non_uk(form2, false, 0)
+    override def view: HtmlFormat.Appendable = accountNumber(form2, false, 0)
 
     errorSummary.html() must include(messageKey)
     doc.getElementById( accountNumberField + "-error-notification").html() must include(messageKey)

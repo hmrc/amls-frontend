@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.msb.summary
 
 
 class summaryPreRelease7Spec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val summary = app.injector.instanceOf[summary]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -37,7 +39,7 @@ class summaryPreRelease7Spec extends AmlsViewSpec with MustMatchers {
 
       val model = MoneyServiceBusiness(whichCurrencies = Some(WhichCurrencies(Seq("GBP"), None, None)))
 
-      def view = views.html.msb.summary(model, Some(BusinessMatchingMsbServices(Set(CurrencyExchange))), ServiceChangeRegister())
+      def view = summary(model, Some(BusinessMatchingMsbServices(Set(CurrencyExchange))), ServiceChangeRegister())
 
       html.contains(Messages("msb.which_currencies.foreign_currencies_question")) must be(false)
 

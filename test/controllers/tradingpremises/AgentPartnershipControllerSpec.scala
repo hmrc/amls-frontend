@@ -28,6 +28,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.tradingpremises.agent_partnership
 
 import scala.concurrent.Future
 
@@ -36,8 +37,15 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
   trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
-
-    val controller = new AgentPartnershipController(mockCacheConnector, SuccessfulAuthAction, ds = commonDependencies, messagesApi, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[agent_partnership]
+    val controller = new AgentPartnershipController(
+      mockCacheConnector,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      messagesApi,
+      cc = mockMcc,
+      agent_partnership = view,
+      error = errorView)
 
     mockCacheFetchAll
     mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(tradingPremisesGen.sample.get)), TradingPremises.key)

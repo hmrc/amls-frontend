@@ -26,6 +26,7 @@ import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.supervision.member_of_professional_body
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,10 +36,13 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks {self =>
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[member_of_professional_body]
     val controller = new ProfessionalBodyMemberController (
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      member_of_professional_body = view)
 
     mockCacheSave[Supervision]
 

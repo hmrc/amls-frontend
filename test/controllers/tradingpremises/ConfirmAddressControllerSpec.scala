@@ -36,6 +36,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.tradingpremises.confirm_address
 
 import scala.concurrent.Future
 
@@ -51,6 +52,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
     val statusService = mock[StatusService]
     val enrolments = mock[AuthEnrolmentsService]
     val amls = mock[AmlsConnector]
+    lazy val view = app.injector.instanceOf[confirm_address]
     val controller = new ConfirmAddressController(
       messagesApi,
       self.dataCache,
@@ -58,7 +60,8 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
       enrolments,
       statusService,
       amls,
-      cc = mockMcc
+      cc = mockMcc,
+      confirm_address = view
     )
 
     when {

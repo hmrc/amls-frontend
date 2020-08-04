@@ -23,10 +23,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
+import views.html.msb.branches_or_agents
 
 class branches_or_agents_has_countriesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
+    lazy val branches_or_agents = app.injector.instanceOf[branches_or_agents]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -34,7 +36,7 @@ class branches_or_agents_has_countriesSpec extends AmlsViewSpec with MustMatcher
 
     "have the back link button" in new ViewFixture {
       val form2: ValidForm[BranchesOrAgentsHasCountries] = Form2(BranchesOrAgentsHasCountries(true))
-      def view = views.html.msb.branches_or_agents(form2, edit = true)
+      def view = branches_or_agents(form2, edit = true)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -42,7 +44,7 @@ class branches_or_agents_has_countriesSpec extends AmlsViewSpec with MustMatcher
 
       val form2: ValidForm[BranchesOrAgentsHasCountries] = Form2(BranchesOrAgentsHasCountries(true))
 
-      def view = views.html.msb.branches_or_agents(form2, edit = true)
+      def view = branches_or_agents(form2, edit = true)
 
       doc.title must be(Messages("msb.branchesoragents.title") +
         " - " + Messages("summary.msb") +
@@ -54,7 +56,7 @@ class branches_or_agents_has_countriesSpec extends AmlsViewSpec with MustMatcher
 
       val form2: ValidForm[BranchesOrAgentsHasCountries] = Form2(BranchesOrAgentsHasCountries(true))
 
-      def view = views.html.msb.branches_or_agents(form2, edit = true)
+      def view = branches_or_agents(form2, edit = true)
 
       heading.html must be(Messages("msb.branchesoragents.title"))
       subHeading.html must include(Messages("summary.msb"))
@@ -67,7 +69,7 @@ class branches_or_agents_has_countriesSpec extends AmlsViewSpec with MustMatcher
           (Path \ "hasCountries") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.msb.branches_or_agents(form2, edit = true)
+      def view = branches_or_agents(form2, edit = true)
 
       errorSummary.html() must include("not a message Key")
 

@@ -18,16 +18,18 @@ package views.bankdetails
 
 import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
-import  utils.AmlsViewSpec
+import utils.AmlsViewSpec
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.bankdetails.what_you_need
 
 class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val whatYouNeed = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
 
-    def view = views.html.bankdetails.what_you_need(controllers.bankdetails.routes.HasBankAccountController.get())
+    def view = whatYouNeed(controllers.bankdetails.routes.HasBankAccountController.get())
   }
 
   "What you need View" must {

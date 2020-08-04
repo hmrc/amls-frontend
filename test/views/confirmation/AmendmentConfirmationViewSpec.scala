@@ -22,15 +22,17 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.confirmation.confirm_amendvariation
 
 class AmendmentConfirmationViewSpec extends AmlsViewSpec with MustMatchers  with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
+    lazy val confirm_amendvariation = app.injector.instanceOf[confirm_amendvariation]
     implicit val requestWithToken = addTokenForView()
 
     val continueHref = "http://google.co.uk"
 
-    override def view = views.html.confirmation.confirm_amendvariation(
+    override def view = confirm_amendvariation(
       Some(paymentReferenceNumber),
       Currency(100),
       Currency(150),

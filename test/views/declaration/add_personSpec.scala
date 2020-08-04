@@ -25,11 +25,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.declaration.add_person
 
 
 class add_personSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val add_person = app.injector.instanceOf[add_person]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -38,7 +40,7 @@ class add_personSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[AddPerson] = Form2(AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))))
 
-      def view = views.html.declaration.add_person("string1", "string2", Some(BusinessType.LPrLLP), form2)
+      def view = add_person("string1", "string2", Some(BusinessType.LPrLLP), form2)
 
       doc.title mustBe s"string1 - ${Messages("title.amls")} - ${Messages("title.gov")}"
     }
@@ -47,7 +49,7 @@ class add_personSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[AddPerson] = Form2(AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))))
 
-      def view = views.html.declaration.add_person("string1", "string2", Some(BusinessType.LPrLLP), form2)
+      def view = add_person("string1", "string2", Some(BusinessType.LPrLLP), form2)
 
       heading.html must be(Messages("declaration.addperson.title"))
       subHeading.html must include(Messages("string2"))
@@ -57,7 +59,7 @@ class add_personSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[AddPerson] = Form2(AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))))
 
-      def view = views.html.declaration.add_person("string1", "string2", Some(BusinessType.LPrLLP), form2)
+      def view = add_person("string1", "string2", Some(BusinessType.LPrLLP), form2)
 
       doc.getElementsByClass("heading-medium").text() must include("Name")
       doc.getElementsByClass("heading-medium").text() must include("Role in the business")
@@ -67,7 +69,7 @@ class add_personSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[AddPerson] = Form2(AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))))
 
-      def view = views.html.declaration.add_person("string1", "string2", Some(BusinessType.LPrLLP), form2)
+      def view = add_person("string1", "string2", Some(BusinessType.LPrLLP), form2)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -82,7 +84,7 @@ class add_personSpec extends AmlsViewSpec with MustMatchers  {
 
       val f = Form2[AddPerson](AddPerson.formWrites.writes(person) ++ RoleWithinBusinessRelease7.formWrites.writes(role))
 
-      def view = views.html.declaration.add_person("string 1", "string 2", Some(BusinessType.UnincorporatedBody), f)
+      def view = add_person("string 1", "string 2", Some(BusinessType.UnincorporatedBody), f)
 
       doc.getElementById("firstName").`val` mustBe "Forename"
       doc.getElementById("middleName").`val` mustBe "Middlename"
@@ -94,7 +96,7 @@ class add_personSpec extends AmlsViewSpec with MustMatchers  {
     "pre-populate the 'other' field correctly" in new ViewFixture {
       val f = Form2(AddPerson("Forename", None, "Surname", RoleWithinBusinessRelease7(Set(models.declaration.release7.Other("Other details")))))
 
-      def view = views.html.declaration.add_person("string 1", "string 2", Some(BusinessType.LPrLLP), f)
+      def view = add_person("string 1", "string 2", Some(BusinessType.LPrLLP), f)
 
       doc.getElementById("otherPosition").`val` mustBe "Other details"
     }
@@ -109,7 +111,7 @@ class add_personSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "otherPosition") -> Seq(ValidationError("fourth not a message Key"))
         ))
 
-      def view = views.html.declaration.add_person("string1", "string2", Some(BusinessType.LPrLLP), form2)
+      def view = add_person("string1", "string2", Some(BusinessType.LPrLLP), form2)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

@@ -32,6 +32,7 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.tradingpremises.msb_services
 
 import scala.concurrent.Future
 
@@ -41,13 +42,15 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
     self => val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
-
+    lazy val view = app.injector.instanceOf[msb_services]
     val controller = new MSBServicesController (
       dataCacheConnector = cache,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       statusService = mock[StatusService],
-      cc = mockMcc
+      cc = mockMcc,
+      msb_services = view,
+      error = errorView
     )
 
     val mockCacheMap = mock[CacheMap]

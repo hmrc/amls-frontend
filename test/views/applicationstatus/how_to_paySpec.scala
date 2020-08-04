@@ -21,28 +21,30 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsSpec, AmlsViewSpec}
 import views.Fixture
+import views.html.applicationstatus.how_to_pay
 
 class how_to_paySpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val howToPay = app.injector.instanceOf[how_to_pay]
     implicit val requestWithToken = addTokenForView()
   }
 
   "What you need View" must {
     "Have the correct title" in new ViewFixture {
-      def view = views.html.applicationstatus.how_to_pay(Some("ref"))
+      def view = howToPay(Some("ref"))
       doc.title must startWith(Messages("howtopay.title"))
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.applicationstatus.how_to_pay(Some("ref"))
+      def view = howToPay(Some("ref"))
 
       heading.html must be (Messages("howtopay.title"))
       subHeading.html must include (Messages("summary.status"))
     }
 
     "contain the expected content elements where there is a payment reference" in new ViewFixture{
-      def view = views.html.applicationstatus.how_to_pay(Some("ref"))
+      def view = howToPay(Some("ref"))
 
       html must include(Messages("howtopay.title2"))
       html must include(Messages("howtopay.para.1"))
@@ -82,7 +84,7 @@ class how_to_paySpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements where there is not a payment reference" in new ViewFixture{
-      def view = views.html.applicationstatus.how_to_pay(None)
+      def view = howToPay(None)
 
       html must include(Messages("howtopay.title2"))
       html must include(Messages("howtopay.para.1"))
@@ -125,7 +127,7 @@ class how_to_paySpec extends AmlsViewSpec with MustMatchers {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.applicationstatus.how_to_pay(None)
+      def view = howToPay(None)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

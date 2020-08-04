@@ -26,12 +26,13 @@ import views.html.bankdetails._
 class HasBankAccountViewSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
+    lazy val hasBankAccount = app.injector.instanceOf[has_bank_account]
     implicit val csrfRequest = addTokenForView()
   }
 
   "The view" should {
     "have all the correct titles, headings and content" in new ViewFixture {
-      override def view = has_bank_account(EmptyForm)
+      override def view = hasBankAccount(EmptyForm)
 
       doc.select("h1").text mustBe Messages("bankdetails.hasbankaccount.title")
       validateTitle(s"${Messages("bankdetails.hasbankaccount.title")} - ${Messages("summary.bankdetails")}")
@@ -39,7 +40,7 @@ class HasBankAccountViewSpec extends AmlsViewSpec {
     }
 
     "displays validation messages in the correct place" in new ViewFixture {
-      override def view = has_bank_account(InvalidForm(
+      override def view = hasBankAccount(InvalidForm(
         Map.empty[String, Seq[String]],
         Seq(Path \ "hasBankDetails" -> Seq(ValidationError("bankdetails.hasbankaccount.validation")))
       ))

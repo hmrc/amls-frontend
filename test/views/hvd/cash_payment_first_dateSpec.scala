@@ -24,11 +24,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.hvd.cash_payment_first_date
 
 
 class cash_payment_first_dateSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val cash_payment_first_date = app.injector.instanceOf[cash_payment_first_date]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -38,7 +40,7 @@ class cash_payment_first_dateSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[CashPaymentFirstDate] = Form2(CashPaymentFirstDate(LocalDate.parse("2016-3-20")))
 
-      def view = views.html.hvd.cash_payment_first_date(form2, true)
+      def view = cash_payment_first_date(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -47,7 +49,7 @@ class cash_payment_first_dateSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[CashPaymentFirstDate] = Form2(CashPaymentFirstDate(LocalDate.parse("2016-3-20")))
 
-      def view = views.html.hvd.cash_payment_first_date(form2, true)
+      def view = cash_payment_first_date(form2, true)
 
       doc.title must startWith(Messages("hvd.cash.payment.date.title") + " - " + Messages("summary.hvd"))
     }
@@ -56,7 +58,7 @@ class cash_payment_first_dateSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[CashPaymentFirstDate] = Form2(CashPaymentFirstDate(LocalDate.parse("2016-3-24")))
 
-      def view = views.html.hvd.cash_payment_first_date(form2, true)
+      def view = cash_payment_first_date(form2, true)
 
       heading.html must be(Messages("hvd.cash.payment.date.title"))
       subHeading.html must include(Messages("summary.hvd"))
@@ -70,7 +72,7 @@ class cash_payment_first_dateSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "paymentDate") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.hvd.cash_payment_first_date(form2, true)
+      def view = cash_payment_first_date(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

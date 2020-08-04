@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessactivities.involved_in_other_name
 
 
 class involved_in_other_nameSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val name = app.injector.instanceOf[involved_in_other_name]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class involved_in_other_nameSpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.businessactivities.involved_in_other_name(form2, true, None)
+      def view = name(form2, true, None)
 
       doc.title must be(Messages("businessactivities.involved.other.title") + " - " +
         Messages("summary.businessactivities") +
@@ -48,7 +50,7 @@ class involved_in_other_nameSpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.businessactivities.involved_in_other_name(form2, true, None)
+      def view = name(form2, true, None)
 
       heading.html must be(Messages("businessactivities.involved.other.title"))
       subHeading.html must include(Messages("summary.businessactivities"))
@@ -59,7 +61,7 @@ class involved_in_other_nameSpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.businessactivities.involved_in_other_name(form2, true, None)
+      def view = name(form2, true, None)
 
       doc.getElementsByAttributeValue("name", "involvedInOther") must not be empty
       doc.getElementsByAttributeValue("name", "details") must not be empty
@@ -74,7 +76,7 @@ class involved_in_other_nameSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "details") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.businessactivities.involved_in_other_name(form2, true, None)
+      def view = name(form2, true, None)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
@@ -82,7 +84,7 @@ class involved_in_other_nameSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.involved_in_other_name(EmptyForm, true, None)
+      def view = name(EmptyForm, true, None)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

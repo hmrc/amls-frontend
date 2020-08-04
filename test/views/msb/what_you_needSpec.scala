@@ -21,13 +21,15 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.msb.what_you_need
 
 
 class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val what_you_need = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
-    def view = views.html.msb.what_you_need()
+    def view = what_you_need()
   }
 
   "What you need View" must {
@@ -74,7 +76,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
     "Transmitting Money is a selected MSB subservice" when {
       trait TMViewFixture extends ViewFixture {
-        override def view = views.html.msb.what_you_need(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+        override def view = what_you_need(BusinessMatchingMsbServices(Set(TransmittingMoney)))
       }
 
       "provide correct content for TM" in new TMViewFixture {
@@ -88,7 +90,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
     "Currency Exchange is a selected MSB subservice" when {
       trait CXViewFixture extends ViewFixture {
-        override def view = views.html.msb.what_you_need(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+        override def view = what_you_need(BusinessMatchingMsbServices(Set(CurrencyExchange)))
       }
 
       "provide correct content for currencyExchange" in new CXViewFixture {
@@ -100,7 +102,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
     "Foreign Exchange is a selected MSB subservice" when {
       trait FXViewFixture extends ViewFixture {
-        override def view = views.html.msb.what_you_need(BusinessMatchingMsbServices(Set(ForeignExchange)))
+        override def view = what_you_need(BusinessMatchingMsbServices(Set(ForeignExchange)))
       }
 
       "state foreign exchange transactions info will be needed" in new FXViewFixture {

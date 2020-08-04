@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
+import views.html.businessdetails.registered_office_uk
 
 
 class registered_office_ukSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
+    lazy val registered_office_uk = app.injector.instanceOf[registered_office_uk]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class registered_office_ukSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
 
-      def view = views.html.businessdetails.registered_office_uk(form2, true)
+      def view = registered_office_uk(form2, true)
 
       doc.title must startWith(Messages("businessdetails.registeredoffice.where.title") + " - " + Messages("summary.businessdetails"))
     }
@@ -45,7 +47,7 @@ class registered_office_ukSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
 
-      def view = views.html.businessdetails.registered_office_uk(form2, true)
+      def view = registered_office_uk(form2, true)
 
       heading.html must be(Messages("businessdetails.registeredoffice.where.title"))
       subHeading.html must include(Messages("summary.businessdetails"))
@@ -59,7 +61,7 @@ class registered_office_ukSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "postCode-fieldset") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessdetails.registered_office_uk(form2, true)
+      def view = registered_office_uk(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -71,7 +73,7 @@ class registered_office_ukSpec extends AmlsViewSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.businessdetails.registered_office_uk(form2, true)
+      def view = registered_office_uk(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

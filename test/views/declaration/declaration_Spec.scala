@@ -16,28 +16,30 @@
 
 package views.declaration
 
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.declaration.declare
 
 
 class declaration_Spec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val declare = app.injector.instanceOf[declare]
     implicit val requestWithToken = addTokenForView()
   }
 
   "declaration view" must {
     "have correct title" in new ViewFixture {
-      def view = views.html.declaration.declare("string1", "string2", "Name", isAmendment = false)
+      def view = declare("string1", "string2", "Name", isAmendment = false)
 
       doc.title mustBe s"string1 - ${Messages("title.amls")} - ${Messages("title.gov")}"
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.declaration.declare("string1", "string2", "Name", isAmendment = false)
+      def view = declare("string1", "string2", "Name", isAmendment = false)
 
       heading.html must be(Messages("declaration.declaration.title"))
       subHeading.html must include(Messages("string2"))
@@ -45,13 +47,13 @@ class declaration_Spec extends AmlsViewSpec with MustMatchers  {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.declaration.declare("string1", "string2", "Name", isAmendment = false)
+      def view = declare("string1", "string2", "Name", isAmendment = false)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct content" in new ViewFixture {
-      def view = views.html.declaration.declare("string1", "string2", "Name", isAmendment = false)
+      def view = declare("string1", "string2", "Name", isAmendment = false)
 
       doc.text() must include(Messages("declaration.declaration.declare"))
 
@@ -66,14 +68,14 @@ class declaration_Spec extends AmlsViewSpec with MustMatchers  {
     }
 
     "have correct preamble when an 'amendment' message is passed in" in new ViewFixture {
-      def view = views.html.declaration.declare("string1", "string2", "Name", isAmendment = true)
+      def view = declare("string1", "string2", "Name", isAmendment = true)
 
       doc.text() must include(Messages("declaration.declaration.amendment.correctinformation"))
     }
 
     "replay the person's name in the first line of the declaration text" in new ViewFixture {
       val name = "Some Person"
-      def view = views.html.declaration.declare("string1", "string2", name, isAmendment = false)
+      def view = declare("string1", "string2", name, isAmendment = false)
 
       doc.select(".notice").text() must include(Messages("declaration.declaration.fullname", name))
     }

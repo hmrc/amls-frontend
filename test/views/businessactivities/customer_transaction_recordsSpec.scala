@@ -23,10 +23,12 @@ import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
 import utils.BooleanFormReadWrite._
+import views.html.businessactivities.customer_transaction_records
 
 class customer_transaction_recordsSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val customer = app.injector.instanceOf[customer_transaction_records]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class customer_transaction_recordsSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[Boolean] = Form2(false)(formWrites("isRecorded"))
 
-      def view = views.html.businessactivities.customer_transaction_records(form2, true)
+      def view = customer(form2, true)
 
       doc.title must startWith(Messages("businessactivities.keep.customer.records.title"))
     }
@@ -44,7 +46,7 @@ class customer_transaction_recordsSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[Boolean] = Form2(false)(formWrites("isRecorded"))
 
-      def view = views.html.businessactivities.customer_transaction_records(form2, true)
+      def view = customer(form2, true)
 
       heading.html must be(Messages("businessactivities.keep.customer.records.title"))
       subHeading.html must include(Messages("summary.businessactivities"))
@@ -58,7 +60,7 @@ class customer_transaction_recordsSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "isRecorded") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessactivities.customer_transaction_records(form2, true)
+      def view = customer(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -68,7 +70,7 @@ class customer_transaction_recordsSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.customer_transaction_records(EmptyForm, true)
+      def view = customer(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

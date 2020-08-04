@@ -21,17 +21,19 @@ import models.confirmation.Currency
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.confirmation.confirmation_new
 
 class SubmitRegistrationConfirmationViewSpec extends AmlsViewSpec with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
+    lazy val confirmation_new = app.injector.instanceOf[confirmation_new]
     implicit val requestWithToken = addTokenForView()
 
     val continueHref = "http://google.co.uk"
 
     val fee = 100
 
-    override def view = views.html.confirmation.confirmation_new(Some(paymentReferenceNumber), Currency(fee), continueHref)
+    override def view = confirmation_new(Some(paymentReferenceNumber), Currency(fee), continueHref)
   }
 
   "The amendment confirmation view" must {

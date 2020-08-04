@@ -20,22 +20,24 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.declaration.register_responsible_person
 
 class register_responsible_personSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val register_responsible_person = app.injector.instanceOf[register_responsible_person]
     implicit val requestWithToken = addTokenForView()
   }
 
   "What you need View" must {
     "Have the correct title" in new ViewFixture {
-      def view = views.html.declaration.register_responsible_person("subheading")
+      def view = register_responsible_person("subheading")
 
       doc.title must startWith(Messages("declaration.register.responsible.person.title"))
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.declaration.register_responsible_person("subheading")
+      def view = register_responsible_person("subheading")
 
       heading.html must be (Messages("declaration.register.responsible.person.title"))
       subHeading.html must include (Messages("subheading"))
@@ -43,13 +45,13 @@ class register_responsible_personSpec extends AmlsViewSpec with MustMatchers {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.declaration.register_responsible_person("subheading")
+      def view = register_responsible_person("subheading")
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.declaration.register_responsible_person("subheading")
+      def view = register_responsible_person("subheading")
 
       html must include(Messages("declaration.register.responsible.person.description"))
       html must include(Messages("declaration.register.responsible.person.title"))

@@ -26,6 +26,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.supervision.summary
 
 import scala.concurrent.Future
 
@@ -33,8 +34,14 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks with SupervisionValues {
     self => val request = addToken(authRequest)
-
-    val controller = new SummaryController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[summary]
+    val controller = new SummaryController(
+      mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      summary = view,
+      error = errorView)
 
     val model = Supervision(None)
   }

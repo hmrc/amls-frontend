@@ -24,16 +24,20 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.supervision.penalised_by_professional
 
 
 class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[penalised_by_professional]
     val controller = new PenalisedByProfessionalController (
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      penalised_by_professional = view)
 
     mockCacheSave[Supervision]
 

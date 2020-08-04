@@ -22,16 +22,19 @@ import org.jsoup.Jsoup
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.tcsp.another_tcsp_supervision
 
 class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[another_tcsp_supervision]
     val controller = new AnotherTCSPSupervisionController(
       SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
-      cc = mockMcc
+      cc = mockMcc,
+      another_tcsp_supervision = view,
+      error = errorView
     )
   }
 

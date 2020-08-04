@@ -39,6 +39,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService}
 import utils.{AmlsSpec, DependencyMocks}
+import views.html.notifications.your_messages
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -92,7 +93,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     val mockAmlsConnector = mock[AmlsConnector]
     val mockNotificationService = mock[NotificationService]
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-
+    lazy val view = app.injector.instanceOf[your_messages]
     val controller = new NotificationController(
       authEnrolmentsService = mockAuthEnrolmentsService,
       statusService = mockStatusService,
@@ -102,7 +103,9 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       amlsNotificationService = mockNotificationService,
       amlsConnector = mockAmlsConnector,
       dataCacheConnector = mockCacheConnector,
-      cc = mockMcc)
+      cc = mockMcc,
+      your_messages = view,
+      error = errorView)
 
     val controllerWithFailedAuthAction = new NotificationController(
       authEnrolmentsService = mockAuthEnrolmentsService,
@@ -113,7 +116,9 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       amlsConnector = mockAmlsConnector,
       dataCacheConnector = mockCacheConnector,
       ds = commonDependencies,
-      cc = mockMcc)
+      cc = mockMcc,
+      your_messages = view,
+      error = errorView)
 
     val mockBusinessMatching = mock[BusinessMatching]
     val mockReviewDetails = mock[ReviewDetails]

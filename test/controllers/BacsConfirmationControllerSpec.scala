@@ -37,6 +37,7 @@ import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.confirmation.{confirmation_bacs, confirmation_bacs_transitional_renewal}
 
 import scala.concurrent.Future
 
@@ -50,7 +51,8 @@ class BacsConfirmationControllerSpec extends AmlsSpec
     self =>
     val baseUrl = "http://localhost"
     val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
-
+    lazy val view1 = app.injector.instanceOf[confirmation_bacs_transitional_renewal]
+    lazy val view2 = app.injector.instanceOf[confirmation_bacs]
     val controller = new BacsConfirmationController(
       authAction = SuccessfulAuthAction,
       statusService = mock[StatusService],
@@ -59,7 +61,9 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       authenticator = mock[AuthenticatorConnector],
       enrolmentService = mock[AuthEnrolmentsService],
       ds = commonDependencies,
-      cc = mockMcc)
+      cc = mockMcc,
+      confirmation_bacs_transitional_renewal = view1,
+      confirmation_bacs = view2)
 
     when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
       .thenReturn(Future.successful(Some(amlsRegistrationNumber)))

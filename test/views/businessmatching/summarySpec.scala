@@ -27,12 +27,14 @@ import utils.AmlsViewSpec
 import views.Fixture
 import forms.EmptyForm
 import org.mockito.Mockito.when
+import views.html.businessmatching.summary
 
 import scala.collection.JavaConversions._
 
 class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
+    lazy val summary = app.injector.instanceOf[summary]
     implicit val requestWithToken = addTokenForView()
 
     val defaultActivitiesUrl = controllers.businessmatching.routes.RegisterServicesController.get().url
@@ -41,7 +43,7 @@ class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropert
   "businessmatching view" must {
     "have correct title when presubmission" in new ViewFixture {
 
-      def view = views.html.businessmatching.summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl, true)
+      def view = summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl, true)
 
       doc.title must startWith("Check your answers before starting your application" + " - " + "Pre-application")
       heading.html must be("Check your answers before starting your application")
@@ -51,7 +53,7 @@ class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropert
 
     "have correct title when not presubmission" in new ViewFixture {
 
-      def view = views.html.businessmatching.summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl, false)
+      def view = summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl, false)
 
       doc.title must startWith("Check your answers" + " - " + "Update information")
       heading.html must be("Check your answers")
@@ -91,7 +93,7 @@ class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropert
         Some(CompanyRegistrationNumberModel),
         Some(BusinessAppliedForPSRNumberModel))
 
-      def view = views.html.businessmatching.summary(EmptyForm, testBusinessMatching, defaultActivitiesUrl)
+      def view = summary(EmptyForm, testBusinessMatching, defaultActivitiesUrl)
 
       val sectionChecks = Table[String, Element => Boolean, String](
         ("title key", "check", "editLink"),
@@ -158,7 +160,7 @@ class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropert
         Some(CompanyRegistrationNumberModel),
         Some(BusinessAppliedForPSRNumberModel))
 
-      def view = views.html.businessmatching.summary(EmptyForm, testBusinessMatching, defaultActivitiesUrl)
+      def view = summary(EmptyForm, testBusinessMatching, defaultActivitiesUrl)
 
       val sectionChecks = Table[String, Element => Boolean, String](
         ("title key", "check", "editLink"),

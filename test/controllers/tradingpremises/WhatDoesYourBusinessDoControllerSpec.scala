@@ -39,6 +39,8 @@ import uk.gov.hmrc.auth.core.{Enrolments, User}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AuthorisedRequest}
+import views.html.date_of_change
+import views.html.tradingpremises.what_does_your_business_do
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -55,12 +57,17 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
   trait Fixture {
     self => val request = addToken(authRequest)
+    lazy val view1 = app.injector.instanceOf[what_does_your_business_do]
+    lazy val view2 = app.injector.instanceOf[date_of_change]
 
     val whatDoesYourBusinessDoController = new WhatDoesYourBusinessDoController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
-      cc = mockMcc
+      cc = mockMcc,
+      what_does_your_business_do = view1,
+      date_of_change = view2,
+      error = errorView
     )
 
     val businessMatchingActivitiesAll = BusinessMatchingActivities(

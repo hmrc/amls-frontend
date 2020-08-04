@@ -25,6 +25,7 @@ import views.html.businessmatching.updateservice.remove.unable_to_remove_activit
 class unable_to_remove_activitySpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
+    lazy val unable_to_remove_activity = app.injector.instanceOf[unable_to_remove_activity]
     implicit val requestWithToken = addTokenForView()
 
     def view = unable_to_remove_activity("test")

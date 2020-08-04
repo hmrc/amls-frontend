@@ -19,17 +19,19 @@ package views.declaration
 import forms.{Form2, InvalidForm, ValidForm}
 import models.declaration.WhoIsRegistering
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.declaration.who_is_registering_this_registration
 
 
 class who_is_registeringSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val who_is_registering_this_registration = app.injector.instanceOf[who_is_registering_this_registration]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -37,7 +39,7 @@ class who_is_registeringSpec extends AmlsViewSpec with MustMatchers  {
     "have correct title" in new ViewFixture {
       val form2: ValidForm[WhoIsRegistering] = Form2(WhoIsRegistering("PersonName"))
 
-      def view = views.html.declaration.who_is_registering_this_registration(form2, Seq(ResponsiblePerson()))
+      def view = who_is_registering_this_registration(form2, Seq(ResponsiblePerson()))
 
       doc.title mustBe s"${Messages("declaration.who.is.registering.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       heading.html must be(Messages("declaration.who.is.registering.title"))
@@ -55,7 +57,7 @@ class who_is_registeringSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "person") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.declaration.who_is_registering_this_registration(form2, Seq(ResponsiblePerson()))
+      def view = who_is_registering_this_registration(form2, Seq(ResponsiblePerson()))
 
       errorSummary.html() must include("not a message Key")
 
@@ -73,7 +75,7 @@ class who_is_registeringSpec extends AmlsViewSpec with MustMatchers  {
         ResponsiblePerson(personName = Some(PersonName("A",  None, "Name 2")))
       )
 
-      def view = views.html.declaration.who_is_registering_this_registration(form2, people)
+      def view = who_is_registering_this_registration(form2, people)
 
       val radioButtons = doc.select("form input[type=radio]")
 
@@ -90,7 +92,7 @@ class who_is_registeringSpec extends AmlsViewSpec with MustMatchers  {
         ResponsiblePerson(personName = Some(PersonName("A",  None, "Person")))
       )
 
-      def view = views.html.declaration.who_is_registering_this_registration(f, people)
+      def view = who_is_registering_this_registration(f, people)
 
       doc.select("form input[type=radio][checked]").`val` mustBe "1"
     }

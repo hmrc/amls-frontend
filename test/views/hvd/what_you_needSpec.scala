@@ -18,39 +18,41 @@ package views.hvd
 
 import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
-import  utils.AmlsViewSpec
+import utils.AmlsViewSpec
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.hvd.what_you_need
 
 class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val what_you_need = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
   }
 
   "What you need View" must {
 
     "have the back link button" in new ViewFixture {
-      def view = views.html.hvd.what_you_need()
+      def view = what_you_need()
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "Have the correct title" in new ViewFixture {
-      def view = views.html.hvd.what_you_need()
+      def view = what_you_need()
 
       doc.title must startWith(Messages("title.wyn"))
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.hvd.what_you_need()
+      def view = what_you_need()
 
       heading.html must be (Messages("title.wyn"))
       subHeading.html must include (Messages("summary.hvd"))
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.hvd.what_you_need()
+      def view = what_you_need()
 
       html must include(Messages("what your business will buy or sell"))
       html must include(Messages("how you’ll sell your goods, for example auction"))

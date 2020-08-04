@@ -24,10 +24,12 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.bankdetails.bank_account_name
 
 class bank_account_nameSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val bankAccountName = app.injector.instanceOf[bank_account_name]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -37,7 +39,7 @@ class bank_account_nameSpec extends AmlsViewSpec with MustMatchers {
       val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
 
-      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_name(form2, false, Some(0))
+      override def view: HtmlFormat.Appendable = bankAccountName(form2, false, Some(0))
 
       doc.title() must startWith(Messages("bankdetails.bankaccount.accountname.title") + " - " + Messages("summary.bankdetails"))
     }
@@ -47,7 +49,7 @@ class bank_account_nameSpec extends AmlsViewSpec with MustMatchers {
 
     val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_name(form2, false, Some(0))
+    override def view: HtmlFormat.Appendable = bankAccountName(form2, false, Some(0))
 
     heading.html() must include(Messages("bankdetails.bankaccount.accountname.title"))
   }
@@ -56,7 +58,7 @@ class bank_account_nameSpec extends AmlsViewSpec with MustMatchers {
 
     val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_name(form2, false, Some(0))
+    override def view: HtmlFormat.Appendable = bankAccountName(form2, false, Some(0))
 
     doc.getElementsByAttributeValue("class", "link-back") must not be empty
   }
@@ -75,7 +77,7 @@ class bank_account_nameSpec extends AmlsViewSpec with MustMatchers {
       Seq((Path \ accountNameField, Seq(ValidationError(messageKey1)))
       ))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_name(form2, false, Some(0))
+    override def view: HtmlFormat.Appendable = bankAccountName(form2, false, Some(0))
 
     errorSummary.html() must include(messageKey1)
 

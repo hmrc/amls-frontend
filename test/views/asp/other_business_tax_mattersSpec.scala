@@ -16,19 +16,21 @@
 
 package views.asp
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.asp.{OtherBusinessTaxMattersNo, OtherBusinessTaxMattersYes, OtherBusinessTaxMatters}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import forms.{Form2, InvalidForm, ValidForm}
+import models.asp.{OtherBusinessTaxMatters, OtherBusinessTaxMattersNo, OtherBusinessTaxMattersYes}
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.asp.other_business_tax_matters
 
 
 class other_business_tax_mattersSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val taxMatters = app.injector.instanceOf[other_business_tax_matters]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -38,7 +40,7 @@ class other_business_tax_mattersSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[OtherBusinessTaxMatters] = Form2(OtherBusinessTaxMattersYes)
 
-      def view = views.html.asp.other_business_tax_matters(form2, true)
+      def view = taxMatters(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -47,7 +49,7 @@ class other_business_tax_mattersSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[OtherBusinessTaxMatters] = Form2(OtherBusinessTaxMattersYes)
 
-      def view = views.html.asp.other_business_tax_matters(form2, true)
+      def view = taxMatters(form2, true)
 
       doc.title must startWith(Messages("asp.other.business.tax.matters.title") + " - " + Messages("summary.asp"))
     }
@@ -56,7 +58,7 @@ class other_business_tax_mattersSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[OtherBusinessTaxMatters] = Form2(OtherBusinessTaxMattersNo)
 
-      def view = views.html.asp.other_business_tax_matters(form2, true)
+      def view = taxMatters(form2, true)
 
       heading.html must be(Messages("asp.other.business.tax.matters.title"))
       subHeading.html must include(Messages("summary.asp"))
@@ -70,7 +72,7 @@ class other_business_tax_mattersSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "otherBusinessTaxMatters") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.asp.other_business_tax_matters(form2, true)
+      def view = taxMatters(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

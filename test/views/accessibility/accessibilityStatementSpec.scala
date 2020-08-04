@@ -18,30 +18,30 @@ package views.accessibility
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
+import play.twirl.api.{Html, HtmlFormat}
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.accessibility.accessibility_statement
 
 
 class accessibilityStatementSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val statement = app.injector.instanceOf[views.html.accessibility.accessibility_statement]
     implicit val requestWithToken = addTokenForView()
   }
 
   "accessibilityStatement view" must {
 
     "have a back link" in new ViewFixture {
-
-      def view = views.html.accessibility.accessibility_statement("")
-
+      def view = statement("")
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
 
 
-      def view = views.html.accessibility.accessibility_statement("")
+      def view = statement("")
 
       doc.title must startWith(Messages("Accessibility statement for Manage your anti-money laundering supervision"))
     }
@@ -49,7 +49,7 @@ class accessibilityStatementSpec extends AmlsViewSpec with MustMatchers  {
     "have correct headings" in new ViewFixture {
 
 
-      def view = views.html.accessibility.accessibility_statement("")
+      def view = statement("")
 
       heading.html must be(Messages("Accessibility statement for Manage your anti-money laundering supervision"))
 
@@ -57,7 +57,7 @@ class accessibilityStatementSpec extends AmlsViewSpec with MustMatchers  {
 
     "have correct content" in new ViewFixture {
 
-      def view = views.html.accessibility.accessibility_statement("")
+      def view = statement("")
 
       html must include("Accessibility statement for Manage your anti-money laundering supervision")
       html must include("This accessibility statement explains how accessible this service is, what to do if you have difficulty using it, and how to report accessibility problems with the service.")
@@ -92,7 +92,7 @@ class accessibilityStatementSpec extends AmlsViewSpec with MustMatchers  {
     }
 
     "have correct list content" in new ViewFixture {
-      def view = views.html.accessibility.accessibility_statement("")
+      def view = statement("")
 
       html must include("change colours, contrast levels and fonts")
       html must include("zoom in up to 300% without the text spilling off the screen")

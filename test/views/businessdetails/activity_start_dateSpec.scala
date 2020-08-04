@@ -24,10 +24,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessdetails.activity_start_date
 
 
 class activity_start_dateSpec extends AmlsViewSpec with MustMatchers {
   trait ViewFixture extends Fixture {
+    lazy val date = app.injector.instanceOf[activity_start_date]
     implicit val requestWithToken = addTokenForView()
   }
   "activity_start_date view" must {
@@ -35,7 +37,7 @@ class activity_start_dateSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[ActivityStartDate] = Form2(ActivityStartDate(LocalDate.now))
 
-      def view = views.html.businessdetails.activity_start_date(form2, true)
+      def view = date(form2, true)
 
       doc.title must startWith(Messages("businessdetails.activity.start.date.title") + " - " + Messages("summary.businessdetails"))
     }
@@ -44,7 +46,7 @@ class activity_start_dateSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[ActivityStartDate] = Form2(ActivityStartDate(LocalDate.now))
 
-      def view = views.html.businessdetails.activity_start_date(form2, true)
+      def view = date(form2, true)
 
       heading.html must be(Messages("businessdetails.activity.start.date.title"))
       subHeading.html must include(Messages("summary.businessdetails"))
@@ -58,7 +60,7 @@ class activity_start_dateSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "startDate") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessdetails.activity_start_date(form2, true)
+      def view = date(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -70,7 +72,7 @@ class activity_start_dateSpec extends AmlsViewSpec with MustMatchers {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.businessdetails.activity_start_date(form2, true)
+      def view = date(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

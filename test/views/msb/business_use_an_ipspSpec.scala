@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.msb.business_use_an_ipsp
 
 
 class business_use_an_ipspSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val business_use_an_ipsp = app.injector.instanceOf[business_use_an_ipsp]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class business_use_an_ipspSpec extends AmlsViewSpec with MustMatchers {
 
     "have the back link button" in new ViewFixture {
       val form2: ValidForm[BusinessUseAnIPSP] = Form2(BusinessUseAnIPSPNo)
-      def view = views.html.msb.business_use_an_ipsp(form2, edit = true)
+      def view = business_use_an_ipsp(form2, edit = true)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -43,7 +45,7 @@ class business_use_an_ipspSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[BusinessUseAnIPSP] = Form2(BusinessUseAnIPSPNo)
 
-      def view = views.html.msb.business_use_an_ipsp(form2, true)
+      def view = business_use_an_ipsp(form2, true)
 
       doc.title must be(Messages("msb.ipsp.title") +
         " - " + Messages("summary.msb") +
@@ -55,7 +57,7 @@ class business_use_an_ipspSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[BusinessUseAnIPSP] = Form2(BusinessUseAnIPSPNo)
 
-      def view = views.html.msb.business_use_an_ipsp(form2, true)
+      def view = business_use_an_ipsp(form2, true)
 
       heading.html must include(Messages("msb.ipsp.title"))
       subHeading.html must include(Messages("summary.msb"))
@@ -71,7 +73,7 @@ class business_use_an_ipspSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "referenceNumber") -> Seq(ValidationError("third not a message Key"))
         ))
 
-      def view = views.html.msb.business_use_an_ipsp(form2, true)
+      def view = business_use_an_ipsp(form2, true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

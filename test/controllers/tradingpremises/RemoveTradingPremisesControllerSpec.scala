@@ -31,6 +31,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import views.html.tradingpremises.remove_trading_premises
 
 import scala.concurrent.Future
 
@@ -38,11 +39,15 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[remove_trading_premises]
     val controller = new RemoveTradingPremisesController (
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      remove_trading_premises = view,
+      error = errorView)
   }
 
   "RemoveTradingPremisesController" must {

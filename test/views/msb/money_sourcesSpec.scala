@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.msb.money_sources
 
 
 class money_sourcesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val money_sources = app.injector.instanceOf[money_sources]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,21 +37,21 @@ class money_sourcesSpec extends AmlsViewSpec with MustMatchers {
 
     "have the back link button" in new ViewFixture {
       val formData: ValidForm[MoneySources] = Form2(MoneySources())
-      def view = views.html.msb.money_sources(formData, true)
+      def view = money_sources(formData, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
       val formData: ValidForm[MoneySources] = Form2(MoneySources())
-      def view = views.html.msb.money_sources(formData, true)
+      def view = money_sources(formData, true)
 
       doc.title must startWith(Messages("msb.supply_foreign_currencies.title") + " - " + Messages("summary.msb"))
     }
 
     "have correct headings" in new ViewFixture {
       val formData: ValidForm[MoneySources] = Form2(MoneySources())
-      def view = views.html.msb.money_sources(formData, true)
+      def view = money_sources(formData, true)
 
       heading.html must be(Messages("msb.supply_foreign_currencies.title"))
       subHeading.html must include(Messages("summary.msb"))
@@ -58,7 +60,7 @@ class money_sourcesSpec extends AmlsViewSpec with MustMatchers {
 
     "ask the user who will supply the foreign currency" in new ViewFixture {
       val formData: ValidForm[MoneySources] = Form2(MoneySources())
-      def view = views.html.msb.money_sources(formData, true)
+      def view = money_sources(formData, true)
 
       Option(doc.getElementById("bankMoneySource-Yes")).isDefined must be(true)
       Option(doc.getElementById("wholesalerMoneySource-Yes")).isDefined must be(true)
@@ -72,7 +74,7 @@ class money_sourcesSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "WhoWillSupply") -> Seq(ValidationError("third not a message Key"))
         ))
 
-      def view = views.html.msb.money_sources(form2, true)
+      def view = money_sources(form2, true)
       errorSummary.html() must include("third not a message Key")
 
       doc.getElementById("WhoWillSupply")

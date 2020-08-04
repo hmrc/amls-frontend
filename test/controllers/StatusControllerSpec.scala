@@ -43,6 +43,7 @@ import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
+import views.html.status.your_registration
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
@@ -54,7 +55,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[your_registration]
     val controller = new StatusController(
       mock[LandingService],
       mock[StatusService],
@@ -69,7 +70,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       commonDependencies,
       mock[FeeResponseService],
       mockMcc,
-      mock[AmlsNotificationConnector])
+      mock[AmlsNotificationConnector],
+      your_registration = view)
 
     val controllerNoAmlsNumber = new StatusController(
       mock[LandingService],
@@ -85,7 +87,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       commonDependencies,
       mock[FeeResponseService],
       mockMcc,
-      mock[AmlsNotificationConnector])
+      mock[AmlsNotificationConnector],
+      your_registration = view)
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
     val rp1 = ResponsiblePerson(

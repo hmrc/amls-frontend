@@ -54,6 +54,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.businessmatching.services
+import views.html.start
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -91,7 +92,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
     val request = addToken(authRequest)
     val config = mock[ApplicationConfig]
-
+    lazy val view = app.injector.instanceOf[start]
     val controller = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
       landingService = mock[LandingService],
@@ -103,7 +104,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       mcc = mockMcc,
       messagesApi = messagesApi,
       config = config,
-      parser = mock[BodyParsers.Default])
+      parser = mock[BodyParsers.Default],
+      start = view)
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
@@ -255,7 +257,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
     val request = addToken(authRequest)
     val config = mock[ApplicationConfig]
-
+    lazy val view = app.injector.instanceOf[start]
     val controller = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
       landingService = mock[LandingService],
@@ -267,7 +269,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       mcc = mockMcc,
       messagesApi = messagesApi,
       config = config,
-      parser = mock[BodyParsers.Default])
+      parser = mock[BodyParsers.Default],
+      start = view)
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))

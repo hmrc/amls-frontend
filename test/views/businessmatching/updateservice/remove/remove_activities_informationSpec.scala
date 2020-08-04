@@ -21,12 +21,14 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessmatching.updateservice.remove.remove_activities_information
 
 class remove_activities_informationSpec extends AmlsViewSpec with MockitoSugar with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val remove_activities_information = app.injector.instanceOf[remove_activities_information]
     implicit val requestWithToken = addTokenForView()
-    def view = views.html.businessmatching.updateservice.remove.remove_activities_information("placeholder")
+    def view = remove_activities_information("placeholder")
   }
 
   "remove_activities view" must {
@@ -50,7 +52,7 @@ class remove_activities_informationSpec extends AmlsViewSpec with MockitoSugar w
     "placeholder is all services" must {
       "contain all services content" in new ViewFixture {
 
-        override def view = views.html.businessmatching.updateservice.remove.remove_activities_information("all services")
+        override def view = remove_activities_information("all services")
 
         doc.html must not include Messages("updateservice.removeactivitiesinformation.info.3")
         doc.html must include(Messages("updateservice.removeactivitiesinformation.info.1.all"))

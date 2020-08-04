@@ -29,6 +29,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import views.html.tradingpremises.is_residential
 
 class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with PrivateMethodTester {
 
@@ -44,8 +45,15 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
     mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(TradingPremises())), TradingPremises.key)
     mockCacheGetEntry[BusinessMatching](Some(BusinessMatching()), BusinessMatching.key)
-
-    val controller = new IsResidentialController(messagesApi, SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[is_residential]
+    val controller = new IsResidentialController(
+      messagesApi,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      mockCacheConnector,
+      cc = mockMcc,
+      is_residential = view,
+      error = errorView)
 
     mockCacheSave[Seq[TradingPremises]]
   }

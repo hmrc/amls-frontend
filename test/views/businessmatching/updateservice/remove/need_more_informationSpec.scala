@@ -27,6 +27,7 @@ import views.html.businessmatching.updateservice.remove.need_more_information
 class need_more_informationSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val need_more_information = app.injector.instanceOf[need_more_information]
     implicit val requestWithToken = addTokenForView()
     def view = need_more_information(Set(AccountancyServices.getMessage()))
   }

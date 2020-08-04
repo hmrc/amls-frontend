@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessdetails.previously_registered
 
 
 class previously_registeredSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val previously_registered = app.injector.instanceOf[previously_registered]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class previously_registeredSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes(Some("prevMLRRegNo")))
 
-      def view = views.html.businessdetails.previously_registered(form2, true)
+      def view = previously_registered(form2, true)
 
       doc.title must startWith(Messages("businessdetails.registeredformlr.title") + " - " + Messages("summary.businessdetails"))
     }
@@ -45,7 +47,7 @@ class previously_registeredSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes(Some("prevMLRRegNo")))
 
-      def view = views.html.businessdetails.previously_registered(form2, true)
+      def view = previously_registered(form2, true)
 
       heading.html must be(Messages("businessdetails.registeredformlr.title"))
       subHeading.html must include(Messages("summary.businessdetails"))
@@ -59,7 +61,7 @@ class previously_registeredSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "previouslyRegistered") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessdetails.previously_registered(form2, true)
+      def view = previously_registered(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -71,7 +73,7 @@ class previously_registeredSpec extends AmlsViewSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.businessdetails.previously_registered(form2, true)
+      def view = previously_registered(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

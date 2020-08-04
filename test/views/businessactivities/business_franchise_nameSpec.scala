@@ -24,11 +24,13 @@ import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.businessactivities.business_franchise_name
 
 
 class business_franchise_nameSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val franchise = app.injector.instanceOf[business_franchise_name]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -37,7 +39,7 @@ class business_franchise_nameSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[BusinessFranchise] = Form2(BusinessFranchiseYes("Franchise name"))
 
-      def view = views.html.businessactivities.business_franchise_name(form2, true)
+      def view = franchise(form2, true)
 
       doc.title must startWith(Messages("businessactivities.businessfranchise.title") + " - " + Messages("summary.businessactivities"))
     }
@@ -45,7 +47,7 @@ class business_franchise_nameSpec extends AmlsViewSpec with MustMatchers  {
     "have correct headings" in new ViewFixture {
       val form2: ValidForm[BusinessFranchise] = Form2(BusinessFranchiseNo)
 
-      def view = views.html.businessactivities.business_franchise_name(form2, true)
+      def view = franchise(form2, true)
 
       heading.html must be(Messages("businessactivities.businessfranchise.title"))
       subHeading.html must include(Messages("summary.businessactivities"))
@@ -59,7 +61,7 @@ class business_franchise_nameSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "businessFranchise") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.businessactivities.business_franchise_name(form2, true)
+      def view = franchise(form2, true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
@@ -72,7 +74,7 @@ class business_franchise_nameSpec extends AmlsViewSpec with MustMatchers  {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.business_franchise_name(EmptyForm, true)
+      def view = franchise(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

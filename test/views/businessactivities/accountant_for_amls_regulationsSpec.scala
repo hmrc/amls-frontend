@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessactivities.accountant_for_amls_regulations
 
 
 class accountant_for_amls_regulationsSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val accountant = app.injector.instanceOf[accountant_for_amls_regulations]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class accountant_for_amls_regulationsSpec extends AmlsViewSpec with MustMatchers
 
       val form2: ValidForm[AccountantForAMLSRegulations] = Form2(AccountantForAMLSRegulations(true))
 
-      def view = views.html.businessactivities.accountant_for_amls_regulations(form2, true)
+      def view = accountant(form2, true)
 
       doc.title must startWith(Messages("businessactivities.accountantForAMLSRegulations.title") + " - " + Messages("summary.businessactivities"))
     }
@@ -45,7 +47,7 @@ class accountant_for_amls_regulationsSpec extends AmlsViewSpec with MustMatchers
 
       val form2: ValidForm[AccountantForAMLSRegulations] = Form2(AccountantForAMLSRegulations(false))
 
-      def view = views.html.businessactivities.accountant_for_amls_regulations(form2, true)
+      def view = accountant(form2, true)
 
       heading.html must be(Messages("businessactivities.accountantForAMLSRegulations.title"))
       subHeading.html must include(Messages("summary.businessactivities"))
@@ -58,7 +60,7 @@ class accountant_for_amls_regulationsSpec extends AmlsViewSpec with MustMatchers
           (Path \ "accountantForAMLSRegulations") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessactivities.accountant_for_amls_regulations(form2, true)
+      def view = accountant(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -68,7 +70,7 @@ class accountant_for_amls_regulationsSpec extends AmlsViewSpec with MustMatchers
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.accountant_for_amls_regulations(EmptyForm, true)
+      def view = accountant(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

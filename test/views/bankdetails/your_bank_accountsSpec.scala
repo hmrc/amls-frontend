@@ -23,10 +23,12 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import views.Fixture
+import views.html.bankdetails.your_bank_accounts
 
 class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
 
   trait ViewFixture extends Fixture {
+    lazy val bankAccounts = app.injector.instanceOf[your_bank_accounts]
     implicit val requestWithToken = addTokenForView(FakeRequest())
 
     val ukAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12341234", "000000")))
@@ -94,7 +96,7 @@ class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
 
   "The your bank accounts view " must {
     "have correct title" in new ViewFixture {
-      def view = views.html.bankdetails.your_bank_accounts(EmptyForm,
+      def view = bankAccounts(EmptyForm,
         Seq((BankDetails(None, None), 1)),
         Seq((BankDetails(None, None), 1)))
 
@@ -102,7 +104,7 @@ class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.bankdetails.your_bank_accounts(EmptyForm,
+      def view = bankAccounts(EmptyForm,
         Seq((BankDetails(None, None), 1)),
         Seq((BankDetails(None, None), 1)))
 
@@ -111,7 +113,7 @@ class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
     }
 
     "have intro text" in new ViewFixture {
-      def view = views.html.bankdetails.your_bank_accounts(EmptyForm,
+      def view = bankAccounts(EmptyForm,
         Seq((BankDetails(None, None), 1)),
         Seq((BankDetails(None, None), 1)))
 
@@ -119,7 +121,7 @@ class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
     }
 
     "have an add link with the correct text and going to the correct place" in new ViewFixture {
-      def view = views.html.bankdetails.your_bank_accounts(EmptyForm,
+      def view = bankAccounts(EmptyForm,
         Seq((BankDetails(None, None), 1)),
         Seq((BankDetails(None, None), 1)))
 
@@ -130,7 +132,7 @@ class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
     "have an incomplete section with correct data and edit / remove links - if there are incomplete elements" in new ViewFixture {
       val incompleteModel = Seq((inCompleteModel1,1), (inCompleteModel2,2), (inCompleteModel3,3), (inCompleteModel4, 4))
       val completedModel = Seq.empty[(BankDetails, Int)]
-      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completedModel)
+      def view = bankAccounts(EmptyForm, incompleteModel, completedModel)
 
       doc.getElementById("incomplete-header").text must include(Messages("bankdetails.yourbankaccounts.incomplete"))
 
@@ -162,7 +164,7 @@ class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
     "have an complete section with correct data and remove links - if there are complete elements" in new ViewFixture {
       val completedModel = Seq((completedModel1,1), (completedModel2,2), (completedModel3,3), (completedModel4, 4))
       val incompleteModel = Seq.empty[(BankDetails, Int)]
-      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completedModel)
+      def view = bankAccounts(EmptyForm, incompleteModel, completedModel)
 
       Option(doc.getElementById("incomplete-header")).isDefined must be(false)
       Option(doc.getElementById("completed-header")).isDefined must be(false)
@@ -194,7 +196,7 @@ class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
     "have an both and incomplete and complete section if there are complete and incomplete elements" in new ViewFixture {
       val completedModel = Seq((completedModel1,1), (completedModel2,2), (completedModel3,3), (completedModel4, 4))
       val incompleteModel = Seq((inCompleteModel1,1), (inCompleteModel2,2), (inCompleteModel3,3), (inCompleteModel4, 4))
-      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completedModel)
+      def view = bankAccounts(EmptyForm, incompleteModel, completedModel)
 
       doc.getElementById("completed-header").text must include(Messages("bankdetails.yourbankaccounts.complete"))
 
@@ -217,7 +219,7 @@ class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
     }
 
     "have no complete or incomplete sections if there are no accounts provided" in new ViewFixture {
-      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, Seq.empty, Seq.empty)
+      def view = bankAccounts(EmptyForm, Seq.empty, Seq.empty)
       doc.body.html() must include(Messages("bankdetails.yourbankaccounts.nobank.account"))
       Option(doc.getElementById("incomplete-header")).isDefined must be(false)
       Option(doc.getElementById("completed-header")).isDefined must be(false)
@@ -226,7 +228,7 @@ class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
     "have a accept and complete section button, and return to application progress link if all are complete" in new ViewFixture {
       val completedModel = Seq((completedModel1,1), (completedModel2,2), (completedModel3,3), (completedModel4, 4))
       val incompleteModel = Seq.empty[(BankDetails, Int)]
-      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completedModel)
+      def view = bankAccounts(EmptyForm, incompleteModel, completedModel)
       Option(doc.getElementById("accept-and-complete")).isDefined must be(true)
       Option(doc.getElementById("return-to-application")).isDefined must be(true)
     }
@@ -235,7 +237,7 @@ class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
       val incompleteModel = Seq((inCompleteModel1, 1), (inCompleteModel2, 2), (inCompleteModel3, 3), (inCompleteModel4, 4))
       val completedModel = Seq.empty[(BankDetails, Int)]
 
-      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completedModel)
+      def view = bankAccounts(EmptyForm, incompleteModel, completedModel)
 
       Option(doc.getElementById("accept-and-complete")).isDefined must be(false)
       Option(doc.getElementById("return-to-application")).isDefined must be(true)

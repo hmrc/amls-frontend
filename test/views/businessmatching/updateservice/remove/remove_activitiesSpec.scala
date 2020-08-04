@@ -28,6 +28,7 @@ import views.html.businessmatching.updateservice.remove._
 class remove_activitiesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val remove_activities = app.injector.instanceOf[remove_activities]
     implicit val requestWithToken = addTokenForView()
 
     override def view = remove_activities(EmptyForm,

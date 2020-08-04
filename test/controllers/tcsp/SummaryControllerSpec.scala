@@ -24,6 +24,7 @@ import org.scalatest.OptionValues
 import play.api.test.Helpers._
 import services.businessmatching.ServiceFlow
 import utils.{AmlsSpec, DependencyMocks}
+import views.html.tcsp.summary
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -50,13 +51,15 @@ class SummaryControllerSpec extends AmlsSpec {
       Some(true),
       Some(defaultServicesOfAnotherTCSP)
     )
-
+    lazy val view = app.injector.instanceOf[summary]
     val controller = new SummaryController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       mock[ServiceFlow],
       mockStatusService,
-      cc = mockMcc
+      cc = mockMcc,
+      summary = view,
+      error = errorView
     )
 
     when {

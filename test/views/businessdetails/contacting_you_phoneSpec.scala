@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessdetails.contacting_you_phone
 
 
 class contacting_you_phoneSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val phone = app.injector.instanceOf[contacting_you_phone]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -37,7 +39,7 @@ class contacting_you_phoneSpec extends AmlsViewSpec with MustMatchers  {
       val form2: ValidForm[ContactingYouPhone] = Form2(ContactingYouPhone("123456789789"))
 
       def view = {
-        views.html.businessdetails.contacting_you_phone(form2, true)
+        phone(form2, true)
       }
 
       doc.title must be(Messages("businessdetails.contactingyou.phone.title") +
@@ -59,7 +61,7 @@ class contacting_you_phoneSpec extends AmlsViewSpec with MustMatchers  {
         ))
 
       def view = {
-        views.html.businessdetails.contacting_you_phone(form2, true)
+        phone(form2, true)
       }
 
       errorSummary.html() must include("not a message Key")
@@ -69,7 +71,7 @@ class contacting_you_phoneSpec extends AmlsViewSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.businessdetails.contacting_you_phone(form2, true)
+      def view = phone(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

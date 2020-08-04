@@ -25,11 +25,13 @@ import jto.validation.ValidationError
 import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching, EstateAgentBusinessService}
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.businessactivities.expected_amls_turnover
 
 
 class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val turnover = app.injector.instanceOf[expected_amls_turnover]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -38,7 +40,7 @@ class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ExpectedAMLSTurnover] = Form2(ExpectedAMLSTurnover.Fifth)
 
-      def view = views.html.businessactivities.expected_amls_turnover(form2, true, None, None)
+      def view = turnover(form2, true, None, None)
 
       doc.title must startWith(Messages("businessactivities.turnover.title") + " - " + Messages("summary.businessactivities"))
     }
@@ -47,7 +49,7 @@ class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ExpectedAMLSTurnover] = Form2(ExpectedAMLSTurnover.Third)
 
-      def view = views.html.businessactivities.expected_amls_turnover(form2, true, None, Some(List("accountancy service provider")))
+      def view = turnover(form2, true, None, Some(List("accountancy service provider")))
 
       heading.html must be(Messages("businessactivities.turnover.heading", "accountancy service provider"))
       subHeading.html must include( Messages("summary.businessactivities"))
@@ -59,7 +61,7 @@ class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ExpectedAMLSTurnover] = Form2(ExpectedAMLSTurnover.Third)
 
-      def view = views.html.businessactivities.expected_amls_turnover(form2, true, None, Some(List("accountancy service provider", "estate agency business")))
+      def view = turnover(form2, true, None, Some(List("accountancy service provider", "estate agency business")))
 
       heading.html must be(Messages("businessactivities.turnover.heading.multiple"))
       subHeading.html must include( Messages("summary.businessactivities"))
@@ -73,7 +75,7 @@ class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "expectedAMLSTurnover") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessactivities.expected_amls_turnover(form2, true, None, Some(List("some provider")))
+      def view = turnover(form2, true, None, Some(List("some provider")))
 
       errorSummary.html() must include("not a message Key")
 
@@ -82,7 +84,7 @@ class expected_amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.expected_amls_turnover(EmptyForm, true, None, None)
+      def view = turnover(EmptyForm, true, None, None)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

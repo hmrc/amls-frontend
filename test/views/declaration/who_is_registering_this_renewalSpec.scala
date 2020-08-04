@@ -24,11 +24,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.declaration.who_is_registering_this_renewal
 
 
 class who_is_registering_this_renewalSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val who_is_registering_this_renewal = app.injector.instanceOf[who_is_registering_this_renewal]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -37,7 +39,7 @@ class who_is_registering_this_renewalSpec extends AmlsViewSpec with MustMatchers
       val form2: ValidForm[WhoIsRegistering] = Form2(WhoIsRegistering("PersonName"))
 
 
-      def view = views.html.declaration.who_is_registering_this_renewal(form2, Seq(ResponsiblePerson()))
+      def view = who_is_registering_this_renewal(form2, Seq(ResponsiblePerson()))
 
       doc.title mustBe s"${Messages("declaration.renewal.who.is.registering.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       heading.html must be(Messages("declaration.renewal.who.is.registering.heading"))
@@ -56,7 +58,7 @@ class who_is_registering_this_renewalSpec extends AmlsViewSpec with MustMatchers
           (Path \ "person") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.declaration.who_is_registering_this_renewal(form2, Seq(ResponsiblePerson()))
+      def view = who_is_registering_this_renewal(form2, Seq(ResponsiblePerson()))
 
       errorSummary.html() must include("not a message Key")
 

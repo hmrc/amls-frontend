@@ -42,6 +42,7 @@ import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AmlsSpec, AuthorisedFixture, FeeHelper}
+import views.html.confirmation._
 
 import scala.concurrent.Future
 
@@ -55,7 +56,11 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
     self =>
     val baseUrl = "http://localhost"
     val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
-
+    lazy val view1 = app.injector.instanceOf[payment_confirmation_renewal]
+    lazy val view2 = app.injector.instanceOf[payment_confirmation_amendvariation]
+    lazy val view3 = app.injector.instanceOf[payment_confirmation_transitional_renewal]
+    lazy val view4 = app.injector.instanceOf[payment_confirmation]
+    lazy val view5 = app.injector.instanceOf[payment_failure]
     val controller = new PaymentConfirmationController(
       authAction = SuccessfulAuthAction,
       statusService = mock[StatusService],
@@ -66,7 +71,12 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
       auditConnector = mock[AuditConnector],
       ds = commonDependencies,
       cc = mockMcc,
-      feeHelper = mock[FeeHelper])
+      feeHelper = mock[FeeHelper],
+      payment_confirmation_renewal = view1,
+      payment_confirmation_amendvariation = view2,
+      payment_confirmation_transitional_renewal = view3,
+      payment_confirmation = view4,
+      payment_failure = view5)
 
     val amlsRegistrationNumber = "amlsRefNumber"
 

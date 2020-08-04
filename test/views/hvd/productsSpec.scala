@@ -16,19 +16,21 @@
 
 package views.hvd
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.hvd.{OtherMotorVehicles, Cars, Products}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import forms.{Form2, InvalidForm, ValidForm}
+import models.hvd.{Cars, OtherMotorVehicles, Products}
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.hvd.products
 
 
 class productsSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val products = app.injector.instanceOf[products]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -38,7 +40,7 @@ class productsSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[Products] = Form2(Products(Set(Cars)))
 
-      def view = views.html.hvd.products(form2, true)
+      def view = products(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -47,7 +49,7 @@ class productsSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[Products] = Form2(Products(Set(Cars)))
 
-      def view = views.html.hvd.products(form2, true)
+      def view = products(form2, true)
 
       doc.title must startWith(Messages(Messages("hvd.products.title") + " - " + Messages("summary.hvd")))
     }
@@ -56,7 +58,7 @@ class productsSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[Products] = Form2(Products(Set(OtherMotorVehicles)))
 
-      def view = views.html.hvd.products(form2, true)
+      def view = products(form2, true)
       heading.html must be(Messages("hvd.products.title"))
       subHeading.html must include(Messages("summary.hvd"))
 
@@ -70,7 +72,7 @@ class productsSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "otherDetails") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.hvd.products(form2, true)
+      def view = products(form2, true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

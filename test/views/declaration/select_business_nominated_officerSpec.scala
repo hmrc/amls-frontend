@@ -24,10 +24,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.declaration.select_business_nominated_officer
 
 class select_business_nominated_officerSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val select_business_nominated_officer = app.injector.instanceOf[select_business_nominated_officer]
     implicit val requestWithToken = addTokenForView()
 
     val people = Seq(
@@ -39,7 +41,7 @@ class select_business_nominated_officerSpec extends AmlsViewSpec with MustMatche
   "select_business_nominated_officer view" must {
     "have correct title, headings and content" in new ViewFixture {
 
-      def view = views.html.declaration.select_business_nominated_officer("subheading", EmptyForm, Seq.empty[ResponsiblePerson])
+      def view = select_business_nominated_officer("subheading", EmptyForm, Seq.empty[ResponsiblePerson])
 
       doc.title mustBe s"${Messages("declaration.who.is.business.nominated.officer")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       heading.html must be(Messages("declaration.who.is.business.nominated.officer"))
@@ -52,7 +54,7 @@ class select_business_nominated_officerSpec extends AmlsViewSpec with MustMatche
 
 
 
-      def view = views.html.declaration.select_business_nominated_officer("subheading", EmptyForm, people)
+      def view = select_business_nominated_officer("subheading", EmptyForm, people)
 
       people.zipWithIndex.map { n =>
         n._1.personName.map { obj =>
@@ -72,14 +74,14 @@ class select_business_nominated_officerSpec extends AmlsViewSpec with MustMatche
 
       val f = Form2(BusinessNominatedOfficer("TestPerson1"))
 
-      def view = views.html.declaration.select_business_nominated_officer("subheading", f, people)
+      def view = select_business_nominated_officer("subheading", f, people)
 
       doc.select("input[type=radio][id=value-0").hasAttr("checked") mustBe true
 
     }
 
     "show the 'register someone else' radio button" in new ViewFixture {
-      def view = views.html.declaration.select_business_nominated_officer("subheading", EmptyForm, Seq.empty[ResponsiblePerson])
+      def view = select_business_nominated_officer("subheading", EmptyForm, Seq.empty[ResponsiblePerson])
 
       Option(doc.select("input[type=radio][id=value--1]")) must be(defined)
       doc.select("label[for=value--1]").text() must include(Messages("lbl.register.some.one.else"))

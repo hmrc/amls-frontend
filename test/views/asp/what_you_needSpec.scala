@@ -16,14 +16,16 @@
 
 package views.asp
 
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.asp.what_you_need
 
 class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val whatYouNeed = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -31,26 +33,26 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.asp.what_you_need()
+      def view = whatYouNeed()
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "Have the correct title" in new ViewFixture {
-      def view = views.html.asp.what_you_need()
+      def view = whatYouNeed()
 
       doc.title must startWith(Messages("title.wyn"))
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.asp.what_you_need()
+      def view = whatYouNeed()
 
       heading.html must be (Messages("title.wyn"))
       subHeading.html must include (Messages("summary.asp"))
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.asp.what_you_need()
+      def view = whatYouNeed()
 
       html must include(Messages("You’ll need to tell us:"))
       html must include(Messages("which accountancy services your business provides"))

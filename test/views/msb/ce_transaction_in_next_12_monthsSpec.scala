@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.msb.ce_transaction_in_next_12_months
 
 
 class ce_transaction_in_next_12_monthsSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val ce_transaction_in_next_12_months = app.injector.instanceOf[ce_transaction_in_next_12_months]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class ce_transaction_in_next_12_monthsSpec extends AmlsViewSpec with MustMatcher
 
     "have the back link button" in new ViewFixture {
       val form2: ValidForm[CETransactionsInNext12Months] = Form2(CETransactionsInNext12Months("1"))
-      def view = views.html.msb.ce_transaction_in_next_12_months(form2, true)
+      def view = ce_transaction_in_next_12_months(form2, true)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -43,7 +45,7 @@ class ce_transaction_in_next_12_monthsSpec extends AmlsViewSpec with MustMatcher
 
       val form2: ValidForm[CETransactionsInNext12Months] = Form2(CETransactionsInNext12Months("1"))
 
-      def view = views.html.msb.ce_transaction_in_next_12_months(form2, true)
+      def view = ce_transaction_in_next_12_months(form2, true)
 
       doc.title must be(Messages("msb.ce.transactions.expected.in.12.months.title") +
         " - " + Messages("summary.msb") +
@@ -55,7 +57,7 @@ class ce_transaction_in_next_12_monthsSpec extends AmlsViewSpec with MustMatcher
 
       val form2: ValidForm[CETransactionsInNext12Months] = Form2(CETransactionsInNext12Months("1"))
 
-      def view = views.html.msb.ce_transaction_in_next_12_months(form2, true)
+      def view = ce_transaction_in_next_12_months(form2, true)
 
       heading.html must include(Messages("msb.ce.transactions.expected.in.12.months.title"))
       subHeading.html must include(Messages("summary.msb"))
@@ -69,7 +71,7 @@ class ce_transaction_in_next_12_monthsSpec extends AmlsViewSpec with MustMatcher
           (Path \ "ceTransaction") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.msb.ce_transaction_in_next_12_months(form2, true)
+      def view = ce_transaction_in_next_12_months(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

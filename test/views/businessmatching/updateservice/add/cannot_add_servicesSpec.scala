@@ -25,6 +25,7 @@ import views.html.businessmatching.updateservice.add._
 class cannot_add_servicesSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
+    lazy val cannot_add_services = app.injector.instanceOf[cannot_add_services]
     implicit val requestWithToken = addTokenForView()
 
     def view = cannot_add_services(EmptyForm)

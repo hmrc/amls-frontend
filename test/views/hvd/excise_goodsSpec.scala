@@ -16,19 +16,21 @@
 
 package views.hvd
 
-import forms.{InvalidForm, ValidForm, Form2}
+import forms.{Form2, InvalidForm, ValidForm}
 import models.hvd.ExciseGoods
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.hvd.excise_goods
 
 
 class excise_goodsSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val excise_goods = app.injector.instanceOf[excise_goods]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -38,7 +40,7 @@ class excise_goodsSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ExciseGoods] = Form2(ExciseGoods(true))
 
-      def view = views.html.hvd.excise_goods(form2, true)
+      def view = excise_goods(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -47,7 +49,7 @@ class excise_goodsSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ExciseGoods] = Form2(ExciseGoods(true))
 
-      def view = views.html.hvd.excise_goods(form2, true)
+      def view = excise_goods(form2, true)
 
       doc.title must startWith(Messages("hvd.excise.goods.title") + " - " + Messages("summary.hvd"))
     }
@@ -56,7 +58,7 @@ class excise_goodsSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ExciseGoods] = Form2(ExciseGoods(false))
 
-      def view = views.html.hvd.excise_goods(form2, true)
+      def view = excise_goods(form2, true)
 
       heading.html must be(Messages("hvd.excise.goods.title"))
       subHeading.html must include(Messages("summary.hvd"))
@@ -70,7 +72,7 @@ class excise_goodsSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "exciseGoods") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.hvd.excise_goods(form2, true)
+      def view = excise_goods(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

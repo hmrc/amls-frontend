@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.msb.uses_foreign_currencies
 
 
 class uses_foreign_currenciesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val uses_foreign_currencies = app.injector.instanceOf[uses_foreign_currencies]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,21 +37,21 @@ class uses_foreign_currenciesSpec extends AmlsViewSpec with MustMatchers {
 
     "have the back link button" in new ViewFixture {
       val formData: ValidForm[UsesForeignCurrencies] = Form2(UsesForeignCurrenciesYes)
-      def view = views.html.msb.uses_foreign_currencies(formData, true)
+      def view = uses_foreign_currencies(formData, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
       val formData: ValidForm[UsesForeignCurrencies] = Form2(UsesForeignCurrenciesYes)
-      def view = views.html.msb.uses_foreign_currencies(formData, true)
+      def view = uses_foreign_currencies(formData, true)
 
       doc.title must startWith(Messages("msb.deal_foreign_currencies.title") + " - " + Messages("summary.msb"))
     }
 
     "have correct headings" in new ViewFixture {
       val formData: ValidForm[UsesForeignCurrencies] = Form2(UsesForeignCurrenciesYes)
-      def view = views.html.msb.uses_foreign_currencies(formData, true)
+      def view = uses_foreign_currencies(formData, true)
 
       heading.html must be(Messages("msb.deal_foreign_currencies.title"))
       subHeading.html must include(Messages("summary.msb"))
@@ -58,7 +60,7 @@ class uses_foreign_currenciesSpec extends AmlsViewSpec with MustMatchers {
     "ask the user whether they deal in foreign currencies" in new ViewFixture {
 
       val formData: ValidForm[UsesForeignCurrencies] = Form2(UsesForeignCurrenciesYes)
-      def view = views.html.msb.uses_foreign_currencies(formData, true)
+      def view = uses_foreign_currencies(formData, true)
 
       Option(doc.getElementsContainingText("yes")).isDefined must be(true)
       Option(doc.getElementsContainingText("no")).isDefined must be(true)
@@ -70,7 +72,7 @@ class uses_foreign_currenciesSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "usesForeignCurrencies") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.msb.uses_foreign_currencies(form2, true)
+      def view = uses_foreign_currencies(form2, true)
 
       errorSummary.html() must include("second not a message Key")
 

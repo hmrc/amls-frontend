@@ -16,17 +16,19 @@
 
 package views.businessactivities
 
-import forms.{InvalidForm, EmptyForm}
+import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import org.scalatest.{MustMatchers}
+import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.businessactivities.identify_suspicious_activity
 
 
 class identify_suspicious_activitySpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val activity = app.injector.instanceOf[identify_suspicious_activity]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class identify_suspicious_activitySpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.businessactivities.identify_suspicious_activity(form2, true)
+      def view = activity(form2, true)
 
       doc.title must be(Messages("businessactivities.identify-suspicious-activity.title") + " - " +
         Messages("summary.businessactivities") +
@@ -47,7 +49,7 @@ class identify_suspicious_activitySpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.businessactivities.identify_suspicious_activity(form2, true)
+      def view = activity(form2, true)
 
       heading.html must be(Messages("businessactivities.identify-suspicious-activity.title"))
       subHeading.html must include(Messages("summary.businessactivities"))
@@ -58,7 +60,7 @@ class identify_suspicious_activitySpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.businessactivities.identify_suspicious_activity(form2, true)
+      def view = activity(form2, true)
 
       doc.getElementsByAttributeValue("name", "hasWrittenGuidance") must not be empty
 
@@ -71,14 +73,14 @@ class identify_suspicious_activitySpec extends AmlsViewSpec with MustMatchers {
           (Path \ "hasWrittenGuidance") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessactivities.identify_suspicious_activity(form2, true)
+      def view = activity(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.identify_suspicious_activity(EmptyForm, true)
+      def view = activity(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

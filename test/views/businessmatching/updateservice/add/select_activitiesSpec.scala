@@ -28,6 +28,7 @@ import views.html.businessmatching.updateservice.add._
 class select_activitiesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val select_activities = app.injector.instanceOf[select_activities]
     implicit val requestWithToken = addTokenForView()
 
     override def view = select_activities(EmptyForm,

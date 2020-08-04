@@ -29,6 +29,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.tradingpremises.business_structure
 
 import scala.concurrent.Future
 
@@ -38,8 +39,15 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
     self => val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
-
-    val controller = new BusinessStructureController(self.cache, SuccessfulAuthAction, ds = commonDependencies, messagesApi, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[business_structure]
+    val controller = new BusinessStructureController(
+      self.cache,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      messagesApi,
+      cc = mockMcc,
+      business_structure = view,
+      error = errorView)
   }
 
   "BusinessStructureController" must {
