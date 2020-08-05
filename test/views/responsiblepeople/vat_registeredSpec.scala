@@ -24,11 +24,13 @@ import utils.AmlsViewSpec
 import views.Fixture
 import jto.validation.Path
 import jto.validation.ValidationError
+import views.html.responsiblepeople.vat_registered
 
 
 class vat_registeredSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val vat_registered = app.injector.instanceOf[vat_registered]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -37,7 +39,7 @@ class vat_registeredSpec extends AmlsViewSpec with MustMatchers {
     "have a back link" in new ViewFixture {
       val form2: ValidForm[VATRegistered] = Form2(VATRegisteredNo)
 
-      def view = views.html.responsiblepeople.vat_registered(form2, true, 1, None, "Person Name")
+      def view = vat_registered(form2, true, 1, None, "Person Name")
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -45,7 +47,7 @@ class vat_registeredSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[VATRegistered] = Form2(VATRegisteredNo)
 
-      def view = views.html.responsiblepeople.vat_registered(form2, true, 1, None, "Person Name")
+      def view = vat_registered(form2, true, 1, None, "Person Name")
 
       doc.title must startWith(Messages("responsiblepeople.registeredforvat.title"))
     }
@@ -54,7 +56,7 @@ class vat_registeredSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[VATRegistered] = Form2(VATRegisteredYes("1234"))
 
-      def view = views.html.responsiblepeople.vat_registered(form2, true, 1, None, "Person Name")
+      def view = vat_registered(form2, true, 1, None, "Person Name")
 
       heading.html must be(Messages("responsiblepeople.registeredforvat.heading", "Person Name"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -69,7 +71,7 @@ class vat_registeredSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "vrnNumber") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.vat_registered(form2, true, 1, None, "Person Name")
+      def view = vat_registered(form2, true, 1, None, "Person Name")
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

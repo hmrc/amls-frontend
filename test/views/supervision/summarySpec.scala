@@ -25,12 +25,14 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import views.Fixture
+import views.html.supervision.summary
 
 import scala.collection.JavaConversions._
 
 class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks{
 
   trait ViewFixture extends Fixture {
+    lazy val summary = app.injector.instanceOf[summary]
     implicit val requestWithToken = addTokenForView(FakeRequest())
 
     val start = Some(SupervisionStart(new LocalDate(1990, 2, 24)))  //scalastyle:off magic.number
@@ -40,13 +42,13 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks{
 
   "summary view" must {
     "have correct title" in new ViewFixture {
-      def view = views.html.supervision.summary(EmptyForm, Supervision())
+      def view = summary(EmptyForm, Supervision())
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.supervision"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.supervision.summary(EmptyForm, Supervision())
+      def view = summary(EmptyForm, Supervision())
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.supervision"))
@@ -63,7 +65,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks{
           hasAccepted = true
         )
 
-        views.html.supervision.summary(EmptyForm, testdata)
+        summary(EmptyForm, testdata)
       }
 
       val sectionChecks = Table[String, Element => Boolean](
@@ -104,7 +106,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks{
           hasAccepted = true
         )
 
-        views.html.supervision.summary(EmptyForm, testdata)
+        summary(EmptyForm, testdata)
       }
 
       val sectionChecks = Table[String, Element => Boolean](

@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.renewal.business_turnover
 
 
 class business_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val business_turnover = app.injector.instanceOf[business_turnover]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class business_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ExpectedBusinessTurnover] = Form2(ExpectedBusinessTurnover.Third)
 
-      def view = views.html.renewal.business_turnover(form2, true)
+      def view = business_turnover(form2, true)
 
       doc.title must startWith(Messages("renewal.business-turnover.title") + " - " + Messages("summary.renewal"))
     }
@@ -45,7 +47,7 @@ class business_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ExpectedBusinessTurnover] = Form2(ExpectedBusinessTurnover.Second)
 
-      def view = views.html.renewal.business_turnover(form2, true)
+      def view = business_turnover(form2, true)
 
       heading.html must be(Messages("renewal.business-turnover.title"))
       subHeading.html must include(Messages("summary.renewal"))
@@ -59,7 +61,7 @@ class business_turnoverSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "businessTurnover") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.renewal.business_turnover(form2, true)
+      def view = business_turnover(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -69,7 +71,7 @@ class business_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.renewal.business_turnover(EmptyForm, true)
+      def view = business_turnover(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

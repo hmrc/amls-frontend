@@ -29,12 +29,13 @@ class AccessibilityStatementControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
 
+    lazy val view = app.injector.instanceOf[accessibility_statement]
     val controller = new AccessibilityStatementController(
       commonDependencies,
       mockMcc,
       appConfig,
       mock[BodyParsers.Default],
-      mock[accessibility_statement]
+      accessibility_statement = view
     )
   }
 

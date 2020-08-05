@@ -30,10 +30,12 @@ import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
 import views.html.include.status._
 import views.html.status.components.{fee_information, registration_status, withdraw_or_deregister_information}
+import views.html.status.your_registration
 
 class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator {
 
   trait ViewFixture extends Fixture {
+    lazy val your_registration = app.injector.instanceOf[your_registration]
     implicit val requestWithToken = addTokenForView()
 
     val feeResponse = FeeResponse(
@@ -59,7 +61,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
       val form2 = EmptyForm
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = HtmlFormat.empty,
@@ -72,7 +74,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain registration information" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
@@ -84,7 +86,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain registration information for status NotCompleted" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = application_incomplete(Some("business Name")),
@@ -98,7 +100,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
     }
 
     "contain correct content for status SubmissionWithdrawn" in new ViewFixture {
-      def view = views.html.status.your_registration("",
+      def view = your_registration("",
         Some("business Name"),
         displayCheckOrUpdateLink = false,
         yourRegistrationInfo = application_withdrawn(Some("business Name")),
@@ -115,7 +117,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
     }
 
     "contain correct content for status SubmissionDecisionRejected" in new ViewFixture {
-      def view = views.html.status.your_registration("",
+      def view = your_registration("",
         Some("business Name"),
         displayCheckOrUpdateLink = false,
         yourRegistrationInfo = application_rejected(Some("business Name")),
@@ -131,7 +133,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
     }
 
     "contain correct content for status SubmissionDecisionRevoked" in new ViewFixture {
-      def view = views.html.status.your_registration("",
+      def view = your_registration("",
         Some("business Name"),
         displayCheckOrUpdateLink = false,
         yourRegistrationInfo = application_revoked(Some("business Name")),
@@ -147,7 +149,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
     }
 
     "contain correct content for status SubmissionDecisionExpired" in new ViewFixture {
-      def view = views.html.status.your_registration("",
+      def view = your_registration("",
         Some("business Name"),
         displayCheckOrUpdateLink = false,
         yourRegistrationInfo = application_expired(Some("business Name")),
@@ -164,7 +166,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain correct content for status DeRegistered" in new ViewFixture {
       val deregistrationDate = Some(LocalDate.now())
-      def view = views.html.status.your_registration("",
+      def view = your_registration("",
         Some("business Name"),
         displayCheckOrUpdateLink = false,
         yourRegistrationInfo = application_deregistered(Some("business Name")),
@@ -182,7 +184,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain registration information for status SubmissionReady" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = application_submission_ready(Call("GET", "/some/url"), Some("business Name")),
@@ -200,7 +202,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         val renewalDate = Some(LocalDate.now())
         val businessName = "business Name"
 
-        def view = views.html.status.your_registration(amlsRegistrationNumber,
+        def view = your_registration(amlsRegistrationNumber,
           Some(businessName),
           yourRegistrationInfo = application_renewal_submission_ready(Some(businessName)),
           unreadNotifications = 10,
@@ -217,7 +219,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         val renewalDate = Some(LocalDate.now())
         val businessName = "business Name"
 
-        def view = views.html.status.your_registration(amlsRegistrationNumber,
+        def view = your_registration(amlsRegistrationNumber,
           Some(businessName),
           yourRegistrationInfo = application_renewal_incomplete(Some(businessName)),
           unreadNotifications = 10,
@@ -234,7 +236,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         val renewalDate = Some(LocalDate.now())
         val businessName = "business Name"
 
-        def view = views.html.status.your_registration(amlsRegistrationNumber,
+        def view = your_registration(amlsRegistrationNumber,
           Some(businessName),
           yourRegistrationInfo = application_renewal_due(Some(businessName), renewalDate),
           unreadNotifications = 10,
@@ -251,7 +253,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         val renewalDate = Some(LocalDate.now())
         val businessName = "business Name"
 
-        def view = views.html.status.your_registration(amlsRegistrationNumber,
+        def view = your_registration(amlsRegistrationNumber,
           Some(businessName),
           yourRegistrationInfo = application_renewal_submitted(),
           unreadNotifications = 10,
@@ -268,7 +270,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain your business information cell with right content" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
@@ -284,7 +286,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain your registration status information cell with right content for status SubmissionReadyForReview" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
@@ -299,7 +301,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain your registration status information cell with right content for status SubmissionDecisionApproved" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
@@ -315,7 +317,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain your registration status information cell with right content for status SubmissionDecisionApproved if endDate is not available" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
@@ -330,7 +332,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain your registration status information cell with right content for status SubmissionReady" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         None,
         yourRegistrationInfo = Html("some registration information"),
@@ -344,7 +346,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain your registration status information cell with right content for status NotCompleted" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         None,
         yourRegistrationInfo = Html("some registration information"),
@@ -358,7 +360,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain your messages cell with right content" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
@@ -374,7 +376,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain your fees cell with right content for status SubmissionReadyForReview" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
@@ -390,7 +392,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain your fees cell with right content for status SubmissionDecisionApproved" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = Html("some registration information"),
@@ -405,7 +407,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain additional content elements" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = HtmlFormat.empty,
@@ -430,7 +432,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain withdraw application link for status SubmissionReadyForReview" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = HtmlFormat.empty,
@@ -445,7 +447,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
 
     "contain deregister link for status SubmissionDecisionApproved" in new ViewFixture {
 
-      def view = views.html.status.your_registration(amlsRegistrationNumber,
+      def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),
         Some(feeResponse),
         yourRegistrationInfo = HtmlFormat.empty,

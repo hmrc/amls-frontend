@@ -22,11 +22,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tcsp.complex_corp_structure_creation
 
 
 class complex_corp_structure_creationSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val complex_corp_structure_creation = app.injector.instanceOf[complex_corp_structure_creation]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class complex_corp_structure_creationSpec extends AmlsViewSpec with MustMatchers
 
       val form2 = EmptyForm
 
-      def view = views.html.tcsp.complex_corp_structure_creation(form2, true)
+      def view = complex_corp_structure_creation(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -54,7 +56,7 @@ class complex_corp_structure_creationSpec extends AmlsViewSpec with MustMatchers
           (Path \ "complexCorpStructureCreation") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tcsp.complex_corp_structure_creation(form2, true)
+      def view = complex_corp_structure_creation(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

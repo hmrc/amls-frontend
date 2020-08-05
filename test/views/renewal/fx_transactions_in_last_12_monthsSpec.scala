@@ -28,6 +28,7 @@ import views.html.renewal.fx_transaction_in_last_12_months
 class fx_transactions_in_last_12_monthsSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val fx_transaction_in_last_12_months = app.injector.instanceOf[fx_transaction_in_last_12_months]
     implicit val requestWithToken = addTokenForView()
   }
 

@@ -23,10 +23,12 @@ import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.responsiblepeople.date_of_birth
 
 class date_of_birthSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val date_of_birth = app.injector.instanceOf[date_of_birth]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -34,7 +36,7 @@ class date_of_birthSpec extends AmlsViewSpec with MustMatchers  {
 
     "have a back link" in new ViewFixture {
       val form2 = EmptyForm
-      def view = views.html.responsiblepeople.date_of_birth(form2, false, 1, None, "Gary")
+      def view = date_of_birth(form2, false, 1, None, "Gary")
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -42,7 +44,7 @@ class date_of_birthSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.date_of_birth(form2, false, 1, None, "Gary")
+      def view = date_of_birth(form2, false, 1, None, "Gary")
 
       doc.title() must startWith(Messages("responsiblepeople.date.of.birth.title") + " - " + Messages("summary.responsiblepeople"))
 
@@ -52,7 +54,7 @@ class date_of_birthSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.date_of_birth(form2, false, 1, None, "first last")
+      def view = date_of_birth(form2, false, 1, None, "first last")
 
       heading.html() must be(Messages("responsiblepeople.date.of.birth.heading", "first last"))
     }
@@ -67,7 +69,7 @@ class date_of_birthSpec extends AmlsViewSpec with MustMatchers  {
         Seq((Path \ dateField, Seq(ValidationError(messageKey1))))
       )
 
-      def view = views.html.responsiblepeople.date_of_birth(form2, false, 1, None, "first last")
+      def view = date_of_birth(form2, false, 1, None, "first last")
 
       errorSummary.html() must include(messageKey1)
 

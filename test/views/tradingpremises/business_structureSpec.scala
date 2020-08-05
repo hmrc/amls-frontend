@@ -22,11 +22,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tradingpremises.business_structure
 
 
 class business_structureSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val business_structure = app.injector.instanceOf[business_structure]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -39,7 +41,7 @@ class business_structureSpec extends AmlsViewSpec with MustMatchers {
         Messages("summary.tradingpremises") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
 
-      def view = views.html.tradingpremises.business_structure(form2, 1, false)
+      def view = business_structure(form2, 1, false)
 
       doc.title must be(pageTitle)
       heading.html must be(Messages("tradingpremises.businessStructure.title"))
@@ -56,7 +58,7 @@ class business_structureSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "agentsBusinessStructure") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tradingpremises.business_structure(form2, 1, true)
+      def view = business_structure(form2, 1, true)
 
       errorSummary.html() must include("not a message Key")
     }

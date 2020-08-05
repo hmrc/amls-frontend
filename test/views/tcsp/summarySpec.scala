@@ -24,19 +24,21 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import views.Fixture
+import views.html.tcsp.summary
 
 import scala.collection.JavaConversions._
 
 class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks with AmlsReferenceNumberGenerator {
 
   trait ViewFixture extends Fixture {
+    lazy val summary = app.injector.instanceOf[summary]
     implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 
   "summary view" must {
     "have correct title, heading and subheading" in new ViewFixture {
 
-      def view = views.html.tcsp.summary(Tcsp(), List())
+      def view = summary(Tcsp(), List())
 
       val title = Messages("title.cya") + " - " + Messages("summary.tcsp") + " - " +
                   Messages("title.amls") + " - " + Messages("title.gov")
@@ -90,7 +92,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks wit
           "Trust or company formation agent",
           "Nominee shareholders provider"
         )
-        views.html.tcsp.summary(testdata, sortedList)
+        summary(testdata, sortedList)
       }
 
       forAll(sectionChecks) { (key, check) => {

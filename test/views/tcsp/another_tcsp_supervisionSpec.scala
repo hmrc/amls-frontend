@@ -22,11 +22,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tcsp.another_tcsp_supervision
 
 
 class another_tcsp_supervisionSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val another_tcsp_supervision = app.injector.instanceOf[another_tcsp_supervision]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class another_tcsp_supervisionSpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.tcsp.another_tcsp_supervision(form2, true)
+      def view = another_tcsp_supervision(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -55,7 +57,7 @@ class another_tcsp_supervisionSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "mlrRefNumber") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.tcsp.another_tcsp_supervision(form2, true)
+      def view = another_tcsp_supervision(form2, true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

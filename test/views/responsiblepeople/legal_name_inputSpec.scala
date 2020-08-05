@@ -22,10 +22,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsSpec, AmlsViewSpec}
 import views.Fixture
+import views.html.responsiblepeople.legal_name_input
 
 class legal_name_inputSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val legal_name_input = app.injector.instanceOf[legal_name_input]
     implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
@@ -35,7 +37,7 @@ class legal_name_inputSpec extends AmlsViewSpec with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.legal_name_input(form2, true, 1, None, name)
+      def view = legal_name_input(form2, true, 1, None, name)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -56,7 +58,7 @@ class legal_name_inputSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "lastName") -> Seq(ValidationError("fourth not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.legal_name_input(form2, true, 1, None, name)
+      def view = legal_name_input(form2, true, 1, None, name)
 
       errorSummary.html() must include("second not a message Key")
       errorSummary.html() must include("third not a message Key")

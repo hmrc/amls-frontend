@@ -24,10 +24,12 @@ import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.responsiblepeople.contact_details
 
 class contact_detailsSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val contact_details = app.injector.instanceOf[contact_details]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class contact_detailsSpec extends AmlsViewSpec with MustMatchers {
 
     "have a back link" in new ViewFixture {
       val form2: ValidForm[ContactDetails] = Form2(ContactDetails("0987654", "email.com"))
-      def view = views.html.responsiblepeople.contact_details(form2, true, 1, None, "firstName lastName")
+      def view = contact_details(form2, true, 1, None, "firstName lastName")
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -43,7 +45,7 @@ class contact_detailsSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[ContactDetails] = Form2(ContactDetails("0987654", "email.com"))
 
-      def view = views.html.responsiblepeople.contact_details(form2, true, 1, None, "firstName lastName")
+      def view = contact_details(form2, true, 1, None, "firstName lastName")
 
       doc.title must startWith(Messages("responsiblepeople.contact_details.title"))
     }
@@ -52,7 +54,7 @@ class contact_detailsSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[ContactDetails] = Form2(ContactDetails("0987654", "email.com"))
 
-      def view = views.html.responsiblepeople.contact_details(form2, true, 1, None, "firstName lastName")
+      def view = contact_details(form2, true, 1, None, "firstName lastName")
 
       heading.html must be(Messages("responsiblepeople.contact_details.heading", "firstName lastName"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -67,7 +69,7 @@ class contact_detailsSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "emailAddress") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.contact_details(form2, true, 1, None, "firstName lastName")
+      def view = contact_details(form2, true, 1, None, "firstName lastName")
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
@@ -87,7 +89,7 @@ class contact_detailsSpec extends AmlsViewSpec with MustMatchers {
         ))
 
 
-      def view = views.html.responsiblepeople.contact_details(form2, true, 1, None, "firstName lastName")
+      def view = contact_details(form2, true, 1, None, "firstName lastName")
 
       doc.body().text() must include(Messages("responsiblepeople.contact_details.lbl","firstName lastName"))
 

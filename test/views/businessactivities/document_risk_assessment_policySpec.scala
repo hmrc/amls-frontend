@@ -49,7 +49,7 @@ class document_risk_assessment_policySpec extends AmlsViewSpec with MustMatchers
 
       def view = risk(form2, true)
 
-      heading.html must be(Messages("businessactivities.riskassessment.policy.title"))
+      heading.html must be(Messages("businessactivities.document.riskassessment.policy.title"))
       subHeading.html must include(Messages("summary.businessactivities"))
 
     }

@@ -21,11 +21,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.notifications.v2m0.minded_to_reject
 
 class minded_to_rejectSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-
+    lazy val minded_to_reject = app.injector.instanceOf[minded_to_reject]
     implicit val requestWithToken = addTokenForView()
 
     val notificationParams = NotificationParams(msgContent = "msgContent", businessName = Some("Fake Name Ltd."), safeId = Some("reference"))
@@ -36,7 +37,7 @@ class minded_to_rejectSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v2m0.minded_to_reject(notificationParams)
+      def view = minded_to_reject(notificationParams)
 
       doc.title must be("Refusal being considered" +
         " - " + "Your registration" +
@@ -46,7 +47,7 @@ class minded_to_rejectSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v2m0.minded_to_reject(notificationParams)
+      def view = minded_to_reject(notificationParams)
 
       heading.html must be("Refusal being considered")
       subHeading.html must include("Your registration")
@@ -55,14 +56,14 @@ class minded_to_rejectSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct content, businessName and reference displayed" in new ViewFixture {
 
-      def view = views.html.notifications.v2m0.minded_to_reject(notificationParams)
+      def view = minded_to_reject(notificationParams)
 
       doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("reference"))
     }
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.notifications.v2m0.minded_to_reject(notificationParams)
+      def view = minded_to_reject(notificationParams)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

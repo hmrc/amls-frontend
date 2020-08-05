@@ -22,12 +22,14 @@ import models.tradingpremises._
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tradingpremises.remove_agent_premises_reasons
 
 class remove_agent_premises_reasonsSpec extends AmlsViewSpec {
 
   import models.tradingpremises.RemovalReasonConstants._
 
   trait ViewFixture extends Fixture {
+    lazy val remove_agent_premises_reasons = app.injector.instanceOf[remove_agent_premises_reasons]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class remove_agent_premises_reasonsSpec extends AmlsViewSpec {
 
       val form2: ValidForm[AgentRemovalReason] = Form2(AgentRemovalReason(Schema.MAJOR_COMPLIANCE_ISSUES))
 
-      def view = views.html.tradingpremises.remove_agent_premises_reasons(form2, 1, false)
+      def view = remove_agent_premises_reasons(form2, 1, false)
 
       doc.title must startWith(Messages("tradingpremises.remove_reasons.agent.premises.title"))
     }
@@ -45,7 +47,7 @@ class remove_agent_premises_reasonsSpec extends AmlsViewSpec {
 
       val form2: ValidForm[AgentRemovalReason] = Form2(AgentRemovalReason(Schema.MAJOR_COMPLIANCE_ISSUES))
 
-      def view = views.html.tradingpremises.remove_agent_premises_reasons(form2, 1, true)
+      def view = remove_agent_premises_reasons(form2, 1, true)
 
       heading.html must be(Messages("tradingpremises.remove_reasons.agent.premises.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
@@ -56,7 +58,7 @@ class remove_agent_premises_reasonsSpec extends AmlsViewSpec {
 
       val form2: ValidForm[AgentRemovalReason] = Form2(AgentRemovalReason(Schema.MAJOR_COMPLIANCE_ISSUES))
 
-      def view = views.html.tradingpremises.remove_agent_premises_reasons(form2, 1, true)
+      def view = remove_agent_premises_reasons(form2, 1, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -71,7 +73,7 @@ class remove_agent_premises_reasonsSpec extends AmlsViewSpec {
         val invalidForm: InvalidForm = InvalidForm(Map.empty,
           Seq((Path \ field, Seq(ValidationError(errorKey)))))
 
-        def view = views.html.tradingpremises.remove_agent_premises_reasons(invalidForm, 0, false)
+        def view = remove_agent_premises_reasons(invalidForm, 0, false)
 
         errorSummary.html() must include(errorKey)
         doc.getElementById(field).parent().getElementsByClass("error-notification").first().html() must include(errorKey)
@@ -87,7 +89,7 @@ class remove_agent_premises_reasonsSpec extends AmlsViewSpec {
         val invalidForm: InvalidForm = InvalidForm(Map("removalReason" -> Seq(Form.OTHER)),
           Seq((Path \ field, Seq(ValidationError(errorKey)))))
 
-        def view = views.html.tradingpremises.remove_agent_premises_reasons(invalidForm, 0, false)
+        def view = remove_agent_premises_reasons(invalidForm, 0, false)
 
         errorSummary.html() must include(Messages(errorKey))
         doc.getElementById(field).parent().getElementsByClass("error-notification").first().html() must include(Messages(errorKey))

@@ -29,6 +29,7 @@ import views.html.renewal.money_sources
 class money_sourcesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val money_sources = app.injector.instanceOf[money_sources]
     implicit val requestWithToken = addTokenForView()
   }
 

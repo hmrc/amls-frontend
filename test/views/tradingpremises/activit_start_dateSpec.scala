@@ -24,11 +24,13 @@ import jto.validation.ValidationError
 import models.tradingpremises.Address
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.tradingpremises.activity_start_date
 
 
 class activit_start_dateSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val activity_start_date = app.injector.instanceOf[activity_start_date]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -43,7 +45,7 @@ class activit_start_dateSpec extends AmlsViewSpec with MustMatchers {
 
       def view = {
         val address = Address("line 1", "Line 2", None, None, "postcode")
-        views.html.tradingpremises.activity_start_date(form2, 1, false, address)
+        activity_start_date(form2, 1, false, address)
       }
 
       val expectedAddressInHtml = "<p> line 1<br> Line 2<br> postcode<br> </p>"
@@ -70,7 +72,7 @@ class activit_start_dateSpec extends AmlsViewSpec with MustMatchers {
 
       def view = {
         val address = Address("", "", None, None, "")
-        views.html.tradingpremises.activity_start_date(form2, 1, true, address)
+        activity_start_date(form2, 1, true, address)
       }
 
       errorSummary.html() must include("not a message Key")

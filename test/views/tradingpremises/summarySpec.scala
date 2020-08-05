@@ -23,6 +23,7 @@ import org.joda.time.LocalDate
 import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, StatusConstants}
 import views.Fixture
+import views.html.tradingpremises.summary
 
 sealed trait ViewTestHelper extends AmlsViewSpec {
   val tradingPremises = Seq(TradingPremises(
@@ -33,6 +34,7 @@ sealed trait ViewTestHelper extends AmlsViewSpec {
   ))
 
   trait ViewFixture extends Fixture {
+    lazy val summary = app.injector.instanceOf[summary]
     implicit val requestWithToken = addTokenForView()
   }
 }
@@ -43,7 +45,7 @@ class SummarySpec extends ViewTestHelper {
 
     "redirect to the 'remove agent premises reasons' page when 'delete' is clicked" in new ViewFixture {
 
-      def view = views.html.tradingpremises.summary(EmptyForm, tradingPremises, add = true, SubmissionDecisionApproved)
+      def view = summary(EmptyForm, tradingPremises, add = true, SubmissionDecisionApproved)
 
       doc.getElementsByClass("check-your-answers__listing").select("a:nth-child(2)").attr("href") must be(
         controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.get(1, complete = true).url
@@ -51,7 +53,7 @@ class SummarySpec extends ViewTestHelper {
     }
 
     "redirect to the 'remove trading premises' page when 'delete' is clicked and it's an agent premises and it's an amendment" in new ViewFixture {
-      def view = views.html.tradingpremises.summary(EmptyForm, tradingPremises, add = true, SubmissionReadyForReview)
+      def view = summary(EmptyForm, tradingPremises, add = true, SubmissionReadyForReview)
 
       doc.getElementsByClass("check-your-answers__listing").select("a:nth-child(2)").attr("href") must be (
         controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1, complete = true).url

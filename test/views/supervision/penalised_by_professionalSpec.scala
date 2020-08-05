@@ -20,11 +20,13 @@ import forms.EmptyForm
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.supervision.penalised_by_professional
 
 
 class penalised_by_professionalSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val penalised_by_professional = app.injector.instanceOf[penalised_by_professional]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -32,7 +34,7 @@ class penalised_by_professionalSpec extends AmlsViewSpec with MustMatchers  {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.supervision.penalised_by_professional(EmptyForm, edit = false)
+      def view = penalised_by_professional(EmptyForm, edit = false)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

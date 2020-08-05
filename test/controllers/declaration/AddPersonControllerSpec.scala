@@ -342,12 +342,13 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[add_person]
     val addPersonController = new AddPersonController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
-      cc = mockMcc
+      cc = mockMcc,
+      add_person = view
     )
   }
 

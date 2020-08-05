@@ -22,17 +22,19 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tradingpremises.agent_name
 
 class agent_nameSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val agent_name = app.injector.instanceOf[agent_name]
     implicit val requestWithToken = addTokenForView()
   }
 
   "have correct title, heading and back link" in new ViewFixture {
 
     def view: _root_.play.twirl.api.HtmlFormat.Appendable =
-      views.html.tradingpremises.agent_name(EmptyForm, 0, false)
+      agent_name(EmptyForm, 0, false)
 
     doc.title() must startWith(Messages("tradingpremises.agentname.title") + " - " + Messages("summary.tradingpremises"))
     heading.html() must be(Messages("tradingpremises.agentname.title"))
@@ -44,7 +46,7 @@ class agent_nameSpec extends AmlsViewSpec with MustMatchers {
   "include date of birth" in new ViewFixture {
 
     def view: _root_.play.twirl.api.HtmlFormat.Appendable =
-      views.html.tradingpremises.agent_name(EmptyForm, 0, false)
+      agent_name(EmptyForm, 0, false)
 
     doc.html() must include(Messages("tradingpremises.agentname.name.dateOfBirth.lbl"))
   }
@@ -57,7 +59,7 @@ class agent_nameSpec extends AmlsViewSpec with MustMatchers {
       Seq((Path \ agentDateOfBirth, Seq(ValidationError(messageKey1)))))
 
     def view: _root_.play.twirl.api.HtmlFormat.Appendable =
-      views.html.tradingpremises.agent_name(form2, 0, false)
+      agent_name(form2, 0, false)
 
     errorSummary.html() must include(messageKey1)
     doc.getElementById(agentDateOfBirth).parent().getElementsByClass("error-notification").first().html() must include(messageKey1)

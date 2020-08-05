@@ -23,10 +23,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsSpec, AmlsViewSpec}
 import views.Fixture
+import views.html.responsiblepeople.address.additional_address_UK
 
 class additional_address_UKSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val additional_address_UK = app.injector.instanceOf[additional_address_UK]
     implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
@@ -37,7 +39,7 @@ class additional_address_UKSpec extends AmlsViewSpec with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.address.additional_address_UK(form2, true, 1, None, name)
+      def view = additional_address_UK(form2, true, 1, None, name)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -65,7 +67,7 @@ class additional_address_UKSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "postCode") -> Seq(ValidationError("not a message Key 6"))
         ))
 
-      def view = views.html.responsiblepeople.address.additional_address_UK(form2, true, 1, None, name)
+      def view = additional_address_UK(form2, true, 1, None, name)
 
       errorSummary.html() must include("not a message Key 2")
       errorSummary.html() must include("not a message Key 3")

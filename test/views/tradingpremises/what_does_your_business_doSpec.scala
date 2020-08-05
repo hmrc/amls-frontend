@@ -24,11 +24,13 @@ import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import views.Fixture
+import views.html.tradingpremises.what_does_your_business_do
 
 
 class what_does_your_business_doSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val what_does_your_business_do = app.injector.instanceOf[what_does_your_business_do]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -47,7 +49,7 @@ class what_does_your_business_doSpec extends AmlsViewSpec with MustMatchers {
 
 
 
-      def view = views.html.tradingpremises.what_does_your_business_do(form2, businessMatchingActivitiesAll, false ,1 )
+      def view = what_does_your_business_do(form2, businessMatchingActivitiesAll, false ,1 )
 
       doc.title must be(pageTitle)
       heading.html must be(Messages("tradingpremises.whatdoesyourbusinessdo.title"))
@@ -65,7 +67,7 @@ class what_does_your_business_doSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "some path") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tradingpremises.what_does_your_business_do(form2, businessMatchingActivitiesAll, true,1)
+      def view = what_does_your_business_do(form2, businessMatchingActivitiesAll, true,1)
 
       errorSummary.html() must include("not a message Key")
     }

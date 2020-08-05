@@ -25,10 +25,12 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tradingpremises.your_trading_premises
 
 class your_trading_premisesSpec extends AmlsViewSpec with MustMatchers with TradingPremisesGenerator {
 
   trait ViewFixture extends Fixture {
+    lazy val your_trading_premises = app.injector.instanceOf[your_trading_premises]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -45,7 +47,7 @@ class your_trading_premisesSpec extends AmlsViewSpec with MustMatchers with Trad
   "Your trading premises View" must {
     "have correct title, headings displayed, no complete/incomplete headers displayed" in new ViewFixture {
 
-      def view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, Seq.empty[(TradingPremises, Int)], Seq.empty[(TradingPremises, Int)])
+      def view = your_trading_premises(EmptyForm, false, NotCompleted, Seq.empty[(TradingPremises, Int)], Seq.empty[(TradingPremises, Int)])
 
       doc.title must be(Messages("tradingpremises.yourpremises.title") +
         " - " + Messages("tradingpremises.subheading") +
@@ -65,35 +67,35 @@ class your_trading_premisesSpec extends AmlsViewSpec with MustMatchers with Trad
     }
 
     "have list with Incomplete and Complete headers displayed when there are both types of lists" in new ViewFixture {
-      def  view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, incompleteTpSeq)
+      def  view = your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, incompleteTpSeq)
 
       html must include(Messages("tradingpremises.yourpremises.incomplete"))
       html must include(Messages("tradingpremises.yourpremises.complete"))
     }
 
     "have list with Incomplete header displayed when there are only incomplete TP's" in new ViewFixture {
-      def  view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, Seq.empty[(TradingPremises, Int)], incompleteTpSeq)
+      def  view = your_trading_premises(EmptyForm, false, NotCompleted, Seq.empty[(TradingPremises, Int)], incompleteTpSeq)
 
       html must include(Messages("tradingpremises.yourpremises.incomplete"))
       html must not include Messages("tradingpremises.yourpremises.complete")
     }
 
     "have list without Complete/Incomplete headers displayed when there are only complete TP's" in new ViewFixture {
-      def  view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, Seq.empty[(TradingPremises, Int)])
+      def  view = your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, Seq.empty[(TradingPremises, Int)])
 
       html must not include Messages("tradingpremises.yourpremises.incomplete")
       html must not include Messages("tradingpremises.yourpremises.complete")
     }
 
     "have an add a trading premises link with the correct text and going to the what you need page" in new ViewFixture {
-      def  view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, incompleteTpSeq)
+      def  view = your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, incompleteTpSeq)
 
       doc.getElementById("addTradingPremises").text must be(Messages("tradingpremises.summary.addanother"))
       doc.getElementById("addTradingPremises").attr("href") must be(controllers.tradingpremises.routes.TradingPremisesAddController.get(true).url)
     }
 
     "have an incomplete/complete sections with addresses displayed and edit/remove links" in new ViewFixture {
-      def  view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, incompleteTpSeq)
+      def  view = your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, incompleteTpSeq)
 
       doc.getElementById("complete-header").text must include(Messages("tradingpremises.yourpremises.complete"))
 
@@ -116,22 +118,22 @@ class your_trading_premisesSpec extends AmlsViewSpec with MustMatchers with Trad
     }
 
     "show the correct continuation button when there are both types of lists" in new ViewFixture {
-      def  view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, incompleteTpSeq)
+      def  view = your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, incompleteTpSeq)
       html must include(Messages("button.returntoapplicationprogress"))
     }
 
     "show the correct continuation button when there are only incomplete tps" in new ViewFixture {
-      def  view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, Seq.empty[(TradingPremises, Int)], incompleteTpSeq)
+      def  view = your_trading_premises(EmptyForm, false, NotCompleted, Seq.empty[(TradingPremises, Int)], incompleteTpSeq)
       html must include(Messages("button.returntoapplicationprogress"))
     }
 
     "show the correct continuation button when there are only complete TP's" in new ViewFixture {
-      def  view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, Seq.empty[(TradingPremises, Int)])
+      def  view = your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, Seq.empty[(TradingPremises, Int)])
       html must include(Messages("button.checkyouranswers.acceptandcomplete"))
     }
 
     "show the correct continuation button when there are no TPs" in new ViewFixture {
-      def view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, Seq.empty[(TradingPremises, Int)], Seq.empty[(TradingPremises, Int)])
+      def view = your_trading_premises(EmptyForm, false, NotCompleted, Seq.empty[(TradingPremises, Int)], Seq.empty[(TradingPremises, Int)])
       html must include (Messages("button.returntoapplicationprogress"))
     }
   }

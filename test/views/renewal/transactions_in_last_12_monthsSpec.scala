@@ -27,6 +27,7 @@ import views.html.renewal._
 class transactions_in_last_12_monthsSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val transactions_in_last_12_months = app.injector.instanceOf[transactions_in_last_12_months]
     implicit val requestWithToken = addTokenForView()
 
     override def view = transactions_in_last_12_months(EmptyForm, edit = false)

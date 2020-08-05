@@ -24,10 +24,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.renewal.percentage
 
 class percentageSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val percentage = app.injector.instanceOf[percentage]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class percentageSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[PercentageOfCashPaymentOver15000] = Form2(Second)
 
-      def view = views.html.renewal.percentage(form2, true)
+      def view = percentage(form2, true)
 
       doc.title must startWith(Messages("renewal.hvd.percentage.title") + " - " + Messages("summary.renewal"))
     }
@@ -45,7 +47,7 @@ class percentageSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[PercentageOfCashPaymentOver15000] = Form2(Third)
 
-      def view = views.html.renewal.percentage(form2, true)
+      def view = percentage(form2, true)
 
       heading.html must be(Messages("renewal.hvd.percentage.title"))
       subHeading.html must include(Messages("summary.renewal"))
@@ -59,7 +61,7 @@ class percentageSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "percentage") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.renewal.percentage(form2, true)
+      def view = percentage(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -69,7 +71,7 @@ class percentageSpec extends AmlsViewSpec with MustMatchers  {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.renewal.percentage(EmptyForm, true)
+      def view = percentage(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

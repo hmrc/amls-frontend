@@ -21,11 +21,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.notifications.v2m0.revocation_reasons
 
 class revocation_reasonsSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-
+    lazy val revocation_reasons = app.injector.instanceOf[revocation_reasons]
     implicit val requestWithToken = addTokenForView()
 
     val notificationParams = NotificationParams(businessName = Some("Fake Name Ltd."), msgContent = "msgContent", amlsRefNo = Some("amlsRegNo"), endDate = Some("endDate"))
@@ -36,7 +37,7 @@ class revocation_reasonsSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v2m0.revocation_reasons(notificationParams)
+      def view = revocation_reasons(notificationParams)
 
       doc.title must be("Your supervision has been revoked" +
         " - " + "Your registration" +
@@ -46,7 +47,7 @@ class revocation_reasonsSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v2m0.revocation_reasons(notificationParams)
+      def view = revocation_reasons(notificationParams)
 
       heading.html must be("Your supervision has been revoked")
       subHeading.html must include("Your registration")
@@ -55,14 +56,14 @@ class revocation_reasonsSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct content, businessName, endDate and reference displayed" in new ViewFixture {
 
-      def view = views.html.notifications.v2m0.revocation_reasons(notificationParams)
+      def view = revocation_reasons(notificationParams)
 
       doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("amlsRegNo") and include("endDate"))
     }
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.notifications.v2m0.revocation_reasons(notificationParams)
+      def view = revocation_reasons(notificationParams)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

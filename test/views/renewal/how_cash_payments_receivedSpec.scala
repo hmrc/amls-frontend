@@ -22,10 +22,12 @@ import models.renewal.{HowCashPaymentsReceived, PaymentMethods}
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.renewal.how_cash_payments_received
 
 class how_cash_payments_receivedSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
+    lazy val how_cash_payments_received = app.injector.instanceOf[how_cash_payments_received]
     implicit val requestWithToken = addTokenForView()
 
     val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
@@ -38,7 +40,7 @@ class how_cash_payments_receivedSpec extends AmlsViewSpec {
 
       val form2: ValidForm[HowCashPaymentsReceived] = Form2(howReceived)
 
-      def view = views.html.renewal.how_cash_payments_received(form2, true)
+      def view = how_cash_payments_received(form2, true)
 
       doc.title must startWith("How did you receive cash payments from customers you have not met in person?" + " - " + "Renewal")
     }
@@ -47,7 +49,7 @@ class how_cash_payments_receivedSpec extends AmlsViewSpec {
 
       val form2: ValidForm[HowCashPaymentsReceived] = Form2(howReceived)
 
-      def view = views.html.renewal.how_cash_payments_received(form2, true)
+      def view = how_cash_payments_received(form2, true)
 
       heading.text() must be("How did you receive cash payments from customers you have not met in person?")
       subHeading.text() must include("Renewal")
@@ -61,7 +63,7 @@ class how_cash_payments_receivedSpec extends AmlsViewSpec {
           (Path \ "cashPaymentMethods") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.renewal.how_cash_payments_received(form2, true)
+      def view = how_cash_payments_received(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -71,7 +73,7 @@ class how_cash_payments_receivedSpec extends AmlsViewSpec {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.renewal.how_cash_payments_received(EmptyForm, true)
+      def view = how_cash_payments_received(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

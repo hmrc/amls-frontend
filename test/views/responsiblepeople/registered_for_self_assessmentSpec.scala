@@ -17,17 +17,19 @@
 package views.responsiblepeople
 
 import forms.{EmptyForm, InvalidForm}
-import org.scalatest.{MustMatchers}
+import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.responsiblepeople.registered_for_self_assessment
 
 
 class registered_for_self_assessmentSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val registered_for_self_assessment = app.injector.instanceOf[registered_for_self_assessment]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -38,7 +40,7 @@ class registered_for_self_assessmentSpec extends AmlsViewSpec with MustMatchers 
     "have a back link" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, None, name)
+      def view = registered_for_self_assessment(form2, true, 0, None, name)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -46,7 +48,7 @@ class registered_for_self_assessmentSpec extends AmlsViewSpec with MustMatchers 
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, None, name)
+      def view = registered_for_self_assessment(form2, true, 0, None, name)
 
       doc.title must be(Messages("responsiblepeople.registeredforselfassessment.title") + " - " +
         Messages("summary.responsiblepeople") +
@@ -58,7 +60,7 @@ class registered_for_self_assessmentSpec extends AmlsViewSpec with MustMatchers 
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, None, name)
+      def view = registered_for_self_assessment(form2, true, 0, None, name)
 
       heading.html must be(Messages("responsiblepeople.registeredforselfassessment.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -69,7 +71,7 @@ class registered_for_self_assessmentSpec extends AmlsViewSpec with MustMatchers 
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, false, 0, None, name)
+      def view = registered_for_self_assessment(form2, false, 0, None, name)
 
       doc.getElementsByAttributeValue("name", "saRegistered") must not be empty
       doc.getElementsByAttributeValue("name", "utrNumber") must not be empty
@@ -84,7 +86,7 @@ class registered_for_self_assessmentSpec extends AmlsViewSpec with MustMatchers 
           (Path \ "utrNumber") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.registered_for_self_assessment(form2, true, 0, None, name)
+      def view = registered_for_self_assessment(form2, true, 0, None, name)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

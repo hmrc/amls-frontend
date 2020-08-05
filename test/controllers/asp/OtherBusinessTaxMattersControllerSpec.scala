@@ -28,6 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.asp.other_business_tax_matters
 
 import scala.concurrent.Future
 
@@ -39,12 +40,18 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[other_business_tax_matters]
     mockCacheFetch[Asp](None)
 
     mockCacheSave[Asp]
 
-    val controller = new OtherBusinessTaxMattersController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    val controller = new OtherBusinessTaxMattersController(
+      mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      other_business_tax_matters = view
+    )
 
     val newRequest = requestWithUrlEncodedBody(
       "otherBusinessTaxMatters" -> "true"

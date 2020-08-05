@@ -18,13 +18,15 @@ package views
 
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
+import views.html.unauthorised_role
 
 class UnauthorisedRoleViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val unauthorised_role = app.injector.instanceOf[unauthorised_role]
     implicit val requestWithToken = addTokenForView()
 
-    def view = views.html.unauthorised_role()
+    def view = unauthorised_role()
   }
 
   "The 'unauthorised role' view" must {

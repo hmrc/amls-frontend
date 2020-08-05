@@ -20,10 +20,12 @@ import generators.PaymentGenerator
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.payments.bank_details
 
 class bank_detailsSpec extends AmlsViewSpec with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
+    lazy val bank_details = app.injector.instanceOf[bank_details]
     implicit val requestWithToken = addTokenForView()
     val secondaryHeading = "Submit application"
   }
@@ -32,7 +34,7 @@ class bank_detailsSpec extends AmlsViewSpec with PaymentGenerator {
 
     "have correct title, headings" in new ViewFixture {
 
-      def view = views.html.payments.bank_details(true, 0, paymentReferenceNumber, secondaryHeading)
+      def view = bank_details(true, 0, paymentReferenceNumber, secondaryHeading)
 
       doc.title must startWith(Messages("payments.bankdetails.title"))
       heading.html must be(Messages("payments.bankdetails.header"))
@@ -42,7 +44,7 @@ class bank_detailsSpec extends AmlsViewSpec with PaymentGenerator {
 
     "have correct title, headings for renewal" in new ViewFixture {
 
-      def view = views.html.payments.bank_details(true, 0, paymentReferenceNumber, secondaryHeading)
+      def view = bank_details(true, 0, paymentReferenceNumber, secondaryHeading)
 
       doc.title must startWith(Messages("payments.bankdetails.title"))
       heading.html must be(Messages("payments.bankdetails.header"))
@@ -52,7 +54,7 @@ class bank_detailsSpec extends AmlsViewSpec with PaymentGenerator {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.payments.bank_details(true, 0, paymentReferenceNumber, secondaryHeading)
+      def view = bank_details(true, 0, paymentReferenceNumber, secondaryHeading)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -61,7 +63,7 @@ class bank_detailsSpec extends AmlsViewSpec with PaymentGenerator {
 
       "non UK" in new ViewFixture {
 
-        def view = views.html.payments.bank_details(false, 100, paymentReferenceNumber, secondaryHeading)
+        def view = bank_details(false, 100, paymentReferenceNumber, secondaryHeading)
 
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.bics.name")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.bics.value")) must not be empty
@@ -77,7 +79,7 @@ class bank_detailsSpec extends AmlsViewSpec with PaymentGenerator {
 
       "uk" in new ViewFixture {
 
-        def view = views.html.payments.bank_details(true, 100, paymentReferenceNumber, secondaryHeading)
+        def view = bank_details(true, 100, paymentReferenceNumber, secondaryHeading)
 
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.sortcode.name")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.sortcode.value")) must not be empty

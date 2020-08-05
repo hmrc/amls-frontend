@@ -16,30 +16,32 @@
 
 package views.responsiblepeople
 
-import forms.{EmptyForm, InvalidForm, Form2}
-import org.scalatest.{MustMatchers}
+import forms.{EmptyForm, Form2, InvalidForm}
+import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.responsiblepeople.fit_and_proper
 
 class fit_and_properSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val fit_and_proper = app.injector.instanceOf[fit_and_proper]
     implicit val requestWithToken = addTokenForView()
   }
 
   "fit_and_proper view" must {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName")
+      def view = fit_and_proper(form2, true, 0, None, "PersonName")
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName")
+      def view = fit_and_proper(form2, true, 0, None, "PersonName")
       doc.title must be(
         Messages("responsiblepeople.fit_and_proper.title", "PersonName")
         + " - " + Messages("summary.responsiblepeople")+
@@ -50,7 +52,7 @@ class fit_and_properSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName")
+      def view = fit_and_proper(form2, true, 0, None, "PersonName")
       heading.html must be(Messages("responsiblepeople.fit_and_proper.heading", "PersonName"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
       doc.title must include(Messages("responsiblepeople.fit_and_proper.title"))
@@ -58,7 +60,7 @@ class fit_and_properSpec extends AmlsViewSpec with MustMatchers {
 
     "have the correct content" in new ViewFixture {
         val form2: Form2[_] = EmptyForm
-        def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName")
+        def view = fit_and_proper(form2, true, 0, None, "PersonName")
         doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.details"))
         doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.details2", "PersonName"))
     }
@@ -69,7 +71,7 @@ class fit_and_properSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "hasAlreadyPassedFitAndProper") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName")
+      def view = fit_and_proper(form2, true, 0, None, "PersonName")
       errorSummary.html() must include("not a message Key")
       doc.getElementById("hasAlreadyPassedFitAndProper")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")

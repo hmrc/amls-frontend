@@ -22,11 +22,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tcsp.only_off_the_shelf_comps_sold
 
 
 class only_off_the_shelf_comps_soldSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val only_off_the_shelf_comps_sold = app.injector.instanceOf[only_off_the_shelf_comps_sold]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class only_off_the_shelf_comps_soldSpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.tcsp.only_off_the_shelf_comps_sold(form2, true)
+      def view = only_off_the_shelf_comps_sold(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -54,7 +56,7 @@ class only_off_the_shelf_comps_soldSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "onlyOffTheShelfCompsSold") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tcsp.only_off_the_shelf_comps_sold(form2, true)
+      def view = only_off_the_shelf_comps_sold(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

@@ -19,15 +19,17 @@ package views
 import play.api.i18n.Messages
 import play.twirl.api.Html
 import utils.AmlsViewSpec
+import views.html.duplicate_submission
 
 class DuplicateSubmissionViewSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
+    lazy val duplicate_submission = app.injector.instanceOf[duplicate_submission]
     implicit val requestWithToken = addTokenForView()
 
     val getHelpView = Html("<p>Get help here</p>")
 
-    def view = views.html.duplicate_submission()
+    def view = duplicate_submission()
 
   }
 

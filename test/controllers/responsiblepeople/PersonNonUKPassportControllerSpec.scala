@@ -32,6 +32,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import views.html.responsiblepeople.person_non_uk_passport
 
 import scala.concurrent.Future
 
@@ -47,9 +48,17 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .build()
+    lazy val view = app.injector.instanceOf[person_non_uk_passport]
 
     val mockApplicationConfig = mock[ApplicationConfig]
-    val controller = new PersonNonUKPassportController(messagesApi = messagesApi, dataCacheConnector, SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    val controller = new PersonNonUKPassportController(messagesApi = messagesApi,
+      dataCacheConnector,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      person_non_uk_passport = view,
+      error = errorView
+    )
 
     val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]

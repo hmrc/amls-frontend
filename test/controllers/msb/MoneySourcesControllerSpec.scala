@@ -89,7 +89,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
       "customerMoneySource" -> "Yes")
 
     val cacheMap = mock[CacheMap]
-
+    lazy val view = app.injector.instanceOf[money_sources]
     when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
       .thenReturn(Future.successful(Some(completeMsb.copy(whichCurrencies = Some(WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, None))))))))
 
@@ -100,7 +100,9 @@ class MoneySourcesControllerSpec extends AmlsSpec
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       serviceFlow = mock[ServiceFlow],
-      cc = mockMcc)
+      cc = mockMcc,
+      money_sources = view,
+      error = errorView)
 
     val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
 

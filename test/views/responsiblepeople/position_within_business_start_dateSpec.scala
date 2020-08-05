@@ -24,10 +24,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.position_within_business_start_date
 
 class position_within_business_start_dateSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val position_within_business_start_date = app.injector.instanceOf[position_within_business_start_date]
     implicit val requestWithToken = addTokenForView()
     val name = "firstName lastName"
   }
@@ -36,13 +38,13 @@ class position_within_business_start_dateSpec extends AmlsViewSpec with MustMatc
 
     "have back link" in new ViewFixture {
       val form2 = EmptyForm
-      def view = views.html.responsiblepeople.position_within_business_start_date(form2, true, 1, BusinessType.SoleProprietor, name, Set(), true, None)
+      def view = position_within_business_start_date(form2, true, 1, BusinessType.SoleProprietor, name, Set(), true, None)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
       val form2 = EmptyForm
-      def view = views.html.responsiblepeople.position_within_business_start_date(form2, true, 1, BusinessType.SoleProprietor, name, Set(), true, None)
+      def view = position_within_business_start_date(form2, true, 1, BusinessType.SoleProprietor, name, Set(), true, None)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
       doc.title must be(Messages("responsiblepeople.position_within_business.startDate.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -52,7 +54,7 @@ class position_within_business_start_dateSpec extends AmlsViewSpec with MustMatc
 
     "have correct headings" in new ViewFixture {
       val form2 = EmptyForm
-      def view = views.html.responsiblepeople.position_within_business_start_date(form2, true, 1, BusinessType.SoleProprietor, name, Set(), true, None)
+      def view = position_within_business_start_date(form2, true, 1, BusinessType.SoleProprietor, name, Set(), true, None)
       heading.html must be(Messages("responsiblepeople.position_within_business.startDate.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
     }
@@ -60,7 +62,7 @@ class position_within_business_start_dateSpec extends AmlsViewSpec with MustMatc
     "display inline text for a single position" in new ViewFixture {
       val form2 = EmptyForm
       val positions =  Set(NominatedOfficer).asInstanceOf[Set[PositionWithinBusiness]]
-      def view = views.html.responsiblepeople.position_within_business_start_date(form2, true, 1, BusinessType.SoleProprietor, name, positions, true, None)
+      def view = position_within_business_start_date(form2, true, 1, BusinessType.SoleProprietor, name, positions, true, None)
       form.text().contains(Messages("responsiblepeople.position_within_business.startDate.toldus.single", name,
         PositionWithinBusiness.getPrettyName(NominatedOfficer).toLowerCase)) mustBe true
       doc.select("li.business-role").isEmpty mustBe true
@@ -69,7 +71,7 @@ class position_within_business_start_dateSpec extends AmlsViewSpec with MustMatc
     "display bullet list for multiple positions" in new ViewFixture {
       val form2 = EmptyForm
       val positions = Set(Director, NominatedOfficer, Partner, Other("Wizard")).asInstanceOf[Set[PositionWithinBusiness]]
-      def view = views.html.responsiblepeople.position_within_business_start_date(form2, true, 1, BusinessType.SoleProprietor, name, positions, true, None)
+      def view = position_within_business_start_date(form2, true, 1, BusinessType.SoleProprietor, name, positions, true, None)
       form.text().contains(Messages("responsiblepeople.position_within_business.startDate.toldus.multiple", name)) mustBe true
       form.text().contains(Messages("responsiblepeople.position_within_business.startDate.toldus.selectfirst")) mustBe true
       doc.select("li.business-role").size() mustBe positions.size
@@ -78,7 +80,7 @@ class position_within_business_start_dateSpec extends AmlsViewSpec with MustMatc
     "show errors in the correct locations" in new ViewFixture {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq((Path \ "positions") -> Seq(ValidationError("not a message Key"))))
-      def view = views.html.responsiblepeople.position_within_business_start_date(form2, true, 1, BusinessType.SoleProprietor, name, Set(), true, None)
+      def view = position_within_business_start_date(form2, true, 1, BusinessType.SoleProprietor, name, Set(), true, None)
       errorSummary.html() must include("not a message Key")
     }
   }

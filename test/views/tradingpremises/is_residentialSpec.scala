@@ -24,11 +24,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tradingpremises.is_residential
 
 
 class is_residentialSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val is_residential = app.injector.instanceOf[is_residential]
     implicit val requestWithToken = addTokenForView()
 
     val address=Address("56 Southview Road", "Newcastle Upon Tyne", Some("Tyne and Wear"), Some ("Whitehill"), Some("NE3 6JAX"), Country(
@@ -46,7 +48,7 @@ class is_residentialSpec extends AmlsViewSpec with MustMatchers {
         Messages("summary.tradingpremises") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
 
-      def view = views.html.tradingpremises.is_residential(form2,Some(address), 1, false)
+      def view = is_residential(form2,Some(address), 1, false)
 
       doc.title must be(pageTitle)
       heading.html must be(Messages("tradingpremises.isResidential.title"))
@@ -64,13 +66,13 @@ class is_residentialSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "some path") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tradingpremises.is_residential(form2,Some(address), 1, true)
+      def view = is_residential(form2,Some(address), 1, true)
 
       errorSummary.html() must include("not a message Key")
     }
 
     "the have a residential address" in new ViewFixture {
-      def view = views.html.tradingpremises.is_residential(EmptyForm, Some(address),1, false)
+      def view = is_residential(EmptyForm, Some(address),1, false)
 
       doc.html() must include("Whitehill")
     }

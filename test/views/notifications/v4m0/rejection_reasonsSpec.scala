@@ -22,11 +22,12 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.notifications.v4m0.rejection_reasons
 
 class rejection_reasonsSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-
+    lazy val rejection_reasons = app.injector.instanceOf[rejection_reasons]
     implicit val requestWithToken = addTokenForView()
 
     val notificationParams = NotificationParams(businessName = Some("Fake Name Ltd."), msgContent = "msgContent", safeId = Some("reference"), endDate = Some("endDate"))
@@ -37,7 +38,7 @@ class rejection_reasonsSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v4m0.rejection_reasons(notificationParams)
+      def view = rejection_reasons(notificationParams)
 
       doc.title must be("Your application has been refused" +
         " - " + "Your registration" +
@@ -47,7 +48,7 @@ class rejection_reasonsSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v4m0.rejection_reasons(notificationParams)
+      def view = rejection_reasons(notificationParams)
 
       heading.html must be("Your application has been refused")
       subHeading.html must include("Your registration")
@@ -56,14 +57,14 @@ class rejection_reasonsSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct content, businessName, endDate and reference displayed" in new ViewFixture {
 
-      def view = views.html.notifications.v4m0.rejection_reasons(notificationParams)
+      def view = rejection_reasons(notificationParams)
 
       doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("reference") and include("endDate"))
     }
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.notifications.v4m0.rejection_reasons(notificationParams)
+      def view = rejection_reasons(notificationParams)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

@@ -49,6 +49,7 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * View in simple form with high value dealing.
     */
   trait SimpleFlowModelViewFixture extends ViewFixture {
+    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(HighValueDealing)))
   }
@@ -59,6 +60,7 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * View to include TrustAndCompanyServices.
     */
   trait SimpleTCSPViewFixture extends ViewFixture {
+    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
     val completePersonName = Some(PersonName("Katie", None, "Test"))
     val completePersonName2 = Some(PersonName("David", None, "Test"))
     val completeRp1 = ResponsiblePerson(completePersonName)
@@ -73,6 +75,7 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * View to include TrustAndCompanyServices.
     */
   trait SimpleTCSPNoFitAndProperViewFixture extends ViewFixture {
+    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(TrustAndCompanyServices)
     ))
@@ -85,6 +88,7 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * Has single CurrencyExchange sub service.
     */
   trait MSBViewFixture extends ViewFixture {
+    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
       subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
@@ -98,6 +102,7 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * Has single CurrencyExchange sub service.
     */
   trait MSBViewNoPremisesFixture extends ViewFixture {
+    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
       subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
@@ -112,6 +117,7 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * Has PSR No.
     */
   trait MSBAllViewFixture extends ViewFixture {
+    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
     val completePersonName = Some(PersonName("Katie", None, "Test"))
     val completeRp1 = ResponsiblePerson(completePersonName)
     val address = Address("1", "2", None, None, "AA1 1BB", None)
@@ -135,6 +141,7 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * Has PSR No.
     */
   trait MSBSingleViewFixture extends ViewFixture {
+    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
       subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
@@ -149,6 +156,7 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * Has no PSR No.
     */
   trait MSBNoPSRViewFixture extends ViewFixture {
+    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
       subSectors = Some(BusinessMatchingMsbServices(Set(
@@ -165,6 +173,7 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * Has a PSR No.
     */
   trait SingleSubSectorPSRMSBViewFixture extends ViewFixture {
+    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
       subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),

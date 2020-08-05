@@ -21,10 +21,12 @@ import jto.validation.{Path, ValidationError}
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.address.new_home_address_UK
 
 class new_home_address_UKSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
+    lazy val new_home_address_UK = app.injector.instanceOf[new_home_address_UK]
     implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
@@ -34,7 +36,7 @@ class new_home_address_UKSpec extends AmlsViewSpec {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.address.new_home_address_UK(form2, 1, name)
+      def view = new_home_address_UK(form2, 1, name)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -64,7 +66,7 @@ class new_home_address_UKSpec extends AmlsViewSpec {
           (Path \ "postCode") -> Seq(ValidationError("not a message Key 6"))
         ))
 
-      def view = views.html.responsiblepeople.address.new_home_address_UK(form2, 1, name)
+      def view = new_home_address_UK(form2, 1, name)
 
       errorSummary.html() must include("not a message Key 1")
       errorSummary.html() must include("not a message Key 2")

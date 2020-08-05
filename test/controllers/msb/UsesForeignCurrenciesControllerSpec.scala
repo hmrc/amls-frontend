@@ -78,7 +78,8 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
   trait Fixture2 extends AuthorisedFixture with DependencyMocks with MoneyServiceBusinessTestData {
     self =>
     val request = addToken(authRequest)
-    val controller = new UsesForeignCurrenciesController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockStatusService, mockServiceFlow, mockMcc)
+    lazy val view = app.injector.instanceOf[uses_foreign_currencies]
+    val controller = new UsesForeignCurrenciesController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockStatusService, mockServiceFlow, mockMcc, view)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     when {

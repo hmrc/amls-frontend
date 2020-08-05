@@ -23,10 +23,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tradingpremises.agent_company_name
 
 class agent_company_nameSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val agent_company_name = app.injector.instanceOf[agent_company_name]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class agent_company_nameSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[AgentCompanyDetails] = Form2(AgentCompanyDetails("", None))
 
-      def view = views.html.tradingpremises.agent_company_name(form2, 1, false)
+      def view = agent_company_name(form2, 1, false)
 
       doc.title() must startWith(Messages("tradingpremises.agentcompanyname.title") + " - " + Messages("summary.tradingpremises"))
       heading.html() must include(Messages("tradingpremises.agentcompanyname.title"))
@@ -52,7 +54,7 @@ class agent_company_nameSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "agentCompanyName") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tradingpremises.agent_company_name(form2, 1, false)
+      def view = agent_company_name(form2, 1, false)
 
       errorSummary.html() must include("not a message Key")
     }

@@ -24,11 +24,13 @@ import jto.validation.ValidationError
 import models.supervision.ProfessionalBodies$
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.supervision.which_professional_body
 
 
 class which_professional_bodySpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val which_professional_body = app.injector.instanceOf[which_professional_body]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,14 +38,14 @@ class which_professional_bodySpec extends AmlsViewSpec with MustMatchers  {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.supervision.which_professional_body(EmptyForm, edit = false)
+      def view = which_professional_body(EmptyForm, edit = false)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.supervision.which_professional_body(EmptyForm, false)
+      def view = which_professional_body(EmptyForm, false)
 
       doc.title must startWith(Messages("supervision.whichprofessionalbody.title") + " - " + Messages("summary.supervision"))
 
@@ -51,7 +53,7 @@ class which_professional_bodySpec extends AmlsViewSpec with MustMatchers  {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.supervision.which_professional_body(EmptyForm, false)
+      def view = which_professional_body(EmptyForm, false)
 
       heading.html must be(Messages("supervision.whichprofessionalbody.title"))
       subHeading.html must include(Messages("summary.supervision"))
@@ -65,7 +67,7 @@ class which_professional_bodySpec extends AmlsViewSpec with MustMatchers  {
         (Path \ "specifyOtherBusiness") -> Seq(ValidationError("not another message Key"))
       ))
 
-      def view = views.html.supervision.which_professional_body(form2, false)
+      def view = which_professional_body(form2, false)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("not another message Key")

@@ -21,30 +21,32 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.renewal.what_you_need
 
 
 class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val what_you_need = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
   }
 
   "What you need View" must {
     "Have the correct title" in new ViewFixture {
-      def view = views.html.renewal.what_you_need(None, None)
+      def view = what_you_need(None, None)
 
       doc.title must startWith(Messages("title.wyn"))
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.renewal.what_you_need(None, None)
+      def view = what_you_need(None, None)
 
       heading.html must be (Messages("title.wyn"))
       subHeading.html must include (Messages("summary.renewal"))
     }
 
     "contain the expected content elements for any renewal" in new ViewFixture{
-      def view = views.html.renewal.what_you_need(None, None)
+      def view = what_you_need(None, None)
 
       html must include(Messages("about any other activities your business was involved in over the last 12 months"))
       html must include(Messages("your total net profit for the last 12 months, if your business was involved in other activities"))
@@ -52,7 +54,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements for AMP renewal" in new ViewFixture{
-      def view = views.html.renewal.what_you_need(Some(BusinessActivities(Set(ArtMarketParticipant))), None)
+      def view = what_you_need(Some(BusinessActivities(Set(ArtMarketParticipant))), None)
 
       html must include(Messages("about any other activities your business was involved in over the last 12 months"))
       html must include(Messages("your total net profit for the last 12 months, if your business was involved in other activities"))
@@ -61,7 +63,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements for MSB renewal" in new ViewFixture{
-      def view = views.html.renewal.what_you_need(Some(BusinessActivities(Set(MoneyServiceBusiness))), None)
+      def view = what_you_need(Some(BusinessActivities(Set(MoneyServiceBusiness))), None)
 
       html must include(Messages("about any other activities your business was involved in over the last 12 months"))
       html must include(Messages("your total net profit for the last 12 months, if your business was involved in other activities"))
@@ -70,7 +72,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements for MSB renewal with MoneyTransmitting" in new ViewFixture{
-      def view = views.html.renewal.what_you_need(Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))
+      def view = what_you_need(Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))
 
       html must include(Messages("about any other activities your business was involved in over the last 12 months"))
       html must include(Messages("your total net profit for the last 12 months, if your business was involved in other activities"))
@@ -82,7 +84,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements for MSB renewal with Currency Exchange" in new ViewFixture{
-      def view = views.html.renewal.what_you_need(Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(CurrencyExchange))))
+      def view = what_you_need(Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(CurrencyExchange))))
 
       html must include(Messages("about any other activities your business was involved in over the last 12 months"))
       html must include(Messages("your total net profit for the last 12 months, if your business was involved in other activities"))
@@ -94,7 +96,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements for MSB renewal with Foreign Exchange" in new ViewFixture{
-      def view = views.html.renewal.what_you_need(Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(ForeignExchange))))
+      def view = what_you_need(Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(ForeignExchange))))
 
       html must include(Messages("about any other activities your business was involved in over the last 12 months"))
       html must include(Messages("your total net profit for the last 12 months, if your business was involved in other activities"))
@@ -104,7 +106,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements for ASP renewal" in new ViewFixture{
-      def view = views.html.renewal.what_you_need(Some(BusinessActivities(Set(AccountancyServices))), None)
+      def view = what_you_need(Some(BusinessActivities(Set(AccountancyServices))), None)
 
       html must include(Messages("about any other activities your business was involved in over the last 12 months"))
       html must include(Messages("your total net profit for the last 12 months, if your business was involved in other activities"))
@@ -113,7 +115,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements for HVD renewal" in new ViewFixture{
-      def view = views.html.renewal.what_you_need(Some(BusinessActivities(Set(HighValueDealing))), None)
+      def view = what_you_need(Some(BusinessActivities(Set(HighValueDealing))), None)
 
       html must include(Messages("about any other activities your business was involved in over the last 12 months"))
       html must include(Messages("your total net profit for the last 12 months, if your business was involved in other activities"))
@@ -124,7 +126,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.renewal.what_you_need(None, None)
+      def view = what_you_need(None, None)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

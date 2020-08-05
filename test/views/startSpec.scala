@@ -18,29 +18,31 @@ package views
 
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
+import views.html.start
 
 class startSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val start = app.injector.instanceOf[start]
     implicit val requestWithToken = addTokenForView()
   }
 
   "Landing Page View" must {
 
     "have the correct title" in new ViewFixture {
-      def view = views.html.start()
+      def view = start()
 
       doc.title must startWith("Manage your anti-money laundering supervision")
     }
 
     "have the correct Headings" in new ViewFixture {
-      def view = views.html.start()
+      def view = start()
 
       heading.html must be("Manage your anti-money laundering supervision")
     }
 
     "contain the expected content elements" in new ViewFixture {
-      def view = views.html.start()
+      def view = start()
 
       html must include("Use this service to:")
       html must include("apply to register with HMRC under the Money Laundering Regulations")
@@ -59,7 +61,7 @@ class startSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected links" in new ViewFixture {
-      def view = views.html.start()
+      def view = start()
 
       doc.getElementsContainingOwnText("Money Laundering Regulations guidance").first().attr("href") mustBe "https://www.gov.uk/topic/business-tax/money-laundering-regulations"
       doc.getElementsContainingOwnText("fees for anti-money laundering supervision").first().attr("href") mustBe "https://www.gov.uk/guidance/money-laundering-regulations-registration-fees"

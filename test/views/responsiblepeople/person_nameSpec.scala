@@ -16,17 +16,19 @@
 
 package views.responsiblepeople
 
-import forms.{InvalidForm, EmptyForm}
+import forms.{EmptyForm, InvalidForm}
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.responsiblepeople.person_name
 
 class person_nameSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val person_name = app.injector.instanceOf[person_name]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -34,7 +36,7 @@ class person_nameSpec extends AmlsViewSpec with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.person_name(form2, true, 1, None)
+      def view = person_name(form2, true, 1, None)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -54,7 +56,7 @@ class person_nameSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "lastName") -> Seq(ValidationError("third not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.person_name(form2, true, 1, None)
+      def view = person_name(form2, true, 1, None)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

@@ -21,36 +21,38 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.what_you_need
 
 
 class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val what_you_need = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
   }
 
   "What you need View" must {
 
     "have a back link" in new ViewFixture {
-      def view = views.html.responsiblepeople.what_you_need(1, None, None)
+      def view = what_you_need(1, None, None)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "Have the correct title" in new ViewFixture {
-      def view = views.html.responsiblepeople.what_you_need(1, None, None)
+      def view = what_you_need(1, None, None)
 
       doc.title must startWith(Messages("title.wyn"))
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.responsiblepeople.what_you_need(1, None, None)
+      def view = what_you_need(1, None, None)
 
       heading.html must be (Messages("title.wyn"))
       subHeading.html must include (Messages("summary.responsiblepeople"))
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.responsiblepeople.what_you_need(1, None, Some(BusinessActivities(Set(MoneyServiceBusiness))))
+      def view = what_you_need(1, None, Some(BusinessActivities(Set(MoneyServiceBusiness))))
 
       html must include(Messages("responsiblepeople.whatyouneed.requiredinfo"))
 
@@ -77,7 +79,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "Contain approval check content for MSB or TCSP" in new ViewFixture{
-      def view = views.html.responsiblepeople.what_you_need(1, None, Some(BusinessActivities(Set(MoneyServiceBusiness))))
+      def view = what_you_need(1, None, Some(BusinessActivities(Set(MoneyServiceBusiness))))
 
       html must include(Messages("if HMRC has charged your business or another business to do an approval check on them"))
     }

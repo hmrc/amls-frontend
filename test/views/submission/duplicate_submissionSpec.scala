@@ -20,16 +20,18 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.submission.duplicate_submission
 
 
 class duplicate_submissionSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val duplicate_submission = app.injector.instanceOf[duplicate_submission]
     implicit val requestWithToken = addTokenForView()
 
     val errorMsg = "Error message"
 
-    def view = views.html.submission.duplicate_submission(errorMsg)
+    def view = duplicate_submission(errorMsg)
   }
   "The duplicate submission view" must {
     "display the correct title and headings" in new ViewFixture {

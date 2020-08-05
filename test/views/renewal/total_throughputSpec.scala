@@ -29,6 +29,7 @@ import views.html.renewal.total_throughput
 class total_throughputSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val total_throughput = app.injector.instanceOf[total_throughput]
     implicit val requestWithToken = addTokenForView()
 
     override def view = total_throughput(EmptyForm, edit = false)
