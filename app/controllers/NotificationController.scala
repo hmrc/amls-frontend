@@ -24,6 +24,7 @@ import javax.inject.{Inject, Singleton}
 import models.notifications.ContactType._
 import models.notifications._
 import models.status.{SubmissionDecisionRejected, SubmissionStatus}
+import play.api.Application
 import play.api.i18n.{Lang, Messages}
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import play.twirl.api.Template5
@@ -32,9 +33,11 @@ import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName}
 import views.html.notifications.your_messages
+import views.notifications.{V1M0, V2M0, V3M0, V4M0}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.reflect.ClassTag
 
 @Singleton
 class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolmentsService,
@@ -47,7 +50,44 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
                                        implicit val dataCacheConnector: DataCacheConnector,
                                        val cc: MessagesControllerComponents,
                                        your_messages: your_messages,
-                                       implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+                                       implicit val error: views.html.error,
+                                       v1m0: V1M0,
+                                       v2m0: V2M0,
+                                       v3m0: V3M0,
+                                       v4m0: V4M0
+) extends AmlsBaseController(ds, cc) {
+
+  def notificationsMap(name: String) =
+    name match {
+      case "v1m0.message_details" => v1m0.message_details
+      case "v1m0.minded_to_reject" => v1m0.minded_to_reject
+      case "v1m0.minded_to_revoke" => v1m0.minded_to_revoke
+      case "v1m0.no_longer_minded_to_reject" => v1m0.no_longer_minded_to_reject
+      case "v1m0.no_longer_minded_to_revoke" => v1m0.no_longer_minded_to_revoke
+      case "v1m0.rejection_reasons" => v1m0.rejection_reasons
+      case "v1m0.revocation_reasons" => v1m0.revocation_reasons
+      case "v2m0.message_details" => v2m0.message_details
+      case "v2m0.minded_to_reject" => v2m0.minded_to_reject
+      case "v2m0.minded_to_revoke" => v2m0.minded_to_revoke
+      case "v2m0.no_longer_minded_to_reject" => v2m0.no_longer_minded_to_reject
+      case "v2m0.no_longer_minded_to_revoke" => v2m0.no_longer_minded_to_revoke
+      case "v2m0.rejection_reasons" => v2m0.rejection_reasons
+      case "v2m0.revocation_reasons" => v2m0.revocation_reasons
+      case "v3m0.message_details" => v3m0.message_details
+      case "v3m0.minded_to_reject" => v3m0.minded_to_reject
+      case "v3m0.minded_to_revoke" => v3m0.minded_to_revoke
+      case "v3m0.no_longer_minded_to_reject" => v3m0.no_longer_minded_to_reject
+      case "v3m0.no_longer_minded_to_revoke" => v3m0.no_longer_minded_to_revoke
+      case "v3m0.rejection_reasons" => v3m0.rejection_reasons
+      case "v3m0.revocation_reasons" => v3m0.revocation_reasons
+      case "v4m0.message_details" => v4m0.message_details
+      case "v4m0.minded_to_reject" => v4m0.minded_to_reject
+      case "v4m0.minded_to_revoke" => v4m0.minded_to_revoke
+      case "v4m0.no_longer_minded_to_reject" => v4m0.no_longer_minded_to_reject
+      case "v4m0.no_longer_minded_to_revoke" => v4m0.no_longer_minded_to_revoke
+      case "v4m0.rejection_reasons" => v4m0.rejection_reasons
+      case "v4m0.revocation_reasons" => v4m0.revocation_reasons
+    }
 
   def getMessages = authAction.async {
       implicit request =>
@@ -112,10 +152,10 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
     val (amlsRefNo, safeId) = reference
 
     def getTemplate[T](name : String)(implicit man: Manifest[T]) : T =
-      Class.forName(name + "$").getField("MODULE$").get(man.runtimeClass).asInstanceOf[T]
+      notificationsMap(name).asInstanceOf[T]
 
     def render(templateName: String, notificationParams: NotificationParams, templateVersion: String) =
-      getTemplate[Template5[NotificationParams, Request[_], Messages, Lang, ApplicationConfig, play.twirl.api.Html]](s"views.html.notifications.${ templateVersion }.${ templateName }")
+      getTemplate[Template5[NotificationParams, Request[_], Messages, Lang, ApplicationConfig, play.twirl.api.Html]](s"${ templateVersion }.${ templateName }")
         .render(notificationParams, request, m, lang, appConfig)
 
     val notification = contactType match {

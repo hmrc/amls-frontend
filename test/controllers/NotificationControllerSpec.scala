@@ -40,6 +40,7 @@ import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.notifications.your_messages
+import views.notifications.{V1M0, V2M0, V3M0, V4M0}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -93,6 +94,10 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     val mockAmlsConnector = mock[AmlsConnector]
     val mockNotificationService = mock[NotificationService]
     val mockBusinessMatchingService = mock[BusinessMatchingService]
+    lazy val first = app.injector.instanceOf[V1M0]
+    lazy val second = app.injector.instanceOf[V2M0]
+    lazy val third = app.injector.instanceOf[V3M0]
+    lazy val fourth = app.injector.instanceOf[V4M0]
     lazy val view = app.injector.instanceOf[your_messages]
     val controller = new NotificationController(
       authEnrolmentsService = mockAuthEnrolmentsService,
@@ -105,7 +110,11 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       dataCacheConnector = mockCacheConnector,
       cc = mockMcc,
       your_messages = view,
-      error = errorView)
+      error = errorView,
+      v1m0 = first,
+      v2m0 = second,
+      v3m0 = third,
+      v4m0 = fourth)
 
     val controllerWithFailedAuthAction = new NotificationController(
       authEnrolmentsService = mockAuthEnrolmentsService,
@@ -118,7 +127,11 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       ds = commonDependencies,
       cc = mockMcc,
       your_messages = view,
-      error = errorView)
+      error = errorView,
+      v1m0 = first,
+      v2m0 = second,
+      v3m0 = third,
+      v4m0 = fourth)
 
     val mockBusinessMatching = mock[BusinessMatching]
     val mockReviewDetails = mock[ReviewDetails]
