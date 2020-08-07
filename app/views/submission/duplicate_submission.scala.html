@@ -18,13 +18,14 @@
 @import include._
 @import uk.gov.hmrc.play.views.html.{helpers => uiHelpers}
 @import utils.Strings._
+@import views.ViewHelpers
 
-@this(main: include.main)
+@this(main: include.main, viewHelpers: ViewHelpers)
 
 @(errorMessage: String)(implicit request: Request[_], m: Messages, appConfig: ApplicationConfig, lang: Lang)
 
 @getHelpForm = {
-    @{uiHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
+    @{viewHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
 }
 
 @header = {
