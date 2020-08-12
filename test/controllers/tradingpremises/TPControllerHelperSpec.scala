@@ -39,7 +39,7 @@ class TPControllerHelperSpec extends PlaySpec with MockitoSugar {
     implicit val lang = mock[Lang]
     implicit val messages = mock[Messages]
     implicit val appConfig = mock[ApplicationConfig]
-    implicit val errorViee = mock[error]
+    implicit val errorView = mock[error]
 
     def setUpTradingPremise(model: Option[TradingPremises]) = when {
       cache.getEntry[Seq[TradingPremises]](any())(any())
