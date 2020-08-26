@@ -22,10 +22,12 @@ import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForP
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessmatching.psr_number
 
 class PsrNumberViewSpec extends AmlsViewSpec {
 
     trait ViewFixture extends Fixture {
+        lazy val psr_number = app.injector.instanceOf[psr_number]
         implicit val requestWithToken = addTokenForView()
     }
 
@@ -34,7 +36,7 @@ class PsrNumberViewSpec extends AmlsViewSpec {
 
             val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-            def view = views.html.businessmatching.psr_number(form2, edit = false, isPreSubmission = true)
+            def view = psr_number(form2, edit = false, isPreSubmission = true)
 
             doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"))
             heading.html must include(Messages("businessmatching.psr.number.title"))
@@ -46,7 +48,7 @@ class PsrNumberViewSpec extends AmlsViewSpec {
 
             val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-            def view = views.html.businessmatching.psr_number(form2, edit = true, isPreSubmission = false, isPsrDefined = true)
+            def view = psr_number(form2, edit = true, isPreSubmission = false, isPsrDefined = true)
 
             doc.title must startWith(Messages("businessmatching.psr.number.title.post.submission") + " - " + Messages("summary.updateinformation"))
             heading.html must include(Messages("businessmatching.psr.number.title.post.submission"))
@@ -62,7 +64,7 @@ class PsrNumberViewSpec extends AmlsViewSpec {
                     (Path \ "regNumber-panel") -> Seq(ValidationError("second not a message Key"))
                 ))
 
-            def view = views.html.businessmatching.psr_number(form2, edit = false)
+            def view = psr_number(form2, edit = false)
 
             errorSummary.html() must include("not a message Key")
             errorSummary.html() must include("second not a message Key")
@@ -78,14 +80,14 @@ class PsrNumberViewSpec extends AmlsViewSpec {
         "hide the return to progress link"in new ViewFixture {
             val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-            def view = views.html.businessmatching.psr_number(form2, edit = true, showReturnLink = false)
+            def view = psr_number(form2, edit = true, showReturnLink = false)
             doc.body().text() must not include Messages("link.return.registration.progress")
         }
 
         "hide the Yes/No selection when editing an inputted PSR number and not in-presubmission mode" in new ViewFixture {
             val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-            override def view = views.html.businessmatching.psr_number(form2, edit = true, isPreSubmission = false, isPsrDefined = true)
+            override def view = psr_number(form2, edit = true, isPreSubmission = false, isPsrDefined = true)
 
             doc.body().text() must not include "Yes"
             doc.body().text() must not include "No"
@@ -94,34 +96,34 @@ class PsrNumberViewSpec extends AmlsViewSpec {
         "hide the Yes/No selection when editing an inputted PSR number and not in-presubmission mode and not in edit mode" in new ViewFixture {
             val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-            override def view = views.html.businessmatching.psr_number(form2, edit = false, isPreSubmission = false, isPsrDefined = true)
+            override def view = psr_number(form2, edit = false, isPreSubmission = false, isPsrDefined = true)
 
             doc.body().text() must not include "Yes"
             doc.body().text() must not include "No"
         }
 
         "show the Yes/No selection when editing an inputted PSR number and in pre-submission mode" in new ViewFixture {
-            override def view = views.html.businessmatching.psr_number(EmptyForm, edit = true, isPreSubmission = true)
+            override def view = psr_number(EmptyForm, edit = true, isPreSubmission = true)
 
             doc.body().text() must include("Yes")
             doc.body().text() must include("No")
         }
 
         "show the Yes/No selection when not editing" in new ViewFixture {
-            override def view = views.html.businessmatching.psr_number(EmptyForm, edit = false)
+            override def view = psr_number(EmptyForm, edit = false)
 
             doc.body().text() must include("Yes")
             doc.body().text() must include("No")
         }
 
         "have a back link in pre-submission mode" in new ViewFixture {
-            def view = views.html.businessmatching.psr_number(EmptyForm, edit = false, isPreSubmission = true)
+            def view = psr_number(EmptyForm, edit = false, isPreSubmission = true)
 
             doc.getElementsByAttributeValue("class", "link-back") must not be empty
         }
 
         "have a back link in non pre-submission mode" in new ViewFixture {
-            def view = views.html.businessmatching.psr_number(EmptyForm, edit = true, isPreSubmission = false)
+            def view = psr_number(EmptyForm, edit = true, isPreSubmission = false)
 
             doc.getElementsByAttributeValue("class", "link-back") must not be empty
         }

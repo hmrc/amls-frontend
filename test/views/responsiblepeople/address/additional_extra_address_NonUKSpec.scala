@@ -25,11 +25,13 @@ import utils.AmlsViewSpec
 import jto.validation.Path
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.responsiblepeople.address.additional_extra_address_NonUK
 
 
 class additional_extra_address_NonUKSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val additional_extra_address_NonUK = app.injector.instanceOf[additional_extra_address_NonUK]
     implicit val requestWithToken = addTokenForView()
 
     val countries = Some(Seq(
@@ -41,7 +43,7 @@ class additional_extra_address_NonUKSpec extends AmlsViewSpec with MustMatchers 
 
     "have a back link" in new ViewFixture {
       val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None))
-      def view = views.html.responsiblepeople.address.additional_extra_address_NonUK(form2, true, 1, None, "firstName lastName", countries)
+      def view = additional_extra_address_NonUK(form2, true, 1, None, "firstName lastName", countries)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -49,7 +51,7 @@ class additional_extra_address_NonUKSpec extends AmlsViewSpec with MustMatchers 
 
       val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None))
 
-      def view = views.html.responsiblepeople.address.additional_extra_address_NonUK(form2, true, 1, None, "firstName lastName", countries)
+      def view = additional_extra_address_NonUK(form2, true, 1, None, "firstName lastName", countries)
 
       doc.title must startWith (Messages("responsiblepeople.additional_extra_address_country.title", "firstName lastName"))
     }
@@ -58,7 +60,7 @@ class additional_extra_address_NonUKSpec extends AmlsViewSpec with MustMatchers 
 
       val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None))
 
-      def view = views.html.responsiblepeople.address.additional_extra_address_NonUK(form2, true, 1, None, "firstName lastName", countries)
+      def view = additional_extra_address_NonUK(form2, true, 1, None, "firstName lastName", countries)
 
       heading.html must be(Messages("responsiblepeople.additional_extra_address_country.heading", "firstName lastName"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -77,7 +79,7 @@ class additional_extra_address_NonUKSpec extends AmlsViewSpec with MustMatchers 
             (Path \ "country") -> Seq(ValidationError("sixth not a message Key"))
           ))
 
-        def view = views.html.responsiblepeople.address.additional_extra_address_NonUK(form2, true, 1, None, "firstName lastName", countries)
+        def view = additional_extra_address_NonUK(form2, true, 1, None, "firstName lastName", countries)
         errorSummary.html() must include("second not a message Key")
         errorSummary.html() must include("third not a message Key")
         errorSummary.html() must include("fourth not a message Key")

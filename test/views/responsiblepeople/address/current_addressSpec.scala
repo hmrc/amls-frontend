@@ -23,10 +23,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsSpec, AmlsViewSpec}
 import views.Fixture
+import views.html.responsiblepeople.address.current_address
 
 class current_addressSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val current_address = app.injector.instanceOf[current_address]
     implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
@@ -40,14 +42,14 @@ class current_addressSpec extends AmlsViewSpec with MustMatchers {
 
     "have a back link" in new ViewFixture {
       val form2 = EmptyForm
-      def view = views.html.responsiblepeople.address.current_address(form2, true, 1, None, name)
+      def view = current_address(form2, true, 1, None, name)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.address.current_address(form2, true, 1, None, name)
+      def view = current_address(form2, true, 1, None, name)
 
       doc.title must be(Messages("responsiblepeople.wherepersonlives.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -65,7 +67,7 @@ class current_addressSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "isUK") -> Seq(ValidationError("not a message Key 1"))
         ))
 
-      def view = views.html.responsiblepeople.address.current_address(form2, true, 1, None, name)
+      def view = current_address(form2, true, 1, None, name)
 
       errorSummary.html() must include("not a message Key 1")
     }

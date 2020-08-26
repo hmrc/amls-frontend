@@ -24,11 +24,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
+import views.html.msb.send_largest_amounts_of_money
 
 
 class send_largest_amounts_of_moneySpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
+    lazy val send_largest_amounts_of_money = app.injector.instanceOf[send_largest_amounts_of_money]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class send_largest_amounts_of_moneySpec extends AmlsViewSpec with MustMatchers {
 
     "have the back link button" in new ViewFixture {
       val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"))))
-      def view = views.html.msb.send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
+      def view = send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -44,7 +46,7 @@ class send_largest_amounts_of_moneySpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"))))
 
-      def view = views.html.msb.send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
+      def view = send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
 
       doc.title must be(Messages("msb.send.the.largest.amounts.of.money.title") +
         " - " + Messages("summary.msb") +
@@ -56,7 +58,7 @@ class send_largest_amounts_of_moneySpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"))))
 
-      def view = views.html.msb.send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
+      def view = send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
 
       heading.html must be(Messages("msb.send.the.largest.amounts.of.money.title"))
       subHeading.html must include(Messages("summary.msb"))
@@ -70,7 +72,7 @@ class send_largest_amounts_of_moneySpec extends AmlsViewSpec with MustMatchers {
           (Path \ "largestAmountsOfMoney") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.msb.send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
+      def view = send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
 
       errorSummary.html() must include("not a message Key")
 

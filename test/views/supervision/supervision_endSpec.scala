@@ -21,11 +21,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.supervision.supervision_end
 
 
 class supervision_endSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val supervision_end = app.injector.instanceOf[supervision_end]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -34,7 +36,7 @@ class supervision_endSpec extends AmlsViewSpec with MustMatchers  {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.supervision.supervision_end(EmptyForm, edit = false)
+      def view = supervision_end(EmptyForm, edit = false)
 
       doc.title must startWith(Messages("supervision.supervision_end.title"))
       heading.html must be(Messages("supervision.supervision_end.title"))
@@ -43,7 +45,7 @@ class supervision_endSpec extends AmlsViewSpec with MustMatchers  {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.supervision.supervision_end(EmptyForm, edit = false)
+      def view = supervision_end(EmptyForm, edit = false)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

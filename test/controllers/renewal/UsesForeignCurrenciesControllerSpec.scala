@@ -31,6 +31,7 @@ import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.renewal.uses_foreign_currencies
 
 import scala.concurrent.Future
 
@@ -42,8 +43,14 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
     val cacheMap = mock[CacheMap]
-
-    lazy val controller = new UsesForeignCurrenciesController(SuccessfulAuthAction, ds = commonDependencies, renewalService, dataCacheConnector, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[uses_foreign_currencies]
+    lazy val controller = new UsesForeignCurrenciesController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      renewalService,
+      dataCacheConnector,
+      cc = mockMcc,
+      uses_foreign_currencies = view)
 
     when {
       renewalService.getRenewal(any())(any(), any())

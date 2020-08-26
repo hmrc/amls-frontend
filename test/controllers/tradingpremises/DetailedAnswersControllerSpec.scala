@@ -35,6 +35,7 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.tradingpremises.summary_details
 
 import scala.concurrent.Future
 
@@ -50,8 +51,14 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture  {
     self =>
     val request = addToken(authRequest)
-
-    val controller = new DetailedAnswersController(SuccessfulAuthAction, ds = commonDependencies, mockDataCacheConnector, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[summary_details]
+    val controller = new DetailedAnswersController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      mockDataCacheConnector,
+      cc = mockMcc,
+      summary_details = view,
+      error = errorView)
 
     when(statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 

@@ -26,6 +26,7 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import views.Fixture
+import views.html.hvd.summary
 
 import scala.collection.JavaConversions._
 
@@ -33,18 +34,19 @@ import scala.collection.JavaConversions._
 class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
+    lazy val summary = app.injector.instanceOf[summary]
     implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 
   "summary view" must {
     "have correct title" in new ViewFixture {
-      def view = views.html.hvd.summary(EmptyForm, Hvd())
+      def view = summary(EmptyForm, Hvd())
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.hvd"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.hvd.summary(EmptyForm, Hvd())
+      def view = summary(EmptyForm, Hvd())
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.hvd"))
@@ -94,7 +96,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
           linkedCashPayment = Some(LinkedCashPayments(true))
         )
 
-        views.html.hvd.summary(EmptyForm, testdata)
+        summary(EmptyForm, testdata)
       }
 
       forAll(sectionChecks) { (key, check) => {

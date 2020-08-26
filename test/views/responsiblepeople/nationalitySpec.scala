@@ -24,10 +24,12 @@ import jto.validation.ValidationError
 import models.autocomplete.NameValuePair
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.responsiblepeople.nationality
 
 class nationalitySpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val nationality = app.injector.instanceOf[nationality]
     implicit val requestWithToken = addTokenForView()
 
     val countries = Some(Seq(
@@ -38,7 +40,7 @@ class nationalitySpec extends AmlsViewSpec with MustMatchers {
   "nationality view" must {
       "have correct title, headings and form fields" in new ViewFixture {
         val form2 = EmptyForm
-        def view = views.html.responsiblepeople.nationality(form2, true, 1, None, "firstName lastName", countries)
+        def view = nationality(form2, true, 1, None, "firstName lastName", countries)
 
         doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -58,7 +60,7 @@ class nationalitySpec extends AmlsViewSpec with MustMatchers {
           )
         )
 
-        def view = views.html.responsiblepeople.nationality(form2, true, 1, None, "firstName lastName", countries)
+        def view = nationality(form2, true, 1, None, "firstName lastName", countries)
         errorSummary.html () must include ("not a message Key")
         errorSummary.html () must include ("second not a message Key")
       }

@@ -27,6 +27,7 @@ import org.mockito.Mockito._
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
+import views.html.responsiblepeople.address.new_home_address_NonUK
 
 import scala.concurrent.Future
 
@@ -38,13 +39,15 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
-
+    lazy val view = app.injector.instanceOf[new_home_address_NonUK]
     val controller = new NewHomeAddressNonUKController(
       SuccessfulAuthAction,
       dataCacheConnector,
       mockAutoComplete,
       commonDependencies,
-      mockMcc
+      mockMcc,
+      new_home_address_NonUK = view,
+      error = errorView
     )
   }
 

@@ -22,6 +22,8 @@
 @import config.ApplicationConfig
 @import scala.math.Ordering
 
+@this(main: include.main)
+
 @(model: Tcsp, sortedProviders: List[String])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

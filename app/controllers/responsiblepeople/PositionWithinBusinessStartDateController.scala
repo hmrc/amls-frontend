@@ -33,7 +33,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class PositionWithinBusinessStartDateController @Inject ()(val dataCacheConnector: DataCacheConnector,
                                                            authAction: AuthAction,
                                                            val ds: CommonPlayDependencies,
-                                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                           val cc: MessagesControllerComponents,
+                                                           position_within_business_start_date: position_within_business_start_date,
+                                                           implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {

@@ -24,11 +24,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.notifications.your_messages
 
 class your_messagesSpec extends AmlsViewSpec with MustMatchers  {
 
     trait ViewFixture extends Fixture {
-
+        lazy val your_messages = app.injector.instanceOf[your_messages]
         implicit val requestWithToken = addTokenForView()
 
         val emptyNotifications: Seq[(NotificationRow, Int)] = Seq()
@@ -70,15 +71,15 @@ class your_messagesSpec extends AmlsViewSpec with MustMatchers  {
 
         val businessName = "Fake Name Ltd."
 
-        def view = views.html.notifications.your_messages(businessName, emptyNotifications, emptyNotifications)
+        def view = your_messages(businessName, emptyNotifications, emptyNotifications)
     }
 
     trait CurrentNotificationsOnlyViewFixture extends ViewFixture {
-        override def view = views.html.notifications.your_messages(businessName, notifications, emptyNotifications)
+        override def view = your_messages(businessName, notifications, emptyNotifications)
     }
 
     trait CurrentNotificationsAndPreviousNotificationsViewFixture extends ViewFixture {
-        override def view = views.html.notifications.your_messages(businessName, notifications, notifications)
+        override def view = your_messages(businessName, notifications, notifications)
     }
 
     "your_messages view" must {

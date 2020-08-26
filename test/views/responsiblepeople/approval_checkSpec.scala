@@ -22,10 +22,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.approval_check
 
 class approval_checkSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val approval_check = app.injector.instanceOf[approval_check]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -33,7 +35,7 @@ class approval_checkSpec extends AmlsViewSpec with MustMatchers {
 
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
-      def view = views.html.responsiblepeople.approval_check(form2, true, 0, None, "PersonName")
+      def view = approval_check(form2, true, 0, None, "PersonName")
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -41,7 +43,7 @@ class approval_checkSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.responsiblepeople.approval_check(form2, true, 0, None, "PersonName")
+      def view = approval_check(form2, true, 0, None, "PersonName")
 
       doc.title must be(
         Messages("responsiblepeople.approval_check.title", "PersonName")
@@ -55,7 +57,7 @@ class approval_checkSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.responsiblepeople.approval_check(form2, true, 0, None, "PersonName")
+      def view = approval_check(form2, true, 0, None, "PersonName")
 
       heading.html must be(Messages("responsiblepeople.approval_check.heading", "PersonName"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -67,7 +69,7 @@ class approval_checkSpec extends AmlsViewSpec with MustMatchers {
 
         val form2: Form2[_] = EmptyForm
 
-        def view = views.html.responsiblepeople.approval_check(form2, true, 0, None, "PersonName")
+        def view = approval_check(form2, true, 0, None, "PersonName")
         doc.body().html() must include(Messages("responsiblepeople.approval_check.text.details"))
         doc.body().html() must include(Messages("responsiblepeople.approval_check.text.details2", "PersonName"))
       }
@@ -80,7 +82,7 @@ class approval_checkSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "hasAlreadyPaidApprovalCheck") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.approval_check(form2, true, 0, None, "PersonName")
+      def view = approval_check(form2, true, 0, None, "PersonName")
 
       errorSummary.html() must include("not a message Key")
 

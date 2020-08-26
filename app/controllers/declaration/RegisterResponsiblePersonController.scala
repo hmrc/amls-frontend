@@ -23,6 +23,8 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionRea
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.AuthAction
+import views.html.declaration.register_responsible_person
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
@@ -30,7 +32,8 @@ class RegisterResponsiblePersonController @Inject()(val dataCacheConnector: Data
                                                     authAction: AuthAction,
                                                     val ds: CommonPlayDependencies,
                                                     val statusService: StatusService,
-                                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                    val cc: MessagesControllerComponents,
+                                                    register_responsible_person: register_responsible_person) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
     implicit request => {
@@ -38,8 +41,8 @@ class RegisterResponsiblePersonController @Inject()(val dataCacheConnector: Data
       statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
         case ReadyForRenewal(_) |
              SubmissionDecisionApproved |
-             SubmissionReadyForReview => Ok(views.html.declaration.register_responsible_person("submit.amendment.application"))
-        case _ => Ok(views.html.declaration.register_responsible_person("submit.registration"))
+             SubmissionReadyForReview => Ok(register_responsible_person("submit.amendment.application"))
+        case _ => Ok(register_responsible_person("submit.registration"))
       }
     }
   }

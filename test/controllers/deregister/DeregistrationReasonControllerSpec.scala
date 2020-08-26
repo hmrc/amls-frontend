@@ -29,6 +29,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.deregister.deregistration_reason
 
 import scala.concurrent.Future
 
@@ -42,8 +43,16 @@ class DeregistrationReasonControllerSpec extends AmlsSpec {
     val authService = mock[AuthEnrolmentsService]
     val dataCacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
-
-    lazy val controller = new DeregistrationReasonController(SuccessfulAuthAction, ds = commonDependencies, dataCacheConnector, amlsConnector, authService, statusService, mockMcc)
+    lazy val view = app.injector.instanceOf[deregistration_reason]
+    lazy val controller = new DeregistrationReasonController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      dataCacheConnector,
+      amlsConnector,
+      authService,
+      statusService,
+      mockMcc,
+      deregistration_reason = view)
 
     val amlsRegistrationNumber = "XA1234567890L"
 

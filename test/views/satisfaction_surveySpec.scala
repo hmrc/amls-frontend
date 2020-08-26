@@ -30,12 +30,14 @@ import play.api.test.Helpers.{BAD_REQUEST, contentAsString, status}
 import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
+import views.html.satisfaction_survey
 
 class satisfaction_surveySpec extends AmlsViewSpec with MustMatchers with MockitoSugar {
 
   trait SatisfactionSurveyFixture {
+    lazy val satisfaction_survey = app.injector.instanceOf[satisfaction_survey]
     implicit val request : Request[_] = addTokenForView()
-    val view = views.html.satisfaction_survey(EmptyForm)
+    val view = satisfaction_survey(EmptyForm)
     lazy val html = view.body
     lazy val doc = Jsoup.parse(html)
     lazy val form = doc.getElementsByTag("form").first()
@@ -72,7 +74,7 @@ class satisfaction_surveySpec extends AmlsViewSpec with MustMatchers with Mockit
           (Path \ "satisfaction") -> Seq(ValidationError("Error found here"))
         ))
 
-      override val view = views.html.satisfaction_survey(form2)
+      override val view = satisfaction_survey(form2)
       doc.select(".validation-summary-message").text().contains("Error found here") mustBe true
       doc.select(".error-notification").text().contains("Error found here") mustBe true
     }

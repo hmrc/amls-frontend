@@ -23,10 +23,12 @@ import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
+import views.html.date_of_change
 
 class date_of_changeSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val date_of_change = app.injector.instanceOf[date_of_change]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class date_of_changeSpec extends AmlsViewSpec with MustMatchers {
     val form2: ValidForm[DateOfChange] = Form2(DateOfChange(LocalDate.now()))
 
     "Have the correct title" in new ViewFixture {
-      def view = views.html.date_of_change(
+      def view = date_of_change(
         form2,
         "testSubheadingMessage",
         controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
@@ -45,7 +47,7 @@ class date_of_changeSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.date_of_change(
+      def view = date_of_change(
         form2,
         "testSubheadingMessage",
         controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
@@ -56,7 +58,7 @@ class date_of_changeSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.date_of_change(
+      def view = date_of_change(
         form2,
         "testSubheadingMessage",
         controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
@@ -72,7 +74,7 @@ class date_of_changeSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "dateOfChange") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.date_of_change(
+      def view = date_of_change(
         form2,
         "testSubheadingMessage",
         controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
@@ -86,7 +88,7 @@ class date_of_changeSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.date_of_change(
+      def view = date_of_change(
         EmptyForm,
         "testSubheadingMessage",
         controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()

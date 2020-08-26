@@ -33,7 +33,8 @@ import scala.concurrent.Future
 class TransactionTypesController @Inject()(val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
                                            val cacheConnector: DataCacheConnector,
-                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                           val cc: MessagesControllerComponents,
+                                           transaction_types: transaction_types) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request => {

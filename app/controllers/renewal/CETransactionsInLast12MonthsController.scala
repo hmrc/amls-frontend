@@ -34,7 +34,8 @@ class CETransactionsInLast12MonthsController @Inject()(val dataCacheConnector: D
                                                        val authAction: AuthAction,
                                                        val ds: CommonPlayDependencies,
                                                        val renewalService: RenewalService,
-                                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                       val cc: MessagesControllerComponents,
+                                                       ce_transactions_in_last_12_months: ce_transactions_in_last_12_months) extends AmlsBaseController(ds, cc) {
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Renewal](request.credId, Renewal.key) map {

@@ -34,7 +34,8 @@ class PercentageOfCashPaymentOver15000Controller @Inject()(val dataCacheConnecto
                                                            val authAction: AuthAction,
                                                            val ds: CommonPlayDependencies,
                                                            val renewalService: RenewalService,
-                                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                           val cc: MessagesControllerComponents,
+                                                           percentage: percentage) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -52,7 +53,7 @@ class PercentageOfCashPaymentOver15000Controller @Inject()(val dataCacheConnecto
   def post(edit: Boolean = false) = authAction.async {
     implicit request => {
       Form2[PercentageOfCashPaymentOver15000](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(views.html.renewal.percentage(f, edit)))
+        case f: InvalidForm => Future.successful(BadRequest(percentage(f, edit)))
         case ValidForm(_, data) =>
           for {
             renewal <- renewalService.getRenewal(request.credId)

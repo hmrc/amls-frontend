@@ -31,9 +31,12 @@ import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName}
+import views.html.notifications.your_messages
+import views.notifications.{V1M0, V2M0, V3M0, V4M0}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+
 
 @Singleton
 class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolmentsService,
@@ -44,7 +47,75 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
                                        val amlsNotificationService: NotificationService,
                                        implicit val amlsConnector: AmlsConnector,
                                        implicit val dataCacheConnector: DataCacheConnector,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                       val cc: MessagesControllerComponents,
+                                       your_messages: your_messages,
+                                       implicit val error: views.html.error,
+                                       v1m0: V1M0,
+                                       v2m0: V2M0,
+                                       v3m0: V3M0,
+                                       v4m0: V4M0
+                                      ) extends AmlsBaseController(ds, cc) {
+
+  def notificationsMap(templateVersion: String, templateName: String) =
+    templateVersion match {
+      case "v1m0" => version1Notifications(templateName)
+      case "v2m0" => version2Notifications(templateName)
+      case "v3m0" => version3Notifications(templateName)
+      case "v4m0" => version4Notifications(templateName)
+      case _ => throw new RuntimeException(s"Notification version $templateVersion not found")
+    }
+
+  def version1Notifications(templateName: String) = {
+    templateName match {
+      case "message_details" => v1m0.message_details
+      case "minded_to_reject" => v1m0.minded_to_reject
+      case "minded_to_revoke" => v1m0.minded_to_revoke
+      case "no_longer_minded_to_reject" => v1m0.no_longer_minded_to_reject
+      case "no_longer_minded_to_revoke" => v1m0.no_longer_minded_to_revoke
+      case "rejection_reasons" => v1m0.rejection_reasons
+      case "revocation_reasons" => v1m0.revocation_reasons
+      case _ => throw new RuntimeException(s"Message template $templateName not found")
+    }
+  }
+
+  def version2Notifications(templateName: String) = {
+    templateName match {
+      case "message_details" => v2m0.message_details
+      case "minded_to_reject" => v2m0.minded_to_reject
+      case "minded_to_revoke" => v2m0.minded_to_revoke
+      case "no_longer_minded_to_reject" => v2m0.no_longer_minded_to_reject
+      case "no_longer_minded_to_revoke" => v2m0.no_longer_minded_to_revoke
+      case "rejection_reasons" => v2m0.rejection_reasons
+      case "revocation_reasons" => v2m0.revocation_reasons
+      case _ => throw new RuntimeException(s"Message template $templateName not found")
+    }
+  }
+
+  def version3Notifications(templateName: String) = {
+    templateName match {
+      case "message_details" => v3m0.message_details
+      case "minded_to_reject" => v3m0.minded_to_reject
+      case "minded_to_revoke" => v3m0.minded_to_revoke
+      case "no_longer_minded_to_reject" => v3m0.no_longer_minded_to_reject
+      case "no_longer_minded_to_revoke" => v3m0.no_longer_minded_to_revoke
+      case "rejection_reasons" => v3m0.rejection_reasons
+      case "revocation_reasons" => v3m0.revocation_reasons
+      case _ => throw new RuntimeException(s"Message template $templateName not found")
+    }
+  }
+
+  def version4Notifications(templateName: String) = {
+    templateName match {
+      case "message_details" => v4m0.message_details
+      case "minded_to_reject" => v4m0.minded_to_reject
+      case "minded_to_revoke" => v4m0.minded_to_revoke
+      case "no_longer_minded_to_reject" => v4m0.no_longer_minded_to_reject
+      case "no_longer_minded_to_revoke" => v4m0.no_longer_minded_to_revoke
+      case "rejection_reasons" => v4m0.rejection_reasons
+      case "revocation_reasons" => v4m0.revocation_reasons
+      case _ => throw new RuntimeException(s"Message template $templateName not found")
+    }
+  }
 
   def getMessages = authAction.async {
       implicit request =>
@@ -78,7 +149,7 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
       val previousRecordsWithIndexes = (for {
         amls <- refNumber
       } yield records.zipWithIndex.filter(_._1.amlsRegistrationNumber != amls)) getOrElse Seq()
-      Ok(views.html.notifications.your_messages(businessName, currentRecordsWithIndexes, previousRecordsWithIndexes))
+      Ok(your_messages(businessName, currentRecordsWithIndexes, previousRecordsWithIndexes))
     }) getOrElse (throw new Exception("Cannot retrieve business name"))
   }
 
@@ -108,11 +179,11 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
 
     val (amlsRefNo, safeId) = reference
 
-    def getTemplate[T](name : String)(implicit man: Manifest[T]) : T =
-      Class.forName(name + "$").getField("MODULE$").get(man.runtimeClass).asInstanceOf[T]
+    def getTemplate[T](templateVersion : String, templateName: String)(implicit man: Manifest[T]) : T =
+      notificationsMap(templateVersion, templateName).asInstanceOf[T]
 
     def render(templateName: String, notificationParams: NotificationParams, templateVersion: String) =
-      getTemplate[Template5[NotificationParams, Request[_], Messages, Lang, ApplicationConfig, play.twirl.api.Html]](s"views.html.notifications.${ templateVersion }.${ templateName }")
+      getTemplate[Template5[NotificationParams, Request[_], Messages, Lang, ApplicationConfig, play.twirl.api.Html]](templateVersion, templateName)
         .render(notificationParams, request, m, lang, appConfig)
 
     val notification = contactType match {

@@ -26,6 +26,7 @@ import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.renewal.cash_payments_customers_not_met
 
 import scala.concurrent.Future
 
@@ -40,11 +41,12 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[cash_payments_customers_not_met]
     val controller = new CashPaymentsCustomersNotMetController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc
+      renewalService = mockRenewalService, cc = mockMcc,
+      cash_payments_customers_not_met = view
     )
 
     when(mockRenewalService.getRenewal(any())(any(), any()))

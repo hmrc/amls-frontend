@@ -19,6 +19,8 @@
 
 @import config.ApplicationConfig
 
+@this(main: include.main)
+
 @(title: String, text: String, message: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 @header = {
  <h1 class="heading-xlarge error-page-margin">@Messages(text)</h1>

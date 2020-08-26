@@ -35,7 +35,9 @@ class RemoveResponsiblePersonController @Inject () (
                                                    authAction: AuthAction,
                                                    val ds: CommonPlayDependencies,
                                                    val statusService: StatusService,
-                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                   val cc: MessagesControllerComponents,
+                                                   remove_responsible_person: remove_responsible_person,
+                                                   implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, flow: Option[String] = None) = authAction.async {
     implicit request =>
@@ -46,7 +48,7 @@ class RemoveResponsiblePersonController @Inject () (
         case Some(person) if (person.lineId.isDefined && !person.isComplete) =>
           Redirect(routes.WhatYouNeedController.get(index, flow))
         case (Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))) =>
-          Ok(views.html.responsiblepeople.remove_responsible_person(
+          Ok(remove_responsible_person(
             f = EmptyForm,
             index = index,
             personName = personName.fullName,

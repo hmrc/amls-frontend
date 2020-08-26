@@ -32,6 +32,7 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.payments.ways_to_pay
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,7 +46,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
     implicit val hc: HeaderCarrier = new HeaderCarrier()
     implicit val ec: ExecutionContext = mock[ExecutionContext]
-
+    lazy val view = app.injector.instanceOf[ways_to_pay]
     val controller = new WaysToPayController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
@@ -53,7 +54,8 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
       cc = mockMcc,
-      renewalService = mock[RenewalService]
+      renewalService = mock[RenewalService],
+      ways_to_pay = view
     )
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))

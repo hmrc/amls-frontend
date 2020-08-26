@@ -25,6 +25,7 @@ import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import play.api.i18n.MessagesApi
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
+import views.html.tradingpremises.registering_agent_premises
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,7 +35,9 @@ class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataC
                                                    val authAction: AuthAction,
                                                    val ds: CommonPlayDependencies,
                                                    override val messagesApi: MessagesApi,
-                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                   val cc: MessagesControllerComponents,
+                                                   registering_agent_premises: registering_agent_premises,
+                                                   implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
    implicit request =>
@@ -47,7 +50,7 @@ class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataC
                   case Some(service) => Form2[RegisteringAgentPremises](service)
                   case None => EmptyForm
                 }
-                Ok(views.html.tradingpremises.registering_agent_premises(form, index, edit))
+                Ok(registering_agent_premises(form, index, edit))
               }
               case Some(tp) if !edit => {
                 TPControllerHelper.redirectToNextPage(cache, index, edit)
@@ -62,7 +65,7 @@ class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataC
     implicit request =>
       Form2[RegisteringAgentPremises](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.tradingpremises.registering_agent_premises(f, index, edit)))
+          Future.successful(BadRequest(registering_agent_premises(f, index, edit)))
         case ValidForm(_, data) => {
           for {
             result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_,tp) =>

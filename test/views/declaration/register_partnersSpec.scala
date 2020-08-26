@@ -25,17 +25,19 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.declaration.register_partners
 
 class register_partnersSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val register_partners = app.injector.instanceOf[register_partners]
     implicit val requestWithToken = addTokenForView()
   }
 
   "register_partners view" must {
     "have correct title, headings and content" in new ViewFixture {
 
-      def view = views.html.declaration.register_partners("subheading", EmptyForm, Seq.empty[ResponsiblePerson], Seq("partner1"))
+      def view = register_partners("subheading", EmptyForm, Seq.empty[ResponsiblePerson], Seq("partner1"))
 
       doc.title mustBe s"${Messages("declaration.register.partners.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       heading.html must include(Messages("declaration.register.partners.title"))
@@ -50,7 +52,7 @@ class register_partnersSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "value") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.declaration.register_partners("subheading", form2, Seq(ResponsiblePerson()), Seq("partner1"))
+      def view = register_partners("subheading", form2, Seq(ResponsiblePerson()), Seq("partner1"))
 
       errorSummary.html() must include("not a message Key")
 
@@ -66,7 +68,7 @@ class register_partnersSpec extends AmlsViewSpec with MustMatchers {
         ResponsiblePerson(PersonName("Test", None, "Person2").some)
       )
 
-      def view = views.html.declaration.register_partners("subheading", EmptyForm, people, Seq("partner1"))
+      def view = register_partners("subheading", EmptyForm, people, Seq("partner1"))
 
       people map(_.personName.get) foreach { n =>
         val id = s"value-${n.fullNameWithoutSpace}"
@@ -99,7 +101,7 @@ class register_partnersSpec extends AmlsViewSpec with MustMatchers {
 
       val currentPartners = Seq.empty
 
-      def view = views.html.declaration.register_partners("subheading", EmptyForm, people, currentPartners)
+      def view = register_partners("subheading", EmptyForm, people, currentPartners)
 
       html must include(Messages("declaration.register.partners.none.text"))
     }
@@ -113,7 +115,7 @@ class register_partnersSpec extends AmlsViewSpec with MustMatchers {
 
       val currentPartners = Seq("firstName lastName")
 
-      def view = views.html.declaration.register_partners("subheading", EmptyForm, people, currentPartners)
+      def view = register_partners("subheading", EmptyForm, people, currentPartners)
 
       html must include(Messages("declaration.register.partners.one.text", currentPartners.head))
     }

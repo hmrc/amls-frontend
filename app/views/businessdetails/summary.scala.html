@@ -21,6 +21,8 @@
 @import utils._
 @import config.ApplicationConfig
 
+@this(main: include.main)
+
 @(f: forms.Form2[_], model: BusinessDetails, showRegisteredForMLR: Boolean)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

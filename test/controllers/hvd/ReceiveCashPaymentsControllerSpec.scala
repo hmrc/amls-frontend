@@ -26,19 +26,21 @@ import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.hvd.receiving
 
 class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[receiving]
     val controller = new ReceiveCashPaymentsController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockServiceFlow,
       mockStatusService,
-      cc = mockMcc
+      cc = mockMcc,
+      receiving = view
     )
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))

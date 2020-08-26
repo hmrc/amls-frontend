@@ -24,10 +24,12 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import utils.{AmlsSpec, AmlsViewSpec}
 import views.Fixture
+import views.html.bankdetails.bank_account_account_has_iban
 
 class bank_account_has_ibanSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val bankAccountHasIban = app.injector.instanceOf[bank_account_account_has_iban]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class bank_account_has_ibanSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[NonUKIBANNumber] = Form2(NonUKIBANNumber(""))
 
-      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_has_iban(form2, false, 0)
+      override def view: HtmlFormat.Appendable = bankAccountHasIban(form2, false, 0)
 
       doc.title() must startWith(Messages("bankdetails.bankaccount.hasiban") + " - " + Messages("summary.bankdetails"))
     }
@@ -46,7 +48,7 @@ class bank_account_has_ibanSpec extends AmlsViewSpec with MustMatchers {
 
     val form2: ValidForm[NonUKIBANNumber] = Form2(NonUKIBANNumber(""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_has_iban(form2, false, 0)
+    override def view: HtmlFormat.Appendable = bankAccountHasIban(form2, false, 0)
 
     heading.html() must be(Messages("bankdetails.bankaccount.hasiban"))
   }
@@ -55,7 +57,7 @@ class bank_account_has_ibanSpec extends AmlsViewSpec with MustMatchers {
 
     val form2: ValidForm[NonUKIBANNumber] = Form2(NonUKIBANNumber(""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_has_iban(form2, false, 0)
+    override def view: HtmlFormat.Appendable = bankAccountHasIban(form2, false, 0)
 
     doc.getElementsByAttributeValue("class", "link-back") must not be empty
   }
@@ -75,7 +77,7 @@ class bank_account_has_ibanSpec extends AmlsViewSpec with MustMatchers {
         (Path \ hasIBANField, Seq(ValidationError(messageKey)))
       ))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_has_iban(form2, false, 0)
+    override def view: HtmlFormat.Appendable = bankAccountHasIban(form2, false, 0)
 
     errorSummary.html() must include(messageKey)
 

@@ -33,7 +33,9 @@ class RemoveTradingPremisesController @Inject () (
                                                    val authAction: AuthAction,
                                                    val ds: CommonPlayDependencies,
                                                    val statusService: StatusService,
-                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                   val cc: MessagesControllerComponents,
+                                                   remove_trading_premises: remove_trading_premises,
+                                                   implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, complete: Boolean = false) = authAction.async {
     implicit request =>
@@ -43,8 +45,7 @@ class RemoveTradingPremisesController @Inject () (
       } yield (tp, status) match {
 
         case (Some(_), SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_)) =>
-          Ok (
-            views.html.tradingpremises.remove_trading_premises (
+          Ok (remove_trading_premises (
               f = EmptyForm,
               index = index,
               complete = complete,
@@ -54,7 +55,7 @@ class RemoveTradingPremisesController @Inject () (
           )
 
         case (Some(_), _) => Ok (
-          views.html.tradingpremises.remove_trading_premises (
+          remove_trading_premises (
             f = EmptyForm,
             index = index,
             complete = complete,

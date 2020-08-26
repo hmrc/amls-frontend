@@ -35,7 +35,8 @@ class SendTheLargestAmountsOfMoneyController @Inject()(val dataCacheConnector: D
                                                        val ds: CommonPlayDependencies,
                                                        val renewalService: RenewalService,
                                                        val autoCompleteService: AutoCompleteService,
-                                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                       val cc: MessagesControllerComponents,
+                                                       send_largest_amounts_of_money: send_largest_amounts_of_money) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

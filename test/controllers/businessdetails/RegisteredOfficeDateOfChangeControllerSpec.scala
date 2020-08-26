@@ -29,6 +29,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.date_of_change
 
 import scala.concurrent.Future
 
@@ -36,11 +37,14 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[date_of_change]
     val controller = new RegisteredOfficeDateOfChangeController (
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      date_of_change = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)

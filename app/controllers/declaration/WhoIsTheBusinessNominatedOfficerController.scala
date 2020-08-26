@@ -42,7 +42,8 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                                                              val statusService: StatusService,
                                                              config: ApplicationConfig,
                                                              val cc: MessagesControllerComponents,
-                                                             val sectionsProvider: SectionsProvider) extends AmlsBaseController(ds, cc) {
+                                                             val sectionsProvider: SectionsProvider,
+                                                             select_business_nominated_officer: select_business_nominated_officer) extends AmlsBaseController(ds, cc) {
 
   def businessNominatedOfficerView(amlsRegistrationNo: Option[String],
                                    accountTypeId: (String, String),

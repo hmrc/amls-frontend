@@ -39,7 +39,8 @@ class NoPsrController @Inject()(
                                  implicit val dataCacheConnector: DataCacheConnector,
                                  val helper: AddBusinessTypeHelper,
                                  val router: Router[AddBusinessTypeFlowModel],
-                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                 val cc: MessagesControllerComponents,
+                                 cannot_add_services: cannot_add_services) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

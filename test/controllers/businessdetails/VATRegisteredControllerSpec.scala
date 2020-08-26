@@ -31,6 +31,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.businessdetails.vat_registered
 
 import scala.concurrent.Future
 
@@ -38,10 +39,13 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[vat_registered]
     val controller = new VATRegisteredController (
       dataCacheConnector = mockCacheConnector,
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      vat_registered = view)
   }
 
   "BusinessRegisteredForVATController" when {

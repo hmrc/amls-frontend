@@ -29,6 +29,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, FeeHelper}
 import play.api.i18n.Messages
+import views.html.applicationstatus.how_to_pay
 
 import scala.concurrent.Future
 
@@ -38,11 +39,13 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
     self =>
 
     val request = addToken(authRequest)
+    lazy val howToPay = app.injector.instanceOf[how_to_pay]
     val controller = new HowToPayController(
       authAction = SuccessfulAuthAction,
       feeHelper = mock[FeeHelper],
       cc = mockMcc,
-      ds = commonDependencies
+      ds = commonDependencies,
+      how_to_pay = howToPay
     )
   }
 

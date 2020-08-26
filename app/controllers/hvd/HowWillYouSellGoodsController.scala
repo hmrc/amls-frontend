@@ -37,7 +37,8 @@ class HowWillYouSellGoodsController @Inject()( val dataCacheConnector: DataCache
                                                val authAction: AuthAction,
                                                val ds: CommonPlayDependencies,
                                                val serviceFlow: ServiceFlow,
-                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                                               val cc: MessagesControllerComponents,
+                                               how_will_you_sell_goods: how_will_you_sell_goods) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

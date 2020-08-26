@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.msb.expected_throughput
 
 
 class expected_throughputSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val expected_throughput = app.injector.instanceOf[expected_throughput]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class expected_throughputSpec extends AmlsViewSpec with MustMatchers {
 
     "have the back link button" in new ViewFixture {
       val form2: ValidForm[ExpectedThroughput] = Form2(ExpectedThroughput.First)
-      def view = views.html.msb.expected_throughput(form2, true)
+      def view = expected_throughput(form2, true)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -43,7 +45,7 @@ class expected_throughputSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[ExpectedThroughput] = Form2(ExpectedThroughput.First)
 
-      def view = views.html.msb.expected_throughput(form2, true)
+      def view = expected_throughput(form2, true)
 
       doc.title must be(Messages("msb.throughput.title") +
         " - " + Messages("summary.msb") +
@@ -55,7 +57,7 @@ class expected_throughputSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[ExpectedThroughput] = Form2(ExpectedThroughput.First)
 
-      def view = views.html.msb.expected_throughput(form2, true)
+      def view = expected_throughput(form2, true)
 
       heading.html must be(Messages("msb.throughput.title"))
       subHeading.html must include(Messages("summary.msb"))
@@ -69,7 +71,7 @@ class expected_throughputSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "throughput") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.msb.expected_throughput(form2, true)
+      def view = expected_throughput(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

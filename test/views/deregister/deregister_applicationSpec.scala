@@ -22,16 +22,18 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.deregister.deregister_application
 
 class deregister_applicationSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator {
 
   trait ViewFixture extends Fixture {
+    lazy val deregister_application = app.injector.instanceOf[deregister_application]
     implicit val requestWithToken = addTokenForView()
 
     val businessName = "Test Business"
     val currentRegYearEndDate = LocalDate.now()
 
-    def view = views.html.deregister.deregister_application(businessName, Set.empty, amlsRegistrationNumber)
+    def view = deregister_application(businessName, Set.empty, amlsRegistrationNumber)
   }
 
   "deregister_application view" must {

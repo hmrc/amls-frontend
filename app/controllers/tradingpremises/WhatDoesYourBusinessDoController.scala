@@ -31,6 +31,7 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
+import views.html.date_of_change
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
@@ -41,7 +42,10 @@ class WhatDoesYourBusinessDoController @Inject () (
                                                     val authAction: AuthAction,
                                                     val ds: CommonPlayDependencies,
                                                     val statusService: StatusService,
-                                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with FormHelpers with DateOfChangeHelper {
+                                                    val cc: MessagesControllerComponents,
+                                                    what_does_your_business_do: what_does_your_business_do,
+                                                    date_of_change: date_of_change,
+                                                    implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with FormHelpers with DateOfChangeHelper {
 
   private def data(credId: String, index: Int, edit: Boolean)(implicit hc: HeaderCarrier)
   : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {
@@ -161,7 +165,7 @@ class WhatDoesYourBusinessDoController @Inject () (
 
   def dateOfChange(index: Int) = authAction.async {
     implicit request =>
-      Future(Ok(views.html.date_of_change(EmptyForm,
+      Future(Ok(date_of_change(EmptyForm,
         "summary.tradingpremises", routes.WhatDoesYourBusinessDoController.saveDateOfChange(index))))
   }
 
@@ -170,7 +174,7 @@ class WhatDoesYourBusinessDoController @Inject () (
       getData[TradingPremises](request.credId, index) flatMap { tradingPremises =>
         Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
           case form: InvalidForm =>
-            Future.successful(BadRequest(views.html.date_of_change(
+            Future.successful(BadRequest(date_of_change(
               form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
               "summary.tradingpremises", routes.WhatDoesYourBusinessDoController.saveDateOfChange(index))))
           case ValidForm(_, dateOfChange) =>

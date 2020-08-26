@@ -28,6 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.businessmatching.type_of_business
 
 import scala.concurrent.Future
 
@@ -35,10 +36,13 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[type_of_business]
     val controller = new TypeOfBusinessController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      type_of_business = view)
   }
 
   "TypeOfBusinessController" must {

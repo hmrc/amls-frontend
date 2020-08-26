@@ -35,7 +35,9 @@ class AdditionalExtraAddressNonUKController @Inject()(val dataCacheConnector: Da
                                                       implicit val auditConnector: AuditConnector,
                                                       autoCompleteService: AutoCompleteService,
                                                       val ds: CommonPlayDependencies,
-                                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper {
+                                                      val cc: MessagesControllerComponents,
+                                                      additional_extra_address_NonUK: additional_extra_address_NonUK,
+                                                      implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>

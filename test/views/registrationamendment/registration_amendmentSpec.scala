@@ -23,10 +23,12 @@ import play.api.i18n.Messages
 import play.api.mvc.Call
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.registrationamendment.registration_amendment
 
 class registration_amendmentSpec extends AmlsViewSpec with MockitoSugar with AddressGenerator {
 
   trait ViewFixture extends Fixture {
+    lazy val registration_amendment = app.injector.instanceOf[registration_amendment]
     implicit val requestWithToken = addTokenForView()
 
     val sections = Seq(
@@ -38,7 +40,7 @@ class registration_amendmentSpec extends AmlsViewSpec with MockitoSugar with Add
     "display the correct visual content for incomplete sections" when {
       "making an amendment" in new ViewFixture {
         def view =
-          views.html.registrationamendment.registration_amendment(
+          registration_amendment(
             Seq(Section("section1", Completed, true, mock[Call]),
               Section("section2", Started, true, mock[Call])),
             true,
@@ -58,7 +60,7 @@ class registration_amendmentSpec extends AmlsViewSpec with MockitoSugar with Add
     }
 
     "show the Nominated officer box with correct title, name and link" in new ViewFixture {
-      def view = views.html.registrationamendment.registration_amendment(
+      def view = registration_amendment(
         Seq(Section("section1", Completed, true, mock[Call]),
           Section("section2", Started, true, mock[Call])),
         true,
@@ -75,7 +77,7 @@ class registration_amendmentSpec extends AmlsViewSpec with MockitoSugar with Add
     }
 
     "do not show the Nominated officer box if NO is not defined" in new ViewFixture {
-      def view = views.html.registrationamendment.registration_amendment(
+      def view = registration_amendment(
         Seq(Section("section1", Completed, true, mock[Call]),
           Section("section2", Started, true, mock[Call])),
         true,

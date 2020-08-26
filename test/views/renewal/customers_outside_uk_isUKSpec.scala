@@ -24,10 +24,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
+import views.html.renewal.customers_outside_uk_isUK
 
 class customers_outside_uk_isUKSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks{
+    lazy val customers_outside_uk_isUK = app.injector.instanceOf[customers_outside_uk_isUK]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class customers_outside_uk_isUKSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[CustomersOutsideUK] = Form2(CustomersOutsideUK(Option(Seq.empty[Country])))
 
-      def view = views.html.renewal.customers_outside_uk_isUK(form2, true)
+      def view = customers_outside_uk_isUK(form2, true)
 
       doc.title must startWith(Messages("renewal.customer.outside.uk.title") + " - " + Messages("summary.renewal"))
     }
@@ -45,7 +47,7 @@ class customers_outside_uk_isUKSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[CustomersOutsideUK] = Form2(CustomersOutsideUK(Option(Seq.empty[Country])))
 
-      def view = views.html.renewal.customers_outside_uk_isUK(form2, true)
+      def view = customers_outside_uk_isUK(form2, true)
 
       heading.html must be(Messages("renewal.customer.outside.uk.title"))
       subHeading.html must include(Messages("summary.renewal"))
@@ -59,7 +61,7 @@ class customers_outside_uk_isUKSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "isOutside") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.renewal.customers_outside_uk_isUK(form2, true)
+      def view = customers_outside_uk_isUK(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -71,7 +73,7 @@ class customers_outside_uk_isUKSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[CustomersOutsideUK] = Form2(CustomersOutsideUK(Option(Seq.empty[Country])))
 
-      def view = views.html.renewal.customers_outside_uk_isUK(form2, true)
+      def view = customers_outside_uk_isUK(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

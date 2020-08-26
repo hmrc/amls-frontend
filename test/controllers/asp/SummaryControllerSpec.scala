@@ -23,6 +23,7 @@ import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.asp.summary
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,7 +34,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
 
     implicit val ec = app.injector.instanceOf[ExecutionContext]
-    val controller = new SummaryController(mockCacheConnector, mockServiceFlow, mockStatusService, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    lazy val summaryView = app.injector.instanceOf[summary]
+    val controller = new SummaryController(mockCacheConnector, mockServiceFlow, mockStatusService, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc, summaryView)
 
     mockCacheSave[Asp]
 

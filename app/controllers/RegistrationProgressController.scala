@@ -48,7 +48,9 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                                                protected[controllers] val businessMatchingService: BusinessMatchingService,
                                                protected[controllers] val serviceFlow: ServiceFlow,
                                                implicit val renewalService: RenewalService,
-                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                               val cc: MessagesControllerComponents,
+                                               registration_progress: registration_progress,
+                                               registration_amendment: registration_amendment) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
       implicit request =>

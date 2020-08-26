@@ -29,19 +29,21 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.msb.send_largest_amounts_of_money
 
 class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSugar with PatienceConfiguration with IntegrationPatience {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[send_largest_amounts_of_money]
     val controller = new SendTheLargestAmountsOfMoneyController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
       mockServiceFlow,
       mockAutoComplete,
-      cc = mockMcc
+      cc = mockMcc,
+      send_largest_amounts_of_money = view
     )
 
     mockCacheFetch[ServiceChangeRegister](None, None)

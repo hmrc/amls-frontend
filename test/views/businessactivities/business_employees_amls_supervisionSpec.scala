@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessactivities.business_employees_amls_supervision
 
 
 class business_employees_amls_supervisionSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val business = app.injector.instanceOf[business_employees_amls_supervision]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class business_employees_amls_supervisionSpec extends AmlsViewSpec with MustMatc
 
       val form2: ValidForm[HowManyEmployees] = Form2(HowManyEmployees(Some("ECount"), Some("SCount")))
 
-      def view = views.html.businessactivities.business_employees_amls_supervision(form2, true)
+      def view = business(form2, true)
 
       doc.title must startWith(Messages("businessactivities.employees.amls.supervision.title") + " - " + Messages("summary.businessactivities"))
     }
@@ -45,7 +47,7 @@ class business_employees_amls_supervisionSpec extends AmlsViewSpec with MustMatc
 
       val form2: ValidForm[HowManyEmployees] = Form2(HowManyEmployees(Some("ECount"), Some("SCount")))
 
-      def view = views.html.businessactivities.business_employees_amls_supervision(form2, true)
+      def view = business(form2, true)
 
       heading.text() must be(Messages("businessactivities.employees.amls.supervision.title"))
       subHeading.text() must include(Messages("summary.businessactivities"))
@@ -59,7 +61,7 @@ class business_employees_amls_supervisionSpec extends AmlsViewSpec with MustMatc
           (Path \ "employeeCountAMLSSupervision") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.businessactivities.business_employees_amls_supervision(form2, true)
+      def view = business(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -70,7 +72,7 @@ class business_employees_amls_supervisionSpec extends AmlsViewSpec with MustMatc
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.business_employees_amls_supervision(EmptyForm, true)
+      def view = business(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

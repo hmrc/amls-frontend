@@ -20,15 +20,17 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.confirmation.confirmation_no_fee
 
 class NoFeeConfirmationViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val confirmation_no_fee = app.injector.instanceOf[confirmation_no_fee]
     implicit val requestWithToken = addTokenForView()
 
     val businessName = "Test Business Ltd"
 
-    override def view = views.html.confirmation.confirmation_no_fee(businessName)
+    override def view = confirmation_no_fee(businessName)
 
   }
 

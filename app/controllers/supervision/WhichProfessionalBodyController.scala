@@ -32,7 +32,8 @@ class WhichProfessionalBodyController @Inject()(
                                                val dataCacheConnector: DataCacheConnector,
                                                val authAction: AuthAction,
                                                val ds: CommonPlayDependencies,
-                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                               val cc: MessagesControllerComponents,
+                                               which_professional_body: which_professional_body) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

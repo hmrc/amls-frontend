@@ -26,6 +26,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.hvd.expect_to_receive
 
 class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -33,6 +34,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
     self =>
     val request = addToken(authRequest)
 
+    lazy val view = app.injector.instanceOf[expect_to_receive]
     val controller =
       new ExpectToReceiveCashPaymentsController(
       SuccessfulAuthAction,
@@ -40,7 +42,8 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
         mockCacheConnector,
         mockStatusService,
         mockServiceFlow,
-        cc = mockMcc)
+        cc = mockMcc,
+        expect_to_receive = view)
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))
     mockCacheSave[Hvd]

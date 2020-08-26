@@ -23,12 +23,13 @@ import org.mockito.Mockito._
 import org.mockito.Matchers._
 import cats.implicits._
 import cats._
-import config.{ApplicationConfig}
+import config.ApplicationConfig
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import play.api.i18n.{Lang, Messages}
 import play.api.mvc.Results._
 import play.api.test.FakeRequest
 import utils.StatusConstants
+import views.html.error
 
 class TPControllerHelperSpec extends PlaySpec with MockitoSugar {
 
@@ -38,6 +39,7 @@ class TPControllerHelperSpec extends PlaySpec with MockitoSugar {
     implicit val lang = mock[Lang]
     implicit val messages = mock[Messages]
     implicit val appConfig = mock[ApplicationConfig]
+    implicit val errorView = mock[error]
 
     def setUpTradingPremise(model: Option[TradingPremises]) = when {
       cache.getEntry[Seq[TradingPremises]](any())(any())

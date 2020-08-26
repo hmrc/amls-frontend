@@ -25,14 +25,21 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.supervision.another_body
 
 class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-
-    val controller = new AnotherBodyController(mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[another_body]
+    val controller = new AnotherBodyController(
+      mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      another_body = view,
+      error = errorView)
   }
 
   "AnotherBodyControllerController" must {

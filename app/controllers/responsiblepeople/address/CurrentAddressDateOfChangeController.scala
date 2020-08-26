@@ -26,6 +26,7 @@ import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
+import views.html.date_of_change
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -34,17 +35,18 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
                                                      authAction: AuthAction,
                                                      val ds: CommonPlayDependencies,
                                                      statusService: StatusService,
-                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                                     val cc: MessagesControllerComponents,
+                                                     date_of_change: date_of_change) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean) = authAction.async {
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map {
         case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _,
         Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_, _, Some(doc))), _, _)), _, _, _, _, _, _, _, _, _, _, _, _))
-        => Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(doc.dateOfChange)), "summary.responsiblepeople",
+        => Ok(date_of_change(Form2[DateOfChange](DateOfChange(doc.dateOfChange)), "summary.responsiblepeople",
           controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
         ))
-        case _ => Ok(views.html.date_of_change(EmptyForm, "summary.responsiblepeople",
+        case _ => Ok(date_of_change(EmptyForm, "summary.responsiblepeople",
           controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
         ))
       }
@@ -65,7 +67,7 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
   private def invalidView(f: forms.Form2[_], index: Integer, edit: Boolean)
                                              (implicit request: Request[AnyContent]) = {
     Future.successful(BadRequest(
-      views.html.date_of_change(
+      date_of_change(
         f,
         "summary.responsiblepeople",
         controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)

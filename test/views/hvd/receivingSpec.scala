@@ -32,19 +32,21 @@
 
 package views.hvd
 
-import forms.{InvalidForm, ValidForm, Form2}
+import forms.{Form2, InvalidForm, ValidForm}
 import models.hvd.{PaymentMethods, ReceiveCashPayments}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.hvd.receiving
 
 
 class receivingSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val receiving = app.injector.instanceOf[receiving]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -54,7 +56,7 @@ class receivingSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ReceiveCashPayments] = Form2(ReceiveCashPayments(Some(PaymentMethods(true, true, None))))
 
-      def view = views.html.hvd.receiving(form2, true)
+      def view = receiving(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -63,7 +65,7 @@ class receivingSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ReceiveCashPayments] = Form2(ReceiveCashPayments(Some(PaymentMethods(true, true, None))))
 
-      def view = views.html.hvd.receiving(form2, true)
+      def view = receiving(form2, true)
 
       doc.title must startWith (Messages("hvd.receiving.title") + " - " + Messages("summary.hvd"))
     }
@@ -72,7 +74,7 @@ class receivingSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[ReceiveCashPayments] = Form2(ReceiveCashPayments(Some(PaymentMethods(true, true, None))))
 
-      def view = views.html.hvd.receiving(form2, true)
+      def view = receiving(form2, true)
 
       heading.html must be (Messages("hvd.receiving.title"))
       subHeading.html must include (Messages("summary.hvd"))
@@ -86,7 +88,7 @@ class receivingSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "receivePayments") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.hvd.receiving(form2, true)
+      def view = receiving(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

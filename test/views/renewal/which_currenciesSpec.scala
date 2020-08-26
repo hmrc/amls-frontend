@@ -29,6 +29,7 @@ import views.html.renewal.which_currencies
 class which_currenciesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val which_currencies = app.injector.instanceOf[which_currencies]
     implicit val requestWithToken = addTokenForView()
   }
 

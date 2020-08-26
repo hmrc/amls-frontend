@@ -20,6 +20,9 @@
 @import config.{ ApplicationConfig}
 
 @import config.ApplicationConfig
+
+@this(main: include.main)
+
 @()(implicit request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 @import config.{ApplicationConfig => appConfig}
 @import uk.gov.hmrc.play.views.html._

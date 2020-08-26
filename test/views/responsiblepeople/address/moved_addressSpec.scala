@@ -23,10 +23,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.address.moved_address
 
 class moved_addressSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val moved_address = app.injector.instanceOf[moved_address]
     implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
@@ -37,7 +39,7 @@ class moved_addressSpec extends AmlsViewSpec with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.address.moved_address(form2, address, 1, name)
+      def view = moved_address(form2, address, 1, name)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -58,7 +60,7 @@ class moved_addressSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "movedAddress") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.address.moved_address(form2, address, 1, name)
+      def view = moved_address(form2, address, 1, name)
 
       errorSummary.html() must include("not a message Key")
     }

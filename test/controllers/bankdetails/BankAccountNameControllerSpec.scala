@@ -24,6 +24,7 @@ import org.jsoup.nodes.Document
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
+import views.html.bankdetails.bank_account_name
 
 class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -32,11 +33,15 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
     val request = addToken(authRequest)
 
+    lazy val bankAccountName = app.injector.instanceOf[bank_account_name]
+
     val controller = new BankAccountNameController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
-      mockMcc
+      mockMcc,
+      bankAccountName,
+      errorView
     )
   }
 

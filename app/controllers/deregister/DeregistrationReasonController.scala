@@ -39,7 +39,8 @@ class DeregistrationReasonController @Inject()(authAction: AuthAction,
                                                amls: AmlsConnector,
                                                enrolments: AuthEnrolmentsService,
                                                statusService: StatusService,
-                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                               val cc: MessagesControllerComponents,
+                                               deregistration_reason: deregistration_reason) extends AmlsBaseController(ds, cc) {
 
   def get = {
     authAction.async {

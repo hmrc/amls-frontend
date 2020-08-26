@@ -28,6 +28,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.satisfaction_survey
 
 import scala.concurrent.Future
 
@@ -35,12 +36,13 @@ class SatisfactionSurveyControllerSpec extends AmlsSpec with MockitoSugar with S
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[satisfaction_survey]
     val controller = new SatisfactionSurveyController (
       mock[AuditConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
-      cc = mockMcc)
+      cc = mockMcc,
+      satisfaction_survey = view)
 
     def model: Option[BusinessActivities] = None
 

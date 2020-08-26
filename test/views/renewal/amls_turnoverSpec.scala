@@ -24,11 +24,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.renewal.amls_turnover
 
 
 class amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val amls_turnover = app.injector.instanceOf[amls_turnover]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -37,7 +39,7 @@ class amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[AMLSTurnover] = Form2(AMLSTurnover.Fifth)
 
-      def view = views.html.renewal.amls_turnover(form2, true, None)
+      def view = amls_turnover(form2, true, None)
 
       doc.title must startWith(Messages("renewal.turnover.title") + " - " + Messages("summary.renewal"))
     }
@@ -46,7 +48,7 @@ class amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[AMLSTurnover] = Form2(AMLSTurnover.Third)
 
-      def view = views.html.renewal.amls_turnover(form2, true, Some(List("some provider")))
+      def view = amls_turnover(form2, true, Some(List("some provider")))
 
       heading.html must be(Messages("renewal.turnover.title.single.service", "some provider"))
       subHeading.html must include( Messages("summary.renewal"))
@@ -56,7 +58,7 @@ class amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[AMLSTurnover] = Form2(AMLSTurnover.Third)
 
-      def view = views.html.renewal.amls_turnover(form2, true, Some(List("some provider", "some other provider")))
+      def view = amls_turnover(form2, true, Some(List("some provider", "some other provider")))
 
       heading.html must be(Messages("renewal.turnover.title"))
       subHeading.html must include( Messages("summary.renewal"))
@@ -66,7 +68,7 @@ class amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[AMLSTurnover] = Form2(AMLSTurnover.Fifth)
 
-      def view = views.html.renewal.amls_turnover(form2, true, Some(List("a service provider")))
+      def view = amls_turnover(form2, true, Some(List("a service provider")))
 
       html must include("a service provider")
     }
@@ -78,7 +80,7 @@ class amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "turnover") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.renewal.amls_turnover(form2, true, Some(List("some provider")))
+      def view = amls_turnover(form2, true, Some(List("some provider")))
 
       errorSummary.html() must include("not a message Key")
 
@@ -88,7 +90,7 @@ class amls_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.renewal.amls_turnover(EmptyForm, true, None)
+      def view = amls_turnover(EmptyForm, true, None)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

@@ -30,6 +30,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.responsiblepeople.sole_proprietor
 
 import scala.concurrent.Future
 
@@ -42,12 +43,14 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
 
     val submissionStatus: SubmissionStatus = NotCompleted
-
+    lazy val view = app.injector.instanceOf[sole_proprietor]
     val controller = new SoleProprietorOfAnotherBusinessController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
-      cc = mockMcc)
+      cc = mockMcc,
+      sole_proprietor = view,
+      error = errorView)
   }
 
   val emptyCache = CacheMap("", Map.empty)

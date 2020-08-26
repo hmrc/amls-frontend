@@ -24,28 +24,31 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import utils.AmlsSummaryViewSpec
 import views.Fixture
+import views.html.businessdetails.summary
 
 import scala.collection.JavaConversions._
 
 class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
+  lazy val summary = app.injector.instanceOf[summary]
+
   "summary view" must {
     "have correct title" in new Fixture {
 
-      def view = views.html.businessdetails.summary(EmptyForm, BusinessDetails(), true)
+      def view = summary(EmptyForm, BusinessDetails(), true)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.businessdetails"))
     }
 
     "have correct headings" in new Fixture {
-      def view = views.html.businessdetails.summary(EmptyForm, BusinessDetails(), true)
+      def view = summary(EmptyForm, BusinessDetails(), true)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.businessdetails"))
     }
 
     "does not show registered for mlr question when approved" in new Fixture {
-      def view = views.html.businessdetails.summary(EmptyForm, BusinessDetails(), false)
+      def view = summary(EmptyForm, BusinessDetails(), false)
 
       html must not include Messages("businessdetails.registeredformlr.title")
     }
@@ -66,7 +69,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
         checkElementTextIncludes(_, "your name", "business name","line1","line2","line3","line4","AB12CD"))
     )
 
-      def view = views.html.businessdetails.summary(
+      def view = summary(
         EmptyForm,
         BusinessDetails(
           Some(PreviouslyRegisteredYes(Some("1234"))),

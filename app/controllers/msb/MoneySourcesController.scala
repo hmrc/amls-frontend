@@ -26,8 +26,9 @@ import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+import views.html.msb.money_sources
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MoneySourcesController @Inject()(authAction: AuthAction,
@@ -35,7 +36,9 @@ class MoneySourcesController @Inject()(authAction: AuthAction,
                                        implicit val dataCacheConnector: DataCacheConnector,
                                        implicit val statusService: StatusService,
                                        implicit val serviceFlow: ServiceFlow,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                       val cc: MessagesControllerComponents,
+                                       money_sources: money_sources,
+                                       implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request => {
@@ -47,7 +50,7 @@ class MoneySourcesController @Inject()(authAction: AuthAction,
               moneySources <- currencies.moneySources
             } yield Form2[MoneySources](moneySources)).getOrElse(EmptyForm)
 
-            Ok(views.html.msb.money_sources(form, edit))
+            Ok(money_sources(form, edit))
         }
       }
   }
@@ -56,7 +59,7 @@ class MoneySourcesController @Inject()(authAction: AuthAction,
       implicit request => {
         Form2[MoneySources](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.msb.money_sources(f, edit)))
+            Future.successful(BadRequest(money_sources(f, edit)))
           case ValidForm(_, data: MoneySources) =>
             for {
               msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)

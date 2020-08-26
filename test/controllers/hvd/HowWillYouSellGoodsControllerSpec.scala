@@ -25,6 +25,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
+import views.html.hvd.how_will_you_sell_goods
 
 class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
@@ -32,13 +33,15 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
     self =>
     val request = addToken(authRequest)
 
+    lazy val view = app.injector.instanceOf[how_will_you_sell_goods]
     val controller = new HowWillYouSellGoodsController(
       mockCacheConnector,
       mockStatusService,
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockServiceFlow,
-      cc = mockMcc
+      cc = mockMcc,
+      how_will_you_sell_goods = view
     )
 
     mockCacheFetch[Hvd](None)

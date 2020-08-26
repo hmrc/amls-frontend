@@ -23,6 +23,7 @@ import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.AmlsSpec
+import views.html.{unauthorised, unauthorised_role}
 
 class AmlsControllerSpec extends AmlsSpec {
 
@@ -31,8 +32,15 @@ class AmlsControllerSpec extends AmlsSpec {
 
       implicit val unauthenticatedRequest = FakeRequest()
       val request = addToken(unauthenticatedRequest)
-
-      val controller = new AmlsController(SuccessfulAuthAction, commonDependencies, mockMcc, messagesApi, mock[BodyParsers.Default])
+      lazy val view1 = app.injector.instanceOf[unauthorised]
+      lazy val view2 = app.injector.instanceOf[unauthorised_role]
+      val controller = new AmlsController(SuccessfulAuthAction,
+        commonDependencies,
+        mockMcc,
+        messagesApi,
+        mock[BodyParsers.Default],
+        unauthorisedView = view1,
+        unauthorisedRole = view2)
     }
 
     "AmlsController" must {

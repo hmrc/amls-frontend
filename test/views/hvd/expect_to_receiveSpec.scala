@@ -23,10 +23,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.hvd.expect_to_receive
 
 class expect_to_receiveSpec extends AmlsViewSpec with MustMatchers  {
 
     trait ViewFixture extends Fixture {
+      lazy val expect_to_receive = app.injector.instanceOf[expect_to_receive]
       implicit val requestWithToken = addTokenForView()
     }
 
@@ -36,7 +38,7 @@ class expect_to_receiveSpec extends AmlsViewSpec with MustMatchers  {
 
         val form2: ValidForm[ReceiveCashPayments] = Form2(ReceiveCashPayments(Some(PaymentMethods(true, true, None))))
 
-        def view = views.html.hvd.expect_to_receive(form2, true)
+        def view = expect_to_receive(form2, true)
 
         doc.getElementsByAttributeValue("class", "link-back") must not be empty
       }
@@ -45,7 +47,7 @@ class expect_to_receiveSpec extends AmlsViewSpec with MustMatchers  {
 
         val form2: ValidForm[ReceiveCashPayments] = Form2(ReceiveCashPayments(Some(PaymentMethods(true, true, None))))
 
-        def view = views.html.hvd.expect_to_receive(form2, true)
+        def view = expect_to_receive(form2, true)
 
         doc.title must startWith (Messages("hvd.expect.to.receive.title") + " - " + Messages("summary.hvd"))
       }
@@ -54,7 +56,7 @@ class expect_to_receiveSpec extends AmlsViewSpec with MustMatchers  {
 
         val form2: ValidForm[ReceiveCashPayments] = Form2(ReceiveCashPayments(Some(PaymentMethods(true, true, None))))
 
-        def view = views.html.hvd.expect_to_receive(form2, true)
+        def view = expect_to_receive(form2, true)
 
         heading.html must be (Messages("hvd.expect.to.receive.title"))
         subHeading.html must include (Messages("summary.hvd"))
@@ -69,7 +71,7 @@ class expect_to_receiveSpec extends AmlsViewSpec with MustMatchers  {
             (Path \ "paymentMethods-details-fieldset") -> Seq(ValidationError("third not a message Key"))
           ))
 
-        def view = views.html.hvd.expect_to_receive(form2, true)
+        def view = expect_to_receive(form2, true)
 
         errorSummary.html() must include("second not a message Key")
         errorSummary.html() must include("third not a message Key")

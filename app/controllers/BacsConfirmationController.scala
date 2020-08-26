@@ -24,6 +24,7 @@ import models.businessdetails.{BusinessDetails, PreviouslyRegisteredYes}
 import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName}
+import views.html.confirmation.{confirmation_bacs, confirmation_bacs_transitional_renewal}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -35,7 +36,9 @@ class BacsConfirmationController @Inject()(authAction: AuthAction,
                                            private[controllers] implicit val statusService: StatusService,
                                            private[controllers] val authenticator: AuthenticatorConnector,
                                            private[controllers] val enrolmentService: AuthEnrolmentsService,
-                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                           val cc: MessagesControllerComponents,
+                                           confirmation_bacs_transitional_renewal: confirmation_bacs_transitional_renewal,
+                                           confirmation_bacs: confirmation_bacs) extends AmlsBaseController(ds, cc) {
 
   def bacsConfirmation() = authAction.async {
       implicit request =>
@@ -46,8 +49,8 @@ class BacsConfirmationController @Inject()(authAction: AuthAction,
           name <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
           businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key))
         } yield businessDetails.previouslyRegistered match {
-          case Some(PreviouslyRegisteredYes(_)) => Ok(views.html.confirmation.confirmation_bacs_transitional_renewal(name))
-          case _ => Ok(views.html.confirmation.confirmation_bacs(name))
+          case Some(PreviouslyRegisteredYes(_)) => Ok(confirmation_bacs_transitional_renewal(name))
+          case _ => Ok(confirmation_bacs(name))
         }
 
         okResult getOrElse InternalServerError("Unable to get BACS confirmation")

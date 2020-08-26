@@ -16,20 +16,22 @@
 
 package views.businessmatching
 
-import forms.{InvalidForm, ValidForm, Form2}
+import forms.{Form2, InvalidForm, ValidForm}
 import models.businessmatching.BusinessType
 import models.businessmatching.BusinessType.LimitedCompany
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.businessmatching.business_type
 
 
 class business_typeSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val business_type = app.injector.instanceOf[business_type]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -38,7 +40,7 @@ class business_typeSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[BusinessType] = Form2(LimitedCompany)
 
-      def view = views.html.businessmatching.business_type(form2)
+      def view = business_type(form2)
 
       doc.title must startWith(Messages("businessmatching.businessType.title") + " - " + Messages("summary.businessmatching"))
       heading.html must be(Messages("businessmatching.businessType.title"))
@@ -52,7 +54,7 @@ class business_typeSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "businessType") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessmatching.business_type(form2)
+      def view = business_type(form2)
 
       errorSummary.html() must include("not a message Key")
 

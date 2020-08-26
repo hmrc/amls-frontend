@@ -31,6 +31,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.responsiblepeople.address.new_home_address_UK
 
 import scala.concurrent.Future
 
@@ -42,12 +43,14 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
-
+    lazy val view = app.injector.instanceOf[new_home_address_UK]
     val controller = new NewHomeAddressUKController(
       SuccessfulAuthAction,
       dataCacheConnector,
       commonDependencies,
-      mockMcc
+      mockMcc,
+      new_home_address_UK = view,
+      error = errorView
     )
   }
 

@@ -44,6 +44,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.responsiblepeople.address.current_address_NonUK
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
@@ -82,7 +83,7 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
       supervisionSection = None,
       aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
     )
-
+    lazy val view = app.injector.instanceOf[current_address_NonUK]
     val currentAddressController = new CurrentAddressNonUKController (
       dataCacheConnector = mockDataCacheConnector,
       auditConnector = auditConnector,
@@ -90,7 +91,9 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
       statusService = statusService,
       autoCompleteService = autoCompleteService,
       ds = commonDependencies,
-      cc = mockMcc
+      cc = mockMcc,
+      current_address_NonUK = view,
+      error = errorView
     )
 
     when {

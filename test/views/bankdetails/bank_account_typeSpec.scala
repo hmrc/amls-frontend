@@ -18,18 +18,20 @@ package views.bankdetails
 
 import forms.{Form2, InvalidForm, ValidForm}
 import models.bankdetails.{Account, BankAccountType, NonUKAccountNumber}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import views.Fixture
+import views.html.bankdetails.bank_account_types
 
 
 class bank_account_typeSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val bankTypes = app.injector.instanceOf[bank_account_types]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -38,7 +40,7 @@ class bank_account_typeSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
-      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0)
+      override def view: HtmlFormat.Appendable = bankTypes(form2, false, 0)
 
       doc.title() must startWith(Messages("bankdetails.accounttype.title") + " - " + Messages("summary.bankdetails"))
     }
@@ -47,7 +49,7 @@ class bank_account_typeSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
-      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0)
+      override def view: HtmlFormat.Appendable = bankTypes(form2, false, 0)
 
       heading.html() must be(Messages("bankdetails.accounttype.title"))
     }
@@ -56,7 +58,7 @@ class bank_account_typeSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[NonUKAccountNumber] = Form2(NonUKAccountNumber(""))
 
-      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0)
+      override def view: HtmlFormat.Appendable = bankTypes(form2, false, 0)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -78,7 +80,7 @@ class bank_account_typeSpec extends AmlsViewSpec with MustMatchers  {
       Seq((Path \ bankAccountTypeField, Seq(ValidationError(messageKey1)))
       ))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0)
+    override def view: HtmlFormat.Appendable = bankTypes(form2, false, 0)
 
     errorSummary.html() must include(messageKey1)
 

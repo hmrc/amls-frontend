@@ -32,6 +32,7 @@ import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
+import views.html.renewal.most_transactions
 
 import scala.concurrent.Future
 
@@ -45,8 +46,15 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
     val cacheMap = mock[CacheMap]
     val emptyCache = CacheMap("", Map.empty)
     val mockRenewalService = mock[RenewalService]
-
-    val controller = new MostTransactionsController(SuccessfulAuthAction, ds = commonDependencies, self.cache, self.mockRenewalService, mockAutoComplete, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[most_transactions]
+    val controller = new MostTransactionsController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      self.cache,
+      self.mockRenewalService,
+      mockAutoComplete,
+      cc = mockMcc,
+      most_transactions = view)
   }
 
   trait FormSubmissionFixture extends Fixture {

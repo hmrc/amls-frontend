@@ -30,6 +30,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.deregister.deregister_application
 
 import scala.concurrent.Future
 
@@ -48,7 +49,16 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec {
     val dataCache = mock[DataCacheConnector]
     val enrolments = mock[AuthEnrolmentsService]
     val amlsConnector = mock[AmlsConnector]
-    val controller = new DeRegisterApplicationController(SuccessfulAuthAction, ds = commonDependencies, dataCache, statusService, enrolments, amlsConnector, mockMcc)
+    lazy val view = app.injector.instanceOf[deregister_application]
+    val controller = new DeRegisterApplicationController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      dataCache,
+      statusService,
+      enrolments,
+      amlsConnector,
+      mockMcc,
+      deregister_application = view)
 
     when {
       dataCache.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())

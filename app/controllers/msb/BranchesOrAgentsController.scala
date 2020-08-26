@@ -24,15 +24,17 @@ import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountri
 import play.api.mvc.{Call, MessagesControllerComponents}
 import services.AutoCompleteService
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+import views.html.msb.branches_or_agents
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheConnector,
                                             authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
                                             val autoCompleteService: AutoCompleteService,
-                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                            val cc: MessagesControllerComponents,
+                                            branches_or_agents: branches_or_agents) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -42,7 +44,7 @@ class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheCon
             msb <- response
             branches <- msb.branchesOrAgents
           } yield Form2[BranchesOrAgentsHasCountries](branches.hasCountries)).getOrElse(EmptyForm)
-          Ok(views.html.msb.branches_or_agents(form, edit))
+          Ok(branches_or_agents(form, edit))
       }
   }
 
@@ -51,7 +53,7 @@ class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheCon
     implicit request =>
       Form2[BranchesOrAgentsHasCountries](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.branches_or_agents(f, edit)))
+          Future.successful(BadRequest(branches_or_agents(f, edit)))
         case ValidForm(_, data) => {
           for {
             msb <-  dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)

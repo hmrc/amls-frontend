@@ -39,6 +39,8 @@ import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, ProgressService, RenewalService, SectionsProvider}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
+import views.html.registrationamendment.registration_amendment
+import views.html.registrationprogress.registration_progress
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -54,6 +56,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
     val mockBusinessMatching = mock[BusinessMatching]
     val mockBusinessMatchingService = mock[BusinessMatchingService]
+    lazy val view1 = app.injector.instanceOf[registration_progress]
+    lazy val view2 = app.injector.instanceOf[registration_amendment]
 
     val controller = new RegistrationProgressController(
       SuccessfulAuthAction,
@@ -66,7 +70,9 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       serviceFlow = mockServiceFlow,
       renewalService = mock[RenewalService],
       ds = commonDependencies,
-      cc = mockMcc)
+      cc = mockMcc,
+      registration_progress = view1,
+      registration_amendment = view2)
 
     mockApplicationStatus(SubmissionReady)
     mockCacheFetch[Renewal](None)

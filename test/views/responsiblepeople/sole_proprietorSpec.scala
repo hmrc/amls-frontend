@@ -18,16 +18,18 @@ package views.responsiblepeople
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.responsiblepeople.{SoleProprietorOfAnotherBusiness}
+import models.responsiblepeople.SoleProprietorOfAnotherBusiness
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.sole_proprietor
 
 
 class sole_proprietorSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val sole_proprietor = app.injector.instanceOf[sole_proprietor]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class sole_proprietorSpec extends AmlsViewSpec with MustMatchers {
     "have a back link" in new ViewFixture {
       val form2: ValidForm[SoleProprietorOfAnotherBusiness] = Form2(SoleProprietorOfAnotherBusiness(true))
 
-      def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, None, "Person Name")
+      def view = sole_proprietor(form2, true, 1, None, "Person Name")
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -44,7 +46,7 @@ class sole_proprietorSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[SoleProprietorOfAnotherBusiness] = Form2(SoleProprietorOfAnotherBusiness(true))
 
-      def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, None, "Person Name")
+      def view = sole_proprietor(form2, true, 1, None, "Person Name")
 
       doc.title must be(Messages("responsiblepeople.sole.proprietor.another.business.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -58,7 +60,7 @@ class sole_proprietorSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[SoleProprietorOfAnotherBusiness] = Form2(SoleProprietorOfAnotherBusiness(true))
 
-      def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, None, "Person Name")
+      def view = sole_proprietor(form2, true, 1, None, "Person Name")
 
       heading.html must be(Messages("responsiblepeople.sole.proprietor.another.business.heading", "Person Name"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -72,7 +74,7 @@ class sole_proprietorSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "soleProprietorOfAnotherBusiness") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, None, "Person Name")
+      def view = sole_proprietor(form2, true, 1, None, "Person Name")
 
       errorSummary.html() must include("not a message Key")
 

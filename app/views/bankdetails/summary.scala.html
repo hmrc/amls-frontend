@@ -20,6 +20,8 @@
 @import models.bankdetails._
 @import include.forms2._
 
+@this(main: include.main)
+
 @(bankDetails: BankDetails, index: Integer)(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

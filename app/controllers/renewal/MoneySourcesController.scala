@@ -36,7 +36,8 @@ class MoneySourcesController @Inject()(val authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
                                        renewalService: RenewalService,
                                        dataCacheConnector: DataCacheConnector,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                       val cc: MessagesControllerComponents,
+                                       money_sources: money_sources) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

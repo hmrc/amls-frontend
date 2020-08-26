@@ -34,6 +34,7 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.tradingpremises.your_trading_premises
 
 import scala.concurrent.Future
 
@@ -48,11 +49,15 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[your_trading_premises]
     val ytpController = new YourTradingPremisesController(
       mockDataCacheConnector,
       mockStatusService,
-      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      your_trading_premises = view,
+      error = errorView)
 
     when(ytpController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 

@@ -22,10 +22,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.known_by
 
 class known_bySpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val known_by = app.injector.instanceOf[known_by]
     implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
@@ -35,7 +37,7 @@ class known_bySpec extends AmlsViewSpec with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.known_by(form2, true, 1, None, name)
+      def view = known_by(form2, true, 1, None, name)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -54,7 +56,7 @@ class known_bySpec extends AmlsViewSpec with MustMatchers {
           (Path \ "otherNames") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.known_by(form2, true, 1, None, name)
+      def view = known_by(form2, true, 1, None, name)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

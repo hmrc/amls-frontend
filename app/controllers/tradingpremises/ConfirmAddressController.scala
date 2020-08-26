@@ -29,6 +29,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.MessagesControllerComponents
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName, RepeatingSection}
+import views.html.tradingpremises.confirm_address
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -41,7 +42,8 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                                          enrolments: AuthEnrolmentsService,
                                          implicit val statusService: StatusService,
                                          implicit val amlsConnector: AmlsConnector,
-                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                         val cc: MessagesControllerComponents,
+                                         confirm_address: confirm_address) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def getAddress(businessMatching: BusinessMatching): Option[BCAddress] =
     businessMatching.reviewDetails.fold[Option[BCAddress]](None)(r => Some(r.businessAddress))
@@ -49,7 +51,7 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
   def get(index: Int) = authAction.async {
     implicit request =>
       val redirect = Redirect(routes.WhereAreTradingPremisesController.get(index))
-      def ok(address: BCAddress) = Ok(views.html.tradingpremises.confirm_address(EmptyForm, address, index))
+      def ok(address: BCAddress) = Ok(confirm_address(EmptyForm, address, index))
 
       {
         for {
@@ -111,7 +113,7 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
             for {
               bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key))
               address <- OptionT.fromOption[Future](getAddress(bm))
-            } yield BadRequest(views.html.tradingpremises.confirm_address(f, address, index))
+            } yield BadRequest(confirm_address(f, address, index))
           } getOrElse Redirect(routes.WhereAreTradingPremisesController.get(index))
           case ValidForm(_, data) =>
             data.confirmAddress match {

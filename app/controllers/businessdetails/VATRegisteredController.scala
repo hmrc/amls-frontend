@@ -35,7 +35,8 @@ class VATRegisteredController @Inject () (
                                            val dataCacheConnector: DataCacheConnector,
                                            val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
-                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                           val cc: MessagesControllerComponents,
+                                           vat_registered: vat_registered) extends AmlsBaseController(ds, cc) {
 
 
 

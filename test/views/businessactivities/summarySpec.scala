@@ -25,26 +25,28 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import views.Fixture
+import views.html.businessactivities.summary
 
 import scala.collection.JavaConversions._
 
 class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
+    lazy val summary = app.injector.instanceOf[summary]
     implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 
   "summary view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.businessactivities.summary(EmptyForm, BusinessActivities(), None, true)
+      def view = summary(EmptyForm, BusinessActivities(), None, true)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.businessactivities"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.businessactivities.summary(EmptyForm, BusinessActivities(), None, true)
+      def view = summary(EmptyForm, BusinessActivities(), None, true)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.businessactivities"))
@@ -84,7 +86,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
       ("businessactivities.tax.matters.summary.title",checkElementTextIncludes(_, "AccountantName", "lbl.yes"))
     )
 
-      def view = views.html.businessactivities.summary(
+      def view = summary(
         f = EmptyForm,
         model = BusinessActivities(
           involvedInOther = Some(InvolvedInOtherYes("OtherActivities")),

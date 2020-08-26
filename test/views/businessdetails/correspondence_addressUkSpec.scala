@@ -24,11 +24,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessdetails.correspondence_address_uk
 
 
 class correspondence_addressUkSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val correspondence_address_uk = app.injector.instanceOf[correspondence_address_uk]
     implicit val requestWithToken = addTokenForView()
     val countries = Some(Seq(
       NameValuePair("Country 1", "country:1")
@@ -47,7 +49,7 @@ class correspondence_addressUkSpec extends AmlsViewSpec with MustMatchers  {
           None,
           "AB12CD"))
 
-      def view = views.html.businessdetails.correspondence_address_uk(form2, true)
+      def view = correspondence_address_uk(form2, true)
 
       doc.title must startWith(Messages("businessdetails.correspondenceaddress.title") + " - " + Messages("summary.businessdetails"))
     }
@@ -63,7 +65,7 @@ class correspondence_addressUkSpec extends AmlsViewSpec with MustMatchers  {
         None,
         "AB12CD"
       ))
-      def view = views.html.businessdetails.correspondence_address_uk(form2, true)
+      def view = correspondence_address_uk(form2, true)
 
       heading.html must be(Messages("businessdetails.correspondenceaddress.title"))
       subHeading.html must include(Messages("summary.businessdetails"))
@@ -78,7 +80,7 @@ class correspondence_addressUkSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "postCode-fieldset") -> Seq(ValidationError("third not a message Key"))
         ))
 
-      def view = views.html.businessdetails.correspondence_address_uk(form2, true)
+      def view = correspondence_address_uk(form2, true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("third not a message Key")
@@ -95,7 +97,7 @@ class correspondence_addressUkSpec extends AmlsViewSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.businessdetails.correspondence_address_uk(form2, true)
+      def view = correspondence_address_uk(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

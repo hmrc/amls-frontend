@@ -28,6 +28,7 @@ import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, StatusConstants}
+import views.html.bankdetails.bank_account_account_iban
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -38,7 +39,9 @@ class BankAccountIbanController @Inject()( val dataCacheConnector: DataCacheConn
                                            val auditConnector: AuditConnector,
                                            val statusService: StatusService,
                                            val ds: CommonPlayDependencies,
-                                           val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
+                                           val mcc: MessagesControllerComponents,
+                                           bank_account_account_iban: bank_account_account_iban,
+                                           implicit val error: views.html.error) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>
@@ -47,9 +50,9 @@ class BankAccountIbanController @Inject()( val dataCacheConnector: DataCacheConn
           status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
         } yield bankDetails match {
           case Some(x@BankDetails(_, _, Some(BankAccount(_, _, Some(data@NonUKIBANNumber(_)))), _, _, _, _)) if x.canEdit(status) =>
-            Ok(views.html.bankdetails.bank_account_account_iban(Form2[NonUKIBANNumber](data), edit, index))
+            Ok(bank_account_account_iban(Form2[NonUKIBANNumber](data), edit, index))
           case Some(x) if x.canEdit(status) =>
-            Ok(views.html.bankdetails.bank_account_account_iban(EmptyForm, edit, index))
+            Ok(bank_account_account_iban(EmptyForm, edit, index))
           case _ => NotFound(notFoundView)
         }
   }
@@ -64,7 +67,7 @@ class BankAccountIbanController @Inject()( val dataCacheConnector: DataCacheConn
 
         Form2[NonUKIBANNumber](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.bankdetails.bank_account_account_iban(f, edit, index)))
+            Future.successful(BadRequest(bank_account_account_iban(f, edit, index)))
           case ValidForm(_, data) =>
             updateDataStrict[BankDetails](request.credId, index) { bd =>
               bd.copy(

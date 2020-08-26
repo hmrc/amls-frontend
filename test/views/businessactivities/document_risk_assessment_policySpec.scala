@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessactivities.document_risk_assessment_policy
 
 
 class document_risk_assessment_policySpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val risk = app.injector.instanceOf[document_risk_assessment_policy]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class document_risk_assessment_policySpec extends AmlsViewSpec with MustMatchers
 
       val form2: ValidForm[RiskAssessmentTypes] = Form2(RiskAssessmentTypes(Set(PaperBased)))
 
-      def view = views.html.businessactivities.document_risk_assessment_policy(form2, true)
+      def view = risk(form2, true)
 
       doc.title must startWith(Messages("businessactivities.document.riskassessment.policy.title"))
     }
@@ -45,9 +47,9 @@ class document_risk_assessment_policySpec extends AmlsViewSpec with MustMatchers
 
       val form2: ValidForm[RiskAssessmentTypes] = Form2(RiskAssessmentTypes(Set(PaperBased)))
 
-      def view = views.html.businessactivities.risk_assessment_policy(form2, true)
+      def view = risk(form2, true)
 
-      heading.html must be(Messages("businessactivities.riskassessment.policy.title"))
+      heading.html must be(Messages("businessactivities.document.riskassessment.policy.title"))
       subHeading.html must include(Messages("summary.businessactivities"))
 
     }
@@ -59,7 +61,7 @@ class document_risk_assessment_policySpec extends AmlsViewSpec with MustMatchers
           (Path \ "riskassessments") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.businessactivities.document_risk_assessment_policy(form2, true)
+      def view = risk(form2, true)
 
       errorSummary.html() must include("second not a message Key")
 
@@ -69,7 +71,7 @@ class document_risk_assessment_policySpec extends AmlsViewSpec with MustMatchers
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.document_risk_assessment_policy(EmptyForm, true)
+      def view = risk(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

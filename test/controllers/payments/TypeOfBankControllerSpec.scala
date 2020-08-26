@@ -33,6 +33,7 @@ import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.payments.type_of_bank
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,7 +45,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
 
     implicit val hc: HeaderCarrier = new HeaderCarrier()
     implicit val ec: ExecutionContext = mock[ExecutionContext]
-
+    lazy val view = app.injector.instanceOf[type_of_bank]
     val controller = new TypeOfBankController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       auditConnector = mock[AuditConnector],
@@ -53,7 +54,8 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       paymentsService = mock[PaymentsService],
       cc = mockMcc,
       statusService = mock[StatusService],
-      renewalService = mock[RenewalService]
+      renewalService = mock[RenewalService],
+      type_of_bank = view
     )
 
     val paymentRef = paymentRefGen.sample.get

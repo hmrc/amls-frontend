@@ -29,6 +29,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.tradingpremises.registering_agent_premises
 
 import scala.concurrent.Future
 
@@ -36,11 +37,14 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
 
   trait Fixture  {
     self => val request = addToken(authRequest)
+    lazy val view = app.injector.instanceOf[registering_agent_premises]
     val controller = new RegisteringAgentPremisesController (
       mock[DataCacheConnector],
       SuccessfulAuthAction, ds = commonDependencies,
       messagesApi,
-      cc = mockMcc)
+      cc = mockMcc,
+      registering_agent_premises = view,
+      error = errorView)
   }
 
   val emptyCache = CacheMap("", Map.empty)

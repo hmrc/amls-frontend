@@ -17,13 +17,14 @@
 package controllers.businessmatching.updateservice.remove
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{AccountancyServices}
+import models.businessmatching.AccountancyServices
 import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.Helpers.{OK, contentAsString, status, _}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.businessmatching.updateservice.remove.need_more_information
 
 class NeedMoreInformationControllerSpec extends AmlsSpec {
 
@@ -31,12 +32,13 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
     self =>
 
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[need_more_information]
     val controller = new NeedMoreInformationController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[RemoveBusinessTypeFlowModel],
-      cc = mockMcc
+      cc = mockMcc,
+      need_more_information = view
     )
   }
 

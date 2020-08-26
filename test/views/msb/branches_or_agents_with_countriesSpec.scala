@@ -24,10 +24,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
+import views.html.msb.branches_or_agents_which_countries
 
 class branches_or_agents_with_countriesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
+    lazy val branches_or_agents_which_countries = app.injector.instanceOf[branches_or_agents_which_countries]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class branches_or_agents_with_countriesSpec extends AmlsViewSpec with MustMatche
 
     "have the back link button" in new ViewFixture {
       val form2: ValidForm[BranchesOrAgentsWhichCountries] = Form2(BranchesOrAgentsWhichCountries(Seq.empty[Country]))
-      def view = views.html.msb.branches_or_agents_which_countries(form2, edit = true, mockAutoComplete.getCountries)
+      def view = branches_or_agents_which_countries(form2, edit = true, mockAutoComplete.getCountries)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -43,7 +45,7 @@ class branches_or_agents_with_countriesSpec extends AmlsViewSpec with MustMatche
 
       val form2: ValidForm[BranchesOrAgentsWhichCountries] = Form2(BranchesOrAgentsWhichCountries(Seq.empty[Country]))
 
-      def view = views.html.msb.branches_or_agents_which_countries(form2, edit = true, mockAutoComplete.getCountries)
+      def view = branches_or_agents_which_countries(form2, edit = true, mockAutoComplete.getCountries)
 
       doc.title must be(Messages("msb.branchesoragents.countries.title") +
         " - " + Messages("summary.msb") +
@@ -55,7 +57,7 @@ class branches_or_agents_with_countriesSpec extends AmlsViewSpec with MustMatche
 
       val form2: ValidForm[BranchesOrAgentsWhichCountries] = Form2(BranchesOrAgentsWhichCountries(Seq.empty[Country]))
 
-      def view = views.html.msb.branches_or_agents_which_countries(form2, edit = true, mockAutoComplete.getCountries)
+      def view = branches_or_agents_which_countries(form2, edit = true, mockAutoComplete.getCountries)
 
       heading.html must be(Messages("msb.branchesoragents.countries.title"))
       subHeading.html must include(Messages("summary.msb"))
@@ -69,7 +71,7 @@ class branches_or_agents_with_countriesSpec extends AmlsViewSpec with MustMatche
           (Path \ "countries") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.msb.branches_or_agents_which_countries(form2, edit = true, mockAutoComplete.getCountries)
+      def view = branches_or_agents_which_countries(form2, edit = true, mockAutoComplete.getCountries)
 
       errorSummary.html() must include("second not a message Key")
 

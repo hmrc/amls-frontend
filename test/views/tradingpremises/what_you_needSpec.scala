@@ -21,18 +21,20 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tradingpremises.what_you_need
 
 
 class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val what_you_need = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
   }
 
   "what_you_need view" must {
     "have correct title, heading and back link" in new ViewFixture {
 
-      def view = views.html.tradingpremises.what_you_need(1, None, None)
+      def view = what_you_need(1, None, None)
 
       val title = Messages("title.wyn") + " - " +
         Messages("summary.tradingpremises") + " - " +
@@ -47,7 +49,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements with one service no MSB" in new ViewFixture {
-      def view = views.html.tradingpremises.what_you_need(1, Some(BusinessActivities(Set(AccountancyServices))), None)
+      def view = what_you_need(1, Some(BusinessActivities(Set(AccountancyServices))), None)
 
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.1"))
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.2"))
@@ -60,7 +62,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements with multiple services no MSB" in new ViewFixture {
-      def view = views.html.tradingpremises.what_you_need(1, Some(BusinessActivities(Set(AccountancyServices, HighValueDealing))), None)
+      def view = what_you_need(1, Some(BusinessActivities(Set(AccountancyServices, HighValueDealing))), None)
 
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.1"))
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.2"))
@@ -74,7 +76,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements with one service being MSB with one MSB activities" in new ViewFixture {
-      def view = views.html.tradingpremises.what_you_need(1, Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))
+      def view = what_you_need(1, Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))
 
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.1"))
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.2"))
@@ -95,7 +97,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements with one service being MSB with multiple MSB activities" in new ViewFixture {
-      def view = views.html.tradingpremises.what_you_need(1, Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))))
+      def view = what_you_need(1, Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))))
 
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.1"))
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.2"))
@@ -117,7 +119,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements with multiple services one being MSB with multiple MSB activities" in new ViewFixture {
-      def view = views.html.tradingpremises.what_you_need(1, Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))))
+      def view = what_you_need(1, Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))))
 
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.1"))
       html must include(Messages("tradingpremises.whatyouneed.requiredinfo.text.2"))

@@ -26,6 +26,7 @@ import org.mockito.Mockito.{verify, when}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.responsiblepeople.address.new_home_address
 
 import scala.concurrent.Future
 
@@ -37,12 +38,14 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
-
+    lazy val view = app.injector.instanceOf[new_home_address]
     val controller = new NewHomeAddressController(
       SuccessfulAuthAction,
       dataCacheConnector,
       commonDependencies,
-      mockMcc
+      mockMcc,
+      new_home_address = view,
+      error = errorView
     )
   }
 

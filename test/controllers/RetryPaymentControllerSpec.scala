@@ -48,7 +48,6 @@ class RetryPaymentControllerSpec extends AmlsSpec
     self =>
     val baseUrl = "http://localhost"
     val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
-
     val controller = new RetryPaymentController(
       SuccessfulAuthAction,
       statusService = mock[StatusService],

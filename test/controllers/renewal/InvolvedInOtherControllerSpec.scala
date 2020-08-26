@@ -32,6 +32,7 @@ import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.renewal.involved_in_other
 
 import scala.concurrent.Future
 
@@ -48,11 +49,12 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockStatusService = mock[StatusService]
     lazy val mockRenewalService = mock[RenewalService]
-
+    lazy val view = app.injector.instanceOf[involved_in_other]
     val controller = new InvolvedInOtherController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc
+      renewalService = mockRenewalService, cc = mockMcc,
+      involved_in_other = view
     )
   }
 

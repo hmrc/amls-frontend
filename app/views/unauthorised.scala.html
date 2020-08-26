@@ -16,6 +16,8 @@
 
 @import config.{ ApplicationConfig}
 
+@this(main: include.main)
+
 @()(implicit request: Request[_], lang: Lang, appConfig: ApplicationConfig, messagesProvider: MessagesProvider)
 @import include.main
 

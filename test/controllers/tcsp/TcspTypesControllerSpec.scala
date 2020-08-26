@@ -29,6 +29,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.tcsp.service_provider_types
 
 import scala.concurrent.Future
 
@@ -39,8 +40,13 @@ class TcspTypesControllerSpec extends AmlsSpec {
     val request = addToken(self.authRequest)
 
     val cache = mock[DataCacheConnector]
-
-    lazy val controller = new TcspTypesController(cache, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[service_provider_types]
+    lazy val controller = new TcspTypesController(
+      cache,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      service_provider_types = view)
 
     val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
     val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")

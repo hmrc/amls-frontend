@@ -25,6 +25,7 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.{AmlsSummaryViewSpec, DateHelper}
 import views.Fixture
+import views.html.tradingpremises.summary_details
 
 import scala.collection.JavaConversions._
 
@@ -69,6 +70,7 @@ sealed trait TestHelper extends AmlsSummaryViewSpec {
   )
 
   trait ViewFixture extends Fixture {
+    lazy val summary_details = app.injector.instanceOf[summary_details]
     implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 }
@@ -93,7 +95,7 @@ class summary_detailsSpec extends TestHelper with TableDrivenPropertyChecks {
     "load summary details page when it is an msb" in new ViewFixture {
 
       val isMsb = true
-      def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1, false, false)
+      def view = summary_details(tradingPremises, isMsb, 1, false, false)
 
       forAll(sectionChecks) { (key, check) => {
         val elements = doc.select("span.bold")
@@ -109,7 +111,7 @@ class summary_detailsSpec extends TestHelper with TableDrivenPropertyChecks {
     "load summary details page when it is not an msb" in new ViewFixture {
 
       val isNotMsb = false
-      def view = views.html.tradingpremises.summary_details(tradingPremises, isNotMsb, 1, false, false)
+      def view = summary_details(tradingPremises, isNotMsb, 1, false, false)
 
       html mustNot include(Messages("tradingpremises.summary.who-uses"))
     }
@@ -119,7 +121,7 @@ class summary_detailsSpec extends TestHelper with TableDrivenPropertyChecks {
       val isMsb = true
       val testData = WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))
 
-      def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1, false, false)
+      def view = summary_details(tradingPremises, isMsb, 1, false, false)
 
       val maybeElement = doc.select("div.cya-summary-list__row").toList.find(e => e.text().contains(Messages("tradingpremises.whatdoesyourbusinessdo.title")))
       val servicesSection = maybeElement.get.parent.toString
@@ -133,7 +135,7 @@ class summary_detailsSpec extends TestHelper with TableDrivenPropertyChecks {
       val isMsb = true
       val testData = WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))
 
-      def view = views.html.tradingpremises.summary_details(tradingPremises.copy(whatDoesYourBusinessDoAtThisAddress = Some(testData)), isMsb, 1, true, false)
+      def view = summary_details(tradingPremises.copy(whatDoesYourBusinessDoAtThisAddress = Some(testData)), isMsb, 1, true, false)
 
       val maybeElement = doc.select("div.cya-summary-list__row").toList.find(e => e.text().contains(Messages("tradingpremises.whatdoesyourbusinessdo.title")))
       val servicesSection = maybeElement.get.toString

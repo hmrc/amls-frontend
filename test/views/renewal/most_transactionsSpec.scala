@@ -24,10 +24,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
+import views.html.renewal.most_transactions
 
 class most_transactionsSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks{
+    lazy val most_transactions = app.injector.instanceOf[most_transactions]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class most_transactionsSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[MostTransactions] = Form2(MostTransactions(Seq.empty[Country]))
 
-      def view = views.html.renewal.most_transactions(form2, true, mockAutoComplete.getCountries)
+      def view = most_transactions(form2, true, mockAutoComplete.getCountries)
 
       doc.title must startWith(Messages("renewal.msb.most.transactions.title") + " - " + Messages("summary.renewal"))
     }
@@ -45,7 +47,7 @@ class most_transactionsSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[MostTransactions] = Form2(MostTransactions(Seq.empty[Country]))
 
-      def view = views.html.renewal.most_transactions(form2, true, mockAutoComplete.getCountries)
+      def view = most_transactions(form2, true, mockAutoComplete.getCountries)
 
       heading.html must be(Messages("renewal.msb.most.transactions.title"))
       subHeading.html must include(Messages("summary.renewal"))
@@ -59,7 +61,7 @@ class most_transactionsSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "mostTransactionsCountries") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.renewal.most_transactions(form2, true, mockAutoComplete.getCountries)
+      def view = most_transactions(form2, true, mockAutoComplete.getCountries)
 
       errorSummary.html() must include("not a message Key")
 
@@ -69,7 +71,7 @@ class most_transactionsSpec extends AmlsViewSpec with MustMatchers {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.renewal.most_transactions(EmptyForm, true, mockAutoComplete.getCountries)
+      def view = most_transactions(EmptyForm, true, mockAutoComplete.getCountries)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

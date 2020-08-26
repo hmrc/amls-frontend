@@ -24,10 +24,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.address.time_at_address
 
 class time_at_addressSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val time_at_address = app.injector.instanceOf[time_at_address]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class time_at_addressSpec extends AmlsViewSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
-      def view = views.html.responsiblepeople.address.time_at_address(form2, false, 0, None, "FirstName LastName")
+      def view = time_at_address(form2, false, 0, None, "FirstName LastName")
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -44,7 +46,7 @@ class time_at_addressSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
-      def view = views.html.responsiblepeople.address.time_at_address(form2, false, 0, None, "FirstName LastName")
+      def view = time_at_address(form2, false, 0, None, "FirstName LastName")
 
       doc.title must be(Messages("responsiblepeople.timeataddress.address_history.current.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -56,7 +58,7 @@ class time_at_addressSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
 
-      def view = views.html.responsiblepeople.address.time_at_address(form2, false, 0, None, "FirstName LastName")
+      def view = time_at_address(form2, false, 0, None, "FirstName LastName")
 
       heading.html() must be(Messages("responsiblepeople.timeataddress.address_history.current.heading", "FirstName LastName"))
     }
@@ -72,7 +74,7 @@ class time_at_addressSpec extends AmlsViewSpec with MustMatchers  {
         Seq((Path \ timeAtAddress, Seq(ValidationError(messageKey1))))
       )
 
-      def view = views.html.responsiblepeople.address.time_at_address(form2, false, 0, None, "FirstName LastName")
+      def view = time_at_address(form2, false, 0, None, "FirstName LastName")
 
       errorSummary.html() must include(messageKey1)
     }

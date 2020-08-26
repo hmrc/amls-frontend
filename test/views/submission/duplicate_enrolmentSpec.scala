@@ -20,13 +20,15 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.submission.duplicate_enrolment
 
 class duplicate_enrolmentSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val duplicate_enrolment = app.injector.instanceOf[duplicate_enrolment]
     implicit val requestWithToken = addTokenForView()
 
-    def view = views.html.submission.duplicate_enrolment()
+    def view = duplicate_enrolment()
   }
 
   "The duplicate enrolment view" must {

@@ -27,6 +27,7 @@ import views.html.businessmatching.updateservice.add._
 class business_applied_for_psr_numberSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
+    lazy val business_applied_for_psr_number = app.injector.instanceOf[business_applied_for_psr_number]
     implicit val requestWithToken = addTokenForView()
 
     def view = business_applied_for_psr_number(EmptyForm, edit = false)

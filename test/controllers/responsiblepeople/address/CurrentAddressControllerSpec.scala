@@ -35,6 +35,7 @@ import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.responsiblepeople.address.current_address
 
 import scala.concurrent.Future
 
@@ -55,13 +56,15 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
     val request = addToken(authRequest)
 
     val autoCompleteService = mock[AutoCompleteService]
-
+    lazy val view = app.injector.instanceOf[current_address]
     val currentAddressController = new CurrentAddressController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       autoCompleteService = autoCompleteService,
       ds = commonDependencies,
-      cc = mockMcc
+      cc = mockMcc,
+      current_address = view,
+      error = errorView
     )
 
     when {

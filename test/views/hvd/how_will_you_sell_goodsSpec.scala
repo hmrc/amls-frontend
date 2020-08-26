@@ -16,19 +16,21 @@
 
 package views.hvd
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.hvd.{Wholesale, Retail, HowWillYouSellGoods}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import forms.{Form2, InvalidForm, ValidForm}
+import models.hvd.{HowWillYouSellGoods, Retail, Wholesale}
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.hvd.how_will_you_sell_goods
 
 
 class how_will_you_sell_goodsSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val how_will_you_sell_goods = app.injector.instanceOf[how_will_you_sell_goods]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -38,7 +40,7 @@ class how_will_you_sell_goodsSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[HowWillYouSellGoods] = Form2(HowWillYouSellGoods(Set(Retail)))
 
-      def view = views.html.hvd.how_will_you_sell_goods(form2, true)
+      def view = how_will_you_sell_goods(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -47,7 +49,7 @@ class how_will_you_sell_goodsSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[HowWillYouSellGoods] = Form2(HowWillYouSellGoods(Set(Retail)))
 
-      def view = views.html.hvd.how_will_you_sell_goods(form2, true)
+      def view = how_will_you_sell_goods(form2, true)
 
       doc.title must startWith(Messages("hvd.how-will-you-sell-goods.title") + " - " + Messages("summary.hvd"))
     }
@@ -56,7 +58,7 @@ class how_will_you_sell_goodsSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[HowWillYouSellGoods] = Form2(HowWillYouSellGoods(Set(Wholesale)))
 
-      def view = views.html.hvd.how_will_you_sell_goods(form2, true)
+      def view = how_will_you_sell_goods(form2, true)
 
       heading.html must be(Messages(Messages("hvd.how-will-you-sell-goods.title")))
       subHeading.html must include(Messages(Messages("summary.hvd")))
@@ -70,7 +72,7 @@ class how_will_you_sell_goodsSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "salesChannels") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.hvd.how_will_you_sell_goods(form2, true)
+      def view = how_will_you_sell_goods(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

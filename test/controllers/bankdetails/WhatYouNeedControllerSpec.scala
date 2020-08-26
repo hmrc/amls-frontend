@@ -27,6 +27,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.TitleValidator
+import views.html.bankdetails.what_you_need
 
 class WhatYouNeedControllerSpec
   extends AmlsSpec
@@ -37,10 +38,13 @@ class WhatYouNeedControllerSpec
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
+    lazy val whatYouNeed = app.injector.instanceOf[what_you_need]
+
     val controller = new WhatYouNeedController(SuccessfulAuthAction,
       commonDependencies,
       mockCacheConnector,
-      mockMcc)
+      mockMcc,
+      whatYouNeed)
 
     def assertHref(url: String)(implicit doc: Document) = {
       doc.getElementById("bankwhatyouneed-button").attr("href") mustBe url

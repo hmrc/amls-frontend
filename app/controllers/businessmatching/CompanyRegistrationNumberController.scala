@@ -37,7 +37,8 @@ class CompanyRegistrationNumberController@Inject()(authAction: AuthAction,
                                                    val dataCacheConnector: DataCacheConnector,
                                                    val statusService: StatusService,
                                                    val businessMatchingService:BusinessMatchingService,
-                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                   val cc: MessagesControllerComponents,
+                                                   company_registration_number: company_registration_number) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

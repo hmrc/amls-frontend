@@ -32,7 +32,8 @@ import scala.concurrent.Future
 class TcspTypesController @Inject()(val dataCacheConnector: DataCacheConnector,
                                     val authAction: AuthAction,
                                     val ds: CommonPlayDependencies,
-                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                    val cc: MessagesControllerComponents,
+                                    service_provider_types: service_provider_types) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

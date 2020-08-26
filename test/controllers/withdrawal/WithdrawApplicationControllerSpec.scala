@@ -30,6 +30,7 @@ import org.mockito.Mockito._
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture, DateHelper}
+import views.html.withdrawal.withdraw_application
 
 import scala.concurrent.Future
 
@@ -43,8 +44,16 @@ class WithdrawApplicationControllerSpec extends AmlsSpec {
     val cacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
     val enrolments = mock[AuthEnrolmentsService]
-
-    val controller = new WithdrawApplicationController(SuccessfulAuthAction, ds = commonDependencies, amlsConnector, cacheConnector, enrolments, statusService, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[withdraw_application]
+    val controller = new WithdrawApplicationController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      amlsConnector,
+      cacheConnector,
+      enrolments,
+      statusService,
+      cc = mockMcc,
+      withdraw_application = view)
 
     val applicationReference = "SUIYD3274890384"
     val safeId = "X87FUDIKJJKJH87364"

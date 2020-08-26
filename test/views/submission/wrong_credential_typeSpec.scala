@@ -20,13 +20,15 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.submission.wrong_credential_type
 
 class wrong_credential_typeSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val wrong_credential_type = app.injector.instanceOf[wrong_credential_type]
     implicit val requestWithToken = addTokenForView()
 
-    override def view = views.html.submission.wrong_credential_type()
+    override def view = wrong_credential_type()
   }
 
   "The 'wrong credential type' template" must {

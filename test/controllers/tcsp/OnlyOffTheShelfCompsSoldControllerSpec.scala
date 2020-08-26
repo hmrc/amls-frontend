@@ -26,6 +26,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.tcsp.only_off_the_shelf_comps_sold
 
 import scala.concurrent.Future
 
@@ -36,12 +37,13 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
     val request = addToken(self.authRequest)
 
     val cache = mock[DataCacheConnector]
-
+    lazy val view = app.injector.instanceOf[only_off_the_shelf_comps_sold]
     lazy val controller = new OnlyOffTheShelfCompsSoldController(
       SuccessfulAuthAction,
       commonDependencies,
       cache,
-      cc = mockMcc)
+      cc = mockMcc,
+      only_off_the_shelf_comps_sold = view)
 
     val tcsp = Tcsp(
       Some(TcspTypes(Set(

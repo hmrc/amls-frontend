@@ -32,7 +32,8 @@ import scala.concurrent.Future
 class AccessibilityStatementController @Inject()(val ds: CommonPlayDependencies,
                                                  val cc: MessagesControllerComponents,
                                                  config: ApplicationConfig,
-                                                 parser: BodyParsers.Default) extends AmlsBaseController(ds, cc) with MessagesRequestHelper {
+                                                 parser: BodyParsers.Default,
+                                                 accessibility_statement: accessibility_statement) extends AmlsBaseController(ds, cc) with MessagesRequestHelper {
 
   def get = messagesAction(parser).async {
       implicit request =>

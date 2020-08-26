@@ -32,16 +32,20 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.businessdetails.previously_registered
 
 import scala.concurrent.Future
 
 class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[previously_registered]
     val controller = new PreviouslyRegisteredController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      previously_registered = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)

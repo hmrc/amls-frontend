@@ -36,7 +36,8 @@ class TotalThroughputController @Inject()(val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           renewals: RenewalService,
                                           dataCacheConnector: DataCacheConnector,
-                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                          val cc: MessagesControllerComponents,
+                                          total_throughput: total_throughput) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

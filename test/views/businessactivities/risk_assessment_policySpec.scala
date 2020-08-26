@@ -24,11 +24,13 @@ import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.businessactivities.risk_assessment_policy
 
 
 class risk_assessment_policySpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val policy = app.injector.instanceOf[risk_assessment_policy]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -37,7 +39,7 @@ class risk_assessment_policySpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[RiskAssessmentHasPolicy] = Form2(RiskAssessmentHasPolicy(false))
 
-      def view = views.html.businessactivities.risk_assessment_policy(form2, true)
+      def view = policy(form2, true)
 
       doc.title must startWith(Messages("businessactivities.riskassessment.policy.title"))
     }
@@ -46,7 +48,7 @@ class risk_assessment_policySpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[RiskAssessmentHasPolicy] = Form2(RiskAssessmentHasPolicy(false))
 
-      def view = views.html.businessactivities.risk_assessment_policy(form2, true)
+      def view = policy(form2, true)
 
       heading.html must be(Messages("businessactivities.riskassessment.policy.title"))
       subHeading.html must include(Messages("summary.businessactivities"))
@@ -60,7 +62,7 @@ class risk_assessment_policySpec extends AmlsViewSpec with MustMatchers {
           (Path \ "hasPolicy") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessactivities.risk_assessment_policy(form2, true)
+      def view = policy(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -69,7 +71,7 @@ class risk_assessment_policySpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.risk_assessment_policy(EmptyForm, true)
+      def view = policy(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

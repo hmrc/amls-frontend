@@ -25,6 +25,7 @@ import models.responsiblepeople.{ResponsiblePerson, Training}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{MessagesControllerComponents, Result}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
+import views.html.responsiblepeople.training
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,16 +35,18 @@ class TrainingController @Inject()(
                                     val dataCacheConnector: DataCacheConnector,
                                     authAction: AuthAction,
                                     val ds: CommonPlayDependencies,
-                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                    val cc: MessagesControllerComponents,
+                                    trainingView: training,
+                                    implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     authAction.async {
       implicit request =>
         getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,Some(training),_,_,_,_,_,_,_))
-          => Ok(views.html.responsiblepeople.training(Form2[Training](training), edit, index, flow, personName.titleName))
+          => Ok(trainingView(Form2[Training](training), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(views.html.responsiblepeople.training(EmptyForm, edit, index, flow, personName.titleName))
+          => Ok(trainingView(EmptyForm, edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
         }
@@ -55,7 +58,7 @@ class TrainingController @Inject()(
         Form2[Training](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(views.html.responsiblepeople.training(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+              BadRequest(trainingView(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {

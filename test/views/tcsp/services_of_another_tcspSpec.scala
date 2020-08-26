@@ -22,11 +22,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tcsp.services_of_another_tcsp
 
 
 class services_of_another_tcspSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val services_of_another_tcsp = app.injector.instanceOf[services_of_another_tcsp]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class services_of_another_tcspSpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.tcsp.services_of_another_tcsp(form2, true)
+      def view = services_of_another_tcsp(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -53,7 +55,7 @@ class services_of_another_tcspSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "servicesOfAnotherTCSP") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tcsp.services_of_another_tcsp(form2, true)
+      def view = services_of_another_tcsp(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

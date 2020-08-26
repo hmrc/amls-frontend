@@ -26,6 +26,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
+import views.html.responsiblepeople.legal_name_change_date
 
 
 class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
@@ -33,8 +34,10 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
   trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(self.authRequest)
     val RecordId = 1
-
-    lazy val controller = new LegalNameChangeDateController(mockCacheConnector, SuccessfulAuthAction, commonDependencies, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[legal_name_change_date]
+    lazy val controller = new LegalNameChangeDateController(mockCacheConnector, SuccessfulAuthAction, commonDependencies, cc = mockMcc,
+      legal_name_change_date = view,
+      error = errorView)
 
     val personName = PersonName("firstname", None, "lastname")
   }

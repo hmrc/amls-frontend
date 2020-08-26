@@ -21,11 +21,13 @@ import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
+import views.html.bankdetails.summary
 import views.{Fixture, HtmlAssertions}
 
 class summarySpec extends AmlsSummaryViewSpec with PropertyChecks with HtmlAssertions {
 
   trait ViewFixture extends Fixture {
+    lazy val summary = app.injector.instanceOf[summary]
     implicit val requestWithToken = addTokenForView(FakeRequest())
 
     val toHide = 6
@@ -42,7 +44,7 @@ class summarySpec extends AmlsSummaryViewSpec with PropertyChecks with HtmlAsser
     "have correct title" in new ViewFixture {
       val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukBankAccount))
 
-      def view = views.html.bankdetails.summary(model, 1)
+      def view = summary(model, 1)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.bankdetails"))
     }
@@ -50,7 +52,7 @@ class summarySpec extends AmlsSummaryViewSpec with PropertyChecks with HtmlAsser
     "have correct headings" in new ViewFixture {
       val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukBankAccount))
 
-      def view = views.html.bankdetails.summary(model, 1)
+      def view = summary(model, 1)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.bankdetails"))
@@ -59,7 +61,7 @@ class summarySpec extends AmlsSummaryViewSpec with PropertyChecks with HtmlAsser
     "have correct button text" in new ViewFixture {
       val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukBankAccount))
 
-      def view = views.html.bankdetails.summary(model, 1)
+      def view = summary(model, 1)
 
       doc.getElementsByClass("button").html must include(Messages("button.checkyouranswers.acceptandaddbankaccount"))
     }
@@ -69,7 +71,7 @@ class summarySpec extends AmlsSummaryViewSpec with PropertyChecks with HtmlAsser
 
       val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukBankAccount))
 
-      def view = views.html.bankdetails.summary(model, 1)
+      def view = summary(model, 1)
 
       view.body must include("My Personal Account")
       view.body must include("12345678")
@@ -79,7 +81,7 @@ class summarySpec extends AmlsSummaryViewSpec with PropertyChecks with HtmlAsser
     "include the provided data for a NonUKAccountNumber" in new ViewFixture {
       val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(nonUkBankAccount))
 
-      def view = views.html.bankdetails.summary(model, 1)
+      def view = summary(model, 1)
 
       view.body must include("My Personal Account")
       view.body must include("123456789")
@@ -89,7 +91,7 @@ class summarySpec extends AmlsSummaryViewSpec with PropertyChecks with HtmlAsser
     "include the provided data for a NonUKIBANNumber" in new ViewFixture {
       val model = BankDetails(Some(BelongsToOtherBusiness), Some("Other Business Account"), Some(nonUkIban))
 
-      def view = views.html.bankdetails.summary(model, 1)
+      def view = summary(model, 1)
 
       view.body must include("Other Business Account")
       view.body must include("NL26RABO0163975856")

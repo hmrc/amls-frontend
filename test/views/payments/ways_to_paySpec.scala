@@ -22,10 +22,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.payments.ways_to_pay
 
 class ways_to_paySpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
+    lazy val ways_to_pay = app.injector.instanceOf[ways_to_pay]
     implicit val requestWithToken = addTokenForView()
     val secondaryHeading = "Submit application"
   }
@@ -34,7 +36,7 @@ class ways_to_paySpec extends AmlsViewSpec {
 
     "have correct title, headings and form fields" in new ViewFixture {
 
-      def view = views.html.payments.ways_to_pay(EmptyForm, secondaryHeading)
+      def view = ways_to_pay(EmptyForm, secondaryHeading)
 
       doc.title must startWith(Messages("payments.waystopay.title"))
       heading.html must be(Messages("payments.waystopay.header"))
@@ -46,7 +48,7 @@ class ways_to_paySpec extends AmlsViewSpec {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.payments.ways_to_pay(EmptyForm, secondaryHeading)
+      def view = ways_to_pay(EmptyForm, secondaryHeading)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -57,14 +59,14 @@ class ways_to_paySpec extends AmlsViewSpec {
         (Path \ "waysToPay") -> Seq(ValidationError("not a message Key"))
       ))
 
-      def view = views.html.payments.ways_to_pay(form2, secondaryHeading)
+      def view = ways_to_pay(form2, secondaryHeading)
 
       errorSummary.html() must include("not a message Key")
     }
 
     "display all fields" in new ViewFixture {
 
-      def view = views.html.payments.ways_to_pay(EmptyForm, secondaryHeading)
+      def view = ways_to_pay(EmptyForm, secondaryHeading)
 
       doc.getElementsByAttributeValue("for", "waysToPay-card") must not be empty
       doc.getElementsByAttributeValue("for", "waysToPay-bacs") must not be empty

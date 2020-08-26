@@ -25,16 +25,18 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.tcsp.services_of_another_tcsp
 
 class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[services_of_another_tcsp]
     val controller = new ServicesOfAnotherTCSPController (
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
-      cc = mockMcc
+      cc = mockMcc,
+      services_of_another_tcsp = view
     )
   }
 

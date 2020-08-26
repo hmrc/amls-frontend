@@ -32,6 +32,8 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.date_of_change
+import views.html.tradingpremises.agent_name
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,13 +42,17 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
   trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
-
+    lazy val view1 = app.injector.instanceOf[agent_name]
+    lazy val view2 = app.injector.instanceOf[date_of_change]
     val controller = new AgentNameController(
       mockCacheConnector,
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockStatusService,
-      cc = mockMcc
+      cc = mockMcc,
+      agent_name = view1,
+      date_of_change = view2,
+      error = errorView
     )
 
     mockCacheFetchAll

@@ -35,6 +35,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
+import views.html.responsiblepeople.position_within_business
 
 import scala.concurrent.Future
 
@@ -45,10 +46,12 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
     val request = addToken(authRequest)
 
     val mockAuthConnector = authConnector
-
+    lazy val view = app.injector.instanceOf[position_within_business]
     val controller = new PositionWithinBusinessController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+      position_within_business = view,
+      error = errorView)
 
     object DefaultValues {
       val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)

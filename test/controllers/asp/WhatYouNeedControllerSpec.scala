@@ -20,6 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
+import views.html.asp.what_you_need
 
 class WhatYouNeedControllerSpec extends AmlsSpec {
 
@@ -27,7 +28,10 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new WhatYouNeedController(SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    lazy val whatYouNeed = app.injector.instanceOf[what_you_need]
+
+
+    val controller = new WhatYouNeedController(SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc, whatYouNeed)
 
   }
 

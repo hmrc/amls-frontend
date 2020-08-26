@@ -43,7 +43,8 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
                                            implicit val statusService: StatusService,
                                            implicit val progressService: ProgressService,
                                            val cc: MessagesControllerComponents,
-                                           val sectionsProvider: SectionsProvider) extends AmlsBaseController(ds, cc) {
+                                           val sectionsProvider: SectionsProvider,
+                                           register_partners: register_partners) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
     implicit request => {
@@ -53,7 +54,7 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
           subtitle <- OptionT.liftF(statusSubtitle(request.amlsRefNumber, request.accountTypeId, request.credId))
           responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key))
         } yield {
-          Ok(views.html.declaration.register_partners(
+          Ok(register_partners(
             subtitle,
             EmptyForm,
             nonPartners(responsiblePeople),

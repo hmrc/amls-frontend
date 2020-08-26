@@ -51,7 +51,8 @@ class StatusController @Inject()(val landingService: LandingService,
                                  val ds: CommonPlayDependencies,
                                  val feeResponseService: FeeResponseService,
                                  val cc: MessagesControllerComponents,
-                                 val notificationConnector: AmlsNotificationConnector) extends AmlsBaseController(ds, cc) {
+                                 val notificationConnector: AmlsNotificationConnector,
+                                 your_registration: your_registration) extends AmlsBaseController(ds, cc) {
 
   def get(fromDuplicateSubmission: Boolean = false) = authAction.async {
     implicit request =>

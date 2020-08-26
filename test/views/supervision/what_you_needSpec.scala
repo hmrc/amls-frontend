@@ -20,26 +20,29 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.supervision.what_you_need
 
 
 class what_you_needSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val what_you_need = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
   }
 
   "what_you_need view" must {
 
     "have a back link" in new Fixture {
+      lazy val what_you_need = app.injector.instanceOf[what_you_need]
       implicit val requestWithToken = addTokenForView()
 
-      def view = views.html.supervision.what_you_need()
+      def view = what_you_need()
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "contain the expected content elements" in new ViewFixture {
-      def view = views.html.supervision.what_you_need()
+      def view = what_you_need()
 
       html must include(Messages("if your business has been registered with another supervisory body under the Money Laundering Regulations"))
       html must include(Messages("which professional bodies you’re a member of, if any"))

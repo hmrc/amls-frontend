@@ -28,7 +28,8 @@ import scala.concurrent.Future
 
 class WhatYouNeedController @Inject() (val authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                       val cc: MessagesControllerComponents,
+                                       what_you_need: what_you_need) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

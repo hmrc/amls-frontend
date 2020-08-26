@@ -41,6 +41,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.start
 
 import scala.concurrent.Future
 
@@ -53,7 +54,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
     val request = addToken(authRequest)
     val config = mock[ApplicationConfig]
-
+    lazy val view = app.injector.instanceOf[start]
     val controllerNoAmlsNumber = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
       landingService = mock[LandingService],
@@ -65,7 +66,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       mcc = mockMcc,
       messagesApi = messagesApi,
       config = config,
-      parser = mock[BodyParsers.Default])
+      parser = mock[BodyParsers.Default],
+      start = view)
 
     val controllerNoUserRole = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -78,7 +80,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       mcc = mockMcc,
       messagesApi = messagesApi,
       config = config,
-      parser = mock[BodyParsers.Default])
+      parser = mock[BodyParsers.Default],
+      start = view)
 
     when {
       controllerNoAmlsNumber.landingService.setAltCorrespondenceAddress(any(), any[String])(any(), any())

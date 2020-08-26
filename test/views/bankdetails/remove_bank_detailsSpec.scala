@@ -16,33 +16,35 @@
 
 package views.bankdetails
 
-import forms.{EmptyForm, InvalidForm, ValidForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.bankdetails.BankDetails
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.bankdetails.remove_bank_details
 
 
 class remove_bank_DetailsSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val removeBankDetails = app.injector.instanceOf[remove_bank_details]
     implicit val requestWithToken = addTokenForView()
   }
 
   "remove_bank_Details view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.bankdetails.remove_bank_details(EmptyForm, 0, "AccountName")
+      def view = removeBankDetails(EmptyForm, 0, "AccountName")
 
       doc.title must startWith(Messages("bankdetails.remove.bank.account.title") + " - " + Messages("summary.bankdetails"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.bankdetails.remove_bank_details(EmptyForm, 0, "AccountName")
+      def view = removeBankDetails(EmptyForm, 0, "AccountName")
 
       heading.html must be(Messages("bankdetails.remove.bank.account.title"))
       subHeading.html must include(Messages("summary.bankdetails"))
@@ -50,7 +52,7 @@ class remove_bank_DetailsSpec extends AmlsViewSpec with MustMatchers  {
     }
     "have a back link" in new ViewFixture {
 
-      def view = views.html.bankdetails.remove_bank_details(EmptyForm, 0, "AccountName")
+      def view = removeBankDetails(EmptyForm, 0, "AccountName")
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

@@ -33,6 +33,7 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
+import views.html.date_of_change
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
@@ -44,7 +45,10 @@ class WhereAreTradingPremisesController @Inject () (
                                                      val auditConnector: AuditConnector,
                                                      val authAction: AuthAction,
                                                      val ds: CommonPlayDependencies,
-                                                     val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                                     val cc: MessagesControllerComponents,
+                                                     where_are_trading_premises: where_are_trading_premises,
+                                                     date_of_change: date_of_change,
+                                                     implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
 
 
@@ -116,7 +120,7 @@ class WhereAreTradingPremisesController @Inject () (
 
   def dateOfChange(index: Int) = authAction.async {
     implicit request =>
-        Future(Ok(views.html.date_of_change(EmptyForm,
+        Future(Ok(date_of_change(EmptyForm,
           "summary.tradingpremises", controllers.tradingpremises.routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
   }
 
@@ -126,7 +130,7 @@ class WhereAreTradingPremisesController @Inject () (
         Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
           case form: InvalidForm =>
             Future.successful(BadRequest(
-              views.html.date_of_change(
+              date_of_change(
                 form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
                 "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
           case ValidForm(_, dateOfChange) =>

@@ -32,6 +32,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.businessmatching.updateservice.remove.remove_activities
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -46,7 +47,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val mockRemoveBusinessTypeHelper = mock[RemoveBusinessTypeHelper]
-
+    lazy val view = app.injector.instanceOf[remove_activities]
 
     val controller = new RemoveBusinessTypesController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
@@ -54,7 +55,8 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       businessMatchingService = mockBusinessMatchingService,
       removeBusinessTypeHelper = mockRemoveBusinessTypeHelper,
       router = createRouter[RemoveBusinessTypeFlowModel],
-      cc = mockMcc
+      cc = mockMcc,
+      remove_activities = view
     )
 
     when {

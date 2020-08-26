@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.bankdetails.bank_account_account_number_non_uk
 
 import scala.concurrent.Future
 
@@ -43,13 +44,16 @@ class BankAccountNonUKControllerSpec extends AmlsSpec {
 
     val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
 
+    lazy val nonUk = app.injector.instanceOf[bank_account_account_number_non_uk]
     val controller = new BankAccountNonUKController(
       mockCacheConnector,
       SuccessfulAuthAction,
       mock[AuditConnector],
       mockStatusService,
       commonDependencies,
-      mockMcc
+      mockMcc,
+      nonUk,
+      errorView
     )
 
   }

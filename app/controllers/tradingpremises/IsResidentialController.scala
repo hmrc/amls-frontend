@@ -37,7 +37,9 @@ class  IsResidentialController @Inject()(
                                           val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           val dataCacheConnector: DataCacheConnector,
-                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                          val cc: MessagesControllerComponents,
+                                          is_residential: is_residential,
+                                          implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false) = authAction.async{
       implicit request =>

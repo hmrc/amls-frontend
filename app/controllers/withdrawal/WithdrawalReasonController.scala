@@ -39,7 +39,8 @@ class WithdrawalReasonController @Inject()(
                                             enrolments: AuthEnrolmentsService,
                                             statusService: StatusService,
                                             cacheConnector: DataCacheConnector,
-                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                            val cc: MessagesControllerComponents,
+                                            withdrawal_reason: withdrawal_reason) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

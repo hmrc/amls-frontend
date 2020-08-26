@@ -20,18 +20,20 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tcsp.what_you_need
 
 
 class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val what_you_need = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
   }
 
   "what_you_need view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.tcsp.what_you_need()
+      def view = what_you_need()
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -44,7 +46,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.tcsp.what_you_need()
+      def view = what_you_need()
 
       heading.html must be(Messages("title.wyn"))
       subHeading.html must include(Messages("summary.tcsp"))
@@ -52,7 +54,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements" in new ViewFixture {
-      def view = views.html.tcsp.what_you_need()
+      def view = what_you_need()
 
       html must include(Messages("the type of trust or company service provider you are"))
       html must include(Messages("if you use the services of another trust or company service provider"))

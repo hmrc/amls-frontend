@@ -40,6 +40,7 @@ import play.api.test.Helpers._
 import services.TradingPremisesService
 import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.businessmatching.updateservice.add.update_services_summary
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -58,6 +59,7 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
+    lazy val view = app.injector.instanceOf[update_services_summary]
     val controller = new AddBusinessTypeSummaryController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
@@ -66,7 +68,8 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
       helper = mockUpdateServiceHelper,
       router = createRouter[AddBusinessTypeFlowModel],
       tradingPremisesService = mockTradingPremisesService,
-      cc = mockMcc
+      cc = mockMcc,
+      update_services_summary = view
     )
 
     val flowModel = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),

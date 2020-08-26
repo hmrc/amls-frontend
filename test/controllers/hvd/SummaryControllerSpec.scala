@@ -34,6 +34,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.hvd.summary
 
 import scala.concurrent.Future
 
@@ -44,7 +45,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
     val request = addToken(authRequest)
 
     implicit val headerCarrier = HeaderCarrier()
-
+    lazy val view = app.injector.instanceOf[summary]
     lazy val controller =
       new SummaryController(
         authAction = SuccessfulAuthAction,
@@ -52,7 +53,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         mockCacheConnector,
         mockStatusService,
         mockServiceFlow,
-        cc = mockMcc)
+        cc = mockMcc,
+        summary = view)
 
     val day = 15
     val month = 2

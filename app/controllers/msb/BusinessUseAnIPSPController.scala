@@ -32,7 +32,8 @@ import scala.concurrent.Future
 class BusinessUseAnIPSPController @Inject() (val dataCacheConnector: DataCacheConnector,
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
-                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                             val cc: MessagesControllerComponents,
+                                             business_use_an_ipsp: business_use_an_ipsp) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

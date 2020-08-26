@@ -33,7 +33,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class NewHomeAddressController @Inject()(authAction: AuthAction,
                                          val dataCacheConnector: DataCacheConnector,
                                          val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with AddressHelper {
+                                         val cc: MessagesControllerComponents,
+                                         new_home_address: new_home_address,
+                                         implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with AddressHelper {
 
   def get(index: Int) = authAction.async {
     implicit request =>

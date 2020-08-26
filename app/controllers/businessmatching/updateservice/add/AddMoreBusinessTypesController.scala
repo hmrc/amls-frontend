@@ -40,7 +40,8 @@ class AddMoreBusinessTypesController @Inject()(
                                                 val ds: CommonPlayDependencies,
                                                 implicit val dataCacheConnector: DataCacheConnector,
                                                 val router: Router[AddBusinessTypeFlowModel],
-                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                val cc: MessagesControllerComponents,
+                                                add_more_activities: add_more_activities) extends AmlsBaseController(ds, cc) {
 
   val fieldName = "addmoreactivities"
 

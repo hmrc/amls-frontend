@@ -22,6 +22,7 @@ import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import utils._
+import views.html.responsiblepeople.known_by
 
 
 class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
@@ -29,12 +30,14 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
   trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(self.authRequest)
     val RecordId = 1
-
+    lazy val view = app.injector.instanceOf[known_by]
     lazy val controller = new KnownByController(
       mockCacheConnector,
       SuccessfulAuthAction,
       commonDependencies,
-      cc = mockMcc)
+      cc = mockMcc,
+      known_by = view,
+      error = errorView)
   }
 
   "The KnownByController" when {

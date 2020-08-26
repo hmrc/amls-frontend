@@ -27,6 +27,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.businessactivities.what_you_need
 
 import scala.concurrent.Future
 
@@ -34,14 +35,15 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[what_you_need]
     val controller = new WhatYouNeedController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       statusService = mockStatusService,
       authConnector = mock[AuthConnector],
-      cc = mockMcc)
+      cc = mockMcc,
+      what_you_need = view)
   }
 
   "WhatYouNeedController" must {

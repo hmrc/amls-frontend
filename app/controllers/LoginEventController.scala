@@ -30,7 +30,8 @@ import scala.concurrent.Future
 class LoginEventController @Inject()(authAction: AuthAction,
                                      val ds: CommonPlayDependencies,
                                      val cc: MessagesControllerComponents,
-                                     applicationConfig: ApplicationConfig) extends AmlsBaseController(ds, cc) {
+                                     applicationConfig: ApplicationConfig,
+                                     login_event: login_event) extends AmlsBaseController(ds, cc) {
 
   val redirectCallType = "GET"
 

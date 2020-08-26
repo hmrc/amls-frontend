@@ -36,6 +36,7 @@ import uk.gov.hmrc.http
 import uk.gov.hmrc.http.{BadRequestException, HttpResponse, Upstream4xxResponse, Upstream5xxResponse}
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.ParagraphHelpers
+import views.html.submission.{bad_request, duplicate_enrolment, duplicate_submission, wrong_credential_type}
 
 import scala.concurrent.Future
 
@@ -46,6 +47,10 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     val request = addToken(authRequest)
 
     val mockSectionsProvider = mock[SectionsProvider]
+    lazy val view1 = app.injector.instanceOf[duplicate_enrolment]
+    lazy val view2 = app.injector.instanceOf[duplicate_submission]
+    lazy val view3 = app.injector.instanceOf[wrong_credential_type]
+    lazy val view4 = app.injector.instanceOf[bad_request]
 
     val controller = new SubmissionController(
       mock[SubmissionService],
@@ -55,7 +60,11 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       SuccessfulAuthAction,
       commonDependencies,
       mockMcc,
-      mockSectionsProvider
+      mockSectionsProvider,
+      duplicate_enrolment = view1,
+      duplicate_submission = view2,
+      wrong_credential_type = view3,
+      bad_request = view4
     )
   }
 

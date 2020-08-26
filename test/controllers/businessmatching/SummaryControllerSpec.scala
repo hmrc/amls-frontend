@@ -32,6 +32,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.businessmatching.summary
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -41,13 +42,14 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
   sealed trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-
+    lazy val view = app.injector.instanceOf[summary]
     val controller = new SummaryController (
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
-      cc = mockMcc)
+      cc = mockMcc,
+      summary = view)
 
     when {
       mockStatusService.isPreSubmission(any())

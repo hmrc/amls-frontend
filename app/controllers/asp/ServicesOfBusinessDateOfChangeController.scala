@@ -34,7 +34,8 @@ import scala.concurrent.Future
 class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                          val authAction: AuthAction,
                                                          val ds: CommonPlayDependencies,
-                                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                         val cc: MessagesControllerComponents,
+                                                         date_of_change: date_of_change) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>

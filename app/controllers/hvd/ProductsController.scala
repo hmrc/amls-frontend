@@ -37,7 +37,8 @@ class ProductsController @Inject() (val dataCacheConnector: DataCacheConnector,
                                     val authAction: AuthAction,
                                     val ds: CommonPlayDependencies,
                                     val serviceFlow: ServiceFlow,
-                                    val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                                    val cc: MessagesControllerComponents,
+                                    products: products) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

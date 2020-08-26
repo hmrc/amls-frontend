@@ -28,6 +28,7 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import views.html.tcsp.complex_corp_structure_creation
 
 import scala.concurrent.Future
 
@@ -38,8 +39,13 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
     val request = addToken(self.authRequest)
 
     val cache = mock[DataCacheConnector]
-
-    lazy val controller = new ComplexCorpStructureCreationController(SuccessfulAuthAction, commonDependencies, cache, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[complex_corp_structure_creation]
+    lazy val controller = new ComplexCorpStructureCreationController(
+      SuccessfulAuthAction,
+      commonDependencies,
+      cache,
+      cc = mockMcc,
+      complex_corp_structure_creation = view)
 
     val tcsp = Tcsp(
       Some(TcspTypes(Set(

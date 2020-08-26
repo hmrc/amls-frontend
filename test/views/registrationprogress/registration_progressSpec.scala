@@ -28,6 +28,7 @@ import views.html.registrationprogress._
 
 class registration_progressSpec extends AmlsViewSpec with MockitoSugar with AddressGenerator {
 
+  lazy val registration_progress = app.injector.instanceOf[registration_progress]
   val businessName = "BusinessName"
   val serviceNames = Seq("Service 1", "Service 2", "Service 3")
 

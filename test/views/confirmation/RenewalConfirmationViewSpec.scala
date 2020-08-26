@@ -21,15 +21,17 @@ import models.confirmation.Currency
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.confirmation.confirm_renewal
 
 class RenewalConfirmationViewSpec extends AmlsViewSpec with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
+    lazy val confirm_renewal = app.injector.instanceOf[confirm_renewal]
     implicit val requestWithToken = addTokenForView()
 
     val continueHref = "http://google.co.uk"
 
-    override def view = views.html.confirmation.confirm_renewal(
+    override def view = confirm_renewal(
       Some(paymentReferenceNumber),
       Currency(100),
       Currency(150),

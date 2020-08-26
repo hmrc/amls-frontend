@@ -22,10 +22,12 @@ import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.payments.type_of_bank
 
 class type_of_bankSpec extends PlaySpec with AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
+    lazy val type_of_bank = app.injector.instanceOf[type_of_bank]
     implicit val requestWithToken = addTokenForView()
     val secondaryHeading = "Submit application"
 
@@ -35,7 +37,7 @@ class type_of_bankSpec extends PlaySpec with AmlsViewSpec {
 
     "have correct title, headings and form fields" in new ViewFixture {
 
-      def view = views.html.payments.type_of_bank(EmptyForm, secondaryHeading)
+      def view = type_of_bank(EmptyForm, secondaryHeading)
 
       doc.title must startWith(Messages("payments.typeofbank.title"))
       heading.html must be(Messages("payments.typeofbank.header"))
@@ -44,7 +46,7 @@ class type_of_bankSpec extends PlaySpec with AmlsViewSpec {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.payments.type_of_bank(EmptyForm, secondaryHeading)
+      def view = type_of_bank(EmptyForm, secondaryHeading)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -55,14 +57,14 @@ class type_of_bankSpec extends PlaySpec with AmlsViewSpec {
         (Path \ "typeOfBank") -> Seq(ValidationError("not a message Key"))
       ))
 
-      def view = views.html.payments.type_of_bank(form2, secondaryHeading)
+      def view = type_of_bank(form2, secondaryHeading)
 
       errorSummary.html() must include("not a message Key")
     }
 
     "display all fields" in new ViewFixture {
 
-      def view = views.html.payments.type_of_bank(EmptyForm, secondaryHeading)
+      def view = type_of_bank(EmptyForm, secondaryHeading)
 
       doc.getElementsByAttributeValue("for", "typeOfBank-true") must not be empty
       doc.getElementsByAttributeValue("for", "typeOfBank-false") must not be empty

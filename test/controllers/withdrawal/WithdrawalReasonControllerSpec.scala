@@ -28,6 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.withdrawal.withdrawal_reason
 
 import scala.concurrent.Future
 
@@ -40,8 +41,16 @@ class WithdrawalReasonControllerSpec extends AmlsSpec {
     val amlsConnector = mock[AmlsConnector]
     val authService = mock[AuthEnrolmentsService]
     val statusService = mock[StatusService]
-
-    lazy val controller = new WithdrawalReasonController(SuccessfulAuthAction, ds = commonDependencies, amlsConnector, authService, statusService, mockCacheConnector, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[withdrawal_reason]
+    lazy val controller = new WithdrawalReasonController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      amlsConnector,
+      authService,
+      statusService,
+      mockCacheConnector,
+      cc = mockMcc,
+      withdrawal_reason = view)
 
     val amlsRegistrationNumber = "XA1234567890L"
 

@@ -38,6 +38,7 @@ import services.StatusService
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
+import views.html.responsiblepeople.remove_responsible_person
 
 import scala.concurrent.Future
 
@@ -46,11 +47,13 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[remove_responsible_person]
     val controller = new RemoveResponsiblePersonController (
       dataCacheConnector = mock[DataCacheConnector],
       statusService =  mock[StatusService],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+      remove_responsible_person = view,
+      error = errorView)
   }
 
   "RemoveResponsiblePersonController" when {

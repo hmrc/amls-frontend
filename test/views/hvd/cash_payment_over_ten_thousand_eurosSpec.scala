@@ -24,11 +24,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.hvd.cash_payment
 
 
 class cash_payment_over_ten_thousand_eurosSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val cash_payment = app.injector.instanceOf[cash_payment]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -38,7 +40,7 @@ class cash_payment_over_ten_thousand_eurosSpec extends AmlsViewSpec with MustMat
 
       val form2: ValidForm[CashPaymentOverTenThousandEuros] = Form2(CashPaymentOverTenThousandEuros(true))
 
-      def view = views.html.hvd.cash_payment(form2, true)
+      def view = cash_payment(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -47,7 +49,7 @@ class cash_payment_over_ten_thousand_eurosSpec extends AmlsViewSpec with MustMat
 
       val form2: ValidForm[CashPaymentOverTenThousandEuros] = Form2(hvd.CashPaymentOverTenThousandEuros(true))
 
-      def view = views.html.hvd.cash_payment(form2, true)
+      def view = cash_payment(form2, true)
 
       doc.title must startWith(Messages("hvd.cash.payment.title") + " - " + Messages("summary.hvd"))
     }
@@ -56,7 +58,7 @@ class cash_payment_over_ten_thousand_eurosSpec extends AmlsViewSpec with MustMat
 
       val form2: ValidForm[CashPaymentOverTenThousandEuros] = Form2(hvd.CashPaymentOverTenThousandEuros(true))
 
-      def view = views.html.hvd.cash_payment(form2, true)
+      def view = cash_payment(form2, true)
 
       heading.html must be(Messages("hvd.cash.payment.title"))
       subHeading.html must include(Messages("summary.hvd"))
@@ -70,7 +72,7 @@ class cash_payment_over_ten_thousand_eurosSpec extends AmlsViewSpec with MustMat
           (Path \ "acceptedAnyPayment") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.hvd.cash_payment(form2, true)
+      def view = cash_payment(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

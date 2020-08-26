@@ -35,7 +35,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class DetailedAnswersController @Inject()(val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           val dataCacheConnector: DataCacheConnector,
-                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                          val cc: MessagesControllerComponents,
+                                          summary_details: summary_details,
+                                          implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int) = authAction.async {
     implicit request =>

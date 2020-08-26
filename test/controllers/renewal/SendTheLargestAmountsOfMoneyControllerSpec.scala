@@ -32,6 +32,7 @@ import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
+import views.html.renewal.send_largest_amounts_of_money
 
 import scala.concurrent.Future
 
@@ -48,12 +49,13 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockStatusService = mock[StatusService]
     lazy val mockRenewalService = mock[RenewalService]
-
+    lazy val view = app.injector.instanceOf[send_largest_amounts_of_money]
     val controller = new SendTheLargestAmountsOfMoneyController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService, cc = mockMcc,
-      autoCompleteService = mockAutoComplete
+      autoCompleteService = mockAutoComplete,
+      send_largest_amounts_of_money = view
     )
   }
 

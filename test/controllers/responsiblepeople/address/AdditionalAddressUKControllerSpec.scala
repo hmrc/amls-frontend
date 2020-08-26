@@ -37,6 +37,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.responsiblepeople.address.additional_address_UK
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
@@ -51,14 +52,16 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
 
     val auditConnector = mock[AuditConnector]
     val autoCompleteService = mock[AutoCompleteService]
-
+    lazy val view = app.injector.instanceOf[additional_address_UK]
     val additionalAddressUKController = new AdditionalAddressUKController(
       dataCacheConnector = mockDataCacheConnector,
       auditConnector = auditConnector,
       authAction = SuccessfulAuthAction,
       autoCompleteService = autoCompleteService,
       ds = commonDependencies,
-      cc = mockMcc
+      cc = mockMcc,
+      additional_address_UK = view,
+      error = errorView
     )
 
     when {

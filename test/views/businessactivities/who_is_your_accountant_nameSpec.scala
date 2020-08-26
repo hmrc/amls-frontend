@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
+import views.html.businessactivities.who_is_your_accountant
 
 
 class who_is_your_accountant_nameSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
+    lazy val accountant = app.injector.instanceOf[who_is_your_accountant]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -40,7 +42,7 @@ class who_is_your_accountant_nameSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[WhoIsYourAccountantName] = Form2(defaultName)
 
-      def view = views.html.businessactivities.who_is_your_accountant(form2, true)
+      def view = accountant(form2, true)
 
       doc.title must startWith(Messages("businessactivities.whoisyouraccountant.title"))
     }
@@ -49,7 +51,7 @@ class who_is_your_accountant_nameSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[WhoIsYourAccountantName] = Form2(defaultName)
 
-      def view = views.html.businessactivities.who_is_your_accountant(form2, true)
+      def view = accountant(form2, true)
 
       heading.html must be(Messages("businessactivities.whoisyouraccountant.title"))
       subHeading.html must include(Messages("summary.businessactivities"))
@@ -64,7 +66,7 @@ class who_is_your_accountant_nameSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "tradingName") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.businessactivities.who_is_your_accountant(form2, true)
+      def view = accountant(form2, true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
@@ -77,7 +79,7 @@ class who_is_your_accountant_nameSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.who_is_your_accountant(EmptyForm, true)
+      def view = accountant(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

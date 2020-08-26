@@ -29,6 +29,7 @@ import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.StatusService
 import utils.{AuthAction, ControllerHelper}
+import views.html.declaration.add_person
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -37,7 +38,8 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
                                       val statusService: StatusService,
                                       authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
-                                      val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                      val cc: MessagesControllerComponents,
+                                      add_person: add_person) extends AmlsBaseController(ds, cc) {
 
 
   def get() = authAction.async {
@@ -105,11 +107,11 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
 
       statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
         case SubmissionReady =>
-          status(views.html.declaration.add_person("declaration.addperson.title", "submit.registration", businessType, form))
+          status(add_person("declaration.addperson.title", "submit.registration", businessType, form))
         case SubmissionReadyForReview | SubmissionDecisionApproved =>
-          status(views.html.declaration.add_person("declaration.addperson.amendment.title", "submit.amendment.application", businessType, form))
-        case RenewalSubmitted(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.amendment.application", businessType, form))
-        case ReadyForRenewal(_) => status(views.html.declaration.add_person("declaration.addperson.title", "submit.renewal.application", businessType, form))
+          status(add_person("declaration.addperson.amendment.title", "submit.amendment.application", businessType, form))
+        case RenewalSubmitted(_) => status(add_person("declaration.addperson.title", "submit.amendment.application", businessType, form))
+        case ReadyForRenewal(_) => status(add_person("declaration.addperson.title", "submit.renewal.application", businessType, form))
         case _ => throw new Exception("Incorrect status - Page not permitted for this status")
 
       }

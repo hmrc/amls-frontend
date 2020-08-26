@@ -46,6 +46,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AmlsSpec
+import views.html.responsiblepeople.address.current_address_UK
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
@@ -84,7 +85,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
     val auditConnector = mock[AuditConnector]
     val autoCompleteService = mock[AutoCompleteService]
     val statusService = mock[StatusService]
-
+    lazy val view = app.injector.instanceOf[current_address_UK]
     val currentAddressController = new CurrentAddressUKController (
       dataCacheConnector = mockDataCacheConnector,
       auditConnector = auditConnector,
@@ -92,7 +93,9 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
       ds = commonDependencies,
       statusService = statusService,
       autoCompleteService = autoCompleteService,
-      cc = mockMcc
+      cc = mockMcc,
+      current_address_UK = view,
+      error = errorView
     )
 
     when {

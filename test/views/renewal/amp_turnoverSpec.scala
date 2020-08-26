@@ -27,12 +27,14 @@ import play.api.libs.json.Json
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.renewal.amp_turnover
 
 import scala.collection.Seq
 
 class amp_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val amp_turnover = app.injector.instanceOf[amp_turnover]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -41,7 +43,7 @@ class amp_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[AMPTurnover] = Form2(Second)
 
-      def view = views.html.renewal.amp_turnover(form2, true)
+      def view = amp_turnover(form2, true)
 
       doc.title must startWith("How much of your turnover for the last 12 months came from sales of art for €10,000 or more? - Renewal - Manage your anti-money laundering supervision - GOV.UK")
     }
@@ -50,7 +52,7 @@ class amp_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[AMPTurnover] = Form2(Third)
 
-      def view = views.html.renewal.amp_turnover(form2, true)
+      def view = amp_turnover(form2, true)
 
       heading.html must be("How much of your turnover for the last 12 months came from sales of art for €10,000 or more?")
       subHeading.html must include(Messages("summary.renewal"))
@@ -64,7 +66,7 @@ class amp_turnoverSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "percentageExpectedTurnover") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.renewal.amp_turnover(form2, true)
+      def view = amp_turnover(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -74,7 +76,7 @@ class amp_turnoverSpec extends AmlsViewSpec with MustMatchers  {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.renewal.amp_turnover(EmptyForm, true)
+      def view = amp_turnover(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

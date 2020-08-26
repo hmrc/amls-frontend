@@ -24,11 +24,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import views.Fixture
 import utils.{AmlsViewSpec, DateHelper}
+import views.html.declaration.renew_registration
 
 
 class renew_registrationSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val renew_registration = app.injector.instanceOf[renew_registration]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class renew_registrationSpec extends AmlsViewSpec with MustMatchers  {
     "have correct title" in new ViewFixture {
       val form2: ValidForm[RenewRegistration] = Form2(RenewRegistrationYes)
 
-      def view = views.html.declaration.renew_registration(form2,
+      def view = renew_registration(form2,
         Some(LocalDate.parse("2019-3-20")))
 
       doc.title must startWith(Messages("declaration.renew.registration.title") + " - " + Messages("summary.declaration"))
@@ -45,7 +47,7 @@ class renew_registrationSpec extends AmlsViewSpec with MustMatchers  {
     "have correct headings" in new ViewFixture {
       val form2: ValidForm[RenewRegistration] = Form2(RenewRegistrationYes)
 
-      def view = views.html.declaration.renew_registration(
+      def view = renew_registration(
         form2, Some(LocalDate.parse("2019-3-20"))
       )
 
@@ -56,7 +58,7 @@ class renew_registrationSpec extends AmlsViewSpec with MustMatchers  {
     "have correct sections" in new ViewFixture {
       val form2: ValidForm[RenewRegistration] = Form2(RenewRegistrationYes)
 
-      def view = views.html.declaration.renew_registration(
+      def view = renew_registration(
         form2, Some(LocalDate.parse("2019-3-20"))
       )
 
@@ -73,7 +75,7 @@ class renew_registrationSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "renewRegistration") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.declaration.renew_registration(
+      def view = renew_registration(
         form2, Some(LocalDate.parse("2019-3-20"))
       )
 
@@ -86,7 +88,7 @@ class renew_registrationSpec extends AmlsViewSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.declaration.renew_registration(
+      def view = renew_registration(
         form2, Some(LocalDate.parse("2019-3-20"))
       )
 

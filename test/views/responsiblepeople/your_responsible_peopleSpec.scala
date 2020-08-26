@@ -25,11 +25,13 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.your_responsible_people
 
 
 class your_responsible_peopleSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val your_responsible_people = app.injector.instanceOf[your_responsible_people]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -47,7 +49,7 @@ class your_responsible_peopleSpec extends AmlsViewSpec with MustMatchers {
     "have correct title, headings, form fields and bullet list of types of RP's to register displayed" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.your_responsible_people(Seq((ResponsiblePerson(),0)), Seq((ResponsiblePerson(),0)))
+      def view = your_responsible_people(Seq((ResponsiblePerson(),0)), Seq((ResponsiblePerson(),0)))
 
       doc.title must be(Messages("responsiblepeople.whomustregister.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -67,7 +69,7 @@ class your_responsible_peopleSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have list with Incomplete and Complete headers displayed when there are both types of lists" in new ViewFixture {
-      def  view = views.html.responsiblepeople.your_responsible_people(completeRpSeq, incompleteRpSeq)
+      def  view = your_responsible_people(completeRpSeq, incompleteRpSeq)
 
       html must include(Messages("responsiblepeople.check_your_answers.incomplete"))
       html must include(Messages("responsiblepeople.check_your_answers.complete"))
@@ -75,7 +77,7 @@ class your_responsible_peopleSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have list with Incomplete header displayed when there are only incomplete RP's" in new ViewFixture {
-      def  view = views.html.responsiblepeople.your_responsible_people(Seq.empty[(ResponsiblePerson, Int)], incompleteRpSeq)
+      def  view = your_responsible_people(Seq.empty[(ResponsiblePerson, Int)], incompleteRpSeq)
 
       html must include(Messages("responsiblepeople.check_your_answers.incomplete"))
       html must not include Messages("responsiblepeople.check_your_answers.complete")
@@ -83,21 +85,21 @@ class your_responsible_peopleSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have list without Complete/Incomplete headers displayed when there are only complete RP's" in new ViewFixture {
-      def  view = views.html.responsiblepeople.your_responsible_people(completeRpSeq, Seq.empty[(ResponsiblePerson, Int)])
+      def  view = your_responsible_people(completeRpSeq, Seq.empty[(ResponsiblePerson, Int)])
 
       html must not include Messages("responsiblepeople.check_your_answers.incomplete")
       html must not include Messages("responsiblepeople.check_your_answers.complete")
     }
 
     "have an add a responsible person link with the correct text and going to the what you need page" in new ViewFixture {
-      def  view = views.html.responsiblepeople.your_responsible_people(completeRpSeq, incompleteRpSeq)
+      def  view = your_responsible_people(completeRpSeq, incompleteRpSeq)
 
       doc.getElementById("addResponsiblePerson").text must be(Messages("responsiblepeople.check_your_answers.add"))
       doc.getElementById("addResponsiblePerson").attr("href") must be(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false).url)
     }
 
     "have an incomplete/complete sections with people names displayed and edit/remove links" in new ViewFixture {
-      def view = views.html.responsiblepeople.your_responsible_people(completeRpSeq, incompleteRpSeq)
+      def view = your_responsible_people(completeRpSeq, incompleteRpSeq)
 
       doc.getElementById("complete-header").text must include(Messages("responsiblepeople.check_your_answers.complete"))
       doc.getElementById("detail-edit-0").attr("href") must be(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url)

@@ -21,30 +21,32 @@ import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.businessdetails.what_you_need
 
 
 class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val what_you_need = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
   }
 
   "What you need View" must {
     "Have the correct title" in new ViewFixture {
-      def view = views.html.businessdetails.what_you_need()
+      def view = what_you_need()
 
       doc.title must startWith(Messages("title.wyn"))
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.businessdetails.what_you_need()
+      def view = what_you_need()
 
       heading.html must be (Messages("title.wyn"))
       subHeading.html must include (Messages("summary.businessdetails"))
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.businessdetails.what_you_need()
+      def view = what_you_need()
 
       html must include(Messages("if your business is currently registered with HMRC under the Money Laundering Regulations"))
       html must include(Messages("the date your business started or will start activities that need to be registered under the Money Laundering Regulations"))
@@ -56,7 +58,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.businessdetails.what_you_need()
+      def view = what_you_need()
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

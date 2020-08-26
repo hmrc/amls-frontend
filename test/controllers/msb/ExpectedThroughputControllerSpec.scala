@@ -30,6 +30,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.msb.expected_throughput
 
 import scala.concurrent.Future
 
@@ -38,12 +39,14 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[expected_throughput]
     val controller = new ExpectedThroughputController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
-      serviceFlow = mockServiceFlow, cc = mockMcc)
+      serviceFlow = mockServiceFlow,
+      cc = mockMcc,
+      expected_throughput = view)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, None)

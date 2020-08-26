@@ -26,17 +26,20 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import views.html.bankdetails.remove_bank_details
 
 class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
-
+    lazy val removeBankDetails = app.injector.instanceOf[remove_bank_details]
     val controller = new RemoveBankDetailsController (
       dataCacheConnector =  mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
-      mcc = mockMcc)
+      mcc = mockMcc,
+      remove_bank_details = removeBankDetails,
+      error = errorView)
   }
 
   "Get" must {

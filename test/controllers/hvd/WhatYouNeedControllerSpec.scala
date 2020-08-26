@@ -22,13 +22,18 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.hvd.what_you_need
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
-    val controller = new WhatYouNeedController (authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc) {
+    lazy val view = app.injector.instanceOf[what_you_need]
+    val controller = new WhatYouNeedController (
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      what_you_need = view) {
 
     }
   }

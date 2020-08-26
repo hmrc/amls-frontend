@@ -23,10 +23,12 @@ import play.api.i18n.Messages
 import utils.Strings.TextHelpers
 import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
+import views.html.renewal.renewal_progress
 
 class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val renewal_progress = app.injector.instanceOf[renewal_progress]
     implicit val requestWithToken = addTokenForView()
 
     val renewalDate = LocalDate.now().plusDays(15)
@@ -40,7 +42,7 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
 
     "Have the correct title and headings " in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, true, true, readyForRenewal)
+      override def view = renewal_progress(Seq.empty, businessName, serviceNames, true, true, readyForRenewal)
 
       doc.title must startWith(Messages("renewal.progress.title"))
 
@@ -52,13 +54,13 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
 
     "show intro text" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal)
+      override def view = renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal)
 
       html must include(Messages("renewal.progress.intro", DateHelper.formatDate(renewalDate)).convertLineBreaks)
     }
 
     "show the business name and services" in new ViewFixture {
-      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal)
+      override def view = renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal)
 
       val element = doc.getElementsByClass("grid-layout")
       serviceNames.foreach(name => element.text() must include {
@@ -67,7 +69,7 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "not show the view details link under services section" in new ViewFixture {
-      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal)
+      override def view = renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal)
 
       val element = Option(doc.getElementById("view-details"))
       element mustBe None
@@ -75,7 +77,7 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
 
 
     "enable the submit registration button when can submit and renewal section complete" in new ViewFixture {
-      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, canSubmit = true,
+      override def view = renewal_progress(Seq.empty, businessName, serviceNames, canSubmit = true,
         msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = true)
 
       doc.select("form button[name=submit]").hasAttr("disabled") mustBe false
@@ -86,7 +88,7 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "not have the submit registration button when cannot submit because renewal section not complete" in new ViewFixture {
-      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, canSubmit = false,
+      override def view = renewal_progress(Seq.empty, businessName, serviceNames, canSubmit = false,
         msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = false)
 
       html must include(Messages("renewal.progress.submit.intro"))
@@ -97,7 +99,7 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "not show the submit registration button when cannot submit and renewal section complete" in new ViewFixture {
-      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, canSubmit = false,
+      override def view = renewal_progress(Seq.empty, businessName, serviceNames, canSubmit = false,
         msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = true)
 
       doc.select("form button[name=submit]").isEmpty mustBe true
@@ -107,14 +109,14 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
 
     "show ready to submit renewal when information are completed" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal, true)
+      override def view = renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal, true)
 
       doc.select("#renewal-information-completed").get(0).text() must be(Messages("renewal.progress.information.completed.info"))
     }
 
     "show submit renewal link and text when information are not completed yet" in new ViewFixture {
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal, false)
+      override def view = renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal, false)
 
       val space = " "
       val fullStop = "."
@@ -130,7 +132,7 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "show the Nominated officer box with correct title, name and link" in new ViewFixture {
-      def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal, false,
+      def view = renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal, false,
         hasCompleteNominatedOfficer = true,
         nominatedOfficerName = Some("FirstName LastName"))
 
@@ -141,7 +143,7 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "do not show the Nominated officer box if NO is not defined" in new ViewFixture {
-      def view = views.html.renewal.renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal, false,
+      def view = renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal, false,
         hasCompleteNominatedOfficer = false,
         nominatedOfficerName = None)
 

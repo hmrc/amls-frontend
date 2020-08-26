@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessdetails.letters_address
 
 
 class letters_addressSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val letters_address = app.injector.instanceOf[letters_address]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -38,7 +40,7 @@ class letters_addressSpec extends AmlsViewSpec with MustMatchers {
 
       def view = {
         val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.businessdetails.letters_address(form2, address, true)
+        letters_address(form2, address, true)
       }
 
       doc.title must be(Messages("businessdetails.lettersaddress.title") +
@@ -61,7 +63,7 @@ class letters_addressSpec extends AmlsViewSpec with MustMatchers {
 
       def view = {
         val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.businessdetails.letters_address(form2, address, true)
+        letters_address(form2, address, true)
       }
 
       errorSummary.html() must include("not a message Key")
@@ -73,7 +75,7 @@ class letters_addressSpec extends AmlsViewSpec with MustMatchers {
 
       def view = {
         val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.businessdetails.letters_address(form2, address, true)
+        letters_address(form2, address, true)
       }
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty

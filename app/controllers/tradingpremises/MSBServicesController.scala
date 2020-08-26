@@ -27,6 +27,7 @@ import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices}
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
+import views.html.tradingpremises.msb_services
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -36,7 +37,9 @@ class MSBServicesController @Inject () (
                                        val authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
                                        val statusService: StatusService,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                       val cc: MessagesControllerComponents,
+                                       msb_services: msb_services,
+                                       implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean = false, changed: Boolean = false) = authAction.async {
     implicit request =>
@@ -64,8 +67,8 @@ class MSBServicesController @Inject () (
                   (for {
                     tps <- tp.msbServices
                   } yield {
-                    Ok(views.html.tradingpremises.msb_services(Form2[TradingPremisesMsbServices](tps), index, edit, changed, businessMatching))
-                  }) getOrElse Ok(views.html.tradingpremises.msb_services(EmptyForm, index, edit, changed, businessMatching))
+                    Ok(msb_services(Form2[TradingPremisesMsbServices](tps), index, edit, changed, businessMatching))
+                  }) getOrElse Ok(msb_services(EmptyForm, index, edit, changed, businessMatching))
 
                 }
             }) getOrElse NotFound(notFoundView)
@@ -96,7 +99,7 @@ class MSBServicesController @Inject () (
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
           } yield {
-            BadRequest(views.html.tradingpremises.msb_services(f, index, edit, changed, businessMatching))
+            BadRequest(msb_services(f, index, edit, changed, businessMatching))
           }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

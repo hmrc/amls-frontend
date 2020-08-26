@@ -30,6 +30,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.hvd.percentage
 
 import scala.concurrent.Future
 
@@ -39,13 +40,15 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
     self =>
     val request = addToken(authRequest)
 
+    lazy val view = app.injector.instanceOf[percentage]
     val controller =
       new PercentageOfCashPaymentOver15000Controller(SuccessfulAuthAction,
         ds = commonDependencies,
         mockCacheConnector,
         mockServiceFlow,
         mockStatusService,
-        cc = mockMcc)
+        cc = mockMcc,
+        percentage = view)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, None)

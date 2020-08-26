@@ -20,6 +20,7 @@ import javax.inject.Inject
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 import utils.AuthAction
+import views.html.{unauthorised, unauthorised_role}
 
 import scala.concurrent.Future
 
@@ -27,16 +28,18 @@ class AmlsController @Inject()(authAction: AuthAction,
                                val ds: CommonPlayDependencies,
                                val cc: MessagesControllerComponents,
                                implicit override val messagesApi: MessagesApi,
-                               parser: BodyParsers.Default) extends AmlsBaseController(ds, cc) with MessagesRequestHelper {
+                               parser: BodyParsers.Default,
+                               unauthorisedView: unauthorised,
+                               unauthorisedRole: unauthorised_role) extends AmlsBaseController(ds, cc) with MessagesRequestHelper {
 
   val unauthorised: Action[AnyContent] = messagesAction(parser).async {
     implicit request: MessagesRequest[AnyContent] =>
-      Future.successful(Ok(views.html.unauthorised()))
+      Future.successful(Ok(unauthorisedView()))
   }
 
   val unauthorised_role = messagesAction(parser).async {
     implicit request: MessagesRequest[AnyContent] =>
-      Future.successful(Unauthorized(views.html.unauthorised_role()))
+      Future.successful(Unauthorized(unauthorisedRole()))
   }
 
   val keep_alive = authAction.async {

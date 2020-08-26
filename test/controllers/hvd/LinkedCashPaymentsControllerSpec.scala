@@ -25,6 +25,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.hvd.linked_cash_payments
 
 import scala.concurrent.Future
 
@@ -32,8 +33,13 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
-
-    val controller = new LinkedCashPaymentsController (mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[linked_cash_payments]
+    val controller = new LinkedCashPaymentsController (
+      mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      linked_cash_payments = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)

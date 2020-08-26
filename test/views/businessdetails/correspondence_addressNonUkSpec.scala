@@ -25,11 +25,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessdetails.correspondence_address_non_uk
 
 
 class correspondence_addressNonUkSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val correspondence_address_non_uk = app.injector.instanceOf[correspondence_address_non_uk]
     implicit val requestWithToken = addTokenForView()
     val countries = Some(Seq(
       NameValuePair("Country 1", "country:1")
@@ -50,7 +52,7 @@ class correspondence_addressNonUkSpec extends AmlsViewSpec with MustMatchers  {
         Country("AB12CD", "XX")
       ))
 
-      def view = views.html.businessdetails.correspondence_address_non_uk(form2, true, countries)
+      def view = correspondence_address_non_uk(form2, true, countries)
 
       doc.title must startWith(Messages("businessdetails.correspondenceaddress.title") + " - " + Messages("summary.businessdetails"))
     }
@@ -66,7 +68,7 @@ class correspondence_addressNonUkSpec extends AmlsViewSpec with MustMatchers  {
         None,
         Country("Antarctica", "XX")
       ))
-      def view = views.html.businessdetails.correspondence_address_non_uk(form2, true, countries)
+      def view = correspondence_address_non_uk(form2, true, countries)
 
       heading.html must be(Messages("businessdetails.correspondenceaddress.title"))
       subHeading.html must include(Messages("summary.businessdetails"))
@@ -80,7 +82,7 @@ class correspondence_addressNonUkSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "country-fieldset") -> Seq(ValidationError("fourth not a message Key"))
         ))
 
-      def view = views.html.businessdetails.correspondence_address_non_uk(form2, true, countries)
+      def view = correspondence_address_non_uk(form2, true, countries)
 
       errorSummary.html() must include("fourth not a message Key")
 
@@ -92,7 +94,7 @@ class correspondence_addressNonUkSpec extends AmlsViewSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.businessdetails.correspondence_address_non_uk(form2, true, countries)
+      def view = correspondence_address_non_uk(form2, true, countries)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

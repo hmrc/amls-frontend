@@ -32,6 +32,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
 
 class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
   with MockitoSugar
@@ -48,11 +49,13 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
+    lazy val view = app.injector.instanceOf[business_applied_for_psr_number]
     val controller = new BusinessAppliedForPSRNumberController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel],
-      cc = mockMcc
+      cc = mockMcc,
+      business_applied_for_psr_number = view
     )
 
     mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())

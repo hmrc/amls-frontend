@@ -26,24 +26,26 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import views.Fixture
+import views.html.renewal.summary
 
 import scala.collection.JavaConversions._
 
 class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
+    lazy val summary = app.injector.instanceOf[summary]
     implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 
   "summary view" must {
     "have correct title" in new ViewFixture {
-      def view = views.html.renewal.summary(EmptyForm, Renewal(), None, None, true)
+      def view = summary(EmptyForm, Renewal(), None, None, true)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.renewal.summary(EmptyForm, Renewal(), None, None, true)
+      def view = summary(EmptyForm, Renewal(), None, None, true)
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.renewal"))
@@ -141,7 +143,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
             "High value dealer",
             "Money service business"
           ))
-        views.html.renewal.summary(EmptyForm, renewalModel, businessTypesList, msbServices, true)
+        summary(EmptyForm, renewalModel, businessTypesList, msbServices, true)
       }
 
       forAll(sectionChecks) { (key, check, editLink) => {

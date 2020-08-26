@@ -25,10 +25,12 @@ import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.responsiblepeople.experience_training
 
 class experience_trainingSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val experience_training = app.injector.instanceOf[experience_training]
     implicit val requestWithToken = addTokenForView()
     val businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices))))
   }
@@ -38,7 +40,7 @@ class experience_trainingSpec extends AmlsViewSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
       def view: _root_.play.twirl.api.HtmlFormat.Appendable =
-        views.html.responsiblepeople.experience_training(form2, businessMatching, false, 0, None, "FirstName LastName")
+        experience_training(form2, businessMatching, false, 0, None, "FirstName LastName")
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -48,7 +50,7 @@ class experience_trainingSpec extends AmlsViewSpec with MustMatchers  {
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
       def view: _root_.play.twirl.api.HtmlFormat.Appendable =
-        views.html.responsiblepeople.experience_training(form2, businessMatching, false, 0, None, "FirstName LastName")
+        experience_training(form2, businessMatching, false, 0, None, "FirstName LastName")
 
       doc.title must be(Messages("responsiblepeople.experiencetraining.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -61,7 +63,7 @@ class experience_trainingSpec extends AmlsViewSpec with MustMatchers  {
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
       def view: _root_.play.twirl.api.HtmlFormat.Appendable =
-        views.html.responsiblepeople.experience_training(form2, businessMatching, false, 0, None, "FirstName LastName")
+        experience_training(form2, businessMatching, false, 0, None, "FirstName LastName")
 
       heading.html() must be(Messages("responsiblepeople.experiencetraining.heading", "FirstName LastName", "an accountancy service provider"))
     }
@@ -75,7 +77,7 @@ class experience_trainingSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "experienceInformation", Seq(ValidationError(messageKey2)))))
 
       def view: _root_.play.twirl.api.HtmlFormat.Appendable =
-        views.html.responsiblepeople.experience_training(form2, businessMatching, false, 0, None, "FirstName LastName")
+        experience_training(form2, businessMatching, false, 0, None, "FirstName LastName")
 
       errorSummary.html() must include(messageKey1)
       errorSummary.html() must include(messageKey2)

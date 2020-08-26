@@ -19,18 +19,20 @@ package views.withdrawal
 import org.joda.time.LocalDateTime
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
-import utils.{DateHelper, AmlsViewSpec}
+import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
+import views.html.withdrawal.withdraw_application
 
 class withdraw_applicationSpec extends AmlsViewSpec with MockitoSugar {
 
   trait ViewFixture extends Fixture {
+    lazy val withdraw_application = app.injector.instanceOf[withdraw_application]
     implicit val requestWithToken = addTokenForView()
 
     //noinspection ScalaStyle
     val date = new LocalDateTime(2001, 1, 1, 12, 0, 0)
 
-    def view = views.html.withdrawal.withdraw_application("The Business", date)
+    def view = withdraw_application("The Business", date)
   }
 
   "The withdraw application view" must {

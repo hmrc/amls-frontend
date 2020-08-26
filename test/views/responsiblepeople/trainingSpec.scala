@@ -23,11 +23,13 @@ import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.responsiblepeople.training
 
 
 class trainingSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val training = app.injector.instanceOf[training]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class trainingSpec extends AmlsViewSpec with MustMatchers {
     "have a back link" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.training(form2, false, 0, None, "Person Name")
+      def view = training(form2, false, 0, None, "Person Name")
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -44,7 +46,7 @@ class trainingSpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.training(form2, false, 0, None, "Person Name")
+      def view = training(form2, false, 0, None, "Person Name")
 
       doc.title must be(Messages("responsiblepeople.training.title") + " - " +
         Messages("summary.responsiblepeople")+
@@ -57,7 +59,7 @@ class trainingSpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.training(form2, false, 0, None, "Person Name")
+      def view = training(form2, false, 0, None, "Person Name")
 
       heading.html must be(Messages("responsiblepeople.training.heading", "Person Name"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -68,7 +70,7 @@ class trainingSpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.training(form2, false, 0, None, "Person Name")
+      def view = training(form2, false, 0, None, "Person Name")
 
       noException must be thrownBy doc.getElementById("training-true")
       noException must be thrownBy doc.getElementById("training-false")
@@ -84,7 +86,7 @@ class trainingSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "information") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.training(form2, false, 0, None, "Person Name")
+      def view = training(form2, false, 0, None, "Person Name")
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

@@ -26,6 +26,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.msb.what_you_need
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,12 +35,14 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
+    lazy val view = app.injector.instanceOf[what_you_need]
     implicit val ec = app.injector.instanceOf[ExecutionContext]
     val controller = new WhatYouNeedController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockStatusService,
       mockCacheConnector,
-      cc = mockMcc)
+      cc = mockMcc,
+      what_you_need = view)
 
     mockCacheFetch[ServiceChangeRegister](None)
     mockCacheFetchAll

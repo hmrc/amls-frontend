@@ -25,18 +25,21 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
+import views.html.hvd.excise_goods
 
 class ExciseGoodsControllerSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
+    lazy val view = app.injector.instanceOf[excise_goods]
     val controller = new ExciseGoodsController(mockCacheConnector,
                                                 mockStatusService,
                                                 SuccessfulAuthAction,
                                                 ds = commonDependencies,
                                                 mockServiceFlow,
-                                                cc = mockMcc)
+                                                cc = mockMcc,
+                                                excise_goods = view)
 
     mockCacheFetch[Hvd](None)
     mockCacheSave[Hvd]

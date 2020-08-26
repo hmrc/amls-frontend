@@ -32,7 +32,8 @@ class ServicesOfAnotherTCSPController @Inject()(
                                                  val authAction: AuthAction,
                                                  val ds: CommonPlayDependencies,
                                                  val dataCacheConnector: DataCacheConnector,
-                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                 val cc: MessagesControllerComponents,
+                                                 services_of_another_tcsp: services_of_another_tcsp) extends AmlsBaseController(ds, cc) {
 
   val NAME = "servicesOfAnotherTCSP"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)

@@ -30,6 +30,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.msb.send_money_to_other_country
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,7 +39,14 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    val controller = new SendMoneyToOtherCountryController(mockCacheConnector, SuccessfulAuthAction, ds = commonDependencies, mockStatusService, mockMcc)
+    lazy val view = app.injector.instanceOf[send_money_to_other_country]
+    val controller = new SendMoneyToOtherCountryController(
+      mockCacheConnector,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      mockStatusService,
+      mockMcc,
+      send_money_to_other_country = view)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
     mockCacheGetEntry[ServiceChangeRegister](None, ServiceChangeRegister.key)

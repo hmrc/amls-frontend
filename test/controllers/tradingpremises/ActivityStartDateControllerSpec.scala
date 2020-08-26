@@ -28,6 +28,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import views.html.tradingpremises.activity_start_date
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
@@ -42,8 +43,15 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
     val authAction: AuthAction = SuccessfulAuthAction
-
-    val controller = new ActivityStartDateController(messagesApi, authAction, commonDependencies, self.cache, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[activity_start_date]
+    val controller = new ActivityStartDateController(
+      messagesApi,
+      authAction,
+      commonDependencies,
+      self.cache,
+      cc = mockMcc,
+      activity_start_date = view,
+      error = errorView)
   }
 
   "ActivityStartDateController" must {

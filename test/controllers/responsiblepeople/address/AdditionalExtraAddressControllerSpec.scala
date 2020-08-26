@@ -32,6 +32,7 @@ import play.api.test.Helpers._
 import services.AutoCompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.responsiblepeople.address.additional_extra_address
 
 import scala.concurrent.Future
 
@@ -49,13 +50,15 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
     val request = addToken(authRequest)
 
     val autoCompleteService = mock[AutoCompleteService]
-
+    lazy val view = app.injector.instanceOf[additional_extra_address]
     val additionalExtraAddressController = new AdditionalExtraAddressController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       autoCompleteService = autoCompleteService,
       ds = commonDependencies,
-      cc = mockMcc
+      cc = mockMcc,
+      additional_extra_address = view,
+      error = errorView
     )
 
     when {

@@ -44,7 +44,8 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
                                            val statusService: StatusService,
                                            val dataCacheConnector: DataCacheConnector,
                                            val businessMatchingService: BusinessMatchingService,
-                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                           val cc: MessagesControllerComponents,
+                                           register_services: register_services) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

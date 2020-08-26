@@ -33,6 +33,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.businessactivities.expected_amls_turnover
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,12 +44,13 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
     val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
-
+    lazy val view = app.injector.instanceOf[expected_amls_turnover]
     val controller = new ExpectedAMLSTurnoverController (
       dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
-      cc = mockMcc
+      cc = mockMcc,
+      expected_amls_turnover = view
     )
 
     val mockCache = mock[CacheMap]

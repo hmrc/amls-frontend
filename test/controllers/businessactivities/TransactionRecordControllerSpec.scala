@@ -25,14 +25,19 @@ import org.scalatest.mockito.MockitoSugar
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import views.html.businessactivities.customer_transaction_records
 
 class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks {
     self =>
-
+    lazy val view = app.injector.instanceOf[customer_transaction_records]
     val request = addToken(authRequest)
-    val controller = new TransactionRecordController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockMcc)
+    val controller = new TransactionRecordController(SuccessfulAuthAction,
+      ds = commonDependencies,
+      mockCacheConnector,
+      mockMcc,
+      customer_transaction_records = view)
 
     mockCacheSave[BusinessActivities]
   }

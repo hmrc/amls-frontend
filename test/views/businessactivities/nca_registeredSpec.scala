@@ -22,11 +22,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessactivities.nca_registered
 
 
 class nca_registeredSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val registered = app.injector.instanceOf[nca_registered]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class nca_registeredSpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.businessactivities.nca_registered(form2, true)
+      def view = registered(form2, true)
 
       doc.title must be(Messages("businessactivities.ncaRegistered.title") + " - " +
         Messages("summary.businessactivities") +
@@ -47,7 +49,7 @@ class nca_registeredSpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.businessactivities.nca_registered(form2, true)
+      def view = registered(form2, true)
 
       heading.html must be(Messages("businessactivities.ncaRegistered.title"))
       subHeading.html must include(Messages("summary.businessactivities"))
@@ -58,7 +60,7 @@ class nca_registeredSpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.businessactivities.nca_registered(form2, true)
+      def view = registered(form2, true)
 
       doc.getElementsByAttributeValue("name", "ncaRegistered") must not be empty
 
@@ -71,14 +73,14 @@ class nca_registeredSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "ncaRegistered") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessactivities.nca_registered(form2, true)
+      def view = registered(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.nca_registered(EmptyForm, true)
+      def view = registered(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

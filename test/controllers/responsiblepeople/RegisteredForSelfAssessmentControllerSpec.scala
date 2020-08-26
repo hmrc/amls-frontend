@@ -30,6 +30,7 @@ import utils.AmlsSpec
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
+import views.html.responsiblepeople.registered_for_self_assessment
 
 import scala.concurrent.Future
 
@@ -39,10 +40,12 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[registered_for_self_assessment]
     val controller = new RegisteredForSelfAssessmentController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+      registered_for_self_assessment = view,
+      error = errorView)
   }
 
   val emptyCache = CacheMap("", Map.empty)

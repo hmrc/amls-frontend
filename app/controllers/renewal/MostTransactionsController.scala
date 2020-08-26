@@ -25,6 +25,7 @@ import models.renewal.{MostTransactions, Renewal}
 import play.api.mvc.{MessagesControllerComponents, Result}
 import services.{AutoCompleteService, RenewalService}
 import utils.{AuthAction, ControllerHelper}
+import views.html.renewal.most_transactions
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,7 +36,8 @@ class MostTransactionsController @Inject()(val authAction: AuthAction,
                                            val cache: DataCacheConnector,
                                            val renewalService: RenewalService,
                                            val autoCompleteService: AutoCompleteService,
-                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                           val cc: MessagesControllerComponents,
+                                           most_transactions: most_transactions) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>
@@ -45,7 +47,7 @@ class MostTransactionsController @Inject()(val authAction: AuthAction,
               msb <- response
               transactions <- msb.mostTransactions
             } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
-            Ok(views.html.renewal.most_transactions(form, edit, autoCompleteService.getCountries))
+            Ok(most_transactions(form, edit, autoCompleteService.getCountries))
         }
   }
 
@@ -54,7 +56,7 @@ class MostTransactionsController @Inject()(val authAction: AuthAction,
       implicit request =>
         Form2[MostTransactions](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.renewal.most_transactions(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
+            Future.successful(BadRequest(most_transactions(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
             cache.fetchAll(request.credId).flatMap {
               optMap =>

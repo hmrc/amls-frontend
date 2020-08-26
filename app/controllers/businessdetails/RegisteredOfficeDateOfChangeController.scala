@@ -26,6 +26,7 @@ import org.joda.time.LocalDate
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.{AuthAction, DateOfChangeHelper}
+import views.html.date_of_change
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,13 +36,14 @@ class RegisteredOfficeDateOfChangeController @Inject () (
                                                           val statusService: StatusService,
                                                           val authAction: AuthAction,
                                                           val ds: CommonPlayDependencies,
-                                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                                                          val cc: MessagesControllerComponents,
+                                                          date_of_change: date_of_change) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
 
 
   def get = authAction.async {
       implicit request =>
-        Future(Ok(views.html.date_of_change(
+        Future(Ok(date_of_change(
           EmptyForm,
           "summary.businessdetails",
           controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
@@ -57,7 +59,7 @@ class RegisteredOfficeDateOfChangeController @Inject () (
           }
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
             case form: InvalidForm =>
-              Future.successful(BadRequest(views.html.date_of_change(
+              Future.successful(BadRequest(date_of_change(
                 form, "summary.businessdetails",
                 controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post())
               ))

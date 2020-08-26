@@ -34,6 +34,7 @@ import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.renewal.transactions_in_last_12_months
 
 import scala.concurrent.Future
 
@@ -44,8 +45,14 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
     val renewalService = mock[RenewalService]
     val request = addToken(authRequest)
     val mockDataCacheConnector = mock[DataCacheConnector]
-
-    lazy val controller = new TransactionsInLast12MonthsController(SuccessfulAuthAction, ds = commonDependencies, mockDataCacheConnector, renewalService, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[transactions_in_last_12_months]
+    lazy val controller = new TransactionsInLast12MonthsController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      mockDataCacheConnector,
+      renewalService,
+      cc = mockMcc,
+      transactions_in_last_12_months = view)
 
     when {
       renewalService.getRenewal(any())(any(), any())

@@ -29,6 +29,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.businessactivities.document_risk_assessment_policy
 
 import scala.concurrent.Future
 
@@ -36,10 +37,15 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
   trait Fixture {
     self => val request = addToken(authRequest)
+    lazy val view = app.injector.instanceOf[document_risk_assessment_policy]
 
     val controller = new DocumentRiskAssessmentController (
       dataCacheConnector = mock[DataCacheConnector],
-      SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      document_risk_assessment_policy = view,
+      error = errorView)
   }
 
   val emptyCache = CacheMap("", Map.empty)

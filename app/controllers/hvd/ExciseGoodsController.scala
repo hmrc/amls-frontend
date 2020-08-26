@@ -37,7 +37,8 @@ class ExciseGoodsController @Inject() (val dataCacheConnector: DataCacheConnecto
                                        val authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
                                        val serviceFlow: ServiceFlow,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                                       val cc: MessagesControllerComponents,
+                                       excise_goods: excise_goods) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = authAction.async {
         implicit request =>

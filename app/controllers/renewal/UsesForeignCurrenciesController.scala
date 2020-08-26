@@ -36,7 +36,8 @@ class UsesForeignCurrenciesController @Inject()(val authAction: AuthAction,
                                                 val ds: CommonPlayDependencies,
                                                 renewalService: RenewalService,
                                                 dataCacheConnector: DataCacheConnector,
-                                                val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                val cc: MessagesControllerComponents,
+                                                uses_foreign_currencies: uses_foreign_currencies) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

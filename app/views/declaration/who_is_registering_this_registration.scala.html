@@ -18,6 +18,10 @@
 @import models.responsiblepeople._
 @import forms2._
 @import config.{ ApplicationConfig}
+@import views.html.declaration.who_is_registering_common
+
+@this(main: include.main,
+      whoIsRegisteringCommon: who_is_registering_common)
 
 @(f: forms.Form2[_], model : Seq[ResponsiblePerson])(implicit m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 
@@ -37,7 +41,7 @@
 
     @form(f, controllers.declaration.routes.WhoIsRegisteringController.post()) {
 
-        @who_is_registering_common(
+        @whoIsRegisteringCommon(
             "declaration.who.is.registering.title",
             f,
             model,

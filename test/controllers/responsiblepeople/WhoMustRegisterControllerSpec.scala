@@ -23,14 +23,16 @@ import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
+import views.html.responsiblepeople.who_must_register
 
 class WhoMustRegisterControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[who_must_register]
     val controller = new WhoMustRegisterController (
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+      who_must_register = view)
   }
   "WhoMustRegisterController" must {
 

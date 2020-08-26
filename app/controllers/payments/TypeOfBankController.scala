@@ -28,6 +28,7 @@ import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, DeclarationHelper}
+import views.html.payments.type_of_bank
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -40,14 +41,15 @@ class TypeOfBankController @Inject()(val authAction: AuthAction,
                                      val paymentsService: PaymentsService,
                                      val cc: MessagesControllerComponents,
                                      val statusService: StatusService,
-                                     val renewalService: RenewalService) extends AmlsBaseController(ds, cc) {
+                                     val renewalService: RenewalService,
+                                     type_of_bank: type_of_bank) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
     implicit request =>
       (for {
         subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
       } yield {
-        Ok(views.html.payments.type_of_bank(EmptyForm, subHeading))
+        Ok(type_of_bank(EmptyForm, subHeading))
       }) getOrElse InternalServerError("Failed to retrieve data.")
   }
 
@@ -63,7 +65,7 @@ class TypeOfBankController @Inject()(val authAction: AuthAction,
         case f: InvalidForm => (for {
           subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
         } yield {
-          BadRequest(views.html.payments.type_of_bank(f, subHeading))
+          BadRequest(type_of_bank(f, subHeading))
         }) getOrElse InternalServerError("Failed to retrieve data.")
       }
   }

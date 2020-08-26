@@ -32,7 +32,8 @@ class PenalisedByProfessionalController @Inject()(
                                                    val dataCacheConnector: DataCacheConnector,
                                                    val authAction: AuthAction,
                                                    val ds: CommonPlayDependencies,
-                                                   val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                   val cc: MessagesControllerComponents,
+                                                   penalised_by_professional: penalised_by_professional) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

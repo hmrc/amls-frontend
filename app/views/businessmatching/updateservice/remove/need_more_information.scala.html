@@ -19,6 +19,8 @@
 @import config.{ ApplicationConfig}
 @import forms.EmptyForm
 
+@this(main: include.main)
+
 @(activities: Set[String])(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

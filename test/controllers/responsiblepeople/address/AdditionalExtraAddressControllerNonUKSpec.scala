@@ -35,6 +35,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.responsiblepeople.address.additional_extra_address_NonUK
 
 import scala.concurrent.Future
 
@@ -50,14 +51,16 @@ class AdditionalExtraAddressControllerNonUKSpec extends AmlsSpec with MockitoSug
 
     val auditConnector = mock[AuditConnector]
     val autoCompleteService = mock[AutoCompleteService]
-
+    lazy val view = app.injector.instanceOf[additional_extra_address_NonUK]
     val additionalExtraAddressController = new AdditionalExtraAddressNonUKController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       auditConnector = auditConnector,
       autoCompleteService = autoCompleteService,
       ds = commonDependencies,
-      cc = mockMcc
+      cc = mockMcc,
+      additional_extra_address_NonUK = view,
+      error = errorView
     )
 
     when {

@@ -28,6 +28,7 @@ import play.api.mvc.{MessagesControllerComponents, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, AuthorisedRequest, DeclarationHelper}
+import views.html.payments.ways_to_pay
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -40,13 +41,14 @@ class WaysToPayController @Inject()(val authAction: AuthAction,
                                     val authEnrolmentsService: AuthEnrolmentsService,
                                     val feeResponseService: FeeResponseService,
                                     val cc: MessagesControllerComponents,
-                                    val renewalService: RenewalService) extends AmlsBaseController(ds, cc) {
+                                    val renewalService: RenewalService,
+                                    ways_to_pay: ways_to_pay) extends AmlsBaseController(ds, cc) {
 
   def get() = authAction.async {
     implicit request =>
       (for {
         subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
-      } yield Ok(views.html.payments.ways_to_pay(EmptyForm, subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
+      } yield Ok(ways_to_pay(EmptyForm, subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
   }
 
   def post() = authAction.async {
@@ -83,7 +85,7 @@ class WaysToPayController @Inject()(val authAction: AuthAction,
         case f: InvalidForm =>
           (for {
             subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
-          } yield BadRequest(views.html.payments.ways_to_pay(f, subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
+          } yield BadRequest(ways_to_pay(f, subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
       }
   }
 

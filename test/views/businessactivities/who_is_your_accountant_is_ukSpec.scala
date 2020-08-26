@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
+import views.html.businessactivities.who_is_your_accountant_is_uk_address
 
 
 class who_is_your_accountant_is_ukSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
+    lazy val address = app.injector.instanceOf[who_is_your_accountant_is_uk_address]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -41,7 +43,7 @@ class who_is_your_accountant_is_ukSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[WhoIsYourAccountantIsUk] = Form2(defaultIsUkTrue)
 
-      def view = views.html.businessactivities.who_is_your_accountant_is_uk_address(form2, true, defaultName.accountantsName)
+      def view = address(form2, true, defaultName.accountantsName)
 
       doc.title must startWith(Messages("businessactivities.whoisyouraccountant.location.title"))
     }
@@ -50,7 +52,7 @@ class who_is_your_accountant_is_ukSpec extends AmlsViewSpec with MustMatchers {
 
       val form2: ValidForm[WhoIsYourAccountantIsUk] = Form2(defaultIsUkTrue)
 
-      def view = views.html.businessactivities.who_is_your_accountant_is_uk_address(form2, true, defaultName.accountantsName)
+      def view = address(form2, true, defaultName.accountantsName)
 
       heading.html must be(Messages("businessactivities.whoisyouraccountant.location.header", defaultName.accountantsName))
       subHeading.html must include(Messages("summary.businessactivities"))
@@ -64,7 +66,7 @@ class who_is_your_accountant_is_ukSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "isUK") -> Seq(ValidationError("third not a message Key"))
         ))
 
-      def view = views.html.businessactivities.who_is_your_accountant_is_uk_address(form2, true, defaultName.accountantsName)
+      def view = address(form2, true, defaultName.accountantsName)
 
       errorSummary.html() must include("third not a message Key")
 
@@ -73,7 +75,7 @@ class who_is_your_accountant_is_ukSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.who_is_your_accountant_is_uk_address(EmptyForm, true, defaultName.accountantsName)
+      def view = address(EmptyForm, true, defaultName.accountantsName)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

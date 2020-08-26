@@ -22,18 +22,20 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessmatching.confirm_postcode
 
 
 class confirm_postcodeSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val confirm_postcode = app.injector.instanceOf[confirm_postcode]
     implicit val requestWithToken = addTokenForView()
   }
 
   "confirm_postcode view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.businessmatching.confirm_postcode(EmptyForm)
+      def view = confirm_postcode(EmptyForm)
 
       doc.title must startWith(Messages("businessmatching.confirm.postcode.title") + " - " + Messages("summary.businessmatching"))
       heading.html must include(Messages("businessmatching.confirm.postcode.title"))
@@ -48,7 +50,7 @@ class confirm_postcodeSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "postCode") -> Seq(ValidationError("not a message key"))
         ))
 
-      def view = views.html.businessmatching.confirm_postcode(form2)
+      def view = confirm_postcode(form2)
 
       errorSummary.html() must include("not a message key")
 

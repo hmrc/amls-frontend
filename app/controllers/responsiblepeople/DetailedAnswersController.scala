@@ -32,6 +32,7 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, DeclarationHelper, RepeatingSection}
+import views.html.responsiblepeople.detailed_answers
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,7 +43,9 @@ class DetailedAnswersController @Inject () (
                                              val ds: CommonPlayDependencies,
                                              val statusService: StatusService,
                                              val config: ApplicationConfig,
-                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                             val cc: MessagesControllerComponents,
+                                             detailed_answers: detailed_answers,
+                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])
                                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
@@ -75,7 +78,7 @@ class DetailedAnswersController @Inject () (
           msbOrTcsp: Option[Boolean] =>
 
             val shouldShowApprovalSection = !(msbOrTcsp.contains(true)) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
-            Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, showHide, ControllerHelper.rpTitleName(Some(x)), flow, shouldShowApprovalSection, businessMatching))
+            Ok(detailed_answers(Some(x), index, showHide, ControllerHelper.rpTitleName(Some(x)), flow, shouldShowApprovalSection, businessMatching))
         }
       }
       case Some(_) => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))

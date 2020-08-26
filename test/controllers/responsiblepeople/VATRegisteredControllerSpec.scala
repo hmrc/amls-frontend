@@ -29,6 +29,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.responsiblepeople.vat_registered
 
 import scala.concurrent.Future
 
@@ -37,10 +38,12 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
   trait Fixture {
     self =>
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[vat_registered]
     val controller = new VATRegisteredController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+      vat_registered = view,
+      error = errorView)
   }
 
   val emptyCache = CacheMap("", Map.empty)

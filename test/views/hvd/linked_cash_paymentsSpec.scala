@@ -16,19 +16,21 @@
 
 package views.hvd
 
-import forms.{InvalidForm, ValidForm, Form2}
+import forms.{Form2, InvalidForm, ValidForm}
 import models.hvd.LinkedCashPayments
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.hvd.linked_cash_payments
 
 
 class linked_cash_paymentsSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val linked_cash_payments = app.injector.instanceOf[linked_cash_payments]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -38,7 +40,7 @@ class linked_cash_paymentsSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[LinkedCashPayments] = Form2(LinkedCashPayments(true))
 
-      def view = views.html.hvd.linked_cash_payments(form2, true)
+      def view = linked_cash_payments(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -47,7 +49,7 @@ class linked_cash_paymentsSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[LinkedCashPayments] = Form2(LinkedCashPayments(true))
 
-      def view = views.html.hvd.linked_cash_payments(form2, true)
+      def view = linked_cash_payments(form2, true)
 
       doc.title must startWith(Messages("hvd.identify.linked.cash.payment.title") + " - " + Messages("summary.hvd"))
     }
@@ -56,7 +58,7 @@ class linked_cash_paymentsSpec extends AmlsViewSpec with MustMatchers  {
 
       val form2: ValidForm[LinkedCashPayments] = Form2(LinkedCashPayments(false))
 
-      def view = views.html.hvd.linked_cash_payments(form2, true)
+      def view = linked_cash_payments(form2, true)
 
       heading.html must be(Messages("hvd.identify.linked.cash.payment.title"))
       subHeading.html must include(Messages("summary.hvd"))
@@ -70,7 +72,7 @@ class linked_cash_paymentsSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "linkedCashPayments") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.hvd.linked_cash_payments(form2, true)
+      def view = linked_cash_payments(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

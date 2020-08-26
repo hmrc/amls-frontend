@@ -21,11 +21,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.notifications.v1m0.no_longer_minded_to_revoke
 
 class no_longer_minded_to_revokeSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-
+    lazy val no_longer_minded_to_revoke = app.injector.instanceOf[no_longer_minded_to_revoke]
     implicit val requestWithToken = addTokenForView()
 
     val notificationParams = NotificationParams(amlsRefNo = Some("amlsRegNo"))
@@ -36,7 +37,7 @@ class no_longer_minded_to_revokeSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v1m0.no_longer_minded_to_revoke(notificationParams)
+      def view = no_longer_minded_to_revoke(notificationParams)
 
       doc.title must be("No longer considering revocation" +
         " - " + "Your registration" +
@@ -46,7 +47,7 @@ class no_longer_minded_to_revokeSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v1m0.no_longer_minded_to_revoke(notificationParams)
+      def view = no_longer_minded_to_revoke(notificationParams)
 
       heading.html must be("No longer considering revocation")
       subHeading.html must include("Your registration")
@@ -55,14 +56,14 @@ class no_longer_minded_to_revokeSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct reference displayed" in new ViewFixture {
 
-      def view = views.html.notifications.v1m0.no_longer_minded_to_revoke(notificationParams)
+      def view = no_longer_minded_to_revoke(notificationParams)
 
       doc.html must include("amlsRegNo")
     }
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.notifications.v1m0.no_longer_minded_to_revoke(notificationParams)
+      def view = no_longer_minded_to_revoke(notificationParams)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

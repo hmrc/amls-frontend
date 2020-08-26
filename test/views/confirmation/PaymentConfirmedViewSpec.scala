@@ -20,16 +20,18 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.confirmation.payment_confirmation
 
 class PaymentConfirmedViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val payment_confirmation = app.injector.instanceOf[payment_confirmation]
     implicit val requestWithToken = addTokenForView()
 
     val businessName = "Test Business Ltd"
     val paymentReference = "XMHSG000000000"
 
-    override def view = views.html.confirmation.payment_confirmation(businessName, paymentReference)
+    override def view = payment_confirmation(businessName, paymentReference)
 
   }
 

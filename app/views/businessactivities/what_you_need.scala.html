@@ -20,6 +20,8 @@
 @import models.businessmatching.BusinessActivities
 @import models.businessmatching.AccountancyServices
 
+@this(whatyouneed: include.whatyouneed)
+
 @(nextPageUrl: String, activities: Option[BusinessActivities])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

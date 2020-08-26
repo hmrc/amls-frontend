@@ -29,6 +29,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
+import views.html.responsiblepeople.address.time_at_additional_address
 
 import scala.concurrent.Future
 
@@ -39,12 +40,14 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[time_at_additional_address]
     val timeAtAdditionalAddressController = new TimeAtAdditionalAddressController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
-      cc = mockMcc)
+      cc = mockMcc,
+      time_at_additional_address = view,
+      error = errorView)
   }
 
   val emptyCache = CacheMap("", Map.empty)

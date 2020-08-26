@@ -27,6 +27,7 @@ import play.api.libs.json.JsValue
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.tradingpremises.remove_agent_premises_reasons
 
 import scala.concurrent.Future
 
@@ -37,10 +38,14 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
   trait Fixture {
     self =>
     implicit val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[remove_agent_premises_reasons]
     val controller = new RemoveAgentPremisesReasonsController (
       dataCacheConnector = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      remove_agent_premises_reasons = view,
+      error = errorView)
 
     val tradingPremises = TradingPremises()
     val cache = CacheMap("", Map.empty[String, JsValue])

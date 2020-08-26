@@ -22,11 +22,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.address.new_home_date_of_change
 
 
 class new_home_date_of_changeSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val new_home_date_of_change = app.injector.instanceOf[new_home_date_of_change]
     implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
@@ -41,7 +43,7 @@ class new_home_date_of_changeSpec extends AmlsViewSpec with MustMatchers {
         Messages("summary.responsiblepeople") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
 
-      def view = views.html.responsiblepeople.address.new_home_date_of_change(form2, 1, name)
+      def view = new_home_date_of_change(form2, 1, name)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -62,7 +64,7 @@ class new_home_date_of_changeSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "some path") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.address.new_home_date_of_change(form2, 1, name)
+      def view = new_home_date_of_change(form2, 1, name)
 
       errorSummary.html() must include("not a message Key")
     }

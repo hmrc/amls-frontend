@@ -27,6 +27,7 @@ import play.api.test.Helpers.{contentAsString, status}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.renewal.how_cash_payments_received
 
 import scala.concurrent.Future
 
@@ -40,11 +41,12 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[how_cash_payments_received]
     val controller = new HowCashPaymentsReceivedController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
-      renewalService = mockRenewalService, cc = mockMcc
+      renewalService = mockRenewalService, cc = mockMcc,
+      how_cash_payments_received = view
     )
 
     when(mockRenewalService.getRenewal(any())(any(), any()))

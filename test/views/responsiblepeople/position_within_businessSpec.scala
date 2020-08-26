@@ -23,10 +23,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.position_within_business
 
 class position_within_businessSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val position_within_business = app.injector.instanceOf[position_within_business]
     implicit val requestWithToken = addTokenForView()
     val name = "firstName lastName"
   }
@@ -35,13 +37,13 @@ class position_within_businessSpec extends AmlsViewSpec with MustMatchers {
 
     "have back link" in new ViewFixture {
       val form2 = EmptyForm
-      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
+      def view = position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
       val form2 = EmptyForm
-      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
+      def view = position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
       doc.title must be(Messages("responsiblepeople.position_within_business.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -51,7 +53,7 @@ class position_within_businessSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
       val form2 = EmptyForm
-      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
+      def view = position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
       heading.html must be(Messages("responsiblepeople.position_within_business.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
     }
@@ -60,7 +62,7 @@ class position_within_businessSpec extends AmlsViewSpec with MustMatchers {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq((Path \ "positions") -> Seq(ValidationError("not a message Key"))))
 
-      def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
+      def view = position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
       errorSummary.html() must include("not a message Key")
     }
   }

@@ -36,7 +36,8 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
                                                   authAction: AuthAction,
                                                   val ds: CommonPlayDependencies,
                                                   val statusService: StatusService,
-                                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                  val cc: MessagesControllerComponents,
+                                                  send_money_to_other_country: send_money_to_other_country) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

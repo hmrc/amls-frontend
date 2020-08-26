@@ -31,7 +31,8 @@ import scala.concurrent.Future
 class LinkedCashPaymentsController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                                val authAction: AuthAction,
                                                val ds: CommonPlayDependencies,
-                                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                               val cc: MessagesControllerComponents,
+                                               linked_cash_payments: linked_cash_payments) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) =
     authAction.async {

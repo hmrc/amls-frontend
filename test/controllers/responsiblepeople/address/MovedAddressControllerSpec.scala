@@ -28,6 +28,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.responsiblepeople.address.moved_address
 
 import scala.concurrent.Future
 
@@ -37,7 +38,9 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
     val dataCache: DataCacheConnector = mock[DataCacheConnector]
-    val controller = new MovedAddressController(messagesApi, self.dataCache, SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+    lazy val view = app.injector.instanceOf[moved_address]
+    val controller = new MovedAddressController(messagesApi, self.dataCache, SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+      moved_address = view)
 
   }
 

@@ -22,6 +22,8 @@
 @import controllers.tradingpremises.ModelHelpers._
 @import models.status._
 
+@this(main: include.main)
+
 @(f: forms.Form2[_], model: Seq[TradingPremises], add: Boolean, status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

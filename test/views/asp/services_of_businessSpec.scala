@@ -16,19 +16,21 @@
 
 package views.asp
 
-import forms.{InvalidForm, ValidForm, Form2}
+import forms.{Form2, InvalidForm, ValidForm}
 import models.asp._
-import org.scalatest.{MustMatchers}
-import  utils.AmlsViewSpec
+import org.scalatest.MustMatchers
+import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
+import views.html.asp.services_of_business
 
 
 class services_of_businessSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
+    lazy val servicesOfBusiness = app.injector.instanceOf[services_of_business]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -43,7 +45,7 @@ class services_of_businessSpec extends AmlsViewSpec with MustMatchers  {
           Auditing,
           FinancialOrTaxAdvice)))
 
-      def view = views.html.asp.services_of_business(form2, true)
+      def view = servicesOfBusiness(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
@@ -57,7 +59,7 @@ class services_of_businessSpec extends AmlsViewSpec with MustMatchers  {
                                                       Auditing,
                                                       FinancialOrTaxAdvice)))
 
-      def view = views.html.asp.services_of_business(form2, true)
+      def view = servicesOfBusiness(form2, true)
 
       doc.title must startWith(Messages("asp.services.title") + " - " + Messages("summary.asp"))
     }
@@ -71,7 +73,7 @@ class services_of_businessSpec extends AmlsViewSpec with MustMatchers  {
                                                       Auditing,
                                                       FinancialOrTaxAdvice)))
 
-      def view = views.html.asp.services_of_business(form2, true)
+      def view = servicesOfBusiness(form2, true)
 
       heading.html must be(Messages("asp.services.title"))
       subHeading.html must include(Messages("summary.asp"))
@@ -85,7 +87,7 @@ class services_of_businessSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "services") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.asp.services_of_business(form2, true)
+      def view = servicesOfBusiness(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

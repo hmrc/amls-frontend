@@ -20,6 +20,8 @@
 
 @import models.confirmation.Currency
 
+@this(main: include.main)
+
 @(isUK: Boolean, fee: Currency, paymentReference: String, sectionHeading: String)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

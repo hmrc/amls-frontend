@@ -29,6 +29,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{ProgressService, RenewalService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.declaration.renew_registration
 
 import scala.concurrent.Future
 
@@ -36,7 +37,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[renew_registration]
     val controller = new RenewRegistrationController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
@@ -44,7 +45,8 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
       statusService = mock[StatusService],
       renewalService = mock[RenewalService],
       ds = commonDependencies,
-      cc = mockMcc
+      cc = mockMcc,
+      renew_registration = view
     )
   }
 

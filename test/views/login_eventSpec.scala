@@ -20,29 +20,31 @@ import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import play.api.i18n.Messages
 import play.api.mvc.Call
+import views.html.login_event
 
 class LoginEventSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val login_event = app.injector.instanceOf[login_event]
     implicit val requestWithToken = addTokenForView()
     implicit val redirectCall = Call("GET", "someurl")
   }
 
   "Login Event Page View" must {
     "Have the correct title" in new ViewFixture {
-      def view = views.html.login_event(redirectCall)
+      def view = login_event(redirectCall)
 
       doc.title must startWith(Messages("login-event.title"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.login_event(redirectCall)
+      def view = login_event(redirectCall)
 
       heading.html must be(Messages("login-event.heading"))
     }
 
     "contain the expected link elements" in new ViewFixture {
-      def view = views.html.login_event(redirectCall)
+      def view = login_event(redirectCall)
 
       html must include(Messages("login-event.event-messages-header"))
       html must include(Messages("login-event.property-redress"))

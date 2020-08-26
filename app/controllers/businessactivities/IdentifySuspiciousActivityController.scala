@@ -31,7 +31,8 @@ import scala.concurrent.Future
 class IdentifySuspiciousActivityController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                                        val authAction: AuthAction,
                                                        val ds: CommonPlayDependencies,
-                                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                       val cc: MessagesControllerComponents,
+                                                       identify_suspicious_activity: identify_suspicious_activity) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

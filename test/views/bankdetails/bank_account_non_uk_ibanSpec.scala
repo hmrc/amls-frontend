@@ -24,10 +24,12 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import utils.{AmlsSpec, AmlsViewSpec}
 import views.Fixture
+import views.html.bankdetails.bank_account_account_iban
 
 class bank_account_non_uk_ibanSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
+    lazy val iban = app.injector.instanceOf[bank_account_account_iban]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -36,7 +38,7 @@ class bank_account_non_uk_ibanSpec extends AmlsViewSpec {
 
       val form2: ValidForm[NonUKIBANNumber] = Form2(NonUKIBANNumber(""))
 
-      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_iban(form2, false, 0)
+      override def view: HtmlFormat.Appendable = iban(form2, false, 0)
 
       doc.title() must startWith(Messages("bankdetails.bankaccount.iban.title") + " - " + Messages("summary.bankdetails"))
     }
@@ -46,7 +48,7 @@ class bank_account_non_uk_ibanSpec extends AmlsViewSpec {
 
     val form2: ValidForm[NonUKIBANNumber] = Form2(NonUKIBANNumber(""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_iban(form2, false, 0)
+    override def view: HtmlFormat.Appendable = iban(form2, false, 0)
 
     heading.text must be(Messages("bankdetails.bankaccount.iban.title"))
   }
@@ -55,7 +57,7 @@ class bank_account_non_uk_ibanSpec extends AmlsViewSpec {
 
     val form2: ValidForm[NonUKIBANNumber] = Form2(NonUKIBANNumber(""))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_iban(form2, false, 0)
+    override def view: HtmlFormat.Appendable = iban(form2, false, 0)
 
     doc.getElementsByAttributeValue("class", "link-back") must not be empty
   }
@@ -75,7 +77,7 @@ class bank_account_non_uk_ibanSpec extends AmlsViewSpec {
         (Path \ ibanField, Seq(ValidationError(messageKey)))
       ))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_account_iban(form2, false, 0)
+    override def view: HtmlFormat.Appendable = iban(form2, false, 0)
 
     errorSummary.html() must include(messageKey)
 

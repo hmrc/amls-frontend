@@ -22,11 +22,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tradingpremises.remove_trading_premises
 
 
 class remove_trading_premisesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val remove_trading_premises = app.injector.instanceOf[remove_trading_premises]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -39,7 +41,7 @@ class remove_trading_premisesSpec extends AmlsViewSpec with MustMatchers {
         Messages("summary.tradingpremises") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
 
-      def view = views.html.tradingpremises.remove_trading_premises(form2, 1, false, "trading address", true )
+      def view = remove_trading_premises(form2, 1, false, "trading address", true )
 
       doc.title must be(pageTitle)
 
@@ -56,14 +58,14 @@ class remove_trading_premisesSpec extends AmlsViewSpec with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.tradingpremises.remove_trading_premises(form2, 1, false, "trading address", false )
+      def view = remove_trading_premises(form2, 1, false, "trading address", false )
 
       heading.html must be(Messages("tradingpremises.remove.trading.premises.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
     }
 
     "check date field existence when input param showDateField is set to true" in new ViewFixture {
-      def view = views.html.tradingpremises.remove_trading_premises(EmptyForm, 1, false, "trading Address", true)
+      def view = remove_trading_premises(EmptyForm, 1, false, "trading Address", true)
 
       doc.getElementsByAttributeValue("id", "endDate") must not be empty
       doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
@@ -78,7 +80,7 @@ class remove_trading_premisesSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "some path") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tradingpremises.remove_trading_premises(form2, 1, true, "trading address",true)
+      def view = remove_trading_premises(form2, 1, true, "trading address",true)
 
       errorSummary.html() must include("not a message Key")
     }

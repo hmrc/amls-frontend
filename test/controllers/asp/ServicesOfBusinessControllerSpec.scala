@@ -27,6 +27,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.asp.services_of_business
 
 class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -36,13 +37,15 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
 
+    lazy val servicesOfBusiness = app.injector.instanceOf[services_of_business]
     val controller = new ServicesOfBusinessController(
       mockCacheConnector,
       mockStatusService,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       mockServiceFlow,
-      mockMcc
+      mockMcc,
+      servicesOfBusiness
     )
 
     mockCacheFetch[Asp](None)

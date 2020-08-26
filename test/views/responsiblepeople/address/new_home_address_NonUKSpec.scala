@@ -22,10 +22,12 @@ import models.autocomplete.NameValuePair
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.address.new_home_address_NonUK
 
 class new_home_address_NonUKSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
+    lazy val new_home_address_NonUK = app.injector.instanceOf[new_home_address_NonUK]
     implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
@@ -39,7 +41,7 @@ class new_home_address_NonUKSpec extends AmlsViewSpec {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.address.new_home_address_NonUK(form2, 1, name, countries)
+      def view = new_home_address_NonUK(form2, 1, name, countries)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -70,7 +72,7 @@ class new_home_address_NonUKSpec extends AmlsViewSpec {
           (Path \ "country") -> Seq(ValidationError("not a message Key 11"))
         ))
 
-      def view = views.html.responsiblepeople.address.new_home_address_NonUK(form2, 1, name, countries)
+      def view = new_home_address_NonUK(form2, 1, name, countries)
 
       errorSummary.html() must include("not a message Key 1")
       errorSummary.html() must include("not a message Key 7")

@@ -22,11 +22,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.tcsp.service_provider_types
 
 
 class service_provider_typesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val service_provider_types = app.injector.instanceOf[service_provider_types]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class service_provider_typesSpec extends AmlsViewSpec with MustMatchers {
     "have correct title, heading and subheading" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.tcsp.service_provider_types(form2, true)
+      def view = service_provider_types(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -54,7 +56,7 @@ class service_provider_typesSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "serviceProviders") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tcsp.service_provider_types(form2, true)
+      def view = service_provider_types(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

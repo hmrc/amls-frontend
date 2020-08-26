@@ -38,7 +38,8 @@ class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnecto
                                        val authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
                                        val renewalService: RenewalService,
-                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                       val cc: MessagesControllerComponents,
+                                       amls_turnover: amls_turnover) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>

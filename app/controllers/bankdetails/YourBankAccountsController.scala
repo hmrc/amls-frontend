@@ -24,12 +24,15 @@ import models.bankdetails.BankDetails
 import models.bankdetails.BankDetails.Filters._
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
+import views.html.bankdetails.your_bank_accounts
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class YourBankAccountsController @Inject()(val dataCacheConnector: DataCacheConnector,
                                            val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
-                                           val mcc: MessagesControllerComponents) extends BankDetailsController(ds, mcc) {
+                                           val mcc: MessagesControllerComponents,
+                                           your_bank_accounts: your_bank_accounts) extends BankDetailsController(ds, mcc) {
 
   def get(complete: Boolean = false) = authAction.async {
       implicit request =>
@@ -38,7 +41,7 @@ class YourBankAccountsController @Inject()(val dataCacheConnector: DataCacheConn
         } yield bankDetails match {
           case Some(data) =>
             val filteredBankDetails = data.zipWithIndex.visibleAccounts.reverse
-            val result = Ok(views.html.bankdetails.your_bank_accounts(
+            val result = Ok(your_bank_accounts(
               EmptyForm,
               filteredBankDetails.incompleteAccounts,
               filteredBankDetails.completeAccounts

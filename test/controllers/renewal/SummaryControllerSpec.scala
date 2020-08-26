@@ -32,6 +32,7 @@ import play.api.test.Helpers._
 import services.{ProgressService, RenewalService, SectionsProvider}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.renewal.summary
 
 import scala.concurrent.Future
 
@@ -49,13 +50,14 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     lazy val mockRenewalService = mock[RenewalService]
     lazy val mockProgressService = mock[ProgressService]
     lazy val mockSectionsProvider = mock[SectionsProvider]
-
+    lazy val view = app.injector.instanceOf[summary]
     val controller = new SummaryController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService, cc = mockMcc,
       progressService = mockProgressService,
-      sectionsProvider = mockSectionsProvider
+      sectionsProvider = mockSectionsProvider,
+      summary = view
     )
 
     when {

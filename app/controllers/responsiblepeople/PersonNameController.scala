@@ -31,7 +31,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class PersonNameController @Inject () ( val dataCacheConnector: DataCacheConnector,
                                         authAction: AuthAction,
                                         val ds: CommonPlayDependencies,
-                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                        val cc: MessagesControllerComponents,
+                                        person_name: person_name,
+                                        implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
@@ -49,7 +51,7 @@ class PersonNameController @Inject () ( val dataCacheConnector: DataCacheConnect
       implicit request => {
         Form2[PersonName](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.responsiblepeople.person_name(f, edit, index, flow)))
+            Future.successful(BadRequest(person_name(f, edit, index, flow)))
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>

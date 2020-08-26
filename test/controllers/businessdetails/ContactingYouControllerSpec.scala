@@ -30,6 +30,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.businessdetails.contacting_you
 
 import scala.concurrent.Future
 
@@ -41,10 +42,13 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[contacting_you]
     val controller = new ContactingYouController (
       dataCache = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      contacting_you = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)

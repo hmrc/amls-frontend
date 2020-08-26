@@ -24,6 +24,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import views.html.bankdetails.bank_account_types
 
 class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -35,11 +36,15 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
     val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
 
+    lazy val bankAccountTypes = app.injector.instanceOf[bank_account_types]
+
     val controller = new BankAccountTypeController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
-      mockMcc
+      mockMcc,
+      bankAccountTypes,
+      errorView
     )
   }
 

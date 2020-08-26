@@ -27,6 +27,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
+import views.html.responsiblepeople.address.time_at_address
 
 import scala.concurrent.Future
 
@@ -37,12 +38,14 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[time_at_address]
     val timeAtAddressController = new TimeAtCurrentAddressController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
-      cc = mockMcc
+      cc = mockMcc,
+      time_at_address = view,
+      error = errorView
     )
   }
 

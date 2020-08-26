@@ -47,7 +47,8 @@ class AddBusinessTypeSummaryController @Inject()(
                                                   val helper: AddBusinessTypeHelper,
                                                   val router: Router[AddBusinessTypeFlowModel],
                                                   val tradingPremisesService: TradingPremisesService,
-                                                  val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                  val cc: MessagesControllerComponents,
+                                                  update_services_summary: update_services_summary) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get() = authAction.async {
     implicit request =>

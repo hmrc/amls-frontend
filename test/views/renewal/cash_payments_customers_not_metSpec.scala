@@ -21,10 +21,12 @@ import jto.validation.{Path, ValidationError}
 import models.renewal.{CashPaymentsCustomerNotMet, HowCashPaymentsReceived, PaymentMethods}
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.renewal.cash_payments_customers_not_met
 
 class cash_payments_customers_not_metSpec extends AmlsViewSpec{
 
   trait ViewFixture extends Fixture {
+    lazy val cash_payments_customers_not_met = app.injector.instanceOf[cash_payments_customers_not_met]
     implicit val requestWithToken = addTokenForView()
 
     val cashPaymentsCustomersNotMet = CashPaymentsCustomerNotMet(true)
@@ -36,7 +38,7 @@ class cash_payments_customers_not_metSpec extends AmlsViewSpec{
 
       val form2: ValidForm[CashPaymentsCustomerNotMet] = Form2(cashPaymentsCustomersNotMet)
 
-      def view = views.html.renewal.cash_payments_customers_not_met(form2, true)
+      def view = cash_payments_customers_not_met(form2, true)
 
       doc.title must startWith("In the last 12 months did you receive cash payments of €10,000 or more from customers you have not met in person?" + " - " + "Renewal")
     }
@@ -45,7 +47,7 @@ class cash_payments_customers_not_metSpec extends AmlsViewSpec{
 
       val form2: ValidForm[CashPaymentsCustomerNotMet] = Form2(cashPaymentsCustomersNotMet)
 
-      def view = views.html.renewal.cash_payments_customers_not_met(form2, true)
+      def view = cash_payments_customers_not_met(form2, true)
 
       heading.text() must be("In the last 12 months did you receive cash payments of €10,000 or more from customers you have not met in person?")
       subHeading.text() must include("Renewal")
@@ -59,7 +61,7 @@ class cash_payments_customers_not_metSpec extends AmlsViewSpec{
           (Path \ "receiveCashPayments") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.renewal.cash_payments_customers_not_met(form2, true)
+      def view = cash_payments_customers_not_met(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -69,7 +71,7 @@ class cash_payments_customers_not_metSpec extends AmlsViewSpec{
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.renewal.cash_payments_customers_not_met(EmptyForm, true)
+      def view = cash_payments_customers_not_met(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

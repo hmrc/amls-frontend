@@ -38,7 +38,8 @@ class BusinessAppliedForPSRNumberController @Inject()(
                                                        val ds: CommonPlayDependencies,
                                                        implicit val dataCacheConnector: DataCacheConnector,
                                                        val router: Router[AddBusinessTypeFlowModel],
-                                                       val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                       val cc: MessagesControllerComponents,
+                                                       business_applied_for_psr_number: business_applied_for_psr_number) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

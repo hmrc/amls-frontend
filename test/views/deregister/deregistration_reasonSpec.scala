@@ -23,17 +23,19 @@ import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
 import models.businessmatching.{BusinessActivities, EstateAgentBusinessService, HighValueDealing}
+import views.html.deregister.deregistration_reason
 
 class deregistration_reasonSpec extends AmlsViewSpec with MustMatchers  {
 
   trait TestFixture extends Fixture {
+    lazy val deregistration_reason = app.injector.instanceOf[deregistration_reason]
     implicit val requestWithToken = addTokenForView()
   }
 
   "withdrawal_reasons view" must {
     "have correct title" in new TestFixture {
 
-      def view = views.html.deregister.deregistration_reason(EmptyForm)
+      def view = deregistration_reason(EmptyForm)
 
       doc.title must be(Messages("deregistration.reason.heading") +
         " - " + Messages("title.yapp") +
@@ -43,7 +45,7 @@ class deregistration_reasonSpec extends AmlsViewSpec with MustMatchers  {
 
     "have correct headings" in new TestFixture {
 
-      def view = views.html.deregister.deregistration_reason(EmptyForm)
+      def view = deregistration_reason(EmptyForm)
 
       heading.html must be(Messages("deregistration.reason.heading"))
       subHeading.html must include(Messages("summary.status"))
@@ -53,7 +55,7 @@ class deregistration_reasonSpec extends AmlsViewSpec with MustMatchers  {
     "have the correct fields" when {
       "HVD is required" in new TestFixture {
 
-        override def view = views.html.deregister.deregistration_reason(EmptyForm, true)
+        override def view = deregistration_reason(EmptyForm, true)
 
         doc.getElementsByAttributeValue("for", "deregistrationReason-01") must not be empty
         doc.getElementsByAttributeValue("for", "deregistrationReason-02") must not be empty
@@ -65,7 +67,7 @@ class deregistration_reasonSpec extends AmlsViewSpec with MustMatchers  {
       }
       "HVD is not required" in new TestFixture {
 
-        override def view = views.html.deregister.deregistration_reason(EmptyForm)
+        override def view = deregistration_reason(EmptyForm)
 
         doc.getElementsByAttributeValue("for", "deregistrationReason-01") must not be empty
         doc.getElementsByAttributeValue("for", "deregistrationReason-02") must not be empty
@@ -86,7 +88,7 @@ class deregistration_reasonSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "specifyOtherReason") -> Seq(ValidationError("not yet another message key"))
         ))
 
-      def view = views.html.deregister.deregistration_reason(form2)
+      def view = deregistration_reason(form2)
 
       errorSummary.html() must include("not another message key")
       errorSummary.html() must include("not yet another message key")

@@ -29,6 +29,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.businessdetails.letters_address
 
 import scala.concurrent.Future
 
@@ -42,12 +43,13 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
   trait Fixture {
     self => val request = addToken(authRequest)
-
+    lazy val view = app.injector.instanceOf[letters_address]
     val controller = new LettersAddressController (
       dataCache = dataCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
-      cc = mockMcc)
+      cc = mockMcc,
+      letters_address = view)
 
     val emptyCache = CacheMap("", Map.empty)
 

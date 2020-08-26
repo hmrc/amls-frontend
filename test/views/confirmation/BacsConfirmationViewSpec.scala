@@ -20,13 +20,15 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.confirmation.confirmation_bacs
 
 class BacsConfirmationViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val confirmation_bacs = app.injector.instanceOf[confirmation_bacs]
     implicit val requestWithToken = addTokenForView()
 
-    override def view = views.html.confirmation.confirmation_bacs(
+    override def view = confirmation_bacs(
       "businessName"
     )
   }

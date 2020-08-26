@@ -32,7 +32,9 @@ class VATRegisteredController @Inject () (
                                          val dataCacheConnector: DataCacheConnector,
                                          authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                         val cc: MessagesControllerComponents,
+                                         vat_registered: vat_registered,
+                                         implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
 

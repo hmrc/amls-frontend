@@ -32,7 +32,8 @@ import scala.concurrent.Future
 class TransactionRecordController @Inject()(val authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
                                             val dataCacheConnector: DataCacheConnector,
-                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                            val cc: MessagesControllerComponents,
+                                            customer_transaction_records: customer_transaction_records) extends AmlsBaseController(ds, cc) {
 
   val fieldName = "isRecorded"
   implicit val reader = formRule(fieldName, "error.required.ba.select.transaction.record")

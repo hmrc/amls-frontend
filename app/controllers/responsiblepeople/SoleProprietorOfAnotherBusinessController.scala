@@ -34,7 +34,9 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
                                                           authAction: AuthAction,
                                                           val ds: CommonPlayDependencies,
                                                           val statusService: StatusService,
-                                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                          val cc: MessagesControllerComponents,
+                                                          sole_proprietor: sole_proprietor,
+                                                          implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request => {

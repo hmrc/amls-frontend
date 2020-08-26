@@ -28,7 +28,8 @@ import scala.concurrent.Future
 class WhoMustRegisterController @Inject () (
                                            authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
-                                           val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                           val cc: MessagesControllerComponents,
+                                           who_must_register: who_must_register) extends AmlsBaseController(ds, cc) {
 
   def get(index : Int, flow: Option[String] = None) =
       authAction.async {

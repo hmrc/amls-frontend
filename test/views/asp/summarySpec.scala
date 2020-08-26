@@ -24,12 +24,14 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import views.Fixture
+import views.html.asp.summary
 
 import scala.collection.JavaConversions._
 
 class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
+    lazy val summary = app.injector.instanceOf[summary]
     implicit val requestWithToken = addTokenForView(FakeRequest())
   }
 
@@ -37,13 +39,13 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
     "have correct title" in new ViewFixture {
 
 
-      def view = views.html.asp.summary(EmptyForm, Asp())
+      def view = summary(EmptyForm, Asp())
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.asp"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.asp.summary(EmptyForm, Asp())
+      def view = summary(EmptyForm, Asp())
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.asp"))
@@ -67,7 +69,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
           Some(OtherBusinessTaxMattersYes)
         )
 
-        views.html.asp.summary(EmptyForm, testdata)
+        summary(EmptyForm, testdata)
       }
 
       forAll(sectionChecks) { (key, check) => {

@@ -19,6 +19,8 @@
 @import config.{ ApplicationConfig}
 @import forms.Form2
 
+@this(main: include.main)
+
 @(f: Form2[_])(implicit m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

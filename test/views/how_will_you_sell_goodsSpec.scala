@@ -26,12 +26,14 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
+import views.html.hvd.how_will_you_sell_goods
 
 class how_will_you_sell_goodsSpec extends AmlsViewSpec with MustMatchers with MockitoSugar {
 
   trait HowWillYouSellGoodsViewFixture {
+    lazy val how_will_you_sell_goods = app.injector.instanceOf[how_will_you_sell_goods]
     implicit val request : Request[_] = addTokenForView()
-    val view = views.html.hvd.how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Set(Retail))), false)
+    val view = how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Set(Retail))), false)
     lazy val html = view.body
     lazy val doc = Jsoup.parse(html)
     lazy val form = doc.getElementsByTag("form").first()
@@ -49,7 +51,7 @@ class how_will_you_sell_goodsSpec extends AmlsViewSpec with MustMatchers with Mo
       }
 
       "maintains the edit flag" in new HowWillYouSellGoodsViewFixture {
-          override val view = views.html.hvd.how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Set(Retail))), true)
+          override val view = how_will_you_sell_goods(forms.Form2[HowWillYouSellGoods](HowWillYouSellGoods(Set(Retail))), true)
           new URI(form.attr("action")).getQuery must include ("edit=true")
       }
     }

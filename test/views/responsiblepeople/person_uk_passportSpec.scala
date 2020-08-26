@@ -22,10 +22,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.person_uk_passport
 
 class person_uk_passportSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val person_uk_passport = app.injector.instanceOf[person_uk_passport]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,7 +37,7 @@ class person_uk_passportSpec extends AmlsViewSpec with MustMatchers {
 
       val name = "firstName lastName"
 
-      def view = views.html.responsiblepeople.person_uk_passport(form2, true, 1, None, name)
+      def view = person_uk_passport(form2, true, 1, None, name)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -55,7 +57,7 @@ class person_uk_passportSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "ukPassportNumber") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.person_uk_passport(form2, true, 1, None, "firstName lastName")
+      def view = person_uk_passport(form2, true, 1, None, "firstName lastName")
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

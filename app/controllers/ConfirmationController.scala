@@ -43,7 +43,12 @@ class ConfirmationController @Inject()(authAction: AuthAction,
                                        private[controllers] val enrolmentService: AuthEnrolmentsService,
                                        private[controllers] val confirmationService: ConfirmationService,
                                        val cc: MessagesControllerComponents,
-                                       val feeHelper: FeeHelper) extends AmlsBaseController(ds, cc) {
+                                       val feeHelper: FeeHelper,
+                                       confirm_renewal: confirm_renewal,
+                                       confirm_amendvariation: confirm_amendvariation,
+                                       confirmation_new: confirmation_new,
+                                       confirmation_no_fee: confirmation_no_fee
+                                      ) extends AmlsBaseController(ds, cc) {
 
   val prefix = "[ConfirmationController]"
 

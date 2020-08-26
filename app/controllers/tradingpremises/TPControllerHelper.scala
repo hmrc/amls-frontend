@@ -26,7 +26,11 @@ import utils.{ControllerHelper, StatusConstants}
 object TPControllerHelper {
 
   def redirectToNextPage(maybeCache: Option[CacheMap], index: Int, edit: Boolean)
-                        (implicit request: Request[AnyContent], messages: Messages, lang: Lang, appConfig: ApplicationConfig) = {
+                        (implicit request: Request[AnyContent],
+                         messages: Messages,
+                         lang: Lang,
+                         appConfig: ApplicationConfig,
+                         error: views.html.error) = {
     maybeCache map { cache =>
 
       val maybeTradingPremises = for {

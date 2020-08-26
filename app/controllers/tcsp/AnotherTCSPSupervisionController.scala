@@ -23,14 +23,17 @@ import javax.inject.Inject
 import models.tcsp.{ServicesOfAnotherTCSP, Tcsp}
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+import views.html.tcsp.another_tcsp_supervision
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AnotherTCSPSupervisionController @Inject()(val authAction: AuthAction,
                                                  val ds: CommonPlayDependencies,
                                                  val dataCacheConnector: DataCacheConnector,
-                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                 val cc: MessagesControllerComponents,
+                                                 another_tcsp_supervision: another_tcsp_supervision,
+                                                 implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -40,7 +43,7 @@ class AnotherTCSPSupervisionController @Inject()(val authAction: AuthAction,
             tcsp <- response
             model <- tcsp.servicesOfAnotherTCSP
           } yield Form2[ServicesOfAnotherTCSP](model)) getOrElse EmptyForm
-          Ok(views.html.tcsp.another_tcsp_supervision(form, edit))
+          Ok(another_tcsp_supervision(form, edit))
       }
   }
 
@@ -48,7 +51,7 @@ class AnotherTCSPSupervisionController @Inject()(val authAction: AuthAction,
     implicit request => {
       Form2[ServicesOfAnotherTCSP](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.tcsp.another_tcsp_supervision(f, edit)))
+          Future.successful(BadRequest(another_tcsp_supervision(f, edit)))
         case ValidForm(_, data) =>
 
           for {

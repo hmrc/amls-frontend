@@ -38,6 +38,8 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.date_of_change
+import views.html.tradingpremises.where_are_trading_premises
 
 import scala.collection.JavaConversions._
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,13 +50,18 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
   trait Fixture  {
     self => val request = addToken(authRequest)
+    lazy val view1 = app.injector.instanceOf[where_are_trading_premises]
+    lazy val view2 = app.injector.instanceOf[date_of_change]
 
     val controller = new WhereAreTradingPremisesController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       auditConnector = mock[AuditConnector],
-      cc = mockMcc
+      cc = mockMcc,
+      where_are_trading_premises = view1,
+      date_of_change = view2,
+      error = errorView
       )
 
     when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))

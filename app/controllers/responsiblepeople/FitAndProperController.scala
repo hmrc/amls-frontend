@@ -25,6 +25,7 @@ import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
+import views.html.responsiblepeople.fit_and_proper
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,7 +35,9 @@ class FitAndProperController @Inject()(
                                         val dataCacheConnector: DataCacheConnector,
                                         authAction: AuthAction,
                                         val ds: CommonPlayDependencies,
-                                        val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                        val cc: MessagesControllerComponents,
+                                        fit_and_proper: fit_and_proper,
+                                        implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   val FIELDNAME = "hasAlreadyPassedFitAndProper"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)
@@ -45,10 +48,10 @@ class FitAndProperController @Inject()(
       getData[ResponsiblePerson](request.credId, index) map {
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,alreadyPassed,_,_,_,_,_,_))
           if alreadyPassed.hasAlreadyPassedFitAndProper.isDefined =>
-          Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed.hasAlreadyPassedFitAndProper.get),
+          Ok(fit_and_proper(Form2[Boolean](alreadyPassed.hasAlreadyPassedFitAndProper.get),
             edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) => {
-          Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName))
+          Ok(fit_and_proper(EmptyForm, edit, index, flow, personName.titleName))
         }
         case _ => NotFound(notFoundView)
       }
@@ -60,7 +63,7 @@ class FitAndProperController @Inject()(
           Form2[Boolean](request.body) match {
             case f: InvalidForm =>
               getData[ResponsiblePerson](request.credId, index) map { rp =>
-                BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow,
+                BadRequest(fit_and_proper(f, edit, index, flow,
                   ControllerHelper.rpTitleName(rp)))
               }
             case ValidForm(_, data) => {

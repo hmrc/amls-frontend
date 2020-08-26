@@ -22,10 +22,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.legal_name_change_date
 
 class legal_name_change_dateSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val legal_name_change_date = app.injector.instanceOf[legal_name_change_date]
     implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
@@ -35,7 +37,7 @@ class legal_name_change_dateSpec extends AmlsViewSpec with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.legal_name_change_date(form2, true, 1, None, name)
+      def view = legal_name_change_date(form2, true, 1, None, name)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
@@ -56,7 +58,7 @@ class legal_name_change_dateSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "date.year") -> Seq(ValidationError("third not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.legal_name_change_date(form2, true, 1, None, name)
+      def view = legal_name_change_date(form2, true, 1, None, name)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

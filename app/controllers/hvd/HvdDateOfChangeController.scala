@@ -35,7 +35,8 @@ import scala.concurrent.Future
 class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                             val authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
-                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
+                                            val cc: MessagesControllerComponents,
+                                            date_of_change: date_of_change) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
 
   def get(redirect: String) = authAction.async {
       implicit request =>

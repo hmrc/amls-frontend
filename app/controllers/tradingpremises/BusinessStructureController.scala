@@ -25,6 +25,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, RepeatingSection}
+import views.html.tradingpremises.business_structure
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,7 +35,9 @@ class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheCon
                                             val authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
                                             override val messagesApi: MessagesApi,
-                                            val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                            val cc: MessagesControllerComponents,
+                                            business_structure: business_structure,
+                                            implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -45,7 +48,7 @@ class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheCon
             services <- tp.businessStructure
           } yield Form2[BusinessStructure](services)).getOrElse(EmptyForm)
 
-          Ok(views.html.tradingpremises.business_structure(form, index, edit))
+          Ok(business_structure(form, index, edit))
       }
   }
 
@@ -66,7 +69,7 @@ class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheCon
     implicit request =>
       Form2[BusinessStructure](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.tradingpremises.business_structure(f, index, edit)))
+          Future.successful(BadRequest(business_structure(f, index, edit)))
         case ValidForm(_, data) =>
           for {
             result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_, tp) =>

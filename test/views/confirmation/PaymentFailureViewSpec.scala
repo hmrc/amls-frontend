@@ -21,14 +21,16 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.confirmation.payment_failure
 
 class PaymentFailureViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val payment_failure = app.injector.instanceOf[payment_failure]
     implicit val requestWithToken = addTokenForView()
 
     //noinspection ScalaStyle
-    override def view = views.html.confirmation.payment_failure("confirmation.payment.failed.reason.failure", 100, "X123456789")
+    override def view = payment_failure("confirmation.payment.failed.reason.failure", 100, "X123456789")
   }
 
   "The Payment Failure view" must {

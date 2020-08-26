@@ -20,23 +20,25 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.responsiblepeople.who_must_register
 
 
 class who_must_registerSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val who_must_register = app.injector.instanceOf[who_must_register]
     implicit val requestWithToken = addTokenForView()
   }
 
   "who_must_register View" must {
 
     "have a back link" in new ViewFixture {
-      def view = views.html.responsiblepeople.who_must_register(1)
+      def view = who_must_register(1)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "Have the correct title" in new ViewFixture {
-      def view = views.html.responsiblepeople.who_must_register(1)
+      def view = who_must_register(1)
 
       doc.title must be(Messages("responsiblepeople.whomustregister.ymr") +
         " - " + Messages("summary.responsiblepeople") +
@@ -45,14 +47,14 @@ class who_must_registerSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.responsiblepeople.who_must_register(1)
+      def view = who_must_register(1)
 
       heading.html must be (Messages("responsiblepeople.whomustregister.ymr"))
       subHeading.html must include (Messages("summary.responsiblepeople"))
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.responsiblepeople.who_must_register(1)
+      def view = who_must_register(1)
 
 
       html must include(Messages("owners, partners, directors, shadow directors, and designated members"))

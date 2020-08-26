@@ -26,6 +26,7 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.businessmatching.updateservice.add.cannot_add_services
 
 import scala.concurrent.Future
 
@@ -37,13 +38,14 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
     val request = addToken(authRequest)
 
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-
+    lazy val view = app.injector.instanceOf[cannot_add_services]
     val controller = new NoPsrController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       helper = mockUpdateServiceHelper,
       router = createRouter[AddBusinessTypeFlowModel],
-      cc = mockMcc
+      cc = mockMcc,
+      cannot_add_services = view
     )
   }
 

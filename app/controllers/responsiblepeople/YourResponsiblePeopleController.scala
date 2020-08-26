@@ -29,7 +29,8 @@ class YourResponsiblePeopleController @Inject () (
                                                  val dataCacheConnector: DataCacheConnector,
                                                  authAction: AuthAction,
                                                  val ds: CommonPlayDependencies,
-                                                 val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                 val cc: MessagesControllerComponents,
+                                                 your_responsible_people: your_responsible_people) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get() =
       authAction.async {

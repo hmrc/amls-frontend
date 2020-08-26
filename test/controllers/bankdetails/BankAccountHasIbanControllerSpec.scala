@@ -27,6 +27,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import views.html.bankdetails.bank_account_account_has_iban
 
 import scala.concurrent.Future
 
@@ -39,13 +40,17 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec {
 
     val accountType = PersonalAccount
 
+    lazy val bankAccountHasIban = app.injector.instanceOf[bank_account_account_has_iban]
+
     val controller = new BankAccountHasIbanController(
       mockCacheConnector,
       SuccessfulAuthAction,
       mock[AuditConnector],
       mockStatusService,
       commonDependencies,
-      mockMcc
+      mockMcc,
+      bankAccountHasIban,
+      errorView
     )
 
   }

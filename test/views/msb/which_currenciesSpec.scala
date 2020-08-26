@@ -23,11 +23,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.msb.which_currencies
 
 
 class which_currenciesSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val which_currencies = app.injector.instanceOf[which_currencies]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -35,21 +37,21 @@ class which_currenciesSpec extends AmlsViewSpec with MustMatchers {
 
     "have the back link button" in new ViewFixture {
       val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")))
-      def view = views.html.msb.which_currencies(formData, true)
+      def view = which_currencies(formData, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
       val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")))
-      def view = views.html.msb.which_currencies(formData, true)
+      def view = which_currencies(formData, true)
 
       doc.title must startWith(Messages("msb.which_currencies.title") + " - " + Messages("summary.msb"))
     }
 
     "have correct headings" in new ViewFixture {
       val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP")))
-      def view = views.html.msb.which_currencies(formData, true)
+      def view = which_currencies(formData, true)
 
       heading.html must be(Messages("msb.which_currencies.title"))
       subHeading.html must include(Messages("summary.msb"))
@@ -62,7 +64,7 @@ class which_currenciesSpec extends AmlsViewSpec with MustMatchers {
           (Path \ "currencies") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.msb.which_currencies(form2, true)
+      def view = which_currencies(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

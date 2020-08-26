@@ -36,7 +36,8 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
                                              val ds: CommonPlayDependencies,
                                              val renewalService: RenewalService,
                                              val autoCompleteService: AutoCompleteService,
-                                             val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                             val cc: MessagesControllerComponents,
+                                             customers_outside_uk: customers_outside_uk) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>

@@ -22,29 +22,31 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.businessactivities.what_you_need
 
 class what_you_needSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
+    lazy val need = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
   }
 
   "What you need View" must {
     "Have the correct title" in new ViewFixture {
-      def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
+      def view = need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
 
       doc.title must startWith(Messages("title.wyn"))
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
+      def view = need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
 
       heading.html must be (Messages("title.wyn"))
       subHeading.html must include (Messages("summary.businessactivities"))
     }
 
     "contain the expected content elements when not ASP" in new ViewFixture{
-      def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(MoneyServiceBusiness))))
+      def view = need("/next-page", Some(BusinessActivities(Set(MoneyServiceBusiness))))
 
       html must include(Messages("about any business activities that are not covered by the Money Laundering Regulations"))
       html must include(Messages("the net profit you expect in the next 12 months, if you also carry out activities not covered by the regulations"))
@@ -60,7 +62,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "contain the expected content elements when ASP" in new ViewFixture{
-      def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
+      def view = need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
 
       html must include(Messages("about any business activities that are not covered by the Money Laundering Regulations"))
       html must include(Messages("the net profit you expect in the next 12 months, if you also carry out activities not covered by the regulations"))
@@ -77,7 +79,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.businessactivities.what_you_need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
+      def view = need("/next-page", Some(BusinessActivities(Set(AccountancyServices))))
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

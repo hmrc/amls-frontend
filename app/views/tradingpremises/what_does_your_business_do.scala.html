@@ -21,6 +21,8 @@
 @import models.tradingpremises._
 @import models.businessmatching._
 
+@this(main: include.main)
+
 @(f:Form2[_], model : BusinessActivities, edit: Boolean, index: Int)(implicit   m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

@@ -21,11 +21,12 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.notifications.v2m0.no_longer_minded_to_reject
 
 class no_longer_minded_to_rejectSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-
+    lazy val no_longer_minded_to_reject = app.injector.instanceOf[no_longer_minded_to_reject]
     implicit val requestWithToken = addTokenForView()
 
     val notificationParams = NotificationParams(safeId = Some("reference"))
@@ -36,7 +37,7 @@ class no_longer_minded_to_rejectSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v2m0.no_longer_minded_to_reject(notificationParams)
+      def view = no_longer_minded_to_reject(notificationParams)
 
       doc.title must be("No longer considering refusal" +
         " - " + "Your registration" +
@@ -46,7 +47,7 @@ class no_longer_minded_to_rejectSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v2m0.no_longer_minded_to_reject(notificationParams)
+      def view = no_longer_minded_to_reject(notificationParams)
 
       heading.html must be("No longer considering refusal")
       subHeading.html must include("Your registration")
@@ -55,14 +56,14 @@ class no_longer_minded_to_rejectSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct reference displayed" in new ViewFixture {
 
-      def view = views.html.notifications.v2m0.no_longer_minded_to_reject(notificationParams)
+      def view = no_longer_minded_to_reject(notificationParams)
 
       doc.html must include("reference")
     }
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.notifications.v2m0.no_longer_minded_to_reject(notificationParams)
+      def view = no_longer_minded_to_reject(notificationParams)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

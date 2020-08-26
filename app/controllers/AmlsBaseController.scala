@@ -41,7 +41,7 @@ abstract class AmlsBaseController(val cpd: CommonPlayDependencies, override val 
     MessagesImpl(lang, messagesApi)
   }
 
-  def notFoundView(implicit request: Request[_], messages: play.api.i18n.Messages) = ControllerHelper.notFoundView
+  def notFoundView(implicit request: Request[_], messages: play.api.i18n.Messages, error: views.html.error) = ControllerHelper.notFoundView
 }
 
 class CommonPlayDependencies @Inject()(val amlsConfig: ApplicationConfig,

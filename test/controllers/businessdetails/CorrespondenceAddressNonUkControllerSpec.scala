@@ -37,6 +37,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture}
+import views.html.businessdetails.correspondence_address_non_uk
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
@@ -46,11 +47,15 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
   trait Fixture {
     self => val request = addToken(authRequest)
 
+    lazy val view = app.injector.instanceOf[correspondence_address_non_uk]
     val controller = new CorrespondenceAddressNonUkController (
       dataConnector = mock[DataCacheConnector],
       auditConnector = mock[AuditConnector],
       autoCompleteService = mock[AutoCompleteService],
-      authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc)
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      correspondence_address_non_uk = view)
 
     when {
       controller.autoCompleteService.getCountries

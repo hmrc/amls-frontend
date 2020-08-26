@@ -33,6 +33,7 @@ import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils._
+import views.html.msb.money_sources
 
 import scala.concurrent.Future
 
@@ -52,11 +53,14 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
     when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any(), any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
-
+    lazy val view = app.injector.instanceOf[money_sources]
     val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
-      serviceFlow = mockServiceFlow, cc = mockMcc)
+      serviceFlow = mockServiceFlow,
+      cc = mockMcc,
+      money_sources = view,
+      error = errorView)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
@@ -85,7 +89,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
       "customerMoneySource" -> "Yes")
 
     val cacheMap = mock[CacheMap]
-
+    lazy val view = app.injector.instanceOf[money_sources]
     when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
       .thenReturn(Future.successful(Some(completeMsb.copy(whichCurrencies = Some(WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, None))))))))
 
@@ -96,7 +100,9 @@ class MoneySourcesControllerSpec extends AmlsSpec
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       serviceFlow = mock[ServiceFlow],
-      cc = mockMcc)
+      cc = mockMcc,
+      money_sources = view,
+      error = errorView)
 
     val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
 

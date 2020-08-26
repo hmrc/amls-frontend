@@ -44,7 +44,8 @@ class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
                                               val router: Router[ChangeBusinessType],
                                               val helper: RemoveBusinessTypeHelper,
                                               val addHelper: AddBusinessTypeHelper,
-                                              val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                              val cc: MessagesControllerComponents,
+                                              change_services: change_services) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get() = authAction.async {
       implicit request =>

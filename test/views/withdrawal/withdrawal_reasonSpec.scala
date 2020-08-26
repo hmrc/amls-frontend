@@ -22,17 +22,19 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
+import views.html.withdrawal.withdrawal_reason
 
 class withdrawal_reasonSpec extends AmlsViewSpec with MustMatchers  {
 
   trait TestFixture extends Fixture {
+    lazy val withdrawal_reason = app.injector.instanceOf[withdrawal_reason]
     implicit val requestWithToken = addTokenForView()
   }
 
   "withdrawal_reasons view" must {
     "have correct title" in new TestFixture {
 
-      def view = views.html.withdrawal.withdrawal_reason(EmptyForm)
+      def view = withdrawal_reason(EmptyForm)
 
       doc.title must be(Messages("withdrawal.reason.heading") +
         " - " + Messages("title.yapp") +
@@ -42,7 +44,7 @@ class withdrawal_reasonSpec extends AmlsViewSpec with MustMatchers  {
 
     "have correct headings" in new TestFixture {
 
-      def view = views.html.withdrawal.withdrawal_reason(EmptyForm)
+      def view = withdrawal_reason(EmptyForm)
 
       heading.html must be(Messages("withdrawal.reason.heading"))
       subHeading.html must include(Messages("summary.status"))
@@ -51,7 +53,7 @@ class withdrawal_reasonSpec extends AmlsViewSpec with MustMatchers  {
 
     "have the correct fields" in new TestFixture {
 
-      override def view = views.html.withdrawal.withdrawal_reason(EmptyForm)
+      override def view = withdrawal_reason(EmptyForm)
 
       doc.getElementsByAttributeValue("for", "withdrawalReason-01") must not be empty
       doc.getElementsByAttributeValue("for", "withdrawalReason-02") must not be empty
@@ -68,7 +70,7 @@ class withdrawal_reasonSpec extends AmlsViewSpec with MustMatchers  {
           (Path \ "specifyOtherReason") -> Seq(ValidationError("not yet another message key"))
         ))
 
-      def view = views.html.withdrawal.withdrawal_reason(form2)
+      def view = withdrawal_reason(form2)
 
       errorSummary.html() must include("not another message key")
       errorSummary.html() must include("not yet another message key")

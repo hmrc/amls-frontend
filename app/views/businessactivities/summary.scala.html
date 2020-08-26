@@ -19,8 +19,10 @@
 @import config.{ ApplicationConfig}
 @import models.businessactivities._
 @import config.ApplicationConfig
-
 @import models.businessmatching.BusinessMatching
+
+@this(main: include.main)
+
 @(f: forms.Form2[_], model: BusinessActivities, bmBusinessActivities: BusinessMatching, hideReceiveAdvice:Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {

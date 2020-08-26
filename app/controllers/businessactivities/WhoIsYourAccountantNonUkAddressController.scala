@@ -24,6 +24,7 @@ import models.businessactivities.{AccountantsAddress, BusinessActivities, NonUkA
 import play.api.mvc.MessagesControllerComponents
 import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper}
+import views.html.businessactivities.who_is_your_accountant_non_uk_address
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -31,7 +32,8 @@ class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector
                                                           val autoCompleteService: AutoCompleteService,
                                                           val authAction: AuthAction,
                                                           val ds: CommonPlayDependencies,
-                                                          val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
+                                                          val cc: MessagesControllerComponents,
+                                                          who_is_your_accountant_non_uk_address: who_is_your_accountant_non_uk_address) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -43,7 +45,7 @@ class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector
           } yield {
             if(!whoIsYourAccountant.isUk) { Form2[AccountantsAddress](whoIsYourAccountant) } else { EmptyForm }
           }).getOrElse(EmptyForm)
-          Ok(views.html.businessactivities.who_is_your_accountant_non_uk_address(form, edit, ControllerHelper.accountantName(response), autoCompleteService.getCountries))
+          Ok(who_is_your_accountant_non_uk_address(form, edit, ControllerHelper.accountantName(response), autoCompleteService.getCountries))
       }
   }
 
@@ -52,7 +54,7 @@ class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector
       Form2[NonUkAccountantsAddress](request.body) match {
         case f: InvalidForm =>
           dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-            response => BadRequest(views.html.businessactivities.who_is_your_accountant_non_uk_address(
+            response => BadRequest(who_is_your_accountant_non_uk_address(
               f, edit, ControllerHelper.accountantName(response), autoCompleteService.getCountries))
           }
         case ValidForm(_, data) => {

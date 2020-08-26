@@ -40,6 +40,7 @@ import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, FeeHelper}
+import views.html.confirmation.{confirm_amendvariation, confirm_renewal, confirmation_new, confirmation_no_fee}
 
 import scala.concurrent.Future
 
@@ -53,7 +54,10 @@ class ConfirmationControllerSpec extends AmlsSpec
     self =>
     val baseUrl = "http://localhost"
     val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
-
+    lazy val view1 = app.injector.instanceOf[confirm_renewal]
+    lazy val view2 = app.injector.instanceOf[confirm_amendvariation]
+    lazy val view3 = app.injector.instanceOf[confirmation_new]
+    lazy val view4 = app.injector.instanceOf[confirmation_no_fee]
     val controller = new ConfirmationController(
       keystoreConnector = mock[KeystoreConnector],
       authAction = SuccessfulAuthAction,
@@ -65,7 +69,11 @@ class ConfirmationControllerSpec extends AmlsSpec
       authenticator = mock[AuthenticatorConnector],
       confirmationService = mock[ConfirmationService],
       cc = mockMcc,
-      feeHelper = mock[FeeHelper])
+      feeHelper = mock[FeeHelper],
+      confirm_renewal = view1,
+      confirm_amendvariation = view2,
+      confirmation_new = view3,
+      confirmation_no_fee = view4)
 
     val amlsRegistrationNumber = "amlsRefNumber"
 
