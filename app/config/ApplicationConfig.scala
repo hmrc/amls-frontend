@@ -121,7 +121,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   lazy val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
   val frontendHost: String= getConfigString("accessibility-statement.baseUrl")
 
-  lazy val accessibilityBaseUrl: String = configuration.get[String]("accessibility-statement.baseUrl")
+  lazy val accessibilityBaseUrl: String = getConfigString("accessibility-statement.baseUrl")
   def accessibilityStatementUrl(referrer: String) =
     s"$accessibilityBaseUrl/accessibility-statement/anti-money-laundering?referrerUrl=${SafeRedirectUrl(
       frontendHost + referrer).encodedUrl}"
