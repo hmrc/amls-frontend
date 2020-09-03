@@ -18,6 +18,7 @@ package config
 
 import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
 @Singleton
@@ -120,8 +121,10 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
 
   lazy val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
+  val frontendHost: String= getConfigString("accessibility-statement.baseUrl")
 
-
-  def accessibilityStatementUpdated = servicesConfig.getConfString("accessibility-statement.updated", "11th May 2020")
-  def accessibilityStatementTested = servicesConfig.getConfString("accessibility-statement.tested", "15th May 2020")
+  lazy val accessibilityBaseUrl: String = configuration.get[String]("accessibility-statement.baseUrl")
+  def accessibilityStatementUrl(referrer: String) =
+    s"$accessibilityBaseUrl/accessibility-statement/anti-money-laundering?referrerUrl=${SafeRedirectUrl(
+      frontendHost + referrer).encodedUrl}"
 }

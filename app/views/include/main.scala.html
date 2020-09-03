@@ -138,7 +138,7 @@
 
 @footerLinks = {
     @if(appConfig.accessibilityStatementToggle) {
-        @viewHelpers.footerLinks(accessibilityFooterUrl=Some(controllers.accessibility.routes.AccessibilityStatementController.get().url))
+        @viewHelpers.footerLinks(accessibilityFooterUrl=Some(appConfig.accessibilityStatementUrl(request.uri)))
     } else {
         @viewHelpers.footerLinks()
     }
