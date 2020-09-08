@@ -15,7 +15,7 @@ private object AppDependencies {
 
   private val playPartialsVersion = "6.11.0-play-26"
   private val httpCachingClientVersion = "9.0.0-play-26"
-  private val playWhitelistFilterVersion = "3.4.0-play-26"
+  private val playAllowListFilterVersion = "3.4.0-play-26"
   private val validationVersion = "2.1.0"
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
@@ -29,7 +29,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "domain" % domain,
     "uk.gov.hmrc" %% "play-partials" % playPartialsVersion,
     "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,
-    "uk.gov.hmrc" %% "play-whitelist-filter" % playWhitelistFilterVersion,
+    "uk.gov.hmrc" %% "play-whitelist-filter" % playAllowListFilterVersion,
     "uk.gov.hmrc" %% "json-encryption" % jsonEncryptionVersion,
     "uk.gov.hmrc" %% "simple-reactivemongo" % playReactivemongoVersion,
     "uk.gov.hmrc" %% "auth-client" % authVersion,

@@ -57,7 +57,7 @@ class GovUkCountryDataProviderSpec extends PlaySpec with MockitoSugar {
       ))
     }
 
-    "strip out countries that don't appear in the whitelist" in new Fixture {
+    "strip out countries that don't appear in the allowList" in new Fixture {
       setupEnvironment(Some(Seq(
         NameValuePair("Haiti", "HT"),
         NameValuePair("Made up country", "MUC")
