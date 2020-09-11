@@ -78,8 +78,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   
   def publicMessageBannerToggle = servicesConfig.getConfBool("feature-toggle.public-message-banner", true)
 
-  def accessibilityStatementToggle = servicesConfig.getConfBool("feature-toggle.accessibility-statement", true)
-
   lazy val authUrl = baseUrl("auth")
 
   def enrolmentStoreUrl = baseUrl("tax-enrolments")
@@ -119,10 +117,4 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
 
   lazy val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
-  val frontendHost: String= getConfigString("accessibility-statement.baseUrl")
-
-  lazy val accessibilityBaseUrl: String = getConfigString("accessibility-statement.baseUrl")
-  def accessibilityStatementUrl(referrer: String) =
-    s"$accessibilityBaseUrl/accessibility-statement/anti-money-laundering?referrerUrl=${SafeRedirectUrl(
-      frontendHost + referrer).encodedUrl}"
 }

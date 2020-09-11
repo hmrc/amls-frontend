@@ -148,13 +148,7 @@
     </main>
 }
 
-@footerLinks = {
-@if(appConfig.accessibilityStatementToggle) {
-    @viewHelpers.footerLinks(accessibilityFooterUrl=Some(appConfig.accessibilityStatementUrl(request.uri)))
-} else {
-    @viewHelpers.footerLinks()
-}
-}
+@footerLinks = {}
 
 @govUkTemplate(
     Some(title + " - " + Messages("title.amls") + " - " + Messages("title.gov")),
@@ -165,6 +159,6 @@
     insideHeader,
     play.twirl.api.HtmlFormat.empty,
     play.twirl.api.HtmlFormat.empty,
-    Some(footerLinks),
+    Some(viewHelpers.footerLinks()),
     true
 )(content)
