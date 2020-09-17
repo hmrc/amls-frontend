@@ -47,7 +47,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
   trait Fixture {
     self =>
     val baseUrl = "http://localhost"
-    val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
+    val request = addToken(authRequest)
     val controller = new RetryPaymentController(
       SuccessfulAuthAction,
       statusService = mock[StatusService],
@@ -56,6 +56,8 @@ class RetryPaymentControllerSpec extends AmlsSpec
       paymentsService = mock[PaymentsService],
       ds = commonDependencies,
       cc = mockMcc)
+
+    when(request.uri).thenReturn(baseUrl)
 
     val response = subscriptionResponseGen(hasFees = true).sample.get
 

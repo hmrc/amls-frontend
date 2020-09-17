@@ -27,7 +27,7 @@ import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 final case class Amp(data: JsObject = Json.obj(),
                      hasChanged: Boolean = false,

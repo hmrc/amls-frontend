@@ -21,12 +21,11 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.play.bootstrap.config.RunMode
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -41,7 +40,7 @@ class TestOnlyStubConnectorSpec extends AmlsSpec
   trait Fixture {
     val http = mock[HttpClient]
     val config = mock[ApplicationConfig]
-    val connector = new TestOnlyStubConnector(http, mock[ApplicationConfig],  mock[Configuration], mock[RunMode])
+    val connector = new TestOnlyStubConnector(http, mock[ApplicationConfig],  mock[Configuration])
   }
 
   "The TestOnly Stub Connector" must {

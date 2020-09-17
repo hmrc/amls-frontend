@@ -19,12 +19,11 @@ package config
 import com.google.inject.Inject
 import play.api.Configuration
 import uk.gov.hmrc.http.cache.client.SessionCache
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.http.HttpClient
 
 class AmlsSessionCache @Inject()(val configuration: Configuration,
-                                 val runMode: RunMode,
-                                 val httpClient: HttpClient) extends ServicesConfig(configuration, runMode) with SessionCache {
+                                 val httpClient: HttpClient) extends ServicesConfig(configuration) with SessionCache {
 
   override def http = httpClient
   override def defaultSource = getConfString("amls-frontend.cache", "amls-frontend")
@@ -33,8 +32,7 @@ class AmlsSessionCache @Inject()(val configuration: Configuration,
 }
 
 class BusinessCustomerSessionCache @Inject()(val configuration: Configuration,
-                                             val runMode: RunMode,
-                                             val httpClient: HttpClient) extends ServicesConfig(configuration, runMode) with SessionCache {
+                                             val httpClient: HttpClient) extends ServicesConfig(configuration) with SessionCache {
   override def http = httpClient
   override def defaultSource: String = getConfString("cachable.session-cache.review-details.cache","business-customer-frontend")
   override def baseUri = baseUrl("cachable.session-cache")

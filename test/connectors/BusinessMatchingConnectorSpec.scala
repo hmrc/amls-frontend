@@ -24,9 +24,8 @@ import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.NotFoundException
-import uk.gov.hmrc.play.bootstrap.config.RunMode
-import uk.gov.hmrc.play.bootstrap.filters.frontend.crypto.SessionCookieCrypto
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCrypto
+import uk.gov.hmrc.http.HttpClient
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
