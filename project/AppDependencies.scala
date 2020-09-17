@@ -35,10 +35,10 @@ private object AppDependencies {
     "io.github.jto" %% "validation-form"      % validationVersion,
 
     "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion,
-    "com.beachape" %% "enumeratum-play" % "1.6.1",
+    "com.beachape" %% "enumeratum-play" % "1.5.10",
     "com.squareup.okhttp3" % "mockwebserver" % okHttpVersion,
-    "com.typesafe.play" %% "play-json" % "2.6.13",
-    "com.typesafe.play" %% "play-json-joda" % "2.7.4"
+    "com.typesafe.play" %% "play-json" % "2.6.14",
+    "com.typesafe.play" %% "play-json-joda" % "2.6.14"
   )
 
   trait ScopeDependencies {
@@ -47,18 +47,18 @@ private object AppDependencies {
   }
 
   private val pegdownVersion = "1.6.0"
-  private val jsoupVersion = "1.9.2"
+  private val jsoupVersion = "1.13.1"
 
   object Test {
     def apply() = new ScopeDependencies {
       override val scope = "test"
       override lazy val dependencies = Seq(
-        "org.scalacheck" %% "scalacheck" % "1.14.3" % scope,
+        "org.scalacheck" %% "scalacheck" % "1.12.5" % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "org.jsoup" % "jsoup" % jsoupVersion % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
         "org.mockito" % "mockito-all" % "1.10.19" % scope,
-        "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3" % scope
+        "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % scope
       )
     }.dependencies
   }
