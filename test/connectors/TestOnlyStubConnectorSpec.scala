@@ -21,7 +21,7 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.Configuration
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse

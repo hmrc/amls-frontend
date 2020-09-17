@@ -57,8 +57,6 @@ class RetryPaymentControllerSpec extends AmlsSpec
       ds = commonDependencies,
       cc = mockMcc)
 
-    when(request.uri).thenReturn(baseUrl)
-
     val response = subscriptionResponseGen(hasFees = true).sample.get
 
     protected val mockCacheMap = mock[CacheMap]
