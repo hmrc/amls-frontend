@@ -30,6 +30,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import utils._
 import views.html.businessmatching.updateservice.add.new_service_information
+import scala.concurrent.ExecutionContext
 
 class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with FutureAssertions with ScalaFutures {
 
@@ -47,7 +48,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
       router = createRouter[AddBusinessTypeFlowModel],
       cc = mockMcc,
       new_service_information = view
-    )
+    )(app.injector.instanceOf[ExecutionContext])
 
     val flowModel = AddBusinessTypeFlowModel(Some(AccountancyServices), Some(true))
     mockCacheFetch[AddBusinessTypeFlowModel](Some(flowModel), Some(AddBusinessTypeFlowModel.key))
@@ -59,8 +60,8 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
       "return OK with new_service_information view" in new Fixture {
 
         mockCacheFetch(Some(ServiceChangeRegister(Some(Set(HighValueDealing)))), Some(ServiceChangeRegister.key))
-
         val result = controller.get()(request)
+        println("Result: "+result)
 
         status(result) must be(OK)
         Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.newserviceinformation.title"))

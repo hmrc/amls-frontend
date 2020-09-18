@@ -56,13 +56,13 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec {
     )
 
     when {
-      controller.businessMatchingService.getModel(any())(any(), any())
+      controller.businessMatchingService.getModel(any())(any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(BillPaymentServices)))
     ))
 
     when {
-      controller.businessMatchingService.getSubmittedBusinessActivities(any())(any(), any())
+      controller.businessMatchingService.getSubmittedBusinessActivities(any())(any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
 
     mockCacheFetch[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel(Some(BillPaymentServices), Some(true))), Some(AddBusinessTypeFlowModel.key))

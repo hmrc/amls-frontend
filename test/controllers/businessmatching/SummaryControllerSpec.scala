@@ -64,7 +64,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
     mockApplicationStatus(NotCompleted)
 
     def mockGetModel(model: Option[BusinessMatching]) = when {
-      controller.businessMatchingService.getModel(any())(any(), any())
+      controller.businessMatchingService.getModel(any())(any())
     } thenReturn {
       if (model.isDefined) {
         OptionT.some[Future, BusinessMatching](model)
@@ -74,7 +74,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
     }
 
     def mockUpdateModel = when {
-      controller.businessMatchingService.updateModel(any(), any())(any(), any())
+      controller.businessMatchingService.updateModel(any(), any())(any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
   }
 
@@ -134,7 +134,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
           redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
           val captor = ArgumentCaptor.forClass(classOf[BusinessMatching])
-          verify(mockBusinessMatchingService).updateModel(any(), captor.capture())(any(), any())
+          verify(mockBusinessMatchingService).updateModel(any(), captor.capture())(any())
           captor.getValue.hasAccepted mustBe true
           captor.getValue.preAppComplete mustBe true
         }

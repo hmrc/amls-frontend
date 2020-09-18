@@ -138,7 +138,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
           activity = Some(HighValueDealing))
 
         when {
-          router.businessMatchingService.getRemainingBusinessActivities(any())(any(), any())
+          router.businessMatchingService.getRemainingBusinessActivities(any())(any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(TelephonePaymentService))
 
         val result = await(router.getRoute("internalId", AddBusinessTypeSummaryPageId, model))
@@ -151,11 +151,11 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
       "we're on the summary page and the user selects continue " +
         "if all possible activities are added" in new Fixture {
         when {
-          router.businessMatchingService.getRemainingBusinessActivities(any())(any(), any())
+          router.businessMatchingService.getRemainingBusinessActivities(any())(any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
 
         when {
-          router.businessMatchingService.getAdditionalBusinessActivities(any())(any(), any())
+          router.businessMatchingService.getAdditionalBusinessActivities(any())(any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
 
         val result = await(router.getRoute("internalId", AddBusinessTypeSummaryPageId, AddBusinessTypeFlowModel(Some(BillPaymentServices))))
@@ -168,11 +168,11 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
       "we're on the summary page and the user selects continue " +
         "and if all possible activities are added" in new Fixture {
         when {
-          router.businessMatchingService.getRemainingBusinessActivities(any())(any(), any())
+          router.businessMatchingService.getRemainingBusinessActivities(any())(any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
 
         when {
-          router.businessMatchingService.getAdditionalBusinessActivities(any())(any(), any())
+          router.businessMatchingService.getAdditionalBusinessActivities(any())(any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](BusinessActivities.all)
 
         val result = await(router.getRoute("internalId", AddBusinessTypeSummaryPageId, AddBusinessTypeFlowModel(Some(HighValueDealing))))
@@ -204,7 +204,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
           addMoreActivities = Some(false))
 
         when {
-          router.businessMatchingService.getAdditionalBusinessActivities(any())(any(), any())
+          router.businessMatchingService.getAdditionalBusinessActivities(any())(any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing, BillPaymentServices))
 
         val result = await(router.getRoute("internalId", AddMoreBusinessTypesPageId, model))
@@ -222,7 +222,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
           addMoreActivities = Some(false))
 
         when {
-          router.businessMatchingService.getAdditionalBusinessActivities(any())(any(), any())
+          router.businessMatchingService.getAdditionalBusinessActivities(any())(any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(TelephonePaymentService, BillPaymentServices))
 
         val result = await(router.getRoute("internalId", AddMoreBusinessTypesPageId, model))

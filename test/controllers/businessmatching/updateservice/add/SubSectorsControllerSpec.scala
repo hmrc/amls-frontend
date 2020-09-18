@@ -64,13 +64,13 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
     when {
-      controller.businessMatchingService.getModel(any())(any(), any())
+      controller.businessMatchingService.getModel(any())(any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(AccountancyServices)))
     ))
 
     when {
-      controller.businessMatchingService.updateModel(any(), any())(any(), any())
+      controller.businessMatchingService.updateModel(any(), any())(any())
     } thenReturn cacheMapT
   }
 

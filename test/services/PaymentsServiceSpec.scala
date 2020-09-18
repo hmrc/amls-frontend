@@ -128,7 +128,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
       "return the default url" when {
         "no response was returned from the connector" in new Fixture {
           when {
-            testPaymentService.paymentsConnector.createPayment(any())(any(), any())
+            testPaymentService.paymentsConnector.createPayment(any())(any())
           } thenReturn Future.successful(None)
 
           //noinspection ScalaStyle
@@ -146,7 +146,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
       "return payments url" when {
         "difference and payment reference are defined in FeeResponse" in new Fixture {
           when {
-            testPaymentService.paymentsConnector.createPayment(any())(any(), any())
+            testPaymentService.paymentsConnector.createPayment(any())(any())
           } thenReturn Future.successful(Some(paymentResponse))
 
           when {
@@ -160,7 +160,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
 
         "payment reference is defined in FeeResponse" in new Fixture {
           when {
-            testPaymentService.paymentsConnector.createPayment(any())(any(), any())
+            testPaymentService.paymentsConnector.createPayment(any())(any())
           } thenReturn Future.successful(Some(paymentResponse))
 
           when {

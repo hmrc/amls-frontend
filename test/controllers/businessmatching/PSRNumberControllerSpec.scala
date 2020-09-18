@@ -93,7 +93,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         )
 
         when {
-          controller.businessMatchingService.getModel(any())(any(), any())
+          controller.businessMatchingService.getModel(any())(any())
         } thenReturn OptionT.some[Future, BusinessMatching](model)
 
         val result = controller.get()(request)
@@ -109,7 +109,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         }
 
         when {
-          controller.businessMatchingService.getModel(any())(any(), any())
+          controller.businessMatchingService.getModel(any())(any())
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
         val result = controller.get()(request)
@@ -126,11 +126,11 @@ class PSRNumberControllerSpec extends AmlsSpec
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
         when {
-          controller.helper.getOrCreateFlowModel(any())(any(), any())
+          controller.helper.getOrCreateFlowModel(any())(any())
         } thenReturn Future.successful(flowModel)
 
         when {
-          controller.helper.updateSubSectors(any(), any())(any(), any())
+          controller.helper.updateSubSectors(any(), any())(any())
         } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
         val newRequest = requestWithUrlEncodedBody(
@@ -153,7 +153,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
         when {
-          controller.helper.getOrCreateFlowModel(any())(any(), any())
+          controller.helper.getOrCreateFlowModel(any())(any())
         } thenReturn Future.successful(flowModel)
 
         mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)
@@ -175,7 +175,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         )
 
         when {
-          controller.businessMatchingService.getModel(any())(any(), any())
+          controller.businessMatchingService.getModel(any())(any())
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
         val result = controller.post()(newRequest)

@@ -40,6 +40,7 @@ import scala.concurrent.Future
 
 class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
+
   trait Fixture extends DependencyMocks {
     self =>
 
@@ -60,13 +61,13 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
     )
 
     when {
-      controller.businessMatchingService.getModel(any())(any(), any())
+      controller.businessMatchingService.getModel(any())(any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(BillPaymentServices)))
     ))
 
     when {
-      controller.businessMatchingService.getSubmittedBusinessActivities(any())(any(), any())
+      controller.businessMatchingService.getSubmittedBusinessActivities(any())(any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
 
     mockCacheFetch[RemoveBusinessTypeFlowModel](Some(RemoveBusinessTypeFlowModel(Some(Set(BillPaymentServices)))), Some(RemoveBusinessTypeFlowModel.key))
@@ -94,7 +95,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       "return the next page in the flow when valid data has been posted" in new Fixture {
 
         when {
-          controller.businessMatchingService.getModel(any())(any(), any())
+          controller.businessMatchingService.getModel(any())(any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
         ))
@@ -114,7 +115,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
       "save the list of business activites to the data cache" in new Fixture {
         when {
-          controller.businessMatchingService.getModel(any())(any(), any())
+          controller.businessMatchingService.getModel(any())(any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
         ))
@@ -138,7 +139,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
       "wipe the date of change if its not required" in new Fixture {
         when {
-          controller.businessMatchingService.getModel(any())(any(), any())
+          controller.businessMatchingService.getModel(any())(any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
         ))
@@ -158,7 +159,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
       "wipe the date of change if the services to remove have been edited and changed" in new Fixture {
         when {
-          controller.businessMatchingService.getModel(any())(any(), any())
+          controller.businessMatchingService.getModel(any())(any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
         ))
@@ -178,7 +179,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
       "leave the date of change if the services to remove have not been changed" in new Fixture {
         when {
-          controller.businessMatchingService.getModel(any())(any(), any())
+          controller.businessMatchingService.getModel(any())(any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
         ))
@@ -198,7 +199,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
       "throw an error message when trying to select all business types the users has" in new Fixture {
         when {
-          controller.businessMatchingService.getModel(any())(any(), any())
+          controller.businessMatchingService.getModel(any())(any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(AccountancyServices,
             BillPaymentServices,

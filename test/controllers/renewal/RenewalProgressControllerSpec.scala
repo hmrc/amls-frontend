@@ -104,7 +104,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
       Some(renewalDate), false)
 
-    when(businessMatchingService.getAdditionalBusinessActivities(any())(any(), any()))
+    when(businessMatchingService.getAdditionalBusinessActivities(any())(any()))
       .thenReturn(OptionT.none[Future, Set[BusinessActivity]])
 
     when {

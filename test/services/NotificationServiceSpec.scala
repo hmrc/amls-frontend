@@ -124,7 +124,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with GeneratorD
     "return content of the notification for every type of notification" in new Fixture {
 
       for(cType <- contactTypes) {
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any(), any())(any(), any()))
+        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any(), any())(any()))
           .thenReturn(Future.successful(Some(NotificationDetails(
             messageText = cType._2,
             contactType = Some(ApplicationApproval),
