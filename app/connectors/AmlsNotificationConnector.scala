@@ -22,7 +22,6 @@ import models.notifications.{NotificationDetails, NotificationRow}
 import play.api.Logger
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.play.http.ws.WSHttp
 
 import scala.concurrent.ExecutionContext.Implicits.global

@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import play.api.Configuration
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.mvc.Request
-import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
+import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import views.html.error
 
 class AmlsErrorHandler @Inject()(val messagesApi: MessagesApi,

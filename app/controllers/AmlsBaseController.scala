@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import config.{ApplicationConfig}
 import play.api.i18n.{Lang, MessagesApi, MessagesImpl, MessagesProvider}
 import play.api.mvc.{AnyContent, BodyParsers, MessagesActionBuilderImpl, MessagesControllerComponents, Request}
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.ControllerHelper
 
 import scala.concurrent.ExecutionContext

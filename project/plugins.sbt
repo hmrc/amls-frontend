@@ -19,7 +19,7 @@ addSbtPlugin("org.scoverage" %% "sbt-scoverage" % "1.6.1")
 
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
 
-addSbtPlugin("uk.gov.hmrc" % "sbt-artifactory" % "1.5.0")
+addSbtPlugin("uk.gov.hmrc" % "sbt-artifactory" % "1.6.0")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.1.3")
 
