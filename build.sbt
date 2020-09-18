@@ -63,7 +63,7 @@ lazy val microservice = Project(appName, file("."))
     resolvers += Resolver.bintrayRepo("hmrc", "releases"),
     resolvers += Resolver.jcenterRepo
   )
-
+  .disablePlugins(JUnitXmlReportPlugin)
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]) = {
   tests.map {
