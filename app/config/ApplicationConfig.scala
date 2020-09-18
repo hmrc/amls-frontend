@@ -18,6 +18,7 @@ package config
 
 import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
 @Singleton
@@ -46,8 +47,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   val reportAProblemNonJSUrl = getConfigString("contact-frontend.report-problem-url.non-js")
   val betaFeedbackUrl = getConfigString("contact-frontend.beta-feedback-url.authenticated")
   val betaFeedbackUnauthenticatedUrl = getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
-
-  val accessibilityStatementUrl = getConfigString("contact-frontend.accessibility-statement-url")
 
   lazy val loginUrl = getConfigString("login.url")
   def logoutUrl = getConfigString("logout.url")
@@ -78,8 +77,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
   
   def publicMessageBannerToggle = servicesConfig.getConfBool("feature-toggle.public-message-banner", true)
-
-  def accessibilityStatementToggle = servicesConfig.getConfBool("feature-toggle.accessibility-statement", true)
 
   lazy val authUrl = baseUrl("auth")
 
@@ -120,8 +117,4 @@ class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode
   lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
 
   lazy val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
-
-
-  def accessibilityStatementUpdated = servicesConfig.getConfString("accessibility-statement.updated", "11th May 2020")
-  def accessibilityStatementTested = servicesConfig.getConfString("accessibility-statement.tested", "15th May 2020")
 }
