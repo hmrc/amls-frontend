@@ -161,7 +161,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     when(mockStatusService.getStatus(any(), any[(String, String)]())(any(), any()))
       .thenReturn(Future.successful(SubmissionDecisionRejected))
 
-    when (mockBusinessMatchingService.getModel(any[String]())(any(), any()))
+    when (mockBusinessMatchingService.getModel(any[String]())(any()))
       .thenReturn(OptionT.some[Future, BusinessMatching](testBusinessMatch))
 
     when {
@@ -186,7 +186,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       when(mockNotificationService.getNotifications(any(), any())(any()))
         .thenReturn(Future.successful(testList))
 
-      when (mockBusinessMatchingService.getModel(any())(any(),any()))
+      when (mockBusinessMatchingService.getModel(any())(any()))
         .thenReturn(OptionT.some[Future, BusinessMatching](None))
 
       when(mockStatusService.getReadStatus(any[String](), any[(String, String)]())(any(), any()))
@@ -216,7 +216,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       when(mockNotificationService.getNotifications(any(), any())(any()))
         .thenReturn(Future.successful(testList))
 
-      when (mockBusinessMatchingService.getModel(any[String]())(any(),any()))
+      when (mockBusinessMatchingService.getModel(any[String]())(any()))
         .thenReturn(OptionT.some[Future, BusinessMatching](None))
 
       when(mockStatusService.getReadStatus(any[Option[String]](), any[(String, String)]())(any(), any()))

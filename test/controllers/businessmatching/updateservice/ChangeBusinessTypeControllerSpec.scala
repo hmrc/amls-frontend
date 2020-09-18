@@ -44,6 +44,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
     val bmService = mock[BusinessMatchingService]
 
+
     lazy val view = app.injector.instanceOf[change_services]
     val controller = new ChangeBusinessTypesController(
       SuccessfulAuthAction, ds = commonDependencies,
@@ -63,7 +64,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
     mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
 
     when {
-      bmService.getRemainingBusinessActivities(any())(any(), any())
+      bmService.getRemainingBusinessActivities(any())(any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
     when {
@@ -94,7 +95,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
         } thenReturn Set.empty[String]
 
         when {
-          bmService.getRemainingBusinessActivities(any())(any(), any())
+          bmService.getRemainingBusinessActivities(any())(any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
 
         val result = controller.get()(request)

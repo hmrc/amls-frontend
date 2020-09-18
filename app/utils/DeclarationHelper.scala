@@ -93,8 +93,8 @@ object DeclarationHelper {
   def promptRenewal(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
                    (implicit statusService: StatusService,
                     renewalService: RenewalService,
-                    hc: HeaderCarrier,
-                    ec: ExecutionContext): Future[Boolean] = {
+                    hc: HeaderCarrier
+                   ): Future[Boolean] = {
     for{
       status <- statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId)
       inWindow <- inRenewalWindow(status)
@@ -105,8 +105,7 @@ object DeclarationHelper {
     }
   }
 
-  private def inRenewalWindow(status: SubmissionStatus)(implicit hc: HeaderCarrier,
-                                                        ec: ExecutionContext): Future[Boolean] = {
+  private def inRenewalWindow(status: SubmissionStatus)(implicit hc: HeaderCarrier): Future[Boolean] = {
     status match {
       case ReadyForRenewal(_) => Future.successful(true)
       case _ => Future.successful(false)
@@ -114,7 +113,7 @@ object DeclarationHelper {
   }
 
   def renewalComplete(renewalService: RenewalService, credId: String)
-                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
+                             (implicit hc: HeaderCarrier): Future[Boolean] = {
     renewalService.getRenewal(credId) flatMap {
       case Some(renewal) =>
         renewalService.isRenewalComplete(renewal, credId)
@@ -123,7 +122,7 @@ object DeclarationHelper {
   }
 
   def sectionsComplete(cacheId: String, sectionsProvider: SectionsProvider)
-                      (implicit hc: HeaderCarrier, ec: ExecutionContext) = {
+                      (implicit hc: HeaderCarrier) = {
 
     sectionsProvider.sections(cacheId) map {
       sections =>

@@ -22,11 +22,11 @@ import models.notifications.{NotificationDetails, NotificationRow}
 import play.api.Logger
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.play.http.ws.WSHttp
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class AmlsNotificationConnector @Inject()(val http: HttpClient,
                                           val appConfig: ApplicationConfig) {
@@ -72,7 +72,7 @@ class AmlsNotificationConnector @Inject()(val http: HttpClient,
   }
 
   def getMessageDetailsByAmlsRegNo(amlsRegistrationNumber: String, contactNumber: String, accountTypeId: (String, String))
-                                  (implicit hc : HeaderCarrier, ec : ExecutionContext): Future[Option[NotificationDetails]]= {
+                                  (implicit hc : HeaderCarrier): Future[Option[NotificationDetails]]= {
 
     val (accountType, accountId) = accountTypeId
 

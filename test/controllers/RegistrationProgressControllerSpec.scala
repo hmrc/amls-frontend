@@ -79,7 +79,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
     when(mockBusinessMatching.isComplete) thenReturn true
     when(mockBusinessMatching.reviewDetails) thenReturn Some(reviewDetailsGen.sample.get)
-    when(mockBusinessMatchingService.getAdditionalBusinessActivities(any[String]())(any(), any())) thenReturn OptionT.none[Future, Set[BusinessActivity]]
+    when(mockBusinessMatchingService.getAdditionalBusinessActivities(any[String]())(any())) thenReturn OptionT.none[Future, Set[BusinessActivity]]
 
     when {
       controller.sectionsProvider.sectionsFromBusinessActivities(any(), any())(any())

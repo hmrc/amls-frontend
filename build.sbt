@@ -40,7 +40,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(scalaSettings: _*)
   .settings(publishingSettings: _*)
   .settings(defaultSettings(): _*)
-  .settings(scalaVersion := "2.11.12")
+  .settings(scalaVersion := "2.12.11")
   .settings(routesImport += "models.notifications.ContactType._")
   .settings(routesImport += "utils.Binders._")
   .settings(

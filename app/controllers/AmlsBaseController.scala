@@ -33,8 +33,6 @@ abstract class AmlsBaseController(val cpd: CommonPlayDependencies, override val 
 
   implicit val lang: Lang = Lang.defaultLang
 
-  implicit val ec: ExecutionContext = controllerComponents.executionContext
-
   val messages: MessagesApi = messagesApi
 
   implicit val messagesProvider: MessagesProvider = {

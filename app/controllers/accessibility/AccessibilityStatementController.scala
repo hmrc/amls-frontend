@@ -26,6 +26,8 @@ import javax.inject.Inject
 import play.api.mvc.{BodyParsers, Call, MessagesControllerComponents}
 import utils.AuthAction
 import views.html.accessibility._
+import scala.concurrent.ExecutionContext.Implicits.global
+
 
 import scala.concurrent.Future
 

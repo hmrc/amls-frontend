@@ -35,7 +35,7 @@ private object AppDependencies {
     "io.github.jto" %% "validation-form"      % validationVersion,
 
     "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion,
-    "com.beachape" %% "enumeratum-play" % "1.5.10",
+    "com.beachape" %% "enumeratum-play" % "1.5.12",
     "com.squareup.okhttp3" % "mockwebserver" % okHttpVersion,
     "com.typesafe.play" %% "play-json" % "2.6.14",
     "com.typesafe.play" %% "play-json-joda" % "2.6.14"
@@ -53,7 +53,7 @@ private object AppDependencies {
     def apply() = new ScopeDependencies {
       override val scope = "test"
       override lazy val dependencies = Seq(
-        "org.scalacheck" %% "scalacheck" % "1.12.5" % scope,
+        "org.scalacheck" %% "scalacheck" % "1.12.6" % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "org.jsoup" % "jsoup" % jsoupVersion % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
