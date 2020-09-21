@@ -35,7 +35,6 @@ import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.businessmatching.updateservice.add.update_services_summary
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class AddBusinessTypeSummaryController @Inject()(

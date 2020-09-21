@@ -29,7 +29,7 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.which_currencies
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class WhichCurrenciesController @Inject()(val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,

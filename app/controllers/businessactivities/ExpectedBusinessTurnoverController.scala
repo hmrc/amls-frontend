@@ -27,7 +27,7 @@ import utils.AuthAction
 import views.html.businessactivities._
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class ExpectedBusinessTurnoverController @Inject() (val dataCacheConnector: DataCacheConnector,
                                                     implicit val statusService: StatusService,

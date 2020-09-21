@@ -30,7 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.renewal.what_you_need
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 

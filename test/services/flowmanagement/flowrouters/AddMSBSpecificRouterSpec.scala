@@ -27,7 +27,7 @@ import services.flowmanagement.flowrouters.businessmatching.AddBusinessTypeRoute
 import services.flowmanagement.pagerouters.addflow._
 import utils.{AmlsSpec, DependencyMocks}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class AddMSBSpecificRouterSpec extends AmlsSpec {
 

@@ -24,8 +24,7 @@ import play.api.mvc.Request
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.NotFoundException
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCrypto
@@ -76,7 +75,7 @@ class BusinessMatchingConnector @Inject()(val http: HttpClient,
 
   val serviceName = "amls"
 
-  def getReviewDetails(implicit request: Request[_]): Future[Option[BusinessMatchingReviewDetails]] = {
+  def getReviewDetails(implicit request: Request[_], ec: ExecutionContext): Future[Option[BusinessMatchingReviewDetails]] = {
 
     val url = s"${applicationConfig.businessMatchingUrl}/fetch-review-details/$serviceName"
     val logPrefix = "[BusinessMatchingConnector][getReviewDetails]"

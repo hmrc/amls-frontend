@@ -28,7 +28,7 @@ import services.businessmatching.ServiceFlow
 import utils.AuthAction
 import views.html.msb.money_sources
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class MoneySourcesController @Inject()(authAction: AuthAction,

@@ -23,8 +23,6 @@ import utils.AmlsSpec
 import controllers.businessmatching.routes
 import play.api.test.Helpers._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture {

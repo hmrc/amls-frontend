@@ -26,7 +26,6 @@ import play.api.libs.json._
 import play.api.mvc.{Action, MessagesControllerComponents}
 import services.ProxyCacheService
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 
 
 class AmpController @Inject()(proxyCacheService: ProxyCacheService,

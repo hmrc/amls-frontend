@@ -26,7 +26,7 @@ import services.StatusService
 import utils.AuthAction
 import views.html.bankdetails.bank_account_types
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 @Singleton

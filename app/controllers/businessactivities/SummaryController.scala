@@ -29,9 +29,6 @@ import services.StatusService
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities.summary
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class SummaryController @Inject() (val dataCache: DataCacheConnector,
                                    implicit val statusService: StatusService,
                                    val authAction: AuthAction,

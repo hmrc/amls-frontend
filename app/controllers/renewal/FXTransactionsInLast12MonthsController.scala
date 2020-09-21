@@ -25,7 +25,7 @@ import models.renewal.{FXTransactionsInLast12Months, Renewal}
 import play.api.mvc.{MessagesControllerComponents, Result}
 import services.RenewalService
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.renewal.fx_transaction_in_last_12_months
 
 import scala.concurrent.Future

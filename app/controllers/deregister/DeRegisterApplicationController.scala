@@ -28,7 +28,7 @@ import utils.{AuthAction, BusinessName}
 import views.html.deregister.deregister_application
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class DeRegisterApplicationController @Inject() (authAction: AuthAction,
                                                  val ds: CommonPlayDependencies,

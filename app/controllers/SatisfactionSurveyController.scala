@@ -26,7 +26,6 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.AuthAction
 import views.html.satisfaction_survey
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton

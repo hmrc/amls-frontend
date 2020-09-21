@@ -28,7 +28,6 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.businessdetails.activity_start_date
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class ActivityStartDateController @Inject () (val dataCache: DataCacheConnector,
                                               val authAction: AuthAction,

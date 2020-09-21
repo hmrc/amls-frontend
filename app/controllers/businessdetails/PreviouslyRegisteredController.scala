@@ -27,7 +27,6 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.businessdetails._
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class PreviouslyRegisteredController @Inject () (
                                                   val dataCacheConnector: DataCacheConnector,

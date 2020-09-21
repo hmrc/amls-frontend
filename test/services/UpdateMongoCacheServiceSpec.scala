@@ -44,7 +44,7 @@ import uk.gov.hmrc.http.HttpClient
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.collection.Seq
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class UpdateMongoCacheServiceSpec extends AmlsSpec
   with BusinessMatchingGenerator

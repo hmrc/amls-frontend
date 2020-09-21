@@ -42,7 +42,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenerator with ResponsiblePeopleValues {
@@ -104,7 +104,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
       Some(renewalDate), false)
 
-    when(businessMatchingService.getAdditionalBusinessActivities(any())(any()))
+    when(businessMatchingService.getAdditionalBusinessActivities(any())(any(), any()))
       .thenReturn(OptionT.none[Future, Set[BusinessActivity]])
 
     when {

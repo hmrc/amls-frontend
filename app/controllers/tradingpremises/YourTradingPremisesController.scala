@@ -32,7 +32,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.tradingpremises.your_trading_premises
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheConnector,

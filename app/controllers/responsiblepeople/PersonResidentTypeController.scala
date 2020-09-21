@@ -31,7 +31,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_residence_type
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class PersonResidentTypeController @Inject()(override val messagesApi: MessagesApi,
                                              val dataCacheConnector: DataCacheConnector,

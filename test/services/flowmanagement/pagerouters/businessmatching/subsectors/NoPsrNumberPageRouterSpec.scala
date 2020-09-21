@@ -20,7 +20,6 @@ import controllers.businessmatching.routes
 import models.flowmanagement.ChangeSubSectorFlowModel
 import utils.AmlsSpec
 import play.api.test.Helpers._
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class NoPsrNumberPageRouterSpec extends AmlsSpec {
 

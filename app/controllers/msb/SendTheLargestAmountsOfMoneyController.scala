@@ -28,7 +28,7 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.msb.send_largest_amounts_of_money
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction,
                                                        val ds: CommonPlayDependencies,

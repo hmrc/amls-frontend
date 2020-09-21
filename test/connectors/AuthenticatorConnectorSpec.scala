@@ -28,7 +28,6 @@ import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.play.http.ws.WSHttp
 import utils.AmlsSpec
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 

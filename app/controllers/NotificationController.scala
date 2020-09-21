@@ -34,7 +34,6 @@ import utils.{AuthAction, BusinessName}
 import views.html.notifications.your_messages
 import views.notifications.{V1M0, V2M0, V3M0, V4M0}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 

@@ -25,7 +25,7 @@ import utils.{AuthAction, RepeatingSection}
 import views.html.responsiblepeople.fit_and_proper_notice
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class FitAndProperNoticeController @Inject()(val dataCacheConnector: DataCacheConnector,

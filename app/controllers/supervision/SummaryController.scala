@@ -25,7 +25,7 @@ import javax.inject.Inject
 import models.supervision.Supervision
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import utils.ControllerHelper
 import views.html.supervision.summary
 

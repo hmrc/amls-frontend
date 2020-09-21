@@ -35,7 +35,7 @@ import views.html.date_of_change
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class WhatDoesYourBusinessDoController @Inject () (
                                                     val dataCacheConnector: DataCacheConnector,

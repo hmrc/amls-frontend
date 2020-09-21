@@ -21,7 +21,7 @@ import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForP
 import models.flowmanagement.ChangeSubSectorFlowModel
 import utils.AmlsSpec
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import play.api.test.Helpers._
 
 class PSRNumberPageRouterSpec extends AmlsSpec {

@@ -22,7 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection}
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class ResponsiblePeopleAddController @Inject () (
                                                 val dataCacheConnector: DataCacheConnector,

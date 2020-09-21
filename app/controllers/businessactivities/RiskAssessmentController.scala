@@ -27,7 +27,7 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConnector,
                                           val authAction: AuthAction,

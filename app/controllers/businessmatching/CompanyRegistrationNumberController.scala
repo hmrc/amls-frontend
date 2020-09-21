@@ -28,7 +28,6 @@ import views.html.businessmatching.company_registration_number
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 

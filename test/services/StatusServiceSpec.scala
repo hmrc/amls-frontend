@@ -29,8 +29,8 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Future,ExecutionContext}
+
 class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with GuiceOneAppPerSuite {
 
    val service = new StatusService(

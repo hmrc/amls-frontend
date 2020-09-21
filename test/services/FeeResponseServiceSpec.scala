@@ -27,7 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.http.NotFoundException
 import utils.{AmlsSpec, AuthorisedFixture}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {

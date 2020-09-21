@@ -29,7 +29,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_non_uk_passport
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class PersonNonUKPassportController @Inject()(override val messagesApi: MessagesApi,
                                               val dataCacheConnector: DataCacheConnector,

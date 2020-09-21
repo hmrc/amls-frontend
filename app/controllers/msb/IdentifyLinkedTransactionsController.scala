@@ -24,7 +24,7 @@ import models.businessmatching.{MoneyServiceBusiness => _, _}
 import models.moneyservicebusiness._
 import play.api.mvc.{MessagesControllerComponents, Result}
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.msb.identify_linked_transactions
 
 import scala.concurrent.Future

@@ -28,7 +28,6 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.responsiblepeople.address.new_home_address_NonUK
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class NewHomeAddressNonUKController @Inject()(authAction: AuthAction,

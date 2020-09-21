@@ -34,7 +34,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.businessmatching.updateservice.change_services
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -64,7 +64,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
     mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
 
     when {
-      bmService.getRemainingBusinessActivities(any())(any())
+      bmService.getRemainingBusinessActivities(any())(any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
     when {
@@ -95,7 +95,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
         } thenReturn Set.empty[String]
 
         when {
-          bmService.getRemainingBusinessActivities(any())(any())
+          bmService.getRemainingBusinessActivities(any())(any(), any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
 
         val result = controller.get()(request)

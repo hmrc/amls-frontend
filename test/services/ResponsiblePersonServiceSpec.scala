@@ -24,7 +24,7 @@ import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import ResponsiblePeopleService._
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenerator with ScalaFutures {
 

@@ -34,7 +34,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.businessmatching.summary
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
@@ -74,7 +74,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
     }
 
     def mockUpdateModel = when {
-      controller.businessMatchingService.updateModel(any(), any())(any())
+      controller.businessMatchingService.updateModel(any(), any())(any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
   }
 
@@ -134,7 +134,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
           redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
 
           val captor = ArgumentCaptor.forClass(classOf[BusinessMatching])
-          verify(mockBusinessMatchingService).updateModel(any(), captor.capture())(any())
+          verify(mockBusinessMatchingService).updateModel(any(), captor.capture())(any(), any())
           captor.getValue.hasAccepted mustBe true
           captor.getValue.preAppComplete mustBe true
         }

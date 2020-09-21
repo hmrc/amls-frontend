@@ -26,7 +26,6 @@ import models.asp.Asp
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.date_of_change
 
 import scala.concurrent.Future

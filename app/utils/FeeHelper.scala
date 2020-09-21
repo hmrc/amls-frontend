@@ -19,12 +19,12 @@ package utils
 import cats.data.OptionT
 import cats.implicits._
 import javax.inject.{Inject, Singleton}
-import models.{FeeResponse}
+import models.FeeResponse
 import play.api.Logger
 import services.{AuthEnrolmentsService, FeeResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FeeHelper  @Inject()(val feeResponseService: FeeResponseService,
@@ -35,7 +35,7 @@ class FeeHelper  @Inject()(val feeResponseService: FeeResponseService,
                                   accountTypeId: (String, String),
                                   groupIdentifier: Option[String],
                                   prefix: String)
-                                 (implicit hc: HeaderCarrier): Future[Option[FeeResponse]] = {
+                                 (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[FeeResponse]] = {
 
     // $COVERAGE-OFF$
     Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")

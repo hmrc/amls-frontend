@@ -34,7 +34,6 @@ import utils.{AuthAction, ControllerHelper, DeclarationHelper}
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton

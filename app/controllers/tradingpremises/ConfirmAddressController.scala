@@ -31,7 +31,7 @@ import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName, RepeatingSection}
 import views.html.tradingpremises.confirm_address
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 @Singleton

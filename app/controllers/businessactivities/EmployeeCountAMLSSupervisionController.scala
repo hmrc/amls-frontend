@@ -23,7 +23,6 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, EmployeeCountAMLSSupervision, HowManyEmployees}
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessactivities._
 
 import scala.concurrent.Future

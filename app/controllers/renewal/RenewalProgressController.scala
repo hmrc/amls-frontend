@@ -33,7 +33,7 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.renewal_progress
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class RenewalProgressController @Inject()(val authAction: AuthAction,

@@ -28,7 +28,7 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class BusinessNameSpec extends AmlsSpec with ScalaFutures {

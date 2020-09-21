@@ -24,7 +24,6 @@ import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.bankdetails.summary
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton

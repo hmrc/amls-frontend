@@ -23,20 +23,20 @@ import javax.inject.{Inject, Singleton}
 import models.notifications.{ContactType, NotificationDetails, NotificationRow}
 import play.api.i18n._
 import uk.gov.hmrc.http.HeaderCarrier
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificationConnector, val messagesApi: MessagesApi) {
 
-  def getNotifications(safeId: String, accountTypeId: (String, String))(implicit hc: HeaderCarrier): Future[Seq[NotificationRow]] =
+  def getNotifications(safeId: String, accountTypeId: (String, String))(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Seq[NotificationRow]] =
     amlsNotificationConnector.fetchAllBySafeId(safeId, accountTypeId) map {
       case notifications@(_::_) => notifications.sortWith((x, y) => x.receivedAt.isAfter(y.receivedAt))
       case notifications => notifications
     }
 
   def getMessageDetails(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String, accountTypeId: (String, String))
-                       (implicit hc: HeaderCarrier): Future[Option[NotificationDetails]] = {
+                       (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[NotificationDetails]] = {
 
     contactType match {
 
@@ -66,7 +66,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   }
 
   private def handleStaticMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String, accountTypeId: (String, String))
-                                 (implicit hc: HeaderCarrier): Future[Option[NotificationDetails]] = {
+                                 (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[NotificationDetails]] = {
 
     val staticMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
       .newInstance().asInstanceOf[{ def static(contactType: ContactType, url: String): String }]
@@ -87,7 +87,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   }
 
   private def handleReminderMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String, accountTypeId: (String, String))
-                                   (implicit hc: HeaderCarrier): Future[Option[NotificationDetails]] = {
+                                   (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[NotificationDetails]] = {
 
     val reminderMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
       .newInstance().asInstanceOf[{ def reminder(contactType: ContactType, paymentAmount: String, referenceNumber: String): String }]
@@ -110,7 +110,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   }
 
   private def handleEndDateMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String, accountTypeId: (String, String))
-                                  (implicit hc: HeaderCarrier): Future[Option[NotificationDetails]] = {
+                                  (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[NotificationDetails]] = {
 
     val endDateMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
       .newInstance().asInstanceOf[{ def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String }]
@@ -134,7 +134,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   }
 
   private def handleEndDateWithRefMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String, accountTypeId: (String, String))
-                                         (implicit hc: HeaderCarrier): Future[Option[NotificationDetails]] = {
+                                         (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[NotificationDetails]] = {
 
     val endDateMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
       .newInstance().asInstanceOf[{ def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String }]

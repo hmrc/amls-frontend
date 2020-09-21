@@ -26,7 +26,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.legal_name_input
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class LegalNameInputController @Inject()(val dataCacheConnector: DataCacheConnector,

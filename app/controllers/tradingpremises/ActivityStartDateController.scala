@@ -27,7 +27,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection}
 import views.html.tradingpremises.activity_start_date
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class ActivityStartDateController @Inject()(override val messagesApi: MessagesApi,

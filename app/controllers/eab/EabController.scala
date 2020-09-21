@@ -34,7 +34,7 @@ import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import utils.DateOfChangeHelper
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 
 class EabController @Inject()(proxyCacheService  : ProxyCacheService,

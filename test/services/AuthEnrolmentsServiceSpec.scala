@@ -27,7 +27,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
 import utils.AmlsSpec
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class AuthEnrolmentsServiceSpec extends AmlsSpec

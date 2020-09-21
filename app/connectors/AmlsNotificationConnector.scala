@@ -24,16 +24,14 @@ import play.api.libs.json.Writes
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.http.ws.WSHttp
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
+import scala.concurrent.{Future, ExecutionContext}
 class AmlsNotificationConnector @Inject()(val http: HttpClient,
                                           val appConfig: ApplicationConfig) {
 
   private[connectors] def baseUrl : String = appConfig.allNotificationsUrl
 
   def fetchAllByAmlsRegNo(amlsRegistrationNumber: String, accountTypeId: (String, String))
-                         (implicit headerCarrier: HeaderCarrier, reqW: Writes[Seq[NotificationRow]]): Future[Seq[NotificationRow]] = {
+                         (implicit headerCarrier: HeaderCarrier,ec: ExecutionContext, reqW: Writes[Seq[NotificationRow]]): Future[Seq[NotificationRow]] = {
 
     val (accountType, accountId) = accountTypeId
 
@@ -52,7 +50,7 @@ class AmlsNotificationConnector @Inject()(val http: HttpClient,
   }
 
   def fetchAllBySafeId(safeId: String, accountTypeId: (String, String))
-                      (implicit headerCarrier: HeaderCarrier, reqW: Writes[Seq[NotificationRow]]): Future[Seq[NotificationRow]] = {
+                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[Seq[NotificationRow]]): Future[Seq[NotificationRow]] = {
 
     val (accountType, accountId) = accountTypeId
 
@@ -71,7 +69,7 @@ class AmlsNotificationConnector @Inject()(val http: HttpClient,
   }
 
   def getMessageDetailsByAmlsRegNo(amlsRegistrationNumber: String, contactNumber: String, accountTypeId: (String, String))
-                                  (implicit hc : HeaderCarrier): Future[Option[NotificationDetails]]= {
+                                  (implicit hc : HeaderCarrier, ec: ExecutionContext): Future[Option[NotificationDetails]]= {
 
     val (accountType, accountId) = accountTypeId
 

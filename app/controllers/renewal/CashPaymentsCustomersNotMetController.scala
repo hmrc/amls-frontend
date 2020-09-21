@@ -26,7 +26,7 @@ import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.renewal.cash_payments_customers_not_met
 
 import scala.concurrent.Future

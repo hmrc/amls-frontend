@@ -126,7 +126,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
     )
 
     when {
-      controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+      controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
     } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
 
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))

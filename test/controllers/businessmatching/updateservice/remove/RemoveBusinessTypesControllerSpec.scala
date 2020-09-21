@@ -34,7 +34,7 @@ import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.businessmatching.updateservice.remove.remove_activities
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 
@@ -67,7 +67,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
     ))
 
     when {
-      controller.businessMatchingService.getSubmittedBusinessActivities(any())(any())
+      controller.businessMatchingService.getSubmittedBusinessActivities(any())(any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
 
     mockCacheFetch[RemoveBusinessTypeFlowModel](Some(RemoveBusinessTypeFlowModel(Some(Set(BillPaymentServices)))), Some(RemoveBusinessTypeFlowModel.key))

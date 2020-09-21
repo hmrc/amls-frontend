@@ -23,7 +23,7 @@ import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, RepeatingSection}
 import views.html.responsiblepeople.your_responsible_people
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class YourResponsiblePeopleController @Inject () (
                                                  val dataCacheConnector: DataCacheConnector,

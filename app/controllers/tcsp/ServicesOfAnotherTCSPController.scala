@@ -23,7 +23,7 @@ import javax.inject.Inject
 import models.tcsp.Tcsp
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.tcsp._
 
 import scala.concurrent.Future

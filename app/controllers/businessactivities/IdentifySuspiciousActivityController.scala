@@ -23,7 +23,6 @@ import forms._
 import models.businessactivities.{BusinessActivities, _}
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessactivities._
 
 import scala.concurrent.Future

@@ -35,7 +35,6 @@ import views.html.businessmatching.updateservice._
 
 import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
                                               val ds: CommonPlayDependencies,

@@ -28,7 +28,6 @@ import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import utils.{AuthAction, DeclarationHelper}
 import views.html.submission.{bad_request, duplicate_enrolment, duplicate_submission, wrong_credential_type}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton

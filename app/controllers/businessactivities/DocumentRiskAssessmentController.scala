@@ -26,7 +26,6 @@ import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 

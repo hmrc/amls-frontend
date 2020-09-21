@@ -30,7 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.msb.uses_foreign_currencies
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class UsesForeignCurrenciesController @Inject()(authAction: AuthAction,

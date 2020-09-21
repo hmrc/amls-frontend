@@ -47,7 +47,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 
-import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
 class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits with DefaultAwaitTimeout {
@@ -571,12 +570,12 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       )
 
       when {
-        service.businessMatchingConnector.getReviewDetails(any())
+        service.businessMatchingConnector.getReviewDetails(any(), any())
       } thenReturn Future.successful(Some(model))
 
       await(service.reviewDetails)
 
-      verify(service.businessMatchingConnector).getReviewDetails(any())
+      verify(service.businessMatchingConnector).getReviewDetails(any(), any())
     }
   }
 

@@ -31,7 +31,7 @@ import uk.gov.hmrc.play.audit.model.{Audit, DataEvent}
 import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
 import utils.{AmlsSpec, DependencyMocks}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class GovernmentGatewayConnectorSpec extends AmlsSpec

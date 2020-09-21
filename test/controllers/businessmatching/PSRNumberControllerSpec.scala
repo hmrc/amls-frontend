@@ -39,7 +39,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.businessmatching.psr_number
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class PSRNumberControllerSpec extends AmlsSpec
@@ -126,11 +126,11 @@ class PSRNumberControllerSpec extends AmlsSpec
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
         when {
-          controller.helper.getOrCreateFlowModel(any())(any())
+          controller.helper.getOrCreateFlowModel(any())(any(), any())
         } thenReturn Future.successful(flowModel)
 
         when {
-          controller.helper.updateSubSectors(any(), any())(any())
+          controller.helper.updateSubSectors(any(), any())(any(), any())
         } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
         val newRequest = requestWithUrlEncodedBody(
@@ -153,7 +153,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
         when {
-          controller.helper.getOrCreateFlowModel(any())(any())
+          controller.helper.getOrCreateFlowModel(any())(any(), any())
         } thenReturn Future.successful(flowModel)
 
         mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)

@@ -27,7 +27,7 @@ import services.RenewalService
 import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.{amp_turnover, percentage}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 @Singleton

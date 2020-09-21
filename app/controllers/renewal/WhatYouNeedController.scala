@@ -28,7 +28,7 @@ import utils.AuthAction
 import views.html.renewal._
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 @Singleton
 class WhatYouNeedController @Inject()(
                                        val dataCacheConnector: DataCacheConnector,

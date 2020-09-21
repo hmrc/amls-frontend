@@ -32,7 +32,6 @@ import views.html.businessmatching.updateservice.add.add_more_activities
 
 import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class AddMoreBusinessTypesController @Inject()(

@@ -30,7 +30,6 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.businessactivities._
 import cats.implicits._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCacheConnector,

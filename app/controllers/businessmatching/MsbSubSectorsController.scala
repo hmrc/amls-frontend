@@ -33,7 +33,6 @@ import services.flowmanagement.Router
 import utils.AuthAction
 import views.html.businessmatching.services
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MsbSubSectorsController @Inject()(authAction: AuthAction,

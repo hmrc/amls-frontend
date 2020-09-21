@@ -25,7 +25,7 @@ import services.StatusService
 import utils.AuthAction
 import views.html.declaration.register_responsible_person
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class RegisterResponsiblePersonController @Inject()(val dataCacheConnector: DataCacheConnector,

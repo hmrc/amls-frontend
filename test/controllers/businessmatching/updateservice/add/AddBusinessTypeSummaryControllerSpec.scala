@@ -42,7 +42,7 @@ import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.businessmatching.updateservice.add.update_services_summary
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
@@ -120,11 +120,11 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
         )
 
         when {
-          controller.helper.updateBusinessMatching(any(), any())(any())
+          controller.helper.updateBusinessMatching(any(), any())(any(), any())
         } thenReturn OptionT.fromOption[Future](Some(businessMatchingModel))
 
         when {
-          controller.helper.updateServicesRegister(any(), any())(any())
+          controller.helper.updateServicesRegister(any(), any())(any(), any())
         } thenReturn OptionT.some[Future, ServiceChangeRegister](serviceChangeRegister)
 
         when {
@@ -132,7 +132,7 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
         } thenReturn modifiedTradingPremises
 
         when {
-          controller.helper.updateHasAcceptedFlag(any(), eqTo(flowModel))(any())
+          controller.helper.updateHasAcceptedFlag(any(), eqTo(flowModel))(any(), any())
         } thenReturn OptionT.fromOption[Future](Some(mockCacheMap))
 
         when {
@@ -140,7 +140,7 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
         } thenReturn OptionT.some[Future, models.businessactivities.BusinessActivities](mock[models.businessactivities.BusinessActivities])
 
         when {
-          controller.helper.updateSupervision(any())(any())
+          controller.helper.updateSupervision(any())(any(), any())
         } thenReturn OptionT.some[Future, Supervision](Supervision())
 
         when {

@@ -26,7 +26,7 @@ import play.api.mvc.{Call, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import utils.DateOfChangeHelper
 import views.html.hvd.products
 

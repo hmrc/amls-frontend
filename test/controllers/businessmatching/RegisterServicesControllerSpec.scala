@@ -42,7 +42,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils._
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class RegisterServicesControllerSpec extends AmlsSpec
@@ -91,7 +91,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
     } thenReturn Future.successful(true)
 
     when {
-      controller.businessMatchingService.updateModel(any(), any())(any())
+      controller.businessMatchingService.updateModel(any(), any())(any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
     when {
@@ -785,7 +785,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         verify(controller.businessMatchingService).updateModel(any(), eqTo(businessMatching1.activities(
           BMBusinessActivities(activityData1, Some(Set(HighValueDealing, TelephonePaymentService)))
-        )))(any())
+        )))(any(), any())
 
       }
     }
@@ -809,7 +809,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         verify(controller.businessMatchingService).updateModel(any(), eqTo(businessMatching1.activities(
           BMBusinessActivities(Set(HighValueDealing, TelephonePaymentService))
-        )))(any())
+        )))(any(), any())
 
       }
     }

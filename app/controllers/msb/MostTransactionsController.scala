@@ -31,7 +31,7 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.msb.most_transactions
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class MostTransactionsController @Inject()(authAction: AuthAction,

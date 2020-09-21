@@ -23,7 +23,7 @@ import javax.inject.Inject
 import models.hvd._
 import play.api.mvc.{Call, MessagesControllerComponents}
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.hvd.cash_payment
 
 import scala.concurrent.Future

@@ -30,7 +30,6 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthAction
 import utils.ControllerHelper
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 // This controller no longer has a vew or POST method. The UTR is acquired in BM and should be copied

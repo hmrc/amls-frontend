@@ -24,8 +24,6 @@ import services.StatusService
 import utils.AuthAction
 import views.html.businessmatching.{cannot_add_services, cannot_continue_with_the_application}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class NoPsrController @Inject()(val authAction: AuthAction,
                                 val ds: CommonPlayDependencies,
                                 statusService: StatusService,

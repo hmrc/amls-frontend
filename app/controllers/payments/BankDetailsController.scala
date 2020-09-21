@@ -27,7 +27,7 @@ import services.{AuthEnrolmentsService, FeeResponseService, RenewalService, Stat
 import utils.{AuthAction, DeclarationHelper}
 import views.html.payments.bank_details
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector,

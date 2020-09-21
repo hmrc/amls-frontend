@@ -39,7 +39,7 @@ import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class BusinessMatchingServiceSpec extends PlaySpec
   with AmlsSpec

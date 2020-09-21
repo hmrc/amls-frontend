@@ -34,8 +34,7 @@ import services.{ResponsiblePeopleService, TradingPremisesService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
@@ -56,7 +55,7 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     })
   }
 
-  def updateSupervision(credId: String)(implicit hc: HeaderCarrier) = {
+  def updateSupervision(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext) = {
     val emptyModel = Supervision(hasAccepted = true)
 
     for {
@@ -71,10 +70,10 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     } yield newSupervision
   }
 
-  def updateHasAcceptedFlag(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier) =
+  def updateHasAcceptedFlag(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier ,ec: ExecutionContext) =
     OptionT.liftF(dataCacheConnector.save[AddBusinessTypeFlowModel](credId, AddBusinessTypeFlowModel.key, model.copy(hasAccepted = true)))
 
-  def updateServicesRegister(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier):  OptionT[Future, ServiceChangeRegister] = {
+  def updateServicesRegister(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier ,ec: ExecutionContext):  OptionT[Future, ServiceChangeRegister] = {
     for {
       activity <- OptionT.fromOption[Future](model.activity)
       updatedModel <- OptionT(dataCacheConnector.update[ServiceChangeRegister](credId, ServiceChangeRegister.key) {
@@ -85,12 +84,12 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     } yield updatedModel
   }
 
-  def tradingPremisesData(credId: String)(implicit hc: HeaderCarrier): Future[Seq[TradingPremises]] =
+  def tradingPremisesData(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Seq[TradingPremises]] =
     getData[TradingPremises](credId).map {
       _.filterNot(tp => tp.status.contains(StatusConstants.Deleted))
     }
 
-  def updateBusinessMatching(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier): OptionT[Future, BusinessMatching] = {
+  def updateBusinessMatching(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier ,ec: ExecutionContext): OptionT[Future, BusinessMatching] = {
     for {
       newActivity <- OptionT.fromOption[Future](model.activity)
       newMsbServices <- OptionT.fromOption[Future](model.subSectors) orElse OptionT.some(BusinessMatchingMsbServices(Set.empty[BusinessMatchingMsbService]))
@@ -131,7 +130,7 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     case _ => Set.empty[String]
   }
 
-  def tradingPremises(credId: String)(implicit hc: HeaderCarrier): Future[Seq[(TradingPremises, Int)]] = {
+  def tradingPremises(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Seq[(TradingPremises, Int)]] = {
     getData[TradingPremises](credId).map {
       _.zipWithIndex.filterNot { case (tp, _) =>
         tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
@@ -139,7 +138,7 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     }
   }
 
-  def responsiblePeople(credId: String)(implicit hc: HeaderCarrier): Future[Seq[(ResponsiblePerson, Int)]] = {
+  def responsiblePeople(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Seq[(ResponsiblePerson, Int)]] = {
     getData[ResponsiblePerson](credId).map {
       _.zipWithIndex.filterNot { case (rp, _) =>
         rp.status.contains(StatusConstants.Deleted) | !rp.isComplete

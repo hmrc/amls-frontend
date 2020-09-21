@@ -26,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
 import views.html.tcsp.service_provider_types
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class TcspTypesController @Inject()(val dataCacheConnector: DataCacheConnector,

@@ -32,7 +32,6 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessMatchingService @Inject()(
@@ -41,7 +40,7 @@ class BusinessMatchingService @Inject()(
                                          appConfig: ApplicationConfig
                                        ) {
 
-  def preApplicationComplete(credId: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
+  def preApplicationComplete(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Boolean] = {
     for {
       bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
     } yield bm.preAppComplete
@@ -51,11 +50,11 @@ class BusinessMatchingService @Inject()(
     OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
 
   def updateModel(credId: String, model: BusinessMatching)
-                 (implicit hc: HeaderCarrier): OptionT[Future, CacheMap] =
+                 (implicit hc: HeaderCarrier ,ec: ExecutionContext): OptionT[Future, CacheMap] =
     OptionT.liftF(dataCacheConnector.save[BusinessMatching](credId, BusinessMatching.key, model))
 
 
-  private def fetchActivitySet(cacheId: String)(implicit hc: HeaderCarrier) =
+  private def fetchActivitySet(cacheId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext) =
     for {
       viewResponse <- OptionT(dataCacheConnector.fetch[ViewResponse](cacheId, ViewResponse.key))
       submitted <- OptionT.fromOption[Future](viewResponse.businessMatchingSection.activities)
@@ -66,17 +65,17 @@ class BusinessMatchingService @Inject()(
     })
 
   private def getActivitySet(cacheId: String, fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
-                            (implicit hc: HeaderCarrier): OptionT[Future, Set[BusinessActivity]] =
+                            (implicit hc: HeaderCarrier ,ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     fetchActivitySet(cacheId) map fn.tupled
 
 
-  def getAdditionalBusinessActivities(cacheId: String)(implicit hc: HeaderCarrier): OptionT[Future, Set[BusinessActivity]] =
+  def getAdditionalBusinessActivities(cacheId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(cacheId, _ diff _)
 
-  def getSubmittedBusinessActivities(credId: String)(implicit hc: HeaderCarrier): OptionT[Future, Set[BusinessActivity]] =
+  def getSubmittedBusinessActivities(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(credId, _ intersect _)
 
-  def getRemainingBusinessActivities(credId: String)(implicit hc: HeaderCarrier): OptionT[Future, Set[BusinessActivity]] =
+  def getRemainingBusinessActivities(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     for {
       model <- getModel(credId)
       activities <- OptionT.fromOption[Future](model.activities)

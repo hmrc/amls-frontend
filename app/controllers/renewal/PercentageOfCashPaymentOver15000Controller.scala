@@ -24,7 +24,7 @@ import models.renewal.{PercentageOfCashPaymentOver15000, Renewal}
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.renewal.percentage
 
 import scala.concurrent.Future

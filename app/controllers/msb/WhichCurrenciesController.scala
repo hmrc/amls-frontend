@@ -28,7 +28,7 @@ import utils.ControllerHelper
 import utils.AuthAction
 import views.html.msb.which_currencies
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class WhichCurrenciesController @Inject() (authAction: AuthAction,

@@ -26,7 +26,6 @@ import org.joda.time.LocalDate
 import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -73,7 +72,7 @@ object DeclarationHelper {
   }
 
   def statusSubtitle(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
-                    (implicit statusService: StatusService, hc: HeaderCarrier): Future[String] = {
+                    (implicit statusService: StatusService, hc: HeaderCarrier ,ec: ExecutionContext): Future[String] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case SubmissionReady => "submit.registration"
       case SubmissionReadyForReview | SubmissionDecisionApproved => "submit.amendment.application"
@@ -83,7 +82,7 @@ object DeclarationHelper {
   }
 
   def statusEndDate(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
-                    (implicit statusService: StatusService, hc: HeaderCarrier): Future[Option[LocalDate]] = {
+                    (implicit statusService: StatusService, hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[LocalDate]] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case ReadyForRenewal(endDate) => endDate
       case _ => None
@@ -93,7 +92,8 @@ object DeclarationHelper {
   def promptRenewal(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
                    (implicit statusService: StatusService,
                     renewalService: RenewalService,
-                    hc: HeaderCarrier
+                    hc: HeaderCarrier ,
+                    ec: ExecutionContext
                    ): Future[Boolean] = {
     for{
       status <- statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId)
@@ -113,7 +113,7 @@ object DeclarationHelper {
   }
 
   def renewalComplete(renewalService: RenewalService, credId: String)
-                             (implicit hc: HeaderCarrier): Future[Boolean] = {
+                             (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Boolean] = {
     renewalService.getRenewal(credId) flatMap {
       case Some(renewal) =>
         renewalService.isRenewalComplete(renewal, credId)
@@ -122,7 +122,7 @@ object DeclarationHelper {
   }
 
   def sectionsComplete(cacheId: String, sectionsProvider: SectionsProvider)
-                      (implicit hc: HeaderCarrier) = {
+                      (implicit hc: HeaderCarrier ,ec: ExecutionContext) = {
 
     sectionsProvider.sections(cacheId) map {
       sections =>
@@ -136,7 +136,7 @@ object DeclarationHelper {
     }
 
   def getSubheadingBasedOnStatus(credId: String, amlsRefNumber: Option[String], accountTypeId: (String, String), statusService: StatusService, renewalService: RenewalService)
-                                (implicit hc: HeaderCarrier)= {
+                                (implicit hc: HeaderCarrier ,ec: ExecutionContext)= {
     for {
       renewalComplete <- OptionT.liftF(DeclarationHelper.renewalComplete(renewalService, credId))
       status <- OptionT.liftF(statusService.getStatus(amlsRefNumber, accountTypeId, credId))

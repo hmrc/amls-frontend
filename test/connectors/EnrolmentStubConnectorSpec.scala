@@ -26,7 +26,7 @@ import uk.gov.hmrc.http.HttpGet
 import uk.gov.hmrc.http.HttpClient
 import utils.AmlsSpec
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {

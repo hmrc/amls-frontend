@@ -30,7 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, AuthorisedRequest, DeclarationHelper}
 import views.html.payments.ways_to_pay
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 @Singleton

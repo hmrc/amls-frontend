@@ -31,7 +31,6 @@ import utils.{AuthAction, StatusConstants}
 import views.html.bankdetails.bank_account_account_is_uk
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class BankAccountIsUKController @Inject()(val dataCacheConnector: DataCacheConnector,

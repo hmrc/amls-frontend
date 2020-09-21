@@ -36,7 +36,7 @@ import utils._
 import views.TitleValidator
 import views.html.businessmatching.updateservice.remove.remove_activities_summary
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValidator {
