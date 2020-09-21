@@ -26,7 +26,7 @@ import play.api.mvc.{MessagesControllerComponents, Request}
 import services.RenewalService
 import utils.AuthAction
 import views.html.renewal._
-
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
@@ -36,7 +36,7 @@ class WhatYouNeedController @Inject()(
                                        val ds: CommonPlayDependencies,
                                        renewalService: RenewalService,
                                        val cc: MessagesControllerComponents,
-                                       what_you_need: what_you_need) extends AmlsBaseController(ds, cc) {
+                                       what_you_need: what_you_need)(implicit executionContext: ExecutionContext) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
     implicit request =>

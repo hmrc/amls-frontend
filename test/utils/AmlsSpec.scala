@@ -46,10 +46,10 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
   val commonDependencies = new CommonPlayDependencies(appConfig, messagesApi)
 
   implicit val messagesProvider: MessagesProvider = MessagesImpl(lang, messagesApi)
-  implicit val ec: ExecutionContext = mock[ExecutionContext]
+  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
   implicit val mat = mock[Materializer]
 
-  val mockMcc = mock[MessagesControllerComponents]
+  lazy val mockMcc = app.injector.instanceOf[MessagesControllerComponents]
 
 
   implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
