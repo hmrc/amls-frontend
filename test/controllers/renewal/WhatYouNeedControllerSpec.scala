@@ -26,6 +26,7 @@ import play.api.i18n._
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import services.RenewalService
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.renewal.what_you_need
 
@@ -55,13 +56,11 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
         val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
         val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
 
-       when(controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())).thenReturn(Future.successful(bm))
+        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(bm))
 
-        when(
-          renewalService.getSection(any())(any(), any())
-        ).thenReturn(
-          Future.successful(Section("renewal", NotStarted, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get()))
-        )
+        when {
+          renewalService.getSection(any())(any[HeaderCarrier], any())
+        } thenReturn Future.successful(Section("renewal", NotStarted, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get()))
 
         val result = controller.get(requestWithToken)
         status(result) must be(OK)
