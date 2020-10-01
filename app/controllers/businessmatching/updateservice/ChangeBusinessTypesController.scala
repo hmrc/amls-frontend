@@ -74,7 +74,8 @@ class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
   private def getFormData(credId: String)(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, messages: Messages) = for {
     cache <- OptionT(dataCacheConnector.fetchAll(credId))
     businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-    remainingActivities <- businessMatchingService.getRemainingBusinessActivities(credId)
+    activities <- businessMatchingService.getRemainingBusinessActivities(credId)
+    remainingActivities = activities.map(_.toString)
   } yield {
     val existing = addHelper.prefixedActivities(businessMatching)
 
