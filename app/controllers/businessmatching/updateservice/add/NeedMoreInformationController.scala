@@ -30,7 +30,6 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.businessmatching.updateservice.add.new_service_information
 
 import scala.concurrent.{ExecutionContext, Future}
-import ExecutionContext.Implicits.global
 
 @Singleton
 class NeedMoreInformationController @Inject()(authAction: AuthAction,

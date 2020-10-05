@@ -28,8 +28,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks, DependencyMocks}
 
-import scala.concurrent.ExecutionContext.Implicits._
-
 class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture extends DependencyMocks with AutoCompleteServiceMocks { self =>

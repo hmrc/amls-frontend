@@ -26,7 +26,7 @@ import services.AutoCompleteService
 import utils.AuthAction
 import views.html.msb.branches_or_agents
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheConnector,

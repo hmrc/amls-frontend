@@ -27,7 +27,7 @@ import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.moved_address
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 

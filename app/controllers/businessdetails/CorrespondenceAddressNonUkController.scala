@@ -31,7 +31,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessdetails._
 
 import scala.concurrent.Future

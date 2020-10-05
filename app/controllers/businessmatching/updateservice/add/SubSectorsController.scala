@@ -29,7 +29,6 @@ import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessmatching.updateservice.add.msb_subservices
 
 import scala.concurrent.Future

@@ -24,7 +24,7 @@ import models.supervision._
 import org.joda.time.LocalDate
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.supervision.supervision_end
 
 import scala.concurrent.Future

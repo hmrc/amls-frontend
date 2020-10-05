@@ -28,7 +28,7 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.most_transactions
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class MostTransactionsController @Inject()(val authAction: AuthAction,

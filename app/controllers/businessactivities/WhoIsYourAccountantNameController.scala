@@ -26,7 +26,7 @@ import services.AutoCompleteService
 import utils.AuthAction
 import views.html.businessactivities.who_is_your_accountant
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class WhoIsYourAccountantNameController @Inject()(val dataCacheConnector: DataCacheConnector,

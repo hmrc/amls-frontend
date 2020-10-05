@@ -29,7 +29,6 @@ import utils.{AuthAction, DateOfChangeHelper}
 import views.html.asp._
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
                                              val statusService: StatusService,

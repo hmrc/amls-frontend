@@ -25,7 +25,7 @@ import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.new_home_date_of_change
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 @Singleton

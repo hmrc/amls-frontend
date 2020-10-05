@@ -20,7 +20,6 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.asp._
 
 import scala.concurrent.Future

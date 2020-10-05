@@ -32,7 +32,7 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.declaration.add_person
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector,
                                       val statusService: StatusService,

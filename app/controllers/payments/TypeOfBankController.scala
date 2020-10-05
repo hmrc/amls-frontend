@@ -30,7 +30,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, DeclarationHelper}
 import views.html.payments.type_of_bank
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class TypeOfBankController @Inject()(val authAction: AuthAction,

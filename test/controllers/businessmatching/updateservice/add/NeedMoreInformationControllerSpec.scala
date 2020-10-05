@@ -59,9 +59,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
       "return OK with new_service_information view" in new Fixture {
 
         mockCacheFetch(Some(ServiceChangeRegister(Some(Set(HighValueDealing)))), Some(ServiceChangeRegister.key))
-
         val result = controller.get()(request)
-
         status(result) must be(OK)
         Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.newserviceinformation.title"))
       }

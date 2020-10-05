@@ -48,7 +48,6 @@ import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse}
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.collection.Seq
-import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
 
 class SubmissionServiceSpec extends AmlsSpec

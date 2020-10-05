@@ -23,10 +23,10 @@ import javax.inject.Inject
 import models.supervision.{ProfessionalBodyMember, ProfessionalBodyMemberNo, ProfessionalBodyMemberYes, Supervision}
 import play.api.mvc.{MessagesControllerComponents, Result}
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.supervision.member_of_professional_body
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class ProfessionalBodyMemberController @Inject()(
                                                   val dataCacheConnector: DataCacheConnector,
@@ -62,7 +62,7 @@ class ProfessionalBodyMemberController @Inject()(
       }
   }
 
-  def updateSupervisionFromIncomingData(data: ProfessionalBodyMember, supervision: Option[Supervision])(implicit ec: ExecutionContext) = {
+  def updateSupervisionFromIncomingData(data: ProfessionalBodyMember, supervision: Option[Supervision]) = {
     Future[Supervision](data match {
       case ProfessionalBodyMemberNo => supervision.professionalBodyMember(data).copy(professionalBodies = None)
       case _ => supervision.professionalBodyMember(data)

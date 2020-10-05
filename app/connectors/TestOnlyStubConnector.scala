@@ -20,15 +20,14 @@ import config.ApplicationConfig
 import javax.inject.Inject
 import play.api.Configuration
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.ExecutionContext
 
 class TestOnlyStubConnector @Inject()(val http: HttpClient,
                                       applicationConfig: ApplicationConfig,
-                                      val configuration: Configuration,
-                                      val runMode: RunMode) extends ServicesConfig(configuration, runMode) {
+                                      val configuration: Configuration) extends ServicesConfig(configuration) {
 
   lazy val baseUrl = applicationConfig.testOnlyStubsUrl
 

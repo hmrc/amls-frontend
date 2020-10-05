@@ -22,8 +22,6 @@ import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, FeeHelper}
 import views.html.applicationstatus.how_to_pay
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 @Singleton
 class HowToPayController @Inject()(authAction: AuthAction,
                                    val ds: CommonPlayDependencies,

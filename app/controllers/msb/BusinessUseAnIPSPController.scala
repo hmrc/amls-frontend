@@ -24,7 +24,7 @@ import javax.inject.Inject
 import models.moneyservicebusiness._
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.msb.business_use_an_ipsp
 
 import scala.concurrent.Future

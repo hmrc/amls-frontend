@@ -27,7 +27,7 @@ import models.renewal.{Renewal, SendMoneyToOtherCountry}
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.renewal.send_money_to_other_country
 
 import scala.concurrent.Future

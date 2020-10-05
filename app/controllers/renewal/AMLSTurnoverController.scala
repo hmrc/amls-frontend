@@ -30,7 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.amls_turnover
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 @Singleton

@@ -55,7 +55,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
   trait Fixture {
     self =>
     val baseUrl = "http://localhost"
-    val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
+    val request = addToken(authRequest(uri = baseUrl))
     lazy val view1 = app.injector.instanceOf[payment_confirmation_renewal]
     lazy val view2 = app.injector.instanceOf[payment_confirmation_amendvariation]
     lazy val view3 = app.injector.instanceOf[payment_confirmation_transitional_renewal]
@@ -126,7 +126,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
     )
 
     when {
-      controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+      controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
     } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
 
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))

@@ -27,7 +27,7 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.responsiblepeople.address.new_home_address_UK
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class NewHomeAddressUKController @Inject()(authAction: AuthAction,

@@ -33,7 +33,6 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, CacheMocks, StatusMocks}
 import views.html.businessmatching.company_registration_number
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -42,6 +41,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
   trait Fixture {
     self => val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
+
 
     lazy val view = app.injector.instanceOf[company_registration_number]
     val controller = new CompanyRegistrationNumberController(
@@ -62,7 +62,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
     mockApplicationStatus(NotCompleted)
 
     when {
-      controller.businessMatchingService.getModel(any())(any(), any())
+      controller.businessMatchingService.getModel(any())(any())
     } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
     val emptyCache = CacheMap("", Map.empty)
@@ -72,7 +72,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
     "on get() display company registration number page" in new Fixture {
       when {
-        controller.businessMatchingService.getModel(any())(any(), any())
+        controller.businessMatchingService.getModel(any())(any())
       } thenReturn OptionT.some[Future, BusinessMatching](None)
 
 

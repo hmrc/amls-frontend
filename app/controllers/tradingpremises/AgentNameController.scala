@@ -35,7 +35,7 @@ import views.html.date_of_change
 import views.html.tradingpremises.agent_name
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class AgentNameController @Inject()(

@@ -42,7 +42,7 @@ import utils.{AmlsSpec, DependencyMocks}
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class RegistrationProgressControllerSpec extends AmlsSpec

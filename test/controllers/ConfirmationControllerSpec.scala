@@ -53,7 +53,7 @@ class ConfirmationControllerSpec extends AmlsSpec
   trait Fixture {
     self =>
     val baseUrl = "http://localhost"
-    val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
+    val request = addToken(authRequest(uri = baseUrl))
     lazy val view1 = app.injector.instanceOf[confirm_renewal]
     lazy val view2 = app.injector.instanceOf[confirm_amendvariation]
     lazy val view3 = app.injector.instanceOf[confirmation_new]
@@ -127,7 +127,7 @@ class ConfirmationControllerSpec extends AmlsSpec
     )
 
     when {
-      controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+      controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
     } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
 
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
@@ -202,7 +202,7 @@ class ConfirmationControllerSpec extends AmlsSpec
           val fees = feeResponse(SubscriptionResponseType)
 
           when {
-            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(Some(fees))
 
           val result = controller.get()(request)
@@ -220,7 +220,7 @@ class ConfirmationControllerSpec extends AmlsSpec
           val fees = feeResponse(SubscriptionResponseType)
 
           when {
-            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(Some(fees))
 
           val result = controller.get()(request)
@@ -241,7 +241,7 @@ class ConfirmationControllerSpec extends AmlsSpec
           val fees = feeResponse(AmendOrVariationResponseType)
 
           when {
-            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(Some(fees))
 
           val result = controller.get()(request)
@@ -259,7 +259,7 @@ class ConfirmationControllerSpec extends AmlsSpec
           val fees = feeResponse(AmendOrVariationResponseType)
 
           when {
-            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(Some(fees))
 
           val result = controller.get()(request)
@@ -277,7 +277,7 @@ class ConfirmationControllerSpec extends AmlsSpec
           setupStatus(SubmissionDecisionApproved)
 
           when {
-            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(Some(feeResponse(AmendOrVariationResponseType)))
 
           val result = controller.get()(request)
@@ -298,7 +298,7 @@ class ConfirmationControllerSpec extends AmlsSpec
         } thenReturn Future.successful(true)
 
         when {
-          controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+          controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
         } thenReturn Future.successful(Some(feeResponse(AmendOrVariationResponseType)))
 
         val result = controller.get()(request)
@@ -319,7 +319,7 @@ class ConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReadyForReview)
 
         when {
-          controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+          controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
         } thenReturn Future.successful(None)
 
         val result = controller.get()(request)
@@ -335,7 +335,7 @@ class ConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionDecisionApproved)
 
         when {
-          controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+          controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
         } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType).copy(paymentReference = None)))
 
         val result = controller.get()(request)

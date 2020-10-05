@@ -23,12 +23,10 @@ import config.ApplicationConfig
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
 import play.api.Logger
 import play.api.libs.json.{JsSuccess, Json}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.HttpResponseHelper
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnector @Inject()(
@@ -41,7 +39,7 @@ class PayApiConnector @Inject()(
   private val logError = (msg: String) => Logger.error(s"[PayApiConnector] $msg")
   // $COVERAGE-ON$
 
-  def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
+  def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
 
     val bodyParser = JsonParsed[CreatePaymentResponse]
     // $COVERAGE-OFF$

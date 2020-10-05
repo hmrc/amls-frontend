@@ -25,7 +25,7 @@ import models.renewal.{InvolvedInOther, InvolvedInOtherNo, InvolvedInOtherYes, R
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.renewal.involved_in_other
 
 @Singleton

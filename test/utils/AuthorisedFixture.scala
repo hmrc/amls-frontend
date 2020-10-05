@@ -31,6 +31,13 @@ trait AuthorisedFixture extends MockitoSugar {
     SessionKeys.userId -> "Test User",
     SessionKeys.authToken -> ""
   )
+  def authRequest(uri :String) = FakeRequest("GET" ,uri).withSession(
+    SessionKeys.sessionId -> "SessionId",
+    SessionKeys.token -> "Token",
+    SessionKeys.userId -> "Test User",
+    SessionKeys.authToken -> ""
+  )
+
 }
 
 

@@ -27,7 +27,7 @@ import services.StatusService
 import utils.AuthAction
 import views.html.businessactivities._
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                             implicit val statusService: StatusService,

@@ -23,7 +23,7 @@ import javax.inject.Inject
 import models.supervision.{ProfessionalBody, Supervision}
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.supervision.penalised_by_professional
 
 import scala.concurrent.Future

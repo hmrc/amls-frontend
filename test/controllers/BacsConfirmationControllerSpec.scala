@@ -50,7 +50,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
   trait Fixture {
     self =>
     val baseUrl = "http://localhost"
-    val request = addToken(authRequest.copyFakeRequest(uri = baseUrl))
+    val request = addToken(authRequest(uri = baseUrl))
     lazy val view1 = app.injector.instanceOf[confirmation_bacs_transitional_renewal]
     lazy val view2 = app.injector.instanceOf[confirmation_bacs]
     val controller = new BacsConfirmationController(

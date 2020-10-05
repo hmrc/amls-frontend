@@ -21,7 +21,6 @@ import play.api.i18n.MessagesApi
 import play.api.mvc._
 import utils.AuthAction
 import views.html.{unauthorised, unauthorised_role}
-
 import scala.concurrent.Future
 
 class AmlsController @Inject()(authAction: AuthAction,

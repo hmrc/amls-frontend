@@ -27,7 +27,7 @@ import utils.ControllerHelper
 import utils.AuthAction
 import views.html.msb.branches_or_agents_which_countries
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector: DataCacheConnector,

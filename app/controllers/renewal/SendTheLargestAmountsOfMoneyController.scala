@@ -27,7 +27,7 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.send_largest_amounts_of_money
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class SendTheLargestAmountsOfMoneyController @Inject()(val dataCacheConnector: DataCacheConnector,

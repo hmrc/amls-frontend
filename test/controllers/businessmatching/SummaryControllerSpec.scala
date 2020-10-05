@@ -34,7 +34,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.businessmatching.summary
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
@@ -64,7 +64,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
     mockApplicationStatus(NotCompleted)
 
     def mockGetModel(model: Option[BusinessMatching]) = when {
-      controller.businessMatchingService.getModel(any())(any(), any())
+      controller.businessMatchingService.getModel(any())(any())
     } thenReturn {
       if (model.isDefined) {
         OptionT.some[Future, BusinessMatching](model)

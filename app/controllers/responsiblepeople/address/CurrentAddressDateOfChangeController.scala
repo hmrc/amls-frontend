@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import views.html.date_of_change
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,

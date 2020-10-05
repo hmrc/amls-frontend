@@ -27,7 +27,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.nationality
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class NationalityController @Inject () (
                                        val dataCacheConnector: DataCacheConnector,

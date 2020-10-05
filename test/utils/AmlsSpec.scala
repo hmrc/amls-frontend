@@ -32,6 +32,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 import scala.concurrent.ExecutionContext
 
+
 trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with MustMatchers with AuthorisedFixture {
 
   import play.api.test.CSRFTokenHelper._
@@ -45,11 +46,12 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
   val commonDependencies = new CommonPlayDependencies(appConfig, messagesApi)
 
   implicit val messagesProvider: MessagesProvider = MessagesImpl(lang, messagesApi)
+  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
   implicit val mat = mock[Materializer]
 
-  val mockMcc = mock[MessagesControllerComponents]
+  lazy val mockMcc = app.injector.instanceOf[MessagesControllerComponents]
 
-  implicit val ec: ExecutionContext = mock[ExecutionContext]
+
   implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
   lazy val errorView = app.injector.instanceOf[views.html.error]

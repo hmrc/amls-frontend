@@ -35,7 +35,7 @@ import play.api.test.Helpers._
 import services.{ResponsiblePeopleService, TradingPremisesService}
 import utils._
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 //noinspection ScalaStyle
 class AddBusinessTypeHelperSpec extends AmlsSpec

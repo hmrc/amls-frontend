@@ -30,7 +30,7 @@ import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import views.html.tradingpremises.msb_services
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class MSBServicesController @Inject () (
                                        val dataCacheConnector: DataCacheConnector,

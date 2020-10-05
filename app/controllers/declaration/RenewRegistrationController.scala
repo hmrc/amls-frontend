@@ -27,7 +27,7 @@ import utils.{AuthAction, DeclarationHelper}
 import play.api.mvc.MessagesControllerComponents
 import views.html.declaration.renew_registration
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class RenewRegistrationController @Inject()(val dataCacheConnector: DataCacheConnector,

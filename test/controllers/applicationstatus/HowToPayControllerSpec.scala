@@ -69,7 +69,7 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
 
         "There is a payment reference number" in new Fixture {
           when {
-            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
 
           val result = controller.get(request)
@@ -84,7 +84,7 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
           val amlsRegistrationNumber = "amlsRefNumber"
 
           when {
-            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(None)
 
           val result = controller.get(request)
@@ -99,7 +99,7 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
           val amlsRegistrationNumber = "amlsRefNumber"
 
           when {
-            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any())
+            controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType).copy(paymentReference = Some("    "))))
 
           val result = controller.get(request)

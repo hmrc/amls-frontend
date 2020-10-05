@@ -26,7 +26,7 @@ import play.api.libs.json.Json
 import services.ProxyCacheService
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class ProxyCacheServiceSpec extends AmlsSpec with MockitoSugar
   with ScalaFutures

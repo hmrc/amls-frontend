@@ -23,7 +23,7 @@ import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future

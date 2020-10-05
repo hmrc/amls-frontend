@@ -28,7 +28,7 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {

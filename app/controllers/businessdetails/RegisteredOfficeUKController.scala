@@ -31,7 +31,6 @@ import utils.{AuthAction, DateOfChangeHelper}
 import views.html.businessdetails._
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class RegisteredOfficeUKController @Inject ()(
                                               val dataCacheConnector: DataCacheConnector,

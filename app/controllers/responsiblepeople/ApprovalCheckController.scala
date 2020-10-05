@@ -26,7 +26,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.approval_check
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class ApprovalCheckController @Inject()(
                                          val dataCacheConnector: DataCacheConnector,

@@ -26,8 +26,6 @@ import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName}
 import views.html.confirmation.{confirmation_bacs, confirmation_bacs_transitional_renewal}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 @Singleton
 class BacsConfirmationController @Inject()(authAction: AuthAction,
                                            val ds: CommonPlayDependencies,

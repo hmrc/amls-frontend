@@ -42,7 +42,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenerator with ResponsiblePeopleValues {

@@ -26,7 +26,7 @@ import play.api.i18n.Messages
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.businessmatching.updateservice.remove.unable_to_remove_activity
 
 import scala.concurrent.Future

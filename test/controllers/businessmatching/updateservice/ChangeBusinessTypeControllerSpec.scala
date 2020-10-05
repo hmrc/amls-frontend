@@ -34,7 +34,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.businessmatching.updateservice.change_services
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -43,6 +43,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
     val request = addToken(authRequest)
     val bmService = mock[BusinessMatchingService]
+
 
     lazy val view = app.injector.instanceOf[change_services]
     val controller = new ChangeBusinessTypesController(

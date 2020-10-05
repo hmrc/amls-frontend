@@ -35,7 +35,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.businessmatching.updateservice.add.msb_subservices
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
@@ -64,7 +64,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
     when {
-      controller.businessMatchingService.getModel(any())(any(), any())
+      controller.businessMatchingService.getModel(any())(any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(AccountancyServices)))
     ))

@@ -29,7 +29,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.tradingpremises.summary_details
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class DetailedAnswersController @Inject()(val authAction: AuthAction,

@@ -25,7 +25,6 @@ import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.asp.summary
 
 class SummaryController @Inject()(val dataCache: DataCacheConnector,

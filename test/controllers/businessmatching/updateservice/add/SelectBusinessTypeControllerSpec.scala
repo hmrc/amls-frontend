@@ -33,7 +33,7 @@ import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.businessmatching.updateservice.add.select_activities
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class SelectBusinessTypeControllerSpec extends AmlsSpec {
@@ -56,7 +56,7 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec {
     )
 
     when {
-      controller.businessMatchingService.getModel(any())(any(), any())
+      controller.businessMatchingService.getModel(any())(any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(BillPaymentServices)))
     ))

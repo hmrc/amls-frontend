@@ -29,7 +29,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.supervision.member_of_professional_body
 
 import scala.concurrent.{Await, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.duration._
 
 class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {

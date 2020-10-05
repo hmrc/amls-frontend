@@ -31,7 +31,7 @@ import utils.{AckRefGenerator, AuthAction}
 import views.html.deregister.deregistration_reason
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class DeregistrationReasonController @Inject()(authAction: AuthAction,
                                                val ds: CommonPlayDependencies,

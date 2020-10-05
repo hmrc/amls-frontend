@@ -29,9 +29,7 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
-
-import scala.concurrent.ExecutionContext.Implicits._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Future,ExecutionContext}
 
 class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with GuiceOneAppPerSuite {
 
@@ -46,7 +44,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   val credId = "123412345"
   
   implicit val hc = mock[HeaderCarrier]
-  implicit val ec = mock[ExecutionContext]
+  implicit val ec = app.injector.instanceOf[ExecutionContext]
 
   val readStatusResponse: ReadStatusResponse = ReadStatusResponse(new LocalDateTime(), "Pending", None, None, None,
     None, false)

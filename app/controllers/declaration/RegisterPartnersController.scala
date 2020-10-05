@@ -31,7 +31,7 @@ import services.{ProgressService, SectionsProvider, StatusService}
 import utils.DeclarationHelper._
 import utils.{AuthAction, DeclarationHelper}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.declaration.register_partners
 
 import scala.concurrent.Future

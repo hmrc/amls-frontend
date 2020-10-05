@@ -26,7 +26,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class RegisteredForSelfAssessmentController @Inject () (
                                                        val dataCacheConnector: DataCacheConnector,

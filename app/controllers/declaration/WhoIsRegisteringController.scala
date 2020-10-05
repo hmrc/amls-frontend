@@ -31,7 +31,7 @@ import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, DeclarationHelper}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.declaration.{who_is_registering_this_registration, who_is_registering_this_renewal, who_is_registering_this_update}
 
 import scala.concurrent.Future

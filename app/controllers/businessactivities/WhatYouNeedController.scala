@@ -27,7 +27,6 @@ import services.StatusService
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AuthAction, ControllerHelper}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import views.html.businessactivities._
 import views.html.deregister.deregistration_reason
 import views.html.registrationprogress.registration_progress

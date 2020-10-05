@@ -34,7 +34,7 @@ import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, DependencyMocks}
 import utils.{AmlsSpec, DependencyMocks}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class ChangeBusinessTypeRouterSpec extends AmlsSpec {
@@ -46,7 +46,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
     val router = new ChangeBusinessTypeRouter(mockBusinessMatchingService)
 
     when {
-      mockBusinessMatchingService.getModel(any())(any(), any())
+      mockBusinessMatchingService.getModel(any())(any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(BillPaymentServices, MoneyServiceBusiness)))
     ))
@@ -83,7 +83,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
         " and selects Remove and has only one Business Type" in new Fixture {
 
         when {
-          mockBusinessMatchingService.getModel(any())(any(), any())
+          mockBusinessMatchingService.getModel(any())(any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
           activities = Some(BusinessActivities(Set(BillPaymentServices)))
         ))

@@ -30,7 +30,6 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, StatusConstants}
 import views.html.bankdetails.bank_account_account_number_non_uk
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton

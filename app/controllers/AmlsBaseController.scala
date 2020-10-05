@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import config.{ApplicationConfig}
 import play.api.i18n.{Lang, MessagesApi, MessagesImpl, MessagesProvider}
 import play.api.mvc.{AnyContent, BodyParsers, MessagesActionBuilderImpl, MessagesControllerComponents, Request}
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.ControllerHelper
 
 import scala.concurrent.ExecutionContext
@@ -29,11 +29,11 @@ abstract class AmlsBaseController(val cpd: CommonPlayDependencies, override val 
 
   override implicit val messagesApi: MessagesApi = cpd.messagesApi
 
+  implicit val ec: ExecutionContext = controllerComponents.executionContext
+
   implicit val appConfig = cpd.amlsConfig
 
   implicit val lang: Lang = Lang.defaultLang
-
-  implicit val ec: ExecutionContext = controllerComponents.executionContext
 
   val messages: MessagesApi = messagesApi
 

@@ -35,7 +35,7 @@ import utils.{AuthAction, ControllerHelper, DeclarationHelper, RepeatingSection}
 import views.html.responsiblepeople.detailed_answers
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class DetailedAnswersController @Inject () (
                                              val dataCacheConnector: DataCacheConnector,

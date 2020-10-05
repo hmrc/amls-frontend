@@ -28,7 +28,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.training
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class TrainingController @Inject()(
                                     override val messagesApi: MessagesApi,

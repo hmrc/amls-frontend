@@ -76,7 +76,7 @@ class select_business_nominated_officerSpec extends AmlsViewSpec with MustMatche
 
       def view = select_business_nominated_officer("subheading", f, people)
 
-      doc.select("input[type=radio][id=value-0").hasAttr("checked") mustBe true
+      doc.select("input[type=radio][id=value-0]").hasAttr("checked") mustBe true
 
     }
 

@@ -40,11 +40,11 @@ import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.verify
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.collection.Seq
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class UpdateMongoCacheServiceSpec extends AmlsSpec
   with BusinessMatchingGenerator

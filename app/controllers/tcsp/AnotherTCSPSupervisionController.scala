@@ -25,7 +25,7 @@ import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.tcsp.another_tcsp_supervision
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class AnotherTCSPSupervisionController @Inject()(val authAction: AuthAction,

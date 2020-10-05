@@ -42,7 +42,6 @@ import play.api.Logger
 import play.api.mvc.Request
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -92,7 +91,7 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
   }
 
   private def savePaymentBeforeResponse(response: CreatePaymentResponse, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
-                                       (implicit hc: HeaderCarrier): Future[Unit] = {
+                                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
       amlsConnector
         .savePayment(response.journeyId, amlsRefNo, safeId, accountTypeId)
         .recover {

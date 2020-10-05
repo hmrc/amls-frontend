@@ -27,7 +27,7 @@ import utils.{AuthAction, RepeatingSection}
 import views.html.tradingpremises.agent_company_name
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class AgentCompanyNameController @Inject()(val dataCacheConnector: DataCacheConnector,

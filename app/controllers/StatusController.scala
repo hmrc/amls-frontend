@@ -34,7 +34,6 @@ import views.html.include.status._
 import views.html.status._
 import views.html.status.components.{fee_information, registration_status, withdraw_or_deregister_information}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

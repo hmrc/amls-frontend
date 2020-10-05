@@ -31,7 +31,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, StatusConstants}
 import views.html.bankdetails.bank_account_name
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton

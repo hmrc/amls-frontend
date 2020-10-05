@@ -29,7 +29,7 @@ import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.tradingpremises.is_residential
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 @Singleton
 class  IsResidentialController @Inject()(

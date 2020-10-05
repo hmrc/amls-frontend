@@ -28,7 +28,7 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.date_of_birth
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class DateOfBirthController @Inject()(
                                        override val messagesApi: MessagesApi,

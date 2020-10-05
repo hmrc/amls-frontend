@@ -39,7 +39,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.businessmatching.psr_number
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class PSRNumberControllerSpec extends AmlsSpec
@@ -93,7 +93,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         )
 
         when {
-          controller.businessMatchingService.getModel(any())(any(), any())
+          controller.businessMatchingService.getModel(any())(any())
         } thenReturn OptionT.some[Future, BusinessMatching](model)
 
         val result = controller.get()(request)
@@ -109,7 +109,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         }
 
         when {
-          controller.businessMatchingService.getModel(any())(any(), any())
+          controller.businessMatchingService.getModel(any())(any())
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
         val result = controller.get()(request)
@@ -175,7 +175,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         )
 
         when {
-          controller.businessMatchingService.getModel(any())(any(), any())
+          controller.businessMatchingService.getModel(any())(any())
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
         val result = controller.post()(newRequest)

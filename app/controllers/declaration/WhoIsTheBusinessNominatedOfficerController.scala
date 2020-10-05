@@ -31,7 +31,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, DeclarationHelper}
 import views.html.declaration.select_business_nominated_officer
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 class WhoIsTheBusinessNominatedOfficerController @Inject ()(

@@ -25,7 +25,7 @@ import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, HowCashPayments
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import views.html.renewal.how_cash_payments_received
 
 import scala.concurrent.Future

@@ -18,11 +18,10 @@ package config
 
 import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class ApplicationConfig @Inject()(configuration: Configuration, runMode: RunMode, servicesConfig: ServicesConfig) {
+class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: ServicesConfig) {
 
   private def baseUrl(serviceName: String) = {
     val protocol = configuration.getOptional[String](s"microservice.services.$serviceName.protocol").getOrElse("http")

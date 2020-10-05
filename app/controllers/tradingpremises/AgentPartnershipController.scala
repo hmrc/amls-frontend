@@ -27,7 +27,6 @@ import utils.{AuthAction, RepeatingSection}
 import views.html.tradingpremises.agent_partnership
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class AgentPartnershipController @Inject()(val dataCacheConnector: DataCacheConnector,

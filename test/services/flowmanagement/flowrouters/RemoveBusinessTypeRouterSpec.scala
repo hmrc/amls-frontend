@@ -37,7 +37,7 @@ import services.flowmanagement.flowrouters.businessmatching.RemoveBusinessTypeRo
 import services.flowmanagement.pagerouters.removeflow._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 
 
 class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerator {
