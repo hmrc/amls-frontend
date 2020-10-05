@@ -17,7 +17,7 @@ AMLS Notification Package Template Versioning
 
 * The version numbers are in the format v{`MAJOR`}m{`MINOR`}, starting from v1m0.
 
-
+ 
 Creating a new package template version
 =============
 
