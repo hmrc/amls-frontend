@@ -23,6 +23,7 @@ import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
+import play.api.Logger
 
 case class Eab(data: JsObject = Json.obj(),
                hasChanged: Boolean = false,
@@ -123,6 +124,8 @@ object Eab {
   val key                    = "estate-agent-business"
 
   private def generateRedirect(destinationUrl: String) = {
+    Logger.debug(s"Destination URL: $destinationUrl")
+    Logger.debug(s"Call: ${Call(redirectCallType, destinationUrl).url}")
     Call(redirectCallType, destinationUrl)
   }
 
