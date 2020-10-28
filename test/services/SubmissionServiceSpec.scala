@@ -17,7 +17,7 @@
 package services
 
 import config.ApplicationConfig
-import connectors.AmlsConnector
+import connectors.{AmlsConnector, BusinessMatchingConnector}
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
@@ -67,7 +67,9 @@ class SubmissionServiceSpec extends AmlsSpec
       mock[GovernmentGatewayService],
       mock[AuthEnrolmentsService],
       mock[AmlsConnector],
-      config)
+      config,
+      mock[connectors.BusinessMatchingConnector]
+    )
 
     val enrolmentResponse = HttpResponse(OK)
 

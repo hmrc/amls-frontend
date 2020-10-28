@@ -117,7 +117,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         }.thenReturn(Future.successful(incompleteSections))
 
         when {
-          controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
+          controller.subscriptionService.subscribe(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(response)
 
         when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
@@ -135,7 +135,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         }.thenReturn(Future.successful(completedSections))
 
         when {
-          controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
+          controller.subscriptionService.subscribe(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(response)
 
         when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
@@ -153,7 +153,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         }.thenReturn(Future.successful(completedSections))
 
         when {
-          controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
+          controller.subscriptionService.subscribe(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(response.copy(previouslySubmitted = Some(true)))
 
         when {
@@ -196,7 +196,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       }.thenReturn(Future.successful(completedSections))
 
       when {
-        controller.subscriptionService.subscribe(any(), any(), any())(any(), any())
+        controller.subscriptionService.subscribe(any(), any(), any())(any(), any(), any())
       } thenReturn Future.failed(DuplicateEnrolmentException(msg, Upstream5xxResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
 
       when {
@@ -218,7 +218,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       }.thenReturn(Future.successful(completedSections))
 
       when {
-        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any())
+        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any(), any())
       } thenReturn Future.failed(DuplicateSubscriptionException(msg))
 
       when {
@@ -244,7 +244,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       } thenReturn Future.successful(SubmissionReady)
 
       when {
-        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any())
+        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any(), any())
       } thenReturn Future.failed(InvalidEnrolmentCredentialsException(msg, Upstream5xxResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
 
       val result = controller.post()(request)
@@ -262,7 +262,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       }.thenReturn(Future.successful(completedSections))
 
       when {
-        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any())
+        controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any(), any())
       } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
 
       when {
