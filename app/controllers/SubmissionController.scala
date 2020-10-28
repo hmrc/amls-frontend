@@ -27,6 +27,7 @@ import services.{RenewalService, SectionsProvider, StatusService, SubmissionServ
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import utils.{AuthAction, DeclarationHelper}
 import views.html.submission.{bad_request, duplicate_enrolment, duplicate_submission, wrong_credential_type}
+import play.api.mvc.Request
 
 import scala.concurrent.Future
 
@@ -84,7 +85,7 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
   }
 
   private def subscribeBasedOnStatus(status: SubmissionStatus, groupIdentifier: Option[String], credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
-                                    (implicit hc: HeaderCarrier) =
+                                    (implicit hc: HeaderCarrier, request: Request[_]) =
     status match {
       case SubmissionReadyForReview => subscriptionService.update(credId, amlsRegistrationNumber, accountTypeId)
       case SubmissionDecisionApproved => subscriptionService.variation(credId, amlsRegistrationNumber, accountTypeId)
