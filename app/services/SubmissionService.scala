@@ -181,10 +181,10 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
       rd <- bm.reviewDetails
     } yield rd.safeId) match {
       case Some(a) =>
-        if(a.isEmpty)
+        if(a.trim.isEmpty)
           businessMatchingConnector.getReviewDetails map {
             case Some(details) => details.safeId
-            case _ => throw new Exception("No SafeID value available.")
+            case _ => throw new Exception("No safe id from business customer service")
           }
         else
           Future.successful(a)
