@@ -58,16 +58,23 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
       DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
         case true => {
           // $COVERAGE-OFF$
-          Logger.debug("[SubmissionController][post]:true")
+          Logger.info("[SubmissionController][post]:true")
           // $COVERAGE-ON$
           statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap[SubmissionResponse](status =>
             subscribeBasedOnStatus(status, request.groupIdentifier, request.credId, request.amlsRefNumber, request.accountTypeId))
           }.flatMap {
           case SubscriptionResponse(_, _, _, Some(true)) =>
+            // $COVERAGE-OFF$
+            Logger.info("[SubmissionController][post]:SubscriptionResponse(previouslySubmitted=true)")
+            // $COVERAGE-ON$
             authenticator.refreshProfile map { _ =>
               Redirect(controllers.routes.LandingController.get())
             }
-          case _ => Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
+          case _ =>
+            // $COVERAGE-OFF$
+            Logger.info("[SubmissionController][post]:SubmissionResponse or SubscriptionResponse(previouslySubmitted=false)")
+            // $COVERAGE-ON$
+            Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
         } recoverWith {
           case _: DuplicateEnrolmentException =>
             Logger.info("[SubmissionController][post] handling DuplicateEnrolmentException")
@@ -87,7 +94,7 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
         }
         case false =>
           // $COVERAGE-OFF$
-          Logger.debug("[SubmissionController][post]:false")
+          Logger.info("[SubmissionController][post]:false")
           // $COVERAGE-ON$
           Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }
