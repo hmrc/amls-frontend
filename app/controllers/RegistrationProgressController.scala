@@ -33,6 +33,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, DeclarationHelper}
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
+import play.api.Logger
 
 import scala.concurrent.Future
 

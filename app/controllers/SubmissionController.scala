@@ -90,7 +90,7 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
             Future.successful(Ok(bad_request()))
           case e: Exception =>
             Logger.info("[SubmissionController][post] handling Exception")
-            throw new Exception(e.getMessage)
+            throw e
         }
         case false =>
           // $COVERAGE-OFF$
