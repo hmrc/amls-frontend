@@ -33,6 +33,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, DeclarationHelper}
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
+import play.api.Logger
 
 import scala.concurrent.Future
 
@@ -103,12 +104,19 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                            (implicit hc: HeaderCarrier, request: Request[AnyContent]): Future[Boolean] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) flatMap {
       case ReadyForRenewal(_) =>
+        // $COVERAGE-OFF$
+        Logger.info("RegistrationProgressController:isRenewalFlow - ReadyForRenewal")
+        // $COVERAGE-ON$
         dataCache.fetch[Renewal](cacheId, Renewal.key) map {
           case Some(_) => true
           case None => false
         }
 
-      case _ => Future.successful(false)
+      case _ =>
+        // $COVERAGE-OFF$
+        Logger.info("RegistrationProgressController:isRenewalFlow - Non-ReadyForRenewal or None")
+        // $COVERAGE-ON$
+        Future.successful(false)
     }
   }
 
