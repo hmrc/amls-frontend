@@ -103,12 +103,19 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                            (implicit hc: HeaderCarrier, request: Request[AnyContent]): Future[Boolean] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) flatMap {
       case ReadyForRenewal(_) =>
+        // $COVERAGE-OFF$
+        Logger.debug("RegistrationProgressController:isRenewalFlow - ReadyForRenewal")
+        // $COVERAGE-ON$
         dataCache.fetch[Renewal](cacheId, Renewal.key) map {
           case Some(_) => true
           case None => false
         }
 
-      case _ => Future.successful(false)
+      case _ =>
+        // $COVERAGE-OFF$
+        Logger.debug("RegistrationProgressController:isRenewalFlow - Non-ReadyForRenewal or None")
+        // $COVERAGE-ON$
+        Future.successful(false)
     }
   }
 

@@ -57,6 +57,9 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
     implicit request =>
       DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
         case true => {
+          // $COVERAGE-OFF$
+          Logger.debug("[SubmissionController][post]:true")
+          // $COVERAGE-ON$
           statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap[SubmissionResponse](status =>
             subscribeBasedOnStatus(status, request.groupIdentifier, request.credId, request.amlsRefNumber, request.accountTypeId))
           }.flatMap {
@@ -78,8 +81,15 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
           case _: BadRequestException =>
             Logger.info("[SubmissionController][post] handling BadRequestException")
             Future.successful(Ok(bad_request()))
+          case e: Exception =>
+            Logger.info("[SubmissionController][post] handling Exception")
+            throw new Exception(e.getMessage)
         }
-        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
+        case false =>
+          // $COVERAGE-OFF$
+          Logger.debug("[SubmissionController][post]:false")
+          // $COVERAGE-ON$
+          Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
       }
   }
 
