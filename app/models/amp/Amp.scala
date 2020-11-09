@@ -16,18 +16,14 @@
 
 package models.amp
 
-import java.time.LocalDateTime
-
 import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.AMPTurnover
-import models.renewal.AMPTurnover.update
-import play.api.{Configuration, Play}
+import play.api.Play
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 final case class Amp(data: JsObject = Json.obj(),
                      hasChanged: Boolean = false,

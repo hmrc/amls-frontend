@@ -20,7 +20,6 @@ import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json.{Json, Reads}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-
 case class BusinessDetails(
                              previouslyRegistered: Option[PreviouslyRegistered] = None,
                              activityStartDate: Option[ActivityStartDate] = None,
@@ -104,9 +103,6 @@ object BusinessDetails {
   }
 
   val key = "about-the-business"
-
-  import play.api.libs.json.JodaWrites._
-  import play.api.libs.json.JodaReads._
 
   implicit val format = Json.writes[BusinessDetails]
 

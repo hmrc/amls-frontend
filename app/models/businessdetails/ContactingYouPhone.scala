@@ -25,7 +25,6 @@ case class ContactingYouPhone(phoneNumber: String)
 object ContactingYouPhone {
 
   implicit val formats = Json.format[ContactingYouPhone]
-  import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, ContactingYouPhone] =
   From[UrlFormEncoded] { __ =>

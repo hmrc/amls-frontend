@@ -18,15 +18,13 @@ package models.businessdetails
 
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
 import play.api.libs.json._
-import cats.data.Validated.{Invalid, Valid}
+import cats.data.Validated.Valid
 
 sealed trait VATRegistered
 
 case class VATRegisteredYes(value : String) extends VATRegistered
 case object VATRegisteredNo extends VATRegistered
-
 
 object VATRegistered {
 

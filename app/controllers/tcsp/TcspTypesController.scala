@@ -16,16 +16,14 @@
 
 package controllers.tcsp
 
-import com.google.inject.Singleton
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.tcsp.{CompanyFormationAgent, RegisteredOfficeEtc, Tcsp, TcspTypes}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.tcsp.service_provider_types
-
 
 import scala.concurrent.Future
 
@@ -82,4 +80,5 @@ class TcspTypesController @Inject()(val dataCacheConnector: DataCacheConnector,
         }
       }
   }
+
 }

@@ -19,7 +19,6 @@ package controllers.responsiblepeople
 import javax.inject.Inject
 import cats.data.OptionT
 import cats.implicits._
-import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -30,7 +29,6 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_uk_passport
 
 import scala.concurrent.Future
-
 
 class PersonUKPassportController @Inject()(
                                             override val messagesApi: MessagesApi,

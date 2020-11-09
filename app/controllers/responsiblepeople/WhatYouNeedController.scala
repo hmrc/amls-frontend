@@ -22,11 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-
-
 import views.html.responsiblepeople._
-
-import scala.concurrent.Future
 
 class WhatYouNeedController @Inject () (
                                         val dataCacheConnector: DataCacheConnector,

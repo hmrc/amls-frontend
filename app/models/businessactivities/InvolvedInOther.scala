@@ -20,7 +20,7 @@ import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
-import cats.data.Validated.{Invalid, Valid}
+import cats.data.Validated.Valid
 import models.renewal.{InvolvedInOther, InvolvedInOtherNo, InvolvedInOtherYes}
 
 sealed trait InvolvedInOther

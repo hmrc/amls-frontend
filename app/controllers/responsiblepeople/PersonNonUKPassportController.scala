@@ -16,7 +16,6 @@
 
 package controllers.responsiblepeople
 
-import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -30,7 +29,6 @@ import views.html.responsiblepeople.person_non_uk_passport
 
 import scala.concurrent.Future
 
-
 class PersonNonUKPassportController @Inject()(override val messagesApi: MessagesApi,
                                               val dataCacheConnector: DataCacheConnector,
                                               authAction: AuthAction,
@@ -38,7 +36,6 @@ class PersonNonUKPassportController @Inject()(override val messagesApi: Messages
                                               val cc: MessagesControllerComponents,
                                               person_non_uk_passport: person_non_uk_passport,
                                               implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
-
 
   def get(index:Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>

@@ -16,11 +16,11 @@
 
 package models.businessactivities
 
-import cats.data.Validated.{Invalid, Valid}
+import cats.data.Validated.Invalid
 import play.api.libs.json.{JsonValidationError => VE}
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Path, Rule, To, ValidationError, Write}
-import models.FormTypes.{basicPunctuationPattern, basicPunctuationRegex, notEmptyStrip, regexWithMsg}
+import jto.validation.{From, Path, Rule, ValidationError, Write}
+import models.FormTypes.{basicPunctuationRegex, notEmptyStrip, regexWithMsg}
 import play.api.libs.json._
 import utils.TraversableValidators.minLengthR
 

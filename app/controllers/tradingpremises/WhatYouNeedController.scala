@@ -16,15 +16,13 @@
 
 package controllers.tradingpremises
 
-
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
-import utils.{AuthAction, ControllerHelper}
+import utils.AuthAction
 import views.html.tradingpremises._
-
 
 @Singleton
 class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,

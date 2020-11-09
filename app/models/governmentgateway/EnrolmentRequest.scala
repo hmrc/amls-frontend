@@ -16,8 +16,7 @@
 
 package models.governmentgateway
 
-import config.ApplicationConfig
-import play.api.libs.json.{JsString, Json, Writes}
+import play.api.libs.json.{Json, Writes}
 
 case class EnrolmentRequest(
                              mlrRefNo: String,

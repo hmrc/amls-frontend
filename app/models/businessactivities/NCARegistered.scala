@@ -16,13 +16,11 @@
 
 package models.businessactivities
 
-import jto.validation.{Path, Write, From, Rule}
+import jto.validation.{Write, From, Rule}
 import jto.validation.forms._
-import jto.validation.ValidationError
 import play.api.libs.json.Json
 
 case class NCARegistered(ncaRegistered: Boolean)
-
 
 object NCARegistered {
 

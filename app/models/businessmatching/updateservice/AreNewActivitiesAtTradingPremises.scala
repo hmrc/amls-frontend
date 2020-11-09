@@ -19,7 +19,6 @@ package models.businessmatching.updateservice
 import jto.validation.forms.UrlFormEncoded
 import models.businessmatching.BusinessActivity
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
 
 sealed trait AreNewActivitiesAtTradingPremises
 

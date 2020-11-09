@@ -22,7 +22,6 @@ import connectors.{BusinessMatchingAddress, BusinessMatchingReviewDetails}
 import models.Country
 import models.businessmatching.BusinessType
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership, SoleProprietor, UnincorporatedBody}
-import play.api.Logger
 import play.api.libs.json.{Json, Reads}
 
 case class ReviewDetails(

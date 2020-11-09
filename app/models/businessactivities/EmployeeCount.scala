@@ -19,7 +19,7 @@ package models.businessactivities
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
-import models.FormTypes.{notEmptyStrip, _}
+import models.FormTypes.notEmptyStrip
 import utils.MappingUtils.Implicits._
 import jto.validation.forms.Rules.{notEmpty, _}
 

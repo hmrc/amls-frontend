@@ -16,7 +16,6 @@
 
 package controllers.responsiblepeople
 
-import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -28,7 +27,6 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.date_of_birth
 
 import scala.concurrent.Future
-
 
 class DateOfBirthController @Inject()(
                                        override val messagesApi: MessagesApi,
@@ -72,4 +70,5 @@ class DateOfBirthController @Inject()(
           }
         }
   }
+
 }

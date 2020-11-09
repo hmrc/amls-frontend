@@ -18,18 +18,12 @@ package connectors
 
 import config.{AmlsHeaderCarrierForPartialsConverter, ApplicationConfig}
 import javax.inject.Inject
-import play.api.{Configuration, Logger, Play}
+import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.Request
-import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
-import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
-
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.NotFoundException
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCrypto
 import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.play.http.ws.WSHttp
 
 case class BusinessMatchingAddress(line_1: String,
                                    line_2: String,

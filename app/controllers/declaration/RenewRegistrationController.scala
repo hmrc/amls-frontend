@@ -16,7 +16,7 @@
 
 package controllers.declaration
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._

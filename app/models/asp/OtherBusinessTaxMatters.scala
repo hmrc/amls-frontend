@@ -17,10 +17,9 @@
 package models.asp
 
 import jto.validation._
-import jto.validation.forms.Rules._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
-import cats.data.Validated.{Invalid, Valid}
+import cats.data.Validated.Valid
 import jto.validation.forms.UrlFormEncoded
 
 sealed trait OtherBusinessTaxMatters

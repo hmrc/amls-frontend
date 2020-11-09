@@ -18,12 +18,11 @@ package models.businessactivities
 
 import models.Country
 import jto.validation.forms.{UrlFormEncoded, _}
-import jto.validation.{From, Rule, Success, Write}
+import jto.validation.{From, Rule, Write}
 import jto.validation._
-import play.api.libs.json.{JsObject, Json, Reads, Writes, __}
+import play.api.libs.json.{Json, Reads, Writes, __}
 import utils.{JsonMapping, TraversableValidators}
-import cats.data.Validated.{Invalid, Valid}
-import models.renewal.MostTransactions
+import cats.data.Validated.Valid
 
 case class CustomersOutsideUK(countries: Option[Seq[Country]])
 
@@ -100,7 +99,6 @@ sealed trait CustomersOutsideUK0 {
 
   val formWrites: Write[CustomersOutsideUK, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import jto.validation.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
     (
       (__ \ "isOutside").write[Boolean].contramap[Option[_]] {
         case Some(_) => true

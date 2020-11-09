@@ -25,7 +25,6 @@ import models.businessmatching.BusinessMatching
 import models.registrationprogress.Completed
 import models.responsiblepeople.ResponsiblePerson
 import models.status.{ReadyForRenewal, RenewalSubmitted}
-import play.api.i18n.MessagesApi
 import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
@@ -33,7 +32,6 @@ import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.renewal_progress
 
 import scala.concurrent.Future
-
 
 @Singleton
 class RenewalProgressController @Inject()(val authAction: AuthAction,
@@ -82,4 +80,5 @@ class RenewalProgressController @Inject()(val authAction: AuthAction,
           case _ => InternalServerError("Could not get data for redirect")
         }
   }
+
 }

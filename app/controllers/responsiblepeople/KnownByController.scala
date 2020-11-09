@@ -16,7 +16,6 @@
 
 package controllers.responsiblepeople
 
-import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -27,7 +26,6 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.known_by
 
 import scala.concurrent.Future
-
 
 @Singleton
 class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,

@@ -22,7 +22,7 @@ import connectors.DataCacheConnector
 import controllers.CommonPlayDependencies
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.bankdetails.{Account, BankDetails}
+import models.bankdetails.BankDetails
 import play.api.mvc.MessagesControllerComponents
 import models.bankdetails.{BankAccount, BankAccountIsUk, BankDetails}
 import services.StatusService

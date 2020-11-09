@@ -17,16 +17,12 @@
 package models.businessactivities
 
 import jto.validation.forms._
-import jto.validation.{From, Rule, To, Write}
+import jto.validation.{To, Write}
 import play.api.libs.json.Json
-import models.FormTypes._
-
-import jto.validation.forms.Rules._
 import utils.MappingUtils.Implicits._
 
 case class HowManyEmployees(employeeCount: Option[String] = None,
                             employeeCountAMLSSupervision: Option[String] = None)
-
 
 object HowManyEmployees {
 

@@ -27,7 +27,6 @@ sealed trait BusinessType
 object BusinessType {
 
   import jto.validation.forms.Rules._
-  import utils.MappingUtils.Implicits._
 
   case object SoleProprietor extends BusinessType
   case object LimitedCompany extends BusinessType
@@ -36,7 +35,6 @@ object BusinessType {
   case object UnincorporatedBody extends BusinessType
 
   def errorMessageFor(businessType: BusinessType)(implicit messages: Messages): String = {
-
     val common = "error.required.declaration.add.position.for"
 
     businessType match {
@@ -46,8 +44,8 @@ object BusinessType {
       case BusinessType.LPrLLP => Messages(s"$common.lprlpp")
       case BusinessType.UnincorporatedBody => Messages(s"$common.unicorporated.body")
     }
-
   }
+
   implicit val formR: Rule[UrlFormEncoded, BusinessType] =
     From[UrlFormEncoded] { __ =>
       (__ \ "businessType").read[String] flatMap {

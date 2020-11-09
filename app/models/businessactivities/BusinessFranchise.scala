@@ -19,8 +19,7 @@ package models.businessactivities
 import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
-import cats.data.Validated.{Invalid, Valid}
+import cats.data.Validated.Valid
 import play.api.libs.json._
 
 sealed trait BusinessFranchise
