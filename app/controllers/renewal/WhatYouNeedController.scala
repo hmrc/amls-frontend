@@ -26,6 +26,7 @@ import play.api.mvc.{MessagesControllerComponents, Request}
 import services.RenewalService
 import utils.AuthAction
 import views.html.renewal._
+import play.api.Logger
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
@@ -46,7 +47,11 @@ class WhatYouNeedController @Inject()(
           section <- OptionT.liftF(getSection(renewalService, request.credId, Some(ba), bm.msbServices))
         } yield {
           section
-        }).getOrElse(InternalServerError("Unable to retrieve business activities"))
+        }).getOrElse {
+          Logger.info("Unable to retrieve business activities")
+          throw new Exception("Unable to retrieve business activities")
+        }
+
   }
 
   def getSection(renewalService: RenewalService,

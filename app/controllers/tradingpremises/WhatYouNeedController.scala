@@ -16,15 +16,14 @@
 
 package controllers.tradingpremises
 
-
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper}
+import play.api.Logger
 import views.html.tradingpremises._
-
 
 @Singleton
 class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -40,7 +39,10 @@ class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector
           bm <- businessMatching
           ba <- bm.activities
         } yield { Ok(what_you_need(index, Some(ba), bm.msbServices))
-      })getOrElse(InternalServerError("Unable to retrieve business activities"))
+      }).getOrElse {
+          Logger.info("Unable to retrieve business activities")
+          throw new Exception("Unable to retrieve business activities")
+        }
     }
   }
 }

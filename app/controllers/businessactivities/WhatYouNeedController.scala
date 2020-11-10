@@ -26,7 +26,7 @@ import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AuthAction, ControllerHelper}
-
+import play.api.Logger
 import views.html.businessactivities._
 import views.html.deregister.deregistration_reason
 import views.html.registrationprogress.registration_progress
@@ -48,7 +48,10 @@ import scala.concurrent.Future
           ba <- bm.activities
         } yield {
           Ok(what_you_need(routes.InvolvedInOtherController.get().url, Some(ba)))
-        })getOrElse(InternalServerError("Unable to retrieve business activities"))
+        }).getOrElse {
+            Logger.info("Unable to retrieve business activities")
+            throw new Exception("Unable to retrieve business activities")
+          }
       }
   }
 }
