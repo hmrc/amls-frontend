@@ -25,6 +25,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AmlsSpec
+import org.scalatest.concurrent.ScalaFutures
 import views.html.tradingpremises.what_you_need
 
 import scala.concurrent.Future
@@ -63,12 +64,13 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
 
     }
 
-    "Throw an error when data cannot be fetched" ignore new Fixture {
+    "throw an error when data cannot be fetched" in new Fixture {
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
-      val result = controller.get(1)(request)
-      status(result) must be(INTERNAL_SERVER_ERROR)
+      a[Exception] must be thrownBy {
+        ScalaFutures.whenReady(controller.get(1)(request)) { x => x }
+      }
     }
   }
 }
