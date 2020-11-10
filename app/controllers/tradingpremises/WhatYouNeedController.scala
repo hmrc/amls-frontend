@@ -40,8 +40,8 @@ class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector
           ba <- bm.activities
         } yield { Ok(what_you_need(index, Some(ba), bm.msbServices))
       }).getOrElse {
-          Logger.info("Unable to retrieve business activities")
-          throw new Exception("Unable to retrieve business activities")
+          Logger.info("Unable to retrieve business activities in [tradingpremises][WhatYouNeedController]")
+          throw new Exception("Unable to retrieve business activities in [tradingpremises][WhatYouNeedController]")
         }
     }
   }

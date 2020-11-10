@@ -49,8 +49,8 @@ import scala.concurrent.Future
         } yield {
           Ok(what_you_need(routes.InvolvedInOtherController.get().url, Some(ba)))
         }).getOrElse {
-            Logger.info("Unable to retrieve business activities")
-            throw new Exception("Unable to retrieve business activities")
+            Logger.info("Unable to retrieve business activities in [businessactivities][WhatYouNeedController]")
+            throw new Exception("Unable to retrieve business activities in [businessactivities][WhatYouNeedController]")
           }
       }
   }

@@ -15,6 +15,7 @@
  */
 
 package controllers.renewal
+
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
@@ -48,8 +49,8 @@ class WhatYouNeedController @Inject()(
         } yield {
           section
         }).getOrElse {
-          Logger.info("Unable to retrieve business activities")
-          throw new Exception("Unable to retrieve business activities")
+          Logger.info("Unable to retrieve business activities in [renewal][WhatYouNeedController]")
+          throw new Exception("Unable to retrieve business activities in [renewal][WhatYouNeedController]")
         }
 
   }
