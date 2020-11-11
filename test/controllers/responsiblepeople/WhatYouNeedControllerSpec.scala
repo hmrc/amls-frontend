@@ -18,12 +18,11 @@ package controllers.responsiblepeople
 
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
-import models.status.SubmissionReadyForReview
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import views.html.responsiblepeople.what_you_need
@@ -39,6 +38,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       dataCacheConnector = mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
       what_you_need = view)
   }
+
   "WhatYouNeedController" must {
 
     "get" must {
@@ -59,14 +59,15 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         contentAsString(result) must include(pageTitle)
       }
     }
-    "Throw an error" when {
-      "bm details cannot be fetched" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
 
-        val result = controller.get(1)(request)
-        status(result) must be(INTERNAL_SERVER_ERROR)
+    "throw an error when data cannot be fetched" in new Fixture {
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+        .thenReturn(Future.successful(None))
+
+      a[Exception] must be thrownBy {
+        ScalaFutures.whenReady(controller.get(1)(request)) { x => x }
       }
     }
   }
+
 }

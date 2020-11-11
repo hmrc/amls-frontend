@@ -28,10 +28,10 @@ import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AmlsSpec, DependencyMocks}
+import org.scalatest.concurrent.ScalaFutures
 import views.html.renewal.what_you_need
 
 import scala.concurrent.Future
-
 
 class WhatYouNeedControllerSpec extends AmlsSpec {
 
@@ -48,6 +48,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
       cc = mock[MessagesControllerComponents],
       what_you_need = view)
   }
+
   "WhatYouNeedController" must {
 
     "get" must {
@@ -87,17 +88,20 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
 
       }
 
-      "return INTERNAL_SERVER_ERROR if no call is returned" in new Fixture {
-        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(None))
+      "throw an error when data cannot be fetched" in new Fixture {
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any())) thenReturn (Future.successful(None))
 
-        when {
-          renewalService.getSection(meq("internalId"))(any(), any())
-        } thenReturn Future.successful(Section("renewal", Completed, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get()))
+          when {
+            renewalService.getSection(meq("internalId"))(any(), any())
+          } thenReturn Future.successful(Section("renewal", Completed, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get()))
 
-        val result = controller.get()(requestWithToken)
-
-        status(result) must be(INTERNAL_SERVER_ERROR)
+          a[Exception] must be thrownBy {
+            ScalaFutures.whenReady(controller.get()(requestWithToken)) { x => x }
+          }
       }
+
     }
+
   }
+
 }

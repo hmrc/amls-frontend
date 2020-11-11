@@ -26,7 +26,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessactivities.what_you_need
 
 import scala.concurrent.Future
@@ -47,6 +47,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
   }
 
   "WhatYouNeedController" must {
+
     "get" must {
       "redirect to InvolvedInOtherController" when {
         "creating a new submission" in new Fixture {
@@ -105,16 +106,19 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
           doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.InvolvedInOtherController.get().url
         }
       }
-      "Throw an error" when {
-        "bm details cannot be fetched" in new Fixture {
+
+      "throw an error when data cannot be fetched" in new Fixture {
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
           mockApplicationStatus(SubmissionReadyForReview)
 
-          val result = controller.get(request)
-          status(result) must be(INTERNAL_SERVER_ERROR)
-        }
+          a[Exception] must be thrownBy {
+            ScalaFutures.whenReady(controller.get(request)) { x => x }
+          }
       }
+
     }
+
   }
+
 }
