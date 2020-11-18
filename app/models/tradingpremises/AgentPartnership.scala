@@ -24,7 +24,6 @@ import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 import typeclasses.MongoKey
-import utils.{JsonMapping, TraversableValidators}
 
 case class AgentPartnership(agentPartnership: String)
 

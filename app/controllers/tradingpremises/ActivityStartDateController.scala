@@ -23,11 +23,8 @@ import javax.inject.{Inject, Singleton}
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
 import play.api.mvc.{MessagesControllerComponents, Request}
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection}
 import views.html.tradingpremises.activity_start_date
-
-
 
 @Singleton
 class ActivityStartDateController @Inject()(override val messagesApi: MessagesApi,
@@ -66,9 +63,7 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
         }
   }
 
-  private def handleValidForm(credId: String, index: Int, edit: Boolean, data: ActivityStartDate)
-                             (implicit hc: HeaderCarrier,
-                              request: Request[_]) = {
+  private def handleValidForm(credId: String, index: Int, edit: Boolean, data: ActivityStartDate) = {
     for {
       _ <- updateDataStrict[TradingPremises](credId, index) { tp =>
         val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None)(x => Some(x.copy(startDate = Some(data.startDate))))
@@ -81,8 +76,7 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
   }
 
   private def handleInvalidForm(credId: String, index: Int, edit: Boolean, f: InvalidForm)
-                               (implicit hc: HeaderCarrier,
-                                request: Request[_]) = {
+                               (implicit request: Request[_]) = {
     for {
       tp <- getData[TradingPremises](credId, index)
     } yield tp.flatMap(_.yourTradingPremises) match {

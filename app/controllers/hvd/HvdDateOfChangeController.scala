@@ -24,12 +24,9 @@ import models.DateOfChange
 import models.businessdetails.BusinessDetails
 import models.hvd.Hvd
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-
 import utils.{DateOfChangeHelper, RepeatingSection}
 import views.html.date_of_change
-
 import scala.concurrent.Future
 
 class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheConnector,
@@ -70,7 +67,7 @@ class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheCon
     }
   }
 
-  private def getModelWithDateMap(credId: String)(implicit hc: HeaderCarrier): Future[(Hvd, Map[_ <: String, Seq[String]])] = {
+  private def getModelWithDateMap(credId: String): Future[(Hvd, Map[_ <: String, Seq[String]])] = {
     dataCacheConnector.fetchAll(credId) map {
       optionalCache =>
         (for {

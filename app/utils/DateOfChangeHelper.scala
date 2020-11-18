@@ -21,7 +21,6 @@ import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionAppro
 import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import play.api.Logger
-import play.api.Play.current
 import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.Call

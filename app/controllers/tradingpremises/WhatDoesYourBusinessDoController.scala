@@ -27,7 +27,6 @@ import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import play.api.Logger
 import play.api.mvc.{MessagesControllerComponents, Result}
 import services.StatusService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import views.html.date_of_change
@@ -45,8 +44,7 @@ class WhatDoesYourBusinessDoController @Inject () (
                                                     date_of_change: date_of_change,
                                                     implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with FormHelpers with DateOfChangeHelper {
 
-  private def data(credId: String, index: Int, edit: Boolean)(implicit hc: HeaderCarrier)
-  : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {
+  private def data(credId: String, index: Int, edit: Boolean): Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {
     dataCacheConnector.fetchAll(credId).map {
       cache =>
         (for {

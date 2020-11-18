@@ -17,7 +17,7 @@
 package models.payments
 
 import models.ReturnLocation
-import play.api.libs.json.{JsString, Json, Writes}
+import play.api.libs.json.Json
 
 case class CreatePaymentRequest(taxType: String, reference: String, description: String, amountInPence: Int, returnUrl: ReturnLocation)
 

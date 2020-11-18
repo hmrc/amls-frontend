@@ -47,7 +47,7 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: DateTime =
     * Upsert a value into the cache given its key.
     * If the data to be inserted is null then remove the entry by key
     */
-  def upsert[T](key: String, data: JsValue, hasValue: Boolean)(implicit ev: Writes[T]) = {
+  def upsert[T](key: String, data: JsValue, hasValue: Boolean) = {
     val updated = if (hasValue) {
       this.data + (key -> data)
     }
@@ -80,7 +80,7 @@ object Cache {
   */
 class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(cache.id, cache.data) with CacheOps {
   def getEncryptedEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] =
-    decryptValue(cache, key)(new JsonDecryptor[T]()(crypto, fmt), fmt)
+    decryptValue(cache, key)(new JsonDecryptor[T]()(crypto, fmt))
 }
 
 /**
@@ -148,7 +148,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
   /**
     * Removes the item with the specified key from the cache
     */
-  def removeByKey[T](credId: String, key: String)(implicit writes: Writes[T]): Future[Cache] = {
+  def removeByKey[T](credId: String, key: String): Future[Cache] = {
 
     fetchAll(Some(credId)) flatMap { maybeNewCache =>
       val cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
@@ -185,7 +185,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
   def find[T](credId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] =
     fetchAll(credId) map {
       case Some(cache) => if (appConfig.mongoEncryptionEnabled) {
-        decryptValue[T](cache, key)(new JsonDecryptor[T](), reads)
+        decryptValue[T](cache, key)(new JsonDecryptor[T]())
       } else {
         getValue[T](cache, key)
       }
@@ -300,12 +300,6 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
     case Failure(e) => throw e
   }
 
-  private def decryptOrGetValue[T](cache: Cache, key: String)(implicit reads: Reads[T]) =
-    if (appConfig.mongoEncryptionEnabled) {
-      decryptValue[T](cache, key)(new JsonDecryptor[T](), reads)
-    } else {
-      getValue[T](cache, key)
-    }
 }
 
 // $COVERAGE-ON$

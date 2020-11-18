@@ -16,7 +16,6 @@
 
 package models.responsiblepeople
 
-import cats.data.Validated.Valid
 import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms._

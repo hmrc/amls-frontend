@@ -102,7 +102,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
         // $COVERAGE-OFF$
         Logger.debug("StatusService:getDetailedStatus: No mlrRegNumber")
         // $COVERAGE-ON$
-        notYetSubmitted(cacheId)(hc, ec) map { status =>
+        notYetSubmitted(cacheId)(ec) map { status =>
           (status, None)
         }
     }
@@ -120,7 +120,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
           // $COVERAGE-OFF$
           Logger.debug("StatusService:getStatus: No mlrRegNumber")
           // $COVERAGE-ON$
-          notYetSubmitted(credId)(hc, ec)
+          notYetSubmitted(credId)(ec)
       }
   }
 
@@ -141,9 +141,10 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
   }
 
   def getReadStatus(amlsRegistrationNumber: String, accountTypeId: (String, String))
-                   (implicit hc: HeaderCarrier, ec: ExecutionContext) = etmpReadStatus(amlsRegistrationNumber, accountTypeId)
+                   (implicit hc: HeaderCarrier, ec: ExecutionContext) =
+    etmpReadStatus(amlsRegistrationNumber, accountTypeId)
 
-  private def notYetSubmitted(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext) = {
+  private def notYetSubmitted(cacheId: String)(implicit ec: ExecutionContext) = {
 
     def isComplete(seq: Seq[Section]): Boolean =
       seq forall {

@@ -22,12 +22,10 @@ import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.tradingpremises.TradingPremises
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
-
 
 @Singleton
 class TradingPremisesAddController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -36,7 +34,7 @@ class TradingPremisesAddController @Inject()(val dataCacheConnector: DataCacheCo
                                              val cc: MessagesControllerComponents,
                                              implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  private def isMSBSelected(cacheMap: Option[CacheMap])(implicit hc: HeaderCarrier): Boolean = {
+  private def isMSBSelected(cacheMap: Option[CacheMap]): Boolean = {
     val test = for {
       c <- cacheMap
       businessMatching <- c.getEntry[BusinessMatching](BusinessMatching.key)
@@ -44,7 +42,7 @@ class TradingPremisesAddController @Inject()(val dataCacheConnector: DataCacheCo
     ControllerHelper.isMSBSelected(test)
   }
 
-  def redirectToNextPage(credId: String, idx: Int) (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
+  def redirectToNextPage(credId: String, idx: Int) (implicit request: Request[AnyContent]) = {
      dataCacheConnector.fetchAll(credId).map {
       cache => isMSBSelected(cache) match {
         case true => Redirect(controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(idx))

@@ -29,7 +29,6 @@ import play.api.i18n.Messages
 import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection}
 import views.html.businessmatching.updateservice._
 
@@ -71,7 +70,7 @@ class ChangeBusinessTypesController @Inject()(authAction: AuthAction,
       }
   }
 
-  private def getFormData(credId: String)(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, messages: Messages) = for {
+  private def getFormData(credId: String)(implicit dataCacheConnector: DataCacheConnector, messages: Messages) = for {
     cache <- OptionT(dataCacheConnector.fetchAll(credId))
     businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
     activities <- businessMatchingService.getRemainingBusinessActivities(credId)

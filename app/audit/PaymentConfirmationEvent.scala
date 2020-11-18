@@ -16,19 +16,14 @@
 
 package audit
 
-import models.governmentgateway.EnrolmentRequest
 import models.payments.{PaymentStatus, PaymentStatuses}
-import play.api.libs.json.Writes
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuditHelper
 
 object PaymentConfirmationEvent {
-  def apply(amlsRef: String, payRef: String, paymentStatus: PaymentStatus)(implicit
-                                                                           hc: HeaderCarrier,
-                                                                           reqW: Writes[EnrolmentRequest]
-  ): DataEvent =
+  def apply(amlsRef: String, payRef: String, paymentStatus: PaymentStatus)(implicit hc: HeaderCarrier): DataEvent =
     DataEvent(
       auditSource = AuditHelper.appName,
       auditType = "paymentConfirm",

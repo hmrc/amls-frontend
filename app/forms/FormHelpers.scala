@@ -37,7 +37,7 @@ trait FormHelpers {
   implicit class InvalidFormExtensions(form: InvalidForm) {
     def withMessageFor(p: Path, message: String)(implicit exceptions: MessageFilter) = {
       form.errors.exists(f => f._1 == p && f._2.map(_.message).intersect(exceptions.messages).isEmpty) match {
-        case true => InvalidForm(form.data, (form.errors filter (x => x._1 != p)) :+ (p, Seq(ValidationError(message))))
+        case true => InvalidForm(form.data, (form.errors filter (x => x._1 != p)) :+ ((p, Seq(ValidationError(message)))))
         case _ => form
       }
     }

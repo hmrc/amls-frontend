@@ -78,23 +78,6 @@ sealed trait PaymentMethods0 {
       }
     }
 
-  private implicit def write
-  (implicit
-   mon: cats.Monoid[UrlFormEncoded],
-   s: Path => WriteLike[Option[String], UrlFormEncoded],
-   b: Path => WriteLike[Boolean, UrlFormEncoded]
-  ): Write[PaymentMethods, UrlFormEncoded] =
-    To[UrlFormEncoded] { __ =>
-      (
-        (__ \ "courier").write[Boolean] ~
-        (__ \ "direct").write[Boolean] ~
-        (__ \ "other").write[Boolean].contramap[Option[_]] {
-          case Some(_) => true
-          case None => false
-        } ~ (__ \ "details").write[Option[String]]
-      )(a => (a.courier, a.direct, a.other, a.other))
-    }
-
   val formR: Rule[UrlFormEncoded, PaymentMethods] = {
     import jto.validation.forms.Rules._
     implicitly[Rule[UrlFormEncoded, PaymentMethods]]

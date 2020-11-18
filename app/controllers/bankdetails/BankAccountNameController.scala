@@ -66,15 +66,15 @@ class BankAccountNameController @Inject()(
 
   def postNoIndex: Action[AnyContent] = authAction.async {
     implicit request =>
-      handlePost(None, false, request.credId)
+      handlePost(request.credId)
   }
 
   def postIndex(index: Int, edit: Boolean = false) = authAction.async {
     implicit request =>
-      handlePost(Some(index), edit, request.credId)
+      handlePost(request.credId, Some(index), edit)
   }
 
-  private def handleGet(index: Option[Int] = None, edit: Boolean = false, amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
+  private def handleGet(index: Option[Int], edit: Boolean, amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
                        (implicit hc: HeaderCarrier, request: Request[_]): Future[Result] = {
     index match {
       case Some(i) => for {
@@ -92,8 +92,8 @@ class BankAccountNameController @Inject()(
     }
   }
 
-  private def handlePost(index: Option[Int] = None, edit: Boolean = false, credId: String)
-                        (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
+  private def handlePost(credId: String, index: Option[Int] = None, edit: Boolean = false)
+                        (implicit request: Request[AnyContent]) = {
     Form2[String](request.body) match {
       case f: InvalidForm =>
         Future.successful(BadRequest(bank_account_name(f, edit, index)))

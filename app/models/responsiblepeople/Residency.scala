@@ -19,7 +19,7 @@ package models.responsiblepeople
 import cats.data.Validated.Valid
 import models.FormTypes._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, To, Write}
+import jto.validation.{From, Rule, Write}
 import play.api.libs.json.{Reads, Writes}
 import uk.gov.hmrc.domain.Nino
 
@@ -53,13 +53,10 @@ object Residency {
 
   implicit val jsonReads: Reads[Residency] = {
     import play.api.libs.json._
-    import play.api.libs.json.Reads._
-    import play.api.libs.functional.syntax._
     (__ \ "nino").read[Nino] map UKResidence.apply map identity[Residency] orElse Reads(_ => JsSuccess(NonUKResidence))
   }
 
   implicit val jsonWrites: Writes[Residency] = {
-    import play.api.libs.functional.syntax._
     import play.api.libs.json.Writes._
     import play.api.libs.json._
     Writes[Residency] {

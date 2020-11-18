@@ -17,7 +17,6 @@
 package models.withdrawal
 
 import org.joda.time.LocalDate
-import play.api.libs.json.JodaWrites._
 import play.api.libs.json.JodaReads._
 
 case class WithdrawSubscriptionRequest(acknowledgementReference: String,

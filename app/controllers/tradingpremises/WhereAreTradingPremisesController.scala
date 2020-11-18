@@ -102,8 +102,7 @@ class WhereAreTradingPremisesController @Inject () (
 
   }
 
-  private def redirectTo(index: Int, edit: Boolean, ytp: YourTradingPremises, tp: TradingPremises, status: SubmissionStatus)
-                        (implicit hc: HeaderCarrier) = {
+  private def redirectTo(index: Int, edit: Boolean, ytp: YourTradingPremises, tp: TradingPremises, status: SubmissionStatus) = {
     if (redirectToDateOfChange(Some(tp), ytp) && edit && isEligibleForDateOfChange(status)) {
       Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
     } else {

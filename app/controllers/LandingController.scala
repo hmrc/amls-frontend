@@ -371,7 +371,7 @@ class LandingController @Inject()(val landingService: LandingService,
 
 
   private def fixEmptyRecords[T](credId: String, cache: CacheMap, key: String)
-                                (implicit hc: HeaderCarrier, f: play.api.libs.json.Format[T]) = {
+                                (implicit f: play.api.libs.json.Format[T]) = {
 
     import play.api.libs.json._
 

@@ -69,22 +69,6 @@ sealed trait CustomersOutsideUK0 {
       } map CustomersOutsideUK.apply
     }
 
-  private implicit def write[A]
-  (implicit
-   mon: cats.Monoid[A],
-   a: Path => WriteLike[Boolean, A],
-   b: Path => WriteLike[Option[Seq[Country]], A]
-  ): Write[CustomersOutsideUK, A] =
-    To[A] { __ =>
-      (
-        (__ \ "isOutside").write[Boolean].contramap[Option[_]] {
-          case Some(_) => true
-          case None => false
-        } ~
-          (__ \ "countries").write[Option[Seq[Country]]]
-        ) (a => (a.countries, a.countries))
-    }
-
   val formR: Rule[UrlFormEncoded, CustomersOutsideUK] = {
     import jto.validation.forms.Rules._
     implicitly

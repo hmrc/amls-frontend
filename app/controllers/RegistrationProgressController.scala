@@ -25,7 +25,7 @@ import models.registrationprogress.{Completed, Section}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePerson
 import models.status._
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import services.{AuthEnrolmentsService, ProgressService, RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -101,7 +101,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
   }
 
   private def isRenewalFlow(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
-                           (implicit hc: HeaderCarrier, request: Request[AnyContent]): Future[Boolean] = {
+                           (implicit hc: HeaderCarrier): Future[Boolean] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) flatMap {
       case ReadyForRenewal(_) =>
         // $COVERAGE-OFF$
@@ -140,7 +140,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
   }
 
   private def preApplicationComplete(cache: CacheMap, status: SubmissionStatus, amlsRegistrationNumber: Option[String])
-                                    (implicit hc: HeaderCarrier): Future[Option[Boolean]] = {
+                                    : Future[Option[Boolean]] = {
 
     val preAppStatus: SubmissionStatus => Boolean = s => Set(NotCompleted, SubmissionReady).contains(s)
 
@@ -159,7 +159,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
     }).getOrElse(Future.successful(None))
   }
 
-  private def getNewActivities(cacheId: String)(implicit hc: HeaderCarrier): OptionT[Future, Set[BusinessActivity]] =
+  private def getNewActivities(cacheId: String): OptionT[Future, Set[BusinessActivity]] =
     businessMatchingService.getAdditionalBusinessActivities(cacheId)
 
   def post() = authAction.async {

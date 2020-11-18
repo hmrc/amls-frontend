@@ -23,10 +23,8 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import play.api.mvc.MessagesControllerComponents
 import services.AutoCompleteService
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.additional_address
-
 
 import scala.concurrent.Future
 
@@ -67,8 +65,7 @@ class AdditionalAddressController @Inject()(override val dataCacheConnector: Dat
         }
     }
 
-  private def processForm(data: ResponsiblePersonAddress, credId: String, index: Int, edit: Boolean, flow: Option[String])
-                         (implicit hc: HeaderCarrier) = {
+  private def processForm(data: ResponsiblePersonAddress, credId: String, index: Int, edit: Boolean, flow: Option[String]) = {
 
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       (res.addressHistory, data.personAddress) match {

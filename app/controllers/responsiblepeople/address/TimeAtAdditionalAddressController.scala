@@ -22,7 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.time_at_additional_address
 
@@ -85,7 +85,7 @@ class TimeAtAdditionalAddressController @Inject() (val dataCacheConnector: DataC
     }
   }
 
-  private def doUpdate(credId: String, index: Int, data: ResponsiblePersonAddress)(implicit request: Request[AnyContent]) = {
+  private def doUpdate(credId: String, index: Int, data: ResponsiblePersonAddress) = {
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       res.addressHistory(
         res.addressHistory match {

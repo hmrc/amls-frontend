@@ -26,12 +26,10 @@ import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
 import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.ServiceFlow
 import services.{AutoCompleteService, StatusService}
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper}
 import views.html.msb.most_transactions
 
 import scala.concurrent.Future
-
 
 @Singleton
 class MostTransactionsController @Inject()(authAction: AuthAction,
@@ -98,14 +96,11 @@ class MostTransactionsController @Inject()(authAction: AuthAction,
                                                     register: ServiceChangeRegister,
                                                     msb: MoneyServiceBusiness,
                                                     edit: Boolean): Boolean = {
-
     foreignExchangeAddedPostSubmission(msbServices, register) ||
             (msbServices.contains(ForeignExchange) && (msb.fxTransactionsInNext12Months.isEmpty || !edit))
   }
 
-  private def routing(msbServices: Set[BusinessMatchingMsbService], register: ServiceChangeRegister, msb: MoneyServiceBusiness, edit: Boolean)
-                     (implicit hc: HeaderCarrier) = {
-
+  private def routing(msbServices: Set[BusinessMatchingMsbService], register: ServiceChangeRegister, msb: MoneyServiceBusiness, edit: Boolean) = {
     if (shouldAnswerCurrencyExchangeQuestions(msbServices, register, msb, edit)) {
       Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
     } else if (shouldAnswerForeignExchangeQuestions(msbServices, register, msb, edit)) {

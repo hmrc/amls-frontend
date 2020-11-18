@@ -14,22 +14,6 @@
  * limitations under the License.
  */
 
-/*
- * Copyright 2019 HM Revenue & Customs
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package services
 
 import config.ApplicationConfig
@@ -39,11 +23,9 @@ import models.confirmation.Currency
 import models.payments._
 import models.{FeeResponse, ReturnLocation}
 import play.api.Logger
-import play.api.mvc.Request
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
-
 
 class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
                                 val paymentsConnector: PayApiConnector,
@@ -51,7 +33,7 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
                                 val applicationConfig: ApplicationConfig) {
 
   def requestPaymentsUrl(fees: FeeResponse, returnUrl: String, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
-                        (implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[NextUrl] =
+                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[NextUrl] =
     fees match {
       case f: FeeResponse if f.difference.isDefined & f.paymentReference.isDefined =>
         paymentsUrlOrDefault(f.paymentReference.get, f.difference.get.toDouble, returnUrl, amlsRefNo, safeId, accountTypeId)
@@ -61,7 +43,7 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
     }
 
   def paymentsUrlOrDefault(paymentReference: String, amount: Double, returnUrl: String, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
-                          (implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[NextUrl] = {
+                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[NextUrl] = {
 
     val amountInPence = (amount * 100).toInt
 

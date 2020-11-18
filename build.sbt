@@ -13,6 +13,7 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
+
 val appName: String = "amls-frontend"
 
 lazy val appDependencies: Seq[ModuleID] = AppDependencies()
@@ -45,6 +46,10 @@ lazy val microservice = Project(appName, file("."))
   .settings(routesImport += "utils.Binders._")
   .settings(
     libraryDependencies ++= appDependencies,
+    libraryDependencies ++= Seq(
+      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.6.0" cross CrossVersion.full),
+      "com.github.ghik" % "silencer-lib" % "1.6.0" % Provided cross CrossVersion.full
+    ),
     retrieveManaged := true,
     PlayKeys.playDefaultPort := 9222,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
@@ -62,6 +67,11 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     resolvers += Resolver.bintrayRepo("hmrc", "releases"),
     resolvers += Resolver.jcenterRepo
+  )
+ .settings(
+    scalacOptions ++= List(
+      "-P:silencer:pathFilters=views;routes;TestStorage"
+    )
   )
   .disablePlugins(JUnitXmlReportPlugin)
 

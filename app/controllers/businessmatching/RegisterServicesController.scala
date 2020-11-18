@@ -147,7 +147,7 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
   private def clearRemovedSections(credId: String,
                                    previousBusinessActivities: Set[BusinessActivity],
                                    currentBusinessActivities: Set[BusinessActivity]
-                                  )(implicit hc: HeaderCarrier) = {
+                                  ) = {
     for {
       _ <- clearSectionIfRemoved(credId, previousBusinessActivities, currentBusinessActivities, AccountancyServices)
       _ <- clearSectionIfRemoved(credId, previousBusinessActivities, currentBusinessActivities, EstateAgentBusinessService)
@@ -162,7 +162,7 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
                                     previousBusinessActivities: Set[BusinessActivity],
                                     currentBusinessActivities: Set[BusinessActivity],
                                     businessActivity: BusinessActivity
-                                   )(implicit hc: HeaderCarrier) = {
+                                   ) = {
     if (previousBusinessActivities.contains(businessActivity) && !currentBusinessActivities.contains(businessActivity)) {
       businessMatchingService.clearSection(credId: String, businessActivity)
     } else {
@@ -173,7 +173,7 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
   private def clearSupervisionIfNoLongerRequired(credId: String,
                                                  previousBusinessActivities: Set[BusinessActivity],
                                                  currentBusinessActivities: Set[BusinessActivity]
-                                                )(implicit hc: HeaderCarrier) = {
+                                                ) = {
     if (hasASPorTCSP(previousBusinessActivities) && !hasASPorTCSP(currentBusinessActivities)) {
       dataCacheConnector.save[Supervision](credId, Supervision.key, Supervision())
     } else {
@@ -181,8 +181,7 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
     }
   }
 
-  private def maybeRemoveAccountantForAMLSRegulations(credId: String, bmActivities: BusinessMatchingActivities)
-                                                     (implicit hc: HeaderCarrier) = {
+  private def maybeRemoveAccountantForAMLSRegulations(credId: String, bmActivities: BusinessMatchingActivities) = {
     for {
       activities <- dataCacheConnector.fetch[BusinessActivities](credId, BusinessActivities.key)
       strippedActivities <- Future.successful(withoutAccountantForAMLSRegulations(activities))
@@ -237,7 +236,7 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
   private def updateModel(credId: String,
                           businessMatching: BusinessMatching,
                           updatedBusinessActivities: BusinessMatchingActivities,
-                          isMsb: Boolean)(implicit hc: HeaderCarrier): Future[BusinessMatchingActivities] = {
+                          isMsb: Boolean): Future[BusinessMatchingActivities] = {
 
     val updatedBusinessMatching = isMsb match {
       case true =>
@@ -266,16 +265,13 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
   private def promptFitAndProper(rp: ResponsiblePerson) =
     rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
 
-  private def removeFitAndProper(rp: ResponsiblePerson): ResponsiblePerson =
-    rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = None)).copy(hasAccepted = true)
-
   private def resetHasAccepted(rp: ResponsiblePerson): ResponsiblePerson =
     rp.approvalFlags.hasAlreadyPassedFitAndProper match {
       case None => rp.copy(hasAccepted = false)
       case _ => rp
     }
 
-  private def updateResponsiblePeople(credId: String, responsiblePeople: Seq[ResponsiblePerson])(implicit hc: HeaderCarrier): Future[_] =
+  private def updateResponsiblePeople(credId: String, responsiblePeople: Seq[ResponsiblePerson]): Future[_] =
     dataCacheConnector.save[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key, responsiblePeople)
 
   val shouldPromptForFitAndProper: (ResponsiblePerson, BusinessMatchingActivities) => ResponsiblePerson =

@@ -83,7 +83,7 @@ class PersonResidentTypeController @Inject()(override val messagesApi: MessagesA
                                       isUKResidence: Residency,
                                       rp: Seq[ResponsiblePerson],
                                       index: Int,
-                                      edit: Boolean = false,
+                                      edit: Boolean,
                                       flow: Option[String]
                                     ) = {
 

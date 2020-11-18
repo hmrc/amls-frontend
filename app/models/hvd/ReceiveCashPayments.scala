@@ -44,34 +44,18 @@ sealed trait ReceiveCashPayments0 {
       case false => Reads(_ => JsSuccess(ReceiveCashPayments(None)))
     }
 
-  private implicit def write[A]
-  (implicit
-   mon:cats.Monoid[A],
-   a: Path => WriteLike[Boolean, A],
-   b: Path => WriteLike[Option[PaymentMethods] , A]
-  ): Write[ReceiveCashPayments, A] =
-    To[A] { __ =>
-      (
-        (__ \ "receivePayments").write[Boolean].contramap[Option[_]] {
-          case Some(_) => true
-          case None => false
-        } ~
-          (__ \ "paymentMethods").write[Option[PaymentMethods]]
-        )(a => (a.paymentMethods, a.paymentMethods))
-    }
-
   val formR: Rule[UrlFormEncoded, ReceiveCashPayments] = {
     implicitly[Rule[UrlFormEncoded, ReceiveCashPayments]]
   }
 
   val formWrite: Write[ReceiveCashPayments, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
     import jto.validation.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    (
-      (__ \ "receivePayments").write[Boolean].contramap[Option[_]] {
-        case Some(_) => true
-        case None => false
-      } ~
+
+     (
+        (__ \ "receivePayments").write[Boolean].contramap[Option[_]] {
+         case Some(_) => true
+         case None => false
+        } ~
         (__ \ "paymentMethods").write[Option[PaymentMethods]]
       )(a => (a.paymentMethods, a.paymentMethods))
   }

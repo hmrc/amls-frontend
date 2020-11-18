@@ -59,7 +59,7 @@ class BankAccountIsUKController @Inject()(val dataCacheConnector: DataCacheConne
   def post(index: Int, edit: Boolean = false) = authAction.async {
       implicit request => {
 
-        lazy val sendAudit = for {
+        for {
           details <- OptionT(getData[BankDetails](request.credId, index))
           result <- OptionT.liftF(auditConnector.sendEvent(audit.AddBankAccountEvent(details)))
         } yield result

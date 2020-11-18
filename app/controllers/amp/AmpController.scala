@@ -34,10 +34,8 @@ class AmpController @Inject()(proxyCacheService: ProxyCacheService,
                               val cc: MessagesControllerComponents) extends AmlsBaseController(ds, cc) {
 
   def get(credId: String) = Action.async {
-    implicit request => {
-      proxyCacheService.getAmp(credId).map {
-        _.map(Ok(_: JsValue)).getOrElse(NotFound)
-      }
+    proxyCacheService.getAmp(credId).map {
+      _.map(Ok(_: JsValue)).getOrElse(NotFound)
     }
   }
 

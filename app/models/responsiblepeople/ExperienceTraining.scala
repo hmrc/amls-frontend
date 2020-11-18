@@ -22,8 +22,7 @@ import models.FormTypes._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
 import jto.validation.forms.UrlFormEncoded
-import cats.data.Validated.{Invalid, Valid}
-
+import cats.data.Validated.Valid
 
 sealed trait ExperienceTraining
 

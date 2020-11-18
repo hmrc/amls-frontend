@@ -16,10 +16,8 @@
 
 package models.businessdetails
 
-import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, ValidationError, Write}
-import models.Country
+import jto.validation.{From, Rule, Write}
 
 case class CorrespondenceAddressUk(
                                   yourName: String,
@@ -44,16 +42,7 @@ case class CorrespondenceAddressUk(
 
 object CorrespondenceAddressUk {
 
-
-
   implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddressUk] = From[UrlFormEncoded] { __ =>
-
-    val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
-      country.code match {
-        case "GB" => Invalid(Seq(ValidationError(List("error.required.atb.letters.address.not.uk"))))
-        case _ => Valid(country)
-      }
-    }
 
     import jto.validation.forms.Rules._
     import models.FormTypes._

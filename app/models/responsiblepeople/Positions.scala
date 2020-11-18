@@ -18,7 +18,6 @@ package models.responsiblepeople
 
 import org.joda.time.LocalDate
 import play.api.libs.json._
-import play.api.libs.json.JodaWrites._
 import play.api.libs.json.JodaReads._
 
 case class Positions(positions: Set[PositionWithinBusiness], startDate: Option[PositionStartDate]) {

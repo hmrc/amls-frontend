@@ -17,7 +17,7 @@
 package services.flowmanagement.pagerouters.removeflow
 
 import javax.inject.Singleton
-import models.flowmanagement.{AddBusinessTypeFlowModel, RemoveBusinessTypeFlowModel}
+import models.flowmanagement.RemoveBusinessTypeFlowModel
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.flowmanagement.PageRouter

@@ -19,7 +19,6 @@ package connectors
 import connectors.cache.MongoCacheConnector
 import javax.inject.Inject
 import play.api.libs.json.Format
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import scala.concurrent.Future
 
@@ -27,32 +26,32 @@ import scala.concurrent.Future
 // Coverage has been turned off for these types until we remove the deprecated methods
 class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
 
-  def fetch[T](credId: String, key: String)(implicit hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
+  def fetch[T](credId: String, key: String)(implicit formats: Format[T]): Future[Option[T]] =
     cacheConnector.fetch(credId, key)
 
-  def save[T](credId: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
+  def save[T](credId: String, key: String, data: T)(implicit format: Format[T]): Future[CacheMap] =
     cacheConnector.save(credId, key, data)
 
   def upsertNewAuth[T](targetCache: CacheMap, cacheId: String, data: T)
-               (implicit hc: HeaderCarrier, format: Format[T]): CacheMap =
+               (implicit format: Format[T]): CacheMap =
     cacheConnector.upsertNewAuth(targetCache, cacheId, data)
 
-  def fetchAll(credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] =
+  def fetchAll(credId: String): Future[Option[CacheMap]] =
     cacheConnector.fetchAll(credId)
 
-  def fetchAllWithDefault(credId: String)(implicit hc: HeaderCarrier): Future[CacheMap] =
+  def fetchAllWithDefault(credId: String): Future[CacheMap] =
     cacheConnector.fetchAllWithDefault(credId)
 
-  def remove(credId: String)(implicit hc: HeaderCarrier): Future[Boolean] =
+  def remove(credId: String): Future[Boolean] =
     cacheConnector.remove(credId)
 
-  def removeByKey[T](credId: String, key: String)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
+  def removeByKey[T](credId: String, key: String): Future[CacheMap] = {
     cacheConnector.removeByKey(credId, key)
   }
 
-  def update[T](credId: String, key: String)(f: Option[T] => T)(implicit hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
+  def update[T](credId: String, key: String)(f: Option[T] => T)(implicit fmt: Format[T]): Future[Option[T]] =
     cacheConnector.update(credId, key)(f)
 
-  def saveAll(credId: String, cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier): Future[CacheMap] =
+  def saveAll(credId: String, cacheMap: Future[CacheMap]): Future[CacheMap] =
     cacheConnector.saveAll(credId, cacheMap)
 }

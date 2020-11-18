@@ -22,7 +22,6 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision.{AnotherBody, AnotherBodyNo, AnotherBodyYes, Supervision}
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 
 import views.html.supervision.another_body
@@ -76,7 +75,7 @@ class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector
     supervision.anotherBody(updatedAnotherBody).copy(hasAccepted = true)
   }
 
-  private def redirectTo(edit: Boolean, maybeSupervision: Option[Supervision])(implicit headerCarrier: HeaderCarrier) = {
+  private def redirectTo(edit: Boolean, maybeSupervision: Option[Supervision]) = {
 
     import utils.ControllerHelper.{anotherBodyComplete, isAnotherBodyYes}
 

@@ -28,7 +28,7 @@ trait CacheOps {
     * @param key The cache key
     * @return The decrypted item from the cache as T, or None if the value wasn't present
     */
-  def decryptValue[T](cache: Cache, key: String)(implicit decryptor: JsonDecryptor[T], reads: Reads[T]): Option[T] =
+  def decryptValue[T](cache: Cache, key: String)(implicit decryptor: JsonDecryptor[T]): Option[T] =
     cache.data.get(key) flatMap { json =>
       if (json.validate[Protected[T]](decryptor).isSuccess) {
         Some(json.as[Protected[T]](decryptor).decryptedValue)

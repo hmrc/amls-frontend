@@ -21,7 +21,6 @@ import javax.inject.Inject
 import models.amp.Amp
 import models.eab.Eab
 import play.api.libs.json.{JsObject, JsValue, Json}
-import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,7 +28,7 @@ class ProxyCacheService @Inject()(cacheConnector: DataCacheConnector)
                                  (implicit ec: ExecutionContext){
 
   //AMP
-  def getAmp(credId: String)(implicit hc: HeaderCarrier): Future[Option[JsValue]] = {
+  def getAmp(credId: String): Future[Option[JsValue]] = {
     for {
       amp <- cacheConnector.fetch[Amp](credId, Amp.key)
     } yield amp match {
@@ -38,7 +37,7 @@ class ProxyCacheService @Inject()(cacheConnector: DataCacheConnector)
     }
   }
 
-  def setAmp(credId: String, body: JsValue)(implicit hc: HeaderCarrier) = {
+  def setAmp(credId: String, body: JsValue) = {
     val jsonObject: JsObject = body.as[JsObject]
     val ampData = jsonObject.value("data").as[JsObject]
 
@@ -49,7 +48,7 @@ class ProxyCacheService @Inject()(cacheConnector: DataCacheConnector)
   }
 
   //EAB
-  def getEab(credId: String)(implicit hc: HeaderCarrier): Future[Option[JsValue]] = {
+  def getEab(credId: String): Future[Option[JsValue]] = {
     for {
       eab <- cacheConnector.fetch[Eab](credId, Eab.key)
     } yield eab match {
@@ -58,7 +57,7 @@ class ProxyCacheService @Inject()(cacheConnector: DataCacheConnector)
     }
   }
 
-  def setEab(credId: String, body: JsValue)(implicit hc: HeaderCarrier) = {
+  def setEab(credId: String, body: JsValue) = {
     val jsonObject: JsObject = body.as[JsObject]
     val eabData = jsonObject.value("data").as[JsObject]
 

@@ -28,9 +28,7 @@ import models.DateOfChange
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, _}
 import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-
 import views.html.date_of_change
 
 import scala.concurrent.Future
@@ -76,7 +74,7 @@ class WhatDateRemovedController @Inject()(
         }
   }
 
-  private def getFormData(credId: String)(implicit hc: HeaderCarrier): OptionT[Future, RemoveBusinessTypeFlowModel] = for {
+  private def getFormData(credId: String): OptionT[Future, RemoveBusinessTypeFlowModel] = for {
     model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](credId, RemoveBusinessTypeFlowModel.key))
   } yield model
 

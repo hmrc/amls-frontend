@@ -24,10 +24,8 @@ import models.DateOfChange
 import models.businessdetails.BusinessDetails
 import models.asp.Asp
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.date_of_change
-
 import scala.concurrent.Future
 
 class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -67,7 +65,7 @@ class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector:
         }
   }
 
-  private def getModelWithDateMap(cacheId: String)(implicit hc: HeaderCarrier): Future[(Asp, Map[_ <: String, Seq[String]])] = {
+  private def getModelWithDateMap(cacheId: String): Future[(Asp, Map[_ <: String, Seq[String]])] = {
     dataCacheConnector.fetchAll(cacheId) map {
       optionalCache =>
         (for {

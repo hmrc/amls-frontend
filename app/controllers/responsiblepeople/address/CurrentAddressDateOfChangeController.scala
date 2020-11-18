@@ -75,8 +75,7 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
     ))
   }
 
-  private def validFormView(credId: String, index: Int, date: DateOfChange, edit: Boolean)
-                           (implicit request: Request[AnyContent]) = {
+  private def validFormView(credId: String, index: Int, date: DateOfChange, edit: Boolean) = {
     doUpdate(credId, index, date).map { cache: CacheMap =>
       if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
         Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
@@ -86,7 +85,7 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
     }
   }
 
-  private def doUpdate(credId: String, index: Int, date: DateOfChange)(implicit request: Request[AnyContent]) =
+  private def doUpdate(credId: String, index: Int, date: DateOfChange) =
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       (for {
         addressHist <- res.addressHistory

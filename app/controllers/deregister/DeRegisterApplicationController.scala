@@ -29,7 +29,6 @@ import views.html.deregister.deregister_application
 
 import scala.concurrent.Future
 
-
 class DeRegisterApplicationController @Inject() (authAction: AuthAction,
                                                  val ds: CommonPlayDependencies,
                                                  implicit val cache: DataCacheConnector,
@@ -56,7 +55,6 @@ class DeRegisterApplicationController @Inject() (authAction: AuthAction,
     }
 
   def post() = authAction.async {
-      implicit request =>
-        Future.successful(Redirect(routes.DeregistrationReasonController.get()))
+    Future.successful(Redirect(routes.DeregistrationReasonController.get()))
   }
 }

@@ -22,7 +22,6 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper}
 import views.html.responsiblepeople.address.new_home_address
 
@@ -69,8 +68,7 @@ class NewHomeAddressController @Inject()(authAction: AuthAction,
         }
     }
 
-  def processFormAndRedirect(data: NewHomeAddress, index: Int, credId: String)
-                            (implicit request: Request[AnyContent], hc: HeaderCarrier) = {
+  def processFormAndRedirect(data: NewHomeAddress, index: Int, credId: String)(implicit request: Request[AnyContent]) = {
     for {
       redirect <- dataCacheConnector.save[NewHomeAddress](credId, NewHomeAddress.key, data) map { _ =>
         data.personAddress match {

@@ -21,8 +21,7 @@ import jto.validation.forms.Rules.{maxLength, notEmpty, minLength => _, _}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Path, Rule, ValidationError, Write}
 import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
-
-import play.api.i18n.{Lang, Messages}
+import play.api.i18n.Messages
 import play.api.libs.json.Reads.StringReads
 import play.api.libs.json._
 import utils.TraversableValidators.minLengthR
@@ -46,7 +45,7 @@ sealed trait BusinessType {
       case Other(_) => "14"
     }
 
-  def getMessage()(implicit lang: Lang, messages: Messages): String = {
+  def getMessage()(implicit messages: Messages): String = {
     val message = s"supervision.memberofprofessionalbody.lbl."
     this match {
       case AccountingTechnicians => Messages(s"${message}01")

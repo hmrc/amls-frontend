@@ -29,7 +29,6 @@ import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.tcsp.Tcsp
 import services.StatusService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,21 +39,23 @@ class BusinessMatchingService @Inject()(
                                          appConfig: ApplicationConfig
                                        ) {
 
-  def preApplicationComplete(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Boolean] = {
-    for {
-      bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
-    } yield bm.preAppComplete
-  } getOrElse false
+  def preApplicationComplete(credId: String)(ec: ExecutionContext): Future[Boolean] = {
+    import cats.instances.future._
+    import scala.concurrent.ExecutionContext.Implicits.global
+    {
+      for {
+        bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
+      } yield bm.preAppComplete
+    } getOrElse false
+  }
 
-  def getModel(credId: String)(implicit hc: HeaderCarrier): OptionT[Future, BusinessMatching] =
+  def getModel(credId: String): OptionT[Future, BusinessMatching] =
     OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
 
-  def updateModel(credId: String, model: BusinessMatching)
-                 (implicit hc: HeaderCarrier ,ec: ExecutionContext): OptionT[Future, CacheMap] =
+  def updateModel(credId: String, model: BusinessMatching)(implicit ec: ExecutionContext): OptionT[Future, CacheMap] =
     OptionT.liftF(dataCacheConnector.save[BusinessMatching](credId, BusinessMatching.key, model))
 
-
-  private def fetchActivitySet(cacheId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext) =
+  private def fetchActivitySet(cacheId: String)(implicit ec: ExecutionContext) =
     for {
       viewResponse <- OptionT(dataCacheConnector.fetch[ViewResponse](cacheId, ViewResponse.key))
       submitted <- OptionT.fromOption[Future](viewResponse.businessMatchingSection.activities)
@@ -65,23 +66,23 @@ class BusinessMatchingService @Inject()(
     })
 
   private def getActivitySet(cacheId: String, fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
-                            (implicit hc: HeaderCarrier ,ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+                            (implicit ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     fetchActivitySet(cacheId) map fn.tupled
 
 
-  def getAdditionalBusinessActivities(cacheId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+  def getAdditionalBusinessActivities(cacheId: String)(implicit ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(cacheId, _ diff _)
 
-  def getSubmittedBusinessActivities(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+  def getSubmittedBusinessActivities(credId: String)(implicit ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(credId, _ intersect _)
 
-  def getRemainingBusinessActivities(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+  def getRemainingBusinessActivities(credId: String)(implicit ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     for {
       model <- getModel(credId)
       activities <- OptionT.fromOption[Future](model.activities)
     } yield BusinessActivities.all diff activities.businessActivities
 
-  def clearSection(credId: String, activity: BusinessActivity)(implicit hc: HeaderCarrier) = activity match {
+  def clearSection(credId: String, activity: BusinessActivity) = activity match {
     case AccountancyServices =>
       dataCacheConnector.removeByKey[Asp](credId, Asp.key)
     case EstateAgentBusinessService =>

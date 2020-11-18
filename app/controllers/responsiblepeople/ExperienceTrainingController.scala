@@ -26,10 +26,7 @@ import play.api.Logger
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.experience_training
-
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
-
 
 class ExperienceTrainingController @Inject () (val dataCacheConnector: DataCacheConnector,
                                                authAction: AuthAction,
@@ -79,7 +76,7 @@ class ExperienceTrainingController @Inject () (val dataCacheConnector: DataCache
       }
     }
 
-  private def businessMatchingData(credId: String)(implicit hc: HeaderCarrier): Future[BusinessMatching] = {
+  private def businessMatchingData(credId: String): Future[BusinessMatching] = {
     dataCacheConnector.fetchAll(credId) map {
       cache =>
         // $COVERAGE-OFF$

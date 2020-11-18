@@ -26,10 +26,8 @@ import models.moneyservicebusiness._
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.msb.uses_foreign_currencies
-
 
 import scala.concurrent.Future
 
@@ -100,7 +98,7 @@ class UsesForeignCurrenciesController @Inject()(authAction: AuthAction,
                       register: ServiceChangeRegister,
                       msb: MoneyServiceBusiness,
                       edit: Boolean,
-                      data: UsesForeignCurrencies)(implicit hc: HeaderCarrier) = {
+                      data: UsesForeignCurrencies) = {
 
     if (data == UsesForeignCurrenciesYes) {
         Redirect(routes.MoneySourcesController.get(edit))

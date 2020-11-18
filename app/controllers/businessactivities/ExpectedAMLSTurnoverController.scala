@@ -25,7 +25,6 @@ import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
 import models.businessmatching._
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.businessactivities._
 import cats.implicits._
@@ -89,7 +88,7 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
       }
       }
     }
-  private def getErrorMessage(credId: String)(implicit hc: HeaderCarrier) = {
+  private def getErrorMessage(credId: String) = {
     (for {
       businessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
       activities <- OptionT.fromOption[Future](businessMatching.activities)

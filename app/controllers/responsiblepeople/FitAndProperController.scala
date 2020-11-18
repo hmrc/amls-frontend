@@ -22,13 +22,12 @@ import forms.{Form2, _}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople.ResponsiblePerson
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.mvc.{MessagesControllerComponents, Result}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.fit_and_proper
 
 import scala.concurrent.Future
-
 
 @Singleton
 class FitAndProperController @Inject()(
@@ -95,8 +94,7 @@ class FitAndProperController @Inject()(
                                     cacheMapOpt: Option[CacheMap],
                                     fitAndProperAnswer: Boolean,
                                     msbOrTscp: Boolean,
-                                    flow: Option[String])
-                                   (implicit request: Request[AnyContent]): Result = {
+                                    flow: Option[String]): Result = {
     (edit, fitAndProperAnswer) match {
       case (true, false) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
       case (false, false) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
@@ -108,8 +106,7 @@ class FitAndProperController @Inject()(
                              cacheMapOpt: Option[CacheMap],
                              fitAndProperAnswer: Boolean,
                              msbOrTscp: Boolean,
-                             flow: Option[String])
-                            (implicit request: Request[AnyContent]):Result = {
+                             flow: Option[String]):Result = {
     if (msbOrTscp) {
       Redirect(routes.DetailedAnswersController.get(index, flow))
     } else {

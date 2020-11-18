@@ -30,7 +30,7 @@ object BusinessName {
 
   private val warn: String => Unit = msg => Logger.warn(s"[BusinessName] $msg")
 
-  def getNameFromCache(credId: String)(implicit hc: HeaderCarrier,  cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
+  def getNameFromCache(credId: String)(implicit cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
     for {
       bm <- OptionT(cache.fetch[BusinessMatching](credId, BusinessMatching.key))
       rd <- OptionT.fromOption[Future](bm.reviewDetails)
@@ -42,7 +42,7 @@ object BusinessName {
     }
 
   def getNameFromAmls(accountTypeId: (String, String), safeId: String)
-                     (implicit hc: HeaderCarrier,  amls: AmlsConnector, ec: ExecutionContext, dc: DataCacheConnector) = {
+                     (implicit hc: HeaderCarrier,  amls: AmlsConnector, ec: ExecutionContext) = {
     OptionT(amls.registrationDetails(accountTypeId, safeId) map { r =>
       Option(r.companyName)
     } recover {

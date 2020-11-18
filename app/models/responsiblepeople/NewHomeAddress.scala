@@ -28,8 +28,6 @@ object NewHomeAddress {
 
   implicit val format = Json.format[NewHomeAddress]
 
-  import play.api.libs.json._
-
   implicit val formRule: Rule[UrlFormEncoded, NewHomeAddress] = From[UrlFormEncoded] { __ =>
 
     import jto.validation.forms.Rules._
