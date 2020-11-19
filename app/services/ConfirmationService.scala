@@ -19,11 +19,13 @@ package services
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.renewal.Renewal
+import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ConfirmationService @Inject()(val cacheConnector: DataCacheConnector) extends DataCacheService {
 
-  def isRenewalDefined(credId: String)(implicit ec: ExecutionContext): Future[Boolean] =
+  def isRenewalDefined(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
     cacheConnector.fetch[Renewal](credId, Renewal.key).map(_.isDefined)
 }

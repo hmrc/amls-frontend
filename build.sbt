@@ -70,6 +70,12 @@ lazy val microservice = Project(appName, file("."))
   )
  .settings(
     scalacOptions ++= List(
+      "-Yrangepos",
+      "-Xlint:-missing-interpolator,_",
+      "-Yno-adapted-args",
+      "-feature",
+      "-unchecked",
+      "-language:implicitConversions",
       "-P:silencer:pathFilters=views;routes;TestStorage"
     )
   )

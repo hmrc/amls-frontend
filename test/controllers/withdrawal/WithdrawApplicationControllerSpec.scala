@@ -80,7 +80,7 @@ class WithdrawApplicationControllerSpec extends AmlsSpec {
 
     when {
       statusService.getDetailedStatus(Some(any()), any(), any())(any(), any())
-    } thenReturn Future.successful(SubmissionReadyForReview, statusResponse.some)
+    } thenReturn Future.successful((SubmissionReadyForReview, statusResponse.some))
 
     when {
       controller.statusService.getSafeIdFromReadStatus(any(), any())(any(), any())

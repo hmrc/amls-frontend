@@ -17,14 +17,20 @@
 package audit
 
 import models.SatisfactionSurvey
-import play.api.libs.json.Json
+import models.governmentgateway.EnrolmentRequest
+import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuditHelper
 
 object SurveyEvent {
-  def apply(survey: SatisfactionSurvey)(implicit hc: HeaderCarrier): DataEvent =
+  def apply
+  (survey: SatisfactionSurvey)
+  (implicit
+   hc: HeaderCarrier,
+   reqW: Writes[EnrolmentRequest]
+  ): DataEvent =
     DataEvent(
       auditSource = AuditHelper.appName,
       auditType = "SurveyCompleted",

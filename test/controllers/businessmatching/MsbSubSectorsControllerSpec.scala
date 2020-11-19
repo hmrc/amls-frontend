@@ -67,7 +67,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
     when {
       controller.helper.updateSubSectors(any(), any())(any(), any())
-    } thenReturn Future.successful(mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty)
+    } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
     def setupModel(model: Option[BusinessMatching]): Unit = when {
       controller.businessMatchingService.getModel(any())(any())

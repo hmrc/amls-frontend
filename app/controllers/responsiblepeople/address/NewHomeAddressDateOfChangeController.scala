@@ -21,7 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{NewHomeDateOfChange, ResponsiblePerson}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.new_home_date_of_change
 
@@ -68,7 +68,7 @@ class NewHomeAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
       }
   }
 
-  private def getPersonName(credId: String, index: Int) = {
+  private def getPersonName(credId: String, index: Int)(implicit request: Request[AnyContent]) = {
     getData[ResponsiblePerson](credId, index) map { x =>
       val personName = ControllerHelper.rpTitleName(x)
       personName

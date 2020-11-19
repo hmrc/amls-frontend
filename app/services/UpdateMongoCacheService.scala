@@ -44,7 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: DataCacheConnector, val applicationConfig: ApplicationConfig) {
 
   def update(credId: String, response: UpdateMongoCacheResponse)
-            (implicit ex: ExecutionContext): Future[Any] = {
+            (implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Any] = {
 
     for {
       _ <- fn(credId, ViewResponse.key, response.view)
@@ -68,7 +68,7 @@ class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: Da
     } yield true
   }
 
-  def fn[T](credId: String, key: String, m: Option[T])(implicit fmt: Format[T]): Future[CacheMap] = m match {
+  def fn[T](credId: String, key: String, m: Option[T])(implicit hc: HeaderCarrier, fmt: Format[T]): Future[CacheMap] = m match {
     case Some(model) => cacheConnector.save[T](credId, key, model)
     case _ => Future.successful(CacheMap("", Map.empty))
   }

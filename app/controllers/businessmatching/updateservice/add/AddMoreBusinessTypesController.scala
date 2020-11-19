@@ -26,6 +26,7 @@ import models.businessmatching.BusinessMatching
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddMoreBusinessTypesPageId}
 import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BooleanFormReadWrite}
 import views.html.businessmatching.updateservice.add.add_more_activities
 
@@ -71,7 +72,7 @@ class AddMoreBusinessTypesController @Inject()(
         }
   }
 
-  private def getActivities(credId: String)(implicit dataCacheConnector: DataCacheConnector): Future[Option[Set[String]]] = {
+  private def getActivities(credId: String)(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier): Future[Option[Set[String]]] = {
     dataCacheConnector.fetchAll(credId) map {
       optionalCache =>
         for {

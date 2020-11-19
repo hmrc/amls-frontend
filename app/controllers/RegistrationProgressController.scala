@@ -25,7 +25,7 @@ import models.registrationprogress.{Completed, Section}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePerson
 import models.status._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import services.{AuthEnrolmentsService, ProgressService, RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -33,7 +33,6 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, DeclarationHelper}
 import views.html.registrationamendment.registration_amendment
 import views.html.registrationprogress.registration_progress
-import play.api.Logger
 
 import scala.concurrent.Future
 
@@ -101,22 +100,15 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
   }
 
   private def isRenewalFlow(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
-                           (implicit hc: HeaderCarrier): Future[Boolean] = {
+                           (implicit hc: HeaderCarrier, request: Request[AnyContent]): Future[Boolean] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) flatMap {
       case ReadyForRenewal(_) =>
-        // $COVERAGE-OFF$
-        Logger.info("RegistrationProgressController:isRenewalFlow - ReadyForRenewal")
-        // $COVERAGE-ON$
         dataCache.fetch[Renewal](cacheId, Renewal.key) map {
           case Some(_) => true
           case None => false
         }
 
-      case _ =>
-        // $COVERAGE-OFF$
-        Logger.info("RegistrationProgressController:isRenewalFlow - Non-ReadyForRenewal or None")
-        // $COVERAGE-ON$
-        Future.successful(false)
+      case _ => Future.successful(false)
     }
   }
 
@@ -140,7 +132,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
   }
 
   private def preApplicationComplete(cache: CacheMap, status: SubmissionStatus, amlsRegistrationNumber: Option[String])
-                                    : Future[Option[Boolean]] = {
+                                    (implicit hc: HeaderCarrier): Future[Option[Boolean]] = {
 
     val preAppStatus: SubmissionStatus => Boolean = s => Set(NotCompleted, SubmissionReady).contains(s)
 
@@ -159,7 +151,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
     }).getOrElse(Future.successful(None))
   }
 
-  private def getNewActivities(cacheId: String): OptionT[Future, Set[BusinessActivity]] =
+  private def getNewActivities(cacheId: String)(implicit hc: HeaderCarrier): OptionT[Future, Set[BusinessActivity]] =
     businessMatchingService.getAdditionalBusinessActivities(cacheId)
 
   def post() = authAction.async {

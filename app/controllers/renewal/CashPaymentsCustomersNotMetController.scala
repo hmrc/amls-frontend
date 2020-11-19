@@ -24,6 +24,7 @@ import javax.inject.Inject
 import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, Renewal}
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.renewal.cash_payments_customers_not_met
 import scala.concurrent.Future
@@ -67,7 +68,8 @@ class CashPaymentsCustomersNotMetController @Inject()(val dataCacheConnector: Da
     }
   }
 
-  private def updateCashPayments(credId: String, data: CashPaymentsCustomerNotMet, renewal: Option[Renewal]) = {
+  private def updateCashPayments(credId: String, data: CashPaymentsCustomerNotMet, renewal: Option[Renewal])
+                                (implicit hc: HeaderCarrier) = {
 
     val noCashPaymentFromCustomer = CashPayments(cashPaymentsCustomerNotMet = data, None)
 

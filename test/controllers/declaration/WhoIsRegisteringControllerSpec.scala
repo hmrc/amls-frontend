@@ -104,7 +104,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
       when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      block()
+      block(())
     }
   }
 

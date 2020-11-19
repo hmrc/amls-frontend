@@ -25,6 +25,7 @@ import models.tcsp._
 import play.api.i18n.Messages
 import services.StatusService
 import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.tcsp.summary
 import play.api.Logger
 import play.api.mvc.MessagesControllerComponents
@@ -79,5 +80,5 @@ class SummaryController @Inject()(
         } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update Tcsp")
   }
 
-  private def fetchModel(credId: String) = dataCache.fetch[Tcsp](credId, Tcsp.key)
+  private def fetchModel(credId: String)(implicit hc: HeaderCarrier) = dataCache.fetch[Tcsp](credId, Tcsp.key)
 }

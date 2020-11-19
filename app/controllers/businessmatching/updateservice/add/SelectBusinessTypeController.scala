@@ -28,12 +28,15 @@ import jto.validation.{Rule, Write}
 import models.FormTypes
 import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.{AddBusinessTypeFlowModel, SelectBusinessTypesPageId}
+import models.responsiblepeople.ResponsiblePerson
 import play.api.i18n.Messages
 import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection}
 import views.html.businessmatching.updateservice.add.select_activities
+import services.ResponsiblePeopleService.ResponsiblePeopleListHelpers
 
 import scala.concurrent.Future
 
@@ -88,7 +91,7 @@ class SelectBusinessTypeController @Inject()(
         }
   }
 
-  private def getFormData(credId: String)(implicit messages: Messages) = for {
+  private def getFormData(credId: String)(implicit hc: HeaderCarrier, messages: Messages) = for {
     model <- businessMatchingService.getModel(credId)
     activities <- OptionT.fromOption[Future](model.activities) map {
       _.businessActivities

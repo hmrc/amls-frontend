@@ -20,16 +20,18 @@ import config.ApplicationConfig
 import javax.inject.Inject
 import models.notifications.{NotificationDetails, NotificationRow}
 import play.api.Logger
+import play.api.libs.json.Writes
 import uk.gov.hmrc.http._
-import scala.concurrent.{Future, ExecutionContext}
+import uk.gov.hmrc.play.http.ws.WSHttp
 
+import scala.concurrent.{Future, ExecutionContext}
 class AmlsNotificationConnector @Inject()(val http: HttpClient,
                                           val appConfig: ApplicationConfig) {
 
   private[connectors] def baseUrl : String = appConfig.allNotificationsUrl
 
   def fetchAllByAmlsRegNo(amlsRegistrationNumber: String, accountTypeId: (String, String))
-                         (implicit headerCarrier: HeaderCarrier,ec: ExecutionContext): Future[Seq[NotificationRow]] = {
+                         (implicit headerCarrier: HeaderCarrier,ec: ExecutionContext, reqW: Writes[Seq[NotificationRow]]): Future[Seq[NotificationRow]] = {
 
     val (accountType, accountId) = accountTypeId
 
@@ -48,7 +50,7 @@ class AmlsNotificationConnector @Inject()(val http: HttpClient,
   }
 
   def fetchAllBySafeId(safeId: String, accountTypeId: (String, String))
-                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Seq[NotificationRow]] = {
+                      (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[Seq[NotificationRow]]): Future[Seq[NotificationRow]] = {
 
     val (accountType, accountId) = accountTypeId
 

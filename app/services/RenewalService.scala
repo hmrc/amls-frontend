@@ -25,6 +25,7 @@ import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.Renewal.ValidationRules._
 import models.renewal._
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.MappingUtils._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
-  def getSection(credId: String)(implicit ec: ExecutionContext) = {
+  def getSection(credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
 
     val notStarted = Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
 
@@ -52,11 +53,13 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     }
   }
 
-  def getRenewal(cacheId: String) = dataCache.fetch[Renewal](cacheId, Renewal.key)
+  def getRenewal(cacheId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) =
+    dataCache.fetch[Renewal](cacheId, Renewal.key)
 
-  def updateRenewal(credId: String, renewal: Renewal) = dataCache.save[Renewal](credId, Renewal.key, renewal)
+  def updateRenewal(credId: String, renewal: Renewal)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) =
+    dataCache.save[Renewal](credId, Renewal.key, renewal)
 
-  def isRenewalComplete(renewal: Renewal, credId: String)(implicit ec: ExecutionContext) = {
+  def isRenewalComplete(renewal: Renewal, credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
 
     val isComplete = for {
       cache <- OptionT(dataCache.fetchAll(credId))
@@ -82,7 +85,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     isComplete.getOrElse(false)
   }
 
-  def isCachePresent(credId: String)(implicit ec: ExecutionContext) = {
+  def isCachePresent(credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
 
     val isCache = for {
       cache <- dataCache.fetchAll(credId)

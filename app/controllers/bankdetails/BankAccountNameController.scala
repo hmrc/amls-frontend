@@ -93,7 +93,7 @@ class BankAccountNameController @Inject()(
   }
 
   private def handlePost(credId: String, index: Option[Int] = None, edit: Boolean = false)
-                        (implicit request: Request[AnyContent]) = {
+                        (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
     Form2[String](request.body) match {
       case f: InvalidForm =>
         Future.successful(BadRequest(bank_account_name(f, edit, index)))

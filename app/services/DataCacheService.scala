@@ -19,13 +19,14 @@ package services
 import connectors.DataCacheConnector
 import uk.gov.hmrc.http.cache.client.CacheMap
 import scala.concurrent.{Future, ExecutionContext}
-import uk.gov.hmrc.http.NotFoundException
+import uk.gov.hmrc.http.{ HeaderCarrier, NotFoundException }
 
 private[services] trait DataCacheService {
 
   private[services] def cacheConnector: DataCacheConnector
 
-  def getCache(credId: String)(implicit ec: ExecutionContext): Future[CacheMap] =
+  def getCache(credId: String)
+              (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[CacheMap] =
     cacheConnector.fetchAll(credId) flatMap {
       case Some(cache) =>
         Future.successful(cache)

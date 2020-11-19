@@ -28,6 +28,7 @@ import play.api.libs.json.Format
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import typeclasses.MongoKey
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import views.html.date_of_change
@@ -105,8 +106,9 @@ class AgentNameController @Inject()(
 
   }
 
-  def getTradingPremises(result: Option[CacheMap], index: Int)
-                        (implicit formats: Format[TradingPremises], key: MongoKey[TradingPremises]) =
+  def getTradingPremises(result: Option[CacheMap], index: Int)(implicit hc: HeaderCarrier,
+                                                               formats: Format[TradingPremises],
+                                                               key: MongoKey[TradingPremises]) =
     result flatMap { cache => getData(cache, index) }
 
   def dateOfChange(index: Int) = authAction.async {

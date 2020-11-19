@@ -28,6 +28,7 @@ import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRe
 import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.businessmatching.updateservice.remove.remove_activities
 
@@ -102,7 +103,7 @@ class RemoveBusinessTypesController @Inject()(
 
       }
 
-  private def getFormData(credId: String) = for {
+  private def getFormData(credId: String)(implicit hc: HeaderCarrier) = for {
     model <- businessMatchingService.getModel(credId)
     activities <- OptionT.fromOption[Future](model.activities) map {
       _.businessActivities

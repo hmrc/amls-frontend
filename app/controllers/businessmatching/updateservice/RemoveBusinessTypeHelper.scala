@@ -32,6 +32,7 @@ import models.moneyservicebusiness.{MoneyServiceBusiness => MSBSection}
 import models.responsiblepeople.ResponsiblePerson
 import models.tcsp.Tcsp
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthAction
 
@@ -43,7 +44,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
                                          implicit val dataCacheConnector: DataCacheConnector) {
 
   def removeSectionData(credId: String, model: RemoveBusinessTypeFlowModel)
-                       (implicit ec: ExecutionContext): OptionT[Future, Seq[CacheMap]] = {
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[CacheMap]] = {
 
     def removeActivities(activities: List[BMBusinessActivity]): Future[Seq[CacheMap]] = {
       activities match {
@@ -83,7 +84,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
   }
 
   def removeBusinessMatchingBusinessTypes(credId: String, model: RemoveBusinessTypeFlowModel)
-                                         (implicit ec: ExecutionContext): OptionT[Future, BMBusinessMatching] = {
+                                         (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BMBusinessMatching] = {
 
     val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])
     val setAccepted = (bm: BMBusinessMatching) => bm.copy(hasAccepted = true)
@@ -111,7 +112,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
   }
 
   def removeTradingPremisesBusinessTypes(credId: String, model: RemoveBusinessTypeFlowModel)
-                                        (implicit ec: ExecutionContext): OptionT[Future, Seq[TradingPremises]] = {
+                                        (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[TradingPremises]] = {
 
     val setAccepted = (tp: TradingPremises) => tp.copy(hasAccepted = true)
 
@@ -151,7 +152,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
   }
 
   def removeFitAndProper(credId: String, model: RemoveBusinessTypeFlowModel)
-                        (implicit ec: ExecutionContext): OptionT[Future, Seq[ResponsiblePerson]] = {
+                        (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[ResponsiblePerson]] = {
 
     val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])
 
@@ -179,7 +180,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
   }
 
   def dateOfChangeApplicable(credId: String, activitiesToRemove: Set[BMBusinessActivity])
-                            (implicit ec: ExecutionContext): OptionT[Future, Boolean] = {
+                            (implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Boolean] = {
     for {
       recentlyAdded <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](credId, ServiceChangeRegister.key)) orElse OptionT.some(ServiceChangeRegister())
       addedActivities <- OptionT.fromOption[Future](recentlyAdded.addedActivities) orElse OptionT.some(Set.empty)
@@ -188,7 +189,7 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
     }
   }
 
-  def removeFlowData(credId: String)(implicit ec: ExecutionContext): OptionT[Future, RemoveBusinessTypeFlowModel] = {
+  def removeFlowData(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, RemoveBusinessTypeFlowModel] = {
     val emptyModel = RemoveBusinessTypeFlowModel()
     OptionT.liftF(dataCacheConnector.save(credId, RemoveBusinessTypeFlowModel.key, RemoveBusinessTypeFlowModel())) map { _ => emptyModel }
   }

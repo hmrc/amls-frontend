@@ -79,7 +79,8 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     }
   }
 
-  private def createSubscriptionRequest(cache: CacheMap): SubscriptionRequest = {
+  private def createSubscriptionRequest(cache: CacheMap)
+                                              (implicit hc: HeaderCarrier, ec: ExecutionContext): SubscriptionRequest = {
 
     def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
     def filteredTradingPremises     = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
@@ -152,7 +153,8 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
   }
 
   private def saveResponse[T](credId: String, response: T, key: String, isRenewalAmendment: Boolean = false)
-                                    (implicit ex: ExecutionContext, fmt: Format[T]) = {
+                                    (implicit hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = {
+
       for {
       _ <- cacheConnector.save[T](credId, key, response)
       c <- cacheConnector.save[SubmissionRequestStatus](credId, SubmissionRequestStatus.key, SubmissionRequestStatus(true, Some(isRenewalAmendment)))

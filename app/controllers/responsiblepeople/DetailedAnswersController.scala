@@ -96,7 +96,7 @@ class DetailedAnswersController @Inject () (
       }
   }
 
-  private def isMsbOrTcsp(credId: String): Future[Option[Boolean]] = {
+  private def isMsbOrTcsp(credId: String)(implicit hc: HeaderCarrier): Future[Option[Boolean]] = {
     for {
       businessmatching <- dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key)
     } yield businessmatching.map(_.msbOrTcsp)
@@ -118,7 +118,7 @@ class DetailedAnswersController @Inject () (
         Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status))
     }) getOrElse InternalServerError("Cannot determine redirect")
 
-  private def fetchModel(credId: String) =
+  private def fetchModel(credId: String)(implicit hc: HeaderCarrier) =
     dataCacheConnector.fetch[Seq[ResponsiblePerson]](credId, ResponsiblePerson.key)
 
 }

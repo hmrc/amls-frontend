@@ -91,7 +91,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
     when {
       controller.keystoreConnector.setConfirmationStatus(any(), any())
-    } thenReturn Future.successful()
+    } thenReturn Future.successful(())
 
     when {
       controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())

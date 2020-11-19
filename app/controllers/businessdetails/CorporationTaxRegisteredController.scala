@@ -25,6 +25,7 @@ import models.businessdetails.{BusinessDetails, CorporationTaxRegistered, Corpor
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
 import play.api.mvc.{MessagesControllerComponents, Request, Result}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthAction
 import utils.ControllerHelper
@@ -65,7 +66,7 @@ class CorporationTaxRegisteredController @Inject () (val dataCacheConnector: Dat
       )
   }
 
-  private def filterByBusinessType(cacheId: String, fn: CacheMap => Future[Result])(implicit request: Request[_]): Future[Result] = {
+  private def filterByBusinessType(cacheId: String, fn: CacheMap => Future[Result])(implicit hc:HeaderCarrier, request: Request[_]): Future[Result] = {
     OptionT(dataCacheConnector.fetchAll(cacheId)) flatMap { cache =>
       ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key)) match {
         case Some((LPrLLP | LimitedCompany)) => OptionT.liftF(fn(cache))
@@ -74,7 +75,7 @@ class CorporationTaxRegisteredController @Inject () (val dataCacheConnector: Dat
     } getOrElse InternalServerError("Could not retrieve business type")
   }
 
-  private def updateCache(cacheId: String, cache: CacheMap, data: CorporationTaxRegistered) = for {
+  private def updateCache(cacheId: String, cache: CacheMap, data: CorporationTaxRegistered)(implicit hc: HeaderCarrier) = for {
     businessDetails <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
     cacheMap <- OptionT.liftF(dataCacheConnector.save[BusinessDetails](cacheId, BusinessDetails.key, businessDetails.corporationTaxRegistered(data)))
   } yield cacheMap

@@ -33,6 +33,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,7 +41,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector,
                                  val config: ApplicationConfig) {
 
-  def sections(cacheId: String)(implicit ec: ExecutionContext): Future[Seq[Section]] =
+  def sections(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[Section]] =
 
     cacheConnector.fetchAll(cacheId) map {
       optionCache =>

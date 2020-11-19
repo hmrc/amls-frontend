@@ -50,7 +50,7 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
                                 val statusService: StatusService,
                                 val businessMatchingConnector: BusinessMatchingConnector){
 
-  def cacheMap(credId: String): Future[Option[CacheMap]] = cacheConnector.fetchAll(credId)
+  def cacheMap(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CacheMap]] = cacheConnector.fetchAll(credId)
 
   def setAltCorrespondenceAddress(amlsRefNumber: String, maybeCacheMap: Option[CacheMap], accountTypeId: (String, String), credId: String)
                                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
@@ -67,7 +67,8 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
     } yield cacheMap) getOrElse (throw new Exception("Unable to update alt correspondence address"))
   }
 
-  def setAltCorrespondenceAddress(businessDetails: BusinessDetails, credId: String): Future[CacheMap] = {
+  def setAltCorrespondenceAddress(businessDetails: BusinessDetails, credId: String)
+                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
     cacheConnector.save[BusinessDetails](credId, BusinessDetails.key, fixAddress(businessDetails))
   }
 
@@ -96,7 +97,7 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
     }
   }
 
-  def reviewDetails(implicit ec: ExecutionContext, request: Request[_]): Future[Option[ReviewDetails]] = {
+  def reviewDetails(implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[Option[ReviewDetails]] = {
     businessMatchingConnector.getReviewDetails map {
       case Some(details) => Some(ReviewDetails.convert(details))
       case _ => None
@@ -108,7 +109,8 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
    * shouldn't be a problem as this should only happen when someone
    * first comes into the Application from Business Customer FE
    */
-  def updateReviewDetails(reviewDetails: ReviewDetails, credId: String): Future[CacheMap] = {
+  def updateReviewDetails(reviewDetails: ReviewDetails, credId: String)
+                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
     val bm = BusinessMatching(reviewDetails = Some(reviewDetails))
     cacheConnector.save[BusinessMatching](credId, BusinessMatching.key, bm)
   }

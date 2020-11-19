@@ -26,6 +26,7 @@ import models.businessmatching._
 import models.renewal.{AMLSTurnover, Renewal}
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.amls_turnover
 
@@ -95,7 +96,7 @@ class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnecto
     }
   }
 
-  private def getErrorMessage(credId: String) = {
+  private def getErrorMessage(credId: String)(implicit hc: HeaderCarrier) = {
     (for {
       businessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
       activities <- OptionT.fromOption[Future](businessMatching.activities)

@@ -31,6 +31,7 @@ import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
 import play.api.i18n.Messages
 import services.{ResponsiblePeopleService, TradingPremisesService}
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,7 +43,7 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
                                       val responsiblePeopleService: ResponsiblePeopleService,
                                       val appConfig:ApplicationConfig) extends RepeatingSection {
 
-  def updateBusinessActivities(credId: String, model: AddBusinessTypeFlowModel): OptionT[Future, BusinessActivities] = {
+  def updateBusinessActivities(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier): OptionT[Future, BusinessActivities] = {
     OptionT(dataCacheConnector.update[BusinessActivities](credId, BusinessActivities.key) {
       case Some(dcModel) if model.activity.contains(AccountancyServices) =>
         dcModel.accountantForAMLSRegulations(None)
@@ -54,7 +55,7 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     })
   }
 
-  def updateSupervision(credId: String)(implicit ec: ExecutionContext) = {
+  def updateSupervision(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext) = {
     val emptyModel = Supervision(hasAccepted = true)
 
     for {
@@ -69,10 +70,10 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     } yield newSupervision
   }
 
-  def updateHasAcceptedFlag(credId: String, model: AddBusinessTypeFlowModel)(implicit ec: ExecutionContext) =
+  def updateHasAcceptedFlag(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier ,ec: ExecutionContext) =
     OptionT.liftF(dataCacheConnector.save[AddBusinessTypeFlowModel](credId, AddBusinessTypeFlowModel.key, model.copy(hasAccepted = true)))
 
-  def updateServicesRegister(credId: String, model: AddBusinessTypeFlowModel)(implicit ec: ExecutionContext):  OptionT[Future, ServiceChangeRegister] = {
+  def updateServicesRegister(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier ,ec: ExecutionContext):  OptionT[Future, ServiceChangeRegister] = {
     for {
       activity <- OptionT.fromOption[Future](model.activity)
       updatedModel <- OptionT(dataCacheConnector.update[ServiceChangeRegister](credId, ServiceChangeRegister.key) {
@@ -83,12 +84,12 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     } yield updatedModel
   }
 
-  def tradingPremisesData(credId: String)(implicit ec: ExecutionContext): Future[Seq[TradingPremises]] =
+  def tradingPremisesData(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Seq[TradingPremises]] =
     getData[TradingPremises](credId).map {
       _.filterNot(tp => tp.status.contains(StatusConstants.Deleted))
     }
 
-  def updateBusinessMatching(credId: String, model: AddBusinessTypeFlowModel)(implicit ec: ExecutionContext): OptionT[Future, BusinessMatching] = {
+  def updateBusinessMatching(credId: String, model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier ,ec: ExecutionContext): OptionT[Future, BusinessMatching] = {
     for {
       newActivity <- OptionT.fromOption[Future](model.activity)
       newMsbServices <- OptionT.fromOption[Future](model.subSectors) orElse OptionT.some(BusinessMatchingMsbServices(Set.empty[BusinessMatchingMsbService]))
@@ -119,7 +120,7 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     model.activity.contains(TrustAndCompanyServices) || model.activity.contains(MoneyServiceBusiness)
   }
 
-  def clearFlowModel(credId: String): OptionT[Future, AddBusinessTypeFlowModel] =
+  def clearFlowModel(credId: String)(implicit hc: HeaderCarrier): OptionT[Future, AddBusinessTypeFlowModel] =
     OptionT(dataCacheConnector.update[AddBusinessTypeFlowModel](credId, AddBusinessTypeFlowModel.key)(_ => AddBusinessTypeFlowModel()))
 
   def prefixedActivities(businessMatching: BusinessMatching)(implicit messages: Messages) =
@@ -129,7 +130,7 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     case _ => Set.empty[String]
   }
 
-  def tradingPremises(credId: String)(implicit ec: ExecutionContext): Future[Seq[(TradingPremises, Int)]] = {
+  def tradingPremises(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Seq[(TradingPremises, Int)]] = {
     getData[TradingPremises](credId).map {
       _.zipWithIndex.filterNot { case (tp, _) =>
         tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
@@ -137,7 +138,7 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
     }
   }
 
-  def responsiblePeople(credId: String)(implicit ec: ExecutionContext): Future[Seq[(ResponsiblePerson, Int)]] = {
+  def responsiblePeople(credId: String)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Seq[(ResponsiblePerson, Int)]] = {
     getData[ResponsiblePerson](credId).map {
       _.zipWithIndex.filterNot { case (rp, _) =>
         rp.status.contains(StatusConstants.Deleted) | !rp.isComplete

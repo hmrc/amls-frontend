@@ -104,14 +104,15 @@ object DeclarationHelper {
     }
   }
 
-  private def inRenewalWindow(status: SubmissionStatus): Future[Boolean] = {
+  private def inRenewalWindow(status: SubmissionStatus)(implicit hc: HeaderCarrier): Future[Boolean] = {
     status match {
       case ReadyForRenewal(_) => Future.successful(true)
       case _ => Future.successful(false)
     }
   }
 
-  def renewalComplete(renewalService: RenewalService, credId: String)(implicit ec: ExecutionContext): Future[Boolean] = {
+  def renewalComplete(renewalService: RenewalService, credId: String)
+                             (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Boolean] = {
     renewalService.getRenewal(credId) flatMap {
       case Some(renewal) =>
         renewalService.isRenewalComplete(renewal, credId)
@@ -119,7 +120,9 @@ object DeclarationHelper {
     }
   }
 
-  def sectionsComplete(cacheId: String, sectionsProvider: SectionsProvider)(implicit ec: ExecutionContext) = {
+  def sectionsComplete(cacheId: String, sectionsProvider: SectionsProvider)
+                      (implicit hc: HeaderCarrier ,ec: ExecutionContext) = {
+
     sectionsProvider.sections(cacheId) map {
       sections =>
         isSectionComplete(sections)

@@ -605,7 +605,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
+          .thenReturn(Future.successful((SubmissionDecisionApproved, statusResponse.some)))
 
         when(controller.landingService.refreshCache(any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
 
@@ -634,7 +634,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
-          .thenReturn(Future.successful(SubmissionReadyForReview, statusResponse.some))
+          .thenReturn(Future.successful((SubmissionReadyForReview, statusResponse.some)))
 
         when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
 
@@ -661,7 +661,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
           .thenReturn(Future.successful(Some(cacheMap)))
 
         when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
+          .thenReturn(Future.successful((SubmissionDecisionApproved, statusResponse.some)))
 
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
 
