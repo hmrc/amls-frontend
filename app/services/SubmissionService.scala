@@ -17,7 +17,7 @@
 package services
 
 import config.ApplicationConfig
-import connectors.{AmlsConnector, DataCacheConnector}
+import connectors.{AmlsConnector, DataCacheConnector, BusinessMatchingConnector}
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import javax.inject.Inject
 import models._
@@ -44,6 +44,7 @@ import play.api.libs.json.Format
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse}
 import utils.StatusConstants
+import play.api.mvc.Request
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -51,7 +52,8 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
                                   val ggService: GovernmentGatewayService,
                                   val authEnrolmentsService: AuthEnrolmentsService,
                                   val amlsConnector: AmlsConnector,
-                                  config: ApplicationConfig) extends DataCacheService {
+                                  config: ApplicationConfig,
+                                  val businessMatchingConnector: BusinessMatchingConnector) extends DataCacheService {
 
   private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String, groupId: Option[String], credId: String)
                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[_] =
@@ -62,7 +64,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     }
 
   def subscribe(credId: String, accountTypeId: (String, String), groupId: Option[String])
-               (implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubscriptionResponse] = {
+               (implicit ec: ExecutionContext, hc: HeaderCarrier, request: Request[_]): Future[SubscriptionResponse] = {
     (for {
       cache <- getCache(credId)
       safeId <- safeId(cache)
@@ -161,12 +163,19 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     } yield c
   }
 
-  private def safeId(cache: CacheMap): Future[String] = {
+  private def safeId(cache: CacheMap)(implicit ec: ExecutionContext, request: Request[_]): Future[String] = {
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       rd <- bm.reviewDetails
     } yield rd.safeId) match {
-      case Some(a) => Future.successful(a)
+      case Some(a) =>
+        if(a.trim.isEmpty)
+          businessMatchingConnector.getReviewDetails map {
+            case Some(details) => details.safeId
+            case _ => throw new Exception("No safe id from business customer service")
+          }
+        else
+          Future.successful(a)
       case _ => Future.failed(new Exception("No SafeID value available"))
     }
   }

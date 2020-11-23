@@ -25,6 +25,7 @@ import services.StatusService
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.AuthAction
 import views.html.businessactivities._
+import play.api.Logger
 
 class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,
                                       val authConnector: AuthConnector,
@@ -42,7 +43,10 @@ class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector
           ba <- bm.activities
         } yield {
           Ok(what_you_need(routes.InvolvedInOtherController.get().url, Some(ba)))
-        })getOrElse(InternalServerError("Unable to retrieve business activities"))
+        }).getOrElse {
+            Logger.info("Unable to retrieve business activities in [businessactivities][WhatYouNeedController]")
+            throw new Exception("Unable to retrieve business activities in [businessactivities][WhatYouNeedController]")
+          }
       }
   }
 }

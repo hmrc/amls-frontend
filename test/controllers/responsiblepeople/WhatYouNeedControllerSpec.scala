@@ -38,6 +38,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       dataCacheConnector = mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
       what_you_need = view)
   }
+
   "WhatYouNeedController" must {
 
     "get" must {
@@ -58,14 +59,15 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         contentAsString(result) must include(pageTitle)
       }
     }
-    "Throw an error" when {
-      "bm details cannot be fetched" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
 
-        val result = controller.get(1)(request)
-        status(result) must be(INTERNAL_SERVER_ERROR)
+    "throw an error when data cannot be fetched" in new Fixture {
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+        .thenReturn(Future.successful(None))
+
+      a[Exception] must be thrownBy {
+        ScalaFutures.whenReady(controller.get(1)(request)) { x => x }
       }
     }
   }
+
 }

@@ -42,7 +42,6 @@ class AmlsConnector @Inject()(val http: HttpClient,
                (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, reqW: Writes[SubscriptionRequest], resW: Writes[SubscriptionResponse]): Future[SubscriptionResponse] = {
 
     val (accountType, accountId) = accountTypeId
-
     val postUrl = s"$url/$accountType/$accountId/$safeId"
     val prefix = "[AmlsConnector][subscribe]"
     // $COVERAGE-OFF$
