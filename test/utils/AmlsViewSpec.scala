@@ -31,7 +31,6 @@ import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.{Application, Mode}
-import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
 import uk.gov.hmrc.http.HeaderCarrier
 
 trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with MustMatchers with AuthorisedFixture {

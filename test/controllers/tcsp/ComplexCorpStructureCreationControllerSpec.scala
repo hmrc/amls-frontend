@@ -23,15 +23,12 @@ import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import play.api.inject.bind
-import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.tcsp.complex_corp_structure_creation
 
 import scala.concurrent.Future
-
 
 class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 

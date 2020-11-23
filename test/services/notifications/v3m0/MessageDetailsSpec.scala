@@ -20,7 +20,7 @@ import connectors.AmlsNotificationConnector
 import models.notifications.ContactType._
 import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
 import org.joda.time.{DateTime, DateTimeZone}
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.MessagesApi
@@ -29,7 +29,7 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import services.{CustomAttributeProvider, NotificationService}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 
 import scala.concurrent.Future
 

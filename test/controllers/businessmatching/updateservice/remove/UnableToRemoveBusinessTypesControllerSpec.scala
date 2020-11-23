@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness}
 import play.api.i18n.Messages
 import play.api.test.Helpers.{contentAsString, status}
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import play.api.test.Helpers._
 import views.html.businessmatching.updateservice.remove.unable_to_remove_activity
 

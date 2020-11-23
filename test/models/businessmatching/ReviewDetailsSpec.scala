@@ -23,8 +23,6 @@ import models.businesscustomer.Address
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
-import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => eqTo, _}
 
 class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
   suite =>

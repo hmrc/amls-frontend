@@ -16,7 +16,6 @@
 
 package controllers.tradingpremises
 
-import akka.stream.Materializer
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.actions.SuccessfulAuthAction
 import generators.businessmatching.BusinessMatchingGenerator
@@ -31,11 +30,9 @@ import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import play.api.test.CSRFTokenHelper._
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.tradingpremises.confirm_address
 
 import scala.concurrent.Future

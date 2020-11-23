@@ -31,7 +31,7 @@ import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 import views.html.renewal.involved_in_other
 
 import scala.concurrent.Future

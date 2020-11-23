@@ -22,7 +22,6 @@ import models.Country
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.registrationprogress.{Completed, Section}
 import models.renewal._
-import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -31,7 +30,7 @@ import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.{ProgressService, RenewalService, SectionsProvider}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 import views.html.renewal.summary
 
 import scala.concurrent.Future

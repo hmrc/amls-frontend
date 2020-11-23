@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.supervision.what_you_need
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {

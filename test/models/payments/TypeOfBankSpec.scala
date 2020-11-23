@@ -19,7 +19,6 @@ package models.payments
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{ValidationError, Path}
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{Json, JsPath, JsSuccess}
 
 class TypeOfBankSpec extends PlaySpec {
 

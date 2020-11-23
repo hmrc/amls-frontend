@@ -26,7 +26,7 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.auth.core.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks, DependencyMocks}
+import utils.{AmlsSpec, AutoCompleteServiceMocks, DependencyMocks}
 
 class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 

@@ -17,7 +17,7 @@
 package models
 
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsString, _}
+import play.api.libs.json._
 import utils.DependencyMocks
 import generators.businessmatching.BusinessMatchingGenerator
 

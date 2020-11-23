@@ -18,12 +18,11 @@ package controllers.responsiblepeople
 
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
-import models.status.SubmissionReadyForReview
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import views.html.responsiblepeople.what_you_need

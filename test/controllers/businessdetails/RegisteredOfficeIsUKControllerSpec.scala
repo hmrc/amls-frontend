@@ -29,7 +29,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
+import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.html.businessdetails.registered_office_is_uk
 
 import scala.collection.JavaConversions._

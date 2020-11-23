@@ -18,7 +18,6 @@ package services.flowmanagement.flowrouters
 
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import models.businessmatching._
-import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
 import models.flowmanagement._
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
@@ -27,8 +26,6 @@ import services.flowmanagement.flowrouters.businessmatching.AddBusinessTypeRoute
 import services.flowmanagement.pagerouters.addflow._
 
 import utils.{AmlsSpec, DependencyMocks}
-
-
 
 class AddTCSPSpecificRouterSpec extends AmlsSpec {
 

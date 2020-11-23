@@ -33,13 +33,12 @@ import org.joda.time.DateTime
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalacheck.Gen
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, FeeHelper}
+import utils.{AmlsSpec, FeeHelper}
 import views.html.confirmation.{confirm_amendvariation, confirm_renewal, confirmation_new, confirmation_no_fee}
 
 import scala.concurrent.Future

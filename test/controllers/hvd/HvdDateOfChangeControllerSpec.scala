@@ -29,7 +29,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper}
+import utils.{AmlsSpec, DateOfChangeHelper}
 import views.html.date_of_change
 
 import scala.concurrent.Future

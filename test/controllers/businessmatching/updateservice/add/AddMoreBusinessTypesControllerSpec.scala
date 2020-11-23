@@ -27,7 +27,7 @@ import org.mockito.Mockito.when
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.add.add_more_activities
 
 import scala.concurrent.Future

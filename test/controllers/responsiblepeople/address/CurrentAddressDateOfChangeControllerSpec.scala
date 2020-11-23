@@ -19,8 +19,7 @@ package controllers.responsiblepeople.address
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import controllers.responsiblepeople.address
-import models.DateOfChange
-import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
+import models.responsiblepeople.TimeAtAddress.{ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
@@ -33,7 +32,6 @@ import utils.AmlsSpec
 import views.html.date_of_change
 
 import scala.concurrent.Future
-
 
 class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 

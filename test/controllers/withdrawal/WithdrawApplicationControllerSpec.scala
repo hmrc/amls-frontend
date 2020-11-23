@@ -29,7 +29,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AmlsSpec, AuthorisedFixture, DateHelper}
+import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.withdrawal.withdraw_application
 
 import scala.concurrent.Future

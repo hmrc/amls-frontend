@@ -27,7 +27,7 @@ import play.api.mvc.AnyContentAsFormUrlEncoded
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
+import utils.{AmlsSpec, DateOfChangeHelper, DependencyMocks}
 import views.html.hvd.products
 
 class ProductsControllerSpec extends AmlsSpec with MockitoSugar {

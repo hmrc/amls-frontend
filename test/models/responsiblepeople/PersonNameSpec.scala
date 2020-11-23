@@ -17,7 +17,6 @@
 package models.responsiblepeople
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import org.joda.time.LocalDate
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 

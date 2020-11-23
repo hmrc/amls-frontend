@@ -25,7 +25,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.html.bankdetails.remove_bank_details
 
 class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {

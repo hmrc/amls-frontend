@@ -27,7 +27,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 import views.html.satisfaction_survey
 
 import scala.concurrent.Future

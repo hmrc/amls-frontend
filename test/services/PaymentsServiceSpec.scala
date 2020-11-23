@@ -17,7 +17,6 @@
 package services
 
 import cats.implicits._
-import config.ApplicationConfig
 import connectors.{AmlsConnector, PayApiConnector}
 import generators.PaymentGenerator
 import models.FeeResponse
@@ -31,8 +30,7 @@ import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
-import utils.{AmlsSpec, AuthorisedFixture}
-
+import utils.AmlsSpec
 
 import scala.concurrent.Future
 

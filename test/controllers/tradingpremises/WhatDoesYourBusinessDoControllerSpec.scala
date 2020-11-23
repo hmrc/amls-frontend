@@ -38,7 +38,7 @@ import uk.gov.hmrc.auth.core.AffinityGroup.Individual
 import uk.gov.hmrc.auth.core.{Enrolments, User}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, AuthorisedRequest}
+import utils.{AmlsSpec, AuthorisedRequest}
 import views.html.date_of_change
 import views.html.tradingpremises.what_does_your_business_do
 

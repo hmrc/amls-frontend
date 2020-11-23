@@ -22,7 +22,6 @@ import org.scalatest.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.AuthorisedFixture
 import views.html.businessdetails.what_you_need
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {

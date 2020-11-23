@@ -21,12 +21,10 @@ import java.time.{LocalDate, LocalDateTime}
 import models.amp.Amp
 import models.eab.Eab
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.libs.json.Json
 import services.ProxyCacheService
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-
-
 
 class ProxyCacheServiceSpec extends AmlsSpec with MockitoSugar
   with ScalaFutures

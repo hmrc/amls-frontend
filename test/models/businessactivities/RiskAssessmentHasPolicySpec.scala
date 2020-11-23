@@ -26,8 +26,6 @@ class RiskAssessmentHasPolicySpec extends PlaySpec with MockitoSugar {
 
   "RiskAssessment" must {
 
-    import jto.validation.forms.Rules._
-
     "fail validation" when {
 
       "given invalid data represented by an empty map" in {

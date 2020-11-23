@@ -29,7 +29,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.DependencyMocks
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 import org.mockito.Matchers.{eq => eqTo}
 
 class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with DependencyMocks {

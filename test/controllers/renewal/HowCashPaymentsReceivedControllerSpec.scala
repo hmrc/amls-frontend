@@ -26,7 +26,7 @@ import play.api.test.Helpers._
 import play.api.test.Helpers.{contentAsString, status}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 import views.html.renewal.how_cash_payments_received
 
 import scala.concurrent.Future

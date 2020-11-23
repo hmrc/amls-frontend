@@ -28,7 +28,6 @@ import org.scalatest.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
 import views.html.responsiblepeople.person_name
 
 import scala.concurrent.Future

@@ -37,7 +37,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.AmlsSpec
 import views.html.date_of_change
 import views.html.tradingpremises.where_are_trading_premises
 

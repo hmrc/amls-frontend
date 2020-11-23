@@ -18,7 +18,6 @@ package models.responsiblepeople
 
 import controllers.responsiblepeople.NinoUtil
 import models.Country
-import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError

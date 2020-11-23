@@ -18,7 +18,6 @@ package models.notifications
 
 import models.notifications.StatusType.{Approved, Revoked, Rejected, DeRegistered, Expired}
 import org.scalatestplus.play.PlaySpec
-import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsString, JsSuccess}
 
 class StatusSpec extends PlaySpec {

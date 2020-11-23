@@ -25,7 +25,7 @@ import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.prop.PropertyChecks
 import play.api.mvc.Call
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 import play.api.test.Helpers._
 import org.scalacheck.Gen
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -75,7 +75,6 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
         val zeroCase = Gen.const(0)
         val emptyCache = CacheMap("", Map.empty)
         val reasonableCounts = for (n <- Gen.choose(min, max)) yield n
-        val partitions = Seq (zeroCase, reasonableCounts)
 
         forAll(reasonableCounts, minSuccessful(PosInt.from(requiredSuccess).get)) { currentCount: Int =>
           forAll(guidanceOptions(currentCount)) { (guidanceRequested: Boolean, fromDeclaration: Option[String], expectedRedirect: Call) =>

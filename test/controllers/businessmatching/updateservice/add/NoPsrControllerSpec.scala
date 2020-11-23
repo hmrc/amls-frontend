@@ -25,7 +25,7 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.add.cannot_add_services
 
 import scala.concurrent.Future

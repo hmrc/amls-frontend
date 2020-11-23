@@ -16,7 +16,6 @@
 
 package models.renewal
 
-import play.api.libs.json.{JsPath, JsSuccess, Json}
 import models.hvd.{PaymentMethods => HvdPaymentMethods}
 import utils.AmlsSpec
 

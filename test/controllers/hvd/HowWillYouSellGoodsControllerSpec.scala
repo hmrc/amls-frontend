@@ -24,7 +24,7 @@ import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DateOfChangeHelper, DependencyMocks}
+import utils.{AmlsSpec, DateOfChangeHelper, DependencyMocks}
 import views.html.hvd.how_will_you_sell_goods
 
 class HowWillYouSellGoodsControllerSpec extends AmlsSpec {

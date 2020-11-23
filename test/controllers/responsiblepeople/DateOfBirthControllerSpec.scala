@@ -30,7 +30,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction}
 
 import scala.concurrent.Future
 
@@ -120,8 +120,6 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
             "dateOfBirth.year" -> "1990"
           )
 
-          val responsiblePeople = ResponsiblePerson()
-
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
 
@@ -143,8 +141,6 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
             "dateOfBirth.month" -> "12",
             "dateOfBirth.year" -> "1990"
           )
-
-          val responsiblePeople = ResponsiblePerson()
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
@@ -194,8 +190,6 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
             "dateOfBirth.month" -> "12",
             "dateOfBirth.year" -> "1990"
           )
-
-          val responsiblePeople = ResponsiblePerson()
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))

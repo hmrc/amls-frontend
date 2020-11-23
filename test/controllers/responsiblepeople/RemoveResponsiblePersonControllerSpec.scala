@@ -37,7 +37,7 @@ import play.api.test.Helpers.{status, _}
 import services.StatusService
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
+import utils.{AmlsSpec, StatusConstants}
 import views.html.responsiblepeople.remove_responsible_person
 
 import scala.concurrent.Future
@@ -226,8 +226,6 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         }
 
         "redirect to start of RP flow where RP is not completed and has a lineId" in new Fixture {
-
-          val emptyCache = CacheMap("", Map.empty)
 
           val p = mock[ResponsiblePerson]
           when(p.isComplete).thenReturn(false)

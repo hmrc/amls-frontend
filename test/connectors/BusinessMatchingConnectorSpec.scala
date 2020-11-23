@@ -20,13 +20,11 @@ import config.AmlsHeaderCarrierForPartialsConverter
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.NotFoundException
-import uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCrypto
 import uk.gov.hmrc.http.HttpClient
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 
 import scala.concurrent.Future
 

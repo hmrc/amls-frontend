@@ -22,7 +22,7 @@ import models.businessactivities.{BusinessActivities, DigitalSoftware, DigitalSp
 import org.jsoup.Jsoup
 import play.api.test.Helpers._
 import org.scalatest.MustMatchers
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.{never, verify}
 import org.mockito.Matchers.{any, eq => eqTo}

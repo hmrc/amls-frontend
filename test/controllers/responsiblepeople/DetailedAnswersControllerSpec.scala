@@ -32,12 +32,12 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.OptionValues
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.responsiblepeople.detailed_answers
 
 import scala.concurrent.Future
@@ -97,7 +97,6 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
         contentAsString(result) must include(Messages("title.cya"))
         contentAsString(result) must include("/anti-money-laundering/responsible-people/check-your-answers")
       }
@@ -164,7 +163,6 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
         contentAsString(result) must include(Messages("title.cya"))
         contentAsString(result) must not include "/anti-money-laundering/responsible-people/your-answers"
       }
@@ -180,7 +178,6 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           val result = controller.get(1)(request)
           status(result) must be(OK)
 
-          val document = Jsoup.parse(contentAsString(result))
           contentAsString(result) must include(Messages("title.cya"))
         }
 
@@ -198,7 +195,6 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           val result = controller.get(1)(request)
           status(result) must be(OK)
 
-          val document = Jsoup.parse(contentAsString(result))
           contentAsString(result) must include("1 January 1999")
         }
 

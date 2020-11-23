@@ -16,18 +16,14 @@
 
 package controllers.responsiblepeople
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.{LegalNameChangeDate, PersonName, ResponsiblePerson}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
-import play.api.inject.bind
-import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.responsiblepeople.legal_name_change_date
-
 
 class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
 

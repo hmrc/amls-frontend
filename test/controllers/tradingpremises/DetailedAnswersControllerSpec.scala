@@ -34,11 +34,10 @@ import play.api.test.Helpers.{OK, contentAsString, status, _}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.AmlsSpec
 import views.html.tradingpremises.summary_details
 
 import scala.concurrent.Future
-
 
 class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 

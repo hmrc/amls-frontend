@@ -24,8 +24,6 @@ import org.joda.time.DateTime
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, FeeHelper}
 import play.api.i18n.Messages

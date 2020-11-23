@@ -27,7 +27,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
 import org.scalatest.mockito.MockitoSugar
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.inject.bind
@@ -142,8 +142,6 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
           val result = controller.get(0)(request)
 
           status(result) must be(NOT_FOUND)
-          val document: Document = Jsoup.parse(contentAsString(result))
-
         }
       }
 

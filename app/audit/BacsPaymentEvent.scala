@@ -17,8 +17,6 @@
 package audit
 
 import models.confirmation.Currency
-import models.governmentgateway.EnrolmentRequest
-import play.api.libs.json.Writes
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.http.HeaderCarrier
@@ -26,8 +24,7 @@ import utils.AuditHelper
 
 object BacsPaymentEvent {
   def apply(ukBank: Boolean, amlsRef: String, payRef: String, amount: Currency)(implicit
-   hc: HeaderCarrier,
-   reqW: Writes[EnrolmentRequest]
+   hc: HeaderCarrier
   ): DataEvent =
     DataEvent(
       auditSource = AuditHelper.appName,

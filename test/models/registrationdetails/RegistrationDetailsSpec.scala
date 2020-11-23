@@ -18,9 +18,7 @@ package models.registrationdetails
 
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsString, JsSuccess, Json}
-import cats.implicits._
-import org.joda.time.LocalDate
+import play.api.libs.json.{JsSuccess, Json}
 
 class RegistrationDetailsSpec extends PlaySpec with MustMatchers {
 

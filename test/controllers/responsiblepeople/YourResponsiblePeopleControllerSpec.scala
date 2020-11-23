@@ -26,7 +26,6 @@ import org.scalatest.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.AuthorisedFixture
 import views.html.responsiblepeople.your_responsible_people
 
 import scala.concurrent.Future
@@ -50,7 +49,6 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
           (any(), any())).thenReturn(Future.successful(Some(Seq(model))))
         val result = controller.get()(request)
         status(result) must be(OK)
-        val document = Jsoup.parse(contentAsString(result))
         contentAsString(result) must include (s"${Messages("responsiblepeople.whomustregister.title")} - ${Messages("summary.responsiblepeople")}")
       }
 

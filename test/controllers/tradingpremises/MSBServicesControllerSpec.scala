@@ -31,7 +31,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.AmlsSpec
 import views.html.tradingpremises.msb_services
 
 import scala.concurrent.Future

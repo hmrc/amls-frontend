@@ -25,7 +25,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.supervision.member_of_professional_body
 
 import scala.concurrent.{Await, Future}

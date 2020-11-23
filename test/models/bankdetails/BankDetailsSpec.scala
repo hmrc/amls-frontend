@@ -19,9 +19,6 @@ package models.bankdetails
 import models.CharacterSets
 import models.bankdetails.BankDetails._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import org.mockito.Matchers.{eq => meq}
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 

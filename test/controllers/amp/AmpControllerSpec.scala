@@ -17,23 +17,16 @@
 package controllers.amp
 
 import java.time.{LocalDate, LocalDateTime, ZoneOffset}
-
-import akka.stream.Materializer
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.amp.Amp
 import org.mockito.Mockito._
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction, AuthorisedFixture, CacheMocks}
 import org.mockito.Matchers.{eq => eqTo, _}
-import org.scalatest.time.Seconds
-import play.api.mvc.DefaultActionBuilder
 import play.api.test.FakeRequest
 import services.ProxyCacheService
 

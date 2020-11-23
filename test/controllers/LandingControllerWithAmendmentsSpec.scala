@@ -45,7 +45,7 @@ import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.mockito.MockitoSugar
 import play.api.libs.json.{JsResultException, Json}
-import play.api.mvc.{BodyParsers, MessagesActionBuilder, Request, Result}
+import play.api.mvc.{BodyParsers, Request}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
@@ -53,7 +53,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AmlsSpec, AuthorisedFixture}
-import views.html.businessmatching.services
 import views.html.start
 
 import scala.concurrent.{ExecutionContext, Future}

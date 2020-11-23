@@ -17,7 +17,6 @@
 package models.businessactivities
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import models.businessactivities
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
@@ -27,8 +26,6 @@ class RiskAssessmentTypesSpec extends PlaySpec with MockitoSugar {
   val formalRiskAssessments: Set[RiskAssessmentType] = Set(PaperBased, Digital)
 
   "RiskAssessment" must {
-
-    import jto.validation.forms.Rules._
 
     "fail validation" when {
       "given invalid data represented by an empty string" in {

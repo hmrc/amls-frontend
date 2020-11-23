@@ -19,16 +19,12 @@ package controllers.bankdetails
 import controllers.actions.SuccessfulAuthAction
 import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.mockito.{ArgumentCaptor, Matchers}
+import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.bankdetails.bank_account_account_is_uk
 

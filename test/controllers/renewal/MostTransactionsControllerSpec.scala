@@ -31,7 +31,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
+import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.html.renewal.most_transactions
 
 import scala.concurrent.Future

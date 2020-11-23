@@ -16,19 +16,12 @@
 
 package models.hvd
 
-import connectors.DataCacheConnector
-import controllers.actions.SuccessfulAuthAction
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.Application
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
-import utils.AuthAction
-
 
 class ProductsSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerTest {
 

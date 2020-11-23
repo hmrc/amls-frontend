@@ -41,7 +41,7 @@ import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import utils.{AmlsSpec, AuthorisedFixture, FeeHelper}
+import utils.{AmlsSpec, FeeHelper}
 import views.html.confirmation._
 
 import scala.concurrent.Future

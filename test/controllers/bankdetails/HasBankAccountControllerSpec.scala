@@ -19,7 +19,7 @@ package controllers.bankdetails
 import controllers.actions.SuccessfulAuthAction
 import models.bankdetails.BankDetails
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.bankdetails.has_bank_account
 
 class HasBankAccountControllerSpec extends AmlsSpec {

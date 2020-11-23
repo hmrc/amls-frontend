@@ -34,7 +34,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
+import utils.{AmlsSpec, StatusConstants}
 import views.html.responsiblepeople.position_within_business
 
 import scala.concurrent.Future

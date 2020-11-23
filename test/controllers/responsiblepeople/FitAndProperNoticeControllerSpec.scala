@@ -27,7 +27,7 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthAction, DependencyMocks}
 
 class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 

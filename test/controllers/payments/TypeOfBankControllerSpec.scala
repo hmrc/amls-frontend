@@ -24,7 +24,7 @@ import models.confirmation.Currency
 import models.renewal.{AMLSTurnover, AMPTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
 import models.status.SubmissionReady
 import org.joda.time.DateTime
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
@@ -32,7 +32,7 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 import views.html.payments.type_of_bank
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -154,7 +154,6 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
           )
 
           val result = controller.post()(postRequest)
-          val body = contentAsString(result)
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) must be (Some(controllers.payments.routes.BankDetailsController.get(false).url))

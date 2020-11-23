@@ -31,9 +31,7 @@ import utils.AmlsSpec
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
 import views.html.businessactivities.summary
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
