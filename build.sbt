@@ -46,10 +46,6 @@ lazy val microservice = Project(appName, file("."))
   .settings(routesImport += "utils.Binders._")
   .settings(
     libraryDependencies ++= appDependencies,
-    libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.6.0" cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % "1.6.0" % Provided cross CrossVersion.full
-    ),
     retrieveManaged := true,
     PlayKeys.playDefaultPort := 9222,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
@@ -73,6 +69,7 @@ lazy val microservice = Project(appName, file("."))
       "-Yrangepos",
       "-Xlint:-missing-interpolator,_",
       "-Yno-adapted-args",
+      "-feature",
       "-unchecked",
       "-language:implicitConversions",
       "-P:silencer:pathFilters=views;routes;TestStorage"
