@@ -20,7 +20,7 @@ import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.MustMatchers
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsString, _}
+import play.api.libs.json._
 
 class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar {
 

@@ -17,8 +17,6 @@
 package models.flowmanagement
 
 import models.businessmatching._
-import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
-import models.responsiblepeople.ResponsiblePerson
 import play.api.i18n.Lang
 import play.api.libs.json.Json
 

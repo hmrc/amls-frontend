@@ -61,12 +61,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
   "TrainingController" when {
 
-    val pageTitle = Messages("responsiblepeople.training.title", "firstname lastname") + " - " +
-      Messages("summary.responsiblepeople") + " - " +
-      Messages("title.amls") + " - " + Messages("title.gov")
     val personName = Some(PersonName("firstname", None, "lastname"))
-
-
 
     "get is called" must {
 
@@ -141,8 +136,6 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
               "training" -> "true",
               "information" -> "I do not remember when I did the training"
             )
-
-            val testCacheMap = CacheMap("", Map())
 
             when(controller.dataCacheConnector.fetchAll(any())(any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))

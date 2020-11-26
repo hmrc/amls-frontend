@@ -16,18 +16,13 @@
 
 package controllers.responsiblepeople
 
-import connectors.DataCacheConnector
-import controllers.CommonPlayDependencies
 import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
-import play.api.inject.bind
-import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import utils._
 import views.html.responsiblepeople.legal_name_input
-
 
 class LegalNameInputControllerSpec extends AmlsSpec with ScalaFutures {
 

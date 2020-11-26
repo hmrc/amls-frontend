@@ -19,7 +19,7 @@ package connectors
 import config.ApplicationConfig
 import javax.inject.{Inject, Singleton}
 import play.api.http.Status._
-import play.api.{Configuration, Environment, Logger}
+import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.http.HttpClient
 

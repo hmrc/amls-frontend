@@ -23,9 +23,7 @@ import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.AuthAction
-
 import views.html.msb.what_you_need
-
 import scala.concurrent.Future
 
 class WhatYouNeedController @Inject()(authAction: AuthAction,
@@ -50,7 +48,6 @@ class WhatYouNeedController @Inject()(authAction: AuthAction,
   }
 
   def post = authAction.async {
-      implicit request =>
         Future.successful(Redirect(routes.ExpectedThroughputController.get()))
   }
 }

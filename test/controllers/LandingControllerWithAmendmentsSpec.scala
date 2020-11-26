@@ -45,7 +45,7 @@ import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.mockito.MockitoSugar
 import play.api.libs.json.{JsResultException, Json}
-import play.api.mvc.{BodyParsers, MessagesActionBuilder, Request, Result}
+import play.api.mvc.{BodyParsers, Request}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
@@ -53,7 +53,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AmlsSpec, AuthorisedFixture}
-import views.html.businessmatching.services
 import views.html.start
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -425,7 +424,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
         when(controller.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
         when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-          .thenReturn(Future.successful(rejectedStatusGen.sample.get, None))
+          .thenReturn(Future.successful((rejectedStatusGen.sample.get, None)))
 
         val result = controller.get()(request)
 
@@ -458,7 +457,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
         when(controller.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
         when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-          .thenReturn(Future.successful(activeStatusGen.sample.get, None))
+          .thenReturn(Future.successful((activeStatusGen.sample.get, None)))
 
         val result = controller.get()(request)
 
@@ -478,7 +477,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
               when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-                .thenReturn(Future.successful(NotCompleted, None))
+                .thenReturn(Future.successful((NotCompleted, None)))
 
               val result = controller.get()(request)
 
@@ -504,7 +503,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
             when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-              .thenReturn(Future.successful(NotCompleted, None))
+              .thenReturn(Future.successful((NotCompleted, None)))
 
             val result = controller.get()(request)
 
@@ -539,7 +538,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-                  .thenReturn(Future.successful(NotCompleted, None))
+                  .thenReturn(Future.successful((NotCompleted, None)))
 
                 when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
                   .thenReturn(Some(List()))
@@ -572,7 +571,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-                  .thenReturn(Future.successful(NotCompleted, None))
+                  .thenReturn(Future.successful((NotCompleted, None)))
 
                 when(testCacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(Some(eabOther))
 
@@ -603,7 +602,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-                  .thenReturn(Future.successful(NotCompleted, None))
+                  .thenReturn(Future.successful((NotCompleted, None)))
 
                 when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
                   .thenReturn(Some(List()))
@@ -643,7 +642,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-                  .thenReturn(Future.successful(NotCompleted, None))
+                  .thenReturn(Future.successful((NotCompleted, None)))
 
                 when(testCacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(Some(eabOmbudsmanServices))
 
@@ -666,7 +665,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
             when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-              .thenReturn(Future.successful(NotCompleted, None))
+              .thenReturn(Future.successful((NotCompleted, None)))
 
             val result = controller.get()(request)
 
@@ -683,7 +682,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
             when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
             when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-              .thenReturn(Future.successful(NotCompleted, None))
+              .thenReturn(Future.successful((NotCompleted, None)))
 
             val result = controller.get()(request)
 
@@ -703,7 +702,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", None))))
 
             when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-              .thenReturn(Future.successful(NotCompleted, None))
+              .thenReturn(Future.successful((NotCompleted, None)))
 
             when(fixedCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None)))
             when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
@@ -734,7 +733,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             .thenReturn(Future.successful(Some(SubscriptionResponse("", "", None))))
 
           when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-            .thenReturn(Future.successful(NotCompleted, None))
+            .thenReturn(Future.successful((NotCompleted, None)))
 
           val result = controller.get()(request)
 
@@ -758,7 +757,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
           when(cacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(None)
           when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-            .thenReturn(Future.successful(NotCompleted, None))
+            .thenReturn(Future.successful((NotCompleted, None)))
 
           val result = controller.get()(request)
 

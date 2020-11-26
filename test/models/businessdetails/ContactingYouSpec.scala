@@ -16,11 +16,8 @@
 
 package models.businessdetails
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{Path, ValidationError}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
 
 class ContactingYouSpec extends PlaySpec with MockitoSugar {
   "Contacting You Form Details" must {

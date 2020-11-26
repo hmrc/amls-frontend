@@ -18,18 +18,14 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.EmptyForm
 import javax.inject.Inject
-import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing}
-import models.responsiblepeople.ResponsiblePerson
+import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import uk.gov.hmrc.auth.core.AuthConnector
-import utils.{AuthAction, ControllerHelper}
-import play.api.Logger
+import utils.AuthAction
 import views.html.businessactivities._
-import views.html.deregister.deregistration_reason
-import views.html.registrationprogress.registration_progress
+import play.api.Logger
 
 class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,
                                       val authConnector: AuthConnector,
@@ -38,7 +34,6 @@ class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector
                                       val ds: CommonPlayDependencies,
                                       val cc: MessagesControllerComponents,
                                       what_you_need: what_you_need) extends AmlsBaseController(ds, cc) {
-import scala.concurrent.Future
 
   def get = authAction.async {
     implicit request =>

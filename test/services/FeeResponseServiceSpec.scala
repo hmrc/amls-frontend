@@ -25,7 +25,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.http.NotFoundException
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 
 
 import scala.concurrent.Future

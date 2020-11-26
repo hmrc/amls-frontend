@@ -103,9 +103,6 @@ class RemoveBusinessTypesController @Inject()(
 
       }
 
-
-
-
   private def getFormData(credId: String)(implicit hc: HeaderCarrier) = for {
     model <- businessMatchingService.getModel(credId)
     activities <- OptionT.fromOption[Future](model.activities) map {

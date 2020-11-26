@@ -41,10 +41,8 @@ class AssetsController @Inject()(errorHandler: HttpErrorHandler,
     ))
 
   def countries = Action {
-    implicit request => {
       countriesJson.fold[Result](InternalServerError) { j =>
         Ok(j.toString()).as("application/json")
       }
-    }
   }
 }

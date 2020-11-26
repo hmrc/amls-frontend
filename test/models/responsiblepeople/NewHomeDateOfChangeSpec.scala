@@ -19,8 +19,7 @@ package models.responsiblepeople
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsString, _}
-
+import play.api.libs.json._
 
 class NewHomeDateOfChangeSpec extends PlaySpec {
   "NewHomeDateOfChange" must {

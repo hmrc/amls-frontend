@@ -17,12 +17,10 @@
 package utils
 
 import forms.EmptyForm
-import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
 import models.businessmatching._
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
-import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
-import org.joda.time.LocalDate
+import models.tradingpremises.Address
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 

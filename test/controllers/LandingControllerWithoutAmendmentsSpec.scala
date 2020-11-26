@@ -33,14 +33,14 @@ import models.{status => _, _}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import play.api.mvc.{BodyParsers, MessagesActionBuilder, Result}
+import play.api.mvc.{BodyParsers, Result}
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 import views.html.start
 
 import scala.concurrent.Future
@@ -133,7 +133,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
         when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
         when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-          .thenReturn(Future.successful(rejectedStatusGen.sample.get, None))
+          .thenReturn(Future.successful((rejectedStatusGen.sample.get, None)))
 
         val result: Future[Result] = controllerNoAmlsNumber.get()(request)
 
@@ -147,7 +147,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       "the landing service has a saved form and " when {
         "the form has not been submitted" in new Fixture {
           when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-            .thenReturn(Future.successful(NotCompleted, None))
+            .thenReturn(Future.successful((NotCompleted, None)))
 
           val complete = mock[BusinessMatching]
           val emptyCacheMap = mock[CacheMap]
@@ -176,7 +176,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
             .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
           when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
-            .thenReturn(Future.successful(SubmissionReady, None))
+            .thenReturn(Future.successful((SubmissionReady, None)))
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)

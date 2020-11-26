@@ -22,7 +22,6 @@ import models.FormTypes.{supervisionEndDateRule, localDateWrite}
 import org.joda.time.LocalDate
 import play.api.libs.json.{Json, Reads, Writes}
 import play.api.libs.json.JodaWrites._
-import play.api.libs.json.JodaReads._
 
 case class SupervisionEnd(endDate: LocalDate)
 

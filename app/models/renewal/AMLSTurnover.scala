@@ -38,7 +38,7 @@ object AMLSTurnover {
 
   implicit val formRule: Rule[UrlFormEncoded, AMLSTurnover] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    import models.FormTypes._
+
     (__ \ "turnover").read[String].withMessage("error.required.renewal.ba.turnover.from.mlr") flatMap {
       case "01" => First
       case "02" => Second
@@ -54,7 +54,7 @@ object AMLSTurnover {
 
   def formRuleWithErrorMsg(message: String = ""): Rule[UrlFormEncoded, AMLSTurnover] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    import models.FormTypes._
+
     (__ \ "turnover").read[String].withMessage(message) flatMap {
       case "01" => First
       case "02" => Second

@@ -186,6 +186,7 @@ object Eab {
 
     import play.api.libs.functional.syntax._
     import play.api.libs.json.Reads._
+    import scala.language.postfixOps
 
     val oldModelTransformer:Reads[JsObject] = (servicesTransform and isRedressTransform and
       (__ \ 'data ++ dateOfChange).json.copyFrom(readPathOrReturn(__ \ 'dateOfChange, JsNull)) and

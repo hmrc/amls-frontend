@@ -22,12 +22,9 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision._
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthAction
-
 import views.html.supervision.supervision_end_reasons
-
 import scala.concurrent.Future
 
 class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -79,7 +76,7 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
     supervision.anotherBody(updatedAnotherBody).copy(hasAccepted = true)
   }
 
-  private def redirectTo(edit: Boolean, cache: CacheMap)(implicit headerCarrier: HeaderCarrier) = {
+  private def redirectTo(edit: Boolean, cache: CacheMap) = {
       import utils.ControllerHelper.supervisionComplete
 
         supervisionComplete(cache) match {

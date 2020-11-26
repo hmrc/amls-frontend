@@ -25,6 +25,7 @@ import play.api.i18n.Messages.Implicits._
 import play.api.i18n.{Lang, Messages}
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{Reads, Writes, _}
+import play.api.Logger
 
 case class BusinessActivities(businessActivities: Set[BusinessActivity],
                               additionalActivities: Option[Set[BusinessActivity]] = None,
@@ -128,8 +129,10 @@ object BusinessActivities {
     TelephonePaymentService
   )
 
-  implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
+  implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] = {
+    Logger.info(s"${p.toString}")
     FormTypes.businessActivityRule("error.required.bm.register.service")
+  }
 
   implicit def formWrites(implicit w: Write[BusinessActivity, String]) = Write[BusinessActivities, UrlFormEncoded](activitiesWriter _)
 
@@ -151,8 +154,11 @@ object BusinessActivities {
 
   def combinedReader(count: Int, msg: String) = formReaderMinLengthR(msg) andThen maxLengthValidator(count).repath(_ => Path \ "businessActivities")
 
-  implicit def activitySetWrites(implicit w: Write[BusinessActivity, String]) = Write[Set[BusinessActivity], UrlFormEncoded] { activities =>
-    Map("businessActivities[]" -> activities.toSeq.map { a => BusinessActivities.getValue(a) })
+  implicit def activitySetWrites(implicit w: Write[BusinessActivity, String]) = {
+    Logger.info(s"${w.toString}")
+    Write[Set[BusinessActivity], UrlFormEncoded] { activities =>
+      Map("businessActivities[]" -> activities.toSeq.map { a => BusinessActivities.getValue(a) })
+    }
   }
 
   implicit val format = Json.writes[BusinessActivities]

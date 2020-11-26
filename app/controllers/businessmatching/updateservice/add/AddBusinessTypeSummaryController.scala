@@ -25,13 +25,10 @@ import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPageId}
 import play.api.mvc.MessagesControllerComponents
-import models.responsiblepeople.ResponsiblePerson
-import models.tradingpremises.TradingPremises
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.{StatusService, TradingPremisesService}
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AuthAction, RepeatingSection, StatusConstants}
+import utils.{AuthAction, RepeatingSection}
 import views.html.businessmatching.updateservice.add.update_services_summary
 
 import scala.concurrent.Future

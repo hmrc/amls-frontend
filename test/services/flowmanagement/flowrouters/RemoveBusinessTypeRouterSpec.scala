@@ -16,7 +16,6 @@
 
 package services.flowmanagement.flowrouters
 
-
 import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
@@ -30,15 +29,11 @@ import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import org.scalacheck.Gen
 import play.api.mvc.Results.Redirect
-import org.mockito.Matchers._
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.flowrouters.businessmatching.RemoveBusinessTypeRouter
 import services.flowmanagement.pagerouters.removeflow._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-
-
-
 
 class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerator {
 

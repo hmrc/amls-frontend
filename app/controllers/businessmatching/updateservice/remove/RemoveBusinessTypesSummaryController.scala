@@ -28,9 +28,7 @@ import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-
 import views.html.businessmatching.updateservice.remove.remove_activities_summary
-
 import scala.concurrent.Future
 
 class RemoveBusinessTypesSummaryController @Inject()(authAction: AuthAction,

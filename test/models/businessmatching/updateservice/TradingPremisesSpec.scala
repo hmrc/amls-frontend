@@ -17,7 +17,7 @@
 package models.businessmatching.updateservice
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
+import models.tradingpremises.TradingPremises
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 

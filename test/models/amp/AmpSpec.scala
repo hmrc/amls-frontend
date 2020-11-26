@@ -15,19 +15,15 @@
  */
 
 package models.amp
-import java.time.{LocalDate, LocalDateTime, ZoneOffset}
 
+import java.time.{LocalDate, LocalDateTime}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.AMPTurnover
-import play.api.libs.json.{JsError, JsPath, Json}
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import org.mockito.Mockito._
-import org.scalatest.MustMatchers
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Call
-
 import scala.collection.Seq
 
 trait AmpValues {

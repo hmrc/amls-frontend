@@ -156,7 +156,7 @@ object TradingPremises {
             _.isComplete
           } => Section(messageKey, Completed, anyChanged(tp), controllers.tradingpremises.routes.YourTradingPremisesController.get())
           case _ =>
-            val index = tp.indexWhere {
+            tp.indexWhere {
               case model if !model.isComplete => true
               case _ => false
             }

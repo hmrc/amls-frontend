@@ -30,9 +30,6 @@ import services.{AuthEnrolmentsService, StatusService}
 import utils.{AckRefGenerator, AuthAction}
 import views.html.deregister.deregistration_reason
 
-import scala.concurrent.Future
-
-
 class DeregistrationReasonController @Inject()(authAction: AuthAction,
                                                val ds: CommonPlayDependencies,
                                                val dataCacheConnector: DataCacheConnector,

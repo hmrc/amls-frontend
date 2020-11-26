@@ -27,7 +27,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.responsiblepeople.address.current_address
 
-
 import scala.concurrent.Future
 
 class CurrentAddressController @Inject ()(val dataCacheConnector: DataCacheConnector,

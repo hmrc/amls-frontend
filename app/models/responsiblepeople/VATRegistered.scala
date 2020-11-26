@@ -30,7 +30,8 @@ object VATRegistered {
 
   import models.FormTypes._
   import utils.MappingUtils.Implicits._
-  import cats.data.Validated.{Invalid, Valid}
+  import cats.data.Validated.Valid
+
   implicit val formRule: Rule[UrlFormEncoded, VATRegistered] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     (__ \ "registeredForVAT").read[Boolean].withMessage("error.required.rp.registered.for.vat") flatMap {

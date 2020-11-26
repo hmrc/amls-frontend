@@ -30,7 +30,6 @@ case object NoPassport extends NonUKPassport
 object NonUKPassport {
 
   import FormTypes._
-  import jto.validation.forms.Rules._
   import utils.MappingUtils.Implicits._
 
   private val nonUKPassportRequired = required("error.required.non.uk.passport.number")

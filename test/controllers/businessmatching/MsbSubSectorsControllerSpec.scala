@@ -33,7 +33,7 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.services
 
 
@@ -67,7 +67,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
     when {
       controller.helper.updateSubSectors(any(), any())(any(), any())
-    } thenReturn Future.successful(mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty)
+    } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
     def setupModel(model: Option[BusinessMatching]): Unit = when {
       controller.businessMatchingService.getModel(any())(any())

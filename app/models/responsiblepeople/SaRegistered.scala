@@ -21,7 +21,7 @@ import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 import jto.validation.forms.Rules._
 import utils.MappingUtils.Implicits._
-import cats.data.Validated.{Invalid, Valid}
+import cats.data.Validated.Valid
 
 sealed trait SaRegistered
 

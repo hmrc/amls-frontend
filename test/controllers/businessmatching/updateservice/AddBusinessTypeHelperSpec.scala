@@ -22,20 +22,16 @@ import controllers.actions.SuccessfulAuthAction
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
 import models.businessactivities.{AccountantForAMLSRegulations, InvolvedInOtherNo, TaxMatters, WhoIsYourAccountant, BusinessActivities => BABusinessActivities}
-import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister}
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.flowmanagement.AddBusinessTypeFlowModel
-import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.supervision._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{never, verify, when}
-import org.scalacheck.Gen
+import org.mockito.Mockito.{never, verify}
 import play.api.test.Helpers._
 import services.{ResponsiblePeopleService, TradingPremisesService}
 import utils._
-
-
 
 //noinspection ScalaStyle
 class AddBusinessTypeHelperSpec extends AmlsSpec

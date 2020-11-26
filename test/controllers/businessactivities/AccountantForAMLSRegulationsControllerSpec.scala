@@ -28,11 +28,9 @@ import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
 import views.html.businessactivities.accountant_for_amls_regulations
 
 import scala.concurrent.Future
-
 
 class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSugar {
 

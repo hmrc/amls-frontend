@@ -88,7 +88,7 @@ object TcspTypes {
   implicit val jsonReads: Reads[TcspTypes] = {
     import play.api.libs.json._
     import play.api.libs.json.Reads._
-    import play.api.libs.functional.syntax._
+
     (__ \ "serviceProviders").read[Set[String]].flatMap { x: Set[String] =>
       x.map {
         case "01" => Reads(_ => JsSuccess(NomineeShareholdersProvider)) map identity[ServiceProvider]

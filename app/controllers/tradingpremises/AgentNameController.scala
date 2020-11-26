@@ -36,7 +36,6 @@ import views.html.tradingpremises.agent_name
 
 import scala.concurrent.Future
 
-
 @Singleton
 class AgentNameController @Inject()(
                                      val dataCacheConnector: DataCacheConnector,

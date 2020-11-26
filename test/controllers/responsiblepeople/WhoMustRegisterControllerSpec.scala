@@ -22,7 +22,6 @@ import org.scalatest.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.AuthorisedFixture
 import views.html.responsiblepeople.who_must_register
 
 class WhoMustRegisterControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {

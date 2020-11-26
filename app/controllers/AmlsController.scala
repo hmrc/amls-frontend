@@ -42,7 +42,6 @@ class AmlsController @Inject()(authAction: AuthAction,
   }
 
   val keep_alive = authAction.async {
-      implicit request =>
         Future.successful(Ok("OK"))
   }
 }

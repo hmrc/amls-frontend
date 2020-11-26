@@ -20,12 +20,8 @@ import config.ApplicationConfig
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import play.api.{Configuration, Environment}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.http.{HttpPost, HttpResponse}
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.play.http.ws.WSHttp
 import utils.AmlsSpec
 
 import scala.concurrent.duration._

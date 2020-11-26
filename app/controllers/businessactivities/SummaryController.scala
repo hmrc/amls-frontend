@@ -26,7 +26,7 @@ import models.businessactivities.BusinessActivities
 import models.businessmatching.{AccountancyServices, BusinessMatching}
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
-import utils.{AuthAction, ControllerHelper}
+import utils.AuthAction
 import views.html.businessactivities.summary
 
 class SummaryController @Inject() (val dataCache: DataCacheConnector,

@@ -21,12 +21,11 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BusinessActivity, BusinessMatching}
+import models.businessmatching.BusinessMatching
 import play.api.i18n.Messages
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-
 import views.html.businessmatching.updateservice.remove.unable_to_remove_activity
 
 import scala.concurrent.Future

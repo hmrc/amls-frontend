@@ -40,7 +40,7 @@ import services.{ProgressService, RenewalService, SectionsProvider, StatusServic
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.auth.core.AuthConnector
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction}
 
 
 import scala.concurrent.Future

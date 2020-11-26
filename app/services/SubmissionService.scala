@@ -16,7 +16,6 @@
 
 package services
 
-import com.fasterxml.jackson.core.JsonParseException
 import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector, BusinessMatchingConnector}
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
@@ -41,7 +40,7 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.tradingpremises.TradingPremises.FilterUtils
 import play.api.http.Status.UNPROCESSABLE_ENTITY
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.Format
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse}
 import utils.StatusConstants
@@ -58,22 +57,11 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
 
   private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String, groupId: Option[String], credId: String)
                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[_] =
-
     if (config.enrolmentStoreToggle) {
       authEnrolmentsService.enrol(amlsRegistrationNumber, postcode, groupId, credId)
     } else {
       ggService.enrol(amlsRegistrationNumber, safeId, postcode)
     }
-
-  private def errorResponse(response: Upstream4xxResponse): Option[SubscriptionErrorResponse] = response match {
-    case e if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
-      try {
-        Json.parse(e.getMessage).asOpt[SubscriptionErrorResponse]
-      } catch {
-        case _: JsonParseException => None
-      }
-    case _ => None
-  }
 
   def subscribe(credId: String, accountTypeId: (String, String), groupId: Option[String])
                (implicit ec: ExecutionContext, hc: HeaderCarrier, request: Request[_]): Future[SubscriptionResponse] = {

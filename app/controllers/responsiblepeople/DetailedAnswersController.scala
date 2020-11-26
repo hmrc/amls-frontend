@@ -36,7 +36,6 @@ import views.html.responsiblepeople.detailed_answers
 
 import scala.concurrent.Future
 
-
 class DetailedAnswersController @Inject () (
                                              val dataCacheConnector: DataCacheConnector,
                                              authAction: AuthAction,
@@ -68,7 +67,7 @@ class DetailedAnswersController @Inject () (
         }
   }
 
-  private def redirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, cache: CacheMap, index: Int, flow: Option[String] = None, businessMatching: BusinessMatching)
+  private def redirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, cache: CacheMap, index: Int, flow: Option[String], businessMatching: BusinessMatching)
                       (implicit request: Request[_]) =
     (for {
       responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)

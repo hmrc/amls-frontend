@@ -27,8 +27,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection}
 import views.html.tradingpremises.activity_start_date
 
-
-
 @Singleton
 class ActivityStartDateController @Inject()(override val messagesApi: MessagesApi,
                                             val authAction: AuthAction,

@@ -26,7 +26,7 @@ import models.businessmatching._
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AuthAction, ControllerHelper}
+import utils.AuthAction
 import views.html.businessactivities._
 import cats.implicits._
 

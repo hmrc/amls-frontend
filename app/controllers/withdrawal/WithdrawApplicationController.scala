@@ -29,7 +29,6 @@ import views.html.withdrawal.withdraw_application
 
 import scala.concurrent.Future
 
-
 class WithdrawApplicationController @Inject()(
                                                authAction: AuthAction,
                                                val ds: CommonPlayDependencies,
@@ -58,8 +57,7 @@ class WithdrawApplicationController @Inject()(
   }
 
   def post = authAction.async {
-      implicit request =>
-        Future.successful(Redirect(routes.WithdrawalReasonController.get()))
+    Future.successful(Redirect(routes.WithdrawalReasonController.get()))
   }
 
 }

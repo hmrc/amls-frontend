@@ -26,7 +26,7 @@ import org.mockito.Matchers.{any, eq => eqTo}
 import models.tradingpremises.{ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, TransmittingMoney => TPTransmittingMoney, ChequeCashingNotScrapMetal => _, _}
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 
 
 import scala.concurrent.Future

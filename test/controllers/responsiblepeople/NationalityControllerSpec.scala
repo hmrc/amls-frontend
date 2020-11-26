@@ -207,7 +207,6 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      val prt = pResidenceType.copy(nationality = Some(Country("France", "FR")))
       val responsiblePeople1 = ResponsiblePerson(None, personResidenceType = Some(pResidenceType))
 
       when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(responsiblePeople1)))(any(), any()))

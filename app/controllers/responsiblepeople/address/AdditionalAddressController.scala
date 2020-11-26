@@ -27,7 +27,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.address.additional_address
 
-
 import scala.concurrent.Future
 
 @Singleton

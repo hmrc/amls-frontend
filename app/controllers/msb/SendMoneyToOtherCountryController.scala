@@ -25,11 +25,8 @@ import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, Cu
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry}
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-
 import views.html.msb.send_money_to_other_country
-
 import scala.concurrent.Future
 
 class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -105,8 +102,7 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
             (services.contains(ForeignExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty)
   }
 
-  private def routing(services: Set[BusinessMatchingMsbService], register: ServiceChangeRegister, msb: MoneyServiceBusiness, edit: Boolean)
-                     (implicit hc: HeaderCarrier) = {
+  private def routing(services: Set[BusinessMatchingMsbService], register: ServiceChangeRegister, msb: MoneyServiceBusiness, edit: Boolean) = {
 
     val (ceQuestion, fxQuestion) = (shouldAnswerCurrencyExchangeQuestion(services, register, msb), shouldAnswerForeignExchangeQuestion(services, register, msb))
 

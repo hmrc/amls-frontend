@@ -39,7 +39,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.TradingPremisesService
 import services.businessmatching.BusinessMatchingService
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.add.update_services_summary
 
 

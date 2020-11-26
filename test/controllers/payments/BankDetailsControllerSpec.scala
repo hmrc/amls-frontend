@@ -30,7 +30,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, FeeResponseService, RenewalService}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.payments.bank_details
 
 import scala.concurrent.{ExecutionContext, Future}

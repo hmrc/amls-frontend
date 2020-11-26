@@ -26,10 +26,8 @@ import models.hvd.Hvd
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-
 import utils.{DateOfChangeHelper, RepeatingSection}
 import views.html.date_of_change
-
 import scala.concurrent.Future
 
 class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheConnector,

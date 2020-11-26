@@ -22,7 +22,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatchingMsbService, TelephonePaymentService, TrustAndCompanyServices}
+import models.businessmatching.{AccountancyServices, BillPaymentServices, TelephonePaymentService, TrustAndCompanyServices}
 import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId}
 import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router

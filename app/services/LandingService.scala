@@ -118,7 +118,6 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
   /* **********
    * Privates *
    ************/
-
   private def upsertCacheEntries(appCache: CacheMap, viewResponse: ViewResponse, subscriptionResponse: Option[SubscriptionResponse],
                                  amendVariationResponse: Option[AmendVariationRenewalResponse], amlsRegistrationNo: String,
                                  accountTypeId: (String, String), cacheId: String)

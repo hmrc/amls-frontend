@@ -26,7 +26,6 @@ import play.api.Logger
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.experience_training
-
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 

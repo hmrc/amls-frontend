@@ -23,7 +23,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.Helpers.{OK, contentAsString, status, _}
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.remove.need_more_information
 
 class NeedMoreInformationControllerSpec extends AmlsSpec {

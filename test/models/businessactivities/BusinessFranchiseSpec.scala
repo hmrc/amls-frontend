@@ -16,7 +16,6 @@
 
 package models.businessactivities
 
-import models.FormTypes
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}

@@ -20,7 +20,6 @@ import cats.data.Validated.Valid
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, To, Write}
-import models.FormTypes._
 import play.api.libs.json.Json
 
 case class AgentRemovalReason(removalReason: String, removalReasonOther: Option[String] = None)

@@ -22,7 +22,6 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessdetails.{BusinessDetails, RegisteredOfficeNonUK, RegisteredOfficeUK}
-import org.joda.time.LocalDate
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.{AuthAction, DateOfChangeHelper}

@@ -19,7 +19,6 @@ package models.renewal
 import models.Country
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
-import models.moneyservicebusiness.MostTransactions
 import play.api.libs.json.{Reads, Writes, __}
 import utils.TraversableValidators
 

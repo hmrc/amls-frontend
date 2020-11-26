@@ -31,7 +31,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
 
 class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec

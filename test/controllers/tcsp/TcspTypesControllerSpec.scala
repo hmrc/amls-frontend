@@ -22,13 +22,9 @@ import models.tcsp._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach}
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.mvc.Result
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.tcsp.service_provider_types
 
 import scala.concurrent.Future

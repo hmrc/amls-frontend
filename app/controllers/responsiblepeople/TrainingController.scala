@@ -16,7 +16,6 @@
 
 package controllers.responsiblepeople
 
-import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
@@ -28,7 +27,6 @@ import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.training
 
 import scala.concurrent.Future
-
 
 class TrainingController @Inject()(
                                     override val messagesApi: MessagesApi,

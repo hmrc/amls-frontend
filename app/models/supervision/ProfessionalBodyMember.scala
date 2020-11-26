@@ -19,7 +19,6 @@ package models.supervision
 import jto.validation._
 import jto.validation.forms.Rules.{minLength => _, _}
 import jto.validation.forms.UrlFormEncoded
-import play.api.libs.json.Reads.StringReads
 import play.api.libs.json._
 
 sealed trait ProfessionalBodyMember

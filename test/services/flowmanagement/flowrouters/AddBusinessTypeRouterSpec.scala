@@ -19,7 +19,6 @@ package services.flowmanagement.flowrouters
 import cats.data.OptionT
 import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
-import models.businessmatching.updateservice.TradingPremisesActivities
 import models.businessmatching.{BillPaymentServices, BusinessActivity, HighValueDealing, TelephonePaymentService, _}
 import models.flowmanagement._
 import org.mockito.Matchers.any

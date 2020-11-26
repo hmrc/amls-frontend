@@ -17,7 +17,7 @@
 package models.businessdetails
 
 import org.joda.time.{DateTimeFieldType, LocalDate}
-import jto.validation.{To, Write, From, Rule}
+import jto.validation.{Write, From, Rule}
 import jto.validation.forms._
 import play.api.libs.json.Json
 import models.FormTypes._

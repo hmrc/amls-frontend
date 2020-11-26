@@ -17,7 +17,7 @@
 package models.businessdetails
 
 import jto.validation.forms._
-import jto.validation.{From, Rule, To, Write}
+import jto.validation.{To, Write}
 import play.api.libs.json.Json
 
 case class ContactingYou(

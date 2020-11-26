@@ -19,8 +19,7 @@ package models.businessactivities
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
-
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class IdentifySuspiciousActivitySpec extends PlaySpec {
 

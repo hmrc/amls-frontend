@@ -26,20 +26,16 @@ sealed trait Field {
   def value: Seq[String]
   def errors: Seq[ValidationError]
 
-  val name: String =
-    PM.asKey(path)
+  val name: String = PM.asKey(path)
 
   val id: String =
     name.replaceAll("\\.", "-").replaceAll("\\[]", "")
 
-  def hasErrors: Boolean =
-    errors.nonEmpty
+  def hasErrors: Boolean = errors.nonEmpty
 
-  def error(implicit lang: Lang = Lang.defaultLang): String =
-    errors.toMessage
+  def error(implicit lang: Lang = Lang.defaultLang): String = errors.toMessage
 
-  def rpError(implicit lang: Lang = Lang.defaultLang): String =
-    errors.headOption.map(_.message)
+  def rpError(): String = errors.headOption.map(_.message)
 
 }
 

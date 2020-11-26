@@ -30,7 +30,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import utils.{AmlsSpec, StatusConstants}
 import views.html.tradingpremises.remove_trading_premises
 
 import scala.concurrent.Future

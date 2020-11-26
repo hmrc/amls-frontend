@@ -191,7 +191,6 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
 
   def removeFlowData(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, RemoveBusinessTypeFlowModel] = {
     val emptyModel = RemoveBusinessTypeFlowModel()
-
     OptionT.liftF(dataCacheConnector.save(credId, RemoveBusinessTypeFlowModel.key, RemoveBusinessTypeFlowModel())) map { _ => emptyModel }
   }
 }

@@ -21,7 +21,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
-import utils.{AuthAction, ControllerHelper}
+import utils.AuthAction
 import play.api.Logger
 import views.html.tradingpremises._
 

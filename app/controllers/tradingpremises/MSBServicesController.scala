@@ -31,7 +31,6 @@ import views.html.tradingpremises.msb_services
 
 import scala.concurrent.Future
 
-
 class MSBServicesController @Inject () (
                                        val dataCacheConnector: DataCacheConnector,
                                        val authAction: AuthAction,
@@ -76,8 +75,6 @@ class MSBServicesController @Inject () (
       }
   }
 
-
-
   private def redirectBasedOnStatus(status: SubmissionStatus,
                                     tradingPremises: Option[TradingPremises],
                                     data:TradingPremisesMsbServices,
@@ -119,6 +116,6 @@ class MSBServicesController @Inject () (
       }
   }
 
-  private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], msbServices: TradingPremisesMsbServices, force: Boolean = false, status: SubmissionStatus) =
+  private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], msbServices: TradingPremisesMsbServices, force: Boolean, status: SubmissionStatus) =
     !tradingPremises.get.msbServices.contains(msbServices) && isEligibleForDateOfChange(status) || force
 }

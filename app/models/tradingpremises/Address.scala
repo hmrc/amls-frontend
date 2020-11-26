@@ -20,7 +20,7 @@ import models.{Country, DateOfChange}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, To, Write}
 import models.FormTypes.genericAddressRule
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.{Reads, Writes}
 import models.businesscustomer.{Address => BCAddress}
 
 case class Address(
@@ -44,7 +44,6 @@ case class Address(
 }
 
 object Address {
-  import utils.MappingUtils.Implicits._
 
   def applyWithoutDateOfChange(address1: String, address2: String, address3: Option[String], address4: Option[String], postcode: String) =
     Address(address1, address2, address3, address4, postcode)

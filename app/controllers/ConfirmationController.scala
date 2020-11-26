@@ -66,7 +66,7 @@ class ConfirmationController @Inject()(authAction: AuthAction,
   }
 
   private def showRenewalConfirmation(fees: FeeResponse, status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus], credId: String)
-                                     (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
+                                     (implicit request: Request[AnyContent]) = {
 
     confirmationService.isRenewalDefined(credId) map { isRenewalDefined =>
       if (isRenewalDefined) {
@@ -85,7 +85,7 @@ class ConfirmationController @Inject()(authAction: AuthAction,
   }
 
   private def showAmendmentVariationConfirmation(fees: FeeResponse, status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus])
-                                                (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
+                                                (implicit request: Request[AnyContent]) = {
 
     val amount = fees.toPay(status, submissionRequestStatus)
 

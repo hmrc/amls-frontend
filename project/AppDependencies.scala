@@ -38,7 +38,10 @@ private object AppDependencies {
     "com.beachape" %% "enumeratum-play" % "1.5.15",
     "com.squareup.okhttp3" % "mockwebserver" % okHttpVersion,
     "com.typesafe.play" %% "play-json" % "2.6.14",
-    "com.typesafe.play" %% "play-json-joda" % "2.6.14"
+    "com.typesafe.play" %% "play-json-joda" % "2.6.14",
+    
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.1" cross CrossVersion.full),
+    "com.github.ghik" % "silencer-lib" % "1.7.1" % Provided cross CrossVersion.full
   )
 
   trait ScopeDependencies {

@@ -18,14 +18,10 @@ package services
 
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
-
-import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
-import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
+import models.responsiblepeople.ResponsiblePerson
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{RepeatingSection, StatusConstants}
-
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnector) extends RepeatingSection {

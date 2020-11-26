@@ -19,7 +19,7 @@ package models.hvd
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
-import play.api.libs.json.{JsPath, Json, JsSuccess}
+import play.api.libs.json.Json
 
 class PaymentMethodSpec extends PlaySpec {
 

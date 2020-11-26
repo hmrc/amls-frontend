@@ -36,7 +36,7 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 import views.html.confirmation.{confirmation_bacs, confirmation_bacs_transitional_renewal}
 
 import scala.concurrent.Future

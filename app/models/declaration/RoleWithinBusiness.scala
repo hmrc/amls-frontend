@@ -84,7 +84,6 @@ object RoleWithinBusiness {
   }
 
   implicit val jsonReads: Reads[RoleWithinBusiness] = {
-    import play.api.libs.functional.syntax._
     import play.api.libs.json._
 
     (__ \ "roleWithinBusiness").read[String].flatMap[RoleWithinBusiness] {

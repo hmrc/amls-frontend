@@ -31,7 +31,6 @@ import play.api.Logger
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 
-
 class SummaryController @Inject()(
                                   val dataCache: DataCacheConnector,
                                   val authAction: AuthAction,

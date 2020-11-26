@@ -16,7 +16,7 @@
 
 package controllers.businessmatching
 
-import connectors.{DataCacheConnector, KeystoreConnector}
+import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching.{BusinessMatching, BusinessType}
@@ -29,8 +29,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.auth.core.AuthConnector
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction}
 
 import scala.concurrent.Future
 

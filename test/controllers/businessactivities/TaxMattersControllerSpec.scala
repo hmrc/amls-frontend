@@ -30,9 +30,7 @@ import play.api.i18n.Messages
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
 import views.html.businessactivities.tax_matters
-
 import scala.concurrent.Future
 
 class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{

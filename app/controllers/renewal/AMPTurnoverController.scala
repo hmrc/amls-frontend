@@ -21,12 +21,11 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
-import models.renewal.{AMPTurnover, PercentageOfCashPaymentOver15000, Renewal}
+import models.renewal.{AMPTurnover, Renewal}
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.{AuthAction, ControllerHelper}
-import views.html.renewal.{amp_turnover, percentage}
-
+import views.html.renewal.amp_turnover
 
 import scala.concurrent.Future
 

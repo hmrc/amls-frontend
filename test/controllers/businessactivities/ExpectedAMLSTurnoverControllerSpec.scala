@@ -32,7 +32,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 import views.html.businessactivities.expected_amls_turnover
 
 import scala.concurrent.{ExecutionContext, Future}

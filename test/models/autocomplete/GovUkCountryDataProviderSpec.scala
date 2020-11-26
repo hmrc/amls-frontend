@@ -17,8 +17,7 @@
 package models.autocomplete
 
 import java.io.StringBufferInputStream
-
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec

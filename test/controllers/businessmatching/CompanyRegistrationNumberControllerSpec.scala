@@ -30,7 +30,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, CacheMocks, StatusMocks}
+import utils.{AmlsSpec, CacheMocks, StatusMocks}
 import views.html.businessmatching.company_registration_number
 
 import scala.concurrent.{ExecutionContext, Future}

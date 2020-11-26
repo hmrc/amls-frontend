@@ -22,10 +22,8 @@ import models.enrolment.{EnrolmentIdentifier, GovernmentGatewayEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HttpGet
 import uk.gov.hmrc.http.HttpClient
 import utils.AmlsSpec
-
 
 import scala.concurrent.Future
 

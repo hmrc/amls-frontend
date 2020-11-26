@@ -20,12 +20,10 @@ import jto.validation._
 import jto.validation.forms.PM.PM
 import jto.validation.forms._
 import jto.validation.ValidationError
-import play.api.libs.functional.{Functor, Monoid}
 import jto.validation.GenericRules
 import jto.validation.forms.PM._
 import play.api.libs.json.{JsValue, Json, JsObject}
-
-import scala.collection.{GenTraversableOnce, TraversableLike}
+import scala.collection.TraversableLike
 import cats.data.Validated.{Valid, Invalid}
 
 // $COVERAGE-OFF$
@@ -39,8 +37,10 @@ object TraversableValidators {
       _ map r
     }
 
-  implicit def flattenR[A]: Rule[Seq[Option[A]], Seq[A]] =
+  implicit def flattenR[A]: Rule[Seq[Option[A]], Seq[A]] = {
+    import scala.language.postfixOps
     Rule.zero[Seq[Option[A]]] map { _ flatten }
+  }
 
   def minLengthR[T <: Traversable[_]](l : Int) : Rule[T, T] =
     GenericRules.validateWith[T]("error.required") {
@@ -71,7 +71,7 @@ object GenericValidators {
 
 trait MappingUtils {
 
-  import play.api.libs.json.{Reads, JsSuccess, JsError}
+  import play.api.libs.json.{Reads, JsSuccess}
 
   def constant[A](a: A): Reads[A] = Reads(_ => JsSuccess(a))
 
@@ -108,7 +108,7 @@ trait MappingUtils {
             case (list, n) =>
               list :+ n
           })
-          m.updated(path, m.getOrElse(path, Seq.empty) :+ (path, v))
+          m.updated(path, m.getOrElse(path, Seq.empty) :+ ((path, v)))
       }.map {
         case (p, vs) =>
           {PM.asKey(p)} -> vs.map(_._2)

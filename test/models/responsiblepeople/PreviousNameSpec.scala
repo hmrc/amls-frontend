@@ -16,7 +16,6 @@
 
 package models.responsiblepeople
 
-import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded

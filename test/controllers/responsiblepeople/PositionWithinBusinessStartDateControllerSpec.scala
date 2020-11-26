@@ -34,7 +34,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
+import utils.{AmlsSpec, StatusConstants}
 import views.html.responsiblepeople.position_within_business_start_date
 
 import scala.concurrent.Future
@@ -111,7 +111,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
         val mockCacheMap = mock[CacheMap]
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
           Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
-        val businessMatching = BusinessMatching(Some(reviewDtls))
+
         when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
@@ -134,7 +134,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
         val mockCacheMap = mock[CacheMap]
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
           Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
-        val businessMatching = BusinessMatching(Some(reviewDtls))
+
         when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
@@ -243,7 +243,6 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
             .thenReturn (Future.successful (Some (mockCacheMap) ) )
             val result = controller.post (RecordId) (newRequest)
             status (result) must be (BAD_REQUEST)
-            val document: Document = Jsoup.parse (contentAsString (result) )
           }
       }
 

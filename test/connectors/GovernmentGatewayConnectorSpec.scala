@@ -16,7 +16,6 @@
 
 package connectors
 
-import config.ApplicationConfig
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator, GovernmentGatewayGenerator}
 import models.governmentgateway.EnrolmentRequest
@@ -26,11 +25,9 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, HttpClient}
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.{Audit, DataEvent}
 import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
 import utils.{AmlsSpec, DependencyMocks}
-
 
 import scala.concurrent.Future
 

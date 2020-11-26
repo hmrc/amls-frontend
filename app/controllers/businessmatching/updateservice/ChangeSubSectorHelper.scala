@@ -26,9 +26,7 @@ import models.tradingpremises.TradingPremisesMsbServices.{convertServices, conve
 import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-
 import scala.concurrent.{ExecutionContext, Future}
-
 
 class ChangeSubSectorHelper @Inject()(authAction: AuthAction,
                                       implicit val dataCacheConnector: DataCacheConnector) {

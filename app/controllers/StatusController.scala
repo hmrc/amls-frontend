@@ -29,7 +29,7 @@ import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AuthAction, BusinessName, ControllerHelper}
+import utils.{AuthAction, BusinessName}
 import views.html.include.status._
 import views.html.status._
 import views.html.status.components.{fee_information, registration_status, withdraw_or_deregister_information}
@@ -220,7 +220,6 @@ class StatusController @Inject()(val landingService: LandingService,
     statusInfo match {
       case (SubmissionDecisionApproved, statusDtls) => {
         val endDate = statusDtls.fold[Option[LocalDate]](None)(_.currentRegYearEndDate)
-        val activities = maybeActivities.map(_.businessActivities.map(_.getMessage())) getOrElse Set.empty
 
         Ok {
           your_registration(
@@ -315,8 +314,6 @@ class StatusController @Inject()(val landingService: LandingService,
                                  cacheId: String,
                                  unreadNotifications: Int)
                                 (implicit request: Request[AnyContent]) = {
-
-    val activities = maybeActivities.map(_.businessActivities.map(_.getMessage())) getOrElse Set.empty
 
     statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>

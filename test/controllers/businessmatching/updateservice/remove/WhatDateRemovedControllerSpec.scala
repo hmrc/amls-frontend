@@ -23,7 +23,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.date_of_change
 
 class WhatDateRemovedControllerSpec extends AmlsSpec {

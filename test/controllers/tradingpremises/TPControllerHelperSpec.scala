@@ -22,7 +22,6 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import org.mockito.Mockito._
 import org.mockito.Matchers._
 import cats.implicits._
-import cats._
 import config.ApplicationConfig
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import play.api.i18n.{Lang, Messages}

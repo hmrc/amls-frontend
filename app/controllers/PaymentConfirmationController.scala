@@ -26,8 +26,7 @@ import models.confirmation.Currency
 import models.payments._
 import models.renewal.Renewal
 import models.status._
-import models.{FeeResponse, ReadStatusResponse}
-import play.api.Logger
+import models.ReadStatusResponse
 import play.api.mvc.MessagesControllerComponents
 import models.ReadStatusResponse
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService}

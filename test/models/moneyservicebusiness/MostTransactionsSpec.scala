@@ -21,7 +21,7 @@ import org.scalatestplus.play.PlaySpec
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
-import play.api.libs.json.{JsPath, JsError, JsSuccess, Json}
+import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class MostTransactionsSpec extends PlaySpec {
 
@@ -108,10 +108,6 @@ class MostTransactionsSpec extends PlaySpec {
 
     "the second country is invalid" must {
       "fail validation" in {
-        import utils.MappingUtils.Implicits.RichRule
-        import utils.TraversableValidators
-        import TraversableValidators._
-
         val x: VA[MostTransactions] = MostTransactions.formR.validate(
           Map(
             "mostTransactionsCountries[0]" -> Seq("GB"),

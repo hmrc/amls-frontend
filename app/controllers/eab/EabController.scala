@@ -18,24 +18,17 @@ package controllers.eab
 
 import cats.implicits._
 import cats.data.OptionT
-import com.google.common.util.concurrent.Futures.FutureCombiner
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.eab.Eab
 import play.api.libs.json._
 import play.api.mvc.MessagesControllerComponents
-import services.{ProxyCacheService, StatusService}
+import services.ProxyCacheService
 import utils.AuthAction
 import models.businessmatching.{EstateAgentBusinessService => EAB}
-import models.status.{ReadyForRenewal, SubmissionStatus}
-import play.api.Logger
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
 import utils.DateOfChangeHelper
-
-
 
 class EabController @Inject()(proxyCacheService  : ProxyCacheService,
                               authAction         : AuthAction,

@@ -27,7 +27,6 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.date_of_change
-
 import scala.concurrent.Future
 
 class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,

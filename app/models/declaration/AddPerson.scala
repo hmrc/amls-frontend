@@ -16,7 +16,6 @@
 
 package models.declaration
 
-import config.ApplicationConfig
 import jto.validation.forms._
 import jto.validation.{From, Rule, To, Write}
 import models.declaration.release7.{RoleType, RoleWithinBusinessRelease7}

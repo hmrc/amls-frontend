@@ -31,7 +31,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.AmlsSpec
 import views.html.payments.ways_to_pay
 
 import scala.concurrent.{ExecutionContext, Future}

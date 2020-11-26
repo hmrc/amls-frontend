@@ -27,7 +27,6 @@ import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePerson}
 import models.status._
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.{SectionsProvider, StatusService}
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, DeclarationHelper}
 import views.html.declaration.select_business_nominated_officer
 
@@ -115,7 +114,7 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                       cacheId: String,
                       form: Form2[BusinessNominatedOfficer])
                      (fn: BusinessNominatedOfficer => Future[Result])
-                     (implicit hc: HeaderCarrier, request: Request[AnyContent]): Future[Result] = {
+                     (implicit request: Request[AnyContent]): Future[Result] = {
     form match {
       case f: InvalidForm => dataCacheConnector.fetch[Seq[ResponsiblePerson]](cacheId, ResponsiblePerson.key) flatMap {
         case Some(data) => businessNominatedOfficerView(amlsRegistrationNo, accountTypeId, cacheId, BadRequest, f, ResponsiblePerson.filter(data))

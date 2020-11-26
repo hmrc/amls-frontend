@@ -176,7 +176,7 @@ object FormTypes {
   private val monthPattern = regexWithMsg(monthRegex, "error.invalid.tp.month")
 
   private val yearRequired = required("error.required.tp.year")
-  private val yearPatternPost1900 = regexWithMsg(yearRegexPost1900, "error.invalid.year.post1900")
+
   private val yearPattern = regexWithMsg(yearRegexFourDigits, "error.invalid.year")
 
   val phoneNumberType = notEmptyStrip andThen
@@ -203,7 +203,7 @@ object FormTypes {
   val confirmEmailType = confirmEmailRequired andThen emailLengthWithMessage() andThen confirmEmailPattern
   val dayType = dayRequired andThen dayPattern
   val monthType = monthRequired andThen monthPattern
-  private val yearTypePost1900: Rule[String, String] = yearRequired andThen yearPatternPost1900
+
   private val yearType: Rule[String, String] = yearRequired andThen yearPattern
 
   def localDateRuleWithPattern : Rule[UrlFormEncoded, LocalDate] = From[UrlFormEncoded] { __ =>

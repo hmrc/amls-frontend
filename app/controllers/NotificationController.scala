@@ -36,7 +36,6 @@ import views.notifications.{V1M0, V2M0, V3M0, V4M0}
 
 import scala.concurrent.Future
 
-
 @Singleton
 class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolmentsService,
                                        val statusService: StatusService,
@@ -178,7 +177,7 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
 
     val (amlsRefNo, safeId) = reference
 
-    def getTemplate[T](templateVersion : String, templateName: String)(implicit man: Manifest[T]) : T =
+    def getTemplate[T](templateVersion : String, templateName: String): T =
       notificationsMap(templateVersion, templateName).asInstanceOf[T]
 
     def render(templateName: String, notificationParams: NotificationParams, templateVersion: String) =

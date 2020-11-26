@@ -28,7 +28,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
 object DeclarationHelper {
 
   def currentPartnersNames(responsiblePeople: Seq[ResponsiblePerson]): Seq[String] = {

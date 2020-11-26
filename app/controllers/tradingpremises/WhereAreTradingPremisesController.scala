@@ -27,7 +27,6 @@ import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.status.SubmissionStatus
 import models.tradingpremises._
-import org.joda.time.LocalDate
 import play.api.mvc.{MessagesControllerComponents, Request}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,7 +36,6 @@ import views.html.date_of_change
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
-
 
 class WhereAreTradingPremisesController @Inject () (
                                                      val dataCacheConnector: DataCacheConnector,
@@ -49,8 +47,6 @@ class WhereAreTradingPremisesController @Inject () (
                                                      where_are_trading_premises: where_are_trading_premises,
                                                      date_of_change: date_of_change,
                                                      implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
-
-
 
   def get(index: Int, edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -106,8 +102,7 @@ class WhereAreTradingPremisesController @Inject () (
 
   }
 
-  private def redirectTo(index: Int, edit: Boolean, ytp: YourTradingPremises, tp: TradingPremises, status: SubmissionStatus)
-                        (implicit hc: HeaderCarrier) = {
+  private def redirectTo(index: Int, edit: Boolean, ytp: YourTradingPremises, tp: TradingPremises, status: SubmissionStatus) = {
     if (redirectToDateOfChange(Some(tp), ytp) && edit && isEligibleForDateOfChange(status)) {
       Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
     } else {

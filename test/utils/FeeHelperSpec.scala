@@ -16,9 +16,8 @@
 
 package utils
 
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-
 import scala.concurrent.{Await, Future}
 import generators.AmlsReferenceNumberGenerator
 import generators.submission.SubscriptionResponseGenerator
@@ -28,7 +27,6 @@ import org.joda.time.DateTime
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import play.api.test.Helpers.await
 import services.{AuthEnrolmentsService, FeeResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.duration._

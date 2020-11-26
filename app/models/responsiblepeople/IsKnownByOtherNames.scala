@@ -22,7 +22,7 @@ import play.api.libs.json._
 import jto.validation.forms.Rules._
 import play.api.libs.functional.syntax._
 import utils.MappingUtils.Implicits._
-import cats.data.Validated.{Invalid, Valid}
+import cats.data.Validated.Valid
 
 sealed trait IsKnownByOtherNames
 

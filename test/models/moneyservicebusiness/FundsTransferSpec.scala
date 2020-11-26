@@ -16,7 +16,6 @@
 
 package models.moneyservicebusiness
 
-import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded

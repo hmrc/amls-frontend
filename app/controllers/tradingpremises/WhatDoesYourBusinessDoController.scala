@@ -24,7 +24,6 @@ import models.DateOfChange
 import models.businessmatching._
 import models.status.SubmissionStatus
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
-import org.joda.time.LocalDate
 import play.api.Logger
 import play.api.mvc.{MessagesControllerComponents, Result}
 import services.StatusService
@@ -35,7 +34,6 @@ import views.html.date_of_change
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
-
 
 class WhatDoesYourBusinessDoController @Inject () (
                                                     val dataCacheConnector: DataCacheConnector,

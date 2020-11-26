@@ -50,7 +50,6 @@ object PositionWithinBusiness
   def getPrettyName(position:PositionWithinBusiness)(implicit message: Messages): String = {
     import play.api.i18n.Messages
 
-    import scala.language.implicitConversions
     position match {
       case BeneficialOwner => Messages("declaration.addperson.lbl.01")
       case Director => Messages("responsiblepeople.position_within_business.lbl.02")

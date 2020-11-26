@@ -163,13 +163,13 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
       "return tuple of (is anotherBodyComplete, is anotherBodyYes) for AnotherBodyNo " in {
         val supervision = Supervision(Some(AnotherBodyNo))
 
-        ControllerHelper.anotherBodyComplete(supervision) mustBe Some(true, false)
+        ControllerHelper.anotherBodyComplete(supervision) mustBe Some((true, false))
       }
 
       "return tuple of (is anotherBodyComplete, is anotherBodyYes) for AnotherBodyYes " in {
         val supervision = Supervision(Some(AnotherBodyYes(supervisorName = "Name")))
 
-        ControllerHelper.anotherBodyComplete(supervision) mustBe Some(false, true)
+        ControllerHelper.anotherBodyComplete(supervision) mustBe Some((false, true))
       }
 
       "return tuple of (is anotherBodyComplete, is anotherBodyYes) for complete AnotherBodyYes " in {
@@ -178,7 +178,7 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
           Some(SupervisionEnd(new LocalDate(1998, 2, 24))),
           Some(SupervisionEndReasons("Reason")))))
 
-        ControllerHelper.anotherBodyComplete(supervision) mustBe Some(true, true)
+        ControllerHelper.anotherBodyComplete(supervision) mustBe Some((true, true))
       }
     }
 

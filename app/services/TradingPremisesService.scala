@@ -19,13 +19,10 @@ package services
 import javax.inject.Singleton
 import models.businessmatching.{BusinessActivity, MoneyServiceBusiness, BusinessMatchingMsbServices}
 import models.tradingpremises
-import models.tradingpremises.{TradingPremisesMsbServices, TradingPremises, WhatDoesYourBusinessDo}
-
-
+import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 
 @Singleton
 class TradingPremisesService {
-
 
   def updateTradingPremises(
                              indices: Seq[Int],

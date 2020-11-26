@@ -26,10 +26,9 @@ import org.mockito.Mockito._
 import org.scalatest.prop.PropertyChecks
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.AmlsSpec
 
 import scala.concurrent.Future
-
 
 class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with TradingPremisesGenerator{
 

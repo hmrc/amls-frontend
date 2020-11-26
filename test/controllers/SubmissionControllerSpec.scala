@@ -32,9 +32,8 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.{RenewalService, SectionsProvider, StatusService, SubmissionService}
-import uk.gov.hmrc.http
-import uk.gov.hmrc.http.{BadRequestException, HttpResponse, Upstream4xxResponse, Upstream5xxResponse}
-import utils.{AmlsSpec, AuthorisedFixture}
+import uk.gov.hmrc.http.{BadRequestException, HttpResponse, Upstream5xxResponse}
+import utils.AmlsSpec
 import views.ParagraphHelpers
 import views.html.submission.{bad_request, duplicate_enrolment, duplicate_submission, wrong_credential_type}
 

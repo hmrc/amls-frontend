@@ -31,7 +31,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction, AuthorisedFixture}
+import utils.{AmlsSpec, AuthAction}
 import views.html.responsiblepeople.person_non_uk_passport
 
 import scala.concurrent.Future
@@ -188,8 +188,6 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             "nonUKPassportNumber" -> passportNumber
           )
 
-          val responsiblePeople = ResponsiblePerson()
-
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(ResponsiblePerson(personName = Some(personName),
               dateOfBirth = Some(DateOfBirth(new LocalDate(1990, 1,22)))))))
@@ -214,8 +212,6 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             "nonUKPassport" -> "true"
           )
 
-          val responsiblePeople = ResponsiblePerson()
-
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
 
@@ -231,8 +227,6 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
           val newRequest = requestWithUrlEncodedBody(
             "nonUKPassport" -> "false"
           )
-
-          val responsiblePeople = ResponsiblePerson()
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(ResponsiblePerson(personName = Some(personName)))))

@@ -20,7 +20,6 @@ import javax.inject.Inject
 import connectors.FeeConnector
 import models.FeeResponse
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
-import models.status.RenewalSubmitted
 import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import scala.concurrent.{ExecutionContext, Future}

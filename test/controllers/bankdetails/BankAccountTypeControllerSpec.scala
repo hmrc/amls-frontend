@@ -23,7 +23,7 @@ import org.jsoup.Jsoup
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
+import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.html.bankdetails.bank_account_types
 
 class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {

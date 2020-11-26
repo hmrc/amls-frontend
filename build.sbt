@@ -13,6 +13,7 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
+
 val appName: String = "amls-frontend"
 
 lazy val appDependencies: Seq[ModuleID] = AppDependencies()
@@ -62,6 +63,17 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     resolvers += Resolver.bintrayRepo("hmrc", "releases"),
     resolvers += Resolver.jcenterRepo
+  )
+ .settings(
+    scalacOptions ++= List(
+      "-Yrangepos",
+      "-Xlint:-missing-interpolator,_",
+      "-Yno-adapted-args",
+      "-feature",
+      "-unchecked",
+      "-language:implicitConversions",
+      "-P:silencer:pathFilters=views;routes;TestStorage"
+    )
   )
   .disablePlugins(JUnitXmlReportPlugin)
 
