@@ -50,6 +50,7 @@ class ViewHelpers @Inject()(
                              val footerLinks: FooterLinks,
                              val head: Head,
                              val headerNav: HeaderNav,
+                             val headWithTrackingConsent: HeadWithTrackingConsent,
                              val loginStatus: LoginStatus,
                              val mainContent: MainContent,
                              val mainContentHeader: MainContentHeader,
