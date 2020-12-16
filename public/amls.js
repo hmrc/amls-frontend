@@ -353,18 +353,30 @@ $(function () {
       url: '/anti-money-laundering/assets/countries'
     })
 
+    var autocompleteId = this.id
+      .replace('-select', '')
+      .replace('[', '\\[')
+      .replace(']', '\\]');
+
     function resetSelectIfEmpty(e) {
-      var val = e.target.value.trim();
-      var countriesArray = Array.prototype.slice.call(this.options);
-      var matches = countriesArray.filter(function (o) {
-        return o.text !== '' && o.text === val
-      });
-      if (!matches.length) {
-        this.value = ''
+      var inputIdEscaped = e.target.id
+        .replace('[', '\\[')
+        .replace(']', '\\]');
+      if (inputIdEscaped === autocompleteId) {
+        var val = e.target.value.trim();
+        var countriesArray = Array.prototype.slice.call(this.options);
+        var matches = countriesArray.filter(function (o) {
+          return o.text !== '' && o.text === val
+        });
+        if (!matches.length) {
+          this.value = ''
+        }
       }
     }
 
-    this.addEventListener('change', resetSelectIfEmpty.bind(this));
+    var wrapper = document.querySelector('#' + autocompleteId + '-wrapper')
+    wrapper.addEventListener('change', resetSelectIfEmpty.bind(this))
+
   })
 
     $('[data-gov-currency-autocomplete]').each(function() {

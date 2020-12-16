@@ -57,7 +57,7 @@ class country_autocompleteSpec extends PlaySpec with AmlsViewSpec {
 
       val html = Jsoup.parse(result)
 
-      html.getElementsByTag("option").eq(0).text() mustBe "invalid entry"
+      html.getElementsByTag("option").eq(0).text() mustBe ""
     }
   }
 
