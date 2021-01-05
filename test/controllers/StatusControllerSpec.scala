@@ -45,7 +45,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
 import views.html.status.your_registration
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
 class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMethodTester {

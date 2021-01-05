@@ -15,6 +15,7 @@
  */
 
 package controllers.tradingpremises
+
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.tradingpremises._

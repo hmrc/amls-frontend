@@ -30,7 +30,6 @@ import views.html.hvd.summary
 
 import scala.collection.JavaConversions._
 
-
 class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {

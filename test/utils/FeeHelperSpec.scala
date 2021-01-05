@@ -17,7 +17,8 @@
 package utils
 
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import scala.concurrent.{Await, Future}
 import generators.AmlsReferenceNumberGenerator
 import generators.submission.SubscriptionResponseGenerator
@@ -30,12 +31,12 @@ import org.scalatest.concurrent.ScalaFutures
 import services.{AuthEnrolmentsService, FeeResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.duration._
-
+import scala.language.postfixOps
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class FeeHelperSpec extends PlaySpec with MockitoSugar
   with ScalaFutures
-  with OneAppPerSuite
+  with GuiceOneAppPerSuite
   with AmlsReferenceNumberGenerator
   with SubscriptionResponseGenerator{
 
