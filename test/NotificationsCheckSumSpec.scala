@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ class NotificationsCheckSumSpec extends AmlsSpec with MustMatchers {
 
     trait NotificationsCheckSumFixture extends AuthorisedFixture {
         val versionNumbers: Seq[String] = Seq(
-            "v1m0", "v2m0", "v3m0","v4m0"
+            "v1m0", "v2m0", "v3m0", "v4m0"
         )
         val checkSumRoute: String = "./conf/notifications/"
         def generateCheckSum(s: String): String =
