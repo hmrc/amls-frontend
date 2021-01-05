@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import views.Fixture
 import views.html.hvd.summary
 
 import scala.collection.JavaConversions._
-
 
 class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
