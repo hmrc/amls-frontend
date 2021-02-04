@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- package controllers.responsiblepeople
+package controllers.responsiblepeople
  import connectors.DataCacheConnector
  import controllers.actions.SuccessfulAuthAction
  import models.responsiblepeople.ResponsiblePerson._

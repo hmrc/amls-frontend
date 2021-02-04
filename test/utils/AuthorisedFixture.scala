@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,10 @@ trait AuthorisedFixture extends MockitoSugar {
 
   val authRequest = FakeRequest().withSession(
     SessionKeys.sessionId -> "SessionId",
-    SessionKeys.token -> "Token",
-    SessionKeys.userId -> "Test User",
     SessionKeys.authToken -> ""
   )
   def authRequest(uri :String) = FakeRequest("GET" ,uri).withSession(
     SessionKeys.sessionId -> "SessionId",
-    SessionKeys.token -> "Token",
-    SessionKeys.userId -> "Test User",
     SessionKeys.authToken -> ""
   )
 
