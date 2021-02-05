@@ -353,52 +353,30 @@ $(function () {
       url: '/anti-money-laundering/assets/countries'
     })
 
-    var selectFieldName = $(this).attr('id').replace('[', '\\[').replace(']', '\\]');
-    var nonSelectFieldName = selectFieldName.replace('-select','');
+    var autocompleteId = this.id
+      .replace('-select', '')
+      .replace('[', '\\[')
+      .replace(']', '\\]');
 
-    var selectField = $('#' + selectFieldName)
-    var nonSelectField = $('#' + nonSelectFieldName)
-
-    nonSelectField.keydown(function(e) {
-      if (e.keyCode === 13 && $(this).val() === '') {
-          selectField.val('')
+    function resetSelectIfEmpty(e) {
+      var inputIdEscaped = e.target.id
+        .replace('[', '\\[')
+        .replace(']', '\\]');
+      if (inputIdEscaped === autocompleteId) {
+        var val = e.target.value.trim();
+        var countriesArray = Array.prototype.slice.call(this.options);
+        var matches = countriesArray.filter(function (o) {
+          return o.text !== '' && o.text === val
+        });
+        if (!matches.length) {
+          this.value = ''
+        }
       }
-    }).keyup(function() {
-        var menu = $('.autocomplete__menu')
-        if (menu.text() === 'No results found') {
-          selectField.val('')
-        }
-    }).attr('name', nonSelectFieldName + '-autocomp');
+    }
 
-    $('body')
-        .on('mouseup', ".autocomplete__option > strong", function(e){
-          e.preventDefault();
-          $(this).parent().trigger('click')
-      }).on('click', '.autocomplete__option', function(evt) {
-        evt.preventDefault()
-        var e = jQuery.Event('keydown');
-        e.keyCode = 13;
-        $(this).closest('.autocomplete__wrapper').trigger(e);
-      })
+    var wrapper = document.querySelector('#' + autocompleteId + '-wrapper')
+    wrapper.addEventListener('change', resetSelectIfEmpty.bind(this))
 
-    $("button[name='submit']").click(function(){
-
-        var selectedOption = $('#' + selectFieldName + ' option:selected')
-
-        if(nonSelectField.val() === '')
-            selectField.val('');
-
-        if (selectField.val() === "" && nonSelectField.val() !== "" || selectedOption.text() !== nonSelectField.val())
-            addOption(nonSelectField.val())
-
-        function addOption(value) {
-            $("<option data-added='true'>")
-                .attr("value", value)
-                .text(value)
-                .prop("selected", true)
-                .appendTo($('#' + selectFieldName))
-        }
-    })
   })
 
     $('[data-gov-currency-autocomplete]').each(function() {
