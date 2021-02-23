@@ -39,9 +39,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
   lazy val authHost = baseUrl("auth")
   lazy val assetsPrefix = getConfigString(s"assets.url") + getConfigString(s"assets.version")
 
-  lazy val analyticsToken = Some(getConfigString(s"analytics.token"))
-  lazy val analyticsHost = getConfigString(s"analytics.host")
-
   val reportAProblemPartialUrl = getConfigString("contact-frontend.report-problem-url.with-js")
   val reportAProblemNonJSUrl = getConfigString("contact-frontend.report-problem-url.non-js")
   val betaFeedbackUrl = getConfigString("contact-frontend.beta-feedback-url.authenticated")
