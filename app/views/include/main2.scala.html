@@ -83,12 +83,11 @@
 
 @bodyEnd = {
     @viewHelpers.footer(
-        analyticsToken = appConfig.analyticsToken,
-        analyticsHost = appConfig.analyticsHost,
+        analyticsToken = None,
+        analyticsHost = "",
         ssoUrl = None,
-        scriptElem = Some(scripts),
-        gaCalls = None,
-        allowQueryStringInAnalytics = true
+        scriptElem = None,
+        gaCalls = None
     )
 }
 
@@ -147,8 +146,6 @@
         </div>
     </main>
 }
-
-@footerLinks = {}
 
 @govUkTemplate(
     Some(title + " - " + Messages("title.amls") + " - " + Messages("title.gov")),
