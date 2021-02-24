@@ -44,6 +44,7 @@ class ViewHelpers @Inject()(
                              //copied from uk.gov.hmrc.play.views.html.layouts
                              val article: Article,
                              val attorneyBanner: AttorneyBanner,
+                             val betaBanner: BetaBanner,
                              val footer: Footer,
                              val euExitLinks: EuExitLinks,
                              val footerLinks: FooterLinks,

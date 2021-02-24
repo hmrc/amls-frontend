@@ -78,12 +78,26 @@
     )
 }
 
+@betaBanner = {
+    @viewHelpers.betaBanner(
+        userLoggedIn = userLoggedIn,
+        betaFeedbackUrl = appConfig.betaFeedbackUrl,
+        betaFeedbackUnauthenticatedUrl = appConfig.betaFeedbackUnauthenticatedUrl,
+        showFeedbackLinkInBetaBanner = true
+    )
+}
+
 @getHelpForm = {
     @{viewHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
 }
 
 @content = {
     <main id="wrapper" role="main">
+        <div class="centered-content">
+            <div class="service-info">
+                @betaBanner
+            </div>
+        </div>
         <div id="content">
             <div class="grid-layout grid-layout--stacked">
                 <div class="grid-layout__column grid-layout__column--2-3">
