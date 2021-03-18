@@ -138,7 +138,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
 
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-    } yield (preAppStatus(status), bm.isComplete) match {
+    } yield (preAppStatus(status), bm.isCompleteAmendments) match {
       case (_, true) | (false, _) =>
         Future.successful(amlsRegistrationNumber) map {
           case Some(_) => status match {
