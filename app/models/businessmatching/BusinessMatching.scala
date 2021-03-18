@@ -103,7 +103,7 @@ case class BusinessMatching(
 
   def isComplete: Boolean = this match {
     case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, true, _)
-      if isbusinessTypeComplete(x.businessType) && msbComplete(activity) => true
+      if isbusinessTypeComplete(x.businessType) && msbComplete(activity) && x.safeId.trim.nonEmpty => true
     case _ => false
   }
 
