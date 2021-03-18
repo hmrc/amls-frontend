@@ -247,7 +247,7 @@ class LandingController @Inject()(val landingService: LandingService,
       // $COVERAGE-OFF$
       Logger.debug(s"[AMLSLandingController][preApplicationComplete]: found BusinessMatching key")
       // $COVERAGE-ON$
-      (bm.isComplete, cache.getEntry[BusinessDetails](BusinessDetails.key)) match {
+      (bm.isCompleteLanding, cache.getEntry[BusinessDetails](BusinessDetails.key)) match {
         case (true, Some(abt)) =>
           landingService.setAltCorrespondenceAddress(abt, cacheId) flatMap { _ =>
             // $COVERAGE-OFF$

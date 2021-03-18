@@ -77,7 +77,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
     mockApplicationStatus(SubmissionReady)
     mockCacheFetch[Renewal](None)
 
-    when(mockBusinessMatching.isCompleteAmendments) thenReturn true
+    when(mockBusinessMatching.isComplete) thenReturn true
     when(mockBusinessMatching.reviewDetails) thenReturn Some(reviewDetailsGen.sample.get)
     when(mockBusinessMatchingService.getAdditionalBusinessActivities(any[String]())(any(), any())) thenReturn OptionT.none[Future, Set[BusinessActivity]]
 
@@ -421,7 +421,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
       "pre application must redirect to the landing controller" when {
         "the business matching is incomplete and status is pre-application" in new Fixture {
-          when(mockBusinessMatching.isCompleteAmendments) thenReturn false
+          when(mockBusinessMatching.isComplete) thenReturn false
           mockCacheFetch(Some(mockBusinessMatching))
 
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
@@ -437,7 +437,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
       "pre-application must return 200 OK" when {
         "business matching is incomplete and status is not pre-application" in new Fixture {
-          when(mockBusinessMatching.isCompleteAmendments) thenReturn false
+          when(mockBusinessMatching.isComplete) thenReturn false
           when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
 
           mockApplicationStatus(SubmissionDecisionApproved)
@@ -454,7 +454,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
       "new sections have been added" must {
         "show the new sections on the page" in new Fixture {
-          when(mockBusinessMatching.isCompleteAmendments) thenReturn true
+          when(mockBusinessMatching.isComplete) thenReturn true
           when(mockCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(mockBusinessMatching))
 
           val hvd = mock[models.hvd.Hvd]

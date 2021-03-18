@@ -124,7 +124,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
         val cacheMap: CacheMap = mock[CacheMap]
         val complete: BusinessMatching = mock[BusinessMatching]
 
-        when(complete.isComplete) thenReturn true
+        when(complete.isCompleteLanding) thenReturn true
         when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
         when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
         when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
@@ -153,7 +153,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           val emptyCacheMap = mock[CacheMap]
 
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(emptyCacheMap))
-          when(complete.isComplete) thenReturn true
+          when(complete.isCompleteLanding) thenReturn true
           when(emptyCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
           when(emptyCacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
           when(emptyCacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(None)
@@ -168,7 +168,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val complete = mock[BusinessMatching]
 
-          when(complete.isComplete) thenReturn true
+          when(complete.isCompleteLanding) thenReturn true
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
           when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
           when(cacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(None)
@@ -298,7 +298,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           when(httpResponse.status) thenReturn (BAD_REQUEST)
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(Some(cachmap))
-          when(complete.isComplete) thenReturn false
+          when(complete.isCompleteLanding) thenReturn false
           when(cachmap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
 
           a[Exception] must be thrownBy {
