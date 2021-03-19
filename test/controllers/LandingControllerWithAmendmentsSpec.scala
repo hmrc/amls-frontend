@@ -415,7 +415,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         val cacheMap: CacheMap = mock[CacheMap]
         val complete: BusinessMatching = mock[BusinessMatching]
 
-        when(complete.isComplete) thenReturn true
+        when(complete.isCompleteLanding) thenReturn true
         when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
         when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
         when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
@@ -448,7 +448,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         val cacheMap: CacheMap = mock[CacheMap]
         val complete: BusinessMatching = mock[BusinessMatching]
 
-        when(complete.isComplete) thenReturn true
+        when(complete.isCompleteLanding) thenReturn true
         when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
         when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
         when(cacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(Some(eabOmbudsmanServices))
@@ -752,7 +752,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           val cacheMap = mock[CacheMap]
 
           when(controller.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
-          when(businessMatching.isComplete) thenReturn true
+          when(businessMatching.isCompleteLanding) thenReturn true
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(businessMatching))
           when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
           when(cacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(None)

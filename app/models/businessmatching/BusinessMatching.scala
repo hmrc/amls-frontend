@@ -107,6 +107,12 @@ case class BusinessMatching(
     case _ => false
   }
 
+  def isCompleteLanding: Boolean = this match {
+    case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, true, _)
+      if isbusinessTypeComplete(x.businessType) && msbComplete(activity) && x.safeId.trim.nonEmpty => true
+    case _ => false
+  }
+
   def alphabeticalBusinessTypes()(implicit message: Messages): Option[List[String]] = {
     activities map { a =>
       a.businessActivities.map {
