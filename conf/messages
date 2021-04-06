@@ -2452,8 +2452,8 @@ msb.services.list.lbl.02 = Currency exchange
 msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 msb.services.list.lbl.05 = Foreign exchange
-msb.throughput.title = How much throughput do you expect in the next 12 months?
-msb.throughput.sub = Throughput is the total value of money you transmit, currency you exchange, and cheques you cash.
+msb.throughput.title = What is your expected total value of transactions for the next 12 months?
+msb.throughput.sub = <p>This is also known as your total throughput. It is <strong class="bold">not</strong> your total net profit or turnover.</p>
 msb.throughput.ipsp.hint = An IPSP is involved in the transfer of funds, but is not the payment service provider for the payer or the payee.
 msb.throughput.lbl.01 = £0 to £99,999
 msb.throughput.lbl.02 = £100,000 to £499,999

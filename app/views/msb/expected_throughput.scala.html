@@ -28,7 +28,7 @@
 }
 
 @supportingContent = {
-    <p>@Messages("msb.throughput.sub")</p>
+    @Html(Messages("msb.throughput.sub"))
 }
 
 @main(
@@ -42,6 +42,7 @@
             f = f("throughput"),
             heading = "msb.throughput.title",
             section = "summary.msb",
+            supportingContent = supportingContent,
             panel = false
         ) {
             @radio(f("throughput"), "msb.throughput.lbl.01", "01")
