@@ -1512,6 +1512,9 @@ tradingpremises.yourpremises.incomplete = Incomplete
 tradingpremises.yourpremises.complete = Complete
 tradingpremises.subheading = Trading premises
 tradingpremises.nodetails = Unspecified trading premises
+tradingpremises.virtualoffice.text_1 = You must tell us about <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register" target="_blank">all premises (opens in a new tab)</a> where you carry out activities covered by the Money Laundering Regulations.
+tradingpremises.virtualoffice.text_2 = This includes virtual offices.
+tradingpremises.virtualoffice.text_3 = You will need to pay a fee for each trading premises you register.
 
 
 estateagentbusiness.whatyouneed.subheading = You’ll need to tell us:
@@ -2343,7 +2346,8 @@ tcsp.service.provider.lbl.05 = Trust or company formation agent
 
 tcsp.off-the-shelf.companies.lbl = Do you sell off-the-shelf companies?
 tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
-tcsp.servicesOfAnotherTcsp.title = Does your business use the services of another trust or company service provider?
+tcsp.servicesOfAnotherTcsp.title = Do you provide your services at any other addresses?
+tcsp.servicesOfAnotherTcsp.hint = <p>You must tell us about <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register" target="_blank">every premises (opens in a new tab)</a> you use, including virtual offices.</p>
 tcsp.servicesOfAnotherTcsp.other.hint = Only include companies which are based in the UK and supervised by HM Revenue and Customs for Money Laundering Regulations.
 tcsp.servicesOfAnotherTcsp.mlrregno.lbl = Trust or company service provider’s Money Laundering Regulations number
 tcsp.cya.mlrregno = Money Laundering Regulation reference number
