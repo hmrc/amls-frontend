@@ -68,7 +68,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
       html must include(Messages("about any other activities your business was involved in over the last 12 months"))
       html must include(Messages("your total net profit for the last 12 months, if your business was involved in other activities"))
       html must include(Messages("your total net profit for the last 12 months from the services you have registered"))
-      html must include(Messages("your total throughput in the last 12 months"))
+      html must include(Messages("your total value of transactions in the last 12 months"))
     }
 
     "contain the expected content elements for MSB renewal with MoneyTransmitting" in new ViewFixture{
@@ -77,7 +77,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
       html must include(Messages("about any other activities your business was involved in over the last 12 months"))
       html must include(Messages("your total net profit for the last 12 months, if your business was involved in other activities"))
       html must include(Messages("your total net profit for the last 12 months from the services you have registered"))
-      html must include(Messages("your total throughput in the last 12 months"))
+      html must include(Messages("your total value of transactions in the last 12 months"))
       html must include(Messages("the number of money transfers you made in the last 12 months"))
       html must include(Messages("which countries you sent the largest amounts of money to, if you sent money to other countries in the last 12 months"))
       html must include(Messages("which countries you sent the most transactions to, if you sent money to other countries in the last 12 months"))
@@ -89,7 +89,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
       html must include(Messages("about any other activities your business was involved in over the last 12 months"))
       html must include(Messages("your total net profit for the last 12 months, if your business was involved in other activities"))
       html must include(Messages("your total net profit for the last 12 months from the services you have registered"))
-      html must include(Messages("your total throughput in the last 12 months"))
+      html must include(Messages("your total value of transactions in the last 12 months"))
       html must include(Messages("the number of currency exchange transactions you made in the last 12 months"))
       html must include(Messages("which currencies you supplied the most to your customers"))
       html must include(Messages("who supplied your foreign currency, if you dealt in physical foreign currencies"))
@@ -101,7 +101,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
       html must include(Messages("about any other activities your business was involved in over the last 12 months"))
       html must include(Messages("your total net profit for the last 12 months, if your business was involved in other activities"))
       html must include(Messages("your total net profit for the last 12 months from the services you have registered"))
-      html must include(Messages("your total throughput in the last 12 months"))
+      html must include(Messages("your total value of transactions in the last 12 months"))
       html must include(Messages("the number of foreign exchange transactions you made in the last 12 months"))
     }
 
