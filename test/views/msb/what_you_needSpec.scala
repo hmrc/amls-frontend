@@ -52,7 +52,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "state that throughput info will be needed" in new ViewFixture {
-      html must include(Messages("the amount of throughput you expect in the next 12 months"))
+      html must include(Messages("msb.whatyouneed.line_1"))
     }
 
     "state that branches or agents in other countries will be needed" in new ViewFixture {

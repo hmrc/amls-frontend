@@ -61,7 +61,7 @@ class total_throughputSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "display the informational text" in new ViewFixture {
-      doc.body().text must include(Messages("renewal.msb.throughput.info"))
+      doc.html must include(Messages("renewal.msb.throughput.info"))
     }
 
     TotalThroughput.throughputValues foreach { selection =>
