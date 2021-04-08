@@ -27,6 +27,10 @@
     @errorSummary(f)
 }
 
+@supportingContent = {
+@Html(Messages("tcsp.servicesOfAnotherTcsp.hint"))
+}
+
 @main(
     title = Messages("tcsp.servicesOfAnotherTcsp.title") + " - " + Messages("summary.tcsp"),
     heading = header
@@ -39,7 +43,8 @@
             heading = "tcsp.servicesOfAnotherTcsp.title",
             section = "summary.tcsp",
             panel = false,
-            classes = Seq("inline")
+            classes = Seq("inline"),
+            supportingContent = supportingContent
         ) {
             @radio(
                 f = f("servicesOfAnotherTCSP"),
