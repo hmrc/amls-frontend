@@ -2346,10 +2346,10 @@ tcsp.service.provider.lbl.05 = Trust or company formation agent
 
 tcsp.off-the-shelf.companies.lbl = Do you sell off-the-shelf companies?
 tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
-tcsp.servicesOfAnotherTcsp.title = Do you provide your services at any other addresses?
+tcsp.servicesOfAnotherTcsp.title = Do you provide services at the address of another business?
 tcsp.servicesOfAnotherTcsp.hint = <p>You must tell us about <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register" target="_blank">every premises (opens in a new tab)</a> you use, including virtual offices.</p>
 tcsp.servicesOfAnotherTcsp.other.hint = Only include companies which are based in the UK and supervised by HM Revenue and Customs for Money Laundering Regulations.
-tcsp.servicesOfAnotherTcsp.mlrregno.lbl = Trust or company service provider’s Money Laundering Regulations number
+tcsp.servicesOfAnotherTcsp.mlrregno.lbl = Trust or company service provider’s Money Laundering Regulations number, if available.
 tcsp.cya.mlrregno = Money Laundering Regulation reference number
 
 tcsp.provided_services.title = Which services does your business provide?
@@ -2363,8 +2363,8 @@ tcsp.provided_services.service.lbl.07 = Conference room
 tcsp.provided_services.service.lbl.08 = Another service
 tcsp.provided_services.service.lbl.details = Service your business provides
 
-tcsp.anothertcspsupervision.title = Is your trust or company service provider registered with HMRC under the Money Laundering Regulations?
-tcsp.anothertcspsupervision.header = Is your trust or company service provider registered with HMRC under the Money Laundering Regulations?
+tcsp.anothertcspsupervision.title = Is the other business whose address you use supervised under the Money Laundering Regulations?
+tcsp.anothertcspsupervision.header = Is the other business whose address you use supervised under the Money Laundering Regulations?
 tcsp.anothertcspsupervision.cya.additional.header = Trust or company service provider’s Money Laundering Regulations number
 
 #ASP
