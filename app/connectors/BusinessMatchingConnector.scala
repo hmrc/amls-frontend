@@ -24,6 +24,7 @@ import play.api.mvc.Request
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.NotFoundException
 import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 case class BusinessMatchingAddress(line_1: String,
                                    line_2: String,

@@ -22,6 +22,7 @@ import models._
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.HttpReads.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
 class FeeConnector @Inject()(

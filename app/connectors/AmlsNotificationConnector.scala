@@ -21,6 +21,7 @@ import javax.inject.Inject
 import models.notifications.{NotificationDetails, NotificationRow}
 import play.api.Logger
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{Future, ExecutionContext}
 
