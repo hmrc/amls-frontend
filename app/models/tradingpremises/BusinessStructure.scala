@@ -16,29 +16,27 @@
 
 package models.tradingpremises
 
-import jto.validation.{Write, Path, From, Rule}
+import jto.validation.{From, Path, Rule, Write}
 import jto.validation.forms._
 import jto.validation.ValidationError
-import play.api.i18n.{Messages, Lang}
+import play.api.i18n.Messages
 import play.api.libs.json.Writes
 import play.api.libs.json._
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
 
 
 sealed trait BusinessStructure {
-  def message(implicit lang: Lang): String =
+  def message(implicit messages: Messages): String =
     this match {
       case SoleProprietor =>
-        Messages("businessType.lbl.01")
+        messages("businessType.lbl.01")
       case LimitedLiabilityPartnership =>
-        Messages("businessType.lbl.02")
+        messages("businessType.lbl.02")
       case Partnership =>
-        Messages("businessType.lbl.03")
+        messages("businessType.lbl.03")
       case IncorporatedBody =>
-        Messages("businessType.lbl.04")
+        messages("businessType.lbl.04")
       case UnincorporatedBody =>
-        Messages("businessType.lbl.05")
+        messages("businessType.lbl.05")
     }
 }
 

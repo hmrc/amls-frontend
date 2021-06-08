@@ -17,8 +17,8 @@
 package utils
 
 import java.net.URLEncoder
-
 import config.ApplicationConfig
+
 import javax.inject.Inject
 import models.ReturnLocation
 import play.api.Logger
@@ -28,7 +28,7 @@ import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -62,7 +62,10 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
 
   override final protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
 
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    //implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request.headers, Some(request.session))
+    implicit val hc: HeaderCarrier =
+      HeaderCarrierConverter
+        .fromRequestAndSession(request.withHeaders(request.headers), request.session)
 
     authorised(authPredicate)
       .retrieve(

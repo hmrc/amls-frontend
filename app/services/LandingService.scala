@@ -50,7 +50,7 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
                                 val statusService: StatusService,
                                 val businessMatchingConnector: BusinessMatchingConnector){
 
-  def cacheMap(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CacheMap]] = cacheConnector.fetchAll(credId)
+  def cacheMap(credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = cacheConnector.fetchAll(credId)
 
   def setAltCorrespondenceAddress(amlsRefNumber: String, maybeCacheMap: Option[CacheMap], accountTypeId: (String, String), credId: String)
                                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
@@ -68,7 +68,7 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
   }
 
   def setAltCorrespondenceAddress(businessDetails: BusinessDetails, credId: String)
-                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+                                 (implicit hc: HeaderCarrier): Future[CacheMap] = {
     cacheConnector.save[BusinessDetails](credId, BusinessDetails.key, fixAddress(businessDetails))
   }
 

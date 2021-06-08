@@ -18,6 +18,7 @@ package models.hvd
 
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.i18n.Messages.Implicits._
 
 
 class SalesChannelSpec extends WordSpec with MustMatchers with GuiceOneAppPerTest {

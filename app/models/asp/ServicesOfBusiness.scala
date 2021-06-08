@@ -20,9 +20,7 @@ import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, ValidationError, _}
 import models.DateOfChange
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
-import play.api.i18n.{Lang, Messages}
+import play.api.i18n.Messages
 import play.api.libs.json.{Reads, Writes, _}
 import utils.TraversableValidators._
 
@@ -31,13 +29,13 @@ case class ServicesOfBusiness(services: Set[Service], dateOfChange: Option[DateO
 
 sealed trait Service {
   val message = "asp.service.lbl."
-  def getMessage(implicit lang: Lang): String =
+  def getMessage(implicit messages: Messages): String =
     this match {
-      case Accountancy => Messages(s"${message}01")
-      case PayrollServices => Messages(s"${message}02")
-      case BookKeeping => Messages(s"${message}03")
-      case Auditing => Messages(s"${message}04")
-      case FinancialOrTaxAdvice => Messages(s"${message}05")
+      case Accountancy => messages(s"${message}01")
+      case PayrollServices => messages(s"${message}02")
+      case BookKeeping => messages(s"${message}03")
+      case Auditing => messages(s"${message}04")
+      case FinancialOrTaxAdvice => messages(s"${message}05")
     }
 }
 

@@ -54,7 +54,6 @@ class ViewHelpers @Inject()(
                              val loginStatus: LoginStatus,
                              val mainContent: MainContent,
                              val mainContentHeader: MainContentHeader,
-                             val optimizelySnippet: OptimizelySnippet,
                              val gtmSnippet: GTMSnippet,
                              val serviceInfo: ServiceInfo,
                              val sidebar: Sidebar

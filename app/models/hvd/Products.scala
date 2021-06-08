@@ -25,9 +25,7 @@ import play.api.libs.json.Reads.StringReads
 import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 import cats.data.Validated.{Invalid, Valid}
-import play.api.i18n.{Messages, Lang}
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.Messages
 
 case class Products(items: Set[ItemType]) {
 
@@ -62,18 +60,18 @@ sealed trait ItemType {
       case Other(_) => "12"
     }
 
-  def getMessage(implicit lang: Lang): String = this match {
-    case Alcohol => Messages("hvd.products.option.01")
-    case Tobacco => Messages("hvd.products.option.02")
-    case Antiques => Messages("hvd.products.option.03")
-    case Cars => Messages("hvd.products.option.04")
-    case OtherMotorVehicles => Messages("hvd.products.option.05")
-    case Caravans => Messages("hvd.products.option.06")
-    case Jewellery => Messages("hvd.products.option.07")
-    case Gold => Messages("hvd.products.option.08")
-    case ScrapMetals => Messages("hvd.products.option.09")
-    case MobilePhones => Messages("hvd.products.option.10")
-    case Clothing => Messages("hvd.products.option.11")
+  def getMessage(implicit messages: Messages): String = this match {
+    case Alcohol => messages("hvd.products.option.01")
+    case Tobacco => messages("hvd.products.option.02")
+    case Antiques => messages("hvd.products.option.03")
+    case Cars => messages("hvd.products.option.04")
+    case OtherMotorVehicles => messages("hvd.products.option.05")
+    case Caravans => messages("hvd.products.option.06")
+    case Jewellery => messages("hvd.products.option.07")
+    case Gold => messages("hvd.products.option.08")
+    case ScrapMetals => messages("hvd.products.option.09")
+    case MobilePhones => messages("hvd.products.option.10")
+    case Clothing => messages("hvd.products.option.11")
     case Other(x) => x
   }
 }

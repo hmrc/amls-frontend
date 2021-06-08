@@ -24,9 +24,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
 import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
-import play.api.i18n.{Messages, Lang}
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.Messages
 
 sealed trait TcspService {
 
@@ -41,16 +39,16 @@ sealed trait TcspService {
     case Other(_) => "08"
   }
 
-  def getMessage(implicit lang: Lang): String = {
+  def getMessage(implicit messages: Messages): String = {
     val message = "tcsp.provided_services.service.lbl."
     this match {
-      case PhonecallHandling => Messages(s"${message}01")
-      case EmailHandling => Messages(s"${message}02")
-      case EmailServer => Messages(s"${message}03")
-      case SelfCollectMailboxes => Messages(s"${message}04")
-      case MailForwarding => Messages(s"${message}05")
-      case Receptionist => Messages(s"${message}06")
-      case ConferenceRooms => Messages(s"${message}07")
+      case PhonecallHandling => messages(s"${message}01")
+      case EmailHandling => messages(s"${message}02")
+      case EmailServer => messages(s"${message}03")
+      case SelfCollectMailboxes => messages(s"${message}04")
+      case MailForwarding => messages(s"${message}05")
+      case Receptionist => messages(s"${message}06")
+      case ConferenceRooms => messages(s"${message}07")
       case Other(details) => s"$details"
     }
   }

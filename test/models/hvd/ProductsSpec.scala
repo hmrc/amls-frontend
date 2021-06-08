@@ -21,6 +21,7 @@ import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.i18n.Messages.Implicits._
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ProductsSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerTest {

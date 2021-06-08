@@ -13,8 +13,7 @@ private object AppDependencies {
   private val okHttpVersion = "3.9.1"
   private val jsonEncryptionVersion = "4.8.0-play-26"
   private val playReactivemongoVersion = "7.30.0-play-26"
-  private val authVersion = "3.1.0-play-26"
-  private val domain = "5.10.0-play-26"
+  private val domain = "5.11.0-play-26"
 
   val compile = Seq(
     ws,
@@ -24,11 +23,9 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-whitelist-filter" % playAllowListFilterVersion,
     "uk.gov.hmrc" %% "json-encryption" % jsonEncryptionVersion,
     "uk.gov.hmrc" %% "simple-reactivemongo" % playReactivemongoVersion,
-    "uk.gov.hmrc" %% "auth-client" % authVersion,
-    "uk.gov.hmrc" %% "play-ui" % "8.15.0-play-26",
-    "uk.gov.hmrc" %% "bootstrap-frontend-play-26" % "2.25.0",
-    "uk.gov.hmrc" %% "govuk-template" % "5.58.0-play-26",
-    "uk.gov.hmrc" %% "http-verbs" % "11.7.0",
+    "uk.gov.hmrc" %% "play-ui" % "9.4.0-play-26",
+    "uk.gov.hmrc" %% "bootstrap-frontend-play-26" % "5.3.0",
+    "uk.gov.hmrc" %% "govuk-template" % "5.66.0-play-26",
 
     "io.github.jto" %% "validation-core"      % validationVersion,
     "io.github.jto" %% "validation-playjson"  % validationVersion,

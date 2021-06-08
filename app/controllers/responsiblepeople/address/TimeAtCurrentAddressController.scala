@@ -100,7 +100,7 @@ class TimeAtCurrentAddressController @Inject() (val dataCacheConnector: DataCach
                          rp: ResponsiblePerson,
                          status: SubmissionStatus,
                          edit: Boolean,
-                         flow: Option[String])(implicit request: Request[AnyContent]) = {
+                         flow: Option[String]) = {
     timeAtAddress match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(controllers.responsiblepeople.routes.PositionWithinBusinessController.get(index, edit, flow))
       case ThreeYearsPlus | OneToThreeYears if edit => Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index, flow))

@@ -21,21 +21,19 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, ValidationError, _}
 import models.DateOfChange
 import models.businessmatching.{ChequeCashingNotScrapMetal => BMChequeCashingNotScrapMetal, ChequeCashingScrapMetal => BMChequeCashingScrapMetal, CurrencyExchange => BMCurrencyExchange, ForeignExchange => BMForeignExchange, TransmittingMoney => BMTransmittingMoney}
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
-import play.api.i18n.{Lang, Messages}
+import play.api.i18n.Messages
 import play.api.libs.json.{Reads, Writes, _}
 import utils.TraversableValidators
 
 sealed trait TradingPremisesMsbService{
   val message = "msb.services.list.lbl."
-  def getMessage(implicit lang: Lang): String =
+  def getMessage(implicit messages: Messages): String =
     this match {
-      case TransmittingMoney => Messages(s"${message}01")
-      case CurrencyExchange => Messages(s"${message}02")
-      case ChequeCashingNotScrapMetal => Messages(s"${message}03")
-      case ChequeCashingScrapMetal => Messages(s"${message}04")
-      case ForeignExchange => Messages(s"${message}05")
+      case TransmittingMoney => messages(s"${message}01")
+      case CurrencyExchange => messages(s"${message}02")
+      case ChequeCashingNotScrapMetal => messages(s"${message}03")
+      case ChequeCashingScrapMetal => messages(s"${message}04")
+      case ForeignExchange => messages(s"${message}05")
     }
 }
 

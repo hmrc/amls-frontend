@@ -73,6 +73,7 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
                   throw DuplicateEnrolmentException(error.toString, e)
                 case (FORBIDDEN, ResponseCodes.invalidCredentialRole) =>
                   throw InvalidEnrolmentCredentialsException(error.toString, e)
+                case _ => throw new Exception("An Unknown exception has occurred :")
               }
 
             case e: Throwable =>

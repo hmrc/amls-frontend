@@ -19,19 +19,17 @@ package models.tradingpremises
 import jto.validation.{Write, Path, From, Rule}
 import jto.validation.forms._
 import jto.validation.ValidationError
-import play.api.i18n.{Messages, Lang}
+import play.api.i18n.Messages
 import play.api.libs.json.Writes
 import play.api.libs.json._
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
 
 sealed trait TaxType {
-  def message(implicit lang: Lang): String =
+  def message(implicit messages: Messages): String =
     this match {
       case TaxTypeSelfAssesment =>
-        Messages("tradingpremises.youragent.taxtype.lbl.01")
+        messages("tradingpremises.youragent.taxtype.lbl.01")
       case TaxTypeCorporationTax =>
-        Messages("tradingpremises.youragent.taxtype.lbl.02")
+        messages("tradingpremises.youragent.taxtype.lbl.02")
     }
 }
 
