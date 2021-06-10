@@ -20,7 +20,6 @@ import javax.inject.Inject
 import models.status.ConfirmationStatus
 import uk.gov.hmrc.http.HeaderCarrier
 import config.AmlsSessionCache
-import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -61,6 +61,7 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
                 case Some(false) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                   rp.legalName(PreviousName(Some(false), None, None, None)).copy(legalNameChangeDate = None)
                 }
+                case None => throw new Exception("An UnknownException has occurred: LegalNameController")
               }
             }
           } yield edit match {

@@ -79,6 +79,7 @@ class PositionWithinBusinessController @Inject () (
                   case s@Some(rp) =>
                     BadRequest(position_within_business(f, edit, index, bt, ControllerHelper.rpTitleName(s),
                       ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
+                  case None => InternalServerError("Post: An UnknowException has occurred: PositionWithinBusinessController")
                 }
               }).getOrElse(NotFound(notFoundView))
             }

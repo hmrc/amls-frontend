@@ -97,6 +97,7 @@ class RemoveBusinessTypesController @Inject()(
                       } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: RemoveActivitiesController")
 
                   }
+                case None => throw new Exception("An UnknownException has occurred: RemoveActivitiesController")
               }
 
         )

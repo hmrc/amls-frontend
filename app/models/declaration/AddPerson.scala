@@ -41,7 +41,6 @@ object AddPerson {
       case ExternalAccountant => models.declaration.release7.ExternalAccountant
       case SoleProprietor => models.declaration.release7.SoleProprietor
       case NominatedOfficer => models.declaration.release7.NominatedOfficer
-      case BeneficialShareholder => models.declaration.release7.BeneficialShareholder
       case Other(x) => models.declaration.release7.Other(x)
     }
   }

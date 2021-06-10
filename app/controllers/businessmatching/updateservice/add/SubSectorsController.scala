@@ -67,6 +67,7 @@ class SubSectorsController @Inject()(authAction: AuthAction,
               case Some(model) => {
                 model.msbServices(data)
               }
+              case _ => throw new Exception("An Unknown Exception has occurred")
             } flatMap {
               case Some(model) => router.getRoute(request.credId, SubSectorsPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: SubServicesController"))

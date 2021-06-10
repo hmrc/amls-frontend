@@ -136,7 +136,6 @@ object BankDetails {
 
     val emptyModelFilter: BankDetails => Boolean = {
       case BankDetails(None, None, None, _, _, _, _) => true
-      case BankDetails(None, None, None, false, false, None, false) => true
       case _ => false
     }
 

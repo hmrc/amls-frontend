@@ -121,6 +121,7 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
         case None => businessNominatedOfficerView(amlsRegistrationNo, accountTypeId, cacheId, BadRequest, f, Seq.empty)
       }
       case ValidForm(_, data) => fn(data)
+      case _ => throw new Exception("An UnknowException has occurred: WhoIsTheBusinessNominatedOfficerController")
     }
   }
 }

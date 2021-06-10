@@ -45,7 +45,6 @@ class SubSectorsPageRouter @Inject()(val statusService: StatusService,
       case (true, false, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
       case (false, false, _) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
       case (_, true, _) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
-      case (_,_,_) => Future.successful(error(SubSectorsPageId))
     }
   }
 }

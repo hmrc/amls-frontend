@@ -59,11 +59,13 @@ class BusinessAppliedForPSRNumberController @Inject()(
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) => model.businessAppliedForPSRNumber(data)
+              case None => throw new Exception("An UnknownException has occurred: BusinessAppliedForPSRNumberController")
             } flatMap {
               case Some(model) => router.getRoute(request.credId, PsrNumberPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: BusinessAppliedForPSRNumberController"))
             }
           }
+          case _ => Future.successful(InternalServerError("Post: An UnknowException has occurred: BusinessAppliedForPSRNumberController"))
         }
   }
 }

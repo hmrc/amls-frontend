@@ -17,8 +17,8 @@
 package forms
 
 import jto.validation.forms.PM
-import jto.validation.{ValidationError, Path}
-import play.api.i18n.Lang
+import jto.validation.{Path, ValidationError}
+import play.api.i18n.Messages
 
 sealed trait Field {
 
@@ -33,7 +33,7 @@ sealed trait Field {
 
   def hasErrors: Boolean = errors.nonEmpty
 
-  def error(implicit lang: Lang = Lang.defaultLang): String = errors.toMessage
+  def error(implicit messages: Messages): String = errors.toMessage
 
   def rpError(): String = errors.headOption.map(_.message)
 

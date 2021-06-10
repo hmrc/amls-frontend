@@ -47,6 +47,7 @@ class AddBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatch
       case SelectBusinessTypesPageId => selectActivitiesPageRouter.getRoute(credId, model, edit)
       case SubSectorsPageId => subServicesPageRouter.getRoute(credId, model, edit)
       case AddBusinessTypeSummaryPageId => updateServicesSummaryPageRouter.getRoute(credId, model, edit)
+      case _ => throw new Exception("An Unknown Exception has occurred : AddBusinessTypeRouter")
     }
   }
 }

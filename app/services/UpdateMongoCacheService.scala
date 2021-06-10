@@ -82,8 +82,8 @@ class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: Da
         println(Json.prettyPrint(Json.toJson(r)) in Console.YELLOW)
         Some(r.copy(dataImport = Some(DataImport(fileName)))) }
       .recover {
-        case e => throw e
         case _: NotFoundException => None
+        case e => throw e
       }
   }
 }

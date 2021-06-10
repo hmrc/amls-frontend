@@ -228,6 +228,7 @@ object FormTypes {
         case el::Nil => ValidationError(List(s"$input.$el"))
         case el1::el2::Nil => ValidationError(List(s"$input.$el1.$el2"))
         case el1::el2::el3::Nil => ValidationError(List(s"$input.$el1.$el2.$el3"))
+        case _ => ValidationError(List("An UnknownException has occurred : FormTypes"))
       }
       Invalid(Seq(errors))
     }

@@ -77,6 +77,7 @@ class PSRNumberController @Inject()(authAction: AuthAction,
                   }
                 case Some(m) =>
                   route(m)
+                case _ => throw new Exception("An Exception has occurred")
               }
             }
         }

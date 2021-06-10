@@ -44,6 +44,7 @@ object WhichCurrencies {
     r.WhichCurrencies(wc.currencies, wc.usesForeignCurrencies match {
       case Some(UsesForeignCurrenciesYes) => Some(r.UsesForeignCurrenciesYes)
       case Some(UsesForeignCurrenciesNo) => Some(r.UsesForeignCurrenciesNo)
+      case None => None
     }, wc.moneySources match {
       case Some(ms) => {
         val bms = ms.bankMoneySource.fold[Option[r.BankMoneySource]](None) {

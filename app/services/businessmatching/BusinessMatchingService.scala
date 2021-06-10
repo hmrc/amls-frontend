@@ -92,6 +92,7 @@ class BusinessMatchingService @Inject()(
       dataCacheConnector.removeByKey[Msb](credId, Msb.key)
     case TrustAndCompanyServices =>
       dataCacheConnector.removeByKey[Tcsp](credId, Tcsp.key)
+    case _ => throw new Exception("An Unknown Exception has occurred : BusinessMatchingService")
   }
 
 }

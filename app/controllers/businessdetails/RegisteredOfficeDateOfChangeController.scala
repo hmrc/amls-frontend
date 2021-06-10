@@ -67,6 +67,7 @@ class RegisteredOfficeDateOfChangeController @Inject () (
                   businessDetails.registeredOffice(businessDetails.registeredOffice match {
                     case Some(office: RegisteredOfficeUK) => office.copy(dateOfChange = Some(dateOfChange))
                     case Some(office: RegisteredOfficeNonUK) => office.copy(dateOfChange = Some(dateOfChange))
+                    case _ => throw new Exception("An exception has occurred")
                   }))
               } yield Redirect(routes.SummaryController.get())
           }

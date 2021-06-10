@@ -40,7 +40,6 @@ object CorrespondenceAddressIsUk {
     a.isUk match {
       case true => Map("isUK" -> Seq("true"))
       case false => Map("isUK" -> Seq("false"))
-      case _ => Map()
     }
   }
 }

@@ -20,9 +20,7 @@ import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, ValidationError, _}
 import models.{DateOfChange, FormTypes}
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
-import play.api.i18n.{Lang, Messages}
+import play.api.i18n.Messages
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{Reads, Writes, _}
 import play.api.Logger
@@ -40,18 +38,18 @@ case class BusinessActivities(businessActivities: Set[BusinessActivity],
 
 sealed trait BusinessActivity {
 
-  def getMessage(usePhrasedMessage:Boolean = false)(implicit lang: Lang): String = {
+  def getMessage(usePhrasedMessage:Boolean = false)(implicit messages: Messages): String = {
     val phrasedString = if(usePhrasedMessage) ".phrased" else ""
     val message = s"businessmatching.registerservices.servicename.lbl."
     this match {
-      case AccountancyServices => Messages(s"${message}01${phrasedString}")
-      case ArtMarketParticipant => Messages(s"${message}02${phrasedString}")
-      case BillPaymentServices => Messages(s"${message}03${phrasedString}")
-      case EstateAgentBusinessService => Messages(s"${message}04${phrasedString}")
-      case HighValueDealing => Messages(s"${message}05${phrasedString}")
-      case MoneyServiceBusiness => Messages(s"${message}06${phrasedString}")
-      case TrustAndCompanyServices => Messages(s"${message}07${phrasedString}")
-      case TelephonePaymentService => Messages(s"${message}08${phrasedString}")
+      case AccountancyServices => messages(s"${message}01${phrasedString}")
+      case ArtMarketParticipant => messages(s"${message}02${phrasedString}")
+      case BillPaymentServices => messages(s"${message}03${phrasedString}")
+      case EstateAgentBusinessService => messages(s"${message}04${phrasedString}")
+      case HighValueDealing => messages(s"${message}05${phrasedString}")
+      case MoneyServiceBusiness => messages(s"${message}06${phrasedString}")
+      case TrustAndCompanyServices => messages(s"${message}07${phrasedString}")
+      case TelephonePaymentService => messages(s"${message}08${phrasedString}")
     }
   }
 }

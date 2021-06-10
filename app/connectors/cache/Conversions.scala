@@ -29,6 +29,7 @@ trait Conversions {
     */
   def toMap(json: JsValue): Map[String, JsValue] = json match {
     case JsObject(fields) => fields.toMap
+    case _ => Map.empty[String, JsValue]
   }
 
   /**

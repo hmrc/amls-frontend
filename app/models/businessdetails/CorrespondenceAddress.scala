@@ -86,6 +86,7 @@ object CorrespondenceAddress {
           (__ \ "correspondenceAddressLine4").writeNullable[String] and
           (__ \ "correspondenceCountry").write[Country]
         )(unlift(CorrespondenceAddressNonUk.unapply)).writes(a)
+      case _ => throw new Exception("An UnknownException has occurred while parsing CorrespondenceAddress")
     }
   }
 }

@@ -127,6 +127,7 @@ object WhichCurrencies {
       usesForeignCurrencies = model.usesForeignCurrencies match {
       case Some(UsesForeignCurrenciesYes) => Some(msb.UsesForeignCurrenciesYes)
       case Some(UsesForeignCurrenciesNo) => Some(msb.UsesForeignCurrenciesNo)
+      case None => None
     }, model.moneySources match {
       case Some(ms) => {
         val bms = ms.bankMoneySource.fold[Option[msb.BankMoneySource]](None) {
