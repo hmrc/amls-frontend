@@ -12,7 +12,7 @@ private object AppDependencies {
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
   private val jsonEncryptionVersion = "4.8.0-play-26"
-  private val playReactivemongoVersion = "7.30.0-play-26"
+  private val playReactivemongoVersion = "8.0.0-play-26"
   private val domain = "5.11.0-play-26"
 
   val compile = Seq(

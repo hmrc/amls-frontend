@@ -76,7 +76,7 @@ class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: Da
   def getMongoCacheData(fileName: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Option[UpdateMongoCacheResponse]] = {
     val requestUrl = s"${applicationConfig.mongoCacheUpdateUrl}$fileName"
 
-    http.GET[UpdateMongoCacheResponse](requestUrl)
+    http.GET[UpdateMongoCacheResponse](requestUrl, Seq.empty, Seq.empty)
       .map { r =>
         import utils.Strings._
         println(Json.prettyPrint(Json.toJson(r)) in Console.YELLOW)

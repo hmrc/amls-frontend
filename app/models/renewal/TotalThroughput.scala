@@ -48,7 +48,7 @@ object TotalThroughput {
   implicit val format = Json.format[TotalThroughput]
 
   private val validSelectionRule: ValidationRule[String] = Rule.fromMapping[String, String] {
-    case input if throughputValues.exists(_.value == input) => Success(input)
+    case input if throughputValues.exists(_.value == input) =>  Valid(input)
     case _ => Invalid(Seq(ValidationError("renewal.msb.throughput.selection.invalid")))
   }.repath(_ => Path \ "throughput")
 

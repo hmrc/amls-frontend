@@ -40,7 +40,7 @@ class FeeConnector @Inject()(
     // $COVERAGE-OFF$
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     // $COVERAGE-ON$
-    http.GET[FeeResponse](getUrl) map {
+    http.GET[FeeResponse](getUrl, Seq.empty, Seq.empty) map {
       response =>
         // $COVERAGE-OFF$
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")

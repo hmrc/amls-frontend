@@ -137,7 +137,7 @@ object TradingPremisesMsbServices {
   }
 
   implicit val msbServiceReader: Reads[Set[TradingPremisesMsbService]] = {
-    __.read[JsArray].map(a => a.value.map(TradingPremisesMsbService.jsonR.validate(_).get).toSet)
+    __.read[JsArray].map(a => a.value.map(TradingPremisesMsbService.jsonR.validate(_).toOption.get).toSet)
   }
 
   implicit val jReads: Reads[TradingPremisesMsbServices] = {
