@@ -24,7 +24,7 @@ import play.api.mvc.Request
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.NotFoundException
 import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
 
 case class BusinessMatchingAddress(line_1: String,
                                    line_2: String,
@@ -79,7 +79,7 @@ class BusinessMatchingConnector @Inject()(val http: HttpClient,
     Logger.debug(s"$logPrefix Fetching $url..")
     // $COVERAGE-ON$
 
-    http.GET[BusinessMatchingReviewDetails](url) map { result =>
+    http.GET[BusinessMatchingReviewDetails](url, Seq.empty, Seq.empty) map { result =>
       // $COVERAGE-OFF$
       Logger.debug(s"$logPrefix Finished getting review details. Name: ${result.businessName}")
       // $COVERAGE-ON$

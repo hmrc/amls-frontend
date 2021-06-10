@@ -23,6 +23,7 @@ import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http._
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
 
 class FeeConnector @Inject()(
                               private[connectors] val http: HttpClient,

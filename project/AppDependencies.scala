@@ -58,7 +58,7 @@ private object AppDependencies {
         "org.jsoup" % "jsoup" % jsoupVersion % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
         "org.mockito" % "mockito-all" % "1.10.19" % scope,
-        "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % scope
+        "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.3" % scope
       )
     }.dependencies
   }

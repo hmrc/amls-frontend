@@ -31,13 +31,13 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
   /**
     * Fetches the data item with the specified key from the mongo store
     */
-  def fetch[T](credId: String, key: String)(implicit formats: Format[T]): Future[Option[T]] =
+  def fetch[T](credId: String, key: String)(implicit hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     mongoCache.find(credId, key)
 
   /**
     * Saves the data item in the mongo store with the specified key
     */
-  def save[T](credId: String, key: String, data: T)(implicit format: Format[T]): Future[CacheMap] = {
+  def save[T](credId: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
     mongoCache.createOrUpdate(credId, data, key).map(toCacheMap)
   }
 
@@ -51,7 +51,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
   /**
     * Fetches the entire cache from the mongo store
     */
-  private def fetchAllByCredId(credId: String): Future[Option[CacheMap]] = {
+  private def fetchAllByCredId(credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
     mongoCache.fetchAll(Some(credId)).map(_.map(toCacheMap))
   }
 
@@ -63,7 +63,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
     * Fetches the entire cache from the mongo store and returns an empty cache where not exists
     */
 
-  def fetchAllWithDefault(credId: String): Future[CacheMap] = {
+  def fetchAllWithDefault(credId: String)(implicit hc: HeaderCarrier): Future[CacheMap] = {
     mongoCache.fetchAllWithDefault(credId).map(toCacheMap)
   }
 
@@ -71,7 +71,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
         mongoCache.removeById(cacheId)
   }
 
-  def removeByKey[T](credId: String, key: String): Future[CacheMap] =
+  def removeByKey[T](credId: String, key: String)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
         mongoCache.removeByKey(credId, key).map(toCacheMap)
 
 
