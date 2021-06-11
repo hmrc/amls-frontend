@@ -19,13 +19,14 @@ package connectors
 import audit.{ESDeEnrolEvent, ESEnrolEvent, ESEnrolFailureEvent, ESRemoveKnownFactsEvent}
 import config.ApplicationConfig
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
+
 import javax.inject.Inject
 import models.enrolment.ErrorResponse._
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentKey, ErrorResponse, TaxEnrolment}
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse, HttpClient}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 
@@ -62,7 +63,7 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
             audit.sendEvent(ESEnrolEvent(enrolment, response, enrolKey))
             response
           } recoverWith {
-            case e: Upstream4xxResponse if Json.parse(e.message).asOpt[ErrorResponse].isDefined =>
+            case e: UpstreamErrorResponse if Json.parse(e.message).asOpt[ErrorResponse].isDefined =>
               val error = Json.parse(e.message).as[ErrorResponse]
               audit.sendEvent(ESEnrolFailureEvent(enrolment, e, enrolKey))
               // $COVERAGE-OFF$

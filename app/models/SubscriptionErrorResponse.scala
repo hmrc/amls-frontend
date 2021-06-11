@@ -17,7 +17,7 @@
 package models
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{Upstream4xxResponse, UpstreamErrorResponse}
+import uk.gov.hmrc.http.UpstreamErrorResponse
 
 import scala.util.Try
 
