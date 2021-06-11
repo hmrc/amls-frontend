@@ -66,7 +66,7 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     val validResponseDetail = BusinessMatchingReviewDetails(
       businessName = "Test Business",
-      businessType = None,AssetsController.scala
+      businessType = None,
       businessAddress = address,
       sapNumber = "A number",
       safeId = "An id",
