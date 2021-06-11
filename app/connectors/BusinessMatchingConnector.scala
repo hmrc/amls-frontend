@@ -16,14 +16,15 @@
 
 package connectors
 
-import config.{AmlsHeaderCarrierForPartialsConverter, ApplicationConfig}
+import config.ApplicationConfig
+
 import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.Request
+
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.NotFoundException
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, NotFoundException}
 import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
 
 case class BusinessMatchingAddress(line_1: String,
@@ -63,14 +64,11 @@ object BusinessMatchingReviewDetails {
 }
 
 class BusinessMatchingConnector @Inject()(val http: HttpClient,
-                                          hc: AmlsHeaderCarrierForPartialsConverter,
                                           val applicationConfig: ApplicationConfig) {
-
-  import hc._
 
   val serviceName = "amls"
 
-  def getReviewDetails(implicit request: Request[_], ec: ExecutionContext): Future[Option[BusinessMatchingReviewDetails]] = {
+  def getReviewDetails(implicit request: Request[_], headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[BusinessMatchingReviewDetails]] = {
 
     val url = s"${applicationConfig.businessMatchingUrl}/fetch-review-details/$serviceName"
     val logPrefix = "[BusinessMatchingConnector][getReviewDetails]"

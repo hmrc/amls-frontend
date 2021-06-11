@@ -163,7 +163,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     } yield c
   }
 
-  private def safeId(cache: CacheMap)(implicit ec: ExecutionContext, request: Request[_]): Future[String] = {
+  private def safeId(cache: CacheMap)(implicit ec: ExecutionContext, request: Request[_], headerCarrier: HeaderCarrier): Future[String] = {
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       rd <- bm.reviewDetails

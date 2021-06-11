@@ -22,10 +22,8 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.NotFoundException
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, NotFoundException}
 import utils.AmlsSpec
-
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 
 import scala.concurrent.Future
@@ -60,15 +58,15 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture { self =>
 
-    lazy val hc: AmlsHeaderCarrierForPartialsConverter = app.injector.instanceOf[AmlsHeaderCarrierForPartialsConverter]
+    lazy val hc: HeaderCarrier = app.injector.instanceOf[HeaderCarrier]
 
-    val testBusinessMatchingConnector = new BusinessMatchingConnector(mock[HttpClient], hc, appConfig)
+    val testBusinessMatchingConnector = new BusinessMatchingConnector(mock[HttpClient], appConfig)
 
     val address = BusinessMatchingAddress("1 Test Street", "Test Town", None, None, None, "UK")
 
     val validResponseDetail = BusinessMatchingReviewDetails(
       businessName = "Test Business",
-      businessType = None,
+      businessType = None,AssetsController.scala
       businessAddress = address,
       sapNumber = "A number",
       safeId = "An id",
