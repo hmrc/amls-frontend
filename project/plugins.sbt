@@ -13,7 +13,7 @@ addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.24" exclude("org.slf4j", 
 
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.10")
 
-addSbtPlugin("org.scoverage" %% "sbt-scoverage" % "1.6.1")
+addSbtPlugin("org.scoverage" %% "sbt-scoverage" % "1.8.1")
 
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
 
