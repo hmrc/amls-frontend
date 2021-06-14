@@ -103,7 +103,7 @@ class PSRNumberControllerSpec extends AmlsSpec
       "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?' with pre populated data" in new Fixture {
         override val businessMatching = businessMatchingWithPsrGen.sample.get
 
-        var psr = businessMatching.businessAppliedForPSRNumber match {
+        val psr = businessMatching.businessAppliedForPSRNumber match {
           case Some(BusinessAppliedForPSRNumberYes(num)) => num
           case _ => "invalid"
         }

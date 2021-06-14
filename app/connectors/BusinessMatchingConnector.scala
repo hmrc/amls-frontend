@@ -24,7 +24,7 @@ import play.api.libs.json.Json
 import play.api.mvc.Request
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, NotFoundException}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
 
 case class BusinessMatchingAddress(line_1: String,
@@ -77,13 +77,15 @@ class BusinessMatchingConnector @Inject()(val http: HttpClient,
     Logger.debug(s"$logPrefix Fetching $url..")
     // $COVERAGE-ON$
 
-    http.GET[BusinessMatchingReviewDetails](url, Seq.empty, Seq.empty) map { result =>
+    http.GET[BusinessMatchingReviewDetails](url) map { result =>
+
+
       // $COVERAGE-OFF$
       Logger.debug(s"$logPrefix Finished getting review details. Name: ${result.businessName}")
       // $COVERAGE-ON$
       Some(result)
     } recoverWith {
-      case _: NotFoundException => Future.successful(None)
+      case e : UpstreamErrorResponse if e.statusCode == 404 => Future.successful(None)
       case ex =>
         // $COVERAGE-OFF$
         Logger.warn(s"$logPrefix Failed to fetch review details", ex)

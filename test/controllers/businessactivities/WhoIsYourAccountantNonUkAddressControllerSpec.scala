@@ -113,10 +113,6 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
               ))
             ))))
 
-          val newRequest = requestWithUrlEncodedBody(
-            "name" -> ""
-          )
-
           val result = controller.post()(request)
           status(result) must be(BAD_REQUEST)
         }

@@ -79,8 +79,6 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
 
         "There is no payment reference number" in new Fixture {
 
-          val amlsRegistrationNumber = "amlsRefNumber"
-
           when {
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(None)
@@ -93,8 +91,6 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
         }
 
         "There is an empty payment reference number" in new Fixture {
-
-          val amlsRegistrationNumber = "amlsRefNumber"
 
           when {
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())

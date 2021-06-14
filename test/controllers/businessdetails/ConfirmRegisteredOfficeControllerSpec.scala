@@ -75,8 +75,6 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load Registered office or main place of business when Business Address from mongoCache returns None" in new Fixture {
 
-        val registeredAddress = ConfirmRegisteredOffice(isRegOfficeOrMainPlaceOfBusiness = true)
-
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))
           .thenReturn(Future.successful(None))
 

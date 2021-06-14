@@ -434,13 +434,6 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       "message details cannot be retrieved from service" in new Fixture {
 
         val msgTxt = "Revoked"
-        val notificationDetails = NotificationDetails(
-          Some(RevocationReasons),
-          None,
-          Some(msgTxt),
-          false,
-          dateTime
-        )
 
         when(mockNotificationService.getMessageDetails(any(), any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(None))

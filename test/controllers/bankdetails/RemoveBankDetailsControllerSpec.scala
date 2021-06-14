@@ -72,8 +72,6 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "remove bank account from YourBankAccounts" in new Fixture {
 
-      val emptyCache = CacheMap("", Map.empty)
-
       val accountType1 = PersonalAccount
       val bankAccount1 = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("111111", "11-11-11")))
 

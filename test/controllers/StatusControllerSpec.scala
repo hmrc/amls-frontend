@@ -45,7 +45,6 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
 import views.html.status.your_registration
 
-import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
 class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMethodTester {
@@ -167,8 +166,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
     "respond with SEE_OTHER and redirect to the landing page" when {
       "status is rejected and the new submission button is selected" in new Fixture {
 
-        val httpResponse = mock[HttpResponse]
-
         when(controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionRejected))
 
@@ -188,8 +185,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       }
 
       "status is deregistered and the new submission button is selected" in new Fixture {
-
-        val httpResponse = mock[HttpResponse]
 
         when(controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful(DeRegistered))
@@ -256,8 +251,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "application status is SubmissionReadyForReview" when {
         "there is a fee response available" in new Fixture {
-          val paymentRef = paymentRefGen.sample.get
-          val payment = paymentGen.sample.get.copy(isBacs = Some(true))
 
           when(controller.landingService.cacheMap(any[String])(any(), any()))
             .thenReturn(Future.successful(Some(cacheMap)))
@@ -612,7 +605,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(false))
 
         val result = controller.get()(request)
-        val doc = Jsoup.parse(contentAsString(result))
 
         redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
       }

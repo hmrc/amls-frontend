@@ -93,7 +93,6 @@ class DataCacheConnectorSpec
     }
 
     "fetch all data from Mongo" in new Fixture {
-      val model = Model("data")
 
       when {
         dataCacheConnector.mongoCache.fetchAll(Some(credId))

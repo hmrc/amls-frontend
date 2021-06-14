@@ -773,7 +773,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             setUpMocksForNoDataInSaveForLater(controller)
             val reviewDetails = setUpMocksForDataExistsInKeystore(controller)
 
-            when(controller.landingService.updateReviewDetails(any[ReviewDetails], any[String])(any[HeaderCarrier], any[ExecutionContext]))
+            when(controller.landingService.updateReviewDetails(any(), any())(any(), any()))
               .thenReturn(Future.successful(mock[CacheMap]))
 
             val result = controller.get()(request)
