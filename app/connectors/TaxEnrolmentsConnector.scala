@@ -70,7 +70,7 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
               warn(error.toString)
               // $COVERAGE-ON$
 
-              (e.upstreamResponseCode, error.code) match {
+              (e.statusCode, error.code) match {
                 case (BAD_REQUEST, ResponseCodes.duplicateEnrolment) =>
                   throw DuplicateEnrolmentException(error.toString, e)
                 case (FORBIDDEN, ResponseCodes.invalidCredentialRole) =>

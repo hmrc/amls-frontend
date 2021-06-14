@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package config
+/*package config
 
 import com.google.inject.Inject
 import uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCrypto
@@ -23,3 +23,4 @@ import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 class AmlsHeaderCarrierForPartialsConverter @Inject()(val sessionCookieCrypto: SessionCookieCrypto) extends HeaderCarrierForPartialsConverter {
   override def crypto: String => String = identity
 }
+*/

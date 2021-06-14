@@ -77,7 +77,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
         case _ => ""
       }), groupId, credId)
     } yield subscription) recoverWith {
-      case e: UpstreamErrorResponse if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
+      case e: UpstreamErrorResponse if e.statusCode == UNPROCESSABLE_ENTITY =>
         Future.failed(SubscriptionErrorResponse.from(e).fold[Throwable](e)(r => DuplicateSubscriptionException(r.message)))
     }
   }

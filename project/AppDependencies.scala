@@ -5,7 +5,7 @@ private object AppDependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  private val playPartialsVersion = "6.11.0-play-26"
+  private val playPartialsVersion = "8.1.0-play-26"
   private val httpCachingClientVersion = "9.5.0-play-26"
   private val playAllowListFilterVersion = "3.4.0-play-26"
   private val validationVersion = "2.1.0"

@@ -16,7 +16,6 @@
 
 package connectors
 
-import config.AmlsHeaderCarrierForPartialsConverter
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures

@@ -23,7 +23,6 @@ import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http._
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
 
 class FeeConnector @Inject()(
                               private[connectors] val http: HttpClient,
@@ -41,7 +40,7 @@ class FeeConnector @Inject()(
     // $COVERAGE-OFF$
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     // $COVERAGE-ON$
-    http.GET[FeeResponse](getUrl, Seq.empty, Seq.empty) map {
+    http.GET[FeeResponse](getUrl) map {
       response =>
         // $COVERAGE-OFF$
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
