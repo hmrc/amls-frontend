@@ -39,7 +39,6 @@ import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, AuthAction}
 
 
@@ -122,7 +121,6 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
       when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
-      val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
       val bmWithoutTCSPOrMSB = Some(BusinessMatching(activities = Some(businessActivitiesModel)))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -143,7 +141,6 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
       when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
         .thenReturn(Future.successful((RenewalSubmitted(Some(renewalDate)), Some(readStatusResponse))))
 
-      val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
       val bmWithoutTCSPOrMSB = Some(bm.get.copy(activities = Some(businessActivitiesModel)))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -162,7 +159,6 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
       when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
-      val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
       val bmWithoutTCSPOrMSB = Some(bm.get.copy(activities = Some(businessActivitiesModel)))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -197,7 +193,6 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
       val result = controller.get()(request)
-      val html = Jsoup.parse(contentAsString(result))
     }
 
     "respond with InternalServerError when no sections are returned" in new Fixture {

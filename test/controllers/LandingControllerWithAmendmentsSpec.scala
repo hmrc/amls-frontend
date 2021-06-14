@@ -771,7 +771,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "there is data in keystore " should {
           "copy keystore data to S4L and redirect to business type controler" in new FixtureNoAmlsNumber {
             setUpMocksForNoDataInSaveForLater(controller)
-            val reviewDetails = setUpMocksForDataExistsInKeystore(controller)
+            setUpMocksForDataExistsInKeystore(controller)
 
             when(controller.landingService.updateReviewDetails(any(), any())(any(), any()))
               .thenReturn(Future.successful(mock[CacheMap]))

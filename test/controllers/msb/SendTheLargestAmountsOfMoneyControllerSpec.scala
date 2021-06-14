@@ -132,10 +132,6 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
         ))
       )
 
-      val outgoingModel = incomingModel.copy(
-        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "UK"))))
-      )
-
       mockCacheFetch[MoneyServiceBusiness](Some(incomingModel), Some(MoneyServiceBusiness.key))
       mockCacheSave[MoneyServiceBusiness]
 
@@ -151,10 +147,6 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       )
 
       val incomingModel = MoneyServiceBusiness()
-
-      val outgoingModel = incomingModel.copy(
-        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "UK"))))
-      )
 
       mockCacheFetch[MoneyServiceBusiness](Some(incomingModel), Some(MoneyServiceBusiness.key))
       mockCacheSave[MoneyServiceBusiness]

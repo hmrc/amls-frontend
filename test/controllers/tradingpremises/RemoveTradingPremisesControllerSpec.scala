@@ -74,52 +74,6 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
         EstateAgentBusinessService,
         MoneyServiceBusiness)
     )
-    val msbServices = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
-
-    val completeModel1 = TradingPremises(
-      Some(RegisteringAgentPremises(true)),
-      Some(ytp),
-      Some(businessStructure),
-      Some(agentName),
-      Some(agentCompanyName),
-      Some(agentPartnership),
-      Some(wdbd),
-      Some(msbServices)
-    )
-
-    val completeModel2 = TradingPremises(
-      Some(RegisteringAgentPremises(true)),
-      Some(ytp1),
-      Some(businessStructure),
-      Some(agentName),
-      Some(agentCompanyName),
-      Some(agentPartnership),
-      Some(wdbd),
-      Some(msbServices)
-    )
-
-    val completeModel3 = TradingPremises(
-      Some(RegisteringAgentPremises(true)),
-      Some(ytp2),
-      Some(businessStructure),
-      Some(agentName),
-      Some(agentCompanyName),
-      Some(agentPartnership),
-      Some(wdbd),
-      Some(msbServices)
-    )
-
-    val completeModel4 = TradingPremises(
-      Some(RegisteringAgentPremises(true)),
-      Some(ytp3),
-      Some(businessStructure),
-      Some(agentName),
-      Some(agentCompanyName),
-      Some(agentPartnership),
-      Some(wdbd),
-      Some(msbServices)
-    )
-    val emptyCache = CacheMap("", Map.empty)
 
     "successfully load remove trading premises page" when {
 

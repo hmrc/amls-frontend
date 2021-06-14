@@ -433,8 +433,6 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     "respond with NOT_FOUND" when {
       "message details cannot be retrieved from service" in new Fixture {
 
-        val msgTxt = "Revoked"
-
         when(mockNotificationService.getMessageDetails(any(), any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 

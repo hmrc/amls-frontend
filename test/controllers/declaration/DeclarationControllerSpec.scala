@@ -35,6 +35,7 @@ import play.api.test.Helpers._
 import services.{RenewalService, SectionsProvider}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.declaration.declare
+import scala.language.postfixOps
 
 import scala.concurrent.Future
 

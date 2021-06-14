@@ -435,7 +435,6 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
       "show the correct view" in new Fixture {
         val authorisedRequest = AuthorisedRequest(request, Some("REF"), "CREDID", Individual, Enrolments(Set()), ("TYPE", "ID"), Some("GROUPID"), Some(User))
-        implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
         val result = whatDoesYourBusinessDoController.dateOfChange(1)(authorisedRequest)
         status(result) must be(OK)
       }

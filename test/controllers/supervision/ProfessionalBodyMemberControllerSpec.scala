@@ -27,6 +27,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.supervision.member_of_professional_body
+import scala.language.postfixOps
 
 import scala.concurrent.{Await, Future}
 
@@ -216,7 +217,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
                 "isAMember" -> "true"
               )
 
-              val cache = mockCacheFetch[Supervision](Some(Supervision(
+              mockCacheFetch[Supervision](Some(Supervision(
                 anotherBody = Some(AnotherBodyNo),
                 professionalBodyMember = Some(ProfessionalBodyMemberYes),
                 professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians))),

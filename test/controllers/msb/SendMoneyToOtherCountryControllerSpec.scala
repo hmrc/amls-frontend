@@ -239,11 +239,6 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange, TransmittingMoney)))
       val incomingModel = MoneyServiceBusiness()
 
-      val outgoingModel = incomingModel.copy(
-        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
-        hasChanged = true
-      )
-
       mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
       mockCacheSave[MoneyServiceBusiness]
@@ -357,11 +352,6 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
             CurrencyExchange)))
 
         val incomingModel = MoneyServiceBusiness()
-
-        val outgoingModel = incomingModel.copy(
-          sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
-          hasChanged = true
-        )
 
         when {
           controller.statusService.isPreSubmission(any(), any(), any())(any(), any())

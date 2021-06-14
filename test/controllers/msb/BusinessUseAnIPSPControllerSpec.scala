@@ -17,7 +17,7 @@
 package controllers.msb
 
 import controllers.actions.SuccessfulAuthAction
-import models.moneyservicebusiness.{BusinessUseAnIPSPNo, BusinessUseAnIPSPYes, FundsTransfer, MoneyServiceBusiness}
+import models.moneyservicebusiness.{BusinessUseAnIPSPYes, FundsTransfer, MoneyServiceBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -108,10 +108,6 @@ class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
         fundsTransfer = Some(FundsTransfer(true))
       )
 
-      val outgoingModel = incomingModel.copy(
-        businessUseAnIPSP = Some(BusinessUseAnIPSPNo)
-      )
-
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))
         (any(), any())).thenReturn(Future.successful(Some(incomingModel)))
 
@@ -127,10 +123,6 @@ class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
 
       val newRequest = requestWithUrlEncodedBody(
         "useAnIPSP" -> "false"
-      )
-
-      val incomingModel = MoneyServiceBusiness(
-        fundsTransfer = Some(FundsTransfer(true))
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))

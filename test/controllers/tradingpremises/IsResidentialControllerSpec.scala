@@ -139,8 +139,6 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
           val updatedYtp = Some(YourTradingPremises("foo",
             Address("1", "2", None, None, "AA1 1BB", None), Some(false), Some(new LocalDate(2010, 10, 10)), None))
-          val updatedTp = TradingPremises(yourTradingPremises = updatedYtp)
-          val tp = TradingPremises(yourTradingPremises = Some(ytp))
 
           mockCacheGetEntry[Seq[TradingPremises]](
             Some(Seq(TradingPremises(yourTradingPremises = Some(ytp)))),

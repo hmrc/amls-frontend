@@ -25,9 +25,8 @@ import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
-import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister, TradingPremisesActivities}
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPageId}
-import models.responsiblepeople.ResponsiblePerson
 import models.status.SubmissionDecisionApproved
 import models.supervision.Supervision
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}

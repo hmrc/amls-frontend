@@ -28,7 +28,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, DependencyMocks}
+import utils.AmlsSpec
 import views.html.tradingpremises.registering_agent_premises
 
 import scala.concurrent.Future
@@ -145,11 +145,6 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           }
 
           "respond with NOT_FOUND when there is no data" in new Fixture {
-            val model = TradingPremises(
-              registeringAgentPremises = Some(
-                RegisteringAgentPremises(true)
-              )
-            )
             val businessMatchingActivitiesAll = BusinessMatchingActivities(
               Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
             when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))

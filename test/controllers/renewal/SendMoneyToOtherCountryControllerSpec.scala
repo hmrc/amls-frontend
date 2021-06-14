@@ -112,13 +112,6 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         "money" -> "false"
       )
 
-      val incomingModel = Renewal()
-
-      val outgoingModel = incomingModel.copy(
-        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
-        hasChanged = true
-      )
-
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(None)
 

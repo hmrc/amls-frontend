@@ -267,7 +267,6 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       }
 
       "return view for Date of Change" in new Fixture {
-        implicit val ec:ExecutionContext = app.injector.instanceOf[ExecutionContext]
         val result = controller.dateOfChange(1)(request)
         status(result) must be(OK)
       }

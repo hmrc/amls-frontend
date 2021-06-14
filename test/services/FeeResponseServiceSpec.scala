@@ -24,7 +24,7 @@ import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import uk.gov.hmrc.http.{NotFoundException, UpstreamErrorResponse}
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.AmlsSpec
 
 import scala.concurrent.Future

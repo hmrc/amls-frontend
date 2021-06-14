@@ -156,16 +156,6 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
               TrustAndCompanyServices
             )))
 
-          val testTradingPremises = Seq(TradingPremises(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(
-              activities = Set(
-                HighValueDealing,
-                AccountancyServices,
-                EstateAgentBusinessService,
-                MoneyServiceBusiness,
-                TrustAndCompanyServices,
-                BillPaymentServices)))))
-
           val newTradingPremises = Seq(TradingPremises(
             whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(
               activities = Set(BillPaymentServices))),

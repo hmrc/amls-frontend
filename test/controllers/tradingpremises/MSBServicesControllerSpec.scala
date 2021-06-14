@@ -82,7 +82,6 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         .thenReturn(Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))))))
 
       val result = controller.get(1)(request)
-      val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustBe OK
 
@@ -156,7 +155,6 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
       when (controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(),any())) thenReturn(Future.successful(None))
 
       val result = controller.post(1)(newRequest)
-      val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustBe BAD_REQUEST
 
@@ -196,12 +194,6 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           ))
         )
 
-        val newModel = currentModel.copy(
-          msbServices = Some(TPMsbServices(
-            Set(TPTransmittingMoney, TPCurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
-          ))
-        )
-
         val newRequest = requestWithUrlEncodedBody(
           "msbServices[0]" -> "01",
           "msbServices[1]" -> "02",
@@ -226,12 +218,6 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val currentModel = TradingPremises(
           msbServices = Some(TPMsbServices(
             Set(ChequeCashingNotScrapMetal)
-          ))
-        )
-
-        val newModel = currentModel.copy(
-          msbServices = Some(TPMsbServices(
-            Set(TPCurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
           ))
         )
 
@@ -261,12 +247,6 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
         Seq[(TradingPremisesMsbService, String)]((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
           case (model, id) =>
-            val currentModel = TradingPremises(
-              msbServices = Some(TPMsbServices(
-                Set(TPTransmittingMoney, TPCurrencyExchange)
-              ))
-            )
-
             val newRequest = requestWithUrlEncodedBody(
               "msbServices[1]" -> "01",
               "msbServices[2]" -> "02",

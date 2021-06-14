@@ -106,11 +106,6 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
 
     "return a redirect to the 'Which Countries' page when the user has selected 'yes' from options" in new Fixture {
 
-      val model = MoneyServiceBusiness(
-        branchesOrAgents = Some(BranchesOrAgents(BranchesOrAgentsHasCountries(true), None)),
-        hasChanged = true
-      )
-
       val newRequest = requestWithUrlEncodedBody(
         "hasCountries" -> "true"
       )

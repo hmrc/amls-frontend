@@ -68,40 +68,24 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
     "fail validation" when {
 
       "given a 'yes' value with more than 8 characters" in {
-        val data = Map(
-          "previouslyRegistered" -> Seq("true"),
-          "prevMLRRegNo" -> Seq("1" * 9)
-        )
 
         be(Invalid(Seq(
           (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
         )))
       }
       "given a 'yes' value with less than 8 characters" in {
-        val data = Map(
-          "previouslyRegistered" -> Seq("true"),
-          "prevMLRRegNo" -> Seq("1" * 5)
-        )
 
         be(Invalid(Seq(
           (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
         )))
       }
       "given a 'yes' value with between 9 and 14 characters" in {
-        val data = Map(
-          "previouslyRegistered" -> Seq("true"),
-          "prevMLRRegNo" -> Seq("1" * 11)
-        )
 
         be(Invalid(Seq(
           (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
         )))
       }
       "given a 'yes' value non-numeric characters" in {
-        val data = Map(
-          "previouslyRegistered" -> Seq("true"),
-          "prevMLRRegNo" -> Seq("1ghy7cnj&")
-        )
 
         be(Invalid(Seq(
           (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))

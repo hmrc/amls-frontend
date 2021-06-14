@@ -23,8 +23,6 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDec
 import org.jsoup.Jsoup
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
-import play.api.mvc.AnyContentAsFormUrlEncoded
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DateOfChangeHelper, DependencyMocks}

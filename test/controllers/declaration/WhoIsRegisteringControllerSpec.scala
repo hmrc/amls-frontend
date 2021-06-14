@@ -179,8 +179,6 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
               val result = controller.get()(request)
               status(result) must be(OK)
 
-              val htmlValue = Jsoup.parse(contentAsString(result))
-
               contentAsString(result) must include(Messages("submit.amendment.application"))
             }
           }
@@ -195,7 +193,6 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
               val result = controller.get(request)
               status(result) must be(OK)
 
-              val htmlValue = Jsoup.parse(contentAsString(result))
               contentAsString(result) must include(Messages("declaration.renewal.who.is.registering.heading"))
             }
           }

@@ -105,8 +105,6 @@ class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
     }
 
     "get the value for each activity type" in {
-      val ba = BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices, HighValueDealing,
-        MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
       BusinessActivities.getValue(EstateAgentBusinessService) must be("04")
       BusinessActivities.getValue(AccountancyServices) must be("01")
       BusinessActivities.getValue(HighValueDealing) must be("05")

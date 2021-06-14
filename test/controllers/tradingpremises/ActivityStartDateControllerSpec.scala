@@ -122,7 +122,6 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
           Address("1","2",None,None,"AA1 1BB",None), None, Some(new LocalDate(2014, 5, 20)), None))
 
         val updatedTp = TradingPremises(yourTradingPremises = updatedYtp, hasChanged = true)
-        val tp = TradingPremises(yourTradingPremises = ytp, hasChanged = true)
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = ytp)))))

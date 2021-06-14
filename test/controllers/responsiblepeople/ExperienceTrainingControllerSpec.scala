@@ -84,8 +84,6 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
         val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-        val newRequest = requestWithUrlEncodedBody("activities[0]" -> "01")
-
         val RecordId = 1
         val result = controller.get(RecordId)(request)
         status(result) must be(OK)

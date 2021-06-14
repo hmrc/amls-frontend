@@ -121,7 +121,6 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
       val UKAddress = PersonAddressUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
       val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, None)
-      val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
 
       "successfully redirect to next page" when {
 

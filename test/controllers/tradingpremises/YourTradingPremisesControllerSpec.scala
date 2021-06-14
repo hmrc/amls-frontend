@@ -139,7 +139,6 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
         .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
       val result = ytpController.getIndividual(1)(request)
-      val json = contentAsString(result)
 
       status(result) must be(NOT_FOUND)
 
@@ -169,7 +168,6 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
       "all questions are complete" in new Fixture {
 
         val ytpModel = YourTradingPremises("foo", Address("1","2",None,None,"AA1 1BB",None), None, Some(new LocalDate(2010, 10, 10)), None)
-        val ytp = Some(ytpModel)
 
         val emptyCache = CacheMap("", Map.empty)
 

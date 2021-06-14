@@ -58,7 +58,6 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
 
     "post is called" must {
       "redirect to next page" in new Fixture {
-        val today = LocalDate.now
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel()), Some(RemoveBusinessTypeFlowModel.key))
 
         val result = controller.post()(request)

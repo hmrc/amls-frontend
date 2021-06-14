@@ -24,7 +24,6 @@ import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
 import org.scalatest.mockito.MockitoSugar
 import utils.{AmlsSpec, AuthAction}

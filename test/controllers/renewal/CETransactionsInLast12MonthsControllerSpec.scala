@@ -112,12 +112,6 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       val incomingModel = Renewal(
       )
 
-      val outgoingModel = incomingModel.copy(
-        ceTransactionsInLast12Months = Some(
-          CETransactionsInLast12Months("12345678963")
-        ), hasChanged = true
-      )
-
       val newRequest = requestWithUrlEncodedBody(
         "ceTransaction" -> "12345678963"
       )
