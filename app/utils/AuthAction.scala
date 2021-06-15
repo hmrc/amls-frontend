@@ -27,8 +27,6 @@ import play.api.mvc._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -63,11 +61,6 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
   def signout      = s"${applicationConfig.logoutUrl}"
 
   override final protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
-
-    //implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request.headers, Some(request.session))
-    /*implicit val hc: HeaderCarrier =
-      HeaderCarrierConverter
-        .fromRequestAndSession(request.withHeaders(request.headers), request.session)*/
 
     implicit val hc = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(request)
 

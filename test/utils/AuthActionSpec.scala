@@ -17,7 +17,6 @@
 package controllers.actions
 
 import java.net.URLEncoder
-
 import config.ApplicationConfig
 import generators.AmlsReferenceNumberGenerator
 import models.ReturnLocation
@@ -32,6 +31,7 @@ import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Credentials, Retrieval, ~}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AuthAction, DefaultAuthAction}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -55,11 +55,15 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
   def fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
 
+  lazy val headerCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
+
+  implicit val hc: HeaderCarrier = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(fakeRequest)
+
   "Auth Action" when {
     "AffinityGroup is Organisation" must {
       "the user has valid credentials" must {
         "redirect the user to amls frontend" in {
-          val authAction = new DefaultAuthAction(fakeAuthConnector(orgAuthRetrievals), mockApplicationConfig, mockParser)
+          val authAction = new DefaultAuthAction(fakeAuthConnector(orgAuthRetrievals), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(fakeRequest)
@@ -71,7 +75,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
     "AffinityGroup is not Organisation" must {
       "the user has valid credentials for sa" must {
         "redirect the user to amls frontend" in {
-          val authAction = new DefaultAuthAction(fakeAuthConnector(agentSaAuthRetrievals), mockApplicationConfig, mockParser)
+          val authAction = new DefaultAuthAction(fakeAuthConnector(agentSaAuthRetrievals), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(fakeRequest)
@@ -81,7 +85,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
       "the user has inactive credentials for sa" must {
         "redirect the user to amls frontend" in {
-          val authAction = new DefaultAuthAction(fakeAuthConnector(agentSaAuthRetrievalsInactive), mockApplicationConfig, mockParser)
+          val authAction = new DefaultAuthAction(fakeAuthConnector(agentSaAuthRetrievalsInactive), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(fakeRequest)
@@ -92,7 +96,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
       "the user has valid credentials for ct" must {
         "redirect the user to amls frontend" in {
-          val authAction = new DefaultAuthAction(fakeAuthConnector(agentCtAuthRetrievals), mockApplicationConfig, mockParser)
+          val authAction = new DefaultAuthAction(fakeAuthConnector(agentCtAuthRetrievals), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(fakeRequest)
@@ -101,7 +105,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
       }
       "the user has inactive credentials for ct" must {
         "redirect the user to amls frontend" in {
-          val authAction = new DefaultAuthAction(fakeAuthConnector(agentCtAuthRetrievalsInactive), mockApplicationConfig, mockParser)
+          val authAction = new DefaultAuthAction(fakeAuthConnector(agentCtAuthRetrievalsInactive), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(fakeRequest)
@@ -113,7 +117,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "erroneous retrievals are obtained" must {
       "redirect the user to unauthorised" in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(erroneousRetrievals), mockApplicationConfig, mockParser)
+        val authAction = new DefaultAuthAction(fakeAuthConnector(erroneousRetrievals), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -124,7 +128,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user hasn't logged in" must {
       "redirect the user to signout " in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new MissingBearerToken)), mockApplicationConfig, mockParser)
+        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new MissingBearerToken)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -135,7 +139,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user's session has expired" must {
       "redirect the user to signout " in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new BearerTokenExpired)), mockApplicationConfig, mockParser)
+        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new BearerTokenExpired)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -146,7 +150,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user doesn't have sufficient enrolments" must {
       "redirect the user to the unauthorised" in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new InsufficientEnrolments)), mockApplicationConfig, mockParser)
+        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new InsufficientEnrolments)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -157,7 +161,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user doesn't have sufficient confidence level" must {
       "redirect the user to the unauthorised" in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new InsufficientConfidenceLevel)), mockApplicationConfig, mockParser)
+        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new InsufficientConfidenceLevel)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -168,7 +172,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user used an unaccepted auth provider" must {
       "redirect the user to the unauthorised" in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new UnsupportedAuthProvider)), mockApplicationConfig, mockParser)
+        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new UnsupportedAuthProvider)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -179,7 +183,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user has an unsupported affinity group" must {
       "redirect the user to the unauthorised" in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new UnsupportedAffinityGroup)), mockApplicationConfig, mockParser)
+        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new UnsupportedAffinityGroup)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
@@ -190,7 +194,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
 
     "the user has an unsupported credential role" must {
       "redirect the user to the unauthorised" in {
-        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new UnsupportedCredentialRole)), mockApplicationConfig, mockParser)
+        val authAction = new DefaultAuthAction(fakeAuthConnector(Future.failed(new UnsupportedCredentialRole)), mockApplicationConfig, mockParser, headerCarrierForPartialsConverter)
         val controller = new Harness(authAction)
 
         val result = controller.onPageLoad()(fakeRequest)
