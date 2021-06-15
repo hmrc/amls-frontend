@@ -55,6 +55,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
     val request = addToken(authRequest)
     val config = mock[ApplicationConfig]
     lazy val view = app.injector.instanceOf[start]
+    lazy val headerCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
     val controllerNoAmlsNumber = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
       landingService = mock[LandingService],
@@ -68,7 +69,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       config = config,
       parser = mock[BodyParsers.Default],
       start = view,
-      headerCarrierForPartialsConverter = mock[HeaderCarrierForPartialsConverter])
+      headerCarrierForPartialsConverter = headerCarrierForPartialsConverter)
 
     val controllerNoUserRole = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -117,7 +118,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
   }
 
   "LandingController" must {
-
 
     "redirect to status page" when {
       "submission status is DeRegistered and responsible person is not complete" in new Fixture {
@@ -210,6 +210,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
 
+          implicit val hc = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(request)
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)

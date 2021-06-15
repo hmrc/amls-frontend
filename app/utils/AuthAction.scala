@@ -29,6 +29,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,7 +46,8 @@ final case class enrolmentNotFound(msg: String = "enrolmentNotFound") extends Au
 
 class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
                                    applicationConfig: ApplicationConfig,
-                                   val parser: BodyParsers.Default)
+                                   val parser: BodyParsers.Default,
+                                   headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter)
                                   (implicit val executionContext: ExecutionContext) extends AuthAction with AuthorisedFunctions {
 
   private val amlsKey       = "HMRC-MLR-ORG"
@@ -63,9 +65,11 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
   override final protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
 
     //implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request.headers, Some(request.session))
-    implicit val hc: HeaderCarrier =
+    /*implicit val hc: HeaderCarrier =
       HeaderCarrierConverter
-        .fromRequestAndSession(request.withHeaders(request.headers), request.session)
+        .fromRequestAndSession(request.withHeaders(request.headers), request.session)*/
+
+    implicit val hc = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(request)
 
     authorised(authPredicate)
       .retrieve(

@@ -61,7 +61,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar with MustMatchers with StatusGenerator {
 
   val businessCustomerUrl = "TestUrl"
-  implicit override val headerCarrier: HeaderCarrier = HeaderCarrier()
+
+  lazy val headerCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
 
   trait Fixture { self =>
 
@@ -106,7 +107,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       config = config,
       parser = mock[BodyParsers.Default],
       start = view,
-      headerCarrierForPartialsConverter = mock[HeaderCarrierForPartialsConverter])
+      headerCarrierForPartialsConverter = headerCarrierForPartialsConverter)
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
@@ -272,7 +273,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       config = config,
       parser = mock[BodyParsers.Default],
       start = view,
-      headerCarrierForPartialsConverter = mock[HeaderCarrierForPartialsConverter])
+      headerCarrierForPartialsConverter = headerCarrierForPartialsConverter)
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
