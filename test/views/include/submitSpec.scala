@@ -16,12 +16,7 @@
 
 package views.include
 
-import forms.{Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
-import models.businessdetails.ActivityStartDate
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.jsoup.select.Elements
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.test.Helpers._

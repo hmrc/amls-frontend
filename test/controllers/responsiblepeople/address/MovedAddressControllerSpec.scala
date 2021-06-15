@@ -119,9 +119,6 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
     "Post is called" must {
 
-      val UKAddress = PersonAddressUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
-      val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, None)
-
       "successfully redirect to next page" when {
 
         "option is 'Yes' is selected confirming the mentioned has moved from the shown address" in new Fixture {

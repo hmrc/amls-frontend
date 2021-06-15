@@ -188,12 +188,6 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
       "adding 'Transmitting Money' as a service during edit" in new Fixture {
 
-        val currentModel = TradingPremises(
-          msbServices = Some(TPMsbServices(
-            Set(ChequeCashingNotScrapMetal)
-          ))
-        )
-
         val newRequest = requestWithUrlEncodedBody(
           "msbServices[0]" -> "01",
           "msbServices[1]" -> "02",
@@ -214,12 +208,6 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
       }
 
       "adding 'CurrencyExchange' as a service during edit" in new Fixture {
-
-        val currentModel = TradingPremises(
-          msbServices = Some(TPMsbServices(
-            Set(ChequeCashingNotScrapMetal)
-          ))
-        )
 
         val newRequest = requestWithUrlEncodedBody(
           "msbServices[1]" -> "02",

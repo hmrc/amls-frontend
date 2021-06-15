@@ -35,7 +35,7 @@ import utils.{AmlsSpec, DependencyMocks}
 import views.html.date_of_change
 import views.html.tradingpremises.agent_name
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
 

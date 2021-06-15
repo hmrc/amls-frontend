@@ -18,7 +18,6 @@ package controllers.supervision
 
 import controllers.actions.SuccessfulAuthAction
 import models.supervision.{ProfessionalBodyYes, Supervision}
-import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages

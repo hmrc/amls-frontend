@@ -24,7 +24,6 @@ import models.businessmatching.{AccountancyServices, BillPaymentServices, Busine
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
-import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar

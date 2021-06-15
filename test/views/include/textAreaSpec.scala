@@ -16,7 +16,7 @@
 
 package views.include
 
-import forms.{InvalidField, ValidField}
+import forms.ValidField
 import jto.validation.{KeyPathNode, Path}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document

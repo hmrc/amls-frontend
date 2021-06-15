@@ -20,13 +20,10 @@ import java.net.URI
 
 import forms.{EmptyForm, InvalidForm}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.scalatest.MustMatchers
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Request
-import play.api.test.FakeRequest
-import play.api.test.Helpers.{BAD_REQUEST, contentAsString, status}
 import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError

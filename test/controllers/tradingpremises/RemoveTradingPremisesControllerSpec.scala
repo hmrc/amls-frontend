@@ -59,21 +59,6 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
     val date = new LocalDate(year, month, day)
 
     val ytp = YourTradingPremises("tradingName1", address, Some(true), Some(date))
-    val ytp1 = YourTradingPremises("tradingName2", address, Some(true), Some(date))
-    val ytp2 = YourTradingPremises("tradingName3", address, Some(true), Some(date))
-    val ytp3 = YourTradingPremises("tradingName3", address, Some(true), Some(date))
-
-
-    val businessStructure = SoleProprietor
-    val agentName = AgentName("test")
-    val agentCompanyName = AgentCompanyDetails("test", Some("12345678"))
-    val agentPartnership = AgentPartnership("test")
-    val wdbd = WhatDoesYourBusinessDo(
-      Set(
-        BillPaymentServices,
-        EstateAgentBusinessService,
-        MoneyServiceBusiness)
-    )
 
     "successfully load remove trading premises page" when {
 

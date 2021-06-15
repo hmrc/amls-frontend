@@ -52,6 +52,7 @@ import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.start
 
@@ -104,7 +105,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       messagesApi = messagesApi,
       config = config,
       parser = mock[BodyParsers.Default],
-      start = view)
+      start = view,
+      headerCarrierForPartialsConverter = mock[HeaderCarrierForPartialsConverter])
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
@@ -269,7 +271,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       messagesApi = messagesApi,
       config = config,
       parser = mock[BodyParsers.Default],
-      start = view)
+      start = view,
+      headerCarrierForPartialsConverter = mock[HeaderCarrierForPartialsConverter])
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
