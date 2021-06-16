@@ -156,8 +156,8 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
         val model = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
-        var startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))), hasAccepted = true, hasChanged = true)
-        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
+        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))), hasAccepted = true, hasChanged = true)
+        val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
 
         mockCacheFetch[BusinessMatching](
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
@@ -171,9 +171,9 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
         val model = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
-        var startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set())), hasAccepted = true, hasChanged = true)
+        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set())), hasAccepted = true, hasChanged = true)
 
-        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))), hasAccepted = true, hasChanged = true)
+        val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))), hasAccepted = true, hasChanged = true)
 
         mockCacheFetch[BusinessMatching](
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set())))),
@@ -191,12 +191,12 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
           subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
         )
 
-        var startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
                                   hasAccepted = true,
                                   hasChanged = true,
                                   msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))))
 
-        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+        val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
                                 hasAccepted = true,
                                 hasChanged = true,
                                 msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))))

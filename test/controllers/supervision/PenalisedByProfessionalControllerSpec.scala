@@ -18,7 +18,6 @@ package controllers.supervision
 
 import controllers.actions.SuccessfulAuthAction
 import models.supervision.{ProfessionalBodyYes, Supervision}
-import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
@@ -92,8 +91,6 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
     val result = controller.post()(newRequest)
     status(result) must be(BAD_REQUEST)
-
-    val document = Jsoup.parse(contentAsString(result))
 
   }
 

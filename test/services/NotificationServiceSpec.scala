@@ -114,7 +114,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with GeneratorD
   "The Notification Service" must {
     "get all notifications in order" in new Fixture {
 
-      when(amlsNotificationConnector.fetchAllBySafeId(any(), any())(any(), any(), any()))
+      when(amlsNotificationConnector.fetchAllBySafeId(any(), any())(any(), any()))
         .thenReturn(Future.successful(testList))
 
       val result = await(service.getNotifications("testNo", accountTypeId))

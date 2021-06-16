@@ -65,10 +65,12 @@ class AddMoreBusinessTypesController @Inject()(
           case ValidForm(_, data) =>
             dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) => model.copy(addMoreActivities = Some(data))
+              case None => throw new Exception("An UnknownException has occurred: AddMoreActivitiesController")
             } flatMap {
               case Some(model) => router.getRoute(request.credId, AddMoreBusinessTypesPageId, model)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: AddMoreActivitiesController"))
             }
+          case _ => Future.successful(InternalServerError("Post: An UnknownException has occurred: AddMoreActivitiesController"))
         }
   }
 

@@ -106,6 +106,8 @@ class RemoveBusinessTypeHelper @Inject()(authAction: AuthAction,
                 newBm
               }
             }
+
+          case _ => None
         })
       }
     } yield newBusinessMatching

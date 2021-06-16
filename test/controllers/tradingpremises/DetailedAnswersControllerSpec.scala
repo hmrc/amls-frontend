@@ -24,7 +24,6 @@ import models.businessmatching.{AccountancyServices, BillPaymentServices, Busine
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
-import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
@@ -86,7 +85,6 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
         contentAsString(result) must include(Messages("title.cya"))
         contentAsString(result) must include("/anti-money-laundering/trading-premises/check-your-answers")
       }
@@ -97,7 +95,6 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
         "all questions are complete and answers accepted" in new Fixture {
 
           val ytpModel = YourTradingPremises("foo", Address("1","2",None,None,"AA1 1BB",None), None, Some(new LocalDate(2010, 10, 10)), None)
-          val ytp = Some(ytpModel)
 
           val emptyCache = CacheMap("", Map.empty)
 

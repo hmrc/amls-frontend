@@ -255,7 +255,6 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     }
 
     "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
-      val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
       when {
         mockSectionsProvider.sections(any[String])(any(), any())
       }.thenReturn(Future.successful(completedSections))
@@ -318,7 +317,6 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       }
 
       "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
-        val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
         when {
           mockSectionsProvider.sections(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
@@ -390,7 +388,6 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       }
 
       "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
-        val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
         when {
           mockSectionsProvider.sections(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))
@@ -441,7 +438,6 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       }
 
       "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
-        val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
         when {
           mockSectionsProvider.sections(any[String])(any(), any())
         }.thenReturn(Future.successful(completedSections))

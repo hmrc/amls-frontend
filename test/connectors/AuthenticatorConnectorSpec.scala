@@ -23,6 +23,7 @@ import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.HttpClient
 import utils.AmlsSpec
+import scala.language.postfixOps
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}

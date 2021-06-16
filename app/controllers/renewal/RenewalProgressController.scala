@@ -69,6 +69,7 @@ class RenewalProgressController @Inject()(val authAction: AuthAction,
             }
           }
           case (r:RenewalSubmitted, _) => OptionT.fromOption[Future](Some(Redirect(controllers.routes.RegistrationProgressController.get)))
+          case _ => throw new Exception("An UnknownException has occurred: RenewalProgressController")
         }
         result.flatMap(_.getOrElse(InternalServerError("Cannot get business matching or renewal date")))
   }

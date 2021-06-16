@@ -71,6 +71,7 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
   private def updateData(supervision: Supervision, data: SupervisionEndReasons): Supervision = {
     def updatedAnotherBody = supervision.anotherBody match {
       case Some(ab) => ab.asInstanceOf[AnotherBodyYes].endingReason(data)
+      case None => throw new Exception("An UnknownException has occurred : SupervisionEndReasonsController")
     }
 
     supervision.anotherBody(updatedAnotherBody).copy(hasAccepted = true)

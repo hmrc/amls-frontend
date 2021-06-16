@@ -351,7 +351,6 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             .thenReturn(Future.successful(Some(businessMatching)))
 
           val result = controller.post(true)(request)
-          val document = Jsoup.parse(contentAsString(result))
 
           status(result) mustBe BAD_REQUEST
         }

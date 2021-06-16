@@ -27,7 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
+import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.html.businessactivities.who_is_your_accountant_uk_address
 
 import scala.concurrent.Future
@@ -100,10 +100,6 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
 
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
-
-          val newRequest = requestWithUrlEncodedBody(
-            "name" -> ""
-          )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(BusinessActivities(

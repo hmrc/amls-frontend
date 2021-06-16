@@ -96,10 +96,6 @@ class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "name" -> ""
-          )
-
           val result = controller.post()(request)
           status(result) must be(BAD_REQUEST)
         }

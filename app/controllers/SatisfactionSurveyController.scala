@@ -46,12 +46,12 @@ class SatisfactionSurveyController @Inject()(val auditConnector: AuditConnector,
         case f: InvalidForm =>
           Future.successful(BadRequest(satisfaction_survey(f)))
         case ValidForm(_, data) => {
-          auditConnector.sendEvent(SurveyEvent(data)).onFailure {
+          auditConnector.sendEvent(SurveyEvent(data)).failed.foreach( {
             case e: Throwable => Logger.error(s"[SatisfactionSurveyController][post] ${e.getMessage}", e)
-          }
+          })
+        }
           Future.successful(Redirect(routes.LandingController.get()))
         }
       }
     }
-  }
 }

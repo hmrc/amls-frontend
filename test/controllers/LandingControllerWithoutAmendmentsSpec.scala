@@ -17,7 +17,6 @@
 package controllers
 
 import java.net.URLEncoder
-
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.{SuccessfulAuthActionNoAmlsRefNo, SuccessfulAuthActionNoUserRole}
@@ -40,6 +39,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
+import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.AmlsSpec
 import views.html.start
 
@@ -55,6 +55,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
     val request = addToken(authRequest)
     val config = mock[ApplicationConfig]
     lazy val view = app.injector.instanceOf[start]
+    lazy val headerCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
     val controllerNoAmlsNumber = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
       landingService = mock[LandingService],
@@ -67,7 +68,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       messagesApi = messagesApi,
       config = config,
       parser = mock[BodyParsers.Default],
-      start = view)
+      start = view,
+      headerCarrierForPartialsConverter = headerCarrierForPartialsConverter)
 
     val controllerNoUserRole = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
@@ -81,7 +83,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       messagesApi = messagesApi,
       config = config,
       parser = mock[BodyParsers.Default],
-      start = view)
+      start = view,
+      headerCarrierForPartialsConverter = mock[HeaderCarrierForPartialsConverter])
 
     when {
       controllerNoAmlsNumber.landingService.setAltCorrespondenceAddress(any(), any[String])(any(), any())
@@ -206,6 +209,8 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(None)
           when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+
+          implicit val hc = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(request)
 
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)

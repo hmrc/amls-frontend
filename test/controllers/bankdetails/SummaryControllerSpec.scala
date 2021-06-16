@@ -136,9 +136,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount), hasAccepted = true)
       val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban))
 
-      val completeModel1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(ukAccount), hasAccepted = true)
-      val completeModel2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(nonUkIban), hasAccepted = true)
-
       val bankAccounts = Seq(model1, model2)
 
       mockCacheFetch[Seq[BankDetails]](Some(bankAccounts))

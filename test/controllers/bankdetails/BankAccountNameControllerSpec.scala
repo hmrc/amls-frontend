@@ -112,7 +112,6 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
           mockApplicationStatus(SubmissionDecisionApproved)
 
           val result = controller.getIndex(1, false)(request)
-          val document: Document = Jsoup.parse(contentAsString(result))
 
           status(result) mustBe NOT_FOUND
         }

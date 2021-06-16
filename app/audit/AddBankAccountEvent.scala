@@ -44,6 +44,7 @@ object AddBankAccountEvent {
       case PersonalAccount => JsString("personal")
       case BelongsToBusiness => JsString("business")
       case BelongsToOtherBusiness => JsString("other business")
+      case NoBankAccountUsed => JsString("no bank account")
     }
 
     implicit val writes: Writes[BankAccountAuditDetail] = {

@@ -52,6 +52,7 @@ import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.start
 
@@ -60,7 +61,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar with MustMatchers with StatusGenerator {
 
   val businessCustomerUrl = "TestUrl"
-  implicit override val headerCarrier: HeaderCarrier = HeaderCarrier()
+
+  lazy val headerCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
 
   trait Fixture { self =>
 
@@ -104,7 +106,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       messagesApi = messagesApi,
       config = config,
       parser = mock[BodyParsers.Default],
-      start = view)
+      start = view,
+      headerCarrierForPartialsConverter = headerCarrierForPartialsConverter)
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
@@ -269,7 +272,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       messagesApi = messagesApi,
       config = config,
       parser = mock[BodyParsers.Default],
-      start = view)
+      start = view,
+      headerCarrierForPartialsConverter = headerCarrierForPartialsConverter)
 
     when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
@@ -771,9 +775,9 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "there is data in keystore " should {
           "copy keystore data to S4L and redirect to business type controler" in new FixtureNoAmlsNumber {
             setUpMocksForNoDataInSaveForLater(controller)
-            val reviewDetails = setUpMocksForDataExistsInKeystore(controller)
+            setUpMocksForDataExistsInKeystore(controller)
 
-            when(controller.landingService.updateReviewDetails(any[ReviewDetails], any[String])(any[HeaderCarrier], any[ExecutionContext]))
+            when(controller.landingService.updateReviewDetails(any(), any())(any(), any()))
               .thenReturn(Future.successful(mock[CacheMap]))
 
             val result = controller.get()(request)

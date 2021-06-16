@@ -95,6 +95,7 @@ object ControllerHelper {
       case Some(matching) => matching.activities.foldLeft(false) { (x, y) =>
         y.businessActivities.contains(TrustAndCompanyServices)
       }
+      case _ => false
     }
   }
 
@@ -103,6 +104,7 @@ object ControllerHelper {
       case Some(matching) => matching.activities.foldLeft(false) { (x, y) =>
         y.businessActivities.contains(AccountancyServices)
       }
+      case _ => false
     }
   }
 
@@ -191,6 +193,7 @@ object ControllerHelper {
   } yield anotherBody) match {
     case Some(AnotherBodyNo) => Option((true, false))
     case Some(body) => Option((body.asInstanceOf[AnotherBodyYes].isComplete(), true))
+    case None => None
   }
 
   def isAnotherBodyYes(abCompleteAndYes: Option[(Boolean, Boolean)]) = {

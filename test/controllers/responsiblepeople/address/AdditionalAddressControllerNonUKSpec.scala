@@ -225,10 +225,6 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
           val result = additionalAddressNonUKController.post(RecordId)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
 
-          val rpName: String = personName.map(pName =>
-            pName.titleName
-          ).getOrElse("")
-
           val document: Document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
           document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))

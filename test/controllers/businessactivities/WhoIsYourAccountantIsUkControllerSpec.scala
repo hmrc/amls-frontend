@@ -102,10 +102,6 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with PrivateMethodT
               ))
             ))))
 
-          val newRequest = requestWithUrlEncodedBody(
-            "isUK" -> ""
-          )
-
           val result = controller.post()(request)
           status(result) must be(BAD_REQUEST)
         }

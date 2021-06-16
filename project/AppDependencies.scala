@@ -5,16 +5,15 @@ private object AppDependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  private val playPartialsVersion = "6.11.0-play-26"
-  private val httpCachingClientVersion = "9.1.0-play-26"
+  private val playPartialsVersion = "8.1.0-play-26"
+  private val httpCachingClientVersion = "9.5.0-play-26"
   private val playAllowListFilterVersion = "3.4.0-play-26"
   private val validationVersion = "2.1.0"
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
-  private val jsonEncryptionVersion = "4.8.0-play-26"
-  private val playReactivemongoVersion = "7.30.0-play-26"
-  private val authVersion = "3.1.0-play-26"
-  private val domain = "5.10.0-play-26"
+  private val jsonEncryptionVersion = "4.10.0-play-26"
+  private val playReactivemongoVersion = "8.0.0-play-26"
+  private val domain = "5.11.0-play-26"
 
   val compile = Seq(
     ws,
@@ -24,11 +23,9 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-whitelist-filter" % playAllowListFilterVersion,
     "uk.gov.hmrc" %% "json-encryption" % jsonEncryptionVersion,
     "uk.gov.hmrc" %% "simple-reactivemongo" % playReactivemongoVersion,
-    "uk.gov.hmrc" %% "auth-client" % authVersion,
-    "uk.gov.hmrc" %% "play-ui" % "8.15.0-play-26",
-    "uk.gov.hmrc" %% "bootstrap-frontend-play-26" % "2.25.0",
-    "uk.gov.hmrc" %% "govuk-template" % "5.58.0-play-26",
-    "uk.gov.hmrc" %% "http-verbs" % "11.7.0",
+    "uk.gov.hmrc" %% "play-ui" % "9.4.0-play-26",
+    "uk.gov.hmrc" %% "bootstrap-frontend-play-26" % "5.3.0",
+    "uk.gov.hmrc" %% "govuk-template" % "5.66.0-play-26",
 
     "io.github.jto" %% "validation-core"      % validationVersion,
     "io.github.jto" %% "validation-playjson"  % validationVersion,
@@ -40,8 +37,8 @@ private object AppDependencies {
     "com.typesafe.play" %% "play-json" % "2.6.14",
     "com.typesafe.play" %% "play-json-joda" % "2.6.14",
     
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.1" cross CrossVersion.full),
-    "com.github.ghik" % "silencer-lib" % "1.7.1" % Provided cross CrossVersion.full
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.5" cross CrossVersion.full),
+    "com.github.ghik" % "silencer-lib" % "1.7.5" % Provided cross CrossVersion.full
   )
 
   trait ScopeDependencies {
@@ -61,7 +58,7 @@ private object AppDependencies {
         "org.jsoup" % "jsoup" % jsoupVersion % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
         "org.mockito" % "mockito-all" % "1.10.19" % scope,
-        "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % scope
+        "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.3" % scope
       )
     }.dependencies
   }

@@ -50,7 +50,6 @@ class AgentCompanyNameControllerSpec extends AmlsSpec {
 
   "AgentCompanyDetailsController" when {
 
-    val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]
 
     "get is called" must {

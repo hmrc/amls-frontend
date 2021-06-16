@@ -100,11 +100,6 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
       "display the is your involved in other page when there is no cache data" in new Fixture {
 
-        val businessMatching = BusinessMatching(
-          activities = Some(BMActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService,
-            HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
-        )
-
         when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 

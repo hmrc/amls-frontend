@@ -303,6 +303,7 @@ class StatusController @Inject()(val landingService: LandingService,
               endDate = deregistrationDate),
             feeInformation = HtmlFormat.empty)
         }
+      case _ => InternalServerError("Post: An UnknowException has occurred: RegisterServicesController")
     }
   }
 
@@ -383,6 +384,7 @@ class StatusController @Inject()(val landingService: LandingService,
             })
         }
       }
+      case _ => Future.successful(InternalServerError("Post: An UnknowException has occurred: StatusController"))
     }
   }
 

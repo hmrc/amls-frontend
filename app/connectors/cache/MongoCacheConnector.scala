@@ -17,12 +17,12 @@
 package connectors.cache
 
 import javax.inject.Inject
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Format
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory) extends Conversions {
 
@@ -75,7 +75,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
         mongoCache.removeByKey(credId, key).map(toCacheMap)
 
 
-  def saveAll(credId: String, cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier): Future[CacheMap] = {
+  def saveAll(credId: String, cacheMap: Future[CacheMap]): Future[CacheMap] = {
     cacheMap.flatMap { updateCache =>
       val cache = Cache(updateCache)
       mongoCache.saveAll(cache, credId) map { _ => toCacheMap(cache) }
@@ -87,7 +87,7 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
     *
     * @return The model after it has been transformed
     */
-  def update[T](credId: String, key: String)(f: Option[T] => T)(implicit hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
+  def update[T](credId: String, key: String)(f: Option[T] => T)(implicit fmt: Format[T]): Future[Option[T]] =
       mongoCache.find[T](credId, key) flatMap { maybeModel =>
         val transformed = f(maybeModel)
         mongoCache.createOrUpdate(credId, transformed, key) map { _ => Some(transformed) }

@@ -18,6 +18,7 @@ package services
 
 import config.ApplicationConfig
 import connectors.DataCacheConnector
+
 import javax.inject.{Inject, Singleton}
 import models._
 import models.amp.Amp
@@ -34,9 +35,10 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.Format
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException, HttpClient}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
+import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -78,12 +80,10 @@ class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: Da
 
     http.GET[UpdateMongoCacheResponse](requestUrl)
       .map { r =>
-        import utils.Strings._
-        println(Json.prettyPrint(Json.toJson(r)) in Console.YELLOW)
         Some(r.copy(dataImport = Some(DataImport(fileName)))) }
       .recover {
+        case e: UpstreamErrorResponse if e.statusCode == 404 => None
         case e => throw e
-        case _: NotFoundException => None
       }
   }
 }

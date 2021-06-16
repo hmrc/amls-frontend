@@ -21,7 +21,8 @@ import connectors.FeeConnector
 import models.FeeResponse
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import play.api.Logger
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class FeeResponseService @Inject()(val feeConnector: FeeConnector) {
@@ -42,6 +43,6 @@ class FeeResponseService @Inject()(val feeConnector: FeeConnector) {
         case _ => None
       })
   } recoverWith {
-    case _: NotFoundException => Future.successful(None)
+    case err : UpstreamErrorResponse if err.statusCode == 404 => Future.successful(None)
   }
 }

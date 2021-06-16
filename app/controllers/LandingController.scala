@@ -17,11 +17,11 @@
 package controllers
 
 import java.net.URLEncoder
-
 import audit.ServiceEntrantEvent
 import cats.data.Validated.{Invalid, Valid}
 import config.ApplicationConfig
 import connectors.DataCacheConnector
+
 import javax.inject.{Inject, Singleton}
 import models._
 import models.amp.Amp
@@ -47,6 +47,7 @@ import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AuthAction, ControllerHelper}
 import views.html.start
 
@@ -64,7 +65,8 @@ class LandingController @Inject()(val landingService: LandingService,
                                   implicit override val messagesApi: MessagesApi,
                                   val config: ApplicationConfig,
                                   parser: BodyParsers.Default,
-                                  start: start) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper {
+                                  start: start,
+                                  headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper {
 
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8")
 
@@ -72,6 +74,7 @@ class LandingController @Inject()(val landingService: LandingService,
 
   private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
     headerCarrier.authorization.isDefined
+
 
   /**
     * allowRedirect allows us to configure whether or not the start page is *always* shown,
@@ -146,6 +149,7 @@ class LandingController @Inject()(val landingService: LandingService,
 
   private def refreshAndRedirect(amlsRegistrationNumber: String, maybeCacheMap: Option[CacheMap], credId: String, accountTypeId: (String, String))
                                 (implicit headerCarrier: HeaderCarrier): Future[Result] = {
+
     maybeCacheMap match {
       case Some(c) if c.getEntry[DataImport](DataImport.key).isDefined =>
         // $COVERAGE-OFF$
@@ -190,6 +194,8 @@ class LandingController @Inject()(val landingService: LandingService,
     // $COVERAGE-OFF$
     Logger.debug("getWithoutAmendments:AMLSReference:" + amlsRegistrationNumber.getOrElse("Amls registration number not available"))
     // $COVERAGE-ON$
+
+    implicit val hc = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(request)
 
     landingService.cacheMap(credId) flatMap {
       case Some(cache) =>

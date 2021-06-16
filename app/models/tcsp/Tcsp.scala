@@ -60,8 +60,6 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
       if(hasRegisteredOfficeEtc(s)) { t.isDefined & accepted } else accepted
     case Tcsp(Some(s), Some(_), Some(_), t, Some(false), _, _, accepted) =>
       if(hasRegisteredOfficeEtc(s)) { t.isDefined & accepted } else accepted
-    case Tcsp(Some(TcspTypes(serviceProviders)), Some(_), Some(_), _, Some(_), Some(_), _, accepted)
-      if !serviceProviders.contains(RegisteredOfficeEtc) => accepted
     case _ => false
   }
 
@@ -70,8 +68,6 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
       if(hasRegisteredOfficeEtc(s)) { t.isDefined & accepted } else accepted
     case Tcsp(Some(s), _, _, t, Some(false), _, _, accepted) =>
       if(hasRegisteredOfficeEtc(s)) { t.isDefined & accepted } else accepted
-    case Tcsp(Some(TcspTypes(serviceProviders)),_, _, _, Some(_), Some(_), _, accepted)
-      if !serviceProviders.contains(RegisteredOfficeEtc) => accepted
     case _ => false
   }
 

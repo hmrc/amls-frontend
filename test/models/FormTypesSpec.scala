@@ -320,11 +320,6 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
   }
 
   "localDateFutureRule" must {
-    val data = Map(
-      "day" -> Seq("24"),
-      "month" -> Seq("2"),
-      "year" -> Seq("1990")
-    )
 
     "fail to validate a future date" in {
       localDateFutureRule.validate(Map(

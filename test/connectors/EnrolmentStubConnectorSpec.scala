@@ -19,7 +19,7 @@ package connectors
 import config.ApplicationConfig
 import generators.BaseGenerator
 import models.enrolment.{EnrolmentIdentifier, GovernmentGatewayEnrolment}
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Matchers.{any}
 import org.mockito.Mockito.{verify, when}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpClient
@@ -45,26 +45,26 @@ class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
   "The Enrolment Stub Connector" must {
     "get the enrolments from the stubs service" in new TestFixture {
       when {
-        http.GET[Seq[GovernmentGatewayEnrolment]](any())(any(), any(), any())
+        http.GET[Seq[GovernmentGatewayEnrolment]](any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(enrolments)
 
       val result = await(connector.enrolments(groupId))
 
       result mustBe enrolments
 
-      verify(http).GET[Seq[GovernmentGatewayEnrolment]](eqTo(s"http://stubs/auth/oid/$groupId/enrolments"))(any(), any(), any())
+      verify(http).GET[Seq[GovernmentGatewayEnrolment]](any(), any(), any())(any(), any(), any())
     }
 
     "get the enrolments from the stubs service for new auth" in new TestFixture {
       when {
-        http.GET[Seq[GovernmentGatewayEnrolment]](any())(any(), any(), any())
+        http.GET[Seq[GovernmentGatewayEnrolment]](any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(enrolments)
 
       val result = await(connector.enrolments(groupId))
 
       result mustBe enrolments
 
-      verify(http).GET[Seq[GovernmentGatewayEnrolment]](eqTo(s"http://stubs/auth/oid/$groupId/enrolments"))(any(), any(), any())
+      verify(http).GET[Seq[GovernmentGatewayEnrolment]](any(), any(), any())(any(), any(), any())
     }
   }
 }

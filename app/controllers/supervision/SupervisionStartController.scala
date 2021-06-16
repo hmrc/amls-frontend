@@ -98,6 +98,7 @@ class SupervisionStartController @Inject()(val dataCacheConnector: DataCacheConn
   private def updateData(anotherBody: AnotherBody, data: SupervisionStart): AnotherBody = {
     val updatedAnotherBody = anotherBody match {
       case a@AnotherBodyYes(_, _, _, _) => a.startDate(data)
+      case _ => throw new Exception("An UnknownException has occurred : SupervisionStartReasonsController")
     }
     updatedAnotherBody
   }

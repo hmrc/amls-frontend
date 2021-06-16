@@ -78,9 +78,6 @@ class SupervisionStartControllerSpec extends AmlsSpec with MockitoSugar with Sca
     }
 
     "on get display the SupervisionStart page with empty form when there is no data" in new Fixture {
-      val start = new LocalDate(1990, 2, 24) //scalastyle:off magic.number
-      val end = new LocalDate(1998, 2, 24)   //scalastyle:off magic.number
-
       mockCacheFetch[Supervision](Some(Supervision(
         Some(AnotherBodyNo),
         None,
@@ -99,7 +96,6 @@ class SupervisionStartControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
     "on post with valid data" in new Fixture {
       val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
-      val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
       val newRequest = requestWithUrlEncodedBody(
         "anotherBody" -> "true",

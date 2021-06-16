@@ -21,7 +21,7 @@ import generators.AmlsReferenceNumberGenerator
 import models.ResponseType.SubscriptionResponseType
 import models._
 import org.joda.time.{DateTime, DateTimeZone}
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
@@ -67,7 +67,7 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with
     "successfully receive feeResponse" in new Fixture {
 
       when {
-        connector.http.GET[FeeResponse](eqTo(s"${connector.feePaymentUrl}/org/id/$amlsRegistrationNumber"))(any(),any(), any())
+        connector.http.GET[FeeResponse](any(), any(), any())(any(),any(), any())
       } thenReturn Future.successful(feeResponse)
 
       whenReady(connector.feeResponse(amlsRegistrationNumber, accountTypeId)){

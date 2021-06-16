@@ -143,7 +143,6 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
       )
 
       val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
-      val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
       val business = BusinessDetails(
         activityStartDate = Some(ActivityStartDate(new LocalDate(2015, 10, 1))),

@@ -266,9 +266,6 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
   private def promptFitAndProper(rp: ResponsiblePerson) =
     rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
 
-  private def removeFitAndProper(rp: ResponsiblePerson): ResponsiblePerson =
-    rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = None)).copy(hasAccepted = true)
-
   private def resetHasAccepted(rp: ResponsiblePerson): ResponsiblePerson =
     rp.approvalFlags.hasAlreadyPassedFitAndProper match {
       case None => rp.copy(hasAccepted = false)

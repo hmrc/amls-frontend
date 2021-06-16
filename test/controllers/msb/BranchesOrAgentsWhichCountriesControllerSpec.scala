@@ -85,7 +85,6 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
       )
 
       val result = controller.post()(newRequest)
-      val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustEqual BAD_REQUEST
     }

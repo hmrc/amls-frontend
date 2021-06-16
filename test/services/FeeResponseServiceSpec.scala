@@ -24,9 +24,8 @@ import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import uk.gov.hmrc.http.NotFoundException
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.AmlsSpec
-
 
 import scala.concurrent.Future
 
@@ -100,9 +99,9 @@ class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
 
       "called with amls reference number will return none if no fees retuned from connector" in new Fixture {
 
-        setupMockFeeConnector(testAmlsReference, None, new NotFoundException("not found").some)
+        setupMockFeeConnector(testAmlsReference, None, UpstreamErrorResponse("not found", 404, 404).some)
 
-        when(mockFeeConnector.feeResponse(any(), any())(any(), any(), any())).thenReturn(Future.failed(new NotFoundException("not found")))
+        when(mockFeeConnector.feeResponse(any(), any())(any(), any(), any())).thenReturn(Future.failed(UpstreamErrorResponse("not found", 404, 404)))
 
         whenReady(testFeeResponseService.getFeeResponse(testAmlsReference, accountTypeId)) { result =>
           result mustBe None

@@ -79,8 +79,6 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
     }
 
     "on get display the SupervisionEnd page with empty form when there is no data" in new Fixture {
-      val start = new LocalDate(1990, 2, 24) //scalastyle:off magic.number
-      val end = new LocalDate(1998, 2, 24) //scalastyle:off magic.number
 
       mockCacheFetch[Supervision](Some(Supervision(
         Some(AnotherBodyNo),

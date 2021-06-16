@@ -24,7 +24,6 @@ import org.jsoup.Jsoup
 import org.scalatest.MustMatchers
 import org.scalatest.mockito.MockitoSugar
 import play.api.mvc.Request
-import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.html.hvd.how_will_you_sell_goods
 

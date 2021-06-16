@@ -17,7 +17,6 @@
 package filters
 
 import javax.inject.Inject
-
 import akka.stream.Materializer
 import connectors.{AuthenticatorConnector, KeystoreConnector}
 import models.status.ConfirmationStatus
@@ -26,9 +25,9 @@ import play.api.mvc.{Filter, RequestHeader, Result}
 import play.api.mvc.Results.Redirect
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.play.HeaderCarrierConverter.fromHeadersAndSession
+import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
-class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, authenticator: AuthenticatorConnector)
+class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, authenticator: AuthenticatorConnector, headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter)
                                   (implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
   override def apply(nextFilter: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
 
@@ -51,9 +50,10 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
     // In this case, the filter should not interfere
     val isFilePath = rh.path.matches(".*\\.[a-zA-Z0-9]+$")
 
-    implicit val headerCarrier = fromHeadersAndSession(rh.headers, Some(rh.session))
 
-    if (headerCarrier.sessionId.isEmpty) {
+    implicit val hc = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(rh)
+
+    if (hc.sessionId.isEmpty) {
       nextFilter(rh)
     }
     else {

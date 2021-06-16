@@ -67,6 +67,7 @@ class AccountantForAMLSRegulationsController @Inject() (val dataCacheConnector: 
     data match {
       case d@Some(AccountantForAMLSRegulations(true)) => ba.accountantForAMLSRegulations(d)
       case d@Some(AccountantForAMLSRegulations(false)) => ba.accountantForAMLSRegulations(d).whoIsYourAccountant(None).taxMatters(None)
+      case _ => None
     }
   }
 }

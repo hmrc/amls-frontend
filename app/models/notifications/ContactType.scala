@@ -88,6 +88,7 @@ object ContactType {
       case ReminderToPayForRenewal => JsString("RPR1")
       case ReminderToPayForVariation => JsString("RPV1")
       case ReminderToPayForManualCharges => JsString("RPM1")
+      case _ => JsString("")
     }
 
   implicit def pathBinder(implicit stringBinder:PathBindable[String]) = new PathBindable[ContactType] {

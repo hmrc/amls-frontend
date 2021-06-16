@@ -96,6 +96,7 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
   private def updateData(anotherBody: AnotherBody, data: SupervisionEnd): AnotherBody = {
     val updatedAnotherBody = anotherBody match {
       case a@AnotherBodyYes(_, _, _, _) => a.endDate(data)
+      case _ => throw new Exception("Unable to update : SupervisionEndController")
     }
     updatedAnotherBody
   }

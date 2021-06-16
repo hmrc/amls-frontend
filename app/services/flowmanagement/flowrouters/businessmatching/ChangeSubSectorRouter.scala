@@ -38,6 +38,7 @@ class ChangeSubSectorRouter @Inject()(
     case SubSectorsPageId => subSectorRouter.getRoute(credId, model, edit)
     case PsrNumberPageId => psrNumberRouter.getRoute(credId, model, edit)
     case NoPSRPageId => noPsrRouter.getRoute(credId, model, edit)
+    case _ => throw new Exception("An Unknown Exception has occurred : ChangeSubSectorRouter")
   }
 }
 // $COVERAGE-ON$

@@ -25,17 +25,6 @@ class PreviousNameSpec extends PlaySpec {
 
   "PreviousName" must {
 
-    "have the formattedPreviousName function correctly return the value" in {
-
-      // scalastyle:off magic.number
-      val first = PreviousName(Some(true), Some("oldfirst"), None, None)
-      val middle = PreviousName(Some(true), None, Some("oldmiddle"), None)
-      val last = PreviousName(Some(true), None, None, Some("oldlast"))
-
-      val personName = PersonName("First", Some("Middle"), "Last")
-
-    }
-
     "successfully validate with all fields" in {
 
       val data: UrlFormEncoded = Map(

@@ -45,7 +45,6 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
 import views.html.status.your_registration
 
-import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
 class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMethodTester {
@@ -135,7 +134,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
     when(controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber), any[(String, String)]())(any(), any()))
       .thenReturn(Future.successful(Some(feeResponse)))
 
-    when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any(), any()))
+    when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
       .thenReturn(Future.successful(Seq()))
   }
 
@@ -167,8 +166,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
     "respond with SEE_OTHER and redirect to the landing page" when {
       "status is rejected and the new submission button is selected" in new Fixture {
 
-        val httpResponse = mock[HttpResponse]
-
         when(controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionRejected))
 
@@ -188,8 +185,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       }
 
       "status is deregistered and the new submission button is selected" in new Fixture {
-
-        val httpResponse = mock[HttpResponse]
 
         when(controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any()))
           .thenReturn(Future.successful(DeRegistered))
@@ -256,8 +251,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "application status is SubmissionReadyForReview" when {
         "there is a fee response available" in new Fixture {
-          val paymentRef = paymentRefGen.sample.get
-          val payment = paymentGen.sample.get.copy(isBacs = Some(true))
 
           when(controller.landingService.cacheMap(any[String])(any(), any()))
             .thenReturn(Future.successful(Some(cacheMap)))
@@ -612,7 +605,6 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(false))
 
         val result = controller.get()(request)
-        val doc = Jsoup.parse(contentAsString(result))
 
         redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
       }
@@ -817,7 +809,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "return 0 if there is amls ref number available but no notifications returned" in new Fixture with FutureAssertions {
 
-        when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any(), any()))
+        when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
           .thenReturn(Future.successful(Seq()))
 
         val result = controller.countUnreadNotifications(Some(amlsRegistrationNumber), None, ("", ""))
@@ -827,7 +819,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "return 1 if there is amls ref number available and 1 unread notification" in new Fixture with FutureAssertions {
 
-        when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any(), any()))
+        when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
           .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), false, amlsRegistrationNumber, "", IDType("")))))
 
         val result = controller.countUnreadNotifications(Some(amlsRegistrationNumber), None, ("", ""))
@@ -837,7 +829,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "return 1 if there is amls ref number available and 1 unread notification and 1 read notification" in new Fixture with FutureAssertions {
 
-        when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any(), any()))
+        when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
           .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), false, amlsRegistrationNumber, "", IDType("")),
             NotificationRow(None, None, None, false, DateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
 
@@ -848,7 +840,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "return 0 if there is amls ref number available and 1 read notification" in new Fixture with FutureAssertions {
 
-        when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any(), any()))
+        when(controller.notificationConnector.fetchAllByAmlsRegNo(eqTo(amlsRegistrationNumber), any())(any(), any()))
           .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
 
         val result = controller.countUnreadNotifications(Some(amlsRegistrationNumber), None, ("", ""))
@@ -858,7 +850,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "return 0 if there is safe id available but no notifications returned" in new Fixture with FutureAssertions {
 
-        when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any(), any()))
+        when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
           .thenReturn(Future.successful(Seq()))
 
         val result = controller.countUnreadNotifications(None, Some("internalId"), ("", ""))
@@ -868,7 +860,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "return 1 if there is safe id available and 1 unread notification" in new Fixture with FutureAssertions {
 
-        when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any(), any()))
+        when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
           .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), false, amlsRegistrationNumber, "", IDType("")))))
 
         val result = controller.countUnreadNotifications(None, Some("internalId"), ("", ""))
@@ -878,7 +870,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "return 1 if there is safe id available and 1 unread notification and 1 read notification" in new Fixture with FutureAssertions {
 
-        when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any(), any()))
+        when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
           .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), false, amlsRegistrationNumber, "", IDType("")),
             NotificationRow(None, None, None, false, DateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
 
@@ -889,7 +881,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "return 0 if there is safe id available and 1 read notification" in new Fixture with FutureAssertions {
 
-        when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any(), any()))
+        when(controller.notificationConnector.fetchAllBySafeId(eqTo("internalId"), any())(any(), any()))
           .thenReturn(Future.successful(Seq(NotificationRow(None, None, None, false, DateTime.now(), true, amlsRegistrationNumber, "", IDType("")))))
 
         val result = controller.countUnreadNotifications(None, Some("internalId"), ("", ""))

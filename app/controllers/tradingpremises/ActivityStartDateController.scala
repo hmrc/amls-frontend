@@ -65,8 +65,7 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
   }
 
   private def handleValidForm(credId: String, index: Int, edit: Boolean, data: ActivityStartDate)
-                             (implicit hc: HeaderCarrier,
-                              request: Request[_]) = {
+                             (implicit hc: HeaderCarrier) = {
     for {
       _ <- updateDataStrict[TradingPremises](credId, index) { tp =>
         val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None)(x => Some(x.copy(startDate = Some(data.startDate))))

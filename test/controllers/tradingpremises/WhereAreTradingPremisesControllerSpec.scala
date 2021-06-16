@@ -107,7 +107,6 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
         val result = controller.get(RecordId1, false)(request)
-        val document = Jsoup.parse(contentAsString(result))
 
         hstatus(result) must be(OK)
 
@@ -477,7 +476,6 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
   "return view for Date of Change" in new Fixture {
     val result = controller.dateOfChange(1)(request)
-    implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
     hstatus(result) must be(OK)
   }
 

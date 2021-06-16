@@ -17,8 +17,9 @@
 package services
 
 import config.ApplicationConfig
-import connectors.{AmlsConnector, DataCacheConnector, BusinessMatchingConnector}
+import connectors.{AmlsConnector, BusinessMatchingConnector, DataCacheConnector}
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
+
 import javax.inject.Inject
 import models._
 import models.amp.Amp
@@ -42,7 +43,7 @@ import models.tradingpremises.TradingPremises.FilterUtils
 import play.api.http.Status.UNPROCESSABLE_ENTITY
 import play.api.libs.json.Format
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import utils.StatusConstants
 import play.api.mvc.Request
 
@@ -76,7 +77,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
         case _ => ""
       }), groupId, credId)
     } yield subscription) recoverWith {
-      case e: Upstream4xxResponse if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
+      case e: UpstreamErrorResponse if e.statusCode == UNPROCESSABLE_ENTITY =>
         Future.failed(SubscriptionErrorResponse.from(e).fold[Throwable](e)(r => DuplicateSubscriptionException(r.message)))
     }
   }
@@ -163,7 +164,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     } yield c
   }
 
-  private def safeId(cache: CacheMap)(implicit ec: ExecutionContext, request: Request[_]): Future[String] = {
+  private def safeId(cache: CacheMap)(implicit ec: ExecutionContext, request: Request[_], headerCarrier: HeaderCarrier): Future[String] = {
     (for {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       rd <- bm.reviewDetails

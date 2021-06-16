@@ -51,7 +51,6 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
 
   "AgentCompanyDetailsController" when {
 
-    val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]
 
     "get is called" must {

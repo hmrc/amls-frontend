@@ -18,10 +18,10 @@ package services.cache
 
 import config.ApplicationConfig
 import connectors.cache.Conversions
+
 import javax.inject.Inject
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.DefaultDB
@@ -35,6 +35,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
@@ -140,7 +141,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
       val document = Json.toJson(updatedCache)
       val modifier = BSONDocument("$set" -> document)
 
-      collection.update(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
+      collection.update(ordered = false).one(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
     }
   }
 
@@ -161,7 +162,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
       val document = Json.toJson(updatedCache)
       val modifier = BSONDocument("$set" -> document)
 
-      collection.update(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
+      collection.update(ordered = false).one(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
     }
   }
 
@@ -195,14 +196,14 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
   /**
     * Fetches the whole cache
     */
-  def fetchAll(credId: String): Future[Option[Cache]] = collection.find(bsonIdQuery(credId)).one[Cache] map {
+  def fetchAll(credId: String): Future[Option[Cache]] = collection.find(bsonIdQuery(credId), Option.empty[Cache]).one[Cache] map {
     case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
     case c => c
   }
 
   def fetchAll(credId: Option[String]): Future[Option[Cache]] = {
     credId match {
-      case Some(x) => collection.find(key(x)).one[Cache] map {
+      case Some(x) => collection.find(key(x), Option.empty[Cache]).one[Cache] map {
         case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
         case c => c
       }
@@ -222,7 +223,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
     * Removes the item with the specified id from the cache
     */
   def removeById(credId: String) =
-    collection.remove(key(credId)) map handleWriteResult
+    collection.delete().one(key(credId)) map handleWriteResult
 
   /**
     * Saves the cache data into the database
@@ -239,7 +240,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
       }
     })
 
-    collection.update(bsonIdQuery(cache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
+    collection.update(ordered = false).one(bsonIdQuery(cache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
   }
 
   def saveAll(cache: Cache, credId: String): Future[Boolean] = {
@@ -254,7 +255,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
       }
     })
 
-    collection.update(bsonIdQuery(rebuiltCache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
+    collection.update(ordered = false).one(bsonIdQuery(rebuiltCache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
   }
 
   /**

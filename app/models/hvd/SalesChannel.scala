@@ -16,15 +16,13 @@
 
 package models.hvd
 
-import play.api.i18n.{Messages, Lang}
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.Messages
 
 sealed trait SalesChannel {
-  def getMessage(implicit lang: Lang): String = this match {
-    case Retail => Messages("hvd.how-will-you-sell-goods.channels.retail")
-    case Wholesale => Messages("hvd.how-will-you-sell-goods.channels.wholesale")
-    case Auction => Messages("hvd.how-will-you-sell-goods.channels.auction")
+  def getMessage(implicit messages: Messages): String = this match {
+    case Retail => messages("hvd.how-will-you-sell-goods.channels.retail")
+    case Wholesale => messages("hvd.how-will-you-sell-goods.channels.wholesale")
+    case Auction => messages("hvd.how-will-you-sell-goods.channels.auction")
   }
 }
 

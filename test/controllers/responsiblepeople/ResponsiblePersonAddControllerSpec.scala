@@ -72,7 +72,6 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
         val requiredSuccess =10
 
 
-        val zeroCase = Gen.const(0)
         val emptyCache = CacheMap("", Map.empty)
         val reasonableCounts = for (n <- Gen.choose(min, max)) yield n
 

@@ -71,8 +71,6 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     }
 
     "on get display the Another Body page with empty form when there is no data" in new Fixture {
-      val start = new LocalDate(1990, 2, 24) //scalastyle:off magic.number
-      val end = new LocalDate(1998, 2, 24) //scalastyle:off magic.number
 
       mockCacheFetch[Supervision](Some(Supervision(
         Some(AnotherBodyNo),
@@ -142,8 +140,6 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       }
 
       "redirect to summary when supervision is complete" in new Fixture with SupervisionValues {
-        val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
-        val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
         val newRequest = requestWithUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 

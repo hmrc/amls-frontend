@@ -199,7 +199,6 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
             } thenReturn Future.successful(submissionStatus)
 
             val result = controller.post()(postRequest)
-            val body = contentAsString(result)
 
             status(result) mustBe 500
           }

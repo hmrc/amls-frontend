@@ -20,7 +20,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
-import models.renewal.{BankMoneySource, MoneySources, Renewal, UsesForeignCurrenciesYes, WhichCurrencies, WholesalerMoneySource}
+import models.renewal.{MoneySources, Renewal, UsesForeignCurrenciesYes, WhichCurrencies}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -168,14 +168,6 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "save the model data into the renewal object" in new RoutingFixture {
-        val currentModel = WhichCurrencies(
-          Seq("USD", "GBP", "BOB"),
-          Some(UsesForeignCurrenciesYes),
-          Some(MoneySources(
-          Some(BankMoneySource("Bank names")),
-          Some(WholesalerMoneySource("wholesaler names")),
-          Some(true))))
-
         val result = await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
 

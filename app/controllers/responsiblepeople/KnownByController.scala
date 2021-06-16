@@ -64,6 +64,7 @@ class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
                   case Some(false) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                     rp.knownBy(KnownBy(Some(false), None))
                   }
+                  case None => throw new Exception("An UnknownException has occurred: KnownByController")
                 }
               }
             } yield edit match {

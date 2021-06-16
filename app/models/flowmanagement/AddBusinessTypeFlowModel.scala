@@ -17,7 +17,7 @@
 package models.flowmanagement
 
 import models.businessmatching._
-import play.api.i18n.Lang
+import play.api.i18n.Messages
 import play.api.libs.json.Json
 
 case class AddBusinessTypeFlowModel(activity: Option[BusinessActivity] = None,
@@ -62,7 +62,7 @@ case class AddBusinessTypeFlowModel(activity: Option[BusinessActivity] = None,
     case _ => true
   }
 
-  def activityName(implicit lang: Lang) = this.activity map {
+  def activityName(implicit messages: Messages) = this.activity map {
     _.getMessage()
   }
 
