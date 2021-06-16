@@ -35,7 +35,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.Format
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
@@ -80,7 +80,6 @@ class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: Da
 
     http.GET[UpdateMongoCacheResponse](requestUrl)
       .map { r =>
-        import utils.Strings._
         Some(r.copy(dataImport = Some(DataImport(fileName)))) }
       .recover {
         case e: UpstreamErrorResponse if e.statusCode == 404 => None

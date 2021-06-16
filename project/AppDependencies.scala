@@ -11,7 +11,7 @@ private object AppDependencies {
   private val validationVersion = "2.1.0"
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
-  private val jsonEncryptionVersion = "4.8.0-play-26"
+  private val jsonEncryptionVersion = "4.10.0-play-26"
   private val playReactivemongoVersion = "8.0.0-play-26"
   private val domain = "5.11.0-play-26"
 
@@ -37,8 +37,8 @@ private object AppDependencies {
     "com.typesafe.play" %% "play-json" % "2.6.14",
     "com.typesafe.play" %% "play-json-joda" % "2.6.14",
     
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.1" cross CrossVersion.full),
-    "com.github.ghik" % "silencer-lib" % "1.7.1" % Provided cross CrossVersion.full
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.5" cross CrossVersion.full),
+    "com.github.ghik" % "silencer-lib" % "1.7.5" % Provided cross CrossVersion.full
   )
 
   trait ScopeDependencies {

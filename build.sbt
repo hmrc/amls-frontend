@@ -25,7 +25,7 @@ lazy val scoverageSettings = {
     // Semicolon-separated list of regexs matching classes to exclude
     ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;modgiels/.data/..*;view.*;forms.*;config.*;" +
       ".*BuildInfo.;uk.gov.hmrc.BuildInfo;.*Routes;.*RoutesPrefix*;controllers.ExampleController;controllers.testonly.TestOnlyController",
-    ScoverageKeys.coverageMinimum := 90,
+    ScoverageKeys.coverageMinimumStmtTotal := 90,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     parallelExecution in Test := false
@@ -42,6 +42,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(scalaVersion := "2.12.13")
   .settings(routesImport += "models.notifications.ContactType._")
   .settings(routesImport += "utils.Binders._")
+  .settings(Global / lintUnusedKeysOnLoad := false)
   .settings(
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
@@ -59,8 +60,7 @@ lazy val microservice = Project(appName, file("."))
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
     parallelExecution in IntegrationTest := false)
   .settings(
-    resolvers += Resolver.bintrayRepo("hmrc", "releases"),
-    resolvers += Resolver.jcenterRepo
+    resolvers += Resolver.bintrayRepo("hmrc", "releases")
   )
  .settings(
     scalacOptions ++= List(
