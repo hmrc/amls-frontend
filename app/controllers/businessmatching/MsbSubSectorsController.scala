@@ -29,7 +29,7 @@ import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import services.flowmanagement.Router
+import services.flowmanagement.{Router,Router2}
 import utils.AuthAction
 import views.html.businessmatching.services
 
@@ -39,6 +39,7 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
                                         val ds: CommonPlayDependencies,
                                         val dataCacheConnector: DataCacheConnector,
                                         val router: Router[ChangeSubSectorFlowModel],
+                                        val router2: Router2[ChangeSubSectorFlowModel],
                                         val businessMatchingService: BusinessMatchingService,
                                         val statusService:StatusService,
                                         val helper: ChangeSubSectorHelper,
@@ -58,7 +59,7 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
         }) getOrElse Ok(services(EmptyForm, edit, fxEnabledToggle = config.fxEnabledToggle))
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false) = authAction.async {
       implicit request =>
         import jto.validation.forms.Rules._
         Form2[BusinessMatchingMsbServices](request.body) match {
@@ -69,9 +70,9 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
               _.getOrElse(ChangeSubSectorFlowModel()).copy(subSectors = Some(data.msbServices))
             } flatMap {
               case Some(m@ChangeSubSectorFlowModel(Some(set), _)) if !(set contains TransmittingMoney) =>
-                helper.updateSubSectors(request.credId, m) flatMap { _ => router.getRoute(request.credId, SubSectorsPageId, m, edit) }
+                helper.updateSubSectors(request.credId, m) flatMap { _ => router2.getRoute(request.credId, SubSectorsPageId, m, edit, includeCompanyNotRegistered) }
               case Some(updatedModel) =>
-                router.getRoute(request.credId, SubSectorsPageId, updatedModel, edit)
+                router2.getRoute(request.credId, SubSectorsPageId, updatedModel, edit, includeCompanyNotRegistered)
             }
         }
   }

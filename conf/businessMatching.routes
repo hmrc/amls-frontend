@@ -8,16 +8,19 @@ GET         /type-of-business                                       @controllers
 POST        /type-of-business                                       @controllers.businessmatching.TypeOfBusinessController.post(edit: Boolean ?= false)
 
 GET         /services                                               @controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
-POST        /services                                               @controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
+POST        /services                                               @controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false, includeCompanyNotRegistered: Boolean ?= false)
 
 GET         /registration-number                                    @controllers.businessmatching.CompanyRegistrationNumberController.get(edit: Boolean ?= false)
 POST        /registration-number                                    @controllers.businessmatching.CompanyRegistrationNumberController.post(edit: Boolean ?= false)
 
 GET         /money-service-business-activities                      @controllers.businessmatching.MsbSubSectorsController.get(edit: Boolean ?= false)
-POST        /money-service-business-activities                      @controllers.businessmatching.MsbSubSectorsController.post(edit: Boolean ?= false)
+POST        /money-service-business-activities                      @controllers.businessmatching.MsbSubSectorsController.post(edit: Boolean ?= false , includeCompanyNotRegistered: Boolean ?= false)
 
 GET         /psr-registration-number                                @controllers.businessmatching.PSRNumberController.get(edit: Boolean ?= false)
-POST        /psr-registration-number                                @controllers.businessmatching.PSRNumberController.post(edit: Boolean ?= false)
+POST        /psr-registration-number                                @controllers.businessmatching.PSRNumberController.post(edit: Boolean ?= false , includeCompanyNotRegistered: Boolean ?= false)
+
+GET         /check-company-is-not-registered                        @controllers.businessmatching.CheckCompanyController.get()
+GET         /check-company-is-not-registered                        @controllers.businessmatching.CheckCompanyController.post()
 
 GET         /check-your-answers                                     @controllers.businessmatching.SummaryController.get()
 POST        /check-your-answers                                     @controllers.businessmatching.SummaryController.post()

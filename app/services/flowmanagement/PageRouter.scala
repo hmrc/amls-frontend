@@ -32,3 +32,12 @@ trait PageRouter[A] {
   def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
 }
 
+trait PageRouterCompanyNotRegistered[A] {
+  def getRoute(credId: String, model: A, edit: Boolean = false, includeCompanyNotRegistered: Boolean = false)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result]
+
+  implicit def toFutureRedirect(call: Call): Future[Result] = Future.successful(Redirect(call))
+  implicit def toFuture(result: Result): Future[Result] = Future.successful(result)
+
+  def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
+}
+

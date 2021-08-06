@@ -28,7 +28,7 @@ import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import services.flowmanagement.Router
+import services.flowmanagement.Router2
 import utils.AuthAction
 import views.html.businessmatching.psr_number
 
@@ -37,7 +37,7 @@ class PSRNumberController @Inject()(authAction: AuthAction,
                                     val dataCacheConnector: DataCacheConnector,
                                     val statusService: StatusService,
                                     val businessMatchingService: BusinessMatchingService,
-                                    val router: Router[ChangeSubSectorFlowModel],
+                                    val router: Router2[ChangeSubSectorFlowModel],
                                     val helper: ChangeSubSectorHelper,
                                     val cc: MessagesControllerComponents,
                                     psr_number: psr_number) extends AmlsBaseController(ds, cc) {
@@ -54,9 +54,9 @@ class PSRNumberController @Inject()(authAction: AuthAction,
         }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
    }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false) = authAction.async {
       implicit request => {
-        val route = router.getRoute(request.credId, PsrNumberPageId, _: ChangeSubSectorFlowModel, edit)
+        val route = router.getRoute(request.credId, PsrNumberPageId, _: ChangeSubSectorFlowModel, edit, includeCompanyNotRegistered)
         Form2[BusinessAppliedForPSRNumber](request.body) match {
           case f: InvalidForm =>
             (for {

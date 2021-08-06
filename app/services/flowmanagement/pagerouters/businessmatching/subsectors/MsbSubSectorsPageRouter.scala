@@ -21,7 +21,7 @@ import models.businessmatching.TransmittingMoney
 import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
-import services.flowmanagement.PageRouter
+import services.flowmanagement.{PageRouter, PageRouterCompanyNotRegistered}
 import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,6 +33,25 @@ class MsbSubSectorsPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
       case sectors if sectors.contains(TransmittingMoney) =>
         routes.PSRNumberController.get(edit)
       case _ => routes.SummaryController.get()
+    }
+
+    result.fold(error(SubSectorsPageId))(Redirect)
+  }
+}
+
+class MsbSubSectorsPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
+
+  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean, includeCompanyNotRegistered: Boolean)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+    val result = model.subSectors map {
+      case sectors if sectors.contains(TransmittingMoney) =>
+        routes.PSRNumberController.get(edit)
+      case _ =>
+        if(includeCompanyNotRegistered){
+          routes.CheckCompanyController.get()
+        }else {
+          routes.SummaryController.get()
+        }
     }
 
     result.fold(error(SubSectorsPageId))(Redirect)
