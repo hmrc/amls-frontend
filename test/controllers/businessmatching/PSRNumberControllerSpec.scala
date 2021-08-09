@@ -57,7 +57,7 @@ class PSRNumberControllerSpec extends AmlsSpec
       mockCacheConnector,
       mockStatusService,
       mock[BusinessMatchingService],
-      createRouter[ChangeSubSectorFlowModel],
+      createRouter2[ChangeSubSectorFlowModel],
       mock[ChangeSubSectorHelper],
       cc = mockMcc,
       psr_number = view

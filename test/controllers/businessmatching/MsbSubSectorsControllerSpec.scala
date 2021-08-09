@@ -50,7 +50,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
     val controller = new MsbSubSectorsController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
-      createRouter[ChangeSubSectorFlowModel],
+      createRouter2[ChangeSubSectorFlowModel],
       mock[BusinessMatchingService],
       mockStatusService,
       mock[ChangeSubSectorHelper],
