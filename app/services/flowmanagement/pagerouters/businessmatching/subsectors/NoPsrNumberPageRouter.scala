@@ -17,10 +17,13 @@
 package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
-import models.flowmanagement.ChangeSubSectorFlowModel
+import models.businessmatching.{BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
+import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
 import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import services.flowmanagement.{PageRouter, PageRouterCompanyNotRegistered}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class NoPsrNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
@@ -36,11 +39,18 @@ class NoPsrNumberPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegi
 
   override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean, includeCompanyNotRegistered: Boolean)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-if (includeCompanyNotRegistered){
-  routes.CheckCompanyController.get()
-}else {
-  routes.SummaryController.get()
-}
+    val call = model.psrNumber map {
+      case BusinessAppliedForPSRNumberNo => {
+        if (includeCompanyNotRegistered) {
+          routes.CheckCompanyController.get()
+        }else{
+          routes.NoPsrController.get()
+        }
+      }
+      case _ => routes.SummaryController.get()
+    }
+
+    call.fold(error(PsrNumberPageId))(Redirect)
 
   }
 }
