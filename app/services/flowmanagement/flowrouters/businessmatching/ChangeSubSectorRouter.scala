@@ -20,7 +20,7 @@ import javax.inject.Inject
 import models.flowmanagement._
 import play.api.mvc.Result
 import services.flowmanagement.{Router, Router2}
-import services.flowmanagement.pagerouters.businessmatching.subsectors.{MsbSubSectorsPageRouter, MsbSubSectorsPageRouterCompanyNotRegistered, NoPsrNumberPageRouter, NoPsrNumberPageRouterCompanyNotRegistered, PSRNumberPageRouter}
+import services.flowmanagement.pagerouters.businessmatching.subsectors.{MsbSubSectorsPageRouter, MsbSubSectorsPageRouterCompanyNotRegistered, NoPsrNumberPageRouter, NoPsrNumberPageRouterCompanyNotRegistered, PSRNumberPageRouter, PSRNumberPageRouterCompanyNotRegistered}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,7 +45,7 @@ class ChangeSubSectorRouter @Inject()(
 
 class ChangeSubSectorRouter2 @Inject()(
                                        subSectorRouter: MsbSubSectorsPageRouterCompanyNotRegistered,
-                                       psrNumberRouter: NoPsrNumberPageRouterCompanyNotRegistered,
+                                       psrNumberRouter: PSRNumberPageRouterCompanyNotRegistered,
                                        noPsrRouter: NoPsrNumberPageRouterCompanyNotRegistered
                                      ) extends Router2[ChangeSubSectorFlowModel] {
 
