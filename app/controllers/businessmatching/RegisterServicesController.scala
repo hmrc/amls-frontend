@@ -63,7 +63,7 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
         }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false) = authAction.async {
       implicit request =>
         import jto.validation.forms.Rules._
         Form2[BusinessMatchingActivities](request.body) match {
@@ -105,7 +105,7 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
                 val rps = responsiblePeople.map(rp => workFlow((rp, activities, isRemovingActivity)))
 
                 updateResponsiblePeople(request.credId, rps) map { _ =>
-                  redirectTo(data.businessActivities)
+                  redirectTo(data.businessActivities, includeCompanyNotRegistered)
                 }
               }
             }
@@ -195,10 +195,14 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
     }
   }
 
-  private def redirectTo(businessActivities: Set[BusinessActivity]) = if (businessActivities.contains(MoneyServiceBusiness)) {
+  private def redirectTo(businessActivities: Set[BusinessActivity], includeCompanyNotRegistered: Boolean = false) = if (businessActivities.contains(MoneyServiceBusiness)) {
     Redirect(routes.MsbSubSectorsController.get())
   } else {
-    Redirect(routes.SummaryController.get())
+    if (includeCompanyNotRegistered){
+      Redirect(routes.CheckCompanyController.get())
+    }else {
+      Redirect(routes.SummaryController.get())
+    }
   }
 
   private def getActivityValues(f: Form2[_], isPreSubmission: Boolean, existingActivities: Option[Set[BusinessActivity]]): (Set[String], Set[String]) = {

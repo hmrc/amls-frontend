@@ -19,8 +19,9 @@ package services.flowmanagement.pagerouters.businessmatching.subsectors
 import controllers.businessmatching.routes
 import models.flowmanagement.ChangeSubSectorFlowModel
 import play.api.mvc.Result
-import services.flowmanagement.PageRouter
+import services.flowmanagement.{PageRouter, PageRouterCompanyNotRegistered}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class NoPsrNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
@@ -31,4 +32,15 @@ class NoPsrNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
     routes.SummaryController.get()
 
   }
+}
+class NoPsrNumberPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegistered[ChangeSubSectorFlowModel] {
+
+  override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean, includeCompanyNotRegistered: Boolean)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+        if (includeCompanyNotRegistered) {
+          routes.CheckCompanyController.get()
+        }else{
+          routes.SummaryController.get()
+        }
+      }
 }

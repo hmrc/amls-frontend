@@ -19,8 +19,8 @@ package modules
 import com.google.inject.{AbstractModule, TypeLiteral}
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.{AddBusinessTypeFlowModel, ChangeSubSectorFlowModel, RemoveBusinessTypeFlowModel}
-import services.flowmanagement.Router
-import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRouter, ChangeBusinessTypeRouter, ChangeSubSectorRouter, RemoveBusinessTypeRouter}
+import services.flowmanagement.{Router, Router2}
+import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRouter, ChangeBusinessTypeRouter, ChangeSubSectorRouter, ChangeSubSectorRouter2, RemoveBusinessTypeRouter}
 
 class Module extends AbstractModule {
 
@@ -29,5 +29,6 @@ class Module extends AbstractModule {
     bind(new TypeLiteral[Router[ChangeBusinessType]] {}).to(classOf[ChangeBusinessTypeRouter])
     bind(new TypeLiteral[Router[RemoveBusinessTypeFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])
     bind(new TypeLiteral[Router[ChangeSubSectorFlowModel]] {}).to(classOf[ChangeSubSectorRouter])
+    bind(new TypeLiteral[Router2[ChangeSubSectorFlowModel]] {}).to(classOf[ChangeSubSectorRouter2])
   }
 }

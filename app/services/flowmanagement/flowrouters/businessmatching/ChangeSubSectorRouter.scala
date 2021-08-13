@@ -19,9 +19,10 @@ package services.flowmanagement.flowrouters.businessmatching
 import javax.inject.Inject
 import models.flowmanagement._
 import play.api.mvc.Result
-import services.flowmanagement.Router
-import services.flowmanagement.pagerouters.businessmatching.subsectors.{MsbSubSectorsPageRouter, NoPsrNumberPageRouter, PSRNumberPageRouter}
+import services.flowmanagement.{Router, Router2}
+import services.flowmanagement.pagerouters.businessmatching.subsectors.{MsbSubSectorsPageRouter, MsbSubSectorsPageRouterCompanyNotRegistered, NoPsrNumberPageRouter, NoPsrNumberPageRouterCompanyNotRegistered, PSRNumberPageRouter, PSRNumberPageRouterCompanyNotRegistered}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.{ExecutionContext, Future}
 
 // $COVERAGE-OFF$
@@ -38,6 +39,21 @@ class ChangeSubSectorRouter @Inject()(
     case SubSectorsPageId => subSectorRouter.getRoute(credId, model, edit)
     case PsrNumberPageId => psrNumberRouter.getRoute(credId, model, edit)
     case NoPSRPageId => noPsrRouter.getRoute(credId, model, edit)
+    case _ => throw new Exception("An Unknown Exception has occurred : ChangeSubSectorRouter")
+  }
+}
+
+class ChangeSubSectorRouter2 @Inject()(
+                                       subSectorRouter: MsbSubSectorsPageRouterCompanyNotRegistered,
+                                       psrNumberRouter: PSRNumberPageRouterCompanyNotRegistered,
+                                       noPsrRouter: NoPsrNumberPageRouterCompanyNotRegistered
+                                     ) extends Router2[ChangeSubSectorFlowModel] {
+
+  override def getRoute(credId: String, pageId: PageId, model: ChangeSubSectorFlowModel, edit: Boolean, includeCompanyNotRegistered: Boolean)
+                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = pageId match {
+    case SubSectorsPageId => subSectorRouter.getRoute(credId, model, edit,includeCompanyNotRegistered)
+    case PsrNumberPageId => psrNumberRouter.getRoute(credId, model, edit, includeCompanyNotRegistered)
+    case NoPSRPageId => noPsrRouter.getRoute(credId, model, edit, includeCompanyNotRegistered)
     case _ => throw new Exception("An Unknown Exception has occurred : ChangeSubSectorRouter")
   }
 }

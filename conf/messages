@@ -1647,6 +1647,12 @@ businessmatching.cannotchangeservices.requiredinfo = Your business must have a P
 
 businessmatching.cannotchangeservices.button.text = Return to about your business
 
+
+businessmatching.checkbusiness.title = Make sure this company is not already registered
+businessmatching.checkbusiness.body = Before you continue, check this company is not already registered for money laundering supervision. For example, if you’re in a partnership your partner may have already done so. HMRC can only check after you finish registration.
+businessmatching.checkbusiness.warning = A company can only be registered for money laundering supervision once.
+businessmatching.checkbusiness.button = Continue
+
 ########################################################################################################################
 ########################################################################################################################
 ##############                                                                                            ##############

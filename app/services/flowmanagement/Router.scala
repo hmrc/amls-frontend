@@ -27,3 +27,9 @@ trait Router[A] {
               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result]
 }
 
+trait Router2[A] {
+
+  def getRoute(credId: String, pageId: PageId, model: A, edit: Boolean = false, includeCompanyNotRegistered : Boolean = false)
+              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result]
+}
+
