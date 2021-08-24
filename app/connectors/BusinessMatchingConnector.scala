@@ -19,7 +19,7 @@ package connectors
 import config.ApplicationConfig
 
 import javax.inject.Inject
-import play.api.Logger
+import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.Request
 
@@ -64,7 +64,7 @@ object BusinessMatchingReviewDetails {
 }
 
 class BusinessMatchingConnector @Inject()(val http: HttpClient,
-                                          val applicationConfig: ApplicationConfig) {
+                                          val applicationConfig: ApplicationConfig) extends Logging {
 
   val serviceName = "amls"
 
@@ -74,21 +74,22 @@ class BusinessMatchingConnector @Inject()(val http: HttpClient,
     val logPrefix = "[BusinessMatchingConnector][getReviewDetails]"
 
     // $COVERAGE-OFF$
-    Logger.debug(s"$logPrefix Fetching $url..")
+
+    logger.debug(s"$logPrefix Fetching $url..")
     // $COVERAGE-ON$
 
     http.GET[BusinessMatchingReviewDetails](url) map { result =>
 
 
       // $COVERAGE-OFF$
-      Logger.debug(s"$logPrefix Finished getting review details. Name: ${result.businessName}")
+      logger.debug(s"$logPrefix Finished getting review details. Name: ${result.businessName}")
       // $COVERAGE-ON$
       Some(result)
     } recoverWith {
       case e : UpstreamErrorResponse if e.statusCode == 404 => Future.successful(None)
       case ex =>
         // $COVERAGE-OFF$
-        Logger.warn(s"$logPrefix Failed to fetch review details", ex)
+        logger.warn(s"$logPrefix Failed to fetch review details", ex)
         // $COVERAGE-ON$
         Future.failed(ex)
     }

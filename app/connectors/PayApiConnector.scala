@@ -21,7 +21,7 @@ import cats.implicits._
 import com.google.inject.Inject
 import config.ApplicationConfig
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
-import play.api.Logger
+import play.api.Logging
 import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
@@ -32,11 +32,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class PayApiConnector @Inject()(
                                  val http: HttpClient,
                                  val auditConnector: DefaultAuditConnector,
-                                 val applicationConfig: ApplicationConfig) extends HttpResponseHelper  {
+                                 val applicationConfig: ApplicationConfig) extends HttpResponseHelper with Logging {
 
   // $COVERAGE-OFF$
-  private val logDebug = (msg: String) => Logger.debug(s"[PayApiConnector] $msg")
-  private val logError = (msg: String) => Logger.error(s"[PayApiConnector] $msg")
+  private val logDebug = (msg: String) => logger.debug(s"[PayApiConnector] $msg")
+  private val logError = (msg: String) => logger.error(s"[PayApiConnector] $msg")
   // $COVERAGE-ON$
 
   def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {

@@ -21,7 +21,7 @@ import connectors.cache.Conversions
 
 import javax.inject.Inject
 import org.joda.time.{DateTime, DateTimeZone}
-import play.api.Logger
+import play.api.Logging
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.DefaultDB
@@ -99,16 +99,18 @@ class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCr
 class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applicationCrypto: ApplicationCrypto)
   extends ReactiveRepository[Cache, BSONObjectID]("app-cache", db, Cache.format)
     with Conversions
-    with CacheOps {
+    with CacheOps
+    with Logging
+{
 
   private val logPrefix = "[MongoCacheClient]"
 
   // $COVERAGE-OFF$
-  private def debug(msg: String) = Logger.debug(s"$logPrefix $msg")
+  private def debug(msg: String) = logger.debug(s"$logPrefix $msg")
 
-  private def error(msg: String, e: Throwable) = Logger.error(s"$logPrefix $msg", e)
+  private def error(msg: String, e: Throwable) = logger.error(s"$logPrefix $msg", e)
 
-  private def error(msg: String) = Logger.error(s"$logPrefix $msg")
+  private def error(msg: String) = logger.error(s"$logPrefix $msg")
   // $COVERAGE-ON$
 
   implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto

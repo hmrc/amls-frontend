@@ -22,7 +22,7 @@ import models.ResponseType.AmendOrVariationResponseType
 import models.confirmation.Currency
 import models.status._
 import models.{FeeResponse, SubmissionRequestStatus}
-import play.api.Logger
+import play.api.Logging
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
 import services.{AuthEnrolmentsService, StatusService, _}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -47,14 +47,14 @@ class ConfirmationController @Inject()(authAction: AuthAction,
                                        confirm_amendvariation: confirm_amendvariation,
                                        confirmation_new: confirmation_new,
                                        confirmation_no_fee: confirmation_no_fee
-                                      ) extends AmlsBaseController(ds, cc) {
+                                      ) extends AmlsBaseController(ds, cc) with Logging {
 
   val prefix = "[ConfirmationController]"
 
   def get() = authAction.async {
     implicit request =>
       // $COVERAGE-OFF$
-      Logger.debug(s"[$prefix] - begin get()...")
+      logger.debug(s"[$prefix] - begin get()...")
       // $COVERAGE-ON$
       for {
         _ <- authenticator.refreshProfile
@@ -100,17 +100,17 @@ class ConfirmationController @Inject()(authAction: AuthAction,
                               (implicit hc: HeaderCarrier, request: Request[AnyContent], statusService: StatusService): Future[Result] = {
 
     // $COVERAGE-OFF$
-    Logger.debug(s"[$prefix][resultFromStatus] - Begin get fee response...)")
+    logger.debug(s"[$prefix][resultFromStatus] - Begin get fee response...)")
     // $COVERAGE-ON$
 
     feeHelper.retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier, prefix) flatMap {
       case Some(fees) if fees.paymentReference.isDefined && fees.toPay(status, submissionRequestStatus) > 0 =>
         // $COVERAGE-OFF$
-        Logger.debug(s"[$prefix][resultFromStatus] - Fee found)")
+        logger.debug(s"[$prefix][resultFromStatus] - Fee found)")
         // $COVERAGE-ON$
 
         // $COVERAGE-OFF$
-        Logger.debug(s"[$prefix][resultFromStatus] - fees: $fees")
+        logger.debug(s"[$prefix][resultFromStatus] - fees: $fees")
         // $COVERAGE-ON$
 
         status match {
@@ -125,7 +125,7 @@ class ConfirmationController @Inject()(authAction: AuthAction,
 
       case _ =>
         // $COVERAGE-OFF$
-        Logger.debug(s"[$prefix][resultFromStatus] - No fee found)")
+        logger.debug(s"[$prefix][resultFromStatus] - No fee found)")
         // $COVERAGE-ON$
         for {
           name <- BusinessName.getBusinessNameFromAmls(amlsRegistrationNumber, accountTypeId, credId).value

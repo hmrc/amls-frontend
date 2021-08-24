@@ -23,7 +23,7 @@ import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsExcep
 import javax.inject.Inject
 import models.enrolment.ErrorResponse._
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentKey, ErrorResponse, TaxEnrolment}
-import play.api.Logger
+import play.api.Logging
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, UpstreamErrorResponse}
@@ -32,7 +32,7 @@ import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: ApplicationConfig, audit: AuditConnector) {
+class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: ApplicationConfig, audit: AuditConnector) extends Logging {
 
   lazy val baseUrl = if (appConfig.enrolmentStubsEnabled) {
     s"${appConfig.enrolmentStubsUrl}/tax-enrolments"
@@ -41,7 +41,7 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
   }
 
   // $COVERAGE-OFF$
-  val warn: String => Unit = msg => Logger.warn(s"[TaxEnrolmentsConnector] $msg")
+  val warn: String => Unit = msg => logger.warn(s"[TaxEnrolmentsConnector] $msg")
   // $COVERAGE-ON$
 
   object ResponseCodes {
@@ -53,7 +53,7 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
            (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
     // $COVERAGE-OFF$
-      Logger.debug("TaxEnrolmentsConnector:enrol:enrolKey:" + enrolKey)
+      logger.debug("TaxEnrolmentsConnector:enrol:enrolKey:" + enrolKey)
     // $COVERAGE-ON$
       groupId match {
         case Some(groupId) =>
@@ -95,7 +95,7 @@ class TaxEnrolmentsConnector @Inject()(http: HttpClient, val appConfig: Applicat
 
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
     // $COVERAGE-OFF$
-      Logger.debug("TaxEnrolmentsConnector:deEnrol:enrolKey:" + enrolKey)
+      logger.debug("TaxEnrolmentsConnector:deEnrol:enrolKey:" + enrolKey)
     // $COVERAGE-ON$
       groupId match {
         case Some(groupId) =>
