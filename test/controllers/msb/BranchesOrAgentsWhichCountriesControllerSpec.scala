@@ -140,7 +140,7 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustEqual Some(routes.SummaryController.get.url)
     }
   }
 }

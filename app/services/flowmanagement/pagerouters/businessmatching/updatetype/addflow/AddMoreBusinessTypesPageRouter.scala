@@ -40,7 +40,7 @@ class AddMoreBusinessTypesPageRouter @Inject()(val statusService: StatusService,
       case Some(true) =>
         Future.successful(Redirect(addRoutes.SelectBusinessTypeController.get(edit)))
       case Some(false) =>
-        Future.successful(Redirect(addRoutes.NeedMoreInformationController.get()))
+        Future.successful(Redirect(addRoutes.NeedMoreInformationController.get))
       case _ =>
         error(AddMoreBusinessTypesPageId)
     }

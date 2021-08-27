@@ -102,7 +102,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec {
 
               captor.getValue.withdrawalReason mustBe WithdrawalReason.OutOfScope
 
-              redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+              redirectLocation(result) must be(Some(controllers.routes.LandingController.get.url))
             }
 
             "withdrawalReason is selection with other reason" in new TestFixture {
@@ -121,7 +121,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec {
               captor.getValue.withdrawalReason mustBe WithdrawalReason.Other("reason")
               captor.getValue.withdrawalReasonOthers mustBe "reason".some
 
-              redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+              redirectLocation(result) must be(Some(controllers.routes.LandingController.get.url))
 
             }
           }

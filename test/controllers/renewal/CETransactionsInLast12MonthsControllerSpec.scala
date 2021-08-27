@@ -124,7 +124,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
     }
 
   }

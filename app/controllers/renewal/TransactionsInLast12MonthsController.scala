@@ -73,11 +73,11 @@ class TransactionsInLast12MonthsController @Inject()(
 
    private def redirectTo(services: Set[BusinessMatchingMsbService], edit: Boolean) =
      if (edit) {
-       Redirect(routes.SummaryController.get())
+       Redirect(routes.SummaryController.get)
      } else if (services contains TransmittingMoney) {
        Redirect(routes.SendMoneyToOtherCountryController.get())
      } else {
-       Redirect(routes.SummaryController.get())
+       Redirect(routes.SummaryController.get)
      }
 
 }

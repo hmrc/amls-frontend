@@ -91,7 +91,7 @@ class InvolvedInOtherController @Inject()(val dataCacheConnector: DataCacheConne
   }
 
   private def redirectDependingOnEdit(edit: Boolean) = edit match {
-    case true => Redirect(routes.SummaryController.get())
+    case true => Redirect(routes.SummaryController.get)
     case false => Redirect(routes.AMLSTurnoverController.get(edit))
   }
 

@@ -606,7 +606,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
         val result = controller.get()(request)
 
-        redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+        redirectLocation(result) must be(Some(controllers.routes.LandingController.get.url))
       }
     }
 
@@ -633,7 +633,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         val result = controllerNoAmlsNumber.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get().url}]").text mustBe Messages("status.withdraw.link-text")
+        doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get.url}]").text mustBe Messages("status.withdraw.link-text")
       }
     }
 
@@ -660,7 +660,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         val result = controller.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("your.registration.deregister.link")
+        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get.url}]").text mustBe Messages("your.registration.deregister.link")
       }
     }
 

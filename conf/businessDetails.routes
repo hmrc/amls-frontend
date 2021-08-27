@@ -10,7 +10,7 @@ POST        /previously-registered                                 @controllers.
 GET         /vat                                                   @controllers.businessdetails.VATRegisteredController.get(edit: Boolean ?= false)
 POST        /vat                                                   @controllers.businessdetails.VATRegisteredController.post(edit: Boolean ?= false)
 
-GET         /corporation-tax                                       @controllers.businessdetails.CorporationTaxRegisteredController.get()
+GET         /corporation-tax                                       @controllers.businessdetails.CorporationTaxRegisteredController.get
 
 GET         /registered-office-address                             @controllers.businessdetails.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /registered-office-address                             @controllers.businessdetails.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
@@ -24,7 +24,7 @@ POST        /registered-office-address-uk                          @controllers.
 GET         /registered-office-address-non-uk                      @controllers.businessdetails.RegisteredOfficeNonUKController.get(edit: Boolean ?= false)
 POST        /registered-office-address-non-uk                      @controllers.businessdetails.RegisteredOfficeNonUKController.post(edit: Boolean ?= false)
 
-GET         /new-registered-office/date-change                     @controllers.businessdetails.RegisteredOfficeDateOfChangeController.get()
+GET         /new-registered-office/date-change                     @controllers.businessdetails.RegisteredOfficeDateOfChangeController.get
 POST        /new-registered-office/date-change                     @controllers.businessdetails.RegisteredOfficeDateOfChangeController.post()
 
 GET         /letters-address-country                               @controllers.businessdetails.CorrespondenceAddressIsUkController.get(edit: Boolean ?= false)
@@ -42,7 +42,7 @@ POST        /when-start-activities                                 @controllers.
 GET         /letters-address                                       @controllers.businessdetails.LettersAddressController.get(edit: Boolean ?= false)
 POST        /letters-address                                       @controllers.businessdetails.LettersAddressController.post(edit: Boolean ?= false)
 
-GET         /what-you-need                                         @controllers.businessdetails.WhatYouNeedController.get()
+GET         /what-you-need                                         @controllers.businessdetails.WhatYouNeedController.get
 
-GET         /check-your-answers                                    @controllers.businessdetails.SummaryController.get()
+GET         /check-your-answers                                    @controllers.businessdetails.SummaryController.get
 POST        /check-your-answers                                    @controllers.businessdetails.SummaryController.post()

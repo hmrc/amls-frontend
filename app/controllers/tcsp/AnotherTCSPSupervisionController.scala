@@ -57,7 +57,7 @@ class AnotherTCSPSupervisionController @Inject()(val authAction: AuthAction,
           for {
             tcsp <- dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key)
             _ <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key, tcsp.servicesOfAnotherTCSP(data))
-          } yield Redirect(routes.SummaryController.get())
+          } yield Redirect(routes.SummaryController.get)
       }
     }
   }

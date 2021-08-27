@@ -16,6 +16,7 @@
 
 package models
 
+import config.ApplicationConfig
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
@@ -26,7 +27,10 @@ class ReturnNameValuePairSpec extends PlaySpec with GuiceOneAppPerSuite {
       "request is running on localhost" in {
 
         val call = controllers.routes.PaymentConfirmationController.paymentConfirmation("reference")
-        val model = ReturnLocation(call)
+
+        val applicationConfig = app.injector.instanceOf[ApplicationConfig]
+
+        val model = ReturnLocation(call, applicationConfig)
 
         model.absoluteUrl mustBe s"http://localhost:9222${call.url}"
       }

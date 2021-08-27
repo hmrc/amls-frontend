@@ -55,6 +55,6 @@ class DeRegisterApplicationController @Inject() (authAction: AuthAction,
     }
 
   def post() = authAction.async {
-    Future.successful(Redirect(routes.DeregistrationReasonController.get()))
+    Future.successful(Redirect(routes.DeregistrationReasonController.get))
   }
 }

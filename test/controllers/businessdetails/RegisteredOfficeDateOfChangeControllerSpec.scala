@@ -77,7 +77,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
       val result = controller.post()(postRequest)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
       val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
       verify(controller.dataCacheConnector).save[BusinessDetails](any(), eqTo(BusinessDetails.key), captor.capture())(any(), any())
@@ -110,7 +110,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
       val result = controller.post()(postRequest)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
       val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
       verify(controller.dataCacheConnector).save[BusinessDetails](any(), eqTo(BusinessDetails.key), captor.capture())(any(), any())

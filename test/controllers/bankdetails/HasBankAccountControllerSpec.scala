@@ -41,7 +41,7 @@ class HasBankAccountControllerSpec extends AmlsSpec {
 
   "The GET action" should {
     "return an OK response" in new Fixture {
-      status(controller.get()(request)) mustBe OK
+      status(controller.get(request)) mustBe OK
     }
   }
 
@@ -63,7 +63,7 @@ class HasBankAccountControllerSpec extends AmlsSpec {
           val result = controller.post()(requestWithUrlEncodedBody(formData))
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.bankdetails.routes.YourBankAccountsController.get().url)
+          redirectLocation(result) mustBe Some(controllers.bankdetails.routes.YourBankAccountsController.get.url)
         }
       }
     }

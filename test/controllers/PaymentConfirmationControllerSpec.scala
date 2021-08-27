@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.ApplicationConfig
 import connectors._
 import controllers.actions.SuccessfulAuthAction
 import generators.submission.SubscriptionResponseGenerator
@@ -134,7 +135,9 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
       controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
     } thenReturn Future.successful(Some(businessDetails))
 
-    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))
+    val applicationConfig = app.injector.instanceOf[ApplicationConfig]
+
+    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref), applicationConfig)
 
     def setupBusinessMatching(companyName: String) = {
 

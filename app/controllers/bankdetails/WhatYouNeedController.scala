@@ -41,12 +41,12 @@ class WhatYouNeedController @Inject()(val authAction: AuthAction,
             bankDetails <- OptionT(dataCacheConnector.fetch[Seq[BankDetails]](request.credId, BankDetails.key))
           } yield {
             if (bankDetails.exists(visibleAccountsFilter)) {
-              Ok(view(routes.BankAccountNameController.getNoIndex()))
+              Ok(view(routes.BankAccountNameController.getNoIndex))
             } else {
-              Ok(view(routes.HasBankAccountController.get()))
+              Ok(view(routes.HasBankAccountController.get))
             }
           }
 
-        result.map(_.removingFromSession("itemIndex")) getOrElse Ok(view(routes.HasBankAccountController.get())).removingFromSession("itemIndex")
+        result.map(_.removingFromSession("itemIndex")) getOrElse Ok(view(routes.HasBankAccountController.get)).removingFromSession("itemIndex")
   }
 }

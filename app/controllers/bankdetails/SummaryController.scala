@@ -40,7 +40,7 @@ class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
       } yield bankDetails match {
         case Some(data) =>
           Ok(summary(data, index))
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+        case _ => Redirect(controllers.routes.RegistrationProgressController.get)
       }
   }
 
@@ -48,7 +48,7 @@ class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
     implicit request =>
       (for {
         _ <- updateDataStrict[BankDetails](request.credId, index) { bd => bd.copy(hasAccepted = true) }
-      } yield Redirect(controllers.bankdetails.routes.YourBankAccountsController.get())).map(_.removingFromSession("itemIndex")) recoverWith {
+      } yield Redirect(controllers.bankdetails.routes.YourBankAccountsController.get)).map(_.removingFromSession("itemIndex")) recoverWith {
         case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
       }
   }

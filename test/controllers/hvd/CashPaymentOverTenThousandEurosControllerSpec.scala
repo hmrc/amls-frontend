@@ -163,7 +163,7 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
       }
 
       "show invalid data error" in new Fixture {

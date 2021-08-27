@@ -16,12 +16,13 @@
 
 package models
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsPath, JsSuccess, Json, Writes}
 import SatisfactionSurvey._
+
 class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {
 
   "Form Validation" must {
@@ -112,28 +113,28 @@ class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {
 
     "successfully validate given feedback with empty details" in {
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "01")) must
-        be(JsSuccess(First(None), JsPath))
+        be(JsSuccess(First(None).asInstanceOf[SatisfactionSurvey], JsPath))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "02")) must
-        be(JsSuccess(Second(None), JsPath))
+        be(JsSuccess(Second(None).asInstanceOf[SatisfactionSurvey], JsPath))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "03")) must
-        be(JsSuccess(Third(None), JsPath))
+        be(JsSuccess(Third(None).asInstanceOf[SatisfactionSurvey], JsPath))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "04")) must
-        be(JsSuccess(Fourth(None), JsPath))
+        be(JsSuccess(Fourth(None).asInstanceOf[SatisfactionSurvey], JsPath))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "05")) must
-        be(JsSuccess(Fifth(None), JsPath))
+        be(JsSuccess(Fifth(None).asInstanceOf[SatisfactionSurvey], JsPath))
     }
 
     "successfully validate given feedback with details" in {
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "01", "details" ->"123")) must
-        be(JsSuccess(First(Some("123")), JsPath \ "details"))
+        be(JsSuccess(First(Some("123")).asInstanceOf[SatisfactionSurvey], JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "02", "details" ->"123")) must
-        be(JsSuccess(Second(Some("123")), JsPath \ "details"))
+        be(JsSuccess(Second(Some("123")).asInstanceOf[SatisfactionSurvey], JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "03", "details" ->"123")) must
-        be(JsSuccess(Third(Some("123")), JsPath \ "details"))
+        be(JsSuccess(Third(Some("123")).asInstanceOf[SatisfactionSurvey], JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "04", "details" ->"123")) must
-        be(JsSuccess(Fourth(Some("123")), JsPath \ "details"))
+        be(JsSuccess(Fourth(Some("123")).asInstanceOf[SatisfactionSurvey], JsPath \ "details"))
       Json.fromJson[SatisfactionSurvey](Json.obj("satisfaction" -> "05", "details" ->"123")) must
-        be(JsSuccess(Fifth(Some("123")), JsPath \ "details"))
+        be(JsSuccess(Fifth(Some("123")).asInstanceOf[SatisfactionSurvey], JsPath \ "details"))
 
     }
 
@@ -146,41 +147,42 @@ class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {
   }
 
   "write the correct value" in {
-    Json.toJson(First(None)) must
+
+    Json.toJson(First(None).asInstanceOf[SatisfactionSurvey]) must
       be(Json.obj("satisfaction" -> "01", "details" -> ""))
-    Json.toJson(First(Some("123"))) must
+    Json.toJson(First(Some("123")).asInstanceOf[SatisfactionSurvey]) must
       be(Json.obj(
         "satisfaction" -> "01",
         "details" -> "123"
       ))
 
-    Json.toJson(Second(None)) must
+    Json.toJson(Second(None).asInstanceOf[SatisfactionSurvey]) must
       be(Json.obj("satisfaction" -> "02", "details" -> ""))
-    Json.toJson(Second(Some("123"))) must
+    Json.toJson(Second(Some("123")).asInstanceOf[SatisfactionSurvey]) must
       be(Json.obj(
         "satisfaction" -> "02",
         "details" -> "123"
       ))
 
-    Json.toJson(Third(None)) must
+    Json.toJson(Third(None).asInstanceOf[SatisfactionSurvey]) must
       be(Json.obj("satisfaction" -> "03", "details" -> ""))
-    Json.toJson(Third(Some("123"))) must
+    Json.toJson(Third(Some("123")).asInstanceOf[SatisfactionSurvey]) must
       be(Json.obj(
         "satisfaction" -> "03",
         "details" -> "123"
       ))
 
-    Json.toJson(Fourth(None)) must
+    Json.toJson(Fourth(None).asInstanceOf[SatisfactionSurvey]) must
       be(Json.obj("satisfaction" -> "04", "details" -> ""))
-    Json.toJson(Fourth(Some("123"))) must
+    Json.toJson(Fourth(Some("123")).asInstanceOf[SatisfactionSurvey]) must
       be(Json.obj(
         "satisfaction" -> "04",
         "details" -> "123"
       ))
 
-    Json.toJson(Fifth(None)) must
+    Json.toJson(Fifth(None).asInstanceOf[SatisfactionSurvey]) must
       be(Json.obj("satisfaction" -> "05", "details" -> ""))
-    Json.toJson(Fifth(Some("123"))) must
+    Json.toJson(Fifth(Some("123")).asInstanceOf[SatisfactionSurvey]) must
       be(Json.obj(
         "satisfaction" -> "05",
         "details" -> "123"

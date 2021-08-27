@@ -49,7 +49,7 @@
         }
         <p>
             @anchor(
-                attrHref = controllers.renewal.routes.SummaryController.get().url,
+                attrHref = controllers.renewal.routes.SummaryController.get.url,
                 linkText = Messages("renewal.progress.edit"),
                 id=Some("renewal-progress-edit")
             )
@@ -59,7 +59,7 @@
             @{renewal match {
                 case _:RenewalSubmitted => {
                     anchor(
-                        attrHref = controllers.renewal.routes.SummaryController.get().url,
+                        attrHref = controllers.renewal.routes.SummaryController.get.url,
                         linkText = Messages("renewal.progress.continue"),
                         attrRole = true,
                         id=Some("renewal-progress-continue")
@@ -67,7 +67,7 @@
                 }
                 case _ => {
                     anchor(
-                        attrHref = controllers.renewal.routes.WhatYouNeedController.get().url,
+                        attrHref = controllers.renewal.routes.WhatYouNeedController.get.url,
                         linkText = Messages("renewal.progress.continue"),
                         attrRole = true,
                         id=Some("renewal-progress-continue")

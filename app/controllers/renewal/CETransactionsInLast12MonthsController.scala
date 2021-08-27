@@ -57,7 +57,7 @@ class CETransactionsInLast12MonthsController @Inject()(val dataCacheConnector: D
             renewal <- dataCacheConnector.fetch[Renewal](request.credId, Renewal.key)
             _ <- renewalService.updateRenewal(request.credId, renewal.ceTransactionsInLast12Months(data))
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true => Redirect(routes.SummaryController.get)
             case false => Redirect(routes.WhichCurrenciesController.get(edit))
           }
       }

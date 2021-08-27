@@ -36,7 +36,7 @@ class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
           val model = ChangeSubSectorFlowModel(Some(Set(s)))
           val result = router.getRoute("internalId", model)
 
-          redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+          redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
         }
       }
     }

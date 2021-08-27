@@ -142,7 +142,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustEqual Some(routes.SummaryController.get.url)
     }
 
     "return a redirect to the 'Which Countries' page on valid submission when edit flag is set and answering yes" in new Fixture {

@@ -60,7 +60,7 @@ class PercentageOfCashPaymentOver15000Controller @Inject() (val authAction: Auth
             _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key,
               hvd.percentageOfCashPaymentOver15000(data)
             )
-          } yield Redirect(routes.SummaryController.get())
+          } yield Redirect(routes.SummaryController.get)
       }
     }
   }

@@ -48,7 +48,7 @@ class ChangeBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMa
       } yield {
 
         if (activities.size < 2) {
-          Redirect(removeRoutes.UnableToRemoveBusinessTypesController.get())
+          Redirect(removeRoutes.UnableToRemoveBusinessTypesController.get)
         } else {
           Redirect(removeRoutes.RemoveBusinessTypesController.get())
         }

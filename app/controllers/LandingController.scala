@@ -68,7 +68,7 @@ class LandingController @Inject()(val landingService: LandingService,
                                   start: start,
                                   headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper with Logging {
 
-  private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role).absoluteUrl, "utf-8")
+  private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role, config).absoluteUrl, "utf-8")
 
   def signoutUrl = s"${appConfig.logoutUrl}?continue=$unauthorisedUrl"
 
@@ -83,7 +83,7 @@ class LandingController @Inject()(val landingService: LandingService,
   def start(allowRedirect: Boolean = true): Action[AnyContent] = messagesAction(parser).async {
     implicit request: MessagesRequest[AnyContent] =>
       if (isAuthorised && allowRedirect) {
-        Future.successful(Redirect(controllers.routes.LandingController.get()))
+        Future.successful(Redirect(controllers.routes.LandingController.get))
       } else {
         Future.successful(Ok(start()))
       }
@@ -182,7 +182,7 @@ class LandingController @Inject()(val landingService: LandingService,
     } yield (redirectToEventPage, dupe)
 
     loginEvent.map {
-      case (true, false) => Redirect(controllers.routes.LoginEventController.get())
+      case (true, false) => Redirect(controllers.routes.LoginEventController.get)
       case (_, true) => Redirect(controllers.routes.StatusController.get(true))
       case (_, false) => Redirect(controllers.routes.StatusController.get(false))
     }
@@ -214,13 +214,13 @@ class LandingController @Inject()(val landingService: LandingService,
               (rd.businessAddress.postcode, rd.businessAddress.country) match {
                   case (Some(postcode), Country("United Kingdom", "GB")) => {
                     FormTypes.postcodeType.validate(postcode) match {
-                      case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
-                      case Invalid(_) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
+                      case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
+                      case Invalid(_) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
                     }
                   }
-                  case (_, Country("United Kingdom", "GB")) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
-                  case (_, country) if !country.isUK && !country.isEmpty => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
-                  case (_, _) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
+                  case (_, Country("United Kingdom", "GB")) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
+                  case (_, country) if !country.isUK && !country.isEmpty => Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
+                  case (_, _) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
                 }
               }
             }
@@ -246,7 +246,7 @@ class LandingController @Inject()(val landingService: LandingService,
       // $COVERAGE-OFF$
       logger.debug(s"[AMLSLandingController][preApplicationComplete]: removed cache and redirect to landingController.get")
       // $COVERAGE-ON$
-      Redirect(controllers.routes.LandingController.get())
+      Redirect(controllers.routes.LandingController.get)
     }
 
     cache.getEntry[BusinessMatching](BusinessMatching.key) map { bm =>
@@ -266,7 +266,7 @@ class LandingController @Inject()(val landingService: LandingService,
                 // $COVERAGE-OFF$
                 logger.debug(s"[AMLSLandingController][preApplicationComplete]: redirecting to LoginEvent")
                 // $COVERAGE-ON$
-                Redirect(controllers.routes.LoginEventController.get())
+                Redirect(controllers.routes.LoginEventController.get)
               case _ =>
                 // $COVERAGE-OFF$
                 logger.debug(s"[AMLSLandingController][preApplicationComplete]: has complete RPs - redirecting to status")

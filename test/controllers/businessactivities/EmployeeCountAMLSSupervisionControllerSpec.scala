@@ -117,7 +117,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
         val resultTrue = controller.post(true)(newRequest)
         status(resultTrue) must be(SEE_OTHER)
-        redirectLocation(resultTrue) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(resultTrue) must be(Some(routes.SummaryController.get.url))
 
       }
     }

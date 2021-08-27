@@ -154,35 +154,35 @@ class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
       "write the correct value" when {
 
         "given a BeneficialOwner" in {
-          Json.toJson(BeneficialOwner) must be(JsString("01"))
+          Json.toJson(BeneficialOwner.asInstanceOf[PositionWithinBusiness]) must be(JsString("01"))
         }
 
         "given a Director" in {
-          Json.toJson(Director) must be(JsString("02"))
+          Json.toJson(Director.asInstanceOf[PositionWithinBusiness]) must be(JsString("02"))
         }
 
         "given a InternalAccountant" in {
-          Json.toJson(InternalAccountant) must be(JsString("03"))
+          Json.toJson(InternalAccountant.asInstanceOf[PositionWithinBusiness]) must be(JsString("03"))
         }
 
         "given a NominatedOfficer" in {
-          Json.toJson(NominatedOfficer) must be(JsString("04"))
+          Json.toJson(NominatedOfficer.asInstanceOf[PositionWithinBusiness]) must be(JsString("04"))
         }
 
         "given a Partner" in {
-          Json.toJson(Partner) must be(JsString("05"))
+          Json.toJson(Partner.asInstanceOf[PositionWithinBusiness]) must be(JsString("05"))
         }
 
         "given a SoleProprietor" in {
-          Json.toJson(SoleProprietor) must be(JsString("06"))
+          Json.toJson(SoleProprietor.asInstanceOf[PositionWithinBusiness]) must be(JsString("06"))
         }
 
         "given a DesignatedMember" in {
-          Json.toJson(DesignatedMember) must be(JsString("07"))
+          Json.toJson(DesignatedMember.asInstanceOf[PositionWithinBusiness]) must be(JsString("07"))
         }
 
         "given an Other" in {
-          Json.toJson(Other("some new role")) mustBe Json.obj("other" -> "some new role")
+          Json.toJson(Other("some new role").asInstanceOf[PositionWithinBusiness]) mustBe Json.obj("other" -> "some new role")
         }
       }
     }

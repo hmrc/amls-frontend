@@ -371,7 +371,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
           cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
         } thenReturn Some(businessMatching)
 
-        BusinessMatching.section mustBe Section("businessmatching", Completed, false, controllers.businessmatching.routes.SummaryController.get())
+        BusinessMatching.section mustBe Section("businessmatching", Completed, false, controllers.businessmatching.routes.SummaryController.get)
       }
     }
   }

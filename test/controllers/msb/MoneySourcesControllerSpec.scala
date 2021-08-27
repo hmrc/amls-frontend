@@ -173,7 +173,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
           mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))), BusinessMatching.key)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get().url)
+          redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get.url)
         }
       }
 

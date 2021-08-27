@@ -130,7 +130,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
     }
 
     "on post with valid data in edit mode" in new Fixture {
@@ -147,7 +147,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
     }
   }
 }

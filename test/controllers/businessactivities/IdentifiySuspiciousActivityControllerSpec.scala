@@ -126,7 +126,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
     }
   }

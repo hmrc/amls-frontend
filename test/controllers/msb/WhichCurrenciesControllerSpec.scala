@@ -134,7 +134,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
         "redirect to Summary Controller" in new DealsInForeignCurrencyFixture {
           val result = controller.post(edit = true).apply(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get().url)
+          redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get.url)
         }
       }
       "data is invalid" should {

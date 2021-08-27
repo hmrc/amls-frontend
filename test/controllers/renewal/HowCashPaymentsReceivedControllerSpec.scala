@@ -106,7 +106,7 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
           val result = controller.post()(newRequest)
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+          redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
         }
       }
     }

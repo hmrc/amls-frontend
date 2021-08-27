@@ -69,7 +69,7 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
               } yield businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
                 ) getOrElse businessNominatedOfficerView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, Seq.empty)
           }
-          case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
+          case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get.url))
         }
   }
 
@@ -103,7 +103,7 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
               rp <- updateNominatedOfficer(responsiblePeople, data)
               _ <- dataCacheConnector.save(request.credId, ResponsiblePerson.key, rp)
             } yield {
-              Redirect(routes.WhoIsRegisteringController.get())
+              Redirect(routes.WhoIsRegisteringController.get)
             }
           }
       }

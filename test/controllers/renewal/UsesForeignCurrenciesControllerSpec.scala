@@ -153,7 +153,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post(edit = true)(validFormRequest2)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe controllers.renewal.routes.SummaryController.get().url.some
+          redirectLocation(result) mustBe controllers.renewal.routes.SummaryController.get.url.some
         }
       }
       "Redirect to the MoneySources page" when {

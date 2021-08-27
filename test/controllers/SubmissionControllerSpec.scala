@@ -125,7 +125,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
       }
 
       "return to the confirmation page on first submission" in new Fixture {
@@ -165,7 +165,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.LandingController.get.url)
         verify(controller.authenticator).refreshProfile(any(), any())
       }
     }
@@ -359,7 +359,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
 
         verify(controller.renewalService).getRenewal(any[String]())(any(), any())
       }
@@ -434,7 +434,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
       }
 
       "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {

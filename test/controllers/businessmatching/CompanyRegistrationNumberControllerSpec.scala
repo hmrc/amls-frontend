@@ -123,7 +123,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
       val result = controller.post(true)(validRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get.url))
     }
 
     "on post() redirect correctly if valid data sent and edit is false" in new Fixture {

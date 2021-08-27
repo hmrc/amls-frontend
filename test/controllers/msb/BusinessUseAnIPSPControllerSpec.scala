@@ -116,7 +116,7 @@ class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on post with valid data in edit mode without next page's data" in new Fixture {

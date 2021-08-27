@@ -20,7 +20,7 @@ import javax.inject.Inject
 import akka.stream.Materializer
 import connectors.{AuthenticatorConnector, KeystoreConnector}
 import models.status.ConfirmationStatus
-import play.api.Logger
+import play.api.Logging
 import play.api.mvc.{Filter, RequestHeader, Result}
 import play.api.mvc.Results.Redirect
 
@@ -28,15 +28,15 @@ import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
 class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, authenticator: AuthenticatorConnector, headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter)
-                                  (implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
+                                  (implicit val mat: Materializer, ec: ExecutionContext) extends Filter with Logging {
   override def apply(nextFilter: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
 
     val exclusionSet = Seq(
-      controllers.routes.LandingController.get().url,
-      controllers.routes.ConfirmationController.get().url,
+      controllers.routes.LandingController.get.url,
+      controllers.routes.ConfirmationController.get.url,
       controllers.routes.BacsConfirmationController.bacsConfirmation().url,
-      controllers.payments.routes.WaysToPayController.get().url,
-      controllers.payments.routes.TypeOfBankController.get().url,
+      controllers.payments.routes.WaysToPayController.get.url,
+      controllers.payments.routes.TypeOfBankController.get.url,
       controllers.payments.routes.BankDetailsController.get(true).url,
       controllers.payments.routes.BankDetailsController.get(false).url,
       "/pay-online/other-taxes",
@@ -67,9 +67,9 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
                 _ <- keystoreConnector.resetConfirmation
               } yield {
 
-                val targetUrl = controllers.routes.LandingController.get().url
+                val targetUrl = controllers.routes.LandingController.get.url
 
-                Logger.info(s"[ConfirmationFilter] Filter activated when trying to fetch ${rh.path}, redirecting to $targetUrl")
+                logger.info(s"[ConfirmationFilter] Filter activated when trying to fetch ${rh.path}, redirecting to $targetUrl")
 
                 Redirect(targetUrl)
               }

@@ -141,10 +141,10 @@ class InvolvedInOtherSpec extends PlaySpec with MockitoSugar {
 
     "write the correct value" in {
 
-      Json.toJson(InvolvedInOtherNo) must
+      Json.toJson(InvolvedInOtherNo.asInstanceOf[InvolvedInOther]) must
         be(Json.obj("involvedInOther" -> false))
 
-      Json.toJson(InvolvedInOtherYes("test")) must
+      Json.toJson(InvolvedInOtherYes("test").asInstanceOf[InvolvedInOther]) must
         be(Json.obj(
           "involvedInOther" -> true,
           "details" -> "test"

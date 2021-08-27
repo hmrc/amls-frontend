@@ -82,7 +82,7 @@ class ActivityStartDateController @Inject () (val dataCache: DataCacheConnector,
 
   private def getRouting(businessType: Option[BusinessType], edit: Boolean): Result = {
     (businessType, edit) match {
-      case (_, true) => Redirect(routes.SummaryController.get())
+      case (_, true) => Redirect(routes.SummaryController.get)
       case (Some(UnincorporatedBody) | Some(LPrLLP) | Some(LimitedCompany) | Some(Partnership), _) =>
         Redirect(routes.VATRegisteredController.get(edit))
       case (_, false) =>

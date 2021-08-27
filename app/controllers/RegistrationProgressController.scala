@@ -54,7 +54,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
   def get() = authAction.async {
       implicit request =>
         isRenewalFlow(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap {
-          case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get()))
+          case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get))
           case _ =>
             (for {
               status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
@@ -95,7 +95,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                   ))
                 }
               } getOrElse InternalServerError("Unable to retrieve the business details")
-            }) getOrElse Redirect(controllers.routes.LandingController.get())
+            }) getOrElse Redirect(controllers.routes.LandingController.get)
         }
   }
 
@@ -157,7 +157,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
   def post() = authAction.async {
     implicit request =>
       DeclarationHelper.promptRenewal(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap {
-        case true => Future.successful(Redirect(controllers.declaration.routes.RenewRegistrationController.get()))
+        case true => Future.successful(Redirect(controllers.declaration.routes.RenewRegistrationController.get))
         case false => progressService.getSubmitRedirect(request.amlsRefNumber, request.accountTypeId, request.credId) map {
           case Some(url) => Redirect(url)
           case _ => InternalServerError("Could not get data for redirect")

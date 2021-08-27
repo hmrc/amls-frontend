@@ -45,7 +45,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           Messages("summary.businessdetails") + " - " +
           Messages("title.amls") + " - " + Messages("title.gov")
 
-        val result = controller.get(request)
+        val result = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(pageTitle)
       }

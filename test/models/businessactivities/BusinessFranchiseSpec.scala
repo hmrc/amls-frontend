@@ -149,10 +149,10 @@ class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
 
     "write the correct value" in {
 
-      Json.toJson(BusinessFranchiseNo) must
+      Json.toJson(BusinessFranchiseNo.asInstanceOf[BusinessFranchise]) must
         be(Json.obj("businessFranchise" -> false))
 
-      Json.toJson(BusinessFranchiseYes("test test")) must
+      Json.toJson(BusinessFranchiseYes("test test").asInstanceOf[BusinessFranchise]) must
         be(Json.obj(
           "businessFranchise" -> true,
           "franchiseName" -> "test test"

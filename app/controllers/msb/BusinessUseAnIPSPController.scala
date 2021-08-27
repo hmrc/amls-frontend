@@ -59,7 +59,7 @@ class BusinessUseAnIPSPController @Inject() (val dataCacheConnector: DataCacheCo
 
           } yield edit match {
             case true if msb.fundsTransfer.isDefined =>
-              Redirect(routes.SummaryController.get())
+              Redirect(routes.SummaryController.get)
             case _ =>
               Redirect(routes.FundsTransferController.get(edit))
           }

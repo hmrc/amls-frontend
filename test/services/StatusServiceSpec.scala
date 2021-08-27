@@ -27,16 +27,19 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Environment
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
-import scala.concurrent.{Future,ExecutionContext}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with GuiceOneAppPerSuite {
 
    val service = new StatusService(
     amlsConnector = mock[AmlsConnector],
     enrolmentsService = mock[AuthEnrolmentsService],
-    sectionsProvider = mock[SectionsProvider]
+    sectionsProvider = mock[SectionsProvider],
+    environment = mock[Environment]
   )
 
   val amlsRegNo = Some("X0123456789")

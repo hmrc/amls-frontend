@@ -107,7 +107,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get.url))
         }
 
         "given valid data in edit mode and 'yes' is selected" in new Fixture {

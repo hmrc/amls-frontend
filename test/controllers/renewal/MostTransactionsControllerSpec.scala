@@ -228,7 +228,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
             post() { result =>
               result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustEqual routes.SummaryController.get().url.some
+              result.header.headers.get("Location") mustEqual routes.SummaryController.get.url.some
             }
           }
         }
@@ -241,7 +241,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
           post(edit = true) { result =>
             result.header.status mustBe SEE_OTHER
-            result.header.headers.get("Location") mustEqual routes.SummaryController.get().url.some
+            result.header.headers.get("Location") mustEqual routes.SummaryController.get.url.some
           }
         }
       }

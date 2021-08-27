@@ -21,7 +21,6 @@ import connectors.cache.Conversions
 
 import javax.inject.Inject
 import org.joda.time.{DateTime, DateTimeZone}
-import play.api.Logging
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.DefaultDB
@@ -100,7 +99,6 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
   extends ReactiveRepository[Cache, BSONObjectID]("app-cache", db, Cache.format)
     with Conversions
     with CacheOps
-    with Logging
 {
 
   private val logPrefix = "[MongoCacheClient]"

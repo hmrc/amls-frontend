@@ -54,7 +54,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     "get" must {
 
       "load the page" in new Fixture {
-        val result = controller.get(request)
+        val result = controller.get()(request)
         status(result) must be(OK)
 
         val pageTitle = Messages("title.wyn") + " - " +

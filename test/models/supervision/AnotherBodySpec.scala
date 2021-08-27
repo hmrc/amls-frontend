@@ -108,7 +108,7 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
       AnotherBody.formWrites.writes(input) must be(expected)
     }
     "Serialise AnotherBodyNo as expected" in {
-      Json.toJson(AnotherBodyNo) must be(Json.obj("anotherBody" -> false))
+      Json.toJson(AnotherBodyNo.asInstanceOf[AnotherBody]) must be(Json.obj("anotherBody" -> false))
     }
 
     "Serialise AnotherBodyYes service as expected" in new Fixture {
@@ -123,7 +123,7 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
         "endingReason" -> Json.obj("supervisionEndingReason" -> "Reason")
       )
 
-      Json.toJson(input) must be(expectedJson)
+      Json.toJson(input.asInstanceOf[AnotherBody]) must be(expectedJson)
     }
 
     "Deserialise AnotherBodyNo as expected" in {

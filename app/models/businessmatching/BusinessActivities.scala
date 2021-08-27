@@ -23,7 +23,7 @@ import models.{DateOfChange, FormTypes}
 import play.api.i18n.Messages
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{Reads, Writes, _}
-import play.api.Logger
+import play.api.Logging
 
 case class BusinessActivities(businessActivities: Set[BusinessActivity],
                               additionalActivities: Option[Set[BusinessActivity]] = None,
@@ -112,7 +112,7 @@ object BusinessActivity {
   }
 }
 
-object BusinessActivities {
+object BusinessActivities extends Logging {
 
   import utils.MappingUtils.Implicits._
 
@@ -128,7 +128,7 @@ object BusinessActivities {
   )
 
   implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] = {
-    Logger.info(s"${p.toString}")
+    logger.info(s"${p.toString}")
     FormTypes.businessActivityRule("error.required.bm.register.service")
   }
 
@@ -153,7 +153,7 @@ object BusinessActivities {
   def combinedReader(count: Int, msg: String) = formReaderMinLengthR(msg) andThen maxLengthValidator(count).repath(_ => Path \ "businessActivities")
 
   implicit def activitySetWrites(implicit w: Write[BusinessActivity, String]) = {
-    Logger.info(s"${w.toString}")
+    logger.info(s"${w.toString}")
     Write[Set[BusinessActivity], UrlFormEncoded] { activities =>
       Map("businessActivities[]" -> activities.toSeq.map { a => BusinessActivities.getValue(a) })
     }

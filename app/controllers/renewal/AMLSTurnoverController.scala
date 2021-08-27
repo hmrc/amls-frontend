@@ -73,7 +73,7 @@ class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnecto
               businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
             } yield {
               if (edit) {
-                Redirect(routes.SummaryController.get())
+                Redirect(routes.SummaryController.get)
               } else {
                 getRouting(ControllerHelper.getBusinessActivity(businessMatching))
               }
@@ -90,7 +90,7 @@ class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnecto
         case x if x.contains(MoneyServiceBusiness) => Redirect(routes.TotalThroughputController.get())
         case x if x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
         case x if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideIsUKController.get())
-        case _ => Redirect(routes.SummaryController.get())
+        case _ => Redirect(routes.SummaryController.get)
       }
       case _ => InternalServerError("Unable to redirect from Turnover page")
     }

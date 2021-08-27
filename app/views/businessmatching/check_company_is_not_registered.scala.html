@@ -31,7 +31,7 @@
     title = Messages("businessmatching.checkbusiness.title") + " - " + Messages("summary.businessmatching"),
     heading = header
 ){
-    @form(f, controllers.businessmatching.routes.SummaryController.get()) {
+    @form(f, controllers.businessmatching.routes.SummaryController.get) {
         <p class="form-hint">@Messages("businessmatching.checkbusiness.body")</p>
 
         <div class="notice spacelarge">

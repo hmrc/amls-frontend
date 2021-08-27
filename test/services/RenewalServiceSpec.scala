@@ -81,7 +81,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         } thenReturn Future.successful(None)
 
         val section = await(service.getSection(credId))
-        section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
+        section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get)
 
       }
 
@@ -112,7 +112,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
         val section = await(service.getSection(credId))
         await(service.isRenewalComplete(completeModel, credId)) mustBe true
-        section mustBe Section(Renewal.sectionKey, Completed, hasChanged = true, controllers.renewal.routes.SummaryController.get())
+        section mustBe Section(Renewal.sectionKey, Completed, hasChanged = true, controllers.renewal.routes.SummaryController.get)
       }
 
       "the renewal model is not complete" in new Fixture {
@@ -122,7 +122,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         setUpRenewal(renewal)
 
         val section = await(service.getSection(credId))
-        section mustBe Section(Renewal.sectionKey, Started, hasChanged = true, controllers.renewal.routes.WhatYouNeedController.get())
+        section mustBe Section(Renewal.sectionKey, Started, hasChanged = true, controllers.renewal.routes.WhatYouNeedController.get)
       }
 
       "the renewal model is not complete and not started" in new Fixture {
@@ -130,7 +130,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         setUpRenewal(renewal)
 
         val section = await(service.getSection(credId))
-        section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
+        section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get)
       }
     }
   }

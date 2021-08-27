@@ -111,25 +111,25 @@ class BusinessTurnoverSpec extends PlaySpec with MockitoSugar {
 
 
     "write the correct value" in {
-      Json.toJson(BusinessTurnover.First) must
+      Json.toJson(BusinessTurnover.First.asInstanceOf[BusinessTurnover]) must
         be(Json.obj("businessTurnover" -> "01"))
 
-      Json.toJson(BusinessTurnover.Second) must
+      Json.toJson(BusinessTurnover.Second.asInstanceOf[BusinessTurnover]) must
         be(Json.obj("businessTurnover" -> "02"))
 
-      Json.toJson(BusinessTurnover.Third) must
+      Json.toJson(BusinessTurnover.Third.asInstanceOf[BusinessTurnover]) must
         be(Json.obj("businessTurnover" -> "03"))
 
-      Json.toJson(BusinessTurnover.Fourth) must
+      Json.toJson(BusinessTurnover.asInstanceOf[BusinessTurnover]) must
         be(Json.obj("businessTurnover" -> "04"))
 
-      Json.toJson(BusinessTurnover.Fifth) must
+      Json.toJson(BusinessTurnover.Fifth.asInstanceOf[BusinessTurnover]) must
         be(Json.obj("businessTurnover" -> "05"))
 
-      Json.toJson(BusinessTurnover.Sixth) must
+      Json.toJson(BusinessTurnover.Sixth.asInstanceOf[BusinessTurnover]) must
         be(Json.obj("businessTurnover" -> "06"))
 
-      Json.toJson(BusinessTurnover.Seventh) must
+      Json.toJson(BusinessTurnover.Seventh.asInstanceOf[BusinessTurnover]) must
         be(Json.obj("businessTurnover" -> "07"))
     }
 

@@ -62,7 +62,7 @@ class HowManyEmployeesController @Inject() (val dataCacheConnector: DataCacheCon
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.howManyEmployees(updateData(businessActivities.howManyEmployees, data)))
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true => Redirect(routes.SummaryController.get)
             case false => Redirect(routes.TransactionRecordController.get())
           }
       }

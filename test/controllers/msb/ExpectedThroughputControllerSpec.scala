@@ -142,7 +142,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
   }
 }

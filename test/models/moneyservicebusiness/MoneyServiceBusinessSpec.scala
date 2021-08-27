@@ -54,7 +54,7 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
         "return a NotStarted Section" in {
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn None
           when(cacheMap.getEntry[MoneyServiceBusiness](BusinessMatching.key)) thenReturn None
-          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, NotStarted, false,  controllers.msb.routes.WhatYouNeedController.get()))
+          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, NotStarted, false,  controllers.msb.routes.WhatYouNeedController.get))
         }
       }
 
@@ -64,7 +64,7 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             Set(ChequeCashingScrapMetal)))))
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn
             Some(MoneyServiceBusiness( throughput = Some(ExpectedThroughput.Second)))
-          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Started, false,  controllers.msb.routes.WhatYouNeedController.get()))
+          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Started, false,  controllers.msb.routes.WhatYouNeedController.get))
         }
       }
 
@@ -73,7 +73,7 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(
             Set(ChequeCashingScrapMetal)))))
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(completeMsb)
-          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Completed, false,  controllers.msb.routes.SummaryController.get()))
+          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Completed, false,  controllers.msb.routes.SummaryController.get))
         }
       }
 
@@ -82,7 +82,7 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(
             Set(ChequeCashingScrapMetal, TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal)))))
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(completeMsb)
-          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Completed, false,  controllers.msb.routes.SummaryController.get()))
+          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Completed, false,  controllers.msb.routes.SummaryController.get))
         }
       }
     }
@@ -157,7 +157,7 @@ trait MoneyServiceBusinessTestData {
     ),
     "identifyLinkedTransactions" -> Json.obj("linkedTxn" -> true),
     "whichCurrencies" -> Json.obj(
-      "currencies" -> Json.arr("USD", "GBP", "EUR"), "usesForeignCurrencies" -> UsesForeignCurrenciesYes, "moneySources" -> Json.obj(
+      "currencies" -> Json.arr("USD", "GBP", "EUR"), "usesForeignCurrencies" -> UsesForeignCurrenciesYes.asInstanceOf[UsesForeignCurrencies], "moneySources" -> Json.obj(
       "bankMoneySource" -> "Yes",
       "bankNames" -> "Bank Name",
       "wholesalerMoneySource" -> "Yes",

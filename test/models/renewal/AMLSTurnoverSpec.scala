@@ -113,25 +113,25 @@ class AMLSTurnoverSpec extends PlaySpec with MockitoSugar {
 
     "write the correct value" in {
 
-      Json.toJson(AMLSTurnover.First) must
+      Json.toJson(AMLSTurnover.First.asInstanceOf[AMLSTurnover]) must
         be(Json.obj("turnover" -> "01"))
 
-      Json.toJson(AMLSTurnover.Second) must
+      Json.toJson(AMLSTurnover.Second.asInstanceOf[AMLSTurnover]) must
         be(Json.obj("turnover" -> "02"))
 
-      Json.toJson(AMLSTurnover.Third) must
+      Json.toJson(AMLSTurnover.Third.asInstanceOf[AMLSTurnover]) must
         be(Json.obj("turnover" -> "03"))
 
-      Json.toJson(AMLSTurnover.Fourth) must
+      Json.toJson(AMLSTurnover.Fourth.asInstanceOf[AMLSTurnover]) must
         be(Json.obj("turnover" -> "04"))
 
-      Json.toJson(AMLSTurnover.Fifth) must
+      Json.toJson(AMLSTurnover.Fifth.asInstanceOf[AMLSTurnover]) must
         be(Json.obj("turnover" -> "05"))
 
-      Json.toJson(AMLSTurnover.Sixth) must
+      Json.toJson(AMLSTurnover.Sixth.asInstanceOf[AMLSTurnover]) must
         be(Json.obj("turnover" -> "06"))
 
-      Json.toJson(AMLSTurnover.Seventh) must
+      Json.toJson(AMLSTurnover.Seventh.asInstanceOf[AMLSTurnover]) must
         be(Json.obj("turnover" -> "07"))
     }
 

@@ -126,7 +126,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = controller.get()(request)
 
-          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
         }
       }
     }
@@ -149,7 +149,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
             .thenReturn(Future.successful(emptyCache))
 
           when(controller.progressService.getSubmitRedirect(Some(any()), any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get())))
+            .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get)))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)

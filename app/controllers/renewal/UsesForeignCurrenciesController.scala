@@ -99,6 +99,6 @@ class UsesForeignCurrenciesController @Inject()(val authAction: AuthAction,
     } else if ((services.contains(HighValueDealing) || services.contains(AccountancyServices)) && !edit) {
       Redirect(routes.CustomersOutsideUKController.get(edit))
     } else {
-      Redirect(routes.SummaryController.get())
+      Redirect(routes.SummaryController.get)
     }
 }

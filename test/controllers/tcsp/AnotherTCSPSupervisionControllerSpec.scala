@@ -84,7 +84,7 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
             val result = controller.post()(newRequest)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(routes.SummaryController.get.url))
           }
 
           "edit is true" in new Fixture {
@@ -100,7 +100,7 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
             val result = controller.post(true)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(routes.SummaryController.get.url))
           }
 
         }

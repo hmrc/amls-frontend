@@ -74,7 +74,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.get(1)(request)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
     }
 
     "load the summary page with correct text when IBAN" in new Fixture {
@@ -108,7 +108,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.post(2)(request)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.bankdetails.routes.YourBankAccountsController.get().url))
+      redirectLocation(result) must be(Some(controllers.bankdetails.routes.YourBankAccountsController.get.url))
     }
 
     "update the accepted flag" in new Fixture {

@@ -274,7 +274,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "Navigate to next page if they have selected cheque cashing as a servicein edit mode" in new Fixture {
@@ -314,7 +314,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "Navigate to Summary page in edit mode when all services are included and have data filled" in new Fixture {
@@ -351,7 +351,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "Navigate to Summary page in edit mode when CE pages are included and have data filled" in new Fixture {
@@ -386,7 +386,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "Navigate to Summary page in edit mode when FX pages are included and have data filled" in new Fixture {
@@ -421,7 +421,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "Navigate to MT section in edit mode when MT data is not in the store" in new Fixture {

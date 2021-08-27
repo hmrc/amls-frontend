@@ -119,7 +119,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
         "redirect to the SummaryController" in new FormSubmissionFixture {
           post(edit = true){ result =>
             result.header.status must be (SEE_OTHER)
-            result.header.headers.get("Location")  must be(routes.SummaryController.get().url.some)
+            result.header.headers.get("Location")  must be(routes.SummaryController.get.url.some)
           }
         }
         "redirect to SendTheLargestAmountsOfMoneyController" when {

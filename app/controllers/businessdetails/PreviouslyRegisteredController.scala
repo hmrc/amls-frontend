@@ -75,7 +75,7 @@ class PreviouslyRegisteredController @Inject () (
 
   private def getRouting(businessType: BusinessType, edit: Boolean, data: PreviouslyRegistered): Result = {
     (edit) match {
-      case true => Redirect(routes.SummaryController.get())
+      case true => Redirect(routes.SummaryController.get)
       case _    => Redirect (routes.ActivityStartDateController.get(edit))
     }
   }

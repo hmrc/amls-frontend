@@ -57,7 +57,7 @@ class WithdrawApplicationController @Inject()(
   }
 
   def post = authAction.async {
-    Future.successful(Redirect(routes.WithdrawalReasonController.get()))
+    Future.successful(Redirect(routes.WithdrawalReasonController.get))
   }
 
 }

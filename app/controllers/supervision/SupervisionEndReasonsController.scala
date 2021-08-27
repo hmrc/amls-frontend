@@ -82,7 +82,7 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
 
         supervisionComplete(cache) match {
           case false => Redirect(routes.ProfessionalBodyMemberController.get())
-          case true => Redirect(routes.SummaryController.get())
+          case true => Redirect(routes.SummaryController.get)
         }
     }
 }

@@ -466,7 +466,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         val result = controller.get()(request)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(controllers.routes.LoginEventController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.LoginEventController.get.url)
       }
     }
 
@@ -582,7 +582,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 val result = controller.get()(requestWithHeaders(("test-context" -> "ESCS")))
 
                 status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get().url))
+                redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get.url))
 
                 verify(controller.landingService).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
               }
@@ -653,7 +653,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 val result = controller.get()(request)
 
                 status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get().url))
+                redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get.url))
 
                 verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
               }
@@ -783,7 +783,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             val result = controller.get()(request)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessmatching.routes.BusinessTypeController.get().url))
+            redirectLocation(result) must be(Some(controllers.businessmatching.routes.BusinessTypeController.get.url))
 
             Mockito.verify(controller.landingService, times(1))
               .updateReviewDetails(any[ReviewDetails], any[String])(any[HeaderCarrier], any[ExecutionContext])

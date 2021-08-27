@@ -107,7 +107,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get.url))
         }
 
         "on post with valid data redirect to advice on MLR due to diligence page when businessActivity is not ASP" in new Fixture {
@@ -202,7 +202,7 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get.url))
         }
       }
     }

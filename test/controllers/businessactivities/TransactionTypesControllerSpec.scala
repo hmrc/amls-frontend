@@ -100,7 +100,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
         val result = controller.post(edit = true)(requestWithUrlEncodedBody(form))
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.businessactivities.routes.SummaryController.get().url)
+        redirectLocation(result) mustBe Some(controllers.businessactivities.routes.SummaryController.get.url)
       }
     }
 

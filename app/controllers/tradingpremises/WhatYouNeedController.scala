@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-import play.api.Logger
+import play.api.Logging
 import views.html.tradingpremises._
 
 @Singleton
@@ -30,7 +30,7 @@ class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector
                                       val authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
                                       val cc: MessagesControllerComponents,
-                                      what_you_need: what_you_need) extends AmlsBaseController(ds, cc) {
+                                      what_you_need: what_you_need) extends AmlsBaseController(ds, cc) with Logging {
 
   def get(index: Int) = authAction.async {
     implicit request =>
@@ -40,7 +40,7 @@ class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector
           ba <- bm.activities
         } yield { Ok(what_you_need(index, Some(ba), bm.msbServices))
       }).getOrElse {
-          Logger.info("Unable to retrieve business activities in [tradingpremises][WhatYouNeedController]")
+          logger.info("Unable to retrieve business activities in [tradingpremises][WhatYouNeedController]")
           throw new Exception("Unable to retrieve business activities in [tradingpremises][WhatYouNeedController]")
         }
     }

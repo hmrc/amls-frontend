@@ -85,7 +85,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
         mockApplicationStatus(SubmissionDecisionRejected)
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
     }
 

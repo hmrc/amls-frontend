@@ -71,7 +71,7 @@ class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheCon
       case (BranchesOrAgentsHasCountries(false), false) =>
         routes.IdentifyLinkedTransactionsController.get()
       case (BranchesOrAgentsHasCountries(false), true) =>
-        routes.SummaryController.get()
+        routes.SummaryController.get
       case (BranchesOrAgentsHasCountries(true), _) =>
         routes.BranchesOrAgentsWhichCountriesController.get(edit)
     }

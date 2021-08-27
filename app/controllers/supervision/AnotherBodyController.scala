@@ -86,7 +86,7 @@ class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector
         supervision.isComplete match {
           case false if isAnotherBodyYes(anotherBody) => Redirect(routes.SupervisionStartController.get())
           case false => Redirect(routes.ProfessionalBodyMemberController.get())
-          case true => Redirect(routes.SummaryController.get())
+          case true => Redirect(routes.SummaryController.get)
         }
       }
       case _ => InternalServerError("Could not fetch the data")

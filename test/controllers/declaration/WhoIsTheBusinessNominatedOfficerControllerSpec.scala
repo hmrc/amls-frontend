@@ -166,7 +166,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
 
-          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
         }
       }
     }
@@ -189,7 +189,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.WhoIsRegisteringController.get().url))
+          redirectLocation(result) must be(Some(routes.WhoIsRegisteringController.get.url))
         }
 
         "selected option is a valid responsible person" in new Fixture {
@@ -206,7 +206,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get().url))
+          redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get.url))
         }
 
       }

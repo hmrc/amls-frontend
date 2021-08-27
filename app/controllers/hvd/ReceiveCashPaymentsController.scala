@@ -77,7 +77,7 @@ class ReceiveCashPaymentsController @Inject()(val authAction: AuthAction,
   def redirectTo(data: Boolean, hvd: Hvd, edit: Boolean) =
     (data, edit, hvd.cashPaymentMethods.isDefined) match {
       case (true, _, false) => Redirect(routes.ExpectToReceiveCashPaymentsController.get(edit))
-      case (_, true, _)     => Redirect(routes.SummaryController.get())
+      case (_, true, _)     => Redirect(routes.SummaryController.get)
       case _                => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
     }
 }

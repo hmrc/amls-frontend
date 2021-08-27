@@ -51,7 +51,7 @@ class YourBankAccountsController @Inject()(val dataCacheConnector: DataCacheConn
               result
             }
 
-          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+          case _ => Redirect(controllers.routes.RegistrationProgressController.get)
         }
   }
 }

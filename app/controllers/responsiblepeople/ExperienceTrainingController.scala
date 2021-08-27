@@ -22,7 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople.{ExperienceTraining, ResponsiblePerson}
-import play.api.Logger
+import play.api.Logging
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.experience_training
@@ -35,7 +35,7 @@ class ExperienceTrainingController @Inject () (val dataCacheConnector: DataCache
                                                val ds: CommonPlayDependencies,
                                                val cc: MessagesControllerComponents,
                                                experience_training: experience_training,
-                                               implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                               implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with Logging {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
       implicit request =>
@@ -82,7 +82,7 @@ class ExperienceTrainingController @Inject () (val dataCacheConnector: DataCache
     dataCacheConnector.fetchAll(credId) map {
       cache =>
         // $COVERAGE-OFF$
-        Logger.debug(cache.toString)
+        logger.debug(cache.toString)
         // $COVERAGE-ON$
         (for {
           c <- cache

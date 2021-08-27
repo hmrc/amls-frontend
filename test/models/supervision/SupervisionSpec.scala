@@ -51,7 +51,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
       "return a NotStarted Section when there is no model in the cache" in {
 
-        val notStartedSection = Section("supervision", NotStarted, false,  controllers.supervision.routes.WhatYouNeedController.get())
+        val notStartedSection = Section("supervision", NotStarted, false,  controllers.supervision.routes.WhatYouNeedController.get)
 
         when(cache.getEntry[Supervision]("supervision")) thenReturn None
 
@@ -61,7 +61,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
       "return a NotStarted Section when there is empty model in cache (everything None, except non optionals)" in {
 
-        val notStartedSection = Section("supervision", NotStarted, false,  controllers.supervision.routes.WhatYouNeedController.get())
+        val notStartedSection = Section("supervision", NotStarted, false,  controllers.supervision.routes.WhatYouNeedController.get)
 
         when(cache.getEntry[Supervision]("supervision")) thenReturn Some(Supervision())
 
@@ -71,7 +71,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
       "return a NotStarted Section when model is empty" in {
 
-        val notStartedSection = Section("supervision", NotStarted, false,  controllers.supervision.routes.WhatYouNeedController.get())
+        val notStartedSection = Section("supervision", NotStarted, false,  controllers.supervision.routes.WhatYouNeedController.get)
 
         when(cache.getEntry[Supervision]("supervision")) thenReturn None
 
@@ -82,7 +82,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
       "return a Completed Section when model is complete" in {
 
         val complete = mock[Supervision]
-        val completedSection = Section("supervision", Completed, false,  controllers.supervision.routes.SummaryController.get())
+        val completedSection = Section("supervision", Completed, false,  controllers.supervision.routes.SummaryController.get)
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Supervision]("supervision")) thenReturn Some(complete)
@@ -94,7 +94,7 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
       "return a Started Section when model is incomplete" in {
 
         val incomplete = mock[Supervision]
-        val startedSection = Section("supervision", Started, false,  controllers.supervision.routes.WhatYouNeedController.get())
+        val startedSection = Section("supervision", Started, false,  controllers.supervision.routes.WhatYouNeedController.get)
 
         when(incomplete.isComplete) thenReturn false
         when(cache.getEntry[Supervision]("supervision")) thenReturn Some(incomplete)

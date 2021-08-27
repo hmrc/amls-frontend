@@ -76,6 +76,6 @@ class FXTransactionsInLast12MonthsController @Inject()(val dataCacheConnector: D
   private def standardRouting(businessActivities: Set[BusinessActivity], edit: Boolean): Result =
     (businessActivities, edit) match {
       case (x, false) if x.contains(HighValueDealing) || x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
-      case _ => Redirect(routes.SummaryController.get())
+      case _ => Redirect(routes.SummaryController.get)
     }
 }

@@ -104,7 +104,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get.url))
         }
         "on post with valid data redirect to DocumentRiskAssessment page when businessActivity is ASP and hasPolicy is true" in new Fixture {
 
@@ -243,7 +243,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get.url))
         }
         "redirect to the DocumentRiskAssessmentController when hasPolicy is true" in new Fixture {
 

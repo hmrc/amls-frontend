@@ -22,7 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
-import play.api.Logger
+import play.api.Logging
 import play.api.mvc.MessagesControllerComponents
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.position_within_business_start_date
@@ -35,7 +35,7 @@ class PositionWithinBusinessStartDateController @Inject ()(val dataCacheConnecto
                                                            val ds: CommonPlayDependencies,
                                                            val cc: MessagesControllerComponents,
                                                            position_within_business_start_date: position_within_business_start_date,
-                                                           implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                           implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with Logging {
 
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
@@ -87,7 +87,7 @@ class PositionWithinBusinessStartDateController @Inject ()(val dataCacheConnecto
                   case Some(x) => rp.positions(Positions.update(x, data))
                   case _ => {
                     // $COVERAGE-OFF$
-                    Logger.error(s"Positions does not exist for ${rp.personName.getOrElse("[NAME MISSING]")}")
+                    logger.error(s"Positions does not exist for ${rp.personName.getOrElse("[NAME MISSING]")}")
                     // $COVERAGE-ON$
                     throw new IllegalStateException("Positions does not exist, cannot update start date")
                   }

@@ -18,10 +18,8 @@ package models.hvd
 
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.i18n.Messages.Implicits._
 
-
-class SalesChannelSpec extends WordSpec with MustMatchers with GuiceOneAppPerTest {
+class SalesChannelSpec extends WordSpec with MustMatchers with GuiceOneAppPerTest with play.api.i18n.LangImplicits {
   import play.api.i18n._
   implicit val lang = Lang("en-US")
 
@@ -38,4 +36,6 @@ class SalesChannelSpec extends WordSpec with MustMatchers with GuiceOneAppPerTes
       Auction.getMessage must be("Auction")
     }
   }
+
+  override def messagesApi: MessagesApi = ???
 }

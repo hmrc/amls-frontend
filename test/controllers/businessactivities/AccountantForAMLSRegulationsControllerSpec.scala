@@ -116,7 +116,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get.url))
           }
         }
 
@@ -147,7 +147,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
             val result = controller.post(false)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get.url))
           }
         }
       }

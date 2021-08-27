@@ -132,7 +132,7 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
         }
 
         "Successfully save data in mongoCache and navigate to Summary page in edit mode if the next page's data is in store" in new Fixture {
@@ -159,7 +159,7 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
         }
     }
 }

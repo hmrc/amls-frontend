@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import javax.inject.{Inject, Singleton}
 import models.FeeResponse
-import play.api.Logger
+import play.api.Logging
 import services.{AuthEnrolmentsService, FeeResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FeeHelper  @Inject()(val feeResponseService: FeeResponseService,
-                           val enrolmentService: AuthEnrolmentsService) {
+                           val enrolmentService: AuthEnrolmentsService) extends Logging {
 
 
   def retrieveFeeResponse(amlsRegistrationNumber: Option[String],
@@ -38,7 +38,7 @@ class FeeHelper  @Inject()(val feeResponseService: FeeResponseService,
                                  (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[FeeResponse]] = {
 
     // $COVERAGE-OFF$
-    Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
+    logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
     // $COVERAGE-ON$
     (for {
       amlsRegNo <- OptionT(enrolmentService.amlsRegistrationNumber(amlsRegistrationNumber, groupIdentifier))

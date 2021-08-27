@@ -110,7 +110,7 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
           val result = controller.post()(newRequest)
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+          redirectLocation(result) mustEqual Some(routes.SummaryController.get.url)
         }
       }
 

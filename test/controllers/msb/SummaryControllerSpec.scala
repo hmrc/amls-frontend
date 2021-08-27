@@ -189,7 +189,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(request)
 
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
 
         verify(controller.dataCache).save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(completeModel.copy(hasAccepted = true)))(any(),any())
       }

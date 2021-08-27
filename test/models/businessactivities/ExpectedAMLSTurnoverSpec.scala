@@ -115,25 +115,25 @@ class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
 
     "write the correct value" in {
 
-      Json.toJson(ExpectedAMLSTurnover.First) must
+      Json.toJson(ExpectedAMLSTurnover.First.asInstanceOf[ExpectedAMLSTurnover]) must
         be(Json.obj("expectedAMLSTurnover" -> "01"))
 
-      Json.toJson(ExpectedAMLSTurnover.Second) must
+      Json.toJson(ExpectedAMLSTurnover.Second.asInstanceOf[ExpectedAMLSTurnover]) must
         be(Json.obj("expectedAMLSTurnover" -> "02"))
 
-      Json.toJson(ExpectedAMLSTurnover.Third) must
+      Json.toJson(ExpectedAMLSTurnover.Third.asInstanceOf[ExpectedAMLSTurnover]) must
         be(Json.obj("expectedAMLSTurnover" -> "03"))
 
-      Json.toJson(ExpectedAMLSTurnover.Fourth) must
+      Json.toJson(ExpectedAMLSTurnover.Fourth.asInstanceOf[ExpectedAMLSTurnover]) must
         be(Json.obj("expectedAMLSTurnover" -> "04"))
 
-      Json.toJson(ExpectedAMLSTurnover.Fifth) must
+      Json.toJson(ExpectedAMLSTurnover.Fifth.asInstanceOf[ExpectedAMLSTurnover]) must
         be(Json.obj("expectedAMLSTurnover" -> "05"))
 
-      Json.toJson(ExpectedAMLSTurnover.Sixth) must
+      Json.toJson(ExpectedAMLSTurnover.Sixth.asInstanceOf[ExpectedAMLSTurnover]) must
         be(Json.obj("expectedAMLSTurnover" -> "06"))
 
-      Json.toJson(ExpectedAMLSTurnover.Seventh) must
+      Json.toJson(ExpectedAMLSTurnover.Seventh.asInstanceOf[ExpectedAMLSTurnover]) must
         be(Json.obj("expectedAMLSTurnover" -> "07"))
     }
 

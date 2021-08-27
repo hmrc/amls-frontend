@@ -27,7 +27,7 @@ import play.api.mvc.{MessagesControllerComponents, Request}
 import services.RenewalService
 import utils.AuthAction
 import views.html.renewal._
-import play.api.Logger
+import play.api.Logging
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
@@ -38,7 +38,7 @@ class WhatYouNeedController @Inject()(
                                        val ds: CommonPlayDependencies,
                                        renewalService: RenewalService,
                                        val cc: MessagesControllerComponents,
-                                       what_you_need: what_you_need)(implicit executionContext: ExecutionContext) extends AmlsBaseController(ds, cc) {
+                                       what_you_need: what_you_need)(implicit executionContext: ExecutionContext) extends AmlsBaseController(ds, cc) with Logging {
 
   def get = authAction.async {
     implicit request =>
@@ -49,7 +49,7 @@ class WhatYouNeedController @Inject()(
         } yield {
           section
         }).getOrElse {
-          Logger.info("Unable to retrieve business activities in [renewal][WhatYouNeedController]")
+          logger.info("Unable to retrieve business activities in [renewal][WhatYouNeedController]")
           throw new Exception("Unable to retrieve business activities in [renewal][WhatYouNeedController]")
         }
 
@@ -60,7 +60,7 @@ class WhatYouNeedController @Inject()(
                  msbActivities: Option[BusinessMatchingMsbServices])(implicit request: Request[_]) = {
     renewalService.getSection(credId) map {
       case Section(_, NotStarted | Started, _, _) => Ok(what_you_need(ba, msbActivities))
-      case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+      case _ => Redirect(controllers.routes.RegistrationProgressController.get)
     }
   }
 }

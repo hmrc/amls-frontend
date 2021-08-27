@@ -56,7 +56,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           mockApplicationStatus(SubmissionReadyForReview)
 
-          val result = controller.get(request)
+          val result = controller.get()(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))
@@ -70,7 +70,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           mockApplicationStatus(SubmissionDecisionApproved)
 
-          val result = controller.get(request)
+          val result = controller.get()(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))
@@ -84,7 +84,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           mockApplicationStatus(ReadyForRenewal(None))
 
-          val result = controller.get(request)
+          val result = controller.get()(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))
@@ -98,7 +98,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           mockApplicationStatus(RenewalSubmitted(None))
 
-          val result = controller.get(request)
+          val result = controller.get()(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))

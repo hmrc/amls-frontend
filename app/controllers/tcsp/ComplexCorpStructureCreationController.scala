@@ -71,7 +71,7 @@ class ComplexCorpStructureCreationController @Inject()(val authAction: AuthActio
     (edit, tcsp.tcspTypes.map(t => t.serviceProviders.contains(RegisteredOfficeEtc))) match {
       case (_, Some(true)) => Redirect(routes.ProvidedServicesController.get(edit))
       case (false, Some(false)) => Redirect(routes.ServicesOfAnotherTCSPController.get(edit))
-      case _ => Redirect(routes.SummaryController.get())
+      case _ => Redirect(routes.SummaryController.get)
     }
   }
 }

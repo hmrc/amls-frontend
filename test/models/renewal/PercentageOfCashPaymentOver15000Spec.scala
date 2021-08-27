@@ -98,19 +98,19 @@ class PercentageOfCashPaymentOver15000Spec extends PlaySpec {
 
       "write the correct value" in {
 
-        Json.toJson(PercentageOfCashPaymentOver15000.First) must
+        Json.toJson(PercentageOfCashPaymentOver15000.First.asInstanceOf[PercentageOfCashPaymentOver15000]) must
           be(Json.obj("percentage" -> "01"))
 
-        Json.toJson(PercentageOfCashPaymentOver15000.Second) must
+        Json.toJson(PercentageOfCashPaymentOver15000.Second.asInstanceOf[PercentageOfCashPaymentOver15000]) must
           be(Json.obj("percentage" -> "02"))
 
-        Json.toJson(PercentageOfCashPaymentOver15000.Third) must
+        Json.toJson(PercentageOfCashPaymentOver15000.Third.asInstanceOf[PercentageOfCashPaymentOver15000]) must
           be(Json.obj("percentage" -> "03"))
 
-        Json.toJson(PercentageOfCashPaymentOver15000.Fourth) must
+        Json.toJson(PercentageOfCashPaymentOver15000.Fourth.asInstanceOf[PercentageOfCashPaymentOver15000]) must
           be(Json.obj("percentage" -> "04"))
 
-        Json.toJson(PercentageOfCashPaymentOver15000.Fifth) must
+        Json.toJson(PercentageOfCashPaymentOver15000.Fifth.asInstanceOf[PercentageOfCashPaymentOver15000]) must
           be(Json.obj("percentage" -> "05"))
 
       }

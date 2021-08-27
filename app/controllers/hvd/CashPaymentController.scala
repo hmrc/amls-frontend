@@ -70,7 +70,7 @@ class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnecto
 
   private def getNextPage(edit:Boolean, data: CashPaymentOverTenThousandEuros): Call = {
     (edit, data) match {
-      case (true, CashPaymentOverTenThousandEuros(false))  => routes.SummaryController.get()
+      case (true, CashPaymentOverTenThousandEuros(false))  => routes.SummaryController.get
       case (false, CashPaymentOverTenThousandEuros(false)) => routes.LinkedCashPaymentsController.get()
       case (_, CashPaymentOverTenThousandEuros(true))      => routes.CashPaymentFirstDateController.get(edit)
     }

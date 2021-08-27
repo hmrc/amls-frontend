@@ -59,7 +59,7 @@ class NCARegisteredController @Inject() (val dataCacheConnector: DataCacheConnec
               businessActivities.ncaRegistered(data)
             )
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true => Redirect(routes.SummaryController.get)
             case false => Redirect(routes.RiskAssessmentController.get())
           }
       }

@@ -90,7 +90,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = router.getRoute("internalId", ChangeBusinessTypesPageId, Remove)
 
-        redirectLocation(result) mustBe Some(removeRoutes.UnableToRemoveBusinessTypesController.get().url)
+        redirectLocation(result) mustBe Some(removeRoutes.UnableToRemoveBusinessTypesController.get.url)
       }
     }
   }

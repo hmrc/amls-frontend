@@ -156,7 +156,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
 
               status(result) mustBe SEE_OTHER
               verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
-              redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get().url)
+              redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get.url)
             }
           }
 
@@ -179,7 +179,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
               val result = controller.post(false)(requestWithUrlEncodedBody("onlyOffTheShelfCompsSold" -> "false"))
               status(result) mustBe SEE_OTHER
               verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
-              redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get().url)
+              redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get.url)
             }
           }
         }

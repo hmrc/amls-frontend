@@ -29,7 +29,7 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers {
     lazy val whatYouNeed = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
 
-    def view = whatYouNeed(controllers.bankdetails.routes.HasBankAccountController.get())
+    def view = whatYouNeed(controllers.bankdetails.routes.HasBankAccountController.get)
   }
 
   "What you need View" must {

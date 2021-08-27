@@ -60,7 +60,7 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
             } yield whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
               ) getOrElse whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, Seq.empty)
         }
-        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
+        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get.url))
       }
 
 
@@ -164,7 +164,7 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
                                         cacheId: String)(implicit hc: HeaderCarrier): Future[Result] =
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case SubmissionReadyForReview | SubmissionDecisionApproved => Redirect(routes.DeclarationController.getWithAmendment())
-      case _ => Redirect(routes.DeclarationController.get())
+      case _ => Redirect(routes.DeclarationController.get)
     }
 
   private def redirectToAddPersonPage(amlsRegistrationNo: Option[String],
@@ -172,7 +172,7 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
                                       cacheId: String)(implicit hc: HeaderCarrier): Future[Result] =
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case SubmissionReadyForReview | SubmissionDecisionApproved => Redirect(routes.AddPersonController.getWithAmendment())
-      case _ => Redirect(routes.AddPersonController.get())
+      case _ => Redirect(routes.AddPersonController.get)
     }
 
   private def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePerson]): Option[AddPerson] = {

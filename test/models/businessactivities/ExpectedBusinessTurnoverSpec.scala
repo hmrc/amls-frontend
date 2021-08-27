@@ -113,25 +113,25 @@ class ExpectedBusinessTurnoverSpec extends PlaySpec with MockitoSugar {
 
 
     "write the correct value" in {
-      Json.toJson(ExpectedBusinessTurnover.First) must
+      Json.toJson(ExpectedBusinessTurnover.First.asInstanceOf[ExpectedBusinessTurnover]) must
         be(Json.obj("expectedBusinessTurnover" -> "01"))
 
-      Json.toJson(ExpectedBusinessTurnover.Second) must
+      Json.toJson(ExpectedBusinessTurnover.Second.asInstanceOf[ExpectedBusinessTurnover]) must
         be(Json.obj("expectedBusinessTurnover" -> "02"))
 
-      Json.toJson(ExpectedBusinessTurnover.Third) must
+      Json.toJson(ExpectedBusinessTurnover.Third.asInstanceOf[ExpectedBusinessTurnover]) must
         be(Json.obj("expectedBusinessTurnover" -> "03"))
 
-      Json.toJson(ExpectedBusinessTurnover.Fourth) must
+      Json.toJson(ExpectedBusinessTurnover.Fourth.asInstanceOf[ExpectedBusinessTurnover]) must
         be(Json.obj("expectedBusinessTurnover" -> "04"))
 
-      Json.toJson(ExpectedBusinessTurnover.Fifth) must
+      Json.toJson(ExpectedBusinessTurnover.Fifth.asInstanceOf[ExpectedBusinessTurnover]) must
         be(Json.obj("expectedBusinessTurnover" -> "05"))
 
-      Json.toJson(ExpectedBusinessTurnover.Sixth) must
+      Json.toJson(ExpectedBusinessTurnover.Sixth.asInstanceOf[ExpectedBusinessTurnover]) must
         be(Json.obj("expectedBusinessTurnover" -> "06"))
 
-      Json.toJson(ExpectedBusinessTurnover.Seventh) must
+      Json.toJson(ExpectedBusinessTurnover.Seventh.asInstanceOf[ExpectedBusinessTurnover]) must
         be(Json.obj("expectedBusinessTurnover" -> "07"))
     }
 

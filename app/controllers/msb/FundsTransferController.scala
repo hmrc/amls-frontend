@@ -58,7 +58,7 @@ class FundsTransferController @Inject() ( val dataCacheConnector: DataCacheConne
               moneyServiceBusiness.fundsTransfer(data))
           } yield edit match {
             case true if moneyServiceBusiness.transactionsInNext12Months.isDefined =>
-              Redirect(routes.SummaryController.get())
+              Redirect(routes.SummaryController.get)
             case _ => Redirect(routes.TransactionsInNext12MonthsController.get(edit))
           }
       }

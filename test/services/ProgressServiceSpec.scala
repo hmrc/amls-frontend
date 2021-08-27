@@ -73,7 +73,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
-          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
+          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get)
         }
 
       }
@@ -99,7 +99,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
-          _ mustEqual Some( controllers.declaration.routes.WhoIsRegisteringController.get())
+          _ mustEqual Some( controllers.declaration.routes.WhoIsRegisteringController.get)
         }
       }
     }
@@ -126,7 +126,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
-          _ mustEqual Some(controllers.declaration.routes.RegisterPartnersController.get())
+          _ mustEqual Some(controllers.declaration.routes.RegisterPartnersController.get)
         }
       }
     }
@@ -153,7 +153,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
-          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
+          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get)
         }
       }
 
@@ -178,7 +178,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
-          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
+          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get)
         }
       }
 
@@ -203,7 +203,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
-          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
+          _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get)
         }
       }
 
@@ -230,7 +230,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
           mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
           whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
-            _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
+            _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get)
           }
 
         }
@@ -257,7 +257,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
           mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
           whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
-            _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get())
+            _ mustEqual Some(controllers.declaration.routes.WhoIsRegisteringController.get)
           }
         }
       }
@@ -286,7 +286,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect(amlsRefNo, accountTypeId, credId)) {
-          _ mustEqual Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get())
+          _ mustEqual Some(controllers.declaration.routes.WhoIsTheBusinessNominatedOfficerController.get)
         }
       }
 

@@ -27,9 +27,13 @@ sealed trait SatisfactionSurvey
 object SatisfactionSurvey {
 
   case class First(details: Option[String]) extends SatisfactionSurvey
+
   case class Second(details: Option[String]) extends SatisfactionSurvey
+
   case class Third(details: Option[String]) extends SatisfactionSurvey
+
   case class Fourth(details: Option[String]) extends SatisfactionSurvey
+
   case class Fifth(details: Option[String]) extends SatisfactionSurvey
 
   import utils.MappingUtils.Implicits._
@@ -64,27 +68,65 @@ object SatisfactionSurvey {
     }
   }
 
-  implicit val jsonWrites =  Writes[SatisfactionSurvey] {
+  //  implicit val format: OFormat[SatisfactionSurvey] = {
+  //    implicit def one = Json.format[First]
+  //    implicit def two = Json.format[Second]
+  //    implicit def three = Json.format[Third]
+  //    implicit def four = Json.format[Fourth]
+  //    implicit def five = Json.format[Fifth]
+  //    Json.format[SatisfactionSurvey]
+  //  }
+  //
+  //
+
+
+  implicit val jsonWrites = Writes[SatisfactionSurvey] {
     case First(details) => Json.obj(
       "satisfaction" -> "01",
-      "details" -> details.fold(""){x => x.toString}
+      "details" -> details.fold("") { x => x.toString }
     )
     case Second(details) => Json.obj(
       "satisfaction" -> "02",
-      "details" -> details.fold(""){x => x.toString}
+      "details" -> details.fold("") { x => x.toString }
     )
     case Third(details) => Json.obj(
       "satisfaction" -> "03",
-      "details" -> details.fold(""){x => x.toString}
+      "details" -> details.fold("") { x => x.toString }
     )
     case Fourth(details) => Json.obj(
       "satisfaction" -> "04",
-      "details" -> details.fold(""){x => x.toString}
+      "details" -> details.fold("") { x => x.toString }
     )
     case Fifth(details) => Json.obj(
       "satisfaction" -> "05",
-      "details" -> details.fold(""){x => x.toString}
+      "details" -> details.fold("") { x => x.toString }
     )
   }
+
+  //  implicit val jsonWrites_1 =  Writes[SatisfactionSurvey.First] {
+  //    case First(details) => Json.obj(      "satisfaction" -> "01",      "details" -> details.fold("") { x => x.toString }    )  }
+
+  //  implicit val jsonWrites_2 =  Writes[SatisfactionSurvey.Second] {    case Second(details) => Json.obj(      "satisfaction" -> "02",      "details" -> details.fold("") { x => x.toString }    )  }
+  //
+  //  implicit val jsonWrites_3 =  Writes[SatisfactionSurvey.Third] {
+  //    case Third(details) => Json.obj(
+  //      "satisfaction" -> "03",
+  //      "details" -> details.fold("") { x => x.toString }
+  //    )
+  //  }
+  //
+  //  implicit val jsonWrites_4 =  Writes[SatisfactionSurvey.Fourth] {
+  //    case Fourth(details) => Json.obj(
+  //      "satisfaction" -> "04",
+  //      "details" -> details.fold("") { x => x.toString }
+  //    )
+  //  }
+  //
+  //  implicit val jsonWrites_5 =  Writes[SatisfactionSurvey.Fifth] {
+  //    case Fifth(details) => Json.obj(
+  //      "satisfaction" -> "05",
+  //      "details" -> details.fold("") { x => x.toString }
+  //    )
+  //  }
 
 }

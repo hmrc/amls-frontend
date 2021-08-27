@@ -42,7 +42,7 @@ class YourResponsiblePeopleController @Inject () (
 
               Ok(your_responsible_people(completeRP, incompleteRP))
             }
-            case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+            case _ => Redirect(controllers.routes.RegistrationProgressController.get)
           }
       }
 }

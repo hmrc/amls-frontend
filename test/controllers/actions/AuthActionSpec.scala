@@ -16,7 +16,6 @@
 
 package controllers.actions
 
-import java.net.URLEncoder
 import config.ApplicationConfig
 import generators.AmlsReferenceNumberGenerator
 import models.ReturnLocation
@@ -34,6 +33,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AuthAction, DefaultAuthAction}
 
+import java.net.URLEncoder
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -47,8 +47,10 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
   val mockApplicationConfig = mock[ApplicationConfig]
   val mockParser = mock[BodyParsers.Default]
 
+  val applicationConfig = app.injector.instanceOf[ApplicationConfig]
+
   private lazy val unauthorisedUrl = URLEncoder.encode(
-    ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8"
+    ReturnLocation(controllers.routes.AmlsController.unauthorised_role, applicationConfig).absoluteUrl, "utf-8"
   )
   def unauthorised = s"${mockApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
   def signout      = s"${mockApplicationConfig.logoutUrl}"
@@ -266,8 +268,10 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator{
     new ~ (new ~(new ~(new ~(Enrolments(Set()), None), Some(AffinityGroup.Organisation)), Some("groupIdentifier")), Some(User))
   )
 
-  class Harness(authAction: AuthAction) extends Controller {
+  class Harness(authAction: AuthAction) extends BaseController {
     def onPageLoad(): Action[AnyContent] = authAction { _ => Ok }
+
+    override protected def controllerComponents: ControllerComponents = ???
   }
 
 }

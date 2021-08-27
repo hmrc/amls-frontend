@@ -37,7 +37,7 @@ class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector:
 
   def get = authAction.async {
       implicit request =>
-        Future.successful(Ok(date_of_change(EmptyForm, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
+        Future.successful(Ok(date_of_change(EmptyForm, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post)))
   }
 
 
@@ -47,7 +47,7 @@ class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector:
           case (asp, startDate) =>
             Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDate) match {
               case f: InvalidForm =>
-                Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
+                Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post)))
               case ValidForm(_, data) => {
                 for {
                   _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
@@ -59,7 +59,7 @@ class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector:
                       case None => asp
                     })
                 } yield {
-                  Redirect(routes.SummaryController.get())
+                  Redirect(routes.SummaryController.get)
                 }
               }
             }

@@ -365,7 +365,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.post()(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
     }
 
     "return a redirect to the summary page on valid submission where the next page data exists (edit) (CE)" in new Fixture {
@@ -407,7 +407,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
     }
 
     trait NextPageDataDoesNotExistFixture extends Fixture {
@@ -463,7 +463,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(edit = true)(newRequest)
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
     }
   }
 

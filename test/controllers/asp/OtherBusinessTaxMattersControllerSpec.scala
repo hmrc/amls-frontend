@@ -83,7 +83,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
 
       "on post with invalid boolean data" in new Fixture {
@@ -110,7 +110,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
         val result = controller.post(true)(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
     }
   }

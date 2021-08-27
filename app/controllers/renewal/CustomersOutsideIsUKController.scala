@@ -80,7 +80,7 @@ class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCache
       case (CustomersOutsideIsUK(true), true) => Redirect(routes.CustomersOutsideUKController.get(true))
       case (CustomersOutsideIsUK(false), _) => (ba, edit) match {
         case (x, false) if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-        case _ => Redirect(routes.SummaryController.get())
+        case _ => Redirect(routes.SummaryController.get)
       }
     }
   }

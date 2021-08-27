@@ -66,10 +66,10 @@ class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheCo
               isNewActivity <- serviceFlow.isNewActivity(request.credId, AccountancyServices)
             } yield {
               if (!isNewActivity && redirectToDateOfChange[ServicesOfBusiness](status, businessServices.services, data)) {
-                Redirect(routes.ServicesOfBusinessDateOfChangeController.get())
+                Redirect(routes.ServicesOfBusinessDateOfChangeController.get)
               } else {
                 edit match {
-                  case true => Redirect(routes.SummaryController.get())
+                  case true => Redirect(routes.SummaryController.get)
                   case false => Redirect(routes.OtherBusinessTaxMattersController.get(edit))
                 }
               }

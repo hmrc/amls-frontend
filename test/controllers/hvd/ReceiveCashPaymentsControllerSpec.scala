@@ -84,7 +84,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.post(true)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
     }
 
     "redirect to PercentageOfCashPaymentOver15000Controller on form equals no" in new Fixture {

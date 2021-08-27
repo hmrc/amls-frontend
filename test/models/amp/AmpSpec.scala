@@ -136,21 +136,21 @@ class AmpSpec extends AmlsSpec with AmpValues {
         val notStartedSection = Section("amp", NotStarted, false, Call("GET", ampWhatYouNeedUrl))
 
         when(cache.getEntry[Amp]("amp")) thenReturn None
-        Amp.section must be(notStartedSection)
+        Amp.section(appConfig) must be(notStartedSection)
       }
 
       "return a Completed Section when model is complete" in {
         val completedSection = Section("amp", Completed, false, Call("GET", ampSummaryUrl))
 
         when(cache.getEntry[Amp]("amp")) thenReturn Some(completeModel)
-        Amp.section must be(completedSection)
+        Amp.section(appConfig) must be(completedSection)
       }
 
       "return a Started Section when model is incomplete" in {
         val startedSection = Section("amp", Started, false, Call("GET", ampWhatYouNeedUrl))
 
         when(cache.getEntry[Amp]("amp")) thenReturn Some(missingTypeOfParticipantDetailModel)
-        Amp.section must be(startedSection)
+        Amp.section(appConfig) must be(startedSection)
       }
     }
 

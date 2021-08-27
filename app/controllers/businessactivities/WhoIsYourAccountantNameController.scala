@@ -62,7 +62,7 @@ class WhoIsYourAccountantNameController @Inject()(val dataCacheConnector: DataCa
               businessActivity.whoIsYourAccountant(businessActivity.flatMap(ba => ba.whoIsYourAccountant).map(acc => acc.copy(names = Option(data))))
             )
           } yield if (edit) {
-            Redirect(routes.SummaryController.get())
+            Redirect(routes.SummaryController.get)
           } else {
             Redirect(routes.WhoIsYourAccountantIsUkController.get())
           }

@@ -146,7 +146,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
       val result = controller.post(edit = true)(newRequest)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
       val captor = ArgumentCaptor.forClass(classOf[DataEvent])
       verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
@@ -233,7 +233,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.RegisteredOfficeDateOfChangeController.get().url))
+        redirectLocation(result) must be(Some(routes.RegisteredOfficeDateOfChangeController.get.url))
       }
 
       "status is ready for renewal and registeredOffice has changed" in new Fixture {
@@ -256,7 +256,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.RegisteredOfficeDateOfChangeController.get().url))
+        redirectLocation(result) must be(Some(routes.RegisteredOfficeDateOfChangeController.get.url))
       }
     }
 

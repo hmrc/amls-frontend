@@ -87,6 +87,6 @@ class EabController @Inject()(proxyCacheService  : ProxyCacheService,
       (for {
         eab <- OptionT(cacheConnector.fetch[Eab](request.credId, Eab.key))
         _ <- OptionT.liftF(cacheConnector.save[Eab](request.credId, Eab.key, eab.copy(hasAccepted = true)))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update EAB")
+      } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update EAB")
   }
 }

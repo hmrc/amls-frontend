@@ -218,7 +218,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get.url))
         }
 
         "redirect to BusinessTurnoverController with valid data in edit mode" in new Fixture {

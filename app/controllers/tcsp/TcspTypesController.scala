@@ -72,7 +72,7 @@ class TcspTypesController @Inject()(val dataCacheConnector: DataCacheConnector,
               case (true, _) => Redirect(routes.OnlyOffTheShelfCompsSoldController.get(edit))
               case (false, true) => Redirect(routes.ProvidedServicesController.get(edit))
               case _ => edit match {
-                case true => Redirect(routes.SummaryController.get())
+                case true => Redirect(routes.SummaryController.get)
                 case false => Redirect(routes.ServicesOfAnotherTCSPController.get())
               }
             }

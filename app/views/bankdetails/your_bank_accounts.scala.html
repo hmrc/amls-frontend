@@ -66,7 +66,7 @@
     ) {
         <p>@Messages("bankdetails.yourbankaccount.intro")</p>
         <p>@anchor(
-            attrHref = controllers.bankdetails.routes.WhatYouNeedController.get().url,
+            attrHref = controllers.bankdetails.routes.WhatYouNeedController.get.url,
             linkText = Messages("bankdetails.yourbankaccount.add.account"),
             id=Some("add-account")
         )</p>
@@ -125,11 +125,11 @@
     }
 
     @if(inCompleteModel.isEmpty) {
-            @form(f, controllers.routes.RegistrationProgressController.get()) {
+            @form(f, controllers.routes.RegistrationProgressController.get) {
                 @submit(false, Some(Messages("button.bankdetails.yourbankaccount.acceptandcomplete")), buttonId = Some("accept-and-complete"))
             }
         } else {
-            @form(f, controllers.routes.RegistrationProgressController.get()) {
+            @form(f, controllers.routes.RegistrationProgressController.get) {
                 @submit(false, Some(Messages("link.return.registration.progress")), returnLink = false, buttonId = Some("return-to-application"))
             }
         }

@@ -1,4 +1,4 @@
-GET         /what-you-need                                        @controllers.businessactivities.WhatYouNeedController.get()
+GET         /what-you-need                                        @controllers.businessactivities.WhatYouNeedController.get
 
 GET         /franchise                                            @controllers.businessactivities.BusinessFranchiseController.get(edit: Boolean ?= false)
 POST        /franchise                                            @controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)
@@ -54,5 +54,5 @@ POST        /adviser-address-non-uk                               @controllers.b
 GET         /tax-matters                                          @controllers.businessactivities.TaxMattersController.get(edit: Boolean ?= false)
 POST        /tax-matters                                          @controllers.businessactivities.TaxMattersController.post(edit: Boolean ?= false)
 
-GET         /check-your-answers                                   @controllers.businessactivities.SummaryController.get()
+GET         /check-your-answers                                   @controllers.businessactivities.SummaryController.get
 POST        /check-your-answers                                   @controllers.businessactivities.SummaryController.post()

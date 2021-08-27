@@ -34,7 +34,7 @@ class NoPSRPageRouter @Inject()(val statusService: StatusService,
 
   override def getRoute(credId: String, model: AddBusinessTypeFlowModel, edit: Boolean = false)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-    Future.successful(Redirect(routes.RegistrationProgressController.get()))
+    Future.successful(Redirect(routes.RegistrationProgressController.get))
   }
 }
 

@@ -125,7 +125,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           val responseF = controller.get()(request)
           status(responseF) must be(SEE_OTHER)
-          redirectLocation(responseF) must be(Some(renewal.routes.RenewalProgressController.get().url))
+          redirectLocation(responseF) must be(Some(renewal.routes.RenewalProgressController.get.url))
         }
       }
       "status is renewal submitted and renewal data exists in mongoCache" must {
@@ -426,12 +426,12 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-          val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get())
+          val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get)
           when(controller.sectionsProvider.sections(mockCacheMap)) thenReturn Seq(completeSection)
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
+          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get.url)
         }
       }
 
@@ -444,7 +444,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-          val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get())
+          val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get)
           when(controller.sectionsProvider.sections(mockCacheMap)) thenReturn Seq(completeSection)
 
           val result = controller.get()(request)
@@ -516,7 +516,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
       "when not in a position to renew" must {
         "redirect to the url provided by progressService" in new Fixture {
-          val call = controllers.routes.RegistrationProgressController.get()
+          val call = controllers.routes.RegistrationProgressController.get
 
           when {
             controller.statusService.getStatus(any(), any(), any())(any(), any())
@@ -559,7 +559,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           val result = controller.post()(request)
 
-          redirectLocation(result) must be(Some(controllers.declaration.routes.RenewRegistrationController.get().url))
+          redirectLocation(result) must be(Some(controllers.declaration.routes.RenewRegistrationController.get.url))
         }
       }
 

@@ -67,7 +67,7 @@ class HowCashPaymentsReceivedController @Inject()(
                 case Some(cp) if !cp.cashPaymentsCustomerNotMet.receiveCashPayments => CashPayments(CashPaymentsCustomerNotMet(false), None)
                 case _ => CashPayments(CashPaymentsCustomerNotMet(false), None)
             }))
-          } yield Redirect(routes.SummaryController.get())
+          } yield Redirect(routes.SummaryController.get)
       }
     }
   }

@@ -119,7 +119,7 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
       val result = controller.accept.apply(FakeRequest())
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get().toString
+      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get.toString
 
       verify(mockCacheConnector).save[Amp](any(), eqTo(Amp.key),
         eqTo(completeJson.as[Amp].copy(hasAccepted = true)))(any(), any())

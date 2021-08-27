@@ -48,7 +48,7 @@ class TransactionTypesController @Inject()(val authAction: AuthAction,
   def post(edit: Boolean = false) = authAction.async {
     implicit request => {
       lazy val redirect = Redirect(if(edit) {
-        routes.SummaryController.get()
+        routes.SummaryController.get
       } else {
         routes.IdentifySuspiciousActivityController.get()
       })

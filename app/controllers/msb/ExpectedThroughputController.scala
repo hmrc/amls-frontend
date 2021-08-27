@@ -62,7 +62,7 @@ class ExpectedThroughputController @Inject() (authAction: AuthAction,
               msb.throughput(data)
             )
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true => Redirect(routes.SummaryController.get)
             case false => Redirect(routes.BranchesOrAgentsController.get())
           }
       }

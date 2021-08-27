@@ -37,6 +37,6 @@ class RemoveBusinessTypesSummaryPageRouter @Inject()(val statusService: StatusSe
   override def getRoute(credId: String, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
-    Future.successful(Redirect(removeRoutes.NeedMoreInformationController.get()))
+    Future.successful(Redirect(removeRoutes.NeedMoreInformationController.get))
   }
 }

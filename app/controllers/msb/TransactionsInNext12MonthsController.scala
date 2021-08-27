@@ -62,7 +62,7 @@ class TransactionsInNext12MonthsController @Inject()(authAction: AuthAction,
                 msb.transactionsInNext12Months(data)
               )
             } yield edit match {
-              case true if msb.sendMoneyToOtherCountry.isDefined => Redirect(routes.SummaryController.get())
+              case true if msb.sendMoneyToOtherCountry.isDefined => Redirect(routes.SummaryController.get)
               case _ => Redirect(routes.SendMoneyToOtherCountryController.get(edit))
             }
         }

@@ -80,7 +80,7 @@ class ProductsController @Inject() (val dataCacheConnector: DataCacheConnector,
       case (true, false, true)   => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.checkYourAnswers)
       case (true, false, false)  => routes.HvdDateOfChangeController.get(DateOfChangeRedirect.howWillYouSellGoods)
       case (false, true, _)      => routes.ExciseGoodsController.get(edit)
-      case (false, false, true)  => routes.SummaryController.get()
+      case (false, false, true)  => routes.SummaryController.get
       case (false, false, false) => routes.HowWillYouSellGoodsController.get()
     }
   }

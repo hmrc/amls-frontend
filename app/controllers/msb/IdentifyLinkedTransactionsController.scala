@@ -55,7 +55,7 @@ class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: Da
     } else if (services.contains(ForeignExchange) && (msb.fxTransactionsInNext12Months.isEmpty || !edit)) {
         Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
     } else {
-        Redirect(routes.SummaryController.get())
+        Redirect(routes.SummaryController.get)
     }
 
   def post(edit: Boolean = false) = authAction.async {

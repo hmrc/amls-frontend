@@ -25,7 +25,7 @@ import services.StatusService
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.AuthAction
 import views.html.businessactivities._
-import play.api.Logger
+import play.api.Logging
 
 class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,
                                       val authConnector: AuthConnector,
@@ -33,7 +33,7 @@ class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector
                                       authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
                                       val cc: MessagesControllerComponents,
-                                      what_you_need: what_you_need) extends AmlsBaseController(ds, cc) {
+                                      what_you_need: what_you_need) extends AmlsBaseController(ds, cc) with Logging {
 
   def get = authAction.async {
     implicit request =>
@@ -44,7 +44,7 @@ class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector
         } yield {
           Ok(what_you_need(routes.InvolvedInOtherController.get().url, Some(ba)))
         }).getOrElse {
-            Logger.info("Unable to retrieve business activities in [businessactivities][WhatYouNeedController]")
+            logger.info("Unable to retrieve business activities in [businessactivities][WhatYouNeedController]")
             throw new Exception("Unable to retrieve business activities in [businessactivities][WhatYouNeedController]")
           }
       }

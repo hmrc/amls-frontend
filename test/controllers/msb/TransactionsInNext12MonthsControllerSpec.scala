@@ -155,7 +155,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on valid post in edit mode without the next page's data in the store" in new Fixture {

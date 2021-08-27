@@ -97,7 +97,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
             val result = controller.post(true)(requestWithUrlEncodedBody("courier" -> "true"))
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
           }
         }

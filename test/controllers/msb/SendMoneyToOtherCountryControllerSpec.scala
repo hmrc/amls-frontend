@@ -194,7 +194,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(false)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on valid post where the value is false (CE)" in new Fixture {
@@ -400,7 +400,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(false)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on valid post where the value is true in edit mode" in new Fixture {
@@ -467,7 +467,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on valid post where the value is false in edit mode (CE, FX)" in new FalseInEditModeFixture {
@@ -477,7 +477,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on valid post where the value is false in edit mode (FX)" in new FalseInEditModeFixture {
@@ -487,7 +487,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on valid post where the value is false in edit mode (Non-CE, Non-FX)" in new FalseInEditModeFixture {
@@ -497,7 +497,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "throw exception when Msb services in Business Matching returns none" in new Fixture {

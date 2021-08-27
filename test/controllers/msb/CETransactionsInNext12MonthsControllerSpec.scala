@@ -177,7 +177,7 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on valid submission (edit) without next page's data" in new Fixture {

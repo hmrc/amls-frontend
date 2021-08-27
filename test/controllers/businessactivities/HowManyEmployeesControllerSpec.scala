@@ -118,7 +118,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
         val resultTrue = controller.post(true)(newRequest)
         status(resultTrue) must be(SEE_OTHER)
-        redirectLocation(resultTrue) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(resultTrue) must be(Some(routes.SummaryController.get.url))
 
       }
     }

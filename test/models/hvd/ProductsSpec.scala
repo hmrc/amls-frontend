@@ -16,15 +16,15 @@
 
 package models.hvd
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.MessagesApi
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class ProductsSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerTest {
+class ProductsSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerTest with play.api.i18n.LangImplicits {
 
   "Products" must {
     "sort itemtypes alphabetically" when {
@@ -252,6 +252,8 @@ class ProductsSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerTest {
       }
     }
   }
+
+  override def messagesApi: MessagesApi = ???
 }
 
 

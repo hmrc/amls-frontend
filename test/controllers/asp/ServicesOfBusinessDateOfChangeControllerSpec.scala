@@ -75,7 +75,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get.url))
     }
 
     "fail submission when invalid date is supplied" in new Fixture {

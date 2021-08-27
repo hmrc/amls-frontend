@@ -73,13 +73,13 @@ class ConfirmationController @Inject()(authAction: AuthAction,
         Ok(confirm_renewal(fees.paymentReference,
           fees.totalFees,
           fees.toPay(status, submissionRequestStatus),
-          controllers.payments.routes.WaysToPayController.get().url,
+          controllers.payments.routes.WaysToPayController.get.url,
           submissionRequestStatus.fold[Boolean](false)(_.isRenewalAmendment.getOrElse(false))))
       } else {
         Ok(confirm_amendvariation(fees.paymentReference,
           fees.totalFees,
           fees.toPay(status, submissionRequestStatus),
-          controllers.payments.routes.WaysToPayController.get().url))
+          controllers.payments.routes.WaysToPayController.get.url))
       }
     }
   }
@@ -92,7 +92,7 @@ class ConfirmationController @Inject()(authAction: AuthAction,
     Future.successful(Ok(confirm_amendvariation(fees.paymentReference,
       Currency(fees.totalFees),
       amount,
-      controllers.payments.routes.WaysToPayController.get().url)))
+      controllers.payments.routes.WaysToPayController.get.url)))
   }
 
   private def resultFromStatus(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus],
@@ -119,7 +119,7 @@ class ConfirmationController @Inject()(authAction: AuthAction,
           case ReadyForRenewal(_) | RenewalSubmitted(_) =>
             showRenewalConfirmation(fees, status, submissionRequestStatus, credId)
           case _ => {
-            Future.successful(Ok(confirmation_new(fees.paymentReference, fees.totalFees, controllers.payments.routes.WaysToPayController.get().url)))
+            Future.successful(Ok(confirmation_new(fees.paymentReference, fees.totalFees, controllers.payments.routes.WaysToPayController.get.url)))
           }
         }
 

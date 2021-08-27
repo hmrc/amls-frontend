@@ -37,11 +37,11 @@ class SelectBusinessTypesPageRouter @Inject()(val statusService: StatusService,
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
     if (edit) {
-      Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
+      Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get))
     } else {
       model.activity match {
         case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.SubSectorsController.get()))
-        case _ => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
+        case _ => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get))
       }
     }
   }

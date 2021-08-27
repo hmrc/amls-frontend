@@ -182,7 +182,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
         val result = ytpController.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
       }
 
     }

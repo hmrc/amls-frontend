@@ -66,10 +66,10 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
                 renewalService.updateRenewal(request.credId, renewal.customersOutsideUK(data)) map {
                   _ =>
                     (edit, businessMatching) match {
-                      case (true, _) => Redirect(routes.SummaryController.get())
+                      case (true, _) => Redirect(routes.SummaryController.get)
                       case (false, bm) if bm.activities.isDefined => bm.activities.get.businessActivities match {
                         case x if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-                        case _ => Redirect(routes.SummaryController.get())
+                        case _ => Redirect(routes.SummaryController.get)
                       }
                     }
                 }

@@ -21,7 +21,7 @@ import exceptions.{DuplicateEnrolmentException, DuplicateSubscriptionException, 
 import javax.inject.{Inject, Singleton}
 import models.status._
 import models.{SubmissionResponse, SubscriptionResponse}
-import play.api.Logger
+import play.api.Logging
 import play.api.mvc.MessagesControllerComponents
 import services.{RenewalService, SectionsProvider, StatusService, SubmissionService}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
@@ -43,7 +43,7 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
                                      duplicate_enrolment: duplicate_enrolment,
                                      duplicate_submission: duplicate_submission,
                                      wrong_credential_type: wrong_credential_type,
-                                     bad_request: bad_request) extends AmlsBaseController(ds, cc) {
+                                     bad_request: bad_request) extends AmlsBaseController(ds, cc) with Logging {
 
   private def handleRenewalAmendment(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
                                     (implicit headerCarrier: HeaderCarrier) = {
@@ -59,45 +59,45 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
       DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
         case true => {
           // $COVERAGE-OFF$
-          Logger.info("[SubmissionController][post]:true")
+          logger.info("[SubmissionController][post]:true")
           // $COVERAGE-ON$
           statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap[SubmissionResponse](status =>
             subscribeBasedOnStatus(status, request.groupIdentifier, request.credId, request.amlsRefNumber, request.accountTypeId))
           }.flatMap {
           case SubscriptionResponse(_, _, _, Some(true)) =>
             // $COVERAGE-OFF$
-            Logger.info("[SubmissionController][post]:SubscriptionResponse(previouslySubmitted=true)")
+            logger.info("[SubmissionController][post]:SubscriptionResponse(previouslySubmitted=true)")
             // $COVERAGE-ON$
             authenticator.refreshProfile map { _ =>
-              Redirect(controllers.routes.LandingController.get())
+              Redirect(controllers.routes.LandingController.get)
             }
           case _ =>
             // $COVERAGE-OFF$
-            Logger.info("[SubmissionController][post]:SubmissionResponse or SubscriptionResponse(previouslySubmitted=false)")
+            logger.info("[SubmissionController][post]:SubmissionResponse or SubscriptionResponse(previouslySubmitted=false)")
             // $COVERAGE-ON$
-            Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
+            Future.successful(Redirect(controllers.routes.ConfirmationController.get))
         } recoverWith {
           case _: DuplicateEnrolmentException =>
-            Logger.info("[SubmissionController][post] handling DuplicateEnrolmentException")
+            logger.info("[SubmissionController][post] handling DuplicateEnrolmentException")
             Future.successful(Ok(duplicate_enrolment()))
           case e: DuplicateSubscriptionException =>
-            Logger.info("[SubmissionController][post] handling DuplicateSubscriptionException")
+            logger.info("[SubmissionController][post] handling DuplicateSubscriptionException")
             Future.successful(Ok(duplicate_submission(e.message)))
           case _: InvalidEnrolmentCredentialsException =>
-            Logger.info("[SubmissionController][post] handling InvalidEnrolmentCredentialsException")
+            logger.info("[SubmissionController][post] handling InvalidEnrolmentCredentialsException")
             Future.successful(Ok(wrong_credential_type()))
           case _: BadRequestException =>
-            Logger.info("[SubmissionController][post] handling BadRequestException")
+            logger.info("[SubmissionController][post] handling BadRequestException")
             Future.successful(Ok(bad_request()))
           case e: Exception =>
-            Logger.info("[SubmissionController][post] handling Exception")
+            logger.info("[SubmissionController][post] handling Exception")
             throw e
         }
         case false =>
           // $COVERAGE-OFF$
-          Logger.info("[SubmissionController][post]:false")
+          logger.info("[SubmissionController][post]:false")
           // $COVERAGE-ON$
-          Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
+          Future.successful(Redirect(controllers.routes.RegistrationProgressController.get.url))
       }
   }
 

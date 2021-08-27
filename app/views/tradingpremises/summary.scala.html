@@ -74,7 +74,7 @@
     }
     </ul>
 
-    @form(f, controllers.routes.RegistrationProgressController.get()) {
+    @form(f, controllers.routes.RegistrationProgressController.get) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
     }
 }

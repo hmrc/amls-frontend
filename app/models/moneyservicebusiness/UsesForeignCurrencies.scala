@@ -54,6 +54,5 @@ object UsesForeignCurrencies {
   implicit val jsonWrites = Writes[UsesForeignCurrencies] {
     case UsesForeignCurrenciesYes => Json.obj("foreignCurrencies" -> true)
     case UsesForeignCurrenciesNo => Json.obj("foreignCurrencies" -> false)
-
   }
 }

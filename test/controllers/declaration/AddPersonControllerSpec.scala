@@ -170,7 +170,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = addPersonController.post()(requestWithParams)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(routes.RegisterResponsiblePersonController.get().url)
+          redirectLocation(result) mustBe Some(routes.RegisterResponsiblePersonController.get.url)
         }
       }
 
@@ -200,7 +200,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = addPersonController.post()(requestWithParams)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
+          redirectLocation(result) mustBe Some(routes.DeclarationController.get.url)
         }
       }
 

@@ -83,7 +83,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
 
       verify(controller.dataCacheConnector).save[Hvd](any(), any(), meq(hvd))(any(), any())
     }
@@ -115,7 +115,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
 
         verify(controller.dataCacheConnector).save[Hvd](any(), any(),
           meq(hvd.copy(dateOfChange = Some(DateOfChange(new LocalDate(1990,1,24))))))(any(), any())
@@ -146,7 +146,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
 
         verify(controller.dataCacheConnector).save[Hvd](any(), any(),
           meq(hvd))(any(), any())

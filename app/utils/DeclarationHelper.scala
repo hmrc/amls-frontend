@@ -57,7 +57,7 @@ object DeclarationHelper {
 
   def routeDependingOnNominatedOfficer(hasNominatedOfficer: Boolean, status: SubmissionStatus) = {
     hasNominatedOfficer match {
-      case true => declaration.routes.WhoIsRegisteringController.get()
+      case true => declaration.routes.WhoIsRegisteringController.get
       case false => routeWithoutNominatedOfficer(status)
     }
   }
@@ -65,7 +65,7 @@ object DeclarationHelper {
   private def routeWithoutNominatedOfficer(status: SubmissionStatus) = {
     status match {
       case SubmissionReady | NotCompleted | SubmissionReadyForReview | ReadyForRenewal(_) =>
-        declaration.routes.WhoIsTheBusinessNominatedOfficerController.get()
+        declaration.routes.WhoIsTheBusinessNominatedOfficerController.get
       case _ => declaration.routes.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
     }
   }

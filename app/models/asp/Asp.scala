@@ -47,13 +47,13 @@ object Asp {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "asp"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.asp.routes.WhatYouNeedController.get())
+    val notStarted = Section(messageKey, NotStarted, false, controllers.asp.routes.WhatYouNeedController.get)
     cache.getEntry[Asp](key).fold(notStarted) {
       model =>
         if (model.isComplete) {
-          Section(messageKey, Completed, model.hasChanged, controllers.asp.routes.SummaryController.get())
+          Section(messageKey, Completed, model.hasChanged, controllers.asp.routes.SummaryController.get)
         } else {
-          Section(messageKey, Started, model.hasChanged, controllers.asp.routes.WhatYouNeedController.get())
+          Section(messageKey, Started, model.hasChanged, controllers.asp.routes.WhatYouNeedController.get)
         }
     }
   }

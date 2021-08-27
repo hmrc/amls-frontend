@@ -77,6 +77,6 @@ class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCac
     if (!edit && !accountancyServices) {
       Redirect(routes.AccountantForAMLSRegulationsController.get())
   } else {
-      Redirect(routes.SummaryController.get())
+      Redirect(routes.SummaryController.get)
     }
 }

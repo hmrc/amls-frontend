@@ -126,16 +126,16 @@ class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar 
 
     "write the correct value" when {
       "OutOfScope" in {
-        Json.toJson(WithdrawalReason.OutOfScope) must be(Json.obj("withdrawalReason" -> "Out of scope"))
+        Json.toJson(WithdrawalReason.OutOfScope.asInstanceOf[WithdrawalReason]) must be(Json.obj("withdrawalReason" -> "Out of scope"))
       }
       "NotTradingInOwnRight" in {
-        Json.toJson(WithdrawalReason.NotTradingInOwnRight) must be(Json.obj("withdrawalReason" -> "Not trading in own right"))
+        Json.toJson(WithdrawalReason.NotTradingInOwnRight.asInstanceOf[WithdrawalReason]) must be(Json.obj("withdrawalReason" -> "Not trading in own right"))
       }
       "UnderAnotherSupervisor" in {
-        Json.toJson(WithdrawalReason.UnderAnotherSupervisor) must be(Json.obj("withdrawalReason" -> "Under another supervisor"))
+        Json.toJson(WithdrawalReason.UnderAnotherSupervisor.asInstanceOf[WithdrawalReason]) must be(Json.obj("withdrawalReason" -> "Under another supervisor"))
       }
       "Other" in {
-        Json.toJson(WithdrawalReason.Other("reason")) must be(Json.obj("withdrawalReason" -> "Other, please specify", "specifyOtherReason" -> "reason"))
+        Json.toJson(WithdrawalReason.Other("reason").asInstanceOf[WithdrawalReason]) must be(Json.obj("withdrawalReason" -> "Other, please specify", "specifyOtherReason" -> "reason"))
       }
     }
 

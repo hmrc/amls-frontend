@@ -65,10 +65,10 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
           dataCacheConnector.save[AddPerson](request.credId, AddPerson.key, data) flatMap { _ =>
             statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
               case _ if isResponsiblePerson(data) => {
-                Redirect(routes.RegisterResponsiblePersonController.get())
+                Redirect(routes.RegisterResponsiblePersonController.get)
               }
               case SubmissionReadyForReview => Redirect(routes.DeclarationController.getWithAmendment())
-              case _ => Redirect(routes.DeclarationController.get())
+              case _ => Redirect(routes.DeclarationController.get)
             }
           }
       }

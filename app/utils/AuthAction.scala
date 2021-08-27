@@ -21,7 +21,7 @@ import config.ApplicationConfig
 
 import javax.inject.Inject
 import models.ReturnLocation
-import play.api.Logger
+import play.api.Logging
 import play.api.mvc.Results.Redirect
 import play.api.mvc._
 import uk.gov.hmrc.auth.core._
@@ -46,7 +46,7 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
                                    applicationConfig: ApplicationConfig,
                                    val parser: BodyParsers.Default,
                                    headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter)
-                                  (implicit val executionContext: ExecutionContext) extends AuthAction with AuthorisedFunctions {
+                                  (implicit val executionContext: ExecutionContext) extends AuthAction with AuthorisedFunctions with Logging {
 
   private val amlsKey       = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
@@ -54,7 +54,7 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
   private val ctKey         = "IR-CT"
 
   private lazy val unauthorisedUrl = URLEncoder.encode(
-    ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8"
+    ReturnLocation(controllers.routes.AmlsController.unauthorised_role, applicationConfig).absoluteUrl, "utf-8"
   )
 
   def unauthorised = s"${applicationConfig.logoutUrl}?continue=$unauthorisedUrl"
@@ -74,7 +74,7 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
       ) {
       case enrolments ~ Some(credentials) ~ Some(affinityGroup) ~ groupIdentifier ~ credentialRole =>
         // $COVERAGE-OFF$
-        Logger.debug("DefaultAuthAction:Refine - Enrolments:" + enrolments)
+        logger.debug("DefaultAuthAction:Refine - Enrolments:" + enrolments)
         // $COVERAGE-ON$
 
         Future.successful(
@@ -93,33 +93,33 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
         )
       case _ =>
         // $COVERAGE-OFF$
-        Logger.debug("DefaultAuthAction:Refine - Non match (enrolments ~ Some(credentials) ~ Some(affinityGroup))")
+        logger.debug("DefaultAuthAction:Refine - Non match (enrolments ~ Some(credentials) ~ Some(affinityGroup))")
         // $COVERAGE-ON$
         Future.successful(Left(Redirect(Call("GET", unauthorised))))
     }.recover[Either[Result, AuthorisedRequest[A]]] {
       case nas: NoActiveSession =>
-        Logger.debug("DefaultAuthAction:Refine - NoActiveSession:" + nas)
+        logger.debug("DefaultAuthAction:Refine - NoActiveSession:" + nas)
         Left(Redirect(Call("GET", signout)))
       case ie: InsufficientEnrolments =>
-        Logger.debug("DefaultAuthAction:Refine - InsufficientEnrolments:" + ie)
+        logger.debug("DefaultAuthAction:Refine - InsufficientEnrolments:" + ie)
         Left(Redirect(Call("GET", unauthorised)))
       case icl: InsufficientConfidenceLevel =>
-        Logger.debug("DefaultAuthAction:Refine - InsufficientConfidenceLevel:" + icl)
+        logger.debug("DefaultAuthAction:Refine - InsufficientConfidenceLevel:" + icl)
         Left(Redirect(Call("GET", unauthorised)))
       case uap: UnsupportedAuthProvider =>
-        Logger.debug("DefaultAuthAction:Refine - UnsupportedAuthProvider:" + uap)
+        logger.debug("DefaultAuthAction:Refine - UnsupportedAuthProvider:" + uap)
         Left(Redirect(Call("GET", unauthorised)))
       case uag: UnsupportedAffinityGroup =>
-        Logger.debug("DefaultAuthAction:Refine - UnsupportedAffinityGroup:" + uag)
+        logger.debug("DefaultAuthAction:Refine - UnsupportedAffinityGroup:" + uag)
         Left(Redirect(Call("GET", unauthorised)))
       case ucr: UnsupportedCredentialRole =>
-        Logger.debug("DefaultAuthAction:Refine - UnsupportedCredentialRole:" + ucr)
+        logger.debug("DefaultAuthAction:Refine - UnsupportedCredentialRole:" + ucr)
         Left(Redirect(Call("GET", unauthorised)))
       case enf: enrolmentNotFound =>
-        Logger.debug("DefaultAuthAction:Refine - enrolmentNotFound:" + enf)
+        logger.debug("DefaultAuthAction:Refine - enrolmentNotFound:" + enf)
         Left(Redirect(Call("GET", unauthorised)))
       case e : AuthorisationException =>
-        Logger.debug("DefaultAuthAction:Refine - AuthorisationException:" + e)
+        logger.debug("DefaultAuthAction:Refine - AuthorisationException:" + e)
         Left(Redirect(Call("GET", unauthorised)))
     }
   }

@@ -84,7 +84,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model))
 
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
         }
       }
     }
@@ -98,7 +98,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
 
           val result = await(router.getRoute("internalId", PsrNumberPageId, model))
 
-          result mustBe Redirect(addRoutes.NoPsrController.get())
+          result mustBe Redirect(addRoutes.NoPsrController.get)
         }
       }
     }
@@ -112,7 +112,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
 
           val result = await(router.getRoute("internalId", PsrNumberPageId, model))
 
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
         }
       }
     }
@@ -122,7 +122,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
         "MSB is the Business Activity" in new Fixture {
           val result = await(router.getRoute("internalId", NoPSRPageId, model))
 
-          result mustBe Redirect(rootRoutes.RegistrationProgressController.get())
+          result mustBe Redirect(rootRoutes.RegistrationProgressController.get)
         }
       }
     }
@@ -132,7 +132,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
         "MSB is the Business Activity" in new Fixture {
           val result = await(router.getRoute("internalId", SubSectorsPageId, model))
 
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
         }
       }
     }
@@ -151,7 +151,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa")))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
         }
       }
     }
@@ -177,7 +177,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ChequeCashingScrapMetal))))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
         }
       }
     }
@@ -191,7 +191,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
         }
       }
     }
@@ -205,7 +205,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
         }
       }
     }
@@ -219,7 +219,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa")))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
         }
       }
     }
@@ -232,7 +232,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))))
           val result = await(router.getRoute("internalId", SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
         }
       }
     }
@@ -274,7 +274,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))))
           val result = await(router.getRoute("internalId", PsrNumberPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get)
         }
       }
     }
@@ -288,7 +288,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo))
           val result = await(router.getRoute("internalId", PsrNumberPageId, model))
 
-          result mustBe Redirect(addRoutes.NoPsrController.get())
+          result mustBe Redirect(addRoutes.NoPsrController.get)
         }
       }
     }

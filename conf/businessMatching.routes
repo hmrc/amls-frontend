@@ -1,7 +1,7 @@
-GET         /business-type                                          @controllers.businessmatching.BusinessTypeController.get()
+GET         /business-type                                          @controllers.businessmatching.BusinessTypeController.get
 POST        /business-type                                          @controllers.businessmatching.BusinessTypeController.post()
 
-GET         /postcode                                               @controllers.businessmatching.ConfirmPostCodeController.get()
+GET         /postcode                                               @controllers.businessmatching.ConfirmPostCodeController.get
 POST        /postcode                                               @controllers.businessmatching.ConfirmPostCodeController.post()
 
 GET         /type-of-business                                       @controllers.businessmatching.TypeOfBusinessController.get(edit: Boolean ?= false)
@@ -19,10 +19,10 @@ POST        /money-service-business-activities                      @controllers
 GET         /psr-registration-number                                @controllers.businessmatching.PSRNumberController.get(edit: Boolean ?= false)
 POST        /psr-registration-number                                @controllers.businessmatching.PSRNumberController.post(edit: Boolean ?= false , includeCompanyNotRegistered: Boolean ?= false)
 
-GET         /check-company-is-not-registered                        @controllers.businessmatching.CheckCompanyController.get()
+GET         /check-company-is-not-registered                        @controllers.businessmatching.CheckCompanyController.get
 GET         /check-company-is-not-registered                        @controllers.businessmatching.CheckCompanyController.post()
 
-GET         /check-your-answers                                     @controllers.businessmatching.SummaryController.get()
+GET         /check-your-answers                                     @controllers.businessmatching.SummaryController.get
 POST        /check-your-answers                                     @controllers.businessmatching.SummaryController.post()
 
-GET         /no-psr-number                                          @controllers.businessmatching.NoPsrController.get()
+GET         /no-psr-number                                          @controllers.businessmatching.NoPsrController.get

@@ -133,7 +133,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
         val captor = ArgumentCaptor.forClass(classOf[DataEvent])
         verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
@@ -170,7 +170,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val result = controller.post(edit = true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
         val captor = ArgumentCaptor.forClass(classOf[DataEvent])
         verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())

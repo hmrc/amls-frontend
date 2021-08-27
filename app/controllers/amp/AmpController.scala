@@ -56,6 +56,6 @@ class AmpController @Inject()(proxyCacheService: ProxyCacheService,
       (for {
         amp <- OptionT(cacheConnector.fetch[Amp](request.credId, Amp.key))
         _ <- OptionT.liftF(cacheConnector.save[Amp](request.credId, Amp.key, amp.copy(hasAccepted = true)))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update AMP")
+      } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update AMP")
   }
 }

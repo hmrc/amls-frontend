@@ -120,7 +120,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         setupBusinessMatching(activities = Set(MoneyServiceBusiness))
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
       }
 
       "business activities contains HVD" in new FlowFixture {
@@ -150,28 +150,28 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         setupBusinessMatching(activities = Set(MoneyServiceBusiness))
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
       }
 
       "business activities contains HVD" in new FlowFixture {
         setupBusinessMatching(activities = Set(MoneyServiceBusiness, HighValueDealing))
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
       }
 
       "business activities contains ASP" in new FlowFixture {
         setupBusinessMatching(activities = Set(MoneyServiceBusiness, AccountancyServices))
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
       }
 
       "business activities contains HVD and ASP" in new FlowFixture {
         setupBusinessMatching(activities = Set(MoneyServiceBusiness, HighValueDealing, AccountancyServices))
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
       }
     }
 

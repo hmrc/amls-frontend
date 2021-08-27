@@ -48,7 +48,7 @@ class SummaryController @Inject() (val dataCache: DataCacheConnector,
           } yield {
             val hideReceiveAdvice = bmActivities.businessActivities.contains(AccountancyServices)
               Ok(summary(EmptyForm, businessActivity, businessMatching, hideReceiveAdvice))
-          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
       }
   }
 
@@ -59,6 +59,6 @@ class SummaryController @Inject() (val dataCache: DataCacheConnector,
         _ <- OptionT.liftF(dataCache.save[BusinessActivities](request.credId, BusinessActivities.key,
           businessActivity.copy(hasAccepted = true))
         )
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update HVD")
+      } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update HVD")
   }
 }

@@ -41,14 +41,14 @@ class DateOfChangeHelperSpec extends AmlsSpec {
 
       "redirect to Summary Controller" when {
         "not supported key is passed" in {
-          DateOfChangeHelperTest.DateOfChangeRedirect("blah").call.url mustBe routes.SummaryController.get().url
+          DateOfChangeHelperTest.DateOfChangeRedirect("blah").call.url mustBe routes.SummaryController.get.url
         }
       }
 
 
       "redirect to Summary Controller" when {
         "1 is passed" in {
-          DateOfChangeHelperTest.DateOfChangeRedirect("1").call.url mustBe routes.SummaryController.get().url
+          DateOfChangeHelperTest.DateOfChangeRedirect("1").call.url mustBe routes.SummaryController.get.url
         }
       }
 

@@ -49,7 +49,7 @@ class SummaryController @Inject () (
           }
           Ok(summary(EmptyForm, data, showRegisteredForMLR))
         }
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+        case _ => Redirect(controllers.routes.RegistrationProgressController.get)
       }
   }
 
@@ -61,7 +61,7 @@ class SummaryController @Inject () (
           businessDetails.copy(hasAccepted = true)
         )
       } yield {
-        Redirect(controllers.routes.RegistrationProgressController.get())
+        Redirect(controllers.routes.RegistrationProgressController.get)
       }
   }
 }

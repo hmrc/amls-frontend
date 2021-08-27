@@ -48,7 +48,7 @@ class SummaryController @Inject()(authAction: AuthAction,
             register <- cache.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
           } yield {
             Ok(summary(msb, businessMatching.msbServices, register))
-          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
       }
   }
 
@@ -58,7 +58,7 @@ class SummaryController @Inject()(authAction: AuthAction,
       for {
         model <- dataCache.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
         _ <- dataCache.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key, model.copy(hasAccepted = true))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())
+      } yield Redirect(controllers.routes.RegistrationProgressController.get)
   }
 
 }

@@ -59,7 +59,7 @@ class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnect
           }
           case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
         }
-        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
+        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get.url))
       }
     }
   }
@@ -75,14 +75,14 @@ class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnect
             Future.successful(Ok(declare(title, subtitle, name, isAmendment)))
           case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
         }
-        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get().url))
+        case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get.url))
       }
   }
 
   private def redirectToAddPersonPage(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)(implicit hc: HeaderCarrier): Future[Result] =
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case SubmissionReadyForReview => Redirect(routes.AddPersonController.getWithAmendment())
-      case _ => Redirect(routes.AddPersonController.get())
+      case _ => Redirect(routes.AddPersonController.get)
     }
 
 }

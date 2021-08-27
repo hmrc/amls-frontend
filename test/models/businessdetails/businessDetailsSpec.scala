@@ -405,7 +405,7 @@ class businessDetailsSpec extends AmlsSpec {
 
   "Section" must {
     "return a NotStarted Section when there is no data at all" in {
-      val notStartedSection = Section("businessdetails", NotStarted, false, controllers.businessdetails.routes.WhatYouNeedController.get())
+      val notStartedSection = Section("businessdetails", NotStarted, false, controllers.businessdetails.routes.WhatYouNeedController.get)
 
       when(cache.getEntry[BusinessDetails](meq("about-the-business"))(any())) thenReturn None
 
@@ -414,7 +414,7 @@ class businessDetailsSpec extends AmlsSpec {
 
     "return a Completed Section when model is complete and has not changed" in {
       val complete = completeModel
-      val completedSection = Section("businessdetails", Completed, false, controllers.businessdetails.routes.SummaryController.get())
+      val completedSection = Section("businessdetails", Completed, false, controllers.businessdetails.routes.SummaryController.get)
 
       when(cache.getEntry[BusinessDetails](meq("about-the-business"))(any())) thenReturn Some(complete)
 
@@ -423,7 +423,7 @@ class businessDetailsSpec extends AmlsSpec {
 
     "return a Started Section when model is incomplete" in {
       val incomplete = BusinessDetails(Some(previouslyRegistered), None)
-      val startedSection = Section("businessdetails", Started, false, controllers.businessdetails.routes.WhatYouNeedController.get())
+      val startedSection = Section("businessdetails", Started, false, controllers.businessdetails.routes.WhatYouNeedController.get)
 
       when(cache.getEntry[BusinessDetails](meq("about-the-business"))(any())) thenReturn Some(incomplete)
 

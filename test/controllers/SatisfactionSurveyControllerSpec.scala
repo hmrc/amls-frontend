@@ -75,7 +75,7 @@ class SatisfactionSurveyControllerSpec extends AmlsSpec with MockitoSugar with S
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+      redirectLocation(result) must be(Some(controllers.routes.LandingController.get.url))
     }
 
     "on post with valid data go to the status page when audit fails" in new Fixture {
@@ -89,7 +89,7 @@ class SatisfactionSurveyControllerSpec extends AmlsSpec with MockitoSugar with S
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+      redirectLocation(result) must be(Some(controllers.routes.LandingController.get.url))
     }
 
 

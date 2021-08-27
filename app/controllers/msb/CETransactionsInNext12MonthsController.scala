@@ -63,7 +63,7 @@ class CETransactionsInNext12MonthsController @Inject() (authAction: AuthAction,
             )
           } yield edit match {
             case true if msb.whichCurrencies.isDefined =>
-              Redirect(routes.SummaryController.get())
+              Redirect(routes.SummaryController.get)
             case _ =>
               Redirect(routes.WhichCurrenciesController.get(edit))
           }

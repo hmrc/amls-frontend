@@ -42,7 +42,7 @@ class SummaryController  @Inject() (val dataCacheConnector: DataCacheConnector,
         case Some(data@Supervision(Some(anotherBody), Some(_), _, Some(_), _, _)) if ControllerHelper.isAbComplete(anotherBody) =>
           Ok(summary(EmptyForm, data))
         case _ =>
-          Redirect(controllers.routes.RegistrationProgressController.get())
+          Redirect(controllers.routes.RegistrationProgressController.get)
       }
   }
 

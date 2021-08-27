@@ -71,7 +71,7 @@ class OnlyOffTheShelfCompsSoldController @Inject()(val authAction: AuthAction,
   def redirectTo(edit: Boolean, tcsp: Tcsp) = {
     (edit, tcsp.tcspTypes.map(t => t.serviceProviders.contains(CompanyFormationAgent))) match {
       case (_, Some(true)) => Redirect(routes.ComplexCorpStructureCreationController.get(edit))
-      case _ => Redirect(routes.SummaryController.get())
+      case _ => Redirect(routes.SummaryController.get)
     }
   }
 }

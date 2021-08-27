@@ -31,8 +31,8 @@ class PSRNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
   override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     val call = model.psrNumber map {
-      case BusinessAppliedForPSRNumberYes(_) => routes.SummaryController.get()
-      case _ => routes.NoPsrController.get()
+      case BusinessAppliedForPSRNumberYes(_) => routes.SummaryController.get
+      case _ => routes.NoPsrController.get
     }
 
     call.fold(error(PsrNumberPageId))(Redirect)
@@ -46,12 +46,12 @@ class PSRNumberPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegist
     val call = model.psrNumber map {
       case BusinessAppliedForPSRNumberYes(_) => {
         if (includeCompanyNotRegistered) {
-          routes.CheckCompanyController.get()
+          routes.CheckCompanyController.get
         }else{
-          routes.SummaryController.get()
+          routes.SummaryController.get
         }
       }
-      case _ => routes.NoPsrController.get()
+      case _ => routes.NoPsrController.get
     }
 
     call.fold(error(PsrNumberPageId))(Redirect)

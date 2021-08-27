@@ -57,7 +57,7 @@ class IdentifySuspiciousActivityController @Inject() ( val dataCacheConnector: D
               businessActivities.identifySuspiciousActivity(data)
             )
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true => Redirect(routes.SummaryController.get)
             case false => Redirect(routes.NCARegisteredController.get())
           }
       }

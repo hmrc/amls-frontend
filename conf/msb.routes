@@ -1,7 +1,7 @@
-GET         /what-you-need                                     @controllers.msb.WhatYouNeedController.get()
+GET         /what-you-need                                     @controllers.msb.WhatYouNeedController.get
 POST        /what-you-need                                     @controllers.msb.WhatYouNeedController.post()
 
-GET         /check-your-answers                                @controllers.msb.SummaryController.get()
+GET         /check-your-answers                                @controllers.msb.SummaryController.get
 POST        /check-your-answers                                @controllers.msb.SummaryController.post()
 
 GET         /throughput-next-12-months                         @controllers.msb.ExpectedThroughputController.get(edit: Boolean ?= false)

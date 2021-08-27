@@ -259,7 +259,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
         post(edit = true) { result =>
           result.header.status mustBe SEE_OTHER
-          result.header.headers.get("Location") mustBe routes.SummaryController.get().url.some
+          result.header.headers.get("Location") mustBe routes.SummaryController.get.url.some
         }
       }
 

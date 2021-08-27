@@ -27,7 +27,7 @@ import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.tcsp.summary
-import play.api.Logger
+import play.api.Logging
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 
@@ -39,7 +39,7 @@ class SummaryController @Inject()(
                                   val statusService: StatusService,
                                   val cc: MessagesControllerComponents,
                                   val summary: summary,
-                                  implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+                                  implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with Logging {
 
   def sortProviders(data: Tcsp): List[String] = {
 
@@ -58,7 +58,7 @@ class SummaryController @Inject()(
 
 
     if (sortedList.isEmpty) {
-      Logger.warn(s"[tcsp][SummaryController][sortProviders] - tcsp provider list is empty")
+      logger.warn(s"[tcsp][SummaryController][sortProviders] - tcsp provider list is empty")
     }
 
     sortedList
@@ -68,7 +68,7 @@ class SummaryController @Inject()(
       implicit request =>
         fetchModel(request.credId) map {
           case Some(data) if data.copy(hasAccepted = true).isComplete => Ok(summary(data, sortProviders(data)))
-          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+          case _ => Redirect(controllers.routes.RegistrationProgressController.get)
         }
   }
 
@@ -77,7 +77,7 @@ class SummaryController @Inject()(
         (for {
           model <- OptionT(fetchModel(request.credId))
           _ <- OptionT.liftF(dataCache.save[Tcsp](request.credId, Tcsp.key, model.copy(hasAccepted = true)))
-        } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update Tcsp")
+        } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Cannot update Tcsp")
   }
 
   private def fetchModel(credId: String)(implicit hc: HeaderCarrier) = dataCache.fetch[Tcsp](credId, Tcsp.key)

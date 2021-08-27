@@ -67,10 +67,10 @@ class RegisteredOfficeNonUKController @Inject ()(
               _ <- auditAddressChange(data, businessDetails flatMap { _.registeredOffice }, edit)
             } yield {
               if (redirectToDateOfChange[RegisteredOffice](status, businessDetails.registeredOffice, data)) {
-                Redirect(routes.RegisteredOfficeDateOfChangeController.get())
+                Redirect(routes.RegisteredOfficeDateOfChangeController.get)
               } else {
                 edit match {
-                  case true => Redirect(routes.SummaryController.get())
+                  case true => Redirect(routes.SummaryController.get)
                   case _ => Redirect(routes.ContactingYouController.get())
                 }
               }

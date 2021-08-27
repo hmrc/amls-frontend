@@ -101,7 +101,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
 
       "respond with Bad Request on post with invalid data" in new Fixture {
@@ -138,7 +138,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
     }
   }
