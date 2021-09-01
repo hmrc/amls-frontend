@@ -17,7 +17,7 @@
 package views.withdrawal
 
 import org.joda.time.LocalDateTime
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture

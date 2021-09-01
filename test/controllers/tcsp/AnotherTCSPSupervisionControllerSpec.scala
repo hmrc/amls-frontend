@@ -19,7 +19,7 @@ package controllers.tcsp
 import controllers.actions.SuccessfulAuthAction
 import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
 import org.jsoup.Jsoup
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.tcsp.another_tcsp_supervision

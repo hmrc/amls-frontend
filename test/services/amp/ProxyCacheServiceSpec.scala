@@ -21,7 +21,7 @@ import java.time.{LocalDate, LocalDateTime}
 import models.amp.Amp
 import models.eab.Eab
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import services.ProxyCacheService
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}

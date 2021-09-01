@@ -19,7 +19,7 @@ package controllers.supervision
 import controllers.actions.SuccessfulAuthAction
 import models.supervision._
 import org.jsoup.Jsoup
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatestplus.play.PlaySpec

@@ -17,7 +17,6 @@
 package models
 
 import config.ApplicationConfig
-import play.api.Play
 import play.api.libs.json.{JsString, Writes}
 import play.api.mvc.Call
 

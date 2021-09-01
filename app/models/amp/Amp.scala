@@ -19,7 +19,6 @@ package models.amp
 import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.AMPTurnover
-import play.api.Play
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey

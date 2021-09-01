@@ -76,7 +76,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
 
     when {
       controller.amlsConnector.savePayment(any(), any(), any(), any())(any(), any())
-    } thenReturn Future.successful(HttpResponse(CREATED))
+    } thenReturn Future.successful(HttpResponse(CREATED, ""))
 
     when {
       controller.amlsConnector.registrationDetails(any(), any())(any(), any())

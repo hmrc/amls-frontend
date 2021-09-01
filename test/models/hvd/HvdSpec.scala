@@ -20,7 +20,7 @@ import models.DateOfChange
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.joda.time.LocalDate
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JodaReads, JodaWrites, JsUndefined, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap

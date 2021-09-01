@@ -27,11 +27,9 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.http.HttpClient
 import utils.AmlsSpec
-
 
 import scala.concurrent.Future
 
@@ -95,7 +93,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
 
         when {
           http.POST[TaxEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        } thenReturn Future.successful(HttpResponse(OK))
+        } thenReturn Future.successful(HttpResponse(OK, ""))
 
         whenReady(connector.enrol(enrolKey, enrolment, Some(groupIdentfier))) { _ =>
           verify(http).POST[TaxEnrolment, HttpResponse](eqTo(endpointUrl), eqTo(enrolment), any())(any(), any(), any(), any())
@@ -112,7 +110,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
       "throws a DuplicateEnrolmentException when the enrolment has already been created" in new Fixture {
         when {
           http.POST[TaxEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        } thenReturn Future.failed(Upstream4xxResponse(jsonError("ERROR_INVALID_IDENTIFIERS", "The enrolment identifiers provided were invalid"), BAD_REQUEST, BAD_REQUEST))
+        } thenReturn Future.failed(UpstreamErrorResponse(jsonError("ERROR_INVALID_IDENTIFIERS", "The enrolment identifiers provided were invalid"), BAD_REQUEST, BAD_REQUEST))
 
         intercept[DuplicateEnrolmentException] {
           await(connector.enrol(enrolKey, enrolment, Some(groupIdentfier)))
@@ -122,7 +120,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
       "throws a InvalidEnrolmentCredentialsException when the enrolment has the wrong type of role" in new Fixture {
         when {
           http.POST[TaxEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        } thenReturn Future.failed(Upstream4xxResponse(jsonError("INVALID_CREDENTIAL_ID", "Invalid credential ID"), FORBIDDEN, FORBIDDEN))
+        } thenReturn Future.failed(UpstreamErrorResponse(jsonError("INVALID_CREDENTIAL_ID", "Invalid credential ID"), FORBIDDEN, FORBIDDEN))
 
         intercept[InvalidEnrolmentCredentialsException] {
           await(connector.enrol(enrolKey, enrolment, Some(groupIdentfier)))
@@ -138,7 +136,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
 
         when {
           http.DELETE[HttpResponse](any(), any())(any(), any(), any())
-        } thenReturn Future.successful(HttpResponse(NO_CONTENT))
+        } thenReturn Future.successful(HttpResponse(NO_CONTENT, ""))
 
         whenReady(connector.deEnrol(amlsRegistrationNumber, Some(groupIdentfier))) { _ =>
           verify(http).DELETE[HttpResponse](eqTo(endpointUrl), any())(any(), any(), any())
@@ -164,7 +162,7 @@ class TaxEnrolmentsConnectorSpec extends AmlsSpec
 
         when {
           http.DELETE[HttpResponse](any(), any())(any(), any(), any())
-        } thenReturn Future.successful(HttpResponse(NO_CONTENT))
+        } thenReturn Future.successful(HttpResponse(NO_CONTENT, ""))
 
         whenReady(connector.removeKnownFacts(amlsRegistrationNumber)) { _ =>
           verify(http).DELETE[HttpResponse](eqTo(endpointUrl), any())(any(), any(), any())

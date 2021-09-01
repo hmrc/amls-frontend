@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.asp.Asp
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.asp.summary

@@ -31,7 +31,7 @@ import org.scalacheck.Gen
 import uk.gov.hmrc.http.cache.client.CacheMap
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import org.scalactic.anyvals.PosInt
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.annotation.tailrec
 import scala.concurrent.Future

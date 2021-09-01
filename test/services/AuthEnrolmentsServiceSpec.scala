@@ -78,7 +78,7 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
 
       when {
         service.enrolmentStore.enrol(any(), any(), any())(any(), any())
-      } thenReturn Future.successful(HttpResponse(OK))
+      } thenReturn Future.successful(HttpResponse(OK, ""))
 
       val postcode = postcodeGen.sample.get
 
@@ -92,11 +92,11 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
 
       when {
         enrolmentStore.deEnrol(eqTo(amlsRegistrationNumber), any())(any(), any())
-      } thenReturn Future.successful(HttpResponse(NO_CONTENT))
+      } thenReturn Future.successful(HttpResponse(NO_CONTENT, ""))
 
       when {
         enrolmentStore.removeKnownFacts(eqTo(amlsRegistrationNumber))(any(), any())
-      } thenReturn Future.successful(HttpResponse(NO_CONTENT))
+      } thenReturn Future.successful(HttpResponse(NO_CONTENT, ""))
 
       whenReady(service.deEnrol(amlsRegistrationNumber, Some("GROUP_ID"))) { result =>
         result mustBe true

@@ -20,7 +20,7 @@ import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService,
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import models.tradingpremises._
 import org.joda.time.LocalDate
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 

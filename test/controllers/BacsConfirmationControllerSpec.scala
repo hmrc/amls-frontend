@@ -81,7 +81,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
 
     when {
       controller.authenticator.refreshProfile(any(), any())
-    } thenReturn Future.successful(HttpResponse(OK))
+    } thenReturn Future.successful(HttpResponse(OK, ""))
 
     when {
       controller.amlsConnector.refreshPaymentStatus(any(), any())(any(), any())
@@ -93,7 +93,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
 
     when {
       controller.amlsConnector.savePayment(any(), any(), any(), any())(any(), any())
-    } thenReturn Future.successful(HttpResponse(CREATED))
+    } thenReturn Future.successful(HttpResponse(CREATED, ""))
 
     when {
       controller.amlsConnector.registrationDetails(any(), any())(any(), any())

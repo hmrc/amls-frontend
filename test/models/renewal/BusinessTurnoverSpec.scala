@@ -17,7 +17,7 @@
 package models.renewal
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -120,7 +120,7 @@ class BusinessTurnoverSpec extends PlaySpec with MockitoSugar {
       Json.toJson(BusinessTurnover.Third.asInstanceOf[BusinessTurnover]) must
         be(Json.obj("businessTurnover" -> "03"))
 
-      Json.toJson(BusinessTurnover.asInstanceOf[BusinessTurnover]) must
+      Json.toJson(BusinessTurnover.Fourth.asInstanceOf[BusinessTurnover]) must
         be(Json.obj("businessTurnover" -> "04"))
 
       Json.toJson(BusinessTurnover.Fifth.asInstanceOf[BusinessTurnover]) must

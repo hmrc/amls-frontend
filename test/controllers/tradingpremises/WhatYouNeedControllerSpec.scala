@@ -21,7 +21,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AmlsSpec

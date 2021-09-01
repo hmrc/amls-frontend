@@ -17,7 +17,7 @@
 package views.businessmatching.updateservice.remove
 
 import org.scalatest.MustMatchers
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture

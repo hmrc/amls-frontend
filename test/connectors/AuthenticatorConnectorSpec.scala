@@ -44,7 +44,7 @@ class AuthenticatorConnectorSpec extends AmlsSpec with ScalaFutures {
 
       when(appConfig.refreshProfileToggle).thenReturn(true)
 
-      when(http.POSTEmpty[HttpResponse](any(), any())(any(), any(), any())) thenReturn Future.successful(HttpResponse(200))
+      when(http.POSTEmpty[HttpResponse](any(), any())(any(), any(), any())) thenReturn Future.successful(HttpResponse(200, ""))
 
       val result = Await.result(connector.refreshProfile, 5 seconds)
 

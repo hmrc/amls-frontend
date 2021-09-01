@@ -19,7 +19,7 @@ package controllers.bankdetails
 import controllers.actions.SuccessfulAuthAction
 import models.bankdetails._
 import models.status.SubmissionReady
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}

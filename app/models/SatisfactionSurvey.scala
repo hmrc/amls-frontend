@@ -68,18 +68,6 @@ object SatisfactionSurvey {
     }
   }
 
-  //  implicit val format: OFormat[SatisfactionSurvey] = {
-  //    implicit def one = Json.format[First]
-  //    implicit def two = Json.format[Second]
-  //    implicit def three = Json.format[Third]
-  //    implicit def four = Json.format[Fourth]
-  //    implicit def five = Json.format[Fifth]
-  //    Json.format[SatisfactionSurvey]
-  //  }
-  //
-  //
-
-
   implicit val jsonWrites = Writes[SatisfactionSurvey] {
     case First(details) => Json.obj(
       "satisfaction" -> "01",

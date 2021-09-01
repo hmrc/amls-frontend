@@ -87,7 +87,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
     when {
       controller.authenticator.refreshProfile(any(), any())
-    } thenReturn Future.successful(HttpResponse(OK))
+    } thenReturn Future.successful(HttpResponse(OK, ""))
 
     when {
       controller.keystoreConnector.setConfirmationStatus(any(), any())
@@ -103,7 +103,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
     when {
       controller.amlsConnector.savePayment(any(), any(), any(), any())(any(), any())
-    } thenReturn Future.successful(HttpResponse(CREATED))
+    } thenReturn Future.successful(HttpResponse(CREATED, ""))
 
     when {
       controller.amlsConnector.registrationDetails(any(), any())(any(), any())

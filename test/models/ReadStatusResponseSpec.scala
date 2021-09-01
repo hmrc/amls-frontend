@@ -19,7 +19,7 @@ package models
 import java.sql.Timestamp
 
 import org.joda.time.{LocalDate, LocalDateTime}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsObject, JsResult, JsSuccess, Json}
 

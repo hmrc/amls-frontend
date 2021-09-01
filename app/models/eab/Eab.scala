@@ -18,7 +18,6 @@ package models.eab
 
 import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import play.api.Play
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey

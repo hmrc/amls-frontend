@@ -20,7 +20,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json, Writes}
+import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 import SatisfactionSurvey._
 
 class SatisfactionSurveySpec extends PlaySpec with MockitoSugar {

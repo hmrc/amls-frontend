@@ -17,7 +17,7 @@
 package models.businessdetails
 
 import jto.validation.{Invalid, Path, ValidationError}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
 class CorrespondenceAddressIsUkSpec extends PlaySpec with MockitoSugar {

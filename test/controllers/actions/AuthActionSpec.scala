@@ -20,7 +20,7 @@ import config.ApplicationConfig
 import generators.AmlsReferenceNumberGenerator
 import models.ReturnLocation
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.mvc._

@@ -25,12 +25,11 @@ object NameValuePair {
 
   implicit val jsonReads: Reads[NameValuePair] = {
     __.read[Seq[String]] map {
-      case key :: value :: _ => NameValuePair(key, value)
+      case Seq(key, value) => NameValuePair(key, value)
     }
   }
 
   implicit val jsonWrites = Writes[NameValuePair] { model =>
     JsArray(Seq(JsString(model.name), JsString(model.value)))
   }
-
 }

@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import controllers.actions.SuccessfulAuthAction
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._

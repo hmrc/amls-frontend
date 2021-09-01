@@ -22,7 +22,7 @@ import models.ReadStatusResponse
 import models.registrationprogress.{Completed, Section}
 import models.status._
 import org.joda.time.LocalDate
-import play.api.{Environment, Logging, Mode, Play}
+import play.api.{Environment, Logging, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}

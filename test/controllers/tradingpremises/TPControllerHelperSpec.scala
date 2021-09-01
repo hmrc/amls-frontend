@@ -16,7 +16,7 @@
 
 package controllers.tradingpremises
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.http.cache.client.CacheMap
 import org.mockito.Mockito._

@@ -25,7 +25,7 @@ import models.tradingpremises.{TradingPremisesMsbServices => TPMsbServices, What
 import org.joda.time.LocalDate
 
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import services.TradingPremisesService
 import utils.{DependencyMocks, FutureAssertions, AmlsSpec, StatusConstants}

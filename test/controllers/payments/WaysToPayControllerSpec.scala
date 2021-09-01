@@ -90,7 +90,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
     when {
       controller.paymentsService.updateBacsStatus(any(), any(), any())(any(), any())
-    } thenReturn Future.successful(HttpResponse(OK))
+    } thenReturn Future.successful(HttpResponse(OK, ""))
 
     when {
       controller.statusService.getDetailedStatus(any[Option[String]], any(), any())( any(), any())

@@ -30,7 +30,7 @@ import org.mockito.Matchers
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
 import uk.gov.hmrc.http._
@@ -263,7 +263,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
       when {
         amlsConnector.http.POSTString[HttpResponse](Matchers.any(), eqTo(id), Matchers.any())(Matchers.any(), Matchers.any(), Matchers.any())
-      } thenReturn Future.successful(HttpResponse(CREATED))
+      } thenReturn Future.successful(HttpResponse(CREATED, ""))
 
       whenReady(amlsConnector.savePayment(id, amlsRegistrationNumber, safeId, accountTypeId)) {
         _.status mustBe CREATED
@@ -351,7 +351,7 @@ class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
     "send the isBacs flag to the middle tier" in {
       val paymentRef = paymentRefGen.sample.get
       val bacsRequest = UpdateBacsRequest(true)
-      val result = HttpResponse(OK)
+      val result = HttpResponse(OK, "")
 
       when {
         amlsConnector.http.PUT[UpdateBacsRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())

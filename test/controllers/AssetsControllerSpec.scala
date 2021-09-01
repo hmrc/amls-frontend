@@ -19,7 +19,7 @@ package controllers
 import models.autocomplete.LocationGraphTransformer
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.Environment
 import play.api.http.HttpErrorHandler

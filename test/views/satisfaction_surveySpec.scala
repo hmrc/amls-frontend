@@ -21,7 +21,7 @@ import java.net.URI
 import forms.{EmptyForm, InvalidForm}
 import org.jsoup.Jsoup
 import org.scalatest.MustMatchers
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Request
 import utils.AmlsViewSpec

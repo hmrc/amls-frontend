@@ -16,7 +16,7 @@
 
 package models.bankdetails
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play. PlaySpec
 import jto.validation.{Path, Invalid, Valid}
 import jto.validation.ValidationError

@@ -32,7 +32,7 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.{RenewalService, SectionsProvider, StatusService, SubmissionService}
-import uk.gov.hmrc.http.{BadRequestException, HttpResponse, Upstream5xxResponse}
+import uk.gov.hmrc.http.{BadRequestException, HttpResponse, UpstreamErrorResponse}
 import utils.AmlsSpec
 import views.ParagraphHelpers
 import views.html.submission.{bad_request, duplicate_enrolment, duplicate_submission, wrong_credential_type}
@@ -157,7 +157,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
         when {
           controller.authenticator.refreshProfile(any(), any())
-        } thenReturn Future.successful(HttpResponse(OK))
+        } thenReturn Future.successful(HttpResponse(OK, ""))
 
         when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
           .thenReturn(Future.successful(SubmissionReady))
@@ -196,7 +196,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       when {
         controller.subscriptionService.subscribe(any(), any(), any())(any(), any(), any())
-      } thenReturn Future.failed(DuplicateEnrolmentException(msg, Upstream5xxResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
+      } thenReturn Future.failed(DuplicateEnrolmentException(msg, UpstreamErrorResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
 
       when {
         controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
@@ -244,7 +244,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       when {
         controller.subscriptionService.subscribe(any[String](), any(), any())(any(), any(), any())
-      } thenReturn Future.failed(InvalidEnrolmentCredentialsException(msg, Upstream5xxResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
+      } thenReturn Future.failed(InvalidEnrolmentCredentialsException(msg, UpstreamErrorResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
 
       val result = controller.post()(request)
 

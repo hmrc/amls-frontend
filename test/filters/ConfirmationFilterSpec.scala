@@ -57,7 +57,7 @@ class ConfirmationFilterSpec extends PlaySpec with GuiceOneAppPerSuite with Mock
 
     when(keystore.confirmationStatus(any(), any())) thenReturn Future.successful(confirmationStatusResult)
 
-    when(authenticator.refreshProfile(any(), any())) thenReturn Future.successful(HttpResponse(OK))
+    when(authenticator.refreshProfile(any(), any())) thenReturn Future.successful(HttpResponse(OK, ""))
 
   }
 
