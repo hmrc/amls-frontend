@@ -187,11 +187,9 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
         }
       }
 
-      val applicationConfig = app.injector.instanceOf[ApplicationConfig]
-
       "redirect to the sign-out page when the user role is not USER" in new Fixture {
         val expectedLocation = s"${appConfig.logoutUrl}?continue=${
-          URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role, applicationConfig).absoluteUrl, "utf-8")}"
+          URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(appConfig).absoluteUrl, "utf-8")}"
 
         val result = controllerNoUserRole.get()(request)
         status(result) mustBe SEE_OTHER

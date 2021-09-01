@@ -18,24 +18,30 @@ package models.hvd
 
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.mvc.ControllerComponents
 
-class SalesChannelSpec extends WordSpec with MustMatchers with GuiceOneAppPerTest with play.api.i18n.LangImplicits {
+class SalesChannelSpec extends WordSpec with MustMatchers with GuiceOneAppPerTest {
   import play.api.i18n._
   implicit val lang = Lang("en-US")
 
   "getMessage" must {
     "return correct text for Retail" in {
+      val cc = app.injector.instanceOf[ControllerComponents]
+      implicit val messages: Messages = cc.messagesApi.preferred(Seq(lang))
       Retail.getMessage must be("Retail")
     }
 
     "return correct text for Wholesale" in {
+      val cc = app.injector.instanceOf[ControllerComponents]
+      implicit val messages: Messages = cc.messagesApi.preferred(Seq(lang))
       Wholesale.getMessage must be("Wholesale")
     }
 
     "return correct text for Auction" in {
+      val cc = app.injector.instanceOf[ControllerComponents]
+      implicit val messages: Messages = cc.messagesApi.preferred(Seq(lang))
       Auction.getMessage must be("Auction")
     }
   }
 
-  override def messagesApi: MessagesApi = ???
 }

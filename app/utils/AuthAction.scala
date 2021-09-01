@@ -54,7 +54,7 @@ class DefaultAuthAction @Inject() (val authConnector: AuthConnector,
   private val ctKey         = "IR-CT"
 
   private lazy val unauthorisedUrl = URLEncoder.encode(
-    ReturnLocation(controllers.routes.AmlsController.unauthorised_role, applicationConfig).absoluteUrl, "utf-8"
+    ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(applicationConfig).absoluteUrl, "utf-8"
   )
 
   def unauthorised = s"${applicationConfig.logoutUrl}?continue=$unauthorisedUrl"

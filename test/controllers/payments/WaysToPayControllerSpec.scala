@@ -61,7 +61,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
     val applicationConfig = app.injector.instanceOf[ApplicationConfig]
 
-    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref), applicationConfig)
+    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
 
     val fees = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber, 100, None, None, 0, 100, Some(paymentReferenceNumber), None, DateTime.now())
 

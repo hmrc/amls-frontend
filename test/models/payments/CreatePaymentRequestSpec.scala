@@ -44,7 +44,7 @@ class CreatePaymentRequestSpec extends AmlsSpec {
 
       val applicationConfig = app.injector.instanceOf[ApplicationConfig]
 
-      val model = CreatePaymentRequest("other", "XA2345678901232", "A description", 100, ReturnLocation("/confirmation", applicationConfig))
+      val model = CreatePaymentRequest("other", "XA2345678901232", "A description", 100, ReturnLocation("/confirmation")(applicationConfig))
 
       Json.toJson(model) mustBe Json.parse(expectedJson)
     }

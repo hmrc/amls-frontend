@@ -47,10 +47,8 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
   val mockApplicationConfig = mock[ApplicationConfig]
   val mockParser = mock[BodyParsers.Default]
 
-  val applicationConfig = app.injector.instanceOf[ApplicationConfig]
-
   private lazy val unauthorisedUrl = URLEncoder.encode(
-    ReturnLocation(controllers.routes.AmlsController.unauthorised_role, applicationConfig).absoluteUrl, "utf-8"
+    ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(mockApplicationConfig).absoluteUrl, "utf-8"
   )
   def unauthorised = s"${mockApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
   def signout      = s"${mockApplicationConfig.logoutUrl}"

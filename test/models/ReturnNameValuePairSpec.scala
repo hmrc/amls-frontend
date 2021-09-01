@@ -30,7 +30,7 @@ class ReturnNameValuePairSpec extends PlaySpec with GuiceOneAppPerSuite {
 
         val applicationConfig = app.injector.instanceOf[ApplicationConfig]
 
-        val model = ReturnLocation(call, applicationConfig)
+        val model = ReturnLocation(call)(applicationConfig)
 
         model.absoluteUrl mustBe s"http://localhost:9222${call.url}"
       }

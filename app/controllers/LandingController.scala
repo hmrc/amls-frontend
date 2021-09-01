@@ -68,7 +68,7 @@ class LandingController @Inject()(val landingService: LandingService,
                                   start: start,
                                   headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper with Logging {
 
-  private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role, config).absoluteUrl, "utf-8")
+  private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(appConfig).absoluteUrl, "utf-8")
 
   def signoutUrl = s"${appConfig.logoutUrl}?continue=$unauthorisedUrl"
 

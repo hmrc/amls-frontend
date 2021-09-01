@@ -25,7 +25,7 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.{AbstractController, BaseController, ControllerComponents, Results}
+import play.api.mvc.{BaseController, ControllerComponents, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
@@ -36,6 +36,9 @@ class ConfirmationFilterSpec extends PlaySpec with GuiceOneAppPerSuite with Mock
 
   val keystore = mock[KeystoreConnector]
   val authenticator = mock[AuthenticatorConnector]
+  val cc = app.injector.instanceOf[ControllerComponents]
+
+  override protected def controllerComponents: ControllerComponents = cc
 
   override lazy val app = new GuiceApplicationBuilder()
     .overrides(bind[KeystoreConnector].to(keystore))
@@ -150,7 +153,5 @@ class ConfirmationFilterSpec extends PlaySpec with GuiceOneAppPerSuite with Mock
     }
 
   }
-
-  override protected def controllerComponents: ControllerComponents = ???
 
 }

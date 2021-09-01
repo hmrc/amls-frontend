@@ -32,8 +32,8 @@ private object AppDependencies {
     "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion,
     "com.beachape" %% "enumeratum-play" % "1.5.15",
     "com.squareup.okhttp3" % "mockwebserver" % okHttpVersion,
-    "com.typesafe.play" %% "play-json" % "2.9.2",
-    "com.typesafe.play" %% "play-json-joda" % "2.9.2",
+    "com.typesafe.play" %% "play-json" % "2.8.1",
+    "com.typesafe.play" %% "play-json-joda" % "2.8.1",
     
     compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.5" cross CrossVersion.full),
     "com.github.ghik" % "silencer-lib" % "1.7.5" % Provided cross CrossVersion.full

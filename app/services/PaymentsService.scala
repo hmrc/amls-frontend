@@ -48,7 +48,7 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
 
     val amountInPence = (amount * 100).toInt
 
-    paymentsConnector.createPayment(CreatePaymentRequest("other", paymentReference, "AMLS Payment", amountInPence, ReturnLocation(returnUrl, applicationConfig))) flatMap {
+    paymentsConnector.createPayment(CreatePaymentRequest("other", paymentReference, "AMLS Payment", amountInPence, ReturnLocation(returnUrl)(applicationConfig))) flatMap {
       case Some(response) =>
         savePaymentBeforeResponse(response, amlsRefNo, safeId, accountTypeId).map(_ => response.nextUrl)
       case _ =>

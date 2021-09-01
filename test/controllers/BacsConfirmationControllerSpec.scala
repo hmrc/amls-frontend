@@ -124,7 +124,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
 
     val applicationConfig = app.injector.instanceOf[ApplicationConfig]
 
-    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref), applicationConfig)
+    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
 
     def setupBusinessMatching(companyName: String) = {
 

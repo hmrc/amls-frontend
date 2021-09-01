@@ -41,6 +41,7 @@ class GovUkCountryDataProviderSpec extends PlaySpec with MockitoSugar {
 
   "fetch" must {
     "retain only the country code data" in new Fixture {
+
       setupEnvironment(Some(Seq(
         NameValuePair("Great Britain", "country:GB"),
         NameValuePair("Bermuda", "country:BM"),

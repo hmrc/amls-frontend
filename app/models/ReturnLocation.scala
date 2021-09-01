@@ -25,13 +25,13 @@ case class ReturnLocation(url: String, absoluteUrl: String)
 
 object ReturnLocation {
 
-  def apply(url: String, appConfig: ApplicationConfig) =
-    new ReturnLocation(url, publicRedirectUrl(url, appConfig))
+  def apply(url: String)(implicit appConfig: ApplicationConfig) =
+    new ReturnLocation(url, publicRedirectUrl(url))
 
-  def apply(call: Call, appConfig: ApplicationConfig) =
-    new ReturnLocation(call.url, publicRedirectUrl(call.url, appConfig))
+  def apply(call: Call)(implicit appConfig: ApplicationConfig) =
+    new ReturnLocation(call.url, publicRedirectUrl(call.url))
 
-  private def publicRedirectUrl(url: String, appConfig: ApplicationConfig) = s"${appConfig.frontendBaseUrl}$url"
+  private def publicRedirectUrl(url: String)(implicit appConfig: ApplicationConfig) = s"${appConfig.frontendBaseUrl}$url"
 
   implicit val locationWrites = new Writes[ReturnLocation] {
     override def writes(o: ReturnLocation) = JsString(o.absoluteUrl)
