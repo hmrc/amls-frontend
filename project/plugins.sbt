@@ -11,8 +11,6 @@ addSbtPlugin("uk.gov.hmrc" % "sbt-distributables" % "2.1.0")
 
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.8" exclude("org.slf4j", "slf4j-simple"))
 
-addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.10")
-
 addSbtPlugin("org.scoverage" %% "sbt-scoverage" % "1.8.1")
 
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
