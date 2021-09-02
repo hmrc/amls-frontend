@@ -91,30 +91,4 @@ object SatisfactionSurvey {
     )
   }
 
-  //  implicit val jsonWrites_1 =  Writes[SatisfactionSurvey.First] {
-  //    case First(details) => Json.obj(      "satisfaction" -> "01",      "details" -> details.fold("") { x => x.toString }    )  }
-
-  //  implicit val jsonWrites_2 =  Writes[SatisfactionSurvey.Second] {    case Second(details) => Json.obj(      "satisfaction" -> "02",      "details" -> details.fold("") { x => x.toString }    )  }
-  //
-  //  implicit val jsonWrites_3 =  Writes[SatisfactionSurvey.Third] {
-  //    case Third(details) => Json.obj(
-  //      "satisfaction" -> "03",
-  //      "details" -> details.fold("") { x => x.toString }
-  //    )
-  //  }
-  //
-  //  implicit val jsonWrites_4 =  Writes[SatisfactionSurvey.Fourth] {
-  //    case Fourth(details) => Json.obj(
-  //      "satisfaction" -> "04",
-  //      "details" -> details.fold("") { x => x.toString }
-  //    )
-  //  }
-  //
-  //  implicit val jsonWrites_5 =  Writes[SatisfactionSurvey.Fifth] {
-  //    case Fifth(details) => Json.obj(
-  //      "satisfaction" -> "05",
-  //      "details" -> details.fold("") { x => x.toString }
-  //    )
-  //  }
-
 }
