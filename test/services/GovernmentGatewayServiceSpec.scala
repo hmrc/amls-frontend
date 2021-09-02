@@ -40,7 +40,7 @@ class GovernmentGatewayServiceSpec extends PlaySpec with MockitoSugar with Scala
 
     "successfully enrol" in {
 
-      val response = HttpResponse(OK)
+      val response = HttpResponse(OK, "")
 
       when {
         service.ggConnector.enrol(any())(any(), any(), any())

@@ -23,14 +23,14 @@ import models.businessmatching._
 import models.tradingpremises.TradingPremises
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 
 import scala.concurrent.Future
 
-class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with TradingPremisesGenerator{
+class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyChecks with TradingPremisesGenerator{
 
   trait Fixture {
     self => val request = addToken(authRequest)

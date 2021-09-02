@@ -19,7 +19,7 @@ package connectors.cache
 import config.ApplicationConfig
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import utils.AmlsSpec
@@ -30,7 +30,7 @@ class DataCacheConnectorSpec
   extends AmlsSpec
     with Conversions
     with ScalaFutures
-    with PropertyChecks
+    with ScalaCheckPropertyChecks
     with IntegrationPatience {
 
   case class Model(value: String)

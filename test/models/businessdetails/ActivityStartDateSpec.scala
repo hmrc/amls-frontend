@@ -21,7 +21,6 @@ import org.scalatestplus.play.PlaySpec
 import jto.validation.Path
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.ValidationError
-import models.tradingpremises.ActivityStartDate
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 

@@ -48,7 +48,7 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AmlsSpec
 import views.html.responsiblepeople.address.current_address_UK
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
@@ -495,9 +495,9 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
           val errorCount = 2
           val elementsWithError : Elements = document.getElementsByClass("error-notification")
           elementsWithError.size() must be(errorCount)
-          val elements = elementsWithError.map(_.text())
-          elements.get(0) must include(Messages("error.required.enter.addresslineone.regex"))
-          elements.get(1) must include(Messages("error.required.enter.addresslinetwo.regex"))
+          val elements = elementsWithError.asScala.map(_.text())
+          elements(0) must include(Messages("error.required.enter.addresslineone.regex"))
+          elements(1) must include(Messages("error.required.enter.addresslinetwo.regex"))
         }
 
         "isUK field is not supplied" in new Fixture {

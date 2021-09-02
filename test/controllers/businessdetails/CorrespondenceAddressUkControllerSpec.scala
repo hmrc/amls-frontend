@@ -38,7 +38,7 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AmlsSpec
 import views.html.businessdetails.correspondence_address_uk
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
@@ -218,7 +218,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
         val elementsWithError : Elements = document.getElementsByClass("error-notification")
         elementsWithError.size() must be(errorCount)
 
-        elementsWithError.map(_.text()) must contain allOf(
+        elementsWithError.asScala.map(_.text()) must contain allOf(
           "Error: " + Messages("error.text.validation.address.line1"),
           "Error: " + Messages("error.text.validation.address.line2"),
           "Error: " + Messages("error.text.validation.address.line3"),

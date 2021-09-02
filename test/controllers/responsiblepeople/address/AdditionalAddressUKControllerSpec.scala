@@ -39,7 +39,7 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.responsiblepeople.address.additional_address_UK
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
@@ -232,9 +232,9 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
           val errorCount = 2
           val elementsWithError : Elements = document.getElementsByClass("error-notification")
           elementsWithError.size() must be(errorCount)
-          val elements = elementsWithError.map(_.text())
-          elements.get(0) must include(Messages("error.required.enter.addresslineone.regex"))
-          elements.get(1) must include(Messages("error.required.enter.addresslinetwo.regex"))
+          val elements = elementsWithError.asScala.map(_.text())
+          elements(0) must include(Messages("error.required.enter.addresslineone.regex"))
+          elements(1) must include(Messages("error.required.enter.addresslinetwo.regex"))
         }
       }
 

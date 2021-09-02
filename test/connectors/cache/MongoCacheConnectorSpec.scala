@@ -21,8 +21,8 @@ import org.mockito.Mockito.{reset, when}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FreeSpec, MustMatchers}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class MongoCacheConnectorSpec extends FreeSpec
   with MustMatchers
-  with PropertyChecks
+  with ScalaCheckPropertyChecks
   with ScalaFutures
   with MockitoSugar
   with IntegrationPatience with Conversions {

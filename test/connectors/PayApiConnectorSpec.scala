@@ -21,14 +21,13 @@ import models.payments.{CreatePaymentRequest, CreatePaymentResponse, NextUrl}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsNull, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, HttpClient}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
 import utils.AmlsSpec
-
 
 import scala.concurrent.Future
 
@@ -69,7 +68,7 @@ class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience  {
           when {
             http.POST[CreatePaymentRequest, HttpResponse](eqTo(s"$payApiUrl/pay-api/amls/journey/start"), any(), any())(any(), any(), any(), any())
           } thenReturn Future.successful(
-            HttpResponse(OK, Some(Json.toJson(validResponse)))
+            HttpResponse(OK, Json.toJson(validResponse), Map.empty[String, Seq[String]])
           )
 
           val result = await(connector.createPayment(validRequest))
@@ -86,7 +85,7 @@ class PayApiConnectorSpec extends AmlsSpec with IntegrationPatience  {
           when {
             http.POST[CreatePaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
           } thenReturn Future.successful(
-            HttpResponse(BAD_REQUEST, None)
+            HttpResponse(BAD_REQUEST, JsNull, Map.empty[String, Seq[String]])
           )
 
           val result = await(connector.createPayment(validRequest))

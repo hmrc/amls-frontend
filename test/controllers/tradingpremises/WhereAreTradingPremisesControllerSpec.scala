@@ -41,7 +41,7 @@ import utils.AmlsSpec
 import views.html.date_of_change
 import views.html.tradingpremises.where_are_trading_premises
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter {
@@ -196,7 +196,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           val errorCount = 1
           val elementsWithError : Elements = document.getElementsByClass("error-notification")
           elementsWithError.size() must be(errorCount)
-          for (ele: Element <- elementsWithError) {
+          for (ele: Element <- elementsWithError.asScala) {
             ele.html() must include(Messages("error.required.enter.addresslineone.regex"))
           }
         }

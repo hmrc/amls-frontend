@@ -31,7 +31,7 @@ import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.Helpers.{status, _}
 import services.StatusService
@@ -43,7 +43,7 @@ import views.html.responsiblepeople.remove_responsible_person
 import scala.concurrent.Future
 
 class RemoveResponsiblePersonControllerSpec extends AmlsSpec
-  with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks with NinoUtil with ResponsiblePersonGenerator {
+  with MustMatchers with MockitoSugar with ScalaFutures with ScalaCheckPropertyChecks with NinoUtil with ResponsiblePersonGenerator {
 
   trait Fixture {
     self => val request = addToken(authRequest)

@@ -20,9 +20,9 @@ import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalacheck.Gen
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-class AgentRemovalReasonSpec extends PlaySpec with GeneratorDrivenPropertyChecks {
+class AgentRemovalReasonSpec extends PlaySpec with ScalaCheckDrivenPropertyChecks {
 
   import models.tradingpremises.RemovalReasonConstants._
 
