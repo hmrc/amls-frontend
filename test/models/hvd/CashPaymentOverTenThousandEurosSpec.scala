@@ -17,7 +17,7 @@
 package models.hvd
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
 class CashPaymentOverTenThousandEurosSpec extends PlaySpec with MockitoSugar {

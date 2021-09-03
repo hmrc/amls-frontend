@@ -176,7 +176,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
 
     "return a NotStarted Section" when {
       "there is no data at all" in {
-        val notStartedSection = Section("bankdetails", NotStarted, false, controllers.bankdetails.routes.WhatYouNeedController.get())
+        val notStartedSection = Section("bankdetails", NotStarted, false, controllers.bankdetails.routes.WhatYouNeedController.get)
 
         mockCacheGetEntry[Seq[BankDetails]](None, BankDetails.key)
 
@@ -187,7 +187,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
     "return a Completed Section" when {
       "model is complete and has not changed" in {
         val complete = Seq(completeModel)
-        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get())
+        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get)
 
         mockCacheGetEntry[Seq[BankDetails]](Some(complete), BankDetails.key)
 
@@ -197,7 +197,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
       "model is complete and has changed" in {
         val completeChangedModel = BankDetails(Some(accountType), Some("name"), Some(bankAccount), true, hasAccepted = true)
 
-        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.YourBankAccountsController.get())
+        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.YourBankAccountsController.get)
 
         mockCacheGetEntry[Seq[BankDetails]](Some(Seq(completeChangedModel)), BankDetails.key)
 
@@ -205,7 +205,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
       }
 
       "model is complete with No bankaccount option selected" in {
-        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get())
+        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get)
 
         mockCacheGetEntry[Seq[BankDetails]](Some(Seq.empty), BankDetails.key)
 
@@ -217,7 +217,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
 
       "model is complete with only deleted bankaccounts that have not changed" in {
         val deleted = Seq(completeModel.copy(status = Some(StatusConstants.Deleted)))
-        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get())
+        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get)
 
         mockCacheGetEntry[Seq[BankDetails]](Some(deleted), BankDetails.key)
 
@@ -229,7 +229,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
 
       "model is complete with only deleted bankaccounts that have changed" in {
         val deleted = Seq(completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true))
-        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.YourBankAccountsController.get())
+        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.YourBankAccountsController.get)
 
         mockCacheGetEntry[Seq[BankDetails]](Some(deleted), BankDetails.key)
 
@@ -242,7 +242,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
 
     "return a Started Section when model is incomplete" in {
       val incomplete = Seq(accountTypePartialModel)
-      val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.YourBankAccountsController.get())
+      val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.YourBankAccountsController.get)
 
       mockCacheGetEntry[Seq[BankDetails]](Some(incomplete), BankDetails.key)
 
@@ -270,7 +270,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
 
           section.hasChanged must be(true)
           section.status must be(Completed)
-          section.call must be(controllers.bankdetails.routes.YourBankAccountsController.get())
+          section.call must be(controllers.bankdetails.routes.YourBankAccountsController.get)
         }
 
         "the section is complete with all the bank details unchanged" in {
@@ -281,7 +281,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
 
           section.hasChanged must be(false)
           section.status must be(Completed)
-          section.call must be(controllers.bankdetails.routes.YourBankAccountsController.get())
+          section.call must be(controllers.bankdetails.routes.YourBankAccountsController.get)
         }
 
         "the section is complete with all the bank details being modified" in {
@@ -292,7 +292,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
 
           section.hasChanged must be(true)
           section.status must be(Completed)
-          section.call must be(controllers.bankdetails.routes.YourBankAccountsController.get())
+          section.call must be(controllers.bankdetails.routes.YourBankAccountsController.get)
         }
 
       }
@@ -307,7 +307,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
 
           section.hasChanged must be(false)
           section.status must be(NotStarted)
-          section.call must be(controllers.bankdetails.routes.WhatYouNeedController.get())
+          section.call must be(controllers.bankdetails.routes.WhatYouNeedController.get)
         }
       }
 

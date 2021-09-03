@@ -84,7 +84,7 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
 
       html must include(Messages("renewal.progress.ready.to.submit.intro"))
 
-      doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
+      doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get.url)
     }
 
     "not have the submit registration button when cannot submit because renewal section not complete" in new ViewFixture {
@@ -95,7 +95,7 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
 
       doc.select(".application-submit form button[name=submit]").isEmpty mustBe true
 
-      doc.getElementsMatchingOwnText(Messages("renewal.progress.continue")).attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
+      doc.getElementsMatchingOwnText(Messages("renewal.progress.continue")).attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get.url)
     }
 
     "not show the submit registration button when cannot submit and renewal section complete" in new ViewFixture {
@@ -104,7 +104,7 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
 
       doc.select("form button[name=submit]").isEmpty mustBe true
 
-      doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
+      doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get.url)
     }
 
     "show ready to submit renewal when information are completed" in new ViewFixture {
@@ -127,7 +127,7 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
         s"$fullStop"
 
       doc.select("#renewal-information-not-completed").get(0).text() must be(expectedText)
-      doc.select("#renewal-information-not-completed a").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
+      doc.select("#renewal-information-not-completed a").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get.url)
       html must include(Messages("renewal.progress.submit.intro"))
     }
 

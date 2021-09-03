@@ -23,7 +23,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
@@ -117,7 +117,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
         val resultTrue = controller.post(true)(newRequest)
         status(resultTrue) must be(SEE_OTHER)
-        redirectLocation(resultTrue) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(resultTrue) must be(Some(routes.SummaryController.get.url))
 
       }
     }

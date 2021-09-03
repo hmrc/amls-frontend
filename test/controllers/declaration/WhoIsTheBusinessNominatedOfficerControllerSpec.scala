@@ -26,7 +26,7 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionRea
 import org.joda.time.LocalDate
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -166,7 +166,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
 
-          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
         }
       }
     }
@@ -189,7 +189,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.WhoIsRegisteringController.get().url))
+          redirectLocation(result) must be(Some(routes.WhoIsRegisteringController.get.url))
         }
 
         "selected option is a valid responsible person" in new Fixture {
@@ -206,7 +206,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get().url))
+          redirectLocation(result) must be(Some(controllers.declaration.routes.WhoIsRegisteringController.get.url))
         }
 
       }

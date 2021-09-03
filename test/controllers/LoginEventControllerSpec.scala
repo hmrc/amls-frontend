@@ -19,7 +19,7 @@ package controllers
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder

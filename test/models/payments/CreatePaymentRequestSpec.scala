@@ -16,6 +16,7 @@
 
 package models.payments
 
+import config.ApplicationConfig
 import models.ReturnLocation
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -40,7 +41,10 @@ class CreatePaymentRequestSpec extends AmlsSpec {
         """.stripMargin
 
       //noinspection ScalaStyle
-      val model = CreatePaymentRequest("other", "XA2345678901232", "A description", 100, ReturnLocation("/confirmation"))
+
+      val applicationConfig = app.injector.instanceOf[ApplicationConfig]
+
+      val model = CreatePaymentRequest("other", "XA2345678901232", "A description", 100, ReturnLocation("/confirmation")(applicationConfig))
 
       Json.toJson(model) mustBe Json.parse(expectedJson)
     }

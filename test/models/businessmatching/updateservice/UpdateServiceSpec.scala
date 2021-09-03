@@ -23,7 +23,7 @@ import utils.AmlsSpec
 class UpdateServiceSpec extends AmlsSpec{
 
   val json = Json.obj(
-    "areNewActivitiesAtTradingPremises" -> Json.toJson(NewActivitiesAtTradingPremisesNo),
+    "areNewActivitiesAtTradingPremises" -> Json.toJson(NewActivitiesAtTradingPremisesNo.asInstanceOf[AreNewActivitiesAtTradingPremises]),
     "tradingPremisesNewActivities" -> Json.toJson(TradingPremisesActivities(Set(4,5))),
     "tradingPremisesSubmittedActivities" -> Json.toJson(TradingPremisesActivities(Set(2)))
   )

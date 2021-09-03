@@ -17,7 +17,6 @@
 package models
 
 import config.ApplicationConfig
-import play.api.Play
 import play.api.libs.json.{JsString, Writes}
 import play.api.mvc.Call
 
@@ -25,15 +24,13 @@ case class ReturnLocation(url: String, absoluteUrl: String)
 
 object ReturnLocation {
 
-  val appConfig = Play.current.injector.instanceOf[ApplicationConfig]
-
-  def apply(url: String) =
+  def apply(url: String)(implicit appConfig: ApplicationConfig) =
     new ReturnLocation(url, publicRedirectUrl(url))
 
-  def apply(call: Call) =
+  def apply(call: Call)(implicit appConfig: ApplicationConfig) =
     new ReturnLocation(call.url, publicRedirectUrl(call.url))
 
-  private def publicRedirectUrl(url: String) = s"${appConfig.frontendBaseUrl}$url"
+  private def publicRedirectUrl(url: String)(implicit appConfig: ApplicationConfig) = s"${appConfig.frontendBaseUrl}$url"
 
   implicit val locationWrites = new Writes[ReturnLocation] {
     override def writes(o: ReturnLocation) = JsString(o.absoluteUrl)

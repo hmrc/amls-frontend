@@ -44,7 +44,7 @@ class SummaryController @Inject() (val authAction: AuthAction,
           hvd <- dataCache.fetch[Hvd](request.credId, Hvd.key)
         } yield hvd match {
           case Some(data) => Ok(summary(EmptyForm, data))
-          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+          case _ => Redirect(controllers.routes.RegistrationProgressController.get)
         }
   }
 

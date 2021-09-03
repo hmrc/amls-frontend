@@ -24,7 +24,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito.{reset, _}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -111,7 +111,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.SummaryController.get.url))
 
         val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
         verify(controller.dataCache).save[BusinessDetails](any(), meq(BusinessDetails.key), captor.capture())(any(), any())

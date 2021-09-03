@@ -89,7 +89,7 @@ class LettersAddressController @Inject () (val dataCache: DataCacheConnector,
 
   private def getRouting(altCorrespondenceAddress: Boolean, edit: Boolean): Result = {
     altCorrespondenceAddress match {
-      case true => Redirect(routes.SummaryController.get())
+      case true => Redirect(routes.SummaryController.get)
       case false => Redirect(routes.CorrespondenceAddressIsUkController.get(edit))
     }
   }

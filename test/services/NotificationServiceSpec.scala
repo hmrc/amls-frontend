@@ -22,8 +22,8 @@ import models.notifications.{ContactType, IDType, NotificationDetails, Notificat
 import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.i18n.MessagesApi
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
@@ -33,7 +33,7 @@ import utils.AmlsSpec
 
 import scala.concurrent.Future
 
-class NotificationServiceSpec extends AmlsSpec with MockitoSugar with GeneratorDrivenPropertyChecks{
+class NotificationServiceSpec extends AmlsSpec with MockitoSugar with ScalaCheckDrivenPropertyChecks {
 
   implicit val hc = HeaderCarrier()
 

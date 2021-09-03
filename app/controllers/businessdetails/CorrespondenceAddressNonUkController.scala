@@ -67,7 +67,7 @@ class CorrespondenceAddressNonUkController @Inject ()(val dataConnector: DataCac
             _ <- OptionT.liftF(dataConnector.save[BusinessDetails]
               (request.credId, BusinessDetails.key, businessDetails.correspondenceAddress(CorrespondenceAddress(None, Some(data)))))
             _ <- OptionT.liftF(auditAddressChange(data, businessDetails.correspondenceAddress.flatMap(a => a.nonUkAddress), edit)) orElse OptionT.some(Success)
-          } yield Redirect(routes.SummaryController.get())
+          } yield Redirect(routes.SummaryController.get)
           doUpdate getOrElse InternalServerError("Could not update correspondence address")
       }
     }

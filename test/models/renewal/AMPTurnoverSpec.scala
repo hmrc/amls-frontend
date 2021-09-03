@@ -102,19 +102,19 @@ class AMPTurnoverSpec extends PlaySpec {
 
       "write the correct value" in {
 
-        Json.toJson(AMPTurnover.First) must
+        Json.toJson(AMPTurnover.First.asInstanceOf[AMPTurnover]) must
           be(Json.obj("percentageExpectedTurnover" -> "01"))
 
-        Json.toJson(AMPTurnover.Second) must
+        Json.toJson(AMPTurnover.Second.asInstanceOf[AMPTurnover]) must
           be(Json.obj("percentageExpectedTurnover" -> "02"))
 
-        Json.toJson(AMPTurnover.Third) must
+        Json.toJson(AMPTurnover.Third.asInstanceOf[AMPTurnover]) must
           be(Json.obj("percentageExpectedTurnover" -> "03"))
 
-        Json.toJson(AMPTurnover.Fourth) must
+        Json.toJson(AMPTurnover.Fourth.asInstanceOf[AMPTurnover]) must
           be(Json.obj("percentageExpectedTurnover" -> "04"))
 
-        Json.toJson(AMPTurnover.Fifth) must
+        Json.toJson(AMPTurnover.Fifth.asInstanceOf[AMPTurnover]) must
           be(Json.obj("percentageExpectedTurnover" -> "05"))
 
       }

@@ -16,7 +16,7 @@
 
 package models.autocomplete
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import org.mockito.Mockito.when

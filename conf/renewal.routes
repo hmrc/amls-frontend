@@ -1,7 +1,7 @@
-GET         /progress                                                         @controllers.renewal.RenewalProgressController.get()
+GET         /progress                                                         @controllers.renewal.RenewalProgressController.get
 POST        /progress                                                         @controllers.renewal.RenewalProgressController.post()
 
-GET         /what-you-need                                                    @controllers.renewal.WhatYouNeedController.get()
+GET         /what-you-need                                                    @controllers.renewal.WhatYouNeedController.get
 
 GET         /other-activities                                                 @controllers.renewal.InvolvedInOtherController.get(edit: Boolean ?= false)
 POST        /other-activities                                                 @controllers.renewal.InvolvedInOtherController.post(edit: Boolean ?= false)
@@ -54,7 +54,7 @@ POST        /cash-payments-customers-not-met                                    
 GET         /how-cash-payments-received                                           @controllers.renewal.HowCashPaymentsReceivedController.get(edit: Boolean ?= false)
 POST        /how-cash-payments-received                                           @controllers.renewal.HowCashPaymentsReceivedController.post(edit: Boolean ?= false)
 
-GET         /check-your-answers                                               @controllers.renewal.SummaryController.get()
+GET         /check-your-answers                                               @controllers.renewal.SummaryController.get
 POST        /check-your-answers                                               @controllers.renewal.SummaryController.post()
 
 GET         /physical-foreign-currencies                                      @controllers.renewal.UsesForeignCurrenciesController.get(edit: Boolean ?= false)

@@ -33,7 +33,7 @@ import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalacheck.Gen
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.TradingPremisesService

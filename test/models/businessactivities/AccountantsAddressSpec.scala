@@ -141,11 +141,11 @@ class AccountantsAddressSpec extends PlaySpec {
       }
 
       "Serialise UK address as expected" in {
-        Json.toJson(testUKAddress) must be(testUKJson)
+        Json.toJson(testUKAddress.asInstanceOf[AccountantsAddress]) must be(testUKJson)
       }
 
       "Serialise non-UK address as expected" in {
-        Json.toJson(testNonUKAddress) must be(testNonUKJson)
+        Json.toJson(testNonUKAddress.asInstanceOf[AccountantsAddress]) must be(testNonUKJson)
       }
 
       "Deserialise UK address as expected" in {

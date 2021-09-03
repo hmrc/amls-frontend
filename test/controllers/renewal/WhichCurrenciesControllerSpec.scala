@@ -25,7 +25,7 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
@@ -163,7 +163,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post(edit = true)(validFormRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe controllers.renewal.routes.SummaryController.get().url.some
+          redirectLocation(result) mustBe controllers.renewal.routes.SummaryController.get.url.some
         }
       }
 

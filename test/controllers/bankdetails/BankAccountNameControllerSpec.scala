@@ -21,7 +21,7 @@ import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.bankdetails.bank_account_name

@@ -199,9 +199,9 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
     Redirect(routes.MsbSubSectorsController.get())
   } else {
     if (includeCompanyNotRegistered){
-      Redirect(routes.CheckCompanyController.get())
+      Redirect(routes.CheckCompanyController.get)
     }else {
-      Redirect(routes.SummaryController.get())
+      Redirect(routes.SummaryController.get)
     }
   }
 

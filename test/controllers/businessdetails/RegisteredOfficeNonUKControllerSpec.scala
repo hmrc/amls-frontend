@@ -27,7 +27,7 @@ import org.jsoup.select.Elements
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -38,7 +38,7 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.html.businessdetails.registered_office_non_uk
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
@@ -146,7 +146,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
       val result = controller.post(edit = true)(newRequest)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
       val captor = ArgumentCaptor.forClass(classOf[DataEvent])
       verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
@@ -186,7 +186,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
       val elementsWithError : Elements = document.getElementsByClass("error-notification")
       elementsWithError.size() must be(errorCount)
 
-      elementsWithError.map(_.text()) must contain allOf(
+      elementsWithError.asScala.map(_.text()) must contain allOf(
         "Error: " + Messages("error.text.validation.address.line1"),
         "Error: " + Messages("error.text.validation.address.line2"))
     }
@@ -233,7 +233,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.RegisteredOfficeDateOfChangeController.get().url))
+        redirectLocation(result) must be(Some(routes.RegisteredOfficeDateOfChangeController.get.url))
       }
 
       "status is ready for renewal and registeredOffice has changed" in new Fixture {
@@ -256,7 +256,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.RegisteredOfficeDateOfChangeController.get().url))
+        redirectLocation(result) must be(Some(routes.RegisteredOfficeDateOfChangeController.get.url))
       }
     }
 

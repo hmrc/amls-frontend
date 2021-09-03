@@ -29,7 +29,7 @@ import models.tcsp.Tcsp
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import utils._
 
 

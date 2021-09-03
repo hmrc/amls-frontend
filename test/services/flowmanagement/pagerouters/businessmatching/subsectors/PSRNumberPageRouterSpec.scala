@@ -39,7 +39,7 @@ class PSRNumberPageRouterSpec extends AmlsSpec {
         val model = createModel(Some(BusinessAppliedForPSRNumberYes("123456789")))
         val result = router.getRoute("internalId", model)
 
-        redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+        redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
       }
     }
 
@@ -48,7 +48,7 @@ class PSRNumberPageRouterSpec extends AmlsSpec {
         val model = createModel(Some(BusinessAppliedForPSRNumberNo))
         val result = router.getRoute("internalId", model)
 
-        redirectLocation(result) mustBe Some(routes.NoPsrController.get().url)
+        redirectLocation(result) mustBe Some(routes.NoPsrController.get.url)
       }
     }
 

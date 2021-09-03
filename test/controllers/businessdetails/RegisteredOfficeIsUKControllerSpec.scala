@@ -25,14 +25,14 @@ import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.html.businessdetails.registered_office_is_uk
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
@@ -157,7 +157,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       val document: Document  = Jsoup.parse(contentAsString(result))
       val elementsWithError : Elements = document.getElementsByClass("error-notification")
       elementsWithError.size() must be(1)
-      for (ele: Element <- elementsWithError) {
+      for (ele: Element <- elementsWithError.asScala) {
         ele.html() must include(Messages("error.required.atb.registered.office.uk.or.overseas"))
       }
     }

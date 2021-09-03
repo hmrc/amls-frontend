@@ -83,15 +83,15 @@ object BankDetails {
 
   def section(implicit cache: CacheMap): Section = {
     val msgKey = "bankdetails"
-    val defaultSection = Section(msgKey, NotStarted, false, controllers.bankdetails.routes.WhatYouNeedController.get())
+    val defaultSection = Section(msgKey, NotStarted, false, controllers.bankdetails.routes.WhatYouNeedController.get)
 
     cache.getEntry[Seq[BankDetails]](key).fold(defaultSection) {
-      case model if model.isEmpty => Section(msgKey, Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get())
+      case model if model.isEmpty => Section(msgKey, Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get)
       case bds@model if model forall {
         _.isComplete
-      } => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.YourBankAccountsController.get())
+      } => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.YourBankAccountsController.get)
       case bds@_ =>
-        Section(msgKey, Started, anyChanged(bds), controllers.bankdetails.routes.YourBankAccountsController.get())
+        Section(msgKey, Started, anyChanged(bds), controllers.bankdetails.routes.YourBankAccountsController.get)
     }
   }
 

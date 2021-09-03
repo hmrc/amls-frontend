@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import models.autocomplete.LocationGraphTransformer
 import play.api.Environment
 import play.api.http.HttpErrorHandler
-import play.api.mvc.{Action, Result}
+import play.api.mvc.Result
 
 @Singleton
 class AssetsController @Inject()(errorHandler: HttpErrorHandler,

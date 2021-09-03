@@ -35,17 +35,17 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
   def getSection(credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
 
-    val notStarted = Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
+    val notStarted = Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get)
 
     this.getRenewal(credId).flatMap {
       case Some(model) =>
         isRenewalComplete(model, credId) flatMap { x =>
           if (x) {
-            Future.successful(Section(Renewal.sectionKey, Completed, model.hasChanged, controllers.renewal.routes.SummaryController.get()))
+            Future.successful(Section(Renewal.sectionKey, Completed, model.hasChanged, controllers.renewal.routes.SummaryController.get))
           } else {
             model match {
               case Renewal(None, None, None, None, None, _, _, _, _, _, _, _, _, _, _, _, _, _) => Future.successful(notStarted)
-              case _ => Future.successful(Section(Renewal.sectionKey, Started, model.hasChanged, controllers.renewal.routes.WhatYouNeedController.get()))
+              case _ => Future.successful(Section(Renewal.sectionKey, Started, model.hasChanged, controllers.renewal.routes.WhatYouNeedController.get))
             }
           }
         }

@@ -46,7 +46,7 @@ class BusinessAppliedForPSRNumberController @Inject()(
           case model if model.isMsbTmDefined =>
           val form = model.businessAppliedForPSRNumber map { v => Form2(v) } getOrElse EmptyForm
           Ok(business_applied_for_psr_number(form, edit))
-          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+          case _ => Redirect(controllers.routes.RegistrationProgressController.get)
         } getOrElse InternalServerError("Get: Unable to show Business Applied For PSR Number page")
   }
 

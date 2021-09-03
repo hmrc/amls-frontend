@@ -70,7 +70,7 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType)))
 
-          val result = controller.get(request)
+          val result = controller.get()(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))
@@ -83,7 +83,7 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(None)
 
-          val result = controller.get(request)
+          val result = controller.get()(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))
@@ -96,7 +96,7 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
             controller.feeHelper.retrieveFeeResponse(any(), any[(String, String)](), any(), any())(any(), any())
           } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType).copy(paymentReference = Some("    "))))
 
-          val result = controller.get(request)
+          val result = controller.get()(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))

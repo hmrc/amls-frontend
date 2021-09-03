@@ -66,7 +66,7 @@ class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector:
             case false =>
               Redirect(routes.IdentifyLinkedTransactionsController.get())
             case true =>
-              Redirect(routes.SummaryController.get())
+              Redirect(routes.SummaryController.get)
           }
       }
   }

@@ -26,7 +26,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import services.RenewalService
@@ -228,7 +228,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
             post() { result =>
               result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustEqual routes.SummaryController.get().url.some
+              result.header.headers.get("Location") mustEqual routes.SummaryController.get.url.some
             }
           }
         }
@@ -241,7 +241,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
           post(edit = true) { result =>
             result.header.status mustBe SEE_OTHER
-            result.header.headers.get("Location") mustEqual routes.SummaryController.get().url.some
+            result.header.headers.get("Location") mustEqual routes.SummaryController.get.url.some
           }
         }
       }

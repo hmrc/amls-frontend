@@ -67,7 +67,7 @@ class WithdrawalReasonController @Inject()(
             (for {
               regNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
               _ <- OptionT.liftF(amls.withdraw(regNumber, withdrawal, request.accountTypeId))
-            } yield Redirect(controllers.routes.LandingController.get())) getOrElse InternalServerError("Unable to withdraw the application")
+            } yield Redirect(controllers.routes.LandingController.get)) getOrElse InternalServerError("Unable to withdraw the application")
           }
         }
   }

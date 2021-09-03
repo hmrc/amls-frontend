@@ -1,4 +1,4 @@
-GET         /what-you-need                                          @controllers.hvd.WhatYouNeedController.get()
+GET         /what-you-need                                          @controllers.hvd.WhatYouNeedController.get
 
 GET         /cash-payments                                          @controllers.hvd.CashPaymentController.get(edit: Boolean ?= false)
 POST        /cash-payments                                          @controllers.hvd.CashPaymentController.post(edit: Boolean ?= false)
@@ -6,7 +6,7 @@ POST        /cash-payments                                          @controllers
 GET         /cash-payments-first-date                               @controllers.hvd.CashPaymentFirstDateController.get(edit: Boolean ?= false)
 POST        /cash-payments-first-date                               @controllers.hvd.CashPaymentFirstDateController.post(edit: Boolean ?= false)
 
-GET         /check-your-answers                                     @controllers.hvd.SummaryController.get()
+GET         /check-your-answers                                     @controllers.hvd.SummaryController.get
 POST        /check-your-answers                                     @controllers.hvd.SummaryController.post()
 
 GET         /how-will-you-sell                                      @controllers.hvd.HowWillYouSellGoodsController.get(edit: Boolean ?= false)

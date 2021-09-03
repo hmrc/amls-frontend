@@ -69,7 +69,7 @@ class TotalThroughputController @Inject()(val authAction: AuthAction,
                     if (!edit) {
                       standardRouting(services.msbServices, activities.businessActivities)
                     } else {
-                      Redirect(routes.SummaryController.get())
+                      Redirect(routes.SummaryController.get)
                     }
                   }
                 }
@@ -85,7 +85,7 @@ class TotalThroughputController @Inject()(val authAction: AuthAction,
       else if(businessActivities.contains(HighValueDealing) || businessActivities.contains(AccountancyServices)) {
         Redirect(routes.CustomersOutsideIsUKController.get())
       } else {
-        Redirect(routes.SummaryController.get())
+        Redirect(routes.SummaryController.get)
       }
   }
 }

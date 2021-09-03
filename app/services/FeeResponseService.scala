@@ -20,12 +20,12 @@ import javax.inject.Inject
 import connectors.FeeConnector
 import models.FeeResponse
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FeeResponseService @Inject()(val feeConnector: FeeConnector) {
+class FeeResponseService @Inject()(val feeConnector: FeeConnector) extends Logging {
 
   private val prefix = "FeeResponseService"
 
@@ -33,7 +33,7 @@ class FeeResponseService @Inject()(val feeConnector: FeeConnector) {
                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[FeeResponse]] = {
 
     // $COVERAGE-OFF$
-    Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
+    logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
     // $COVERAGE-ON$
     feeConnector.feeResponse(amlsReferenceNumber, accountTypeId) map ( feeResponse =>
       feeResponse.responseType match {

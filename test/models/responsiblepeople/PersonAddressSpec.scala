@@ -243,11 +243,11 @@ class PersonAddressSpec extends PlaySpec {
     }
 
     "Serialise UK address as expected" in {
-      Json.toJson(DefaultUKAddress) must be(DefaultUKJson)
+      Json.toJson(DefaultUKAddress.asInstanceOf[PersonAddress]) must be(DefaultUKJson)
     }
 
     "Serialise non-UK address as expected" in {
-      Json.toJson(DefaultNonUKAddress) must be(DefaultNonUKJson)
+      Json.toJson(DefaultNonUKAddress.asInstanceOf[PersonAddress]) must be(DefaultNonUKJson)
     }
 
     "Deserialise UK address as expected" in {

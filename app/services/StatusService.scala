@@ -22,14 +22,15 @@ import models.ReadStatusResponse
 import models.registrationprogress.{Completed, Section}
 import models.status._
 import org.joda.time.LocalDate
-import play.api.{Logger, Mode, Play}
+import play.api.{Environment, Logging, Mode}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class StatusService @Inject() (val amlsConnector: AmlsConnector,
                                val enrolmentsService: AuthEnrolmentsService,
-                               val sectionsProvider: SectionsProvider){
+                               val sectionsProvider: SectionsProvider,
+                               val environment: Environment) extends Logging {
   private val renewalPeriod = 30
 
   val Pending = "Pending"
@@ -52,7 +53,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
 
   private def getETMPStatus(response: ReadStatusResponse) = {
     // $COVERAGE-OFF$
-    Logger.debug("StatusService:getETMPStatus:formBundleStatus:" + response.formBundleStatus)
+    logger.debug("StatusService:getETMPStatus:formBundleStatus:" + response.formBundleStatus)
     // $COVERAGE-ON$
     response.formBundleStatus match {
       case `Pending` => SubmissionReadyForReview
@@ -62,7 +63,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
       case `Expired` => SubmissionDecisionExpired
       case `Withdrawal` => SubmissionWithdrawn
       case `DeRegistered` => models.status.DeRegistered
-      case _ if Play.current.mode == Mode.Dev => models.status.NotCompleted
+      case _ if environment.mode == Mode.Dev => models.status.NotCompleted
       case _ => throw new RuntimeException("ETMP returned status is inconsistent")
     }
   }
@@ -71,7 +72,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     amlsConnector.status(mlrRegNumber, accountTypeId) map {
       response =>
         // $COVERAGE-OFF$
-        Logger.debug("StatusService:etmpStatusInformation:response:" + response)
+        logger.debug("StatusService:etmpStatusInformation:response:" + response)
         // $COVERAGE-ON$
         Option(response.safeId.getOrElse(""))
     }
@@ -84,7 +85,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
       response =>
         val status = getETMPStatus(response)
         // $COVERAGE-OFF$
-        Logger.debug("StatusService:etmpStatusInformation:status:" + status)
+        logger.debug("StatusService:etmpStatusInformation:status:" + status)
         // $COVERAGE-ON$
         (status, Some(response))
     }
@@ -95,12 +96,12 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     amlsRegistrationNumber match {
       case Some(mlrRegNumber) =>
         // $COVERAGE-OFF$
-        Logger.debug("StatusService:getDetailedStatus:mlrRegNumber:" + mlrRegNumber)
+        logger.debug("StatusService:getDetailedStatus:mlrRegNumber:" + mlrRegNumber)
         // $COVERAGE-ON$
         etmpStatusInformation(mlrRegNumber, accountTypeId)(hc, ec)
       case None =>
         // $COVERAGE-OFF$
-        Logger.debug("StatusService:getDetailedStatus: No mlrRegNumber")
+        logger.debug("StatusService:getDetailedStatus: No mlrRegNumber")
         // $COVERAGE-ON$
         notYetSubmitted(cacheId)(hc, ec) map { status =>
           (status, None)
@@ -113,12 +114,12 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     amlsRegistrationNo match {
         case Some(mlrRegNumber) =>
           // $COVERAGE-OFF$
-          Logger.debug("StatusService:getStatus:mlrRegNumber:" + mlrRegNumber)
+          logger.debug("StatusService:getStatus:mlrRegNumber:" + mlrRegNumber)
           // $COVERAGE-ON$
           etmpStatus(mlrRegNumber, accountTypeId)(hc, ec)
         case None =>
           // $COVERAGE-OFF$
-          Logger.debug("StatusService:getStatus: No mlrRegNumber")
+          logger.debug("StatusService:getStatus: No mlrRegNumber")
           // $COVERAGE-ON$
           notYetSubmitted(credId)(hc, ec)
       }
@@ -133,7 +134,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     amlsRegistrationNumber match {
       case Some(mlrRegNumber) =>
         // $COVERAGE-OFF$
-        Logger.debug("StatusService:getReadStatus:mlrRegNumber:" + mlrRegNumber)
+        logger.debug("StatusService:getReadStatus:mlrRegNumber:" + mlrRegNumber)
         // $COVERAGE-ON$
         etmpReadStatus(mlrRegNumber, accountTypeId)(hc, ec)
       case _ => throw new RuntimeException("ETMP returned no read status")
@@ -154,12 +155,12 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
       sections =>
         if (isComplete(sections)) {
           // $COVERAGE-OFF$
-          Logger.debug("StatusService:notYetSubmitted: SubmissionReady")
+          logger.debug("StatusService:notYetSubmitted: SubmissionReady")
           // $COVERAGE-ON$
           SubmissionReady
         } else {
           // $COVERAGE-OFF$
-          Logger.debug("StatusService:notYetSubmitted: NotCompleted")
+          logger.debug("StatusService:notYetSubmitted: NotCompleted")
           // $COVERAGE-ON$
           NotCompleted
         }
@@ -180,7 +181,7 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     {
       val status = amlsConnector.status(amlsRefNumber, accountTypeId)
       // $COVERAGE-OFF$
-      Logger.debug("StatusService:etmpReadStatus:status:" + status)
+      logger.debug("StatusService:etmpReadStatus:status:" + status)
       // $COVERAGE-ON$
       status
     }

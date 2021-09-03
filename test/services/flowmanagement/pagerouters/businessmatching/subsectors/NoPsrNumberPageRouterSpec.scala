@@ -32,7 +32,7 @@ class NoPsrNumberPageRouterSpec extends AmlsSpec {
       val model = ChangeSubSectorFlowModel()
       val result = router.getRoute("internalId", model)
 
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
     }
   }
 }

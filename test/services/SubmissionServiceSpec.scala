@@ -17,7 +17,7 @@
 package services
 
 import config.ApplicationConfig
-import connectors.{AmlsConnector, BusinessMatchingConnector}
+import connectors.AmlsConnector
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
@@ -44,7 +44,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse}
+import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.collection.Seq
@@ -71,7 +71,7 @@ class SubmissionServiceSpec extends AmlsSpec
       mock[connectors.BusinessMatchingConnector]
     )
 
-    val enrolmentResponse = HttpResponse(OK)
+    val enrolmentResponse = HttpResponse(OK, "")
 
     val subscriptionResponse = SubscriptionResponse(
       etmpFormBundleNumber = "",
@@ -190,7 +190,7 @@ class SubmissionServiceSpec extends AmlsSpec
 
           when {
             submissionService.authEnrolmentsService.enrol(any(), any(), any(), any())(any(), any())
-          } thenReturn Future.successful(HttpResponse(OK))
+          } thenReturn Future.successful(HttpResponse(OK, ""))
 
           whenReady(submissionService.subscribe("12345678", ("accType", "id"), Some("GROUP_ID"))) {
             _ mustBe subscriptionResponse
@@ -204,7 +204,7 @@ class SubmissionServiceSpec extends AmlsSpec
         when {
           submissionService.amlsConnector.subscribe(any(), eqTo(safeId), any())(any(), any(), any(), any())
         } thenReturn Future.failed(
-          Upstream4xxResponse(Json.toJson(SubscriptionErrorResponse(amlsRegistrationNumber, "An error occurred")).toString(),
+          UpstreamErrorResponse(Json.toJson(SubscriptionErrorResponse(amlsRegistrationNumber, "An error occurred")).toString(),
             UNPROCESSABLE_ENTITY,
             UNPROCESSABLE_ENTITY))
 
@@ -220,9 +220,9 @@ class SubmissionServiceSpec extends AmlsSpec
 
         when {
           submissionService.amlsConnector.subscribe(any(), eqTo(safeId), any())(any(), any(), any(), any())
-        } thenReturn Future.failed(Upstream4xxResponse("Some other kind of error occurred", UNPROCESSABLE_ENTITY, UNPROCESSABLE_ENTITY))
+        } thenReturn Future.failed(UpstreamErrorResponse("Some other kind of error occurred", UNPROCESSABLE_ENTITY, UNPROCESSABLE_ENTITY))
 
-        intercept[Upstream4xxResponse] {
+        intercept[UpstreamErrorResponse] {
           await(submissionService.subscribe("12345678", ("accType", "id"), Some("GROUP_ID")))
         }
 
@@ -234,9 +234,9 @@ class SubmissionServiceSpec extends AmlsSpec
 
         when {
           submissionService.amlsConnector.subscribe(any(), eqTo(safeId), any())(any(), any(), any(), any())
-        } thenReturn Future.failed(Upstream4xxResponse("Some other kind of error occurred", BAD_REQUEST, BAD_REQUEST))
+        } thenReturn Future.failed(UpstreamErrorResponse("Some other kind of error occurred", BAD_REQUEST, BAD_REQUEST))
 
-        intercept[Upstream4xxResponse] {
+        intercept[UpstreamErrorResponse] {
           await(submissionService.subscribe("12345678", ("accType", "id"), Some("GROUP_ID")))
         }
 

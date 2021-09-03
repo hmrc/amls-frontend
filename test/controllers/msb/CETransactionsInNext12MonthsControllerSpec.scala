@@ -23,7 +23,7 @@ import models.moneyservicebusiness._
 import models.status.NotCompleted
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -177,7 +177,7 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get.url))
     }
 
     "on valid submission (edit) without next page's data" in new Fixture {

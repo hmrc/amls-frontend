@@ -22,7 +22,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -75,7 +75,7 @@ class SatisfactionSurveyControllerSpec extends AmlsSpec with MockitoSugar with S
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+      redirectLocation(result) must be(Some(controllers.routes.LandingController.get.url))
     }
 
     "on post with valid data go to the status page when audit fails" in new Fixture {
@@ -89,7 +89,7 @@ class SatisfactionSurveyControllerSpec extends AmlsSpec with MockitoSugar with S
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.routes.LandingController.get().url))
+      redirectLocation(result) must be(Some(controllers.routes.LandingController.get.url))
     }
 
 

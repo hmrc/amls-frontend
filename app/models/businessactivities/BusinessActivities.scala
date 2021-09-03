@@ -19,7 +19,7 @@ package models.businessactivities
 import models.businessactivities.TransactionTypes._
 import models.businessmatching.{AccountancyServices, BusinessMatching, BusinessActivities => BusinessMatchingActivities}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.ControllerHelper
 
@@ -152,18 +152,18 @@ case class BusinessActivities(
   }
 }
 
-object BusinessActivities {
+object BusinessActivities extends Logging {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "businessactivities"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.businessactivities.routes.WhatYouNeedController.get())
+    val notStarted = Section(messageKey, NotStarted, false, controllers.businessactivities.routes.WhatYouNeedController.get)
     val bmBusinessActivities = ControllerHelper.getBusinessActivity(cache.getEntry[BusinessMatching](BusinessMatching.key))
     cache.getEntry[BusinessActivities](key).fold(notStarted) {
       model =>
         if (model.isComplete(bmBusinessActivities)) {
-          Section(messageKey, Completed, model.hasChanged, controllers.businessactivities.routes.SummaryController.get())
+          Section(messageKey, Completed, model.hasChanged, controllers.businessactivities.routes.SummaryController.get)
         } else {
-          Section(messageKey, Started, model.hasChanged, controllers.businessactivities.routes.WhatYouNeedController.get())
+          Section(messageKey, Started, model.hasChanged, controllers.businessactivities.routes.WhatYouNeedController.get)
         }
     }
   }
@@ -199,7 +199,7 @@ object BusinessActivities {
     model =>
       if(!model.accountantForAMLSRegulations.isDefined) {
         // $COVERAGE-OFF$
-        Logger.debug("accountantForAMLSRegulations is not defined()")
+        logger.debug("accountantForAMLSRegulations is not defined()")
         // $COVERAGE-ON$
       }
       Seq(

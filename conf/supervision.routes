@@ -1,4 +1,4 @@
-GET         /what-you-need                                                @controllers.supervision.WhatYouNeedController.get()
+GET         /what-you-need                                                @controllers.supervision.WhatYouNeedController.get
 
 GET         /another-supervising-body                                     @controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
 POST        /another-supervising-body                                     @controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
@@ -21,5 +21,5 @@ POST        /which-professional-bodies                                    @contr
 GET         /penalty                                                      @controllers.supervision.PenalisedByProfessionalController.get(edit: Boolean ?= false)
 POST        /penalty                                                      @controllers.supervision.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
-GET         /check-your-answers                                           @controllers.supervision.SummaryController.get()
+GET         /check-your-answers                                           @controllers.supervision.SummaryController.get
 POST        /check-your-answers                                           @controllers.supervision.SummaryController.post()

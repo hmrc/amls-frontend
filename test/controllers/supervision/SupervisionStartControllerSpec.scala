@@ -21,7 +21,7 @@ import models.supervision._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
@@ -134,7 +134,7 @@ class SupervisionStartControllerSpec extends AmlsSpec with MockitoSugar with Sca
       val result = controller.post(true)(newRequest)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.SummaryController.get.url))
     }
 
     "on post with invalid data" in new Fixture {

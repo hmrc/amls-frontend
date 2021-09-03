@@ -60,7 +60,7 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
       "enrol the user via an HTTP call" in new Fixture {
         implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-        mockHttpCall(Future.successful(HttpResponse(OK)))
+        mockHttpCall(Future.successful(HttpResponse(OK, "")))
 
         whenReady(connector.enrol(enrolmentRequestGen.sample.get)) { result =>
           result.status mustBe OK

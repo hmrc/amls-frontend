@@ -59,7 +59,7 @@ class BusinessTurnoverController @Inject()(val dataCacheConnector: DataCacheConn
             renewal <- dataCacheConnector.fetch[Renewal](request.credId, Renewal.key)
             _ <- renewalService.updateRenewal(request.credId, renewal.businessTurnover(data))
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true => Redirect(routes.SummaryController.get)
             case false => Redirect(routes.AMLSTurnoverController.get())
           }
       }

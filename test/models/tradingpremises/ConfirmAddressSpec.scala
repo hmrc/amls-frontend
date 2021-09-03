@@ -18,7 +18,7 @@ package models.tradingpremises
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, ValidationError}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
 class ConfirmAddressSpec extends PlaySpec with MockitoSugar {

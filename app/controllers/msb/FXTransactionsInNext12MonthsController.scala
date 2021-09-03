@@ -60,7 +60,7 @@ class FXTransactionsInNext12MonthsController @Inject()(authAction: AuthAction,
               _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
                 msb.fxTransactionsInNext12Months(data)
               )
-            } yield Redirect(routes.SummaryController.get())
+            } yield Redirect(routes.SummaryController.get)
         }
       }
   }

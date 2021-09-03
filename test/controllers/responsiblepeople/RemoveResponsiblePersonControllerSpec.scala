@@ -30,8 +30,8 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.Helpers.{status, _}
 import services.StatusService
@@ -43,7 +43,7 @@ import views.html.responsiblepeople.remove_responsible_person
 import scala.concurrent.Future
 
 class RemoveResponsiblePersonControllerSpec extends AmlsSpec
-  with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks with NinoUtil with ResponsiblePersonGenerator {
+  with MustMatchers with MockitoSugar with ScalaFutures with ScalaCheckPropertyChecks with NinoUtil with ResponsiblePersonGenerator {
 
   trait Fixture {
     self => val request = addToken(authRequest)
@@ -260,7 +260,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(
             CompleteResponsiblePeople2,
@@ -281,7 +281,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(
             CompleteResponsiblePeople2,
@@ -302,7 +302,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(
             CompleteResponsiblePeople2,
@@ -324,7 +324,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(
             CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true),
@@ -347,7 +347,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(
             CompleteResponsiblePeople2,
@@ -373,7 +373,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(
             CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true,
@@ -404,7 +404,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           val result = controller.remove(1)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
 
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key), captor.capture())(any(), any())

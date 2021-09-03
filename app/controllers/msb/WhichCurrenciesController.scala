@@ -64,7 +64,7 @@ class WhichCurrenciesController @Inject() (authAction: AuthAction,
                 _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
                   updateCurrencies(msb, data))
               } yield edit match {
-                case true => Redirect(routes.SummaryController.get())
+                case true => Redirect(routes.SummaryController.get)
                 case _ => Redirect(routes.UsesForeignCurrenciesController.get())
               }
       }

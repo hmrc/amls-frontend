@@ -18,7 +18,7 @@ package models.deregister
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatest.MustMatchers
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -146,22 +146,22 @@ class DeregistrationReasonSpec extends PlaySpec with MustMatchers with MockitoSu
 
     "write the correct value" when {
       "OutOfScope" in {
-        Json.toJson(DeregistrationReason.OutOfScope) must be(Json.obj("deregistrationReason" -> "Out of scope"))
+        Json.toJson(DeregistrationReason.OutOfScope.asInstanceOf[DeregistrationReason]) must be(Json.obj("deregistrationReason" -> "Out of scope"))
       }
       "NotTradingInOwnRight" in {
-        Json.toJson(DeregistrationReason.NotTradingInOwnRight) must be(Json.obj("deregistrationReason" -> "Not trading in own right"))
+        Json.toJson(DeregistrationReason.NotTradingInOwnRight.asInstanceOf[DeregistrationReason]) must be(Json.obj("deregistrationReason" -> "Not trading in own right"))
       }
       "UnderAnotherSupervisor" in {
-        Json.toJson(DeregistrationReason.UnderAnotherSupervisor) must be(Json.obj("deregistrationReason" -> "Under another supervisor"))
+        Json.toJson(DeregistrationReason.UnderAnotherSupervisor.asInstanceOf[DeregistrationReason]) must be(Json.obj("deregistrationReason" -> "Under another supervisor"))
       }
       "ChangeOfLegalEntity" in {
-        Json.toJson(DeregistrationReason.ChangeOfLegalEntity) must be(Json.obj("deregistrationReason" -> "Change of Legal Entity"))
+        Json.toJson(DeregistrationReason.ChangeOfLegalEntity.asInstanceOf[DeregistrationReason]) must be(Json.obj("deregistrationReason" -> "Change of Legal Entity"))
       }
       "HVDPolicyOfNotAcceptingHighValueCashPayments" in {
-        Json.toJson(DeregistrationReason.HVDPolicyOfNotAcceptingHighValueCashPayments) must be(Json.obj("deregistrationReason" -> "HVD - policy of not accepting high value cash payments"))
+        Json.toJson(DeregistrationReason.HVDPolicyOfNotAcceptingHighValueCashPayments.asInstanceOf[DeregistrationReason]) must be(Json.obj("deregistrationReason" -> "HVD - policy of not accepting high value cash payments"))
       }
       "Other" in {
-        Json.toJson(DeregistrationReason.Other("reason")) must be(Json.obj("deregistrationReason" -> "Other, please specify", "specifyOtherReason" -> "reason"))
+        Json.toJson(DeregistrationReason.Other("reason").asInstanceOf[DeregistrationReason]) must be(Json.obj("deregistrationReason" -> "Other, please specify", "specifyOtherReason" -> "reason"))
       }
     }
 

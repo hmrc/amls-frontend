@@ -18,7 +18,6 @@ package models.eab
 
 import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import play.api.Play
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
@@ -106,8 +105,6 @@ case class Eab(data: JsObject = Json.obj(),
 
 object Eab {
 
-  lazy val appConfig = Play.current.injector.instanceOf[ApplicationConfig]
-
   val eabServicesProvided             = JsPath \ "eabServicesProvided"
   val dateOfChange                    = JsPath \ "dateOfChange"
   val redressScheme                   = JsPath \ "redressScheme"
@@ -126,7 +123,7 @@ object Eab {
     Call(redirectCallType, destinationUrl)
   }
 
-  def section(implicit cache: CacheMap): Section = {
+  def section(appConfig: ApplicationConfig)(implicit cache: CacheMap): Section = {
     val messageKey = "eab"
     val notStarted = Section(messageKey, NotStarted, false, generateRedirect(appConfig.eabWhatYouNeedUrl))
     cache.getEntry[Eab](key).fold(notStarted) {

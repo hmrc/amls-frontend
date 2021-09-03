@@ -23,7 +23,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, DependencyMocks}
@@ -56,7 +56,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           mockApplicationStatus(SubmissionReadyForReview)
 
-          val result = controller.get(request)
+          val result = controller.get()(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))
@@ -70,7 +70,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           mockApplicationStatus(SubmissionDecisionApproved)
 
-          val result = controller.get(request)
+          val result = controller.get()(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))
@@ -84,7 +84,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           mockApplicationStatus(ReadyForRenewal(None))
 
-          val result = controller.get(request)
+          val result = controller.get()(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))
@@ -98,7 +98,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           mockApplicationStatus(RenewalSubmitted(None))
 
-          val result = controller.get(request)
+          val result = controller.get()(request)
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))

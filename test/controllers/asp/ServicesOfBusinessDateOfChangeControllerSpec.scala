@@ -22,7 +22,7 @@ import models.businessdetails.{ActivityStartDate, BusinessDetails}
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -75,7 +75,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get.url))
     }
 
     "fail submission when invalid date is supplied" in new Fixture {

@@ -19,7 +19,7 @@ package connectors
 import config.ApplicationConfig
 import javax.inject.{Inject, Singleton}
 import play.api.http.Status._
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuthenticatorConnector @Inject()(http: HttpClient,
-                                       val appConfig: ApplicationConfig) {
+                                       val appConfig: ApplicationConfig) extends Logging {
 
   def refreshProfile(implicit hc: HeaderCarrier, ec: ExecutionContext) = {
 
@@ -36,7 +36,7 @@ class AuthenticatorConnector @Inject()(http: HttpClient,
     appConfig.refreshProfileToggle match {
       case true =>
         http.POSTEmpty(s"${appConfig.ggAuthUrl}/government-gateway-authentication/refresh-profile") map { response =>
-          Logger.info("[AuthenticatorConnector] Current user profile was refreshed")
+          logger.info("[AuthenticatorConnector] Current user profile was refreshed")
           response
         }
       case _ => Future.successful(HttpResponse(OK, ""))

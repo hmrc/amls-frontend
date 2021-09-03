@@ -161,7 +161,7 @@ class SummaryControllerSpec extends AmlsSpec {
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get().url
+      redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get.url
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
@@ -182,7 +182,7 @@ class SummaryControllerSpec extends AmlsSpec {
 
         val result = controller.post()(request)
 
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
 
         verify(controller.dataCache).save[Tcsp](any(), any(), eqTo(model.copy(hasAccepted = true)))(any(), any())
 

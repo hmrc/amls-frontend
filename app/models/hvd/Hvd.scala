@@ -18,7 +18,7 @@ package models.hvd
 
 import models.DateOfChange
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import play.Logger
+import play.api.Logging
 import play.api.libs.json._
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -32,7 +32,7 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
                 linkedCashPayment: Option[LinkedCashPayments] = None,
                 dateOfChange: Option[DateOfChange] = None,
                 hasChanged: Boolean = false,
-                hasAccepted: Boolean = false) {
+                hasAccepted: Boolean = false) extends Logging {
 
 
   def cashPayment(p: CashPayment): Hvd =
@@ -81,7 +81,7 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
 
   def isComplete: Boolean = {
     // $COVERAGE-OFF$
-    Logger.debug(s"[Hvd][isComplete] $this")
+    logger.debug(s"[Hvd][isComplete] $this")
     // $COVERAGE-ON$
     this match {
         case Hvd(Some(cp), Some(pr), _, Some(_), Some(_), Some(true), Some(_), Some(_), _, _, true)
@@ -108,13 +108,13 @@ object Hvd {
   val key = "hvd"
 
   def section(implicit cache: CacheMap): Section = {
-    val notStarted = Section(key, NotStarted, false, controllers.hvd.routes.WhatYouNeedController.get())
+    val notStarted = Section(key, NotStarted, false, controllers.hvd.routes.WhatYouNeedController.get)
     cache.getEntry[Hvd](key).fold(notStarted)  {
       model =>
         if (model.isComplete) {
-          Section(key, Completed, model.hasChanged, controllers.hvd.routes.SummaryController.get())
+          Section(key, Completed, model.hasChanged, controllers.hvd.routes.SummaryController.get)
         } else {
-          Section(key, Started, model.hasChanged, controllers.hvd.routes.WhatYouNeedController.get())
+          Section(key, Started, model.hasChanged, controllers.hvd.routes.WhatYouNeedController.get)
         }
     }
   }

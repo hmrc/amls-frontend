@@ -16,7 +16,7 @@
 
 package models.responsiblepeople
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -157,10 +157,10 @@ class SaRegisteredSpec extends PlaySpec with MockitoSugar {
 
     "write the correct value" in {
 
-      Json.toJson(SaRegisteredNo) must
+      Json.toJson(SaRegisteredNo.asInstanceOf[SaRegistered]) must
         be(Json.obj("saRegistered" -> false))
 
-      Json.toJson(SaRegisteredYes("0123456789")) must
+      Json.toJson(SaRegisteredYes("0123456789").asInstanceOf[SaRegistered]) must
         be(Json.obj(
           "saRegistered" -> true,
           "utrNumber" -> "0123456789"

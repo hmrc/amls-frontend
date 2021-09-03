@@ -20,7 +20,7 @@ import audit.SurveyEvent
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.SatisfactionSurvey
-import play.api.Logger
+import play.api.Logging
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.AuthAction
@@ -33,7 +33,7 @@ class SatisfactionSurveyController @Inject()(val auditConnector: AuditConnector,
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val cc: MessagesControllerComponents,
-                                             satisfaction_survey: satisfaction_survey) extends AmlsBaseController(ds, cc) {
+                                             satisfaction_survey: satisfaction_survey) extends AmlsBaseController(ds, cc) with Logging {
 
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
@@ -47,10 +47,10 @@ class SatisfactionSurveyController @Inject()(val auditConnector: AuditConnector,
           Future.successful(BadRequest(satisfaction_survey(f)))
         case ValidForm(_, data) => {
           auditConnector.sendEvent(SurveyEvent(data)).failed.foreach( {
-            case e: Throwable => Logger.error(s"[SatisfactionSurveyController][post] ${e.getMessage}", e)
+            case e: Throwable => logger.error(s"[SatisfactionSurveyController][post] ${e.getMessage}", e)
           })
         }
-          Future.successful(Redirect(routes.LandingController.get()))
+          Future.successful(Redirect(routes.LandingController.get))
         }
       }
     }

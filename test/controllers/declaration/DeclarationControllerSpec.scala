@@ -28,7 +28,7 @@ import org.joda.time.{LocalDate, LocalDateTime}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
 import play.api.test.Helpers._
@@ -121,7 +121,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         val result = declarationController.get()(request)
         status(result) must be(SEE_OTHER)
 
-        redirectLocation(result) mustBe Some(routes.AddPersonController.get().url)
+        redirectLocation(result) mustBe Some(routes.AddPersonController.get.url)
       }
 
       "load the declaration page for pre-submissions if name and business matching is found" in new Fixture {
@@ -221,7 +221,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         val result = declarationController.get()(request)
         status(result) must be(SEE_OTHER)
 
-        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
       }
     }
   }
@@ -264,7 +264,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         val result = declarationController.getWithAmendment()(request)
         status(result) must be(SEE_OTHER)
 
-        redirectLocation(result) mustBe Some(routes.AddPersonController.get().url)
+        redirectLocation(result) mustBe Some(routes.AddPersonController.get.url)
       }
 
       "redirect to the declaration-persons for amendments page if name and/or business matching not found and submission is ready for review" in new Fixture {
@@ -303,7 +303,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         val result = declarationController.getWithAmendment(request)
         status(result) must be(SEE_OTHER)
 
-        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
       }
     }
   }

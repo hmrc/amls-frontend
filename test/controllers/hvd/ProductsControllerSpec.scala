@@ -21,7 +21,7 @@ import models.businessmatching.HighValueDealing
 import models.hvd._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -85,7 +85,7 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
         mockApplicationStatus(SubmissionDecisionRejected)
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.SummaryController.get.url))
       }
     }
 

@@ -17,7 +17,7 @@
 package models.payments
 
 import jto.validation.Valid
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import utils.AmlsSpec
 

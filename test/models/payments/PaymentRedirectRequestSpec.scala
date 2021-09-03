@@ -16,6 +16,7 @@
 
 package models.payments
 
+import config.ApplicationConfig
 import models.ReturnLocation
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -37,7 +38,10 @@ class PaymentRedirectRequestSpec extends AmlsSpec {
       )
 
       //noinspection ScalaStyle
-      val model = PaymentRedirectRequest("some_reference", 100, ReturnLocation("/anti-money-laundering/start"))
+
+      val applicationConfig = app.injector.instanceOf[ApplicationConfig]
+
+      val model = PaymentRedirectRequest("some_reference", 100, ReturnLocation("/anti-money-laundering/start")(applicationConfig))
 
       Json.toJson(model) mustBe expectedJson
 

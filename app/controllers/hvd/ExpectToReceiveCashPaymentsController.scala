@@ -75,7 +75,7 @@ class ExpectToReceiveCashPaymentsController @Inject()( val authAction: AuthActio
               hvd.cashPaymentMethods(data)
             )
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true => Redirect(routes.SummaryController.get)
             case false => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
           }
       }

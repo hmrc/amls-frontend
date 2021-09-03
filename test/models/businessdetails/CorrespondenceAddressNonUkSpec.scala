@@ -34,7 +34,7 @@ package models.businessdetails
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import models.Country
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
 

@@ -19,7 +19,7 @@ package models.businessdetails
 import models.{Country, DateOfChange}
 import models.businesscustomer.Address
 import org.joda.time.LocalDate
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -239,7 +239,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
     "write correct value to json with date of change" in {
       val data = RegisteredOfficeUK("38B", "area", Some("line 1"), None, "AA1 1AA", Some(DateOfChange(new LocalDate(2017,1,1))))
 
-      Json.toJson(data) must
+      Json.toJson(data.asInstanceOf[RegisteredOffice]) must
         be(Json.obj(
           "addressLine1" -> "38B",
           "addressLine2" -> "area",
@@ -253,7 +253,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
     "write correct value to json without date of change" in {
       val data = RegisteredOfficeUK("38B", "area", Some("line 1"), None, "AA1 1AA", None)
 
-      Json.toJson(data) must
+      Json.toJson(data.asInstanceOf[RegisteredOffice]) must
         be(Json.obj(
           "addressLine1" -> "38B",
           "addressLine2" -> "area",

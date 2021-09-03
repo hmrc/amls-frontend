@@ -52,7 +52,7 @@ class AddBusinessTypeSummaryController @Inject()(
         flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key))
       } yield {
         Ok(update_services_summary(EmptyForm, flowModel))
-      }) getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
+      }) getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get)
   }
 
   def post() = authAction.async {

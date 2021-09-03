@@ -16,12 +16,11 @@
 
 package controllers.actions
 
-import java.net.URLEncoder
 import config.ApplicationConfig
 import generators.AmlsReferenceNumberGenerator
 import models.ReturnLocation
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.mvc._
@@ -34,6 +33,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AuthAction, DefaultAuthAction}
 
+import java.net.URLEncoder
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -48,7 +48,7 @@ class AuthActionSpec extends PlaySpec with MockitoSugar
   val mockParser = mock[BodyParsers.Default]
 
   private lazy val unauthorisedUrl = URLEncoder.encode(
-    ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8"
+    ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(mockApplicationConfig).absoluteUrl, "utf-8"
   )
   def unauthorised = s"${mockApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
   def signout      = s"${mockApplicationConfig.logoutUrl}"
@@ -266,8 +266,10 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator{
     new ~ (new ~(new ~(new ~(Enrolments(Set()), None), Some(AffinityGroup.Organisation)), Some("groupIdentifier")), Some(User))
   )
 
-  class Harness(authAction: AuthAction) extends Controller {
+  class Harness(authAction: AuthAction) extends BaseController {
     def onPageLoad(): Action[AnyContent] = authAction { _ => Ok }
+
+    override protected def controllerComponents: ControllerComponents = ???
   }
 
 }

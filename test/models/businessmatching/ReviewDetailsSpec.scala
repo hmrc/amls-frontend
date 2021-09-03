@@ -20,7 +20,7 @@ import connectors.BusinessMatchingAddress
 import models.Country
 import models.businesscustomer.ReviewDetails
 import models.businesscustomer.Address
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
 

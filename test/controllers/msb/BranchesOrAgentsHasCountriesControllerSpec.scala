@@ -22,7 +22,7 @@ import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountri
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
@@ -142,7 +142,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustEqual Some(routes.SummaryController.get.url)
     }
 
     "return a redirect to the 'Which Countries' page on valid submission when edit flag is set and answering yes" in new Fixture {

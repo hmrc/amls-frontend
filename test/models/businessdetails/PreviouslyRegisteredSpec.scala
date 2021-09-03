@@ -16,7 +16,7 @@
 
 package models.businessdetails
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
@@ -141,10 +141,10 @@ class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
 
     "write the correct value" in {
 
-      Json.toJson(PreviouslyRegisteredNo) must
+      Json.toJson(PreviouslyRegisteredNo.asInstanceOf[PreviouslyRegistered]) must
         be(Json.obj("previouslyRegistered" -> false))
 
-      Json.toJson(PreviouslyRegisteredYes(Some("12345678"))) must
+      Json.toJson(PreviouslyRegisteredYes(Some("12345678")).asInstanceOf[PreviouslyRegistered]) must
         be(Json.obj(
           "previouslyRegistered" -> true,
           "prevMLRRegNo" -> "12345678"

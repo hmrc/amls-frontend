@@ -26,7 +26,7 @@ import models.businessmatching.BusinessType.{LimitedCompany, UnincorporatedBody}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{verify}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.DependencyMocks
 import utils.AmlsSpec

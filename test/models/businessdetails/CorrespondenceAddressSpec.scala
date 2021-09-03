@@ -17,7 +17,7 @@
 package models.businessdetails
 
 import models.Country
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
 class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {

@@ -89,7 +89,7 @@ class SendMoneyToOtherCountryController @Inject()(val authAction: AuthAction,
       case (false, x, _) if x.contains(CurrencyExchange) =>  Redirect(routes.CETransactionsInLast12MonthsController.get())
       case (false, x, _) if x.contains(ForeignExchange) =>  Redirect(routes.FXTransactionsInLast12MonthsController.get())
       case (false, _, x) if x.contains(HighValueDealing) || x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
-      case _ => Redirect(routes.SummaryController.get())
+      case _ => Redirect(routes.SummaryController.get)
     }
   }
 

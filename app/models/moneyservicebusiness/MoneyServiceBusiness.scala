@@ -129,15 +129,15 @@ object MoneyServiceBusiness {
 
   def section(implicit cache: CacheMap): Section = {
     val messageKey = key
-    val notStarted = Section(messageKey, NotStarted, false, controllers.msb.routes.WhatYouNeedController.get())
+    val notStarted = Section(messageKey, NotStarted, false, controllers.msb.routes.WhatYouNeedController.get)
 
     cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {
       model =>
         val msbService = ControllerHelper.getMsbServices(cache.getEntry[BusinessMatching](BusinessMatching.key)).getOrElse(Set.empty)
         if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange))) {
-          Section(messageKey, Completed, model.hasChanged, controllers.msb.routes.SummaryController.get())
+          Section(messageKey, Completed, model.hasChanged, controllers.msb.routes.SummaryController.get)
         } else {
-          Section(messageKey, Started, model.hasChanged, controllers.msb.routes.WhatYouNeedController.get())
+          Section(messageKey, Started, model.hasChanged, controllers.msb.routes.WhatYouNeedController.get)
         }
     }
   }

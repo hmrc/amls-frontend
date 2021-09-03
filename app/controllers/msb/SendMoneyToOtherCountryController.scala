@@ -73,7 +73,7 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
 
                     dataCacheConnector.save(request.credId, MoneyServiceBusiness.key, newModel) map {
                     _ => if(edit) {
-                      Redirect(routes.SummaryController.get())
+                      Redirect(routes.SummaryController.get)
                     } else {
                       routing(services.msbServices,register, newModel, edit)
                     }
@@ -109,7 +109,7 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
     (ceQuestion, fxQuestion) match {
       case (true, _ ) => Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
       case (_, true) => Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
-      case _ =>Redirect(routes.SummaryController.get())
+      case _ =>Redirect(routes.SummaryController.get)
     }
   }
 }

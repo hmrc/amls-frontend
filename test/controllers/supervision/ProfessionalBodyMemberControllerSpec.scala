@@ -19,7 +19,7 @@ package controllers.supervision
 import controllers.actions.SuccessfulAuthAction
 import models.supervision._
 import org.jsoup.Jsoup
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.i18n.Messages
@@ -205,7 +205,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
           val result: Future[Result] = Future(controller.redirectTo(supervision, false))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
         }
 
@@ -233,7 +233,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
               val result = controller.post(true)(newRequest)
               status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+              redirectLocation(result) must be(Some(routes.SummaryController.get.url))
             }
           }
         }

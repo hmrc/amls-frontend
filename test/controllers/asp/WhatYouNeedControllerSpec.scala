@@ -45,7 +45,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
           Messages("summary.asp") + " - " +
           Messages("title.amls") + " - " + Messages("title.gov")
 
-        val result = controller.get(request)
+        val result = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(pageTitle)
       }

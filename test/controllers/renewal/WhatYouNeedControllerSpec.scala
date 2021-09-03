@@ -61,7 +61,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
 
         when {
           renewalService.getSection(any())(any[HeaderCarrier], any())
-        } thenReturn Future.successful(Section("renewal", NotStarted, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get()))
+        } thenReturn Future.successful(Section("renewal", NotStarted, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get))
 
         val result = controller.get(requestWithToken)
         status(result) must be(OK)
@@ -81,7 +81,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
 
         when {
           renewalService.getSection(meq("internalId"))(any(), any())
-        } thenReturn Future.successful(Section("renewal", Completed, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get()))
+        } thenReturn Future.successful(Section("renewal", Completed, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get))
 
         val result = controller.get(requestWithToken)
         status(result) must be(SEE_OTHER)
@@ -93,10 +93,10 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
 
           when {
             renewalService.getSection(meq("internalId"))(any(), any())
-          } thenReturn Future.successful(Section("renewal", Completed, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get()))
+          } thenReturn Future.successful(Section("renewal", Completed, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get))
 
           a[Exception] must be thrownBy {
-            ScalaFutures.whenReady(controller.get()(requestWithToken)) { x => x }
+            ScalaFutures.whenReady(controller.get(requestWithToken)) { x => x }
           }
       }
 

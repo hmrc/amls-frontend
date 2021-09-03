@@ -28,7 +28,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.AutoCompleteService
@@ -39,7 +39,7 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AmlsSpec
 import views.html.businessdetails.correspondence_address_non_uk
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
@@ -133,7 +133,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
         val captor = ArgumentCaptor.forClass(classOf[DataEvent])
         verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
@@ -170,7 +170,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val result = controller.post(edit = true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
         val captor = ArgumentCaptor.forClass(classOf[DataEvent])
         verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
@@ -214,7 +214,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
         val elementsWithError : Elements = document.getElementsByClass("error-notification")
         elementsWithError.size() must be(errorCount)
 
-        elementsWithError.map(_.text()) must contain allOf(
+        elementsWithError.asScala.map(_.text()) must contain allOf(
           "Error: " + Messages("error.text.validation.address.line1"),
           "Error: " + Messages("error.text.validation.address.line2"),
           "Error: " + Messages("error.text.validation.address.line3"),

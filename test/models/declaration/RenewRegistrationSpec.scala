@@ -17,7 +17,7 @@
 package models.declaration
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
@@ -77,10 +77,10 @@ class RenewRegistrationSpec extends PlaySpec with MockitoSugar {
     }
 
     "write the correct value" in {
-      Json.toJson(RenewRegistrationNo) must
+      Json.toJson(RenewRegistrationNo.asInstanceOf[RenewRegistration]) must
         be(Json.obj("renewRegistration" -> false))
 
-      Json.toJson(RenewRegistrationYes) must
+      Json.toJson(RenewRegistrationYes.asInstanceOf[RenewRegistration]) must
         be(Json.obj("renewRegistration" -> true))
     }
   }

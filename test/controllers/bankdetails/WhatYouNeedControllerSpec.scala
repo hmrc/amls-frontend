@@ -86,7 +86,7 @@ class WhatYouNeedControllerSpec
 
           implicit val doc = Jsoup.parse(contentAsString(result))
 
-          assertHref(controllers.bankdetails.routes.HasBankAccountController.get().url)
+          assertHref(controllers.bankdetails.routes.HasBankAccountController.get.url)
         }
 
         "when there are bank accounts, but they've all been deleted" in new Fixture {
@@ -98,7 +98,7 @@ class WhatYouNeedControllerSpec
 
           implicit val doc = Jsoup.parse(contentAsString(result))
 
-          assertHref(controllers.bankdetails.routes.HasBankAccountController.get().url)
+          assertHref(controllers.bankdetails.routes.HasBankAccountController.get.url)
         }
       }
 

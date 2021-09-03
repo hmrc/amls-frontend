@@ -26,7 +26,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -134,7 +134,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
         "redirect to Summary Controller" in new DealsInForeignCurrencyFixture {
           val result = controller.post(edit = true).apply(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get().url)
+          redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get.url)
         }
       }
       "data is invalid" should {

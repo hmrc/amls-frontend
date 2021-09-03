@@ -126,7 +126,7 @@ class your_bank_accountsSpec extends AmlsSummaryViewSpec with PropertyChecks {
         Seq((BankDetails(None, None), 1)))
 
       doc.getElementById("add-account").text must be(Messages("bankdetails.yourbankaccount.add.account"))
-      doc.getElementById("add-account").attr("href") must be(controllers.bankdetails.routes.WhatYouNeedController.get().url)
+      doc.getElementById("add-account").attr("href") must be(controllers.bankdetails.routes.WhatYouNeedController.get.url)
     }
 
     "have an incomplete section with correct data and edit / remove links - if there are incomplete elements" in new ViewFixture {

@@ -54,7 +54,7 @@ class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
               val variationSections = sectionsProvider.sections(cache).filter(_.name != BusinessMatching.messageKey)
               val canSubmit = renewalService.canSubmit(renewalSection, variationSections)
               Ok(summary(EmptyForm, renewal, businessMatching.alphabeticalBusinessTypes(), businessMatching.msbServices, canSubmit))
-            }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+            }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
         }
   }
 

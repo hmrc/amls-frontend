@@ -57,7 +57,7 @@ class SummaryController @Inject()(
           val changeActivitiesUrl = if (isPreSubmission) {
             controllers.businessmatching.routes.RegisterServicesController.get().url
           } else {
-            controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get().url
+            controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get.url
           }
 
           Ok(summary(EmptyForm,
@@ -66,7 +66,7 @@ class SummaryController @Inject()(
             isPreSubmission,
             statusService.isPending(status)))
 
-        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
   }
 
   def post() = authAction.async {
@@ -74,7 +74,7 @@ class SummaryController @Inject()(
         for {
           businessMatching <- businessMatchingService.getModel(request.credId)
           _ <- businessMatchingService.updateModel(request.credId, businessMatching.copy(hasAccepted = true, preAppComplete = true))
-        } yield Redirect(controllers.routes.RegistrationProgressController.get())
+        } yield Redirect(controllers.routes.RegistrationProgressController.get)
       } getOrElse InternalServerError("Unable to update business matching")
   }
 }

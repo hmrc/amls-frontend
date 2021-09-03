@@ -80,7 +80,7 @@ class MoneySourcesController @Inject()(authAction: AuthAction,
       services.msbServices.contains(ForeignExchange) match {
         case true if msb.fxTransactionsInNext12Months.isEmpty || !edit =>
           Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
-        case _ => Redirect(routes.SummaryController.get())
+        case _ => Redirect(routes.SummaryController.get)
       }
     }
   }

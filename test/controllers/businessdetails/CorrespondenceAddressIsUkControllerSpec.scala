@@ -26,7 +26,7 @@ import org.jsoup.select.Elements
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -35,7 +35,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import utils.AmlsSpec
 import views.html.businessdetails.correspondence_address_is_uk
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
@@ -164,7 +164,7 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
         val errorCount = 1
         val elementsWithError : Elements = document.getElementsByClass("error-notification")
         elementsWithError.size() must be(errorCount)
-        for (ele: Element <- elementsWithError) {
+        for (ele: Element <- elementsWithError.asScala) {
           ele.html() must include(Messages("businessdetails.correspondenceaddress.isuk.error"))
         }
       }

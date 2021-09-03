@@ -62,7 +62,7 @@ class RemoveResponsiblePersonController @Inject () (
   def remove(index: Int, flow: Option[String] = None) = authAction.async {
     implicit request =>
         def removeWithoutDate = removeDataStrict[ResponsiblePerson](request.credId, index) map { _ =>
-          Redirect(routes.YourResponsiblePeopleController.get())
+          Redirect(routes.YourResponsiblePeopleController.get)
         }
 
         statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap {
@@ -71,7 +71,7 @@ class RemoveResponsiblePersonController @Inject () (
               getData[ResponsiblePerson](request.credId, index) flatMap {
                   case Some(person) if person.lineId.isDefined => for {
                       _ <- updateDataStrict[ResponsiblePerson](request.credId, index)(_.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
-                  } yield Redirect(routes.YourResponsiblePeopleController.get())
+                  } yield Redirect(routes.YourResponsiblePeopleController.get)
                   case _ => removeWithoutDate
               }
           case _ =>
@@ -97,7 +97,7 @@ class RemoveResponsiblePersonController @Inject () (
                         _ <- updateDataStrict[ResponsiblePerson](request.credId, index) {
                           _.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
                         }
-                      } yield Redirect(routes.YourResponsiblePeopleController.get())
+                      } yield Redirect(routes.YourResponsiblePeopleController.get)
                     }
                     case _ => removeWithoutDate
                   }

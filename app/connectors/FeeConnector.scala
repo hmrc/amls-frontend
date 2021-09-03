@@ -19,7 +19,7 @@ package connectors
 import config.ApplicationConfig
 import javax.inject.Inject
 import models._
-import play.api.Logger
+import play.api.Logging
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http._
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,7 +27,7 @@ import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
 
 class FeeConnector @Inject()(
                               private[connectors] val http: HttpClient,
-                              appConfig: ApplicationConfig) {
+                              appConfig: ApplicationConfig) extends Logging {
 
   val feePaymentUrl = appConfig.feePaymentUrl
 
@@ -39,12 +39,12 @@ class FeeConnector @Inject()(
     val getUrl = s"$feePaymentUrl/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[FeeConnector]"
     // $COVERAGE-OFF$
-    Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
+    logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     // $COVERAGE-ON$
     http.GET[FeeResponse](getUrl) map {
       response =>
         // $COVERAGE-OFF$
-        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         // $COVERAGE-ON$
         response
     }

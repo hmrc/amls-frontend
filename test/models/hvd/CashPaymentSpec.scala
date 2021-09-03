@@ -17,7 +17,7 @@
 package models.hvd
 
 import org.joda.time.LocalDate
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JodaReads, JodaWrites, JsPath, JsSuccess, Json}
 

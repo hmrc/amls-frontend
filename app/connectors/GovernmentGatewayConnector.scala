@@ -19,11 +19,12 @@ package connectors
 import audit.EnrolEvent
 import config.ApplicationConfig
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
+
 import javax.inject.Inject
 import models.governmentgateway.EnrolmentRequest
-import play.api.Logger.{debug, warn}
+import play.api.Logging
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, HttpClient}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.Audit
 import utils.AuditHelper
@@ -33,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class GovernmentGatewayConnector @Inject()(val http: HttpClient,
                                            val appConfig: ApplicationConfig,
-                                           val auditConnector: AuditConnector) {
+                                           val auditConnector: AuditConnector) extends Logging {
 
   val audit: Audit = new Audit(AuditHelper.appName, auditConnector)
   protected def enrolUrl = appConfig.enrolUrl
@@ -50,22 +51,22 @@ class GovernmentGatewayConnector @Inject()(val http: HttpClient,
    reqW: Writes[EnrolmentRequest]
   ): Future[HttpResponse] = {
 
-    debug(msg(s"Request body: ${Json.toJson(request)}"))
+    logger.debug(msg(s"Request body: ${Json.toJson(request)}"))
 
     http.POST[EnrolmentRequest, HttpResponse](enrolUrl, request) map {
       response =>
         audit.sendDataEvent(EnrolEvent(request, response))
-        debug(msg(s"Successful Response: ${response.json}"))
+        logger.debug(msg(s"Successful Response: ${response.json}"))
         response
     } recoverWith {
       case e: Throwable if e.getMessage.contains(duplicateEnrolmentMessage) =>
-        warn(msg(s"'${e.getMessage}' error encountered"))
+        logger.warn(msg(s"'${e.getMessage}' error encountered"))
         Future.failed(DuplicateEnrolmentException(e.getMessage, e))
       case e: Throwable if e.getMessage.contains(invalidCredentialsMessage) =>
-        warn(msg(s"'${e.getMessage}' error encountered"))
+        logger.warn(msg(s"'${e.getMessage}' error encountered"))
         Future.failed(InvalidEnrolmentCredentialsException(e.getMessage, e))
       case e =>
-        warn(msg("Failure response"))
+        logger.warn(msg("Failure response"))
         Future.failed(e)
     }
   }

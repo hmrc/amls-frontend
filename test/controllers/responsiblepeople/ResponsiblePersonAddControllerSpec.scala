@@ -23,7 +23,6 @@ import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.prop.PropertyChecks
 import play.api.mvc.Call
 import utils.AmlsSpec
 import play.api.test.Helpers._
@@ -31,13 +30,14 @@ import org.scalacheck.Gen
 import uk.gov.hmrc.http.cache.client.CacheMap
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import org.scalactic.anyvals.PosInt
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
 
 class ResponsiblePersonAddControllerSpec extends AmlsSpec
-  with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks {
+  with MustMatchers with MockitoSugar with ScalaFutures with ScalaCheckPropertyChecks {
 
   trait Fixture {
     self => val request = addToken(authRequest)

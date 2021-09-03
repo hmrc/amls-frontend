@@ -26,7 +26,7 @@
         <div>
             <p class="no-print">
                 @Messages("your.registration.withdraw")
-                <a id="withdraw-application" href="@controllers.withdrawal.routes.WithdrawApplicationController.get()">@Messages("status.withdraw.link-text")</a>@Messages("full.stop")
+                <a id="withdraw-application" href="@controllers.withdrawal.routes.WithdrawApplicationController.get">@Messages("status.withdraw.link-text")</a>@Messages("full.stop")
             </p>
         </div>
     }
@@ -34,7 +34,7 @@
         <div>
             <p class="no-print">
                 @Messages("your.registration.deregister")
-                <a class="no-print" id="deregister-link" href="@controllers.deregister.routes.DeRegisterApplicationController.get()">@Messages("your.registration.deregister.link")</a>@Messages("full.stop")
+                <a class="no-print" id="deregister-link" href="@controllers.deregister.routes.DeRegisterApplicationController.get">@Messages("your.registration.deregister.link")</a>@Messages("full.stop")
             </p>
         </div>
     }

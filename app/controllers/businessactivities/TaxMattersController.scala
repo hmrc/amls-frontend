@@ -57,7 +57,7 @@ class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector
               BusinessActivities.key,
               businessActivities.taxMatters(Some(data))
             )
-          } yield Redirect(routes.SummaryController.get())
+          } yield Redirect(routes.SummaryController.get)
       }
   }
 }

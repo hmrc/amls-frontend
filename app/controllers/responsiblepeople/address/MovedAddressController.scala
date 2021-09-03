@@ -52,7 +52,7 @@ class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
               case Some(addr) => Ok(moved_address(EmptyForm, addr.personAddress, index, ControllerHelper.rpTitleName(Some(rp))))
               case _ => Redirect(address.routes.CurrentAddressController.get(index, true))
             }
-          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+          }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
       }
   }
 
@@ -71,7 +71,7 @@ class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
                   case Some(addr) => BadRequest(moved_address(f, addr.personAddress, index, ControllerHelper.rpTitleName(Some(rp))))
                   case _ => Redirect(address.routes.CurrentAddressController.get(index, true))
                 }
-              }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+              }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
           }
         case ValidForm(_, data) =>
           data.movedAddress match {

@@ -70,7 +70,7 @@ class MostTransactionsController @Inject()(val authAction: AuthAction,
                   if (!edit) {
                     redirectTo(services.msbServices, ba.businessActivities)
                   } else {
-                    Redirect(routes.SummaryController.get())
+                    Redirect(routes.SummaryController.get)
                   }
                 }
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
@@ -88,7 +88,7 @@ class MostTransactionsController @Inject()(val authAction: AuthAction,
         case (x, _) if x.contains(ForeignExchange) => Redirect(routes.FXTransactionsInLast12MonthsController.get())
         case (_, x) if x.contains(HighValueDealing) && x.contains(AccountancyServices) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
         case (_, x) if x.contains(HighValueDealing) || x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
-        case _ => Redirect(routes.SummaryController.get())
+        case _ => Redirect(routes.SummaryController.get)
       }
   }
 }

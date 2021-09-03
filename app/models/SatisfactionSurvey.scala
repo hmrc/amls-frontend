@@ -27,9 +27,13 @@ sealed trait SatisfactionSurvey
 object SatisfactionSurvey {
 
   case class First(details: Option[String]) extends SatisfactionSurvey
+
   case class Second(details: Option[String]) extends SatisfactionSurvey
+
   case class Third(details: Option[String]) extends SatisfactionSurvey
+
   case class Fourth(details: Option[String]) extends SatisfactionSurvey
+
   case class Fifth(details: Option[String]) extends SatisfactionSurvey
 
   import utils.MappingUtils.Implicits._
@@ -64,26 +68,26 @@ object SatisfactionSurvey {
     }
   }
 
-  implicit val jsonWrites =  Writes[SatisfactionSurvey] {
+  implicit val jsonWrites = Writes[SatisfactionSurvey] {
     case First(details) => Json.obj(
       "satisfaction" -> "01",
-      "details" -> details.fold(""){x => x.toString}
+      "details" -> details.fold("") { x => x.toString }
     )
     case Second(details) => Json.obj(
       "satisfaction" -> "02",
-      "details" -> details.fold(""){x => x.toString}
+      "details" -> details.fold("") { x => x.toString }
     )
     case Third(details) => Json.obj(
       "satisfaction" -> "03",
-      "details" -> details.fold(""){x => x.toString}
+      "details" -> details.fold("") { x => x.toString }
     )
     case Fourth(details) => Json.obj(
       "satisfaction" -> "04",
-      "details" -> details.fold(""){x => x.toString}
+      "details" -> details.fold("") { x => x.toString }
     )
     case Fifth(details) => Json.obj(
       "satisfaction" -> "05",
-      "details" -> details.fold(""){x => x.toString}
+      "details" -> details.fold("") { x => x.toString }
     )
   }
 

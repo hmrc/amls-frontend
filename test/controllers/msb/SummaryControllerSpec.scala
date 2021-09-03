@@ -25,7 +25,7 @@ import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
@@ -189,7 +189,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(request)
 
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
 
         verify(controller.dataCache).save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(completeModel.copy(hasAccepted = true)))(any(),any())
       }

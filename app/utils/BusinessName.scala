@@ -20,15 +20,15 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
-import play.api.Logger
+import play.api.Logging
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object BusinessName {
+object BusinessName extends Logging {
 
-  private val warn: String => Unit = msg => Logger.warn(s"[BusinessName] $msg")
+  private val warn: String => Unit = msg => logger.warn(s"[BusinessName] $msg")
 
   def getNameFromCache(credId: String)(implicit hc: HeaderCarrier,  cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
     for {
@@ -36,7 +36,7 @@ object BusinessName {
       rd <- OptionT.fromOption[Future](bm.reviewDetails)
     } yield {
       // $COVERAGE-OFF$
-      Logger.debug(s"Found business name in cache: ${rd.businessName}")
+      logger.debug(s"Found business name in cache: ${rd.businessName}")
       // $COVERAGE-ON$
       rd.businessName
     }

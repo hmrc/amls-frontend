@@ -18,7 +18,7 @@ package services
 
 import connectors.GovernmentGatewayConnector
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -40,7 +40,7 @@ class GovernmentGatewayServiceSpec extends PlaySpec with MockitoSugar with Scala
 
     "successfully enrol" in {
 
-      val response = HttpResponse(OK)
+      val response = HttpResponse(OK, "")
 
       when {
         service.ggConnector.enrol(any())(any(), any(), any())

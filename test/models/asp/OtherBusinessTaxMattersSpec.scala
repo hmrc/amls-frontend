@@ -16,7 +16,7 @@
 
 package models.asp
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -85,10 +85,10 @@ class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
 
     "write the correct value" in {
 
-      Json.toJson(OtherBusinessTaxMattersNo) must
+      Json.toJson(OtherBusinessTaxMattersNo.asInstanceOf[OtherBusinessTaxMatters]) must
         be(Json.obj("otherBusinessTaxMatters" -> false))
 
-      Json.toJson(OtherBusinessTaxMattersYes)must
+      Json.toJson(OtherBusinessTaxMattersYes.asInstanceOf[OtherBusinessTaxMatters]) must
         be(Json.obj("otherBusinessTaxMatters" -> true))
     }
 

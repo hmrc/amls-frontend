@@ -85,7 +85,7 @@ class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheCon
     case InvolvedInOtherYes(_) => Redirect(routes.ExpectedBusinessTurnoverController.get(edit))
     case InvolvedInOtherNo => edit match {
       case false => Redirect(routes.ExpectedAMLSTurnoverController.get(edit))
-      case true => Redirect(routes.SummaryController.get())
+      case true => Redirect(routes.SummaryController.get)
     }
   }
 }

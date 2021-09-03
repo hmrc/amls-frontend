@@ -16,6 +16,7 @@
 
 package controllers.payments
 
+import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.ResponseType.SubscriptionResponseType
@@ -58,7 +59,9 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
       ways_to_pay = view
     )
 
-    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))
+    val applicationConfig = app.injector.instanceOf[ApplicationConfig]
+
+    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
 
     val fees = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber, 100, None, None, 0, 100, Some(paymentReferenceNumber), None, DateTime.now())
 
@@ -87,7 +90,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
     when {
       controller.paymentsService.updateBacsStatus(any(), any(), any())(any(), any())
-    } thenReturn Future.successful(HttpResponse(OK))
+    } thenReturn Future.successful(HttpResponse(OK, ""))
 
     when {
       controller.statusService.getDetailedStatus(any[Option[String]], any(), any())( any(), any())
@@ -151,7 +154,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
           val result = controller.post()(postRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.payments.routes.TypeOfBankController.get().url))
+          redirectLocation(result) must be(Some(controllers.payments.routes.TypeOfBankController.get.url))
 
           val bacsModel: CreateBacsPaymentRequest = CreateBacsPaymentRequest(amlsRegistrationNumber, paymentReferenceNumber, safeId, 10000)
           verify(controller.paymentsService).createBacsPayment(eqTo(bacsModel), any())(any(), any())

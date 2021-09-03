@@ -30,9 +30,9 @@ import org.jsoup.Jsoup
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.OptionValues
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -242,7 +242,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
             val result = controller.post(1, None)(request)
 
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
 
             verify(controller.dataCacheConnector).save(any(), any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any(), any())
           }
@@ -263,7 +263,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
             val result = controller.post(1, flow)(request)
 
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
 
             verify(controller.dataCacheConnector).save(any(), any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any(),any())
 
@@ -297,7 +297,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.post(1, flow)(request)
-          redirectLocation(result) must be(Some(controllers.declaration.routes.RegisterPartnersController.get().url))
+          redirectLocation(result) must be(Some(controllers.declaration.routes.RegisterPartnersController.get.url))
         }
       }
 
@@ -327,7 +327,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.post(1, flow)(request)
-          redirectLocation(result) must be(Some(declaration.routes.WhoIsRegisteringController.get().url))
+          redirectLocation(result) must be(Some(declaration.routes.WhoIsRegisteringController.get.url))
         }
       }
 
@@ -357,7 +357,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
             .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.post(1, flow)(request)
-          redirectLocation(result) must be(Some(declaration.routes.WhoIsTheBusinessNominatedOfficerController.get().url))
+          redirectLocation(result) must be(Some(declaration.routes.WhoIsTheBusinessNominatedOfficerController.get.url))
         }
       }
 
@@ -387,7 +387,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
             .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.post(1, flow)(request)
-          redirectLocation(result) must be(Some(declaration.routes.WhoIsTheBusinessNominatedOfficerController.get().url))
+          redirectLocation(result) must be(Some(declaration.routes.WhoIsTheBusinessNominatedOfficerController.get.url))
         }
       }
     }

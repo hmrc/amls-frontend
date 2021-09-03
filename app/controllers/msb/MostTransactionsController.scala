@@ -106,7 +106,7 @@ class MostTransactionsController @Inject()(authAction: AuthAction,
     } else if (shouldAnswerForeignExchangeQuestions(msbServices, register, msb, edit)) {
       Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
     } else {
-      Redirect(routes.SummaryController.get())
+      Redirect(routes.SummaryController.get)
     }
   }
 }

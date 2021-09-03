@@ -72,7 +72,7 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
             .partition(_._1.isComplete)
           Ok(your_trading_premises(EmptyForm, edit, status, completeTp, incompleteTp))
         }
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+        case _ => Redirect(controllers.routes.RegistrationProgressController.get)
       }
   }
 
@@ -82,7 +82,7 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
         tp <- dataCacheConnector.fetch[Seq[TradingPremises]](request.credId, TradingPremises.key)
         tpNew <- updateTradingPremises(tp)
         _ <- dataCacheConnector.save[Seq[TradingPremises]](request.credId, TradingPremises.key, tpNew.getOrElse(Seq.empty))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())) recoverWith {
+      } yield Redirect(controllers.routes.RegistrationProgressController.get)) recoverWith {
         case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
       }
   }

@@ -24,7 +24,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
@@ -131,7 +131,7 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
 
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get.url))
         }
       }
 

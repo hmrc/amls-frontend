@@ -64,7 +64,7 @@ class WhichCurrenciesController @Inject()(val authAction: AuthAction,
                 } yield {
                   renewalService.updateRenewal(request.credId, updateWhichCurrencies(renewal, model)) map { _ =>
                     edit match {
-                      case true => Redirect(routes.SummaryController.get())
+                      case true => Redirect(routes.SummaryController.get)
                       case _ => Redirect(routes.UsesForeignCurrenciesController.get())
                     }
                   }

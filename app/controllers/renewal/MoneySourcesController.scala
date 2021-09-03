@@ -92,6 +92,6 @@ class MoneySourcesController @Inject()(val authAction: AuthAction,
     (services, businessActivities, edit) match {
       case (x, _, false) if x.contains(ForeignExchange) => Redirect(routes.FXTransactionsInLast12MonthsController.get())
       case (_, x, false) if x.contains(HighValueDealing) || x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideIsUKController.get())
-      case _ => Redirect(routes.SummaryController.get())
+      case _ => Redirect(routes.SummaryController.get)
     }
 }

@@ -17,7 +17,7 @@
 package models.businessactivities
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
 class RiskAssessmentHasPolicySpec extends PlaySpec with MockitoSugar {

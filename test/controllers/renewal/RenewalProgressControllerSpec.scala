@@ -165,8 +165,8 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
         .thenReturn(bmWithoutTCSPOrMSB)
 
       val sections = Seq(
-        Section("supervision", Completed, true,  controllers.supervision.routes.SummaryController.get()),
-        Section("businessmatching", Completed, true,  controllers.businessmatching.routes.SummaryController.get())
+        Section("supervision", Completed, true,  controllers.supervision.routes.SummaryController.get),
+        Section("businessmatching", Completed, true,  controllers.businessmatching.routes.SummaryController.get)
       )
 
       when(controller.sectionsProvider.sections(cacheMap))
@@ -216,7 +216,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
       val newRequest = requestWithUrlEncodedBody("" -> "")
 
       when(controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any()))
-        .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get())))
+        .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get)))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)

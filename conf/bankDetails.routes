@@ -31,5 +31,5 @@ POST        /check-your-answers/:index/                                  @contro
 GET         /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.get(index: Int)
 POST        /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.remove(index: Int)
 
-GET         /bank-account                                                @controllers.bankdetails.HasBankAccountController.get()
+GET         /bank-account                                                @controllers.bankdetails.HasBankAccountController.get
 POST        /bank-account                                                @controllers.bankdetails.HasBankAccountController.post()

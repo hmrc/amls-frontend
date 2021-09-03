@@ -26,7 +26,6 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -37,7 +36,7 @@ import views.html.businessactivities.involved_in_other_name
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with PrivateMethodTester{
+class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with PrivateMethodTester{
 
   trait Fixture {
     self => val request = addToken(authRequest)
@@ -241,7 +240,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(routes.SummaryController.get.url))
           }
         }
       }

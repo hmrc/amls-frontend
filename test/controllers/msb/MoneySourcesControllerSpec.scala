@@ -26,7 +26,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status.SEE_OTHER
 import play.api.test.Helpers._
 import services.StatusService
@@ -173,7 +173,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
           mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))), BusinessMatching.key)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get().url)
+          redirectLocation(result) mustBe Some(controllers.msb.routes.SummaryController.get.url)
         }
       }
 

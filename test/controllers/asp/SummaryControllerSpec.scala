@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.asp.Asp
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.asp.summary
@@ -74,7 +74,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post()(postRequest)
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
 
       verify(mockCacheConnector).save[Asp](any(), eqTo(Asp.key), eqTo(model.copy(hasAccepted = true)))(any(), any())
     }

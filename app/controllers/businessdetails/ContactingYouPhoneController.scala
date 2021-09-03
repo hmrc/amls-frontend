@@ -65,7 +65,7 @@ class ContactingYouPhoneController @Inject () (val dataCache: DataCacheConnector
             )
           } yield {
             edit match {
-              case true => Redirect(routes.SummaryController.get())
+              case true => Redirect(routes.SummaryController.get)
               case _ => Redirect(routes.LettersAddressController.get(edit))
             }
           }

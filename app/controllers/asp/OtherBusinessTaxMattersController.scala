@@ -56,7 +56,7 @@ class OtherBusinessTaxMattersController @Inject()(val dataCacheConnector: DataCa
               _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
                 asp.otherBusinessTaxMatters(data)
               )
-            } yield Redirect(routes.SummaryController.get())
+            } yield Redirect(routes.SummaryController.get)
         }
       }
   }

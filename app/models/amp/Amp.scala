@@ -19,7 +19,6 @@ package models.amp
 import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.AMPTurnover
-import play.api.Play
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
@@ -75,17 +74,15 @@ final case class Amp(data: JsObject = Json.obj(),
   }
 }
 
-object Amp  {
+object Amp {
   val redirectCallType       = "GET"
   val key                    = "amp"
-
-  lazy val appConfig = Play.current.injector.instanceOf[ApplicationConfig]
 
   private def generateRedirect(destinationUrl: String) = {
     Call(redirectCallType, destinationUrl)
   }
 
-  def section(implicit cache: CacheMap): Section = {
+  def section(appConfig: ApplicationConfig)(implicit cache: CacheMap): Section = {
     val notStarted = Section(key, NotStarted, false, generateRedirect(appConfig.ampWhatYouNeedUrl))
     cache.getEntry[Amp](key).fold(notStarted) {
       model =>

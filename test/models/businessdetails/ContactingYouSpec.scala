@@ -16,7 +16,7 @@
 
 package models.businessdetails
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
 class ContactingYouSpec extends PlaySpec with MockitoSugar {

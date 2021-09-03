@@ -24,7 +24,7 @@ import models.status._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -126,7 +126,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = controller.get()(request)
 
-          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+          redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
         }
       }
     }
@@ -149,7 +149,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
             .thenReturn(Future.successful(emptyCache))
 
           when(controller.progressService.getSubmitRedirect(Some(any()), any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get())))
+            .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get)))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)

@@ -22,7 +22,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-import play.api.Logger
+import play.api.Logging
 import views.html.responsiblepeople._
 
 class WhatYouNeedController @Inject () (
@@ -30,7 +30,7 @@ class WhatYouNeedController @Inject () (
                                         authAction: AuthAction,
                                         val ds: CommonPlayDependencies,
                                         val cc: MessagesControllerComponents,
-                                        what_you_need: what_you_need) extends AmlsBaseController(ds, cc) {
+                                        what_you_need: what_you_need) extends AmlsBaseController(ds, cc) with Logging {
 
   def get(index: Int, flow: Option[String] = None) =
     authAction.async {
@@ -42,7 +42,7 @@ class WhatYouNeedController @Inject () (
           } yield {
             Ok(what_you_need(index, flow, Some(ba)))
           }).getOrElse {
-              Logger.info("Unable to retrieve business activities in [responsiblepeople][WhatYouNeedController]")
+              logger.info("Unable to retrieve business activities in [responsiblepeople][WhatYouNeedController]")
               throw new Exception("Unable to retrieve business activities in [responsiblepeople][WhatYouNeedController]")
             }
         }

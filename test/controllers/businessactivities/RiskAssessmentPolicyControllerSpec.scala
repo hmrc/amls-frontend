@@ -23,7 +23,7 @@ import models.businessmatching.{AccountancyServices, BusinessMatching, MoneyServ
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -104,7 +104,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get.url))
         }
         "on post with valid data redirect to DocumentRiskAssessment page when businessActivity is ASP and hasPolicy is true" in new Fixture {
 
@@ -243,7 +243,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get.url))
         }
         "redirect to the DocumentRiskAssessmentController when hasPolicy is true" in new Fixture {
 

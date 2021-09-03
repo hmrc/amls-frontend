@@ -16,12 +16,11 @@
 
 package models.hvd
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.i18n.Messages.Implicits._
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ProductsSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerTest {
@@ -204,54 +203,79 @@ class ProductsSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerTest {
       implicit val lang = Lang("en-US")
 
       "return correct text for Alcohol" in {
+        val messagesApi = app.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = messagesApi.preferred(Seq(lang))
         Alcohol.getMessage must be("Alcohol")
       }
 
       "return correct text for Tobacco" in {
+        val messagesApi = app.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = messagesApi.preferred(Seq(lang))
         Tobacco.getMessage must be("Tobacco")
       }
 
       "return correct text for Antiques" in {
+        val messagesApi = app.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = messagesApi.preferred(Seq(lang))
         Antiques.getMessage must be("Antiques")
       }
 
       "return correct text for Cars" in {
+        val messagesApi = app.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = messagesApi.preferred(Seq(lang))
         Cars.getMessage must be("Cars")
       }
 
       "return correct text for OtherMotorVehicles" in {
+        val messagesApi = app.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = messagesApi.preferred(Seq(lang))
         OtherMotorVehicles.getMessage must be("Motor vehicles (except cars)")
       }
 
       "return correct text for Caravans" in {
+        val messagesApi = app.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = messagesApi.preferred(Seq(lang))
         Caravans.getMessage must be("Caravans")
       }
 
       "return correct text for Jewellery" in {
+        val messagesApi = app.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = messagesApi.preferred(Seq(lang))
         Jewellery.getMessage must be("Jewellery")
       }
 
       "return correct text for Gold" in {
+        val messagesApi = app.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = messagesApi.preferred(Seq(lang))
         Gold.getMessage must be("Gold")
       }
 
       "return correct text for ScrapMetals" in {
+        val messagesApi = app.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = messagesApi.preferred(Seq(lang))
         ScrapMetals.getMessage must be("Scrap metals")
       }
 
       "return correct text for MobilePhones" in {
+        val messagesApi = app.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = messagesApi.preferred(Seq(lang))
         MobilePhones.getMessage must be("Mobile phones")
       }
 
       "return correct text for Clothing" in {
+        val messagesApi = app.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = messagesApi.preferred(Seq(lang))
         Clothing.getMessage must be("Clothing")
       }
 
       "return correct text for Other" in {
+        val messagesApi = app.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = messagesApi.preferred(Seq(lang))
         Other("Something else").getMessage must be("Something else")
       }
     }
   }
+
 }
 
 

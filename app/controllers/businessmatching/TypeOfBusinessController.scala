@@ -57,7 +57,7 @@ class TypeOfBusinessController @Inject()(val dataCacheConnector: DataCacheConnec
               businessMatching.typeOfBusiness(data)
             )
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true => Redirect(routes.SummaryController.get)
             case false => Redirect(routes.RegisterServicesController.get())
           }
       }

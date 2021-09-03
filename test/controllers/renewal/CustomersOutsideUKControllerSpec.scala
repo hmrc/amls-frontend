@@ -168,21 +168,21 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
           "in edit mode" in new FormSubmissionFixture {
             post(edit = true, businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))) { result =>
               result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
+              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get.url)
             }
           }
 
           "business is an asp and not an hvd or an msb" in new FormSubmissionFixture {
             post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices))))) { result =>
               result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
+              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get.url)
             }
           }
 
           "business is an msb and asp" in new FormSubmissionFixture {
             post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))))) { result =>
               result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
+              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get.url)
             }
           }
         }

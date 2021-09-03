@@ -34,8 +34,8 @@ class HasBankAccountController @Inject()(val authAction: AuthAction,
                                          has_bank_account: has_bank_account) extends AmlsBaseController(ds, cc) {
 
   val router: Boolean => Call = {
-    case true => routes.BankAccountNameController.getNoIndex()
-    case _ => routes.YourBankAccountsController.get()
+    case true => routes.BankAccountNameController.getNoIndex
+    case _ => routes.YourBankAccountsController.get
   }
 
   def view(implicit request: Request[_]) = has_bank_account.apply _

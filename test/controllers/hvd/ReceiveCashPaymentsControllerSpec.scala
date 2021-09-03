@@ -23,7 +23,7 @@ import models.hvd.{Hvd, PaymentMethods}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.hvd.receiving
@@ -84,7 +84,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.post(true)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
     }
 
     "redirect to PercentageOfCashPaymentOver15000Controller on form equals no" in new Fixture {

@@ -23,7 +23,7 @@ GET         /assets/*file                                                       
 GET         /                                                                         @controllers.LandingController.start(allowRedirect: Boolean ?= true)
 GET         /start/bta                                                                @controllers.LandingController.start(allowRedirect: Boolean ?= false)
 
-GET         /start                                                                    @controllers.LandingController.get()
+GET         /start                                                                    @controllers.LandingController.get
 
 POST        /subscribe                                                                @controllers.SubmissionController.post()
 
@@ -31,7 +31,7 @@ GET         /unauthorised                                                       
 GET         /unauthorised-role                                                        @controllers.AmlsController.unauthorised_role
 GET         /keep-alive                                                               @controllers.AmlsController.keep_alive
 
-GET         /registration-progress                                                    @controllers.RegistrationProgressController.get()
+GET         /registration-progress                                                    @controllers.RegistrationProgressController.get
 POST        /registration-progress                                                    @controllers.RegistrationProgressController.post()
 
 GET         /application-status                                                       @controllers.StatusController.get(fromDuplicateSubmission: Boolean ?= false)
@@ -40,40 +40,40 @@ POST        /application-status/new-submission                                  
 GET         /your-registration/your-messages/:id/:contactType/:amlsRegNo/:templateVersion              @controllers.NotificationController.messageDetails(id : String, contactType:models.notifications.ContactType, amlsRegNo: String, templateVersion: String)
 GET         /your-registration/your-messages                                          @controllers.NotificationController.getMessages()
 
-GET         /your-registration/withdraw-application                                   @controllers.withdrawal.WithdrawApplicationController.get()
+GET         /your-registration/withdraw-application                                   @controllers.withdrawal.WithdrawApplicationController.get
 POST        /your-registration/withdraw-application                                   @controllers.withdrawal.WithdrawApplicationController.post()
 
-GET         /your-registration/withdraw-application-reason                            @controllers.withdrawal.WithdrawalReasonController.get()
+GET         /your-registration/withdraw-application-reason                            @controllers.withdrawal.WithdrawalReasonController.get
 POST        /your-registration/withdraw-application-reason                            @controllers.withdrawal.WithdrawalReasonController.post()
 
-GET         /your-registration/deregister                                             @controllers.deregister.DeRegisterApplicationController.get()
+GET         /your-registration/deregister                                             @controllers.deregister.DeRegisterApplicationController.get
 POST        /your-registration/deregister                                             @controllers.deregister.DeRegisterApplicationController.post()
 
-GET         /your-registration/deregister-reason                                      @controllers.deregister.DeregistrationReasonController.get()
+GET         /your-registration/deregister-reason                                      @controllers.deregister.DeregistrationReasonController.get
 POST        /your-registration/deregister-reason                                      @controllers.deregister.DeregistrationReasonController.post()
 
 GET         /satisfaction-survey                                                      @controllers.SatisfactionSurveyController.get()
 POST        /satisfaction-survey                                                      @controllers.SatisfactionSurveyController.post()
 
-GET         /submit-application/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.get()
+GET         /submit-application/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.get
 POST        /submit-application/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.post()
 
-GET         /update-information/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.get()
-GET         /update-information/who-is-registering-renewal                            @controllers.declaration.WhoIsRegisteringController.get()
+GET         /update-information/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.get
+GET         /update-information/who-is-registering-renewal                            @controllers.declaration.WhoIsRegisteringController.get
 
-GET         /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.get()
+GET         /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.get
 POST        /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.post()
 
-GET         /submit-application/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get()
+GET         /submit-application/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.get
 GET         /update-information/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.getWithAmendment()
 POST        /submit-application/nominated-officer                                     @controllers.declaration.WhoIsTheBusinessNominatedOfficerController.post()
 
-GET         /how-to-pay                                                               @controllers.applicationstatus.HowToPayController.get()
+GET         /how-to-pay                                                               @controllers.applicationstatus.HowToPayController.get
 
-GET         /submit-application/ways-to-pay                                           @controllers.payments.WaysToPayController.get()
+GET         /submit-application/ways-to-pay                                           @controllers.payments.WaysToPayController.get
 POST        /submit-application/ways-to-pay                                           @controllers.payments.WaysToPayController.post()
 
-GET         /submit-application/type-of-bank                                          @controllers.payments.TypeOfBankController.get()
+GET         /submit-application/type-of-bank                                          @controllers.payments.TypeOfBankController.get
 POST        /submit-application/type-of-bank                                          @controllers.payments.TypeOfBankController.post()
 
 GET         /submit-application/bank-details/                                         @controllers.payments.BankDetailsController.get(isUK: Boolean = true)
@@ -84,22 +84,22 @@ GET         /submit-application/confirm-bacs/                                   
 GET         /confirmation/payment-complete                                            @controllers.PaymentConfirmationController.paymentConfirmation(reference: String)
 POST        /confirmation/payment/retry                                               @controllers.RetryPaymentController.retryPayment()
 
-GET         /confirmation                                                             @controllers.ConfirmationController.get()
+GET         /confirmation                                                             @controllers.ConfirmationController.get
 
-GET         /declaration/add-person                                                   @controllers.declaration.AddPersonController.get()
+GET         /declaration/add-person                                                   @controllers.declaration.AddPersonController.get
 POST        /declaration/add-person                                                   @controllers.declaration.AddPersonController.post()
 
-GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
+GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get
 
-GET         /declaration/declaration                                                  @controllers.declaration.DeclarationController.get()
+GET         /declaration/declaration                                                  @controllers.declaration.DeclarationController.get
 GET         /update-information/declaration                                           @controllers.declaration.DeclarationController.getWithAmendment()
 
 GET         /update-information/add-person                                            @controllers.declaration.AddPersonController.getWithAmendment()
 
-GET         /declaration/renew-registration                                           @controllers.declaration.RenewRegistrationController.get()
+GET         /declaration/renew-registration                                           @controllers.declaration.RenewRegistrationController.get
 POST        /declaration/renew-registration                                           @controllers.declaration.RenewRegistrationController.post()
 
-GET         /update-information/add-or-remove-services                                @controllers.businessmatching.updateservice.ChangeBusinessTypesController.get()
+GET         /update-information/add-or-remove-services                                @controllers.businessmatching.updateservice.ChangeBusinessTypesController.get
 POST        /update-information/add-or-remove-services                                @controllers.businessmatching.updateservice.ChangeBusinessTypesController.post()
 
-GET         /login-event/redress-scheme                                               @controllers.LoginEventController.get()
+GET         /login-event/redress-scheme                                               @controllers.LoginEventController.get

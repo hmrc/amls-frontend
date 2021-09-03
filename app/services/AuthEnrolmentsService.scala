@@ -20,14 +20,14 @@ import config.ApplicationConfig
 import connectors.{EnrolmentStubConnector, TaxEnrolmentsConnector}
 import javax.inject.Inject
 import models.enrolment.{AmlsEnrolmentKey, TaxEnrolment}
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthEnrolmentsService @Inject()(val enrolmentStore: TaxEnrolmentsConnector,
                                       val config: ApplicationConfig,
-                                      val stubConnector: EnrolmentStubConnector) {
+                                      val stubConnector: EnrolmentStubConnector) extends Logging {
 
   private val amlsKey = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
@@ -37,15 +37,15 @@ class AuthEnrolmentsService @Inject()(val enrolmentStore: TaxEnrolmentsConnector
                             (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] = {
 
     // $COVERAGE-OFF$
-    Logger.debug(s"[$prefix][amlsRegistrationNumber] - Begin...)")
-    Logger.debug(s"[$prefix][amlsRegistrationNumber] - config.enrolmentStubsEnabled: ${config.enrolmentStubsEnabled})")
+    logger.debug(s"[$prefix][amlsRegistrationNumber] - Begin...)")
+    logger.debug(s"[$prefix][amlsRegistrationNumber] - config.enrolmentStubsEnabled: ${config.enrolmentStubsEnabled})")
     // $COVERAGE-ON$
 
     val stubbedEnrolments =  if (config.enrolmentStubsEnabled) {
       stubConnector.enrolments(groupIdentifier.getOrElse(throw new Exception("Group ID is unavailable")))
     } else {
       // $COVERAGE-OFF$
-      Logger.debug(s"[$prefix][amlsRegistrationNumber] - Returning empty sequence...)")
+      logger.debug(s"[$prefix][amlsRegistrationNumber] - Returning empty sequence...)")
       // $COVERAGE-ON$
       Future.successful(Seq.empty)
     }
@@ -54,15 +54,15 @@ class AuthEnrolmentsService @Inject()(val enrolmentStore: TaxEnrolmentsConnector
       case regNo@Some(_) => Future.successful(regNo)
       case None => stubbedEnrolments map { enrolmentsList =>
         // $COVERAGE-OFF$
-        Logger.debug(s"[$prefix][amlsRegistrationNumber] - enrolmentsList: $enrolmentsList)")
+        logger.debug(s"[$prefix][amlsRegistrationNumber] - enrolmentsList: $enrolmentsList)")
         // $COVERAGE-ON$
           for {
             amlsEnrolment   <- enrolmentsList.find(enrolment => enrolment.key == amlsKey)
             amlsIdentifier  <- amlsEnrolment.identifiers.find(identifier => identifier.key == amlsNumberKey)
           } yield {
             // $COVERAGE-OFF$
-            Logger.debug(s"[$prefix][amlsRegistrationNumber] - amlsEnrolment: $amlsEnrolment)")
-            Logger.debug(s"[$prefix][amlsRegistrationNumber] : ${amlsIdentifier.value}")
+            logger.debug(s"[$prefix][amlsRegistrationNumber] - amlsEnrolment: $amlsEnrolment)")
+            logger.debug(s"[$prefix][amlsRegistrationNumber] : ${amlsIdentifier.value}")
             // $COVERAGE-ON$
             amlsIdentifier.value
           }

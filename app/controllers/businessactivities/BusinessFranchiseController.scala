@@ -57,7 +57,7 @@ class BusinessFranchiseController @Inject() (val dataCacheConnector: DataCacheCo
               businessActivities.businessFranchise(data)
             )
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true => Redirect(routes.SummaryController.get)
             case false => Redirect(routes.EmployeeCountAMLSSupervisionController.get())
           }
       }

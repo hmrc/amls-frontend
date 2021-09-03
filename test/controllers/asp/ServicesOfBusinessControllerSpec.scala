@@ -22,7 +22,7 @@ import models.businessmatching.AccountancyServices
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -123,7 +123,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get.url))
     }
 
     "go to the date of change page" when {
@@ -138,7 +138,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.asp.routes.ServicesOfBusinessDateOfChangeController.get().url))
+        redirectLocation(result) must be(Some(controllers.asp.routes.ServicesOfBusinessDateOfChangeController.get.url))
       }
     }
 
@@ -154,7 +154,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.asp.routes.ServicesOfBusinessDateOfChangeController.get().url))
+        redirectLocation(result) must be(Some(controllers.asp.routes.ServicesOfBusinessDateOfChangeController.get.url))
       }
     }
 

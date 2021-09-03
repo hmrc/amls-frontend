@@ -22,7 +22,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -163,7 +163,7 @@ class CashPaymentOverTenThousandEurosControllerSpec extends AmlsSpec with Mockit
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
       }
 
       "show invalid data error" in new Fixture {

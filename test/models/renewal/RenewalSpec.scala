@@ -69,7 +69,7 @@ class RenewalSpec extends AmlsSpec {
         Some(AMLSTurnover.First),
         Some(AMPTurnover.First),
         Some(CustomersOutsideIsUK(false)),
-        None,
+        Some(CustomersOutsideUK(None)),
         Some(PercentageOfCashPaymentOver15000.First),
         Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
         Some(TotalThroughput("01")),
@@ -112,7 +112,7 @@ class RenewalSpec extends AmlsSpec {
         Some(AMLSTurnover.First),
         Some(AMPTurnover.First),
         Some(CustomersOutsideIsUK(false)),
-        None,
+        Some(CustomersOutsideUK(Option(Nil))),
         Some(PercentageOfCashPaymentOver15000.First),
         Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other")))))),
         Some(TotalThroughput("01")),
@@ -131,7 +131,10 @@ class RenewalSpec extends AmlsSpec {
 
   "successfully validate json" when {
     "receiveCashPayments is false" in {
-      val renewal = Renewal(receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(false), None)))
+      val renewal = Renewal(
+        customersOutsideUK = Some(CustomersOutsideUK(None)),
+        receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(false), None))
+      )
 
       val json = Json.obj(
         "receiveCashPayments" -> Json.obj(

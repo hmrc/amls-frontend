@@ -16,10 +16,10 @@
 
 package models.autocomplete
 
-import java.io.StringBufferInputStream
+import java.io.ByteArrayInputStream
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.Environment
 import play.api.libs.json.Json
@@ -34,13 +34,14 @@ class GovUkCountryDataProviderSpec extends PlaySpec with MockitoSugar {
 
     def setupEnvironment(countries: Option[Seq[NameValuePair]]) = when {
       env.resourceAsStream(any())
-    } thenReturn Some(new StringBufferInputStream(
-      Json.toJson(countries).toString
+    } thenReturn Some(new ByteArrayInputStream(
+      Json.toJson(countries).toString.getBytes
     ))
   }
 
   "fetch" must {
     "retain only the country code data" in new Fixture {
+
       setupEnvironment(Some(Seq(
         NameValuePair("Great Britain", "country:GB"),
         NameValuePair("Bermuda", "country:BM"),

@@ -24,7 +24,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{ProgressService, RenewalService, StatusService}
@@ -104,12 +104,12 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.renewal.routes.WhatYouNeedController.get().url))
+            redirectLocation(result) must be(Some(controllers.renewal.routes.WhatYouNeedController.get.url))
           }
         }
 
         "redirect to the url provided by progressService" in new Fixture {
-          val call = controllers.routes.RegistrationProgressController.get()
+          val call = controllers.routes.RegistrationProgressController.get
           val newRequest = requestWithUrlEncodedBody("renewRegistration" -> "false")
           val date = new LocalDate()
 

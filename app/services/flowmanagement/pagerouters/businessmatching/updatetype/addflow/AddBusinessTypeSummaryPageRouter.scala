@@ -39,9 +39,9 @@ class AddBusinessTypeSummaryPageRouter @Inject()(val statusService: StatusServic
 
     businessMatchingService.getRemainingBusinessActivities(credId) flatMap {
       case set if set.nonEmpty =>
-        OptionT.some(Redirect(addRoutes.AddMoreBusinessTypesController.get()))
+        OptionT.some(Redirect(addRoutes.AddMoreBusinessTypesController.get))
       case _ =>
-        OptionT.some(Redirect(addRoutes.NeedMoreInformationController.get()))
+        OptionT.some(Redirect(addRoutes.NeedMoreInformationController.get))
     } getOrElse error(AddBusinessTypeSummaryPageId)
   }
 }

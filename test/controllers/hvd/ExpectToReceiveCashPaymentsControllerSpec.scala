@@ -22,7 +22,7 @@ import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd.Hvd
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
@@ -97,7 +97,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
             val result = controller.post(true)(requestWithUrlEncodedBody("courier" -> "true"))
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
           }
         }

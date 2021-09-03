@@ -74,7 +74,7 @@ class ServicesOfAnotherTCSPController @Inject()(
   def redirectTo(data: Boolean, edit: Boolean, tcsp: Tcsp) = {
     (data, edit, tcsp.servicesOfAnotherTCSP.isDefined) match {
       case (true, _, false) => Redirect(routes.AnotherTCSPSupervisionController.get(edit))
-      case _ => Redirect(routes.SummaryController.get())
+      case _ => Redirect(routes.SummaryController.get)
     }
   }
 }

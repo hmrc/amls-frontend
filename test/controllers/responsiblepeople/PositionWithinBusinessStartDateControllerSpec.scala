@@ -29,7 +29,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -169,8 +169,8 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
         val document: Document = Jsoup.parse(contentAsString(result))
         document.title must include(pageTitle)
-        document.select("input[id=startDate-day]").`val`() must be(startDate.get.startDate.dayOfMonth().get().toString)
-        document.select("input[id=startDate-month]").`val`() must be(startDate.get.startDate.monthOfYear().get().toString)
+        document.select("input[id=startDate-day]").`val`() must be(startDate.get.startDate.dayOfMonth().get.toString)
+        document.select("input[id=startDate-month]").`val`() must be(startDate.get.startDate.monthOfYear().get.toString)
         document.select("input[id=startDate-year]").`val`() must be(startDate.get.startDate.getYear.toString)
       }
     }

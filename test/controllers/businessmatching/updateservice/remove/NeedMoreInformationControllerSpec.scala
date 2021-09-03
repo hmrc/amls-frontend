@@ -19,9 +19,8 @@ package controllers.businessmatching.updateservice.remove
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.AccountancyServices
 import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
-import org.joda.time.LocalDate
-import org.jsoup.Jsoup
 import play.api.i18n.Messages
+import org.jsoup.Jsoup
 import play.api.test.Helpers.{OK, contentAsString, status, _}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.remove.need_more_information

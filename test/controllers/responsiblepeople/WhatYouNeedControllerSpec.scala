@@ -21,7 +21,7 @@ import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServi
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import utils.{AmlsSpec, DependencyMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._

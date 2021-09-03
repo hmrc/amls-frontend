@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.ApplicationConfig
 import connectors._
 import controllers.actions.SuccessfulAuthAction
 import generators.submission.SubscriptionResponseGenerator
@@ -35,6 +36,7 @@ import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
+
 import scala.concurrent.Future
 
 // scalastyle:off magic.number
@@ -74,7 +76,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
 
     when {
       controller.amlsConnector.savePayment(any(), any(), any(), any())(any(), any())
-    } thenReturn Future.successful(HttpResponse(CREATED))
+    } thenReturn Future.successful(HttpResponse(CREATED, ""))
 
     when {
       controller.amlsConnector.registrationDetails(any(), any())(any(), any())
@@ -102,7 +104,9 @@ class RetryPaymentControllerSpec extends AmlsSpec
       controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
     } thenReturn Future.successful(Some(businessDetails))
 
-    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))
+    val applicationConfig = app.injector.instanceOf[ApplicationConfig]
+
+    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
 
     def setupBusinessMatching(companyName: String) = {
 

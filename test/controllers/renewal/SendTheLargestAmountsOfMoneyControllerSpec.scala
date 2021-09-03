@@ -25,7 +25,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
@@ -119,7 +119,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
         "redirect to the SummaryController" in new FormSubmissionFixture {
           post(edit = true){ result =>
             result.header.status must be (SEE_OTHER)
-            result.header.headers.get("Location")  must be(routes.SummaryController.get().url.some)
+            result.header.headers.get("Location")  must be(routes.SummaryController.get.url.some)
           }
         }
         "redirect to SendTheLargestAmountsOfMoneyController" when {

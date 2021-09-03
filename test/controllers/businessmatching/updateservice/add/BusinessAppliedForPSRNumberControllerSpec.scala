@@ -25,7 +25,7 @@ import models.status.SubmissionDecisionApproved
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
@@ -99,7 +99,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
         val result = controller.get()(request)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
       }
 
       "redirect to RegistrationProgressController if there is MSB with no TM defined" in new Fixture {
@@ -108,7 +108,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
         val result = controller.get()(request)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
       }
     }
 

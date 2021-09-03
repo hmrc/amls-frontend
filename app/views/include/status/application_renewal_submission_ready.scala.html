@@ -17,7 +17,7 @@
 @(businessName: Option[String])(implicit request: Request[_], m: Messages, lang: Lang)
 
 <p>@Messages("status.renewalnotsubmitted.description")</p>
-<a href="@controllers.routes.RegistrationProgressController.get()" id="go-to-about-your-business" class="button" type="submit" draggable="false">@Messages("your.registration.status.renewal.not.submitted.button")
+<a href="@controllers.routes.RegistrationProgressController.get" id="go-to-about-your-business" class="button" type="submit" draggable="false">@Messages("your.registration.status.renewal.not.submitted.button")
  @if(businessName.isDefined){<span class="visually-hidden"> for @businessName.get</span>}</a>
 
 

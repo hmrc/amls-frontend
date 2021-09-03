@@ -83,7 +83,7 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
               businessActivities.expectedAMLSTurnover(data)
             )
           } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
+            case true => Redirect(routes.SummaryController.get)
             case false => Redirect(routes.BusinessFranchiseController.get())
           }
       }

@@ -64,7 +64,7 @@ class StatusController @Inject()(val landingService: LandingService,
           request.groupIdentifier,
           fromDuplicateSubmission
         )
-        case _ => Future.successful(Redirect(controllers.routes.LandingController.get()))
+        case _ => Future.successful(Redirect(controllers.routes.LandingController.get))
       }
   }
 
@@ -183,7 +183,7 @@ class StatusController @Inject()(val landingService: LandingService,
           Ok(your_registration(
             regNo = mlrRegNumber.getOrElse(""),
             businessName = businessNameOption,
-            yourRegistrationInfo = application_submission_ready(controllers.routes.RegistrationProgressController.get(), businessNameOption),
+            yourRegistrationInfo = application_submission_ready(controllers.routes.RegistrationProgressController.get, businessNameOption),
             unreadNotifications = unreadNotifications,
             registrationStatus = registration_status(
               amlsRegNo = mlrRegNumber,

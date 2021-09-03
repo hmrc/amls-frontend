@@ -21,7 +21,7 @@ import models.businessactivities._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import utils.{AmlsSpec, DependencyMocks}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -107,7 +107,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get.url))
         }
 
         "given valid data in edit mode and 'yes' is selected" in new Fixture {

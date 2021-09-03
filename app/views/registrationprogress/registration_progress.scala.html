@@ -14,13 +14,11 @@
  * limitations under the License.
  *@
 
-@import forms.Form2
-@import include._
-@import include.forms2._
-@import config.{ ApplicationConfig}
+@import include.{heading, services_sidebar}
+@import config.ApplicationConfig
 @import views.html.helper.CSRF
 @import models.registrationprogress.Section
-@import models.businesscustomer.Address
+@import views.html.registrationprogress.section
 
 @this(main2: include.main2)
 
@@ -66,9 +64,9 @@ title = Messages("progress.title")
     <div class="grid-layout">
         @* Main sections *@
         <ul class="grid-layout__column grid-layout__column--2-3 display-block">
-            @sections.map { case Section(name, status, _, call) =>
-                @section(name, status, call)
-            }
+            @(sections.map { case Section(name1, status1, _, call1) =>
+                section(name1, status1, call1)
+            })
         </ul>
 
     </div>

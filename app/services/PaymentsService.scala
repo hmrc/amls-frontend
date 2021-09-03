@@ -22,7 +22,7 @@ import javax.inject.Inject
 import models.confirmation.Currency
 import models.payments._
 import models.{FeeResponse, ReturnLocation}
-import play.api.Logger
+import play.api.Logging
 import play.api.mvc.Request
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
                                 val paymentsConnector: PayApiConnector,
                                 val statusService: StatusService,
-                                val applicationConfig: ApplicationConfig) {
+                                val applicationConfig: ApplicationConfig) extends Logging {
 
   def requestPaymentsUrl(fees: FeeResponse, returnUrl: String, amlsRefNo: String, safeId: String, accountTypeId: (String, String))
                         (implicit hc: HeaderCarrier, ec: ExecutionContext, request: Request[_]): Future[NextUrl] =
@@ -48,12 +48,12 @@ class PaymentsService @Inject()(val amlsConnector: AmlsConnector,
 
     val amountInPence = (amount * 100).toInt
 
-    paymentsConnector.createPayment(CreatePaymentRequest("other", paymentReference, "AMLS Payment", amountInPence, ReturnLocation(returnUrl))) flatMap {
+    paymentsConnector.createPayment(CreatePaymentRequest("other", paymentReference, "AMLS Payment", amountInPence, ReturnLocation(returnUrl)(applicationConfig))) flatMap {
       case Some(response) =>
         savePaymentBeforeResponse(response, amlsRefNo, safeId, accountTypeId).map(_ => response.nextUrl)
       case _ =>
         // $COVERAGE-OFF$
-        Logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
+        logger.warn("[ConfirmationController.requestPaymentUrl] Did not get a redirect url from the payments service; using configured default")
         // $COVERAGE-ON$
         Future.successful(NextUrl(applicationConfig.paymentsUrl))
     }

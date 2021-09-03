@@ -23,7 +23,7 @@ import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import services.{RenewalService, SectionsProvider, StatusService}
 import org.mockito.Mockito.when

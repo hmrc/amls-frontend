@@ -26,7 +26,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
@@ -268,7 +268,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
           }
 
           "it does not have business type of ASP, HVD or MSB" in new Fixture {
@@ -289,7 +289,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
           }
         }
 

@@ -96,7 +96,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
 
         when {
           testPaymentService.amlsConnector.updateBacsStatus(any(), any(), any())(any(), any())
-        } thenReturn Future.successful(HttpResponse(OK))
+        } thenReturn Future.successful(HttpResponse(OK, ""))
 
         whenReady(testPaymentService.updateBacsStatus(accountTypeId, paymentRef, request)) { _ =>
           verify(testPaymentService.amlsConnector).updateBacsStatus(any(), eqTo(paymentRef), eqTo(request))(any(), any())
@@ -149,7 +149,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
 
           when {
             mockAmlsConnector.savePayment(any(), any(), any(), any())(any(), any())
-          } thenReturn Future.successful(HttpResponse(CREATED))
+          } thenReturn Future.successful(HttpResponse(CREATED, ""))
 
           whenReady(testPaymentService.requestPaymentsUrl(testFeeResponseAmendVariation, "http://return.com", "XAML0000000001", safeId, accountTypeId)) { result =>
             result mustBe NextUrl("http://return.com")
@@ -163,7 +163,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
 
           when {
             mockAmlsConnector.savePayment(any(), any(), any(), any())(any(), any())
-          } thenReturn Future.successful(HttpResponse(CREATED))
+          } thenReturn Future.successful(HttpResponse(CREATED, ""))
 
           whenReady(testPaymentService.requestPaymentsUrl(testFeeResponseSubscription, "http://return.com", "XAML0000000001", safeId, accountTypeId)) { result =>
             result mustBe NextUrl("http://return.com")

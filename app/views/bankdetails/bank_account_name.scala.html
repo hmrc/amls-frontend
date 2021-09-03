@@ -35,7 +35,7 @@
     @form(f, if(index.isDefined) {
      controllers.bankdetails.routes.BankAccountNameController.postIndex(index.get, edit)
     } else {
-        controllers.bankdetails.routes.BankAccountNameController.postNoIndex()
+        controllers.bankdetails.routes.BankAccountNameController.postNoIndex
     }) {
         @input(
             field = f("accountName"),

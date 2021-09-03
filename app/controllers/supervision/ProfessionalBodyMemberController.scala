@@ -73,7 +73,7 @@ class ProfessionalBodyMemberController @Inject()(
     (supervision.professionalBodyMember, edit) match {
       case (Some(ProfessionalBodyMemberYes), _) if !supervision.isComplete => Redirect(routes.WhichProfessionalBodyController.get(edit))
       case (Some(ProfessionalBodyMemberNo), false) => Redirect(routes.PenalisedByProfessionalController.get())
-      case _ => Redirect(routes.SummaryController.get())
+      case _ => Redirect(routes.SummaryController.get)
     }
   }
 }

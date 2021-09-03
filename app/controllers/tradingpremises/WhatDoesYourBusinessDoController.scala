@@ -24,7 +24,7 @@ import models.DateOfChange
 import models.businessmatching._
 import models.status.SubmissionStatus
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
-import play.api.Logger
+import play.api.Logging
 import play.api.mvc.{MessagesControllerComponents, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -43,7 +43,7 @@ class WhatDoesYourBusinessDoController @Inject () (
                                                     val cc: MessagesControllerComponents,
                                                     what_does_your_business_do: what_does_your_business_do,
                                                     date_of_change: date_of_change,
-                                                    implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with FormHelpers with DateOfChangeHelper {
+                                                    implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with FormHelpers with DateOfChangeHelper with Logging {
 
   private def data(credId: String, index: Int, edit: Boolean)(implicit hc: HeaderCarrier)
   : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {
@@ -86,7 +86,7 @@ class WhatDoesYourBusinessDoController @Inject () (
                   }
             }.recover {
                 case _ =>
-                Logger.error(s"[WhatDoesYourBusinessDoController][get] WhatDoesYourBusinessDo($activities) can not be persisted for index = $index")
+                logger.error(s"[WhatDoesYourBusinessDoController][get] WhatDoesYourBusinessDo($activities) can not be persisted for index = $index")
                 NotFound(notFoundView)
               }
           } else {

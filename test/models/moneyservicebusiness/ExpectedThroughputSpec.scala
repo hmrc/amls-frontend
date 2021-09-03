@@ -114,25 +114,25 @@ class ExpectedThroughputSpec extends PlaySpec with MustMatchers{
       }
 
       "write the correct value" in {
-        Json.toJson(ExpectedThroughput.First) must
+        Json.toJson(ExpectedThroughput.First.asInstanceOf[ExpectedThroughput]) must
           be(Json.obj("throughput" -> "01"))
 
-        Json.toJson(ExpectedThroughput.Second) must
+        Json.toJson(ExpectedThroughput.Second.asInstanceOf[ExpectedThroughput]) must
           be(Json.obj("throughput" -> "02"))
 
-        Json.toJson(ExpectedThroughput.Third) must
+        Json.toJson(ExpectedThroughput.Third.asInstanceOf[ExpectedThroughput]) must
           be(Json.obj("throughput" -> "03"))
 
-        Json.toJson(ExpectedThroughput.Fourth) must
+        Json.toJson(ExpectedThroughput.Fourth.asInstanceOf[ExpectedThroughput]) must
           be(Json.obj("throughput" -> "04"))
 
-        Json.toJson(ExpectedThroughput.Fifth) must
+        Json.toJson(ExpectedThroughput.Fifth.asInstanceOf[ExpectedThroughput]) must
           be(Json.obj("throughput" -> "05"))
 
-        Json.toJson(ExpectedThroughput.Sixth) must
+        Json.toJson(ExpectedThroughput.Sixth.asInstanceOf[ExpectedThroughput]) must
           be(Json.obj("throughput" -> "06"))
 
-        Json.toJson(ExpectedThroughput.Seventh) must
+        Json.toJson(ExpectedThroughput.Seventh.asInstanceOf[ExpectedThroughput]) must
           be(Json.obj("throughput" -> "07"))
       }
 

@@ -96,7 +96,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       doc.getElementById("incomplete-description").html() must be("Your application to register with HMRC is incomplete. You have 28 days to complete your application from when you last saved your progress.")
       doc.getElementById("return-to-saved-application").html() must include("Return to your application")
       doc.getElementById("return-to-saved-application").html() must include("for business Name")
-      doc.getElementById("return-to-saved-application").attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
+      doc.getElementById("return-to-saved-application").attr("href") must be(controllers.routes.RegistrationProgressController.get.url)
     }
 
     "contain correct content for status SubmissionWithdrawn" in new ViewFixture {
@@ -212,7 +212,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         doc.getElementById("registration-info").html() must include("You have completed your renewal but have not submitted it. If you do not submit your renewal, your registration with HMRC will expire.")
         doc.getElementById("go-to-about-your-business").html() must include("Check business information and submit renewal")
         doc.getElementById("go-to-about-your-business").html() must include("for business Name")
-        doc.getElementById("go-to-about-your-business").attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
+        doc.getElementById("go-to-about-your-business").attr("href") must be(controllers.routes.RegistrationProgressController.get.url)
       }
 
       "renewal section is incomplete" in new ViewFixture {
@@ -229,7 +229,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         doc.getElementById("registration-info").html() must include("You have started your renewal but have not completed it. If you do not submit your renewal, your registration with HMRC will expire.")
         doc.getElementById("continue-renewal").html() must include("Return to your renewal")
         doc.getElementById("continue-renewal").html() must include("for business Name")
-        doc.getElementById("continue-renewal").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
+        doc.getElementById("continue-renewal").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get.url)
       }
 
       "renewal section is not started (due)" in new ViewFixture {
@@ -246,7 +246,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         doc.getElementById("registration-info").html() must include("Your registration with HMRC will expire on " + DateHelper.formatDate(renewalDate.get) + " unless you renew.")
         doc.getElementById("start-renewal").html() must include("Start your renewal")
         doc.getElementById("start-renewal").html() must include("for business Name")
-        doc.getElementById("start-renewal").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
+        doc.getElementById("start-renewal").attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get.url)
       }
 
       "renewal is submitted" in new ViewFixture {
@@ -281,7 +281,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
       yourBusinessCell.getElementsByClass("heading-small").first().html() must include("Your business")
       yourBusinessCell.getElementById("business-name").html() must include("business Name")
       yourBusinessCell.getElementsMatchingOwnText("Check or update your business information")
-        .attr("href") must be(controllers.routes.RegistrationProgressController.get().url)
+        .attr("href") must be(controllers.routes.RegistrationProgressController.get.url)
     }
 
     "contain your registration status information cell with right content for status SubmissionReadyForReview" in new ViewFixture {
@@ -442,7 +442,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         withdrawOrDeregisterInformation = withdraw_or_deregister_information(SubmissionReadyForReview))
 
       doc.getElementsMatchingOwnText("withdraw your application")
-        .attr("href") must be(controllers.withdrawal.routes.WithdrawApplicationController.get().url)
+        .attr("href") must be(controllers.withdrawal.routes.WithdrawApplicationController.get.url)
     }
 
     "contain deregister link for status SubmissionDecisionApproved" in new ViewFixture {
@@ -457,7 +457,7 @@ class your_registrationSpec extends AmlsViewSpec with MustMatchers with AmlsRefe
         withdrawOrDeregisterInformation = withdraw_or_deregister_information(SubmissionDecisionApproved))
 
       doc.getElementsMatchingOwnText("deregister your business")
-        .attr("href") must be(controllers.deregister.routes.DeRegisterApplicationController.get().url)
+        .attr("href") must be(controllers.deregister.routes.DeRegisterApplicationController.get.url)
     }
   }
 }

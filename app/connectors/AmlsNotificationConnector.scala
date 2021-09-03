@@ -17,16 +17,17 @@
 package connectors
 
 import config.ApplicationConfig
+
 import javax.inject.Inject
 import models.notifications.{NotificationDetails, NotificationRow}
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.HttpReads.Implicits._
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 class AmlsNotificationConnector @Inject()(val http: HttpClient,
-                                          val appConfig: ApplicationConfig) {
+                                          val appConfig: ApplicationConfig) extends Logging {
 
   private[connectors] def baseUrl : String = appConfig.allNotificationsUrl
 
@@ -38,12 +39,12 @@ class AmlsNotificationConnector @Inject()(val http: HttpClient,
     val getUrl = s"$baseUrl/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[AmlsNotificationConnector][fetchAllByAmlsRegNo]"
     // $COVERAGE-OFF$
-    Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
+    logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     // $COVERAGE-ON$
     http.GET[Seq[NotificationRow]](getUrl) map {
       response =>
         // $COVERAGE-OFF$
-        Logger.debug(s"$prefix - Response Body: $response")
+        logger.debug(s"$prefix - Response Body: $response")
         // $COVERAGE-ON$
         response
     }
@@ -57,12 +58,12 @@ class AmlsNotificationConnector @Inject()(val http: HttpClient,
     val getUrl = s"$baseUrl/$accountType/$accountId/safeId/$safeId"
     val prefix = "[AmlsNotificationConnector][fetchAllBySafeId]"
     // $COVERAGE-OFF$
-    Logger.debug(s"$prefix - Request : $safeId")
+    logger.debug(s"$prefix - Request : $safeId")
     // $COVERAGE-ON$
     http.GET[Seq[NotificationRow]](getUrl) map {
       response =>
         // $COVERAGE-OFF$
-        Logger.debug(s"$prefix - Response Body: $response")
+        logger.debug(s"$prefix - Response Body: $response")
         // $COVERAGE-ON$
         response
     }

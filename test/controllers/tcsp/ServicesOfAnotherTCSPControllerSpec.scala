@@ -22,7 +22,7 @@ import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.tcsp.services_of_another_tcsp
@@ -83,7 +83,7 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
               val result = controller.post(true)(newRequest)
 
               status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+              redirectLocation(result) must be(Some(routes.SummaryController.get.url))
             }
           }
 
@@ -100,7 +100,7 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
               val result = controller.post()(newRequest)
 
               status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+              redirectLocation(result) must be(Some(routes.SummaryController.get.url))
             }
           }
 
@@ -175,7 +175,7 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
         val result = controller.post(true)(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
         verify(controller.dataCacheConnector).save(any(), any(),eqTo(Tcsp(doesServicesOfAnotherTCSP = Some(false), hasChanged = true)))(any(),any())
 

@@ -16,7 +16,7 @@
 
 package models.businessdetails
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
@@ -184,10 +184,10 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
     "write the correct value" in {
 
-      Json.toJson(VATRegisteredNo) must
+      Json.toJson(VATRegisteredNo.asInstanceOf[VATRegistered]) must
         be(Json.obj("registeredForVAT" -> false))
 
-      Json.toJson(VATRegisteredYes("12345678")) must
+      Json.toJson(VATRegisteredYes("12345678").asInstanceOf[VATRegistered]) must
         be(Json.obj(
           "registeredForVAT" -> true,
           "vrnNumber" -> "12345678"

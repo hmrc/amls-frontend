@@ -29,7 +29,7 @@ class NoPsrNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
   override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
-    routes.SummaryController.get()
+    routes.SummaryController.get
 
   }
 }
@@ -38,9 +38,9 @@ class NoPsrNumberPageRouterCompanyNotRegistered extends PageRouterCompanyNotRegi
   override def getRoute(credId: String, model: ChangeSubSectorFlowModel, edit: Boolean, includeCompanyNotRegistered: Boolean)
                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
         if (includeCompanyNotRegistered) {
-          routes.CheckCompanyController.get()
+          routes.CheckCompanyController.get
         }else{
-          routes.SummaryController.get()
+          routes.SummaryController.get
         }
       }
 }

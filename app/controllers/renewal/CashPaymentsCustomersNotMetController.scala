@@ -62,7 +62,7 @@ class CashPaymentsCustomersNotMetController @Inject()(val dataCacheConnector: Da
             _ <- updateCashPayments(request.credId, data, renewal)
           } yield data match {
             case CashPaymentsCustomerNotMet(true) => Redirect(routes.HowCashPaymentsReceivedController.get(edit))
-            case CashPaymentsCustomerNotMet(false) => Redirect(routes.SummaryController.get())
+            case CashPaymentsCustomerNotMet(false) => Redirect(routes.SummaryController.get)
           }
       }
     }

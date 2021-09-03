@@ -71,7 +71,7 @@ class RenewRegistrationController @Inject()(val dataCacheConnector: DataCacheCon
                                           amlsRefNo: Option[String],
                                           accountTypeId: (String, String),
                                           credId: String)(implicit hc: HeaderCarrier)= data match {
-    case RenewRegistrationYes => Future.successful(Redirect(controllers.renewal.routes.WhatYouNeedController.get()))
+    case RenewRegistrationYes => Future.successful(Redirect(controllers.renewal.routes.WhatYouNeedController.get))
     case RenewRegistrationNo  => resolveDeclarationDest(amlsRefNo, accountTypeId, credId)
   }
 

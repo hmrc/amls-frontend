@@ -68,7 +68,7 @@ class SendTheLargestAmountsOfMoneyController @Inject()(val dataCacheConnector: D
 
 
   def redirectTo(edit:Boolean, renewal: Renewal) = edit match {
-    case true if !mostTransactionsDataRequired(renewal)  => Redirect(routes.SummaryController.get())
+    case true if !mostTransactionsDataRequired(renewal)  => Redirect(routes.SummaryController.get)
     case _ => Redirect(routes.MostTransactionsController.get(edit))
   }
 

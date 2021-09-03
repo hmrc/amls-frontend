@@ -25,7 +25,7 @@ import models.businessmatching.{BusinessMatching, BusinessType}
 import models.status.SubmissionReady
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -115,7 +115,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
       }
     }
   }

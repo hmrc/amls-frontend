@@ -104,7 +104,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
     }
 
     "fail with validation error when mandatory field is missing" in new Fixture {

@@ -61,7 +61,7 @@ class WhoIsYourAccountantUkAddressController @Inject()(val dataCacheConnector: D
               businessActivity.whoIsYourAccountant(businessActivity.flatMap(ba => ba.whoIsYourAccountant).map(acc => acc.copy(address = Option(data))))
             )
           } yield if (edit) {
-            Redirect(routes.SummaryController.get())
+            Redirect(routes.SummaryController.get)
           } else {
             Redirect(routes.TaxMattersController.get())
           }

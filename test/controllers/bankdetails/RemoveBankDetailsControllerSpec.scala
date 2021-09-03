@@ -21,13 +21,12 @@ import models.bankdetails._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.html.bankdetails.remove_bank_details
 
-class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
+class RemoveBankDetailsControllerSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
@@ -95,7 +94,7 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.remove(1)(request)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(controllers.bankdetails.routes.YourBankAccountsController.get().url))
+      redirectLocation(result) must be (Some(controllers.bankdetails.routes.YourBankAccountsController.get.url))
 
       verify(controller.dataCacheConnector).save[Seq[BankDetails]](
         any(),

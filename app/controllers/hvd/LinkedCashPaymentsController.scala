@@ -60,7 +60,7 @@ class LinkedCashPaymentsController @Inject() ( val dataCacheConnector: DataCache
                 hvd.linkedCashPayment(data)
               )
             } yield edit match {
-              case true  => Redirect(routes.SummaryController.get())
+              case true  => Redirect(routes.SummaryController.get)
               case false => Redirect(routes.ReceiveCashPaymentsController.get())
             }
         }

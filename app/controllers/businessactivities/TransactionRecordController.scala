@@ -64,7 +64,7 @@ class TransactionRecordController @Inject()(val authAction: AuthAction,
             case (false, true) => Redirect(routes.TransactionTypesController.get())
             case (false, false) => Redirect(routes.IdentifySuspiciousActivityController.get())
             case (true, true) if businessActivity.transactionRecordTypes.isEmpty => Redirect(routes.TransactionTypesController.get(edit))
-            case _ => Redirect(routes.SummaryController.get())
+            case _ => Redirect(routes.SummaryController.get)
           }
         }
       }
