@@ -1,5 +1,5 @@
 @*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,11 @@
 @import models.businessmatching.BusinessActivities
 @import models.businessmatching.BusinessMatchingMsbServices
 @import models.businessmatching.MoneyServiceBusiness
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcNewTabLink
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablink.NewTabLink
 
-@this(whatyouneed: include.whatyouneed)
+@this(whatyouneed: include.whatyouneed,
+      hmrcNewTabLink: HmrcNewTabLink)
 
 @(index: Int, activities: Option[BusinessActivities], msbServices: Option[BusinessMatchingMsbServices])(implicit request: Request[_], m: Messages, lang: Lang, appConfig: ApplicationConfig)
 
@@ -37,8 +40,17 @@
     heading = header
 ) {
     @components.user_attention_saving()
-
-    <p>@Html(Messages("tradingpremises.virtualoffice.text_1"))</p>
+    <p>
+        @Messages("tradingpremises.virtualoffice.text_1.1")
+        @hmrcNewTabLink(
+            NewTabLink(
+                classList = Some("govuk-link"),
+                href=Some(Messages("tradingpremises.virtualoffice.text_1.1.link")),
+                text=Messages("tradingpremises.virtualoffice.text_1.1.link.text")
+            )
+        )
+        @Messages("tradingpremises.virtualoffice.text_1.2")
+    </p>
     <p>@Messages("tradingpremises.virtualoffice.text_2")</p>
     <p>@Messages("tradingpremises.virtualoffice.text_3")</p>
     <p>@Messages("tradingpremises.whatyouneed.requiredinfo.heading")</p>

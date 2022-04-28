@@ -1,5 +1,5 @@
 @*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,12 @@
 @import include._
 @import forms2._
 @import config.{ ApplicationConfig}
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcNewTabLink
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablink.NewTabLink
 
-@this(main: include.main)
+@this(main: include.main,
+      hmrcNewTabLink: HmrcNewTabLink
+     )
 
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
@@ -28,7 +32,17 @@
 }
 
 @supportingContent = {
-@Html(Messages("tcsp.servicesOfAnotherTcsp.hint"))
+    <p>
+        @Messages("tcsp.servicesOfAnotherTcsp.hint.1")
+        @hmrcNewTabLink(
+            NewTabLink(
+                classList = Some("govuk-link"),
+                href=Some(Messages("tcsp.servicesOfAnotherTcsp.hint.1.link")),
+                text=Messages("tcsp.servicesOfAnotherTcsp.hint.1.link.text")
+            )
+        )
+        @Messages("tcsp.servicesOfAnotherTcsp.hint.2")
+    </p>
 }
 
 @main(

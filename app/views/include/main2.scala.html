@@ -1,5 +1,5 @@
 @*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,13 @@
 @import config.{ApplicationConfig}
 @import views.html.layouts.GovUkTemplate
 @import views.ViewHelpers
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcNewTabLink
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablink.NewTabLink
 
 @this(govUkTemplate: GovUkTemplate,
-        viewHelpers: ViewHelpers)
+        viewHelpers: ViewHelpers,
+        hmrcNewTabLink: HmrcNewTabLink
+)
 
 @(
     title: String,
@@ -97,9 +101,13 @@
             <div class="full-width-banner__title">
                 @Messages("urr.title")
             </div>
-            <a href="https://zwgy80l7.optimalworkshop.com/chalkmark/235k8r00" target="_blank">
-                @Messages("urr.clicktest")
-            </a>
+            @hmrcNewTabLink(
+                NewTabLink(
+                    classList = Some("govuk-link"),
+                    href=Some("https://zwgy80l7.optimalworkshop.com/chalkmark/235k8r00"),
+                    text=Messages("urr.clicktest")
+                )
+            )
             <a class="full-width-banner__close" href="#" role="button">
                 @Messages("urr.nothanks")
             </a>
@@ -113,10 +121,13 @@
             <div class="centered-content">
                 <div class="notice-banner__wrapper amls-notice-banner__wrapper">
                     <div class="grid-layout__column--1-4 bold">
-                        <a class="notice-banner__content"
-                        href="https://www.gov.uk/government/publications/guidance-to-employers-and-businesses-about-covid-19"
-                        id="recruitment-page-link" data-journey-click="link - click:Your business taxes:Public Announcement" target="_blank"
-                        rel="noopener">Coronavirus (COVID-19): what you need to do</a>
+                        @hmrcNewTabLink(
+                            NewTabLink(
+                                classList = Some("notice-banner__content"),
+                                href=Some("https://www.gov.uk/government/publications/guidance-to-employers-and-businesses-about-covid-19"),
+                                text=Messages("Coronavirus (COVID-19): what you need to do")
+                            )
+                        )
                     </div>
                     <div class="grid-layout__column--1-4 text--right">
                         <a id="dismiss-user-panel" class="notice-banner__close notice-banner__content" href="#"
