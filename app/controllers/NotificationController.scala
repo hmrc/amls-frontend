@@ -32,7 +32,7 @@ import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName}
 import views.html.notifications.your_messages
-import views.notifications.{V1M0, V2M0, V3M0, V4M0}
+import views.notifications.{V1M0, V2M0, V3M0, V4M0, V5M0}
 
 import scala.concurrent.Future
 
