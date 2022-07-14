@@ -72,12 +72,14 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
       implicit request =>
         stubsService.getMongoCacheData(fileName) flatMap {
           case Some(data) =>
+            println("inside data::"+data)
             removeCacheData(request.credId) flatMap { _ =>
               stubsService.update(request.credId, data) map { _ =>
                 Redirect(controllers.routes.LandingController.get)
               }
             }
-          case _ => Future.successful(BadRequest)
+          case _ =>  println("inside _::")
+            Future.successful(BadRequest)
         }
   }
 

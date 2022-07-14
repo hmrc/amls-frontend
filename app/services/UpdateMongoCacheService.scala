@@ -78,12 +78,17 @@ class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: Da
   def getMongoCacheData(fileName: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Option[UpdateMongoCacheResponse]] = {
     val requestUrl = s"${applicationConfig.mongoCacheUpdateUrl}$fileName"
 
+    println("inside requesturl is ::"+requestUrl)
+    println("inside getMongoCacheData")
     http.GET[UpdateMongoCacheResponse](requestUrl)
       .map { r =>
+        println(" r is ::"+r)
         Some(r.copy(dataImport = Some(DataImport(fileName)))) }
       .recover {
-        case e: UpstreamErrorResponse if e.statusCode == 404 => None
-        case e => throw e
+        case e: UpstreamErrorResponse if e.statusCode == 404 => println(" insde case 404exception::"+e)
+          None
+        case e =>  println(" insde exception::"+e)
+          throw e
       }
   }
 }

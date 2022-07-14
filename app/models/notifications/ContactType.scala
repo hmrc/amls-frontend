@@ -36,6 +36,7 @@ object ContactType {
   case object ReminderToPayForVariation extends ContactType
   case object ReminderToPayForManualCharges extends ContactType
   case object RenewalReminder extends ContactType
+  case object NewRenewalReminder extends ContactType
 
   case object MindedToReject extends ContactType
   case object MindedToRevoke extends ContactType
@@ -63,6 +64,7 @@ object ContactType {
       case JsString("APR1") => JsSuccess(RenewalApproval)
       case JsString("EXPR") => JsSuccess(AutoExpiryOfRegistration)
       case JsString("RREM") => JsSuccess(RenewalReminder)
+      case JsString("RREM2") => JsSuccess(NewRenewalReminder)
       case JsString("RPA1") => JsSuccess(ReminderToPayForApplication)
       case JsString("RPR1") => JsSuccess(ReminderToPayForRenewal)
       case JsString("RPV1") => JsSuccess(ReminderToPayForVariation)
@@ -88,6 +90,7 @@ object ContactType {
       case ReminderToPayForRenewal => JsString("RPR1")
       case ReminderToPayForVariation => JsString("RPV1")
       case ReminderToPayForManualCharges => JsString("RPM1")
+      case NewRenewalReminder => JsString("RREM2")
       case _ => JsString("")
     }
 
@@ -116,6 +119,7 @@ object ContactType {
         case "ApplicationAutorejectionForFailureToPay" => ContactType.ApplicationAutorejectionForFailureToPay
         case "DeRegistrationEffectiveDateChange" => ContactType.DeRegistrationEffectiveDateChange
         case "NoSubject" => ContactType.NoSubject
+        case "NewRenewalReminder" => ContactType.NewRenewalReminder
         case _ => throw new RuntimeException("No correct contact type")
       }
     }

@@ -43,7 +43,9 @@ class CompanyRegistrationNumberController@Inject()(authAction: AuthAction,
       implicit request =>
         (for {
           bm <- businessMatchingService.getModel(request.credId)
+          _ = println(" bm is ::"+bm)
           status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId,request.credId))
+          _ = println(" status is ::"+status)
         } yield {
           val form: Form2[CompanyRegistrationNumber] = bm.companyRegistrationNumber map
             Form2[CompanyRegistrationNumber] getOrElse EmptyForm
