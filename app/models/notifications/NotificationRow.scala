@@ -74,7 +74,8 @@ case class NotificationRow(
          ReminderToPayForVariation |
          ReminderToPayForRenewal |
          ReminderToPayForManualCharges |
-         RenewalReminder => "notifications.type.reminder"
+         RenewalReminder |
+         NewRenewalReminder => "notifications.type.reminder"
     case _ => "notifications.type.communication"
   }
 

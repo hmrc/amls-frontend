@@ -51,17 +51,20 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
                                        v1m0: V1M0,
                                        v2m0: V2M0,
                                        v3m0: V3M0,
-                                       v4m0: V4M0
+                                       v4m0: V4M0,
+                                       v5m0: V5M0
                                       ) extends AmlsBaseController(ds, cc) {
 
-  def notificationsMap(templateVersion: String, templateName: String) =
+  def notificationsMap(templateVersion: String, templateName: String) = {
     templateVersion match {
       case "v1m0" => version1Notifications(templateName)
       case "v2m0" => version2Notifications(templateName)
       case "v3m0" => version3Notifications(templateName)
       case "v4m0" => version4Notifications(templateName)
+      case "v5m0" => version5Notifications(templateName)
       case _ => throw new RuntimeException(s"Notification version $templateVersion not found")
     }
+  }
 
   def version1Notifications(templateName: String) = {
     templateName match {
@@ -115,6 +118,19 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
     }
   }
 
+  def version5Notifications(templateName: String) = {
+    templateName match {
+      case "message_details" => v5m0.message_details
+      case "minded_to_reject" => v5m0.minded_to_reject
+      case "minded_to_revoke" => v5m0.minded_to_revoke
+      case "no_longer_minded_to_reject" => v5m0.no_longer_minded_to_reject
+      case "no_longer_minded_to_revoke" => v5m0.no_longer_minded_to_revoke
+      case "rejection_reasons" => v5m0.rejection_reasons
+      case "revocation_reasons" => v5m0.revocation_reasons
+      case _ => throw new RuntimeException(s"Message template $templateName not found")
+    }
+  }
+
   def getMessages = authAction.async {
       implicit request =>
         request.amlsRefNumber match {
@@ -141,12 +157,16 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
       businessName <- BusinessName.getName(credId, Some(safeId), accountTypeId)
       records: Seq[NotificationRow] <- OptionT.liftF(amlsNotificationService.getNotifications(safeId, accountTypeId))
     } yield {
+      println(" records are ::"+records)
       val currentRecordsWithIndexes = (for {
         amls <- refNumber
       } yield records.zipWithIndex.filter(_._1.amlsRegistrationNumber == amls)) getOrElse records.zipWithIndex
       val previousRecordsWithIndexes = (for {
         amls <- refNumber
       } yield records.zipWithIndex.filter(_._1.amlsRegistrationNumber != amls)) getOrElse Seq()
+
+      println("currentRecordsWithIndexes :: "+currentRecordsWithIndexes)
+      println("previousRecordsWithIndexes :: "+previousRecordsWithIndexes)
       Ok(your_messages(businessName, currentRecordsWithIndexes, previousRecordsWithIndexes))
     }) getOrElse (throw new Exception("Cannot retrieve business name"))
   }
