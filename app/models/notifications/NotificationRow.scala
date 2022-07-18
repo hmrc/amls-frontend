@@ -54,6 +54,9 @@ case class NotificationRow(
       val cType = ContactTypeHelper.getContactType(status, contactType, variation)
       cType match {
         case ApplicationAutorejectionForFailureToPay => "notifications.fail.title"
+        case RenewalReminder if templatePackageVersion == "v5m0" => s"notifications.subject.$cType.v5"
+        case ReminderToPayForRenewal if templatePackageVersion == "v5m0" => s"notifications.subject.$cType.v5"
+        case AutoExpiryOfRegistration if templatePackageVersion == "v5m0" => s"notifications.subject.$cType.v5"
         case _ => s"notifications.subject.$cType"
       }
     }

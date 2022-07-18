@@ -223,11 +223,11 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
         (status, contactType) match {
           case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) => {
             render("message_details", NotificationParams(
-              msgTitle = details.subject, msgContent = msgText, safeId = safeId.some), templateVersion)
+              msgTitle = details.subject(templateVersion), msgContent = msgText, safeId = safeId.some), templateVersion)
           }
           case _ =>
             render("message_details", NotificationParams(
-              msgTitle = details.subject, msgContent = msgText), templateVersion)
+              msgTitle = details.subject(templateVersion), msgContent = msgText), templateVersion)
         }
     }
     Ok(notification)
