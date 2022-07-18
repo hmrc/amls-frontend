@@ -19,6 +19,8 @@ package views.notifications.v5m0
 import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, Request}
+import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.notifications.v5m0.minded_to_revoke
@@ -26,10 +28,11 @@ import views.html.notifications.v5m0.minded_to_revoke
 class minded_to_revokeSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    lazy val minded_to_revoke = app.injector.instanceOf[minded_to_revoke]
-    implicit val requestWithToken = addTokenForView()
+    lazy val minded_to_revoke: minded_to_revoke = app.injector.instanceOf[minded_to_revoke]
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = addTokenForView()
 
-    val notificationParams = NotificationParams(msgContent = "msgContent", businessName = Some("Fake Name Ltd."), amlsRefNo = Some("amlsRegNo"))
+    val notificationParams: NotificationParams = NotificationParams(
+      msgContent = "msgContent", businessName = Some("Fake Name Ltd."), amlsRefNo = Some("amlsRegNo"))
 
   }
 
@@ -37,7 +40,7 @@ class minded_to_revokeSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = minded_to_revoke(notificationParams)
+      def view: HtmlFormat.Appendable = minded_to_revoke(notificationParams)
 
       doc.title must be("Revocation being considered" +
         " - " + "Your registration" +
@@ -47,7 +50,7 @@ class minded_to_revokeSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = minded_to_revoke(notificationParams)
+      def view: HtmlFormat.Appendable = minded_to_revoke(notificationParams)
 
       heading.html must be("Revocation being considered")
       subHeading.html must include("Your registration")
@@ -56,7 +59,7 @@ class minded_to_revokeSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct content, businessName and reference displayed" in new ViewFixture {
 
-      def view = minded_to_revoke(notificationParams)
+      def view: HtmlFormat.Appendable = minded_to_revoke(notificationParams)
 
       doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("amlsRegNo"))
     }
@@ -64,7 +67,7 @@ class minded_to_revokeSpec extends AmlsViewSpec with MustMatchers {
 
     "have a back link" in new ViewFixture {
 
-      def view = minded_to_revoke(notificationParams)
+      def view: HtmlFormat.Appendable = minded_to_revoke(notificationParams)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
