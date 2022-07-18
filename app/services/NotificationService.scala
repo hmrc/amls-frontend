@@ -118,14 +118,16 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
       .getDeclaredConstructor().newInstance().asInstanceOf[{ def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String }]
 
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId) map {
-      case Some(notificationDetails) => {
+      case Some(notificationDetails) =>
         for {
           message <- notificationDetails.messageText
           details <- NotificationDetails.convertEndDateMessageText(message)
         } yield {
 
           val endDate: String =
-          if(templateVersion == "v5m0") details.endDate.toString("dd-MM-yyyy") else details.endDate.toString
+          if(templateVersion == "v5m0" && (contactType == ContactType.RenewalReminder || contactType == ContactType.NewRenewalReminder))
+            details.endDate.toString("dd-MM-yyyy")
+          else details.endDate.toString
 
           notificationDetails.copy(messageText = Some(endDateMessage.endDate(
             contactType,
@@ -134,7 +136,6 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
             ""
           )))
         }
-      }
       case _ => None
     }
   }

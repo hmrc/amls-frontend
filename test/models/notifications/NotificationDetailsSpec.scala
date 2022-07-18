@@ -67,31 +67,31 @@ class NotificationDetailsSpec extends PlaySpec with MustMatchers {
 
     "return the correct contactType when contactType is present" in {
       val details = NotificationDetails(Some(ContactType.AutoExpiryOfRegistration), None, None, false, dateTime)
-      details.subject mustBe "notifications.subject.AutoExpiryOfRegistration"
+      details.subject("v4mo") mustBe "notifications.subject.AutoExpiryOfRegistration"
     }
 
     "return the correct subject string" when {
 
       "the contact type is DeRegistrationEffectiveDateChange" in {
         val details = NotificationDetails(None, Some(Status(Some(DeRegistered), None)), None, false, dateTime)
-        details.subject mustBe "notifications.subject.DeRegistrationEffectiveDateChange"
+        details.subject("v4mo") mustBe "notifications.subject.DeRegistrationEffectiveDateChange"
       }
 
       "the contact type is ApplicationAutorejectionForFailureToPay" in {
         val details = NotificationDetails(None, Some(Status(None, Some(FailedToPayCharges))), None, false, dateTime)
-        details.subject mustBe "notifications.subject.ApplicationAutorejectionForFailureToPay"
+        details.subject("v4mo") mustBe "notifications.subject.ApplicationAutorejectionForFailureToPay"
       }
 
       "the contact type is RegistrationVariationApproval" in {
         val details = NotificationDetails(None, None, None, true, dateTime)
-        details.subject mustBe "notifications.subject.RegistrationVariationApproval"
+        details.subject("v4mo") mustBe "notifications.subject.RegistrationVariationApproval"
       }
 
     }
 
     "return return the no subject when the contact type cannot be figured out" in {
       val details = NotificationDetails(None, None, None, false, dateTime)
-      details.subject mustBe "notifications.subject.NoSubject"
+      details.subject("v4mo") mustBe "notifications.subject.NoSubject"
     }
 
   }
