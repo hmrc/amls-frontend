@@ -123,9 +123,13 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
           message <- notificationDetails.messageText
           details <- NotificationDetails.convertEndDateMessageText(message)
         } yield {
+
+          val endDate: String =
+          if(templateVersion == "v5m0") details.endDate.toString("dd-MM-yyyy") else details.endDate.toString
+
           notificationDetails.copy(messageText = Some(endDateMessage.endDate(
             contactType,
-            details.endDate.toString,
+            endDate,
             controllers.routes.StatusController.get().url,
             ""
           )))
