@@ -34,9 +34,7 @@ class textAreaSpec extends PlaySpec with AmlsViewSpec {
       val result: String = textarea(ValidField(Path(List(KeyPathNode("key"))), Seq(""))).toString()
       val html: Document = Jsoup.parse(result)
       println(html)
-
       val hintText: String = html.getElementById("key-info").text()
-
       hintText mustBe "You can enter up to 200 characters"
     }
   }

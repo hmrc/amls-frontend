@@ -95,7 +95,6 @@ class StatusController @Inject()(val landingService: LandingService,
                      (implicit request: Request[AnyContent]) = {
     for {
       refNo <- enrolmentsService.amlsRegistrationNumber(amlsRefNumber, groupIdentifier)
-      _ = println(" ref no is ::"+refNo)
       statusInfo <- statusService.getDetailedStatus(refNo, accountTypeId, credId)
       statusResponse <- Future(statusInfo._2)
       maybeBusinessName <- getBusinessName(credId, statusResponse.fold(none[String])(_.safeId), accountTypeId).value
@@ -131,18 +130,14 @@ class StatusController @Inject()(val landingService: LandingService,
                                   (implicit request: Request[AnyContent]) = {
     statusInfo match {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
-        println(" inside case 1")
         getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission, accountTypeId, cacheId, activities, unreadNotifications)
       case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
            (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
            (SubmissionWithdrawn, _) | (DeRegistered, _) =>
-        println(" inside case 2")
         Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, accountTypeId, unreadNotifications))
       case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
-        println(" inside case 3")
         getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, cacheId, unreadNotifications)
-      case (_, _) => println(" inside case _")
-        Future.successful(
+      case (_, _) => Future.successful(
         Ok(your_registration(
           regNo = mlrRegNumber.getOrElse(""),
           businessName = businessNameOption,
