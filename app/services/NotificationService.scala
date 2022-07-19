@@ -53,9 +53,16 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
       case ContactType.ApplicationApproval => handleEndDateWithRefMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
 
       case ContactType.RenewalApproval |
-           ContactType.AutoExpiryOfRegistration |
-           ContactType.RenewalReminder |
-           ContactType.NewRenewalReminder => handleEndDateMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
+           ContactType.AutoExpiryOfRegistration => handleEndDateMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
+
+      case ContactType.RenewalReminder |
+           ContactType.NewRenewalReminder => {
+        templateVersion match {
+          case "v5m0"  => handleEndDateMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
+          case "v1m0" | "v2m0" | "v3m0" | "v4m0" | "v5m0 " => handleEndDateMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
+          case _ => throw new Exception(s"Unknown template version $templateVersion")
+        }
+      }
 
       case _ => (for {
         details <- OptionT(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId))
@@ -123,15 +130,9 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
           message <- notificationDetails.messageText
           details <- NotificationDetails.convertEndDateMessageText(message)
         } yield {
-
-          val endDate: String =
-          if(templateVersion == "v5m0" && (contactType == ContactType.RenewalReminder || contactType == ContactType.NewRenewalReminder))
-            details.endDate.toString("dd-MM-yyyy")
-          else details.endDate.toString
-
           notificationDetails.copy(messageText = Some(endDateMessage.endDate(
             contactType,
-            endDate,
+            details.endDate.toString,
             controllers.routes.StatusController.get().url,
             ""
           )))

@@ -18,7 +18,6 @@ package models.notifications
 
 import cats.implicits._
 import models.confirmation.Currency
-import models.notifications.ContactType.{AutoExpiryOfRegistration, ReminderToPayForRenewal, RenewalReminder}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import play.api.libs.json._
@@ -32,14 +31,13 @@ case class NotificationDetails(contactType: Option[ContactType],
 
   val cType = ContactTypeHelper.getContactType(status, contactType, variation)
 
-  def subject(templateVersion: String) = {
-    cType match {
-      case RenewalReminder if templateVersion == "v5m0" => s"notifications.subject.$cType.v5"
-      case ReminderToPayForRenewal if templateVersion == "v5m0" => s"notifications.subject.$cType.v5"
-      case AutoExpiryOfRegistration if templateVersion == "v5m0" => s"notifications.subject.$cType.v5"
-      case _ => s"notifications.subject.$cType"
+  def subject(templateVersion: String) =
+    templateVersion match {
+      case "v1m0" | "v2m0" | "v3m0" | "v4m0" => s"notifications.subject.$cType"
+      case "v5m0" => s"notifications.subject.v5.$cType"
+      case _ => throw new Exception(s"Unknown template version $templateVersion")
     }
-  }
+
 
   def dateReceived = {
     val fmt: DateTimeFormatter = DateTimeFormat.forPattern("d MMMM Y")
