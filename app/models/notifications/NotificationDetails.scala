@@ -31,7 +31,13 @@ case class NotificationDetails(contactType: Option[ContactType],
 
   val cType = ContactTypeHelper.getContactType(status, contactType, variation)
 
-  def subject = s"notifications.subject.$cType"
+  def subject(templateVersion: String) =
+    templateVersion match {
+      case "v1m0" | "v2m0" | "v3m0" | "v4m0" => s"notifications.subject.$cType"
+      case "v5m0" => s"notifications.subject.v5.$cType"
+      case _ => throw new Exception(s"Unknown template version $templateVersion")
+    }
+
 
   def dateReceived = {
     val fmt: DateTimeFormatter = DateTimeFormat.forPattern("d MMMM Y")

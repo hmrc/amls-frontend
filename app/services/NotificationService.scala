@@ -31,7 +31,8 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
 
   def getNotifications(safeId: String, accountTypeId: (String, String))(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Seq[NotificationRow]] =
     amlsNotificationConnector.fetchAllBySafeId(safeId, accountTypeId) map {
-      case notifications@(_::_) => notifications.sortWith((x, y) => x.receivedAt.isAfter(y.receivedAt))
+      case notifications@(_::_) =>
+        notifications.sortWith((x, y) => x.receivedAt.isAfter(y.receivedAt))
       case notifications => notifications
     }
 
@@ -53,7 +54,8 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
 
       case ContactType.RenewalApproval |
            ContactType.AutoExpiryOfRegistration |
-           ContactType.RenewalReminder => handleEndDateMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
+           ContactType.RenewalReminder |
+           ContactType.NewRenewalReminder => handleEndDateMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
 
       case _ => (for {
         details <- OptionT(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId))
@@ -116,7 +118,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
       .getDeclaredConstructor().newInstance().asInstanceOf[{ def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String }]
 
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId) map {
-      case Some(notificationDetails) => {
+      case Some(notificationDetails) =>
         for {
           message <- notificationDetails.messageText
           details <- NotificationDetails.convertEndDateMessageText(message)
@@ -128,7 +130,6 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
             ""
           )))
         }
-      }
       case _ => None
     }
   }

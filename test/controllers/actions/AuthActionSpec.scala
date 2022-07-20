@@ -259,9 +259,9 @@ object AuthActionSpec extends AmlsReferenceNumberGenerator{
     new ~ (new ~(new ~(new ~(enrolmentsCtInactive, Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Agent)), Some("groupIdentifier")), Some(User))
   )
 
-  private def emptyAuthRetrievals = Future.successful(
-    new ~(new ~(new ~(Enrolments(Set()), Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Organisation)), Some("groupIdentifier"))
-  )
+//  private def emptyAuthRetrievals = Future.successful(
+//    new ~(new ~(new ~(Enrolments(Set()), Some(Credentials("gg", "cred-1234"))), Some(AffinityGroup.Organisation)), Some("groupIdentifier"))
+//  )
   private def erroneousRetrievals = Future.successful(
     new ~ (new ~(new ~(new ~(Enrolments(Set()), None), Some(AffinityGroup.Organisation)), Some("groupIdentifier")), Some(User))
   )

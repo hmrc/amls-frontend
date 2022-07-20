@@ -77,7 +77,6 @@ class UpdateMongoCacheService @Inject()(http: HttpClient, val cacheConnector: Da
 
   def getMongoCacheData(fileName: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Option[UpdateMongoCacheResponse]] = {
     val requestUrl = s"${applicationConfig.mongoCacheUpdateUrl}$fileName"
-
     http.GET[UpdateMongoCacheResponse](requestUrl)
       .map { r =>
         Some(r.copy(dataImport = Some(DataImport(fileName)))) }

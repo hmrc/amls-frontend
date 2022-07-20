@@ -2626,12 +2626,16 @@ notifications.subject.RejectionReasons = Your application has been refused
 notifications.subject.ApplicationAutorejectionForFailureToPay = Application Auto-Rejection for Failure to Pay
 notifications.subject.RevocationReasons = Registration Revocation
 notifications.subject.AutoExpiryOfRegistration = Your supervision has expired
+notifications.subject.v5.AutoExpiryOfRegistration = Cancellation of registration
 
 notifications.subject.ReminderToPayForApplication = Reminder to pay - Application
 notifications.subject.ReminderToPayForVariation = Reminder to pay - Variation
 notifications.subject.ReminderToPayForRenewal = Reminder to pay - Renewal
+notifications.subject.v5.ReminderToPayForRenewal = Reminder to pay your annual fee
 notifications.subject.ReminderToPayForManualCharges = Reminder to pay - Manual Charge
 notifications.subject.RenewalReminder = Reminder to Renew
+notifications.subject.v5.RenewalReminder = Reminder to pay your annual fee
+notifications.subject.NewRenewalReminder = Notification that your annual fee is due
 
 notifications.subject.MindedToReject = Refusal of Application being Considered
 notifications.subject.MindedToRevoke = Revocation of Registration being Considered

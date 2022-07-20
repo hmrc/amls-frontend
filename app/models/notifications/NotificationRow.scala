@@ -41,7 +41,7 @@ case class NotificationRow(
   }
 
   def subject: String = contactType match {
-    case Some(RejectionReasons) => {
+    case Some(RejectionReasons) =>
       (for {
         st <- status
         sr <- st.statusReason match {
@@ -49,14 +49,16 @@ case class NotificationRow(
           case _ => None
         }
       } yield sr) getOrElse "notifications.fail.title"
-    }
-    case _ => {
+
+    case _ =>
       val cType = ContactTypeHelper.getContactType(status, contactType, variation)
-      cType match {
-        case ApplicationAutorejectionForFailureToPay => "notifications.fail.title"
-        case _ => s"notifications.subject.$cType"
+      templatePackageVersion match {
+        case _ if cType == ApplicationAutorejectionForFailureToPay => "notifications.fail.title"
+        case "v1m0" | "v2m0" | "v3m0" | "v4m0" => s"notifications.subject.$cType"
+        case "v5m0" => s"notifications.subject.v5.$cType"
+        case _ => throw new Exception(s"Unknown template version $templatePackageVersion")
       }
-    }
+
   }
 
   def notificationType: String = ContactTypeHelper.getContactType(status, contactType, variation) match {
@@ -74,7 +76,8 @@ case class NotificationRow(
          ReminderToPayForVariation |
          ReminderToPayForRenewal |
          ReminderToPayForManualCharges |
-         RenewalReminder => "notifications.type.reminder"
+         RenewalReminder |
+         NewRenewalReminder => "notifications.type.reminder"
     case _ => "notifications.type.communication"
   }
 

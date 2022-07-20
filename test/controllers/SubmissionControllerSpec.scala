@@ -381,8 +381,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
           controller.renewalService.getRenewal(any[String]())(any(), any())
         } thenReturn Future.successful(None)
 
-        val result = await(controller.post()(request))
-
+       await(controller.post()(request))
         verify(controller.subscriptionService).variation(any[String](), any(), any())(any(), any())
         verify(controller.subscriptionService, never()).renewal(any(), any(), any(), any())(any(), any())
       }

@@ -35,13 +35,13 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.mvc.{AnyContentAsEmpty, Request, Result}
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.notifications.your_messages
-import views.notifications.{V1M0, V2M0, V3M0, V4M0}
-
+import views.notifications.{V1M0, V2M0, V3M0, V4M0, V5M0}
 
 import scala.concurrent.Future
 
@@ -51,22 +51,22 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
   trait Fixture extends DependencyMocks { self =>
 
-    val request = addToken(authRequest)
+    val request: Request[AnyContentAsEmpty.type] = addToken(authRequest)
 
-    val registrationDate = LocalDateTime.now()
-    val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false, safeId = Some("X123456789123"))
-    val statusResponseBad = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false, safeId = None)
+    val registrationDate: LocalDateTime = LocalDateTime.now()
+    val statusResponse: ReadStatusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false, safeId = Some("X123456789123"))
+    val statusResponseBad: ReadStatusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false, safeId = None)
 
-    val testNotifications = NotificationRow(
+    val testNotifications: NotificationRow = NotificationRow(
       status = None,
       contactType = None,
       contactNumber = None,
       variation = true,
       receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
-      false,
-      amlsRegistrationNumber,
-      "v1m0",
-      IDType("132456")
+      isRead = false,
+      amlsRegistrationNumber = amlsRegistrationNumber,
+      templatePackageVersion = "v1m0",
+      _id = IDType("132456")
     )
 
     val testList = Seq(
@@ -90,15 +90,16 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       testNotifications.copy(amlsRegistrationNumber = "anotherstring")
     )
 
-    val mockAuthEnrolmentsService = mock[AuthEnrolmentsService]
-    val mockAmlsConnector = mock[AmlsConnector]
-    val mockNotificationService = mock[NotificationService]
-    val mockBusinessMatchingService = mock[BusinessMatchingService]
-    lazy val first = app.injector.instanceOf[V1M0]
-    lazy val second = app.injector.instanceOf[V2M0]
-    lazy val third = app.injector.instanceOf[V3M0]
-    lazy val fourth = app.injector.instanceOf[V4M0]
-    lazy val view = app.injector.instanceOf[your_messages]
+    val mockAuthEnrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
+    val mockAmlsConnector: AmlsConnector = mock[AmlsConnector]
+    val mockNotificationService: NotificationService = mock[NotificationService]
+    val mockBusinessMatchingService: BusinessMatchingService = mock[BusinessMatchingService]
+    lazy val first: V1M0 = app.injector.instanceOf[V1M0]
+    lazy val second: V2M0 = app.injector.instanceOf[V2M0]
+    lazy val third: V3M0 = app.injector.instanceOf[V3M0]
+    lazy val fourth: V4M0 = app.injector.instanceOf[V4M0]
+    lazy val fifth: V5M0 = app.injector.instanceOf[V5M0]
+    lazy val view: your_messages = app.injector.instanceOf[your_messages]
     val controller = new NotificationController(
       authEnrolmentsService = mockAuthEnrolmentsService,
       statusService = mockStatusService,
@@ -114,7 +115,8 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       v1m0 = first,
       v2m0 = second,
       v3m0 = third,
-      v4m0 = fourth)
+      v4m0 = fourth,
+      v5m0 = fifth)
 
     val controllerWithFailedAuthAction = new NotificationController(
       authEnrolmentsService = mockAuthEnrolmentsService,
@@ -131,20 +133,21 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       v1m0 = first,
       v2m0 = second,
       v3m0 = third,
-      v4m0 = fourth)
+      v4m0 = fourth,
+      v5m0 = fifth)
 
-    val mockBusinessMatching = mock[BusinessMatching]
-    val mockReviewDetails = mock[ReviewDetails]
+    val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
+    val mockReviewDetails: ReviewDetails = mock[ReviewDetails]
     val testBusinessName = "Ubunchews Accountancy Services"
 
-    val testReviewDetails = ReviewDetails(
+    val testReviewDetails: ReviewDetails = ReviewDetails(
       testBusinessName,
       Some(BusinessType.LimitedCompany),
       Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")),
       "XE0001234567890"
     )
 
-    val testBusinessMatch = BusinessMatching(
+    val testBusinessMatch: BusinessMatching = BusinessMatching(
       reviewDetails = Some(testReviewDetails)
     )
 
@@ -176,7 +179,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       when(mockNotificationService.getNotifications(any(), any())(any(), any()))
         .thenReturn(Future.successful(testList))
 
-      val result = controller.getMessages()(request)
+      val result: Future[Result] = controller.getMessages()(request)
 
       status(result) mustBe OK
     }
@@ -205,10 +208,10 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       when(mockStatusService.getReadStatus(any[Option[String]](), any[(String, String)]())(any(), any()))
         .thenReturn(Future.successful(statusResponseBad))
 
-      val result = controllerWithFailedAuthAction.getMessages()(request)
+      val result: Future[Result] = controllerWithFailedAuthAction.getMessages()(request)
 
       status(result) mustBe OK
-      contentAsString(result) must not include(Messages("notifications.previousReg"))
+      contentAsString(result) must not include Messages("notifications.previousReg")
     }
 
     "respond with an error message when a valid safeId cannot be found (AuthEnrolmentsService doesn't return value)" in new Fixture {
@@ -235,18 +238,18 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
       "contactType is ApplicationAutorejectionForFailureToPay" in new Fixture {
 
-        val notificationDetails = NotificationDetails(
-          Some(ApplicationAutorejectionForFailureToPay),
-          None,
-          Some("Message Text"),
-          false,
-          dateTime
+        val notificationDetails: NotificationDetails = NotificationDetails(
+          contactType = Some(ApplicationAutorejectionForFailureToPay),
+          status = None,
+          messageText = Some("Message Text"),
+          variation = false,
+          receivedAt = dateTime
         )
 
         when(mockNotificationService.getMessageDetails(any(), any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails(
+        val result: Future[Result] = controller.messageDetails(
           "dfgdhsjk",
           ContactType.ApplicationAutorejectionForFailureToPay,
           amlsRegistrationNumber,
@@ -259,20 +262,20 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
       "contactType is ReminderToPayForVariation" in new Fixture {
 
-        val reminderVariationMessage = Messages("notification.reminder-to-pay-variation", Currency(1234), "ABC1234")
+        val reminderVariationMessage: String = Messages("notification.reminder-to-pay-variation", Currency(1234), "ABC1234")
 
-        val notificationDetails = NotificationDetails(
-          Some(ReminderToPayForVariation),
-          None,
-          Some(reminderVariationMessage),
-          false,
-          dateTime
+        val notificationDetails: NotificationDetails = NotificationDetails(
+          contactType = Some(ReminderToPayForVariation),
+          status = None,
+          messageText = Some(reminderVariationMessage),
+          variation = false,
+          receivedAt = dateTime
         )
 
         when(mockNotificationService.getMessageDetails(any(), any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("dfgdhsjk", ContactType.ReminderToPayForVariation, amlsRegistrationNumber, "v1m0")(request)
+        val result: Future[Result] = controller.messageDetails("dfgdhsjk", ContactType.ReminderToPayForVariation, amlsRegistrationNumber, "v1m0")(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(
@@ -286,18 +289,18 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       "contact is MTRV" in new Fixture {
 
         val msgTxt = "Considering revokation"
-        val notificationDetails = NotificationDetails(
-          Some(MindedToRevoke),
-          None,
-          Some(msgTxt),
-          false,
-          dateTime
+        val notificationDetails: NotificationDetails = NotificationDetails(
+          contactType = Some(MindedToRevoke),
+          status = None,
+          messageText = Some(msgTxt),
+          variation = false,
+          receivedAt = dateTime
         )
 
         when(mockNotificationService.getMessageDetails(any(), any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.MindedToRevoke, amlsRegistrationNumber, "v1m0")(request)
+        val result: Future[Result] = controller.messageDetails("id", ContactType.MindedToRevoke, amlsRegistrationNumber, "v1m0")(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(msgTxt)
@@ -311,18 +314,18 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       "contact is MTRJ" in new Fixture {
 
         val msgTxt = "Considering revokation"
-        val notificationDetails = NotificationDetails(
-          Some(MindedToReject),
-          None,
-          Some(msgTxt),
-          false,
-          dateTime
+        val notificationDetails: NotificationDetails = NotificationDetails(
+          contactType = Some(MindedToReject),
+          status = None,
+          messageText = Some(msgTxt),
+          variation = false,
+          receivedAt = dateTime
         )
 
         when(mockNotificationService.getMessageDetails(any(), any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.MindedToReject, amlsRegistrationNumber, "v1m0")(request)
+        val result: Future[Result] = controller.messageDetails("id", ContactType.MindedToReject, amlsRegistrationNumber, "v1m0")(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(msgTxt)
@@ -335,7 +338,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       "contact is REJR" in new Fixture {
 
         val msgTxt = "Rejected"
-        val notificationDetails = NotificationDetails(
+        val notificationDetails: NotificationDetails = NotificationDetails(
           Some(RejectionReasons),
           None,
           Some(msgTxt),

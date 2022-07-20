@@ -32,7 +32,7 @@ import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName}
 import views.html.notifications.your_messages
-import views.notifications.{V1M0, V2M0, V3M0, V4M0}
+import views.notifications.{V1M0, V2M0, V3M0, V4M0, V5M0}
 
 import scala.concurrent.Future
 
@@ -51,17 +51,20 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
                                        v1m0: V1M0,
                                        v2m0: V2M0,
                                        v3m0: V3M0,
-                                       v4m0: V4M0
+                                       v4m0: V4M0,
+                                       v5m0: V5M0
                                       ) extends AmlsBaseController(ds, cc) {
 
-  def notificationsMap(templateVersion: String, templateName: String) =
+  def notificationsMap(templateVersion: String, templateName: String) = {
     templateVersion match {
       case "v1m0" => version1Notifications(templateName)
       case "v2m0" => version2Notifications(templateName)
       case "v3m0" => version3Notifications(templateName)
       case "v4m0" => version4Notifications(templateName)
+      case "v5m0" => version5Notifications(templateName)
       case _ => throw new RuntimeException(s"Notification version $templateVersion not found")
     }
+  }
 
   def version1Notifications(templateName: String) = {
     templateName match {
@@ -111,6 +114,19 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
       case "no_longer_minded_to_revoke" => v4m0.no_longer_minded_to_revoke
       case "rejection_reasons" => v4m0.rejection_reasons
       case "revocation_reasons" => v4m0.revocation_reasons
+      case _ => throw new RuntimeException(s"Message template $templateName not found")
+    }
+  }
+
+  def version5Notifications(templateName: String) = {
+    templateName match {
+      case "message_details" => v5m0.message_details
+      case "minded_to_reject" => v5m0.minded_to_reject
+      case "minded_to_revoke" => v5m0.minded_to_revoke
+      case "no_longer_minded_to_reject" => v5m0.no_longer_minded_to_reject
+      case "no_longer_minded_to_revoke" => v5m0.no_longer_minded_to_revoke
+      case "rejection_reasons" => v5m0.rejection_reasons
+      case "revocation_reasons" => v5m0.revocation_reasons
       case _ => throw new RuntimeException(s"Message template $templateName not found")
     }
   }
@@ -207,11 +223,11 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
         (status, contactType) match {
           case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) => {
             render("message_details", NotificationParams(
-              msgTitle = details.subject, msgContent = msgText, safeId = safeId.some), templateVersion)
+              msgTitle = details.subject(templateVersion), msgContent = msgText, safeId = safeId.some), templateVersion)
           }
           case _ =>
             render("message_details", NotificationParams(
-              msgTitle = details.subject, msgContent = msgText), templateVersion)
+              msgTitle = details.subject(templateVersion), msgContent = msgText), templateVersion)
         }
     }
     Ok(notification)

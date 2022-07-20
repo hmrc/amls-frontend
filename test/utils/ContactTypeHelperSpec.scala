@@ -106,18 +106,18 @@ class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
 
       "return NoSubject when ContactType not determined" in {
         val model = NotificationRow(
-          Some(
+          status = Some(
             Status(
               Some(StatusType.Approved), None
             )),
-          None,
-          None,
-          false,
-          new DateTime(1479730062573L, DateTimeZone.UTC),
-          false,
-          "XJML00000200000",
-          "1",
-          new IDType("5832e38e01000001005ca3ff"
+          contactType = None,
+          contactNumber = None,
+          variation = false,
+          receivedAt = new DateTime(1479730062573L, DateTimeZone.UTC),
+          isRead = false,
+          amlsRegistrationNumber = "XJML00000200000",
+          templatePackageVersion = "v1m0",
+          _id = new IDType("5832e38e01000001005ca3ff"
           ))
 
         ContactTypeHelper.getContactType(model.status, model.contactType, model.variation) mustBe NoSubject
