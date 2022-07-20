@@ -53,16 +53,9 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
       case ContactType.ApplicationApproval => handleEndDateWithRefMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
 
       case ContactType.RenewalApproval |
-           ContactType.AutoExpiryOfRegistration => handleEndDateMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
-
-      case ContactType.RenewalReminder |
-           ContactType.NewRenewalReminder => {
-        templateVersion match {
-          case "v5m0"  => handleEndDateMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
-          case "v1m0" | "v2m0" | "v3m0" | "v4m0" | "v5m0 " => handleEndDateMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
-          case _ => throw new Exception(s"Unknown template version $templateVersion")
-        }
-      }
+           ContactType.AutoExpiryOfRegistration |
+           ContactType.RenewalReminder |
+           ContactType.NewRenewalReminder => handleEndDateMessage(amlsRegNo, id, contactType, templateVersion, accountTypeId)
 
       case _ => (for {
         details <- OptionT(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId))
