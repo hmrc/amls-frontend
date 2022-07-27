@@ -2635,7 +2635,7 @@ notifications.subject.v5.ReminderToPayForRenewal = Reminder to pay your annual f
 notifications.subject.ReminderToPayForManualCharges = Reminder to pay - Manual Charge
 notifications.subject.RenewalReminder = Reminder to Renew
 notifications.subject.v5.RenewalReminder = Reminder to pay your annual fee
-notifications.subject.NewRenewalReminder = Notification that your annual fee is due
+notifications.subject.v5.NewRenewalReminder = Notification that your annual fee is due
 
 notifications.subject.MindedToReject = Refusal of Application being Considered
 notifications.subject.MindedToRevoke = Revocation of Registration being Considered
