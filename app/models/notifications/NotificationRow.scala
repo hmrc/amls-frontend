@@ -17,6 +17,7 @@
 package models.notifications
 
 import models.notifications.ContactType._
+import models.notifications.NotificationDetails.isContactTypev5
 import models.notifications.RejectedReason._
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import org.joda.time.{DateTime, DateTimeZone}
@@ -56,13 +57,12 @@ case class NotificationRow(
         case _ if cType == ApplicationAutorejectionForFailureToPay => "notifications.fail.title"
         case "v1m0" | "v2m0" | "v3m0" | "v4m0" => s"notifications.subject.$cType"
         case "v5m0" if(isContactTypev5(cType))=> s"notifications.subject.v5.$cType"
+        case "v5m0" => s"notifications.subject.$cType"
         case _ => throw new Exception(s"Unknown template version $templatePackageVersion")
       }
 
   }
 
-  private def isContactTypev5(contactType: ContactType) = (contactType == RenewalReminder || contactType == NewRenewalReminder ||
-    contactType == ReminderToPayForRenewal || contactType == AutoExpiryOfRegistration)
 
   def notificationType: String = ContactTypeHelper.getContactType(status, contactType, variation) match {
     case ApplicationApproval |

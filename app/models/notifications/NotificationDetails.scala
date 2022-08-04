@@ -18,6 +18,8 @@ package models.notifications
 
 import cats.implicits._
 import models.confirmation.Currency
+import models.notifications.ContactType._
+import models.notifications.NotificationDetails.isContactTypev5
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import play.api.libs.json._
@@ -34,7 +36,8 @@ case class NotificationDetails(contactType: Option[ContactType],
   def subject(templateVersion: String) =
     templateVersion match {
       case "v1m0" | "v2m0" | "v3m0" | "v4m0" => s"notifications.subject.$cType"
-      case "v5m0" => s"notifications.subject.v5.$cType"
+      case "v5m0" if(isContactTypev5(cType))=> s"notifications.subject.v5.$cType"
+      case "v5m0" => s"notifications.subject.$cType"
       case _ => throw new Exception(s"Unknown template version $templateVersion")
     }
 
@@ -93,6 +96,9 @@ object NotificationDetails {
       new DateTime(dateTime, DateTimeZone.UTC)
     }
   }
+
+  def isContactTypev5(contactType: ContactType) = (contactType == RenewalReminder || contactType == NewRenewalReminder ||
+    contactType == ReminderToPayForRenewal || contactType == AutoExpiryOfRegistration)
 
   implicit val reads = Json.reads[NotificationDetails]
 
