@@ -2619,35 +2619,52 @@ notifications.type.reminder = Reminder
 notifications.type.communication = Communication
 
 notifications.subject.ApplicationApproval = Application Approval
+notifications.subject.v5.ApplicationApproval = Application Approval
 notifications.subject.RegistrationVariationApproval = Registration Variation Approval
+notifications.subject.v5.RegistrationVariationApproval = Registration Variation Approval
 notifications.subject.RenewalApproval = Renewal Approval
-
+notifications.subject.v5.RenewalApproval = Renewal Approval
 notifications.subject.RejectionReasons = Your application has been refused
+notifications.subject.v5.RejectionReasons = Your application has been refused
 notifications.subject.ApplicationAutorejectionForFailureToPay = Application Auto-Rejection for Failure to Pay
+notifications.subject.v5.ApplicationAutorejectionForFailureToPay = Application Auto-Rejection for Failure to Pay
 notifications.subject.RevocationReasons = Registration Revocation
+notifications.subject.v5.RevocationReasons = Registration Revocation
 notifications.subject.AutoExpiryOfRegistration = Your supervision has expired
 notifications.subject.v5.AutoExpiryOfRegistration = Cancellation of registration
 
 notifications.subject.ReminderToPayForApplication = Reminder to pay - Application
+notifications.subject.v5.ReminderToPayForApplication = Reminder to pay - Application
 notifications.subject.ReminderToPayForVariation = Reminder to pay - Variation
+notifications.subject.v5.ReminderToPayForVariation = Reminder to pay - Variation
 notifications.subject.ReminderToPayForRenewal = Reminder to pay - Renewal
 notifications.subject.v5.ReminderToPayForRenewal = Reminder to pay your annual fee
 notifications.subject.ReminderToPayForManualCharges = Reminder to pay - Manual Charge
+notifications.subject.v5.ReminderToPayForManualCharges = Reminder to pay - Manual Charge
 notifications.subject.RenewalReminder = Reminder to Renew
 notifications.subject.v5.RenewalReminder = Reminder to pay your annual fee
 notifications.subject.v5.NewRenewalReminder = Notification that your annual fee is due
 
 notifications.subject.MindedToReject = Refusal of Application being Considered
+notifications.subject.v5.MindedToReject = Refusal of Application being Considered
 notifications.subject.MindedToRevoke = Revocation of Registration being Considered
+notifications.subject.v5.MindedToRevoke = Revocation of Registration being Considered
 notifications.subject.NoLongerMindedToReject = No longer considering refusal
+notifications.subject.v5.NoLongerMindedToReject = No longer considering refusal
 notifications.subject.NoLongerMindedToRevoke = No longer considering revocation
+notifications.subject.v5.NoLongerMindedToRevoke = No longer considering revocation
 notifications.subject.Others = Message about your supervision
+notifications.subject.v5.Others = Message about your supervision
 
 notifications.subject.RegistrationVariationApproval = Registration Variation Approval
+notifications.subject.v5.RegistrationVariationApproval = Registration Variation Approval
 notifications.subject.ApplicationAutorejectionForFailureToPay = Your application has failed
+notifications.subject.v5.ApplicationAutorejectionForFailureToPay = Your application has failed
 notifications.subject.DeRegistrationEffectiveDateChange = Your de-registration date has been changed
+notifications.subject.v5.DeRegistrationEffectiveDateChange = Your de-registration date has been changed
 
 notifications.subject.NoSubject = <no subject>
+notifications.subject.v5.NoSubject = <no subject>
 
 notifications.previousReg = Messages from your previous registrations
 
