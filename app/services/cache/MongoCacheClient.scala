@@ -19,20 +19,19 @@ package services.cache
 import config.ApplicationConfig
 import connectors.cache.Conversions
 
+import play.api.Logging
 import javax.inject.Inject
-import org.joda.time.{DateTime, DateTimeZone}
+import java.time.{LocalDateTime, ZoneOffset}
+import java.time.format.DateTimeFormatter
 import play.api.libs.json._
-import play.modules.reactivemongo.ReactiveMongoComponent
-import reactivemongo.api.DefaultDB
-import reactivemongo.api.commands.WriteResult
-import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.{BSONDocument, BSONObjectID}
-import reactivemongo.play.json.ImplicitBSONHandlers._
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.mongo.ReactiveRepository
-import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import org.mongodb.scala.model.{Filters, FindOneAndUpdateOptions, IndexModel, IndexOptions, Indexes, ReturnDocument}
+import org.mongodb.scala.bson.BsonDocument
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -41,7 +40,7 @@ import scala.util.{Failure, Success, Try}
 // $COVERAGE-OFF$
 // Coverage has been turned off for these types, as the only things we can really do with them
 // is mock out the mongo connection, which is bad craic. This has all been manually tested in the running application.
-case class Cache(id: String, data: Map[String, JsValue], lastUpdated: DateTime = DateTime.now(DateTimeZone.UTC)) {
+case class Cache(id: String, data: Map[String, JsValue], lastUpdated: LocalDateTime = LocalDateTime.now(ZoneOffset.UTC)) {
 
   /**
     * Upsert a value into the cache given its key.
@@ -57,13 +56,13 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: DateTime =
 
     this.copy(
       data = updated,
-      lastUpdated = DateTime.now(DateTimeZone.UTC)
+      lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
     )
   }
 }
 
 object Cache {
-  implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
+  implicit val dateFormat = MongoJavatimeFormats.localDateTimeFormat
   implicit val format = Json.format[Cache]
 
   def apply(cacheMap: CacheMap): Cache = Cache(cacheMap.id, cacheMap.data)
@@ -86,7 +85,7 @@ class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(
 /**
   * An injectible factory for creating new MongoCacheClients
   */
-class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCrypto: ApplicationCrypto, component: ReactiveMongoComponent) {
+class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCrypto: ApplicationCrypto, mongo: MongoComponent) {
   def createClient: MongoCacheClient = new MongoCacheClient(config, component.mongoConnector.db, applicationCrypto)
 }
 
@@ -95,10 +94,22 @@ class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCr
   *
   * @param appConfig The application configuration
   */
-class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applicationCrypto: ApplicationCrypto)
-  extends ReactiveRepository[Cache, BSONObjectID]("app-cache", db, Cache.format)
+class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: ApplicationCrypto, mongo: MongoComponent)
+  extends PlayMongoRepository[Cache](
+    mongoComponent = mongo,
+    collectionName = "app-cache",
+    domainFormat = Cache.format,
+    indexes = Seq(
+      IndexModel(
+        Indexes.ascending(HttpResponseCacheKey.NAME),
+        IndexOptions()
+          .name("httpResponseCacheKeyIndex")
+          .unique(true))
+    )
+  )
     with Conversions
     with CacheOps
+    with Logging
 {
 
   private val logPrefix = "[MongoCacheClient]"
@@ -135,11 +146,11 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
       val updatedCache: Cache = cache.copy(
         id = credId,
         data = cache.data + (key -> jsonData),
-        lastUpdated = DateTime.now(DateTimeZone.UTC)
+        lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
       )
 
       val document = Json.toJson(updatedCache)
-      val modifier = BSONDocument("$set" -> document)
+      val modifier = BsonDocument("$set" -> document)
 
       collection.update(ordered = false).one(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
     }
@@ -156,11 +167,11 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
 
       val updatedCache = cache.copy(
         data = cache.data - (key),
-        lastUpdated = DateTime.now(DateTimeZone.UTC)
+        lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
       )
 
       val document = Json.toJson(updatedCache)
-      val modifier = BSONDocument("$set" -> document)
+      val modifier = BsonDocument("$set" -> document)
 
       collection.update(ordered = false).one(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
     }
@@ -240,7 +251,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
       }
     })
 
-    collection.update(ordered = false).one(bsonIdQuery(cache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
+    collection.update(ordered = false).one(bsonIdQuery(cache.id), BsonDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
   }
 
   def saveAll(cache: Cache, credId: String): Future[Boolean] = {
@@ -255,7 +266,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
       }
     })
 
-    collection.update(ordered = false).one(bsonIdQuery(rebuiltCache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
+    collection.update(ordered = false).one(bsonIdQuery(rebuiltCache.id), BsonDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
   }
 
   /**
@@ -265,7 +276,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
     collection.indexesManager.ensure(Index(
       Seq((field, IndexType.Ascending)),
       Some(indexName),
-      options = BSONDocument("expireAfterSeconds" -> ttl))
+      options = BsonDocument("expireAfterSeconds" -> ttl))
     ) map { result =>
       debug(s"Index $indexName set with value $ttl -> result: $result")
       result
@@ -277,7 +288,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
   /**
     * Generates a BSON document query for an id
     */
-  private def bsonIdQuery(id: String) = BSONDocument("_id" -> id)
+  private def bsonIdQuery(id: String) = BsonDocument("_id" -> id)
 
   private def key(id: String) = bsonIdQuery(id)
 
