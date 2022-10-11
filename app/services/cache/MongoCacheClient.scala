@@ -32,7 +32,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-import org.mongodb.scala.model.{Filters, FindOneAndUpdateOptions, IndexModel, IndexOptions, Indexes, ReturnDocument}
+import org.mongodb.scala.model.{Filters, FindOneAndUpdateOptions, IndexModel, IndexOptions, Indexes, ReturnDocument, Updates}
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
@@ -146,7 +146,6 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
     } else {
       Json.toJson(data)
     }
-
     fetchAll(Some(credId)) flatMap { maybeNewCache =>
 
       val cache: Cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
@@ -158,9 +157,11 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
       )
 
       val document = Json.toJson(updatedCache)
-      val modifier = BsonDocument("$set" -> document)
-
-      collection.update(ordered = false).one(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
+        collection.findOneAndUpdate(
+        filter=bsonIdQuery(credId),
+        update = BsonDocument(Json.toJson(document).toString()),
+        options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+        ).toFuture
     }
   }
 
@@ -179,9 +180,11 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
       )
 
       val document = Json.toJson(updatedCache)
-      val modifier = BsonDocument("$set" -> document)
-
-      collection.update(ordered = false).one(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
+      collection.findOneAndUpdate(
+        filter=bsonIdQuery(credId),
+        update = BsonDocument(Json.toJson(document).toString()),
+        options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+      ).toFuture
     }
   }
 
@@ -215,19 +218,17 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
   /**
     * Fetches the whole cache
     */
-  def fetchAll(credId: String): Future[Option[Cache]] = collection.find(bsonIdQuery(credId), Option.empty[Cache]).one[Cache] map {
-    case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
-    case c => c
+
+  def fetchAll(credId: String): Future[Option[Cache]] = collection
+    .find(filter = Filters.equal("_id" ,credId)).toFuture().map {
+    case c if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c.head, compositeSymmetricCrypto))
+    case _      => None
   }
 
-  def fetchAll(credId: Option[String]): Future[Option[Cache]] = {
-    credId match {
-      case Some(x) => collection.find(key(x), Option.empty[Cache]).one[Cache] map {
-        case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
-        case c => c
-      }
-      case _ => Future.successful(None)
-    }
+  def fetchAll(credId: Option[String]): Future[Option[Cache]] = collection
+    .find(filter = Filters.equal("_id" ,credId)).toFuture().map {
+    case c if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c.head, compositeSymmetricCrypto))
+    case _      => None
   }
 
   /**
@@ -241,8 +242,11 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
   /**
     * Removes the item with the specified id from the cache
     */
-  def removeById(credId: String) =
-    collection.deleteOne(key(credId)) map handleWriteResult
+  def removeById(credId: String):Future[Boolean] =
+    collection.findOneAndDelete(key(credId)).toFuture()
+      .map { result => true
+      }
+      .recover { case _ => false }
 
   /**
     * Saves the cache data into the database
@@ -258,8 +262,11 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
         acc + (value._1 -> Json.parse(plainText.value))
       }
     })
-
-    collection.update(ordered = false).one(bsonIdQuery(cache.id), BsonDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
+    collection.findOneAndUpdate(
+      filter=bsonIdQuery(cache.id),
+      update = Updates.set("cache",rebuiltCache),
+      options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+    ).toFuture.map(result => true)
   }
 
   def saveAll(cache: Cache, credId: String): Future[Boolean] = {
@@ -274,8 +281,11 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
       }
     })
 
-//    collection.update(ordered = false).one(bsonIdQuery(rebuiltCache.id), BsonDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
-    collection.updateOne(bsonIdQuery(rebuiltCache.id), rebuiltCache).toFuture()
+    collection.findOneAndUpdate(
+      filter=bsonIdQuery(cache.id),
+      update = Updates.set("cache",rebuiltCache),
+      options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+    ).toFuture.map(result => true)
   }
 
   /**
