@@ -16,10 +16,12 @@
 
 package services.cache
 
+import cats.data.State.set
+import com.mongodb.bulk.BulkWriteResult
 import config.ApplicationConfig
 import connectors.cache.Conversions
-
 import play.api.Logging
+
 import javax.inject.Inject
 import java.time.{LocalDateTime, ZoneOffset}
 import java.time.format.DateTimeFormatter
@@ -32,9 +34,14 @@ import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import org.mongodb.scala.model.{Filters, FindOneAndUpdateOptions, IndexModel, IndexOptions, Indexes, ReturnDocument}
 import org.mongodb.scala.bson.BsonDocument
+import org.mongodb.scala.bson.conversions.Bson
+import org.mongodb.scala.model.Filters.equal
+import play.api.http.Status.OK
+import play.shaded.ahc.org.asynchttpclient.Dsl.options
 
+import scala.collection.script.Index
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 // $COVERAGE-OFF$
@@ -86,7 +93,7 @@ class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(
   * An injectible factory for creating new MongoCacheClients
   */
 class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCrypto: ApplicationCrypto, mongo: MongoComponent) {
-  def createClient: MongoCacheClient = new MongoCacheClient(config, component.mongoConnector.db, applicationCrypto)
+  def createClient: MongoCacheClient = new MongoCacheClient(config, applicationCrypto, mongo: MongoComponent)
 }
 
 /**
@@ -94,6 +101,7 @@ class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCr
   *
   * @param appConfig The application configuration
   */
+
 class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: ApplicationCrypto, mongo: MongoComponent)
   extends PlayMongoRepository[Cache](
     mongoComponent = mongo,
@@ -101,7 +109,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
     domainFormat = Cache.format,
     indexes = Seq(
       IndexModel(
-        Indexes.ascending(HttpResponseCacheKey.NAME),
+        Indexes.ascending("name"),
         IndexOptions()
           .name("httpResponseCacheKeyIndex")
           .unique(true))
@@ -234,7 +242,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
     * Removes the item with the specified id from the cache
     */
   def removeById(credId: String) =
-    collection.delete().one(key(credId)) map handleWriteResult
+    collection.deleteOne(key(credId)) map handleWriteResult
 
   /**
     * Saves the cache data into the database
@@ -266,24 +274,34 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
       }
     })
 
-    collection.update(ordered = false).one(bsonIdQuery(rebuiltCache.id), BsonDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
+//    collection.update(ordered = false).one(bsonIdQuery(rebuiltCache.id), BsonDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
+    collection.updateOne(bsonIdQuery(rebuiltCache.id), rebuiltCache).toFuture()
   }
 
   /**
     * Creates a new index on the specified field, using the specified name and the ttl
     */
+//  private def createIndex(field: String, indexName: String, ttl: Int): Future[Boolean] = {
+//    collection.indexesManager.ensure(Index(
+//      Seq((field, IndexType.Ascending)),
+//      Some(indexName)
+//      options = BsonDocument("expireAfterSeconds" -> ttl))
+//    ) map { result =>
+//      debug(s"Index $indexName set with value $ttl -> result: $result")
+//      result
+//    } recover {
+//      case e => error("Failed to set TTL index", e); false
+//    }
+//  }
   private def createIndex(field: String, indexName: String, ttl: Int): Future[Boolean] = {
-    collection.indexesManager.ensure(Index(
-      Seq((field, IndexType.Ascending)),
-      Some(indexName),
-      options = BsonDocument("expireAfterSeconds" -> ttl))
-    ) map { result =>
-      debug(s"Index $indexName set with value $ttl -> result: $result")
-      result
-    } recover {
-      case e => error("Failed to set TTL index", e); false
-    }
+    collection.createIndex(Indexes.ascending(field)).toFuture() map { result =>
+            debug(s"Index $indexName set with value $ttl -> result: $result")
+            true
+          } recover {
+            case e => error("Failed to set TTL index", e); false
+          }
   }
+
 
   /**
     * Generates a BSON document query for an id
@@ -295,11 +313,8 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
   /**
     * Handles logging for write results
     */
-  private def handleWriteResult(writeResult: WriteResult) = writeResult match {
-    case w if w.ok => true
-    case w if w.writeErrors.nonEmpty =>
-      w.writeErrors.map(_.errmsg).foreach(e => error(e))
-      throw new RuntimeException(w.writeErrors.map(_.errmsg).mkString("; "))
+  private def handleWriteResult(writeResult: BulkWriteResult) = writeResult match {
+    case w if w.wasAcknowledged() => true
     case _ =>
       throw new RuntimeException("Error while removing the session data")
   }
