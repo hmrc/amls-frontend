@@ -30,10 +30,10 @@ import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.mongo.MongoComponent
-import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import org.mongodb.scala.model.{Filters, FindOneAndUpdateOptions, IndexModel, IndexOptions, Indexes, ReturnDocument, Updates}
-import org.mongodb.scala.bson.BsonDocument
+import org.mongodb.scala.bson.{BsonDocument, codecs}
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import play.api.http.Status.OK
@@ -109,10 +109,10 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
     domainFormat = Cache.format,
     indexes = Seq(
       IndexModel(
-        Indexes.ascending("name"),
+        Indexes.ascending("lastUpdated"),
         IndexOptions()
-          .name("httpResponseCacheKeyIndex")
-          .unique(true))
+          .name("cacheExpiry")
+          .unique(false))
     )
   )
     with Conversions
@@ -120,6 +120,15 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
     with Logging
 {
 
+  createIndex("lastUpdated", "cacheExpiry", cacheExpiryInSeconds)
+  private def createIndex(field: String, indexName: String, ttl: Int): Future[Boolean] = {
+    collection.createIndex(Indexes.ascending(field)).toFuture() map { result =>
+      debug(s"Index $indexName set with value $ttl -> result: $result")
+      true
+    } recover {
+      case e => error("Failed to set TTL index", e); false
+    }
+  }
   private val logPrefix = "[MongoCacheClient]"
 
   // $COVERAGE-OFF$
@@ -134,7 +143,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
 
   val cacheExpiryInSeconds: Int = appConfig.cacheExpiryInSeconds
 
-  createIndex("lastUpdated", "cacheExpiry", cacheExpiryInSeconds)
+
 
   /**
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.
@@ -159,7 +168,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
       val document = Json.toJson(updatedCache)
         collection.findOneAndUpdate(
         filter=bsonIdQuery(credId),
-        update = BsonDocument(Json.toJson(document).toString()),
+        update = Updates.set(credId,Codecs.toBson(document)),
         options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
         ).toFuture
     }
@@ -182,7 +191,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
       val document = Json.toJson(updatedCache)
       collection.findOneAndUpdate(
         filter=bsonIdQuery(credId),
-        update = BsonDocument(Json.toJson(document).toString()),
+        update = Updates.set(credId,Codecs.toBson(document)),
         options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       ).toFuture
     }
@@ -220,13 +229,13 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
     */
 
   def fetchAll(credId: String): Future[Option[Cache]] = collection
-    .find(filter = Filters.equal("_id" ,credId)).toFuture().map {
+    .find(filter = Filters.equal("_id" ,Codecs.toBson(credId))).toFuture().map {
     case c if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c.head, compositeSymmetricCrypto))
     case _      => None
   }
 
   def fetchAll(credId: Option[String]): Future[Option[Cache]] = collection
-    .find(filter = Filters.equal("_id" ,credId)).toFuture().map {
+    .find(filter = Filters.equal("_id" ,Codecs.toBson(credId))).toFuture().map {
     case c if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c.head, compositeSymmetricCrypto))
     case _      => None
   }
@@ -263,8 +272,8 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
       }
     })
     collection.findOneAndUpdate(
-      filter=bsonIdQuery(cache.id),
-      update = Updates.set("cache",rebuiltCache),
+      filter= equal("_id" ,Codecs.toBson(cache.id)),
+      update = Updates.set("data",Codecs.toBson(rebuiltCache)),
       options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
     ).toFuture.map(result => true)
   }
@@ -282,8 +291,8 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
     })
 
     collection.findOneAndUpdate(
-      filter=bsonIdQuery(cache.id),
-      update = Updates.set("cache",rebuiltCache),
+      filter= equal("_id" ,Codecs.toBson(cache.id)),
+      update = Updates.set(credId,Codecs.toBson(rebuiltCache)),
       options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
     ).toFuture.map(result => true)
   }
@@ -291,26 +300,6 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
   /**
     * Creates a new index on the specified field, using the specified name and the ttl
     */
-//  private def createIndex(field: String, indexName: String, ttl: Int): Future[Boolean] = {
-//    collection.indexesManager.ensure(Index(
-//      Seq((field, IndexType.Ascending)),
-//      Some(indexName)
-//      options = BsonDocument("expireAfterSeconds" -> ttl))
-//    ) map { result =>
-//      debug(s"Index $indexName set with value $ttl -> result: $result")
-//      result
-//    } recover {
-//      case e => error("Failed to set TTL index", e); false
-//    }
-//  }
-  private def createIndex(field: String, indexName: String, ttl: Int): Future[Boolean] = {
-    collection.createIndex(Indexes.ascending(field)).toFuture() map { result =>
-            debug(s"Index $indexName set with value $ttl -> result: $result")
-            true
-          } recover {
-            case e => error("Failed to set TTL index", e); false
-          }
-  }
 
 
   /**
