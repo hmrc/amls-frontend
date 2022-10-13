@@ -16,32 +16,25 @@
 
 package services.cache
 
-import cats.data.State.set
 import com.mongodb.bulk.BulkWriteResult
 import config.ApplicationConfig
 import connectors.cache.Conversions
+import org.mongodb.scala.bson.BsonDocument
+import org.mongodb.scala.model.Filters.equal
+import org.mongodb.scala.model._
 import play.api.Logging
-
-import javax.inject.Inject
-import java.time.{LocalDateTime, ZoneOffset}
-import java.time.format.DateTimeFormatter
 import play.api.libs.json._
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.mongo.MongoComponent
-import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-import org.mongodb.scala.model.{Filters, FindOneAndUpdateOptions, IndexModel, IndexOptions, Indexes, ReturnDocument, Updates}
-import org.mongodb.scala.bson.{BsonDocument, codecs}
-import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.model.Filters.equal
-import play.api.http.Status.OK
-import play.shaded.ahc.org.asynchttpclient.Dsl.options
+import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
-import scala.collection.script.Index
+import java.time.{LocalDateTime, ZoneOffset}
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 // $COVERAGE-OFF$
@@ -166,10 +159,10 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
       )
 
       val document = Json.toJson(updatedCache)
-        collection.findOneAndUpdate(
+        collection.findOneAndReplace(
         filter=bsonIdQuery(credId),
-        update = Updates.set(credId,Codecs.toBson(document)),
-        options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+        replacement = updatedCache,
+        options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
         ).toFuture
     }
   }
@@ -189,10 +182,10 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
       )
 
       val document = Json.toJson(updatedCache)
-      collection.findOneAndUpdate(
+      collection.findOneAndReplace(
         filter=bsonIdQuery(credId),
-        update = Updates.set(credId,Codecs.toBson(document)),
-        options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+        replacement = updatedCache,
+        options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       ).toFuture
     }
   }
