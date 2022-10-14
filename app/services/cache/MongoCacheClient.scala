@@ -157,16 +157,10 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
 
       val cache: Cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
 
-      val updatedCache: Cache = cache.copy(
-        id = credId,
-        data = cache.data + (key -> jsonData),
-        lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
-      )
-
-      val document = Json.toJson(updatedCache)
+      val document = Json.toJson(cache.data + (key -> jsonData))
       collection.findOneAndUpdate(
-        filter=bsonIdQuery(credId),
-        update = Updates.set("data",Codecs.toBson(document)),
+        filter=Filters.eq("_id" , credId),
+        update = Updates.combine(Updates.set("data",Codecs.toBson(document)),Updates.set("lastUpdated",LocalDateTime.now(ZoneOffset.UTC))),
         options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       ).toFuture
     }
@@ -187,11 +181,12 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
       )
 
       val document = Json.toJson(updatedCache)
-      collection.findOneAndReplace(
+      collection.findOneAndUpdate(
         filter=bsonIdQuery(credId),
-        replacement = updatedCache,
-        options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+        update = Updates.set("data",Codecs.toBson(updatedCache)),
+        options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       ).toFuture
+
     }
   }
 
@@ -227,14 +222,14 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
     */
 
   def fetchAll(credId: String): Future[Option[Cache]] = collection.find(filter = Filters.equal(
-    "id" ,Codecs.toBson(credId))).toFuture().map {
+    "_id" ,Codecs.toBson(credId))).toFuture().map {
     case c if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c.head, compositeSymmetricCrypto))
     case _      => None
   }
 
   def fetchAll(credId: Option[String]): Future[Option[Cache]] = {
     credId match {
-      case Some(x) => collection.find (filter = Filters.equal ("id", Codecs.toBson(x))).toFuture ().map {
+      case Some(x) => collection.find (filter = Filters.equal ("_id", Codecs.toBson(x))).toFuture ().map {
         case c if appConfig.mongoEncryptionEnabled => Some (new CryptoCache (c.head, compositeSymmetricCrypto) )
         case _ => None
       }
@@ -274,7 +269,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
       }
     })
     collection.findOneAndUpdate(
-      filter= equal("id" ,Codecs.toBson(cache.id)),
+      filter= equal("_id" ,Codecs.toBson(cache.id)),
       update = Updates.set("data",Codecs.toBson(rebuiltCache)),
       options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
     ).toFuture.map(result => true)
@@ -293,7 +288,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
     })
 
     collection.findOneAndUpdate(
-      filter= equal("id",Codecs.toBson(rebuiltCache.id)),
+      filter= equal("_id",Codecs.toBson(rebuiltCache.id)),
       update = Updates.set("data",Codecs.toBson(rebuiltCache)),
       options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
     ).toFuture.map(result => true)
@@ -307,7 +302,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
   /**
     * Generates a BSON document query for an id
     */
-  private def bsonIdQuery(id: String) = Document("id" -> id)
+  private def bsonIdQuery(id: String) = Document("_id" -> id)
 
   private def key(id: String) = bsonIdQuery(id)
 
