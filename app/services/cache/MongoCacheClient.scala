@@ -54,6 +54,7 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: LocalDateT
     * If the data to be inserted is null then remove the entry by key
     */
   def upsert[T](key: String, data: JsValue, hasValue: Boolean) = {
+    println("upsert")
     val updated = if (hasValue) {
       this.data + (key -> data)
     }
@@ -147,6 +148,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.
     */
   def createOrUpdate[T](credId: String, data: T, key: String)(implicit writes: Writes[T]): Future[Cache] = {
+    println("createOrUpdate")
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
       val jsonEncryptor = new JsonEncryptor[T]()
       Json.toJson(Protected(data))(jsonEncryptor)
@@ -158,14 +160,18 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
       val cache: Cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
 
       val document = Json.toJson(cache.data + (key -> jsonData))
-      collection.findOneAndUpdate(
-        filter=Filters.eq("_id" , credId),
-        update = Updates.combine(Updates.set("data",Codecs.toBson(document)),Updates.set("lastUpdated",LocalDateTime.now(ZoneOffset.UTC))),
+
+      val m = collection.findOneAndUpdate(
+        filter = Filters.eq("_id", credId),
+        update = Updates.combine(Updates.set("data", Codecs.toBson(document)),
+          Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))),
         options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       ).toFuture
+      m.map{ result => Cache(result.id,result.data,result.lastUpdated)
+      }
+      m
     }
   }
-
 
   /**
     * Removes the item with the specified key from the cache
@@ -194,6 +200,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
     * Inserts data into the existing cache object in memory given the specified key. If the data does not exist, it will be created.
     */
   def upsert[T](targetCache: CacheMap, data: T, key: String)(implicit writes: Writes[T]): CacheMap = {
+    println("upsert")
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
       val jsonEncryptor = new JsonEncryptor[T]()
       Json.toJson(Protected(data))(jsonEncryptor)
