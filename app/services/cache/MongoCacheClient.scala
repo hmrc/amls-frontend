@@ -16,32 +16,31 @@
 
 package services.cache
 
-import cats.data.State.set
 import com.mongodb.bulk.BulkWriteResult
 import config.ApplicationConfig
 import connectors.cache.Conversions
-import play.api.Logging
+import play.api.{Configuration, Logging}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import java.time.{LocalDateTime, ZoneOffset}
-import java.time.format.DateTimeFormatter
 import play.api.libs.json._
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.{MongoComponent, MongoUtils, TimestampSupport}
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-import org.mongodb.scala.model.{Filters, FindOneAndReplaceOptions, FindOneAndUpdateOptions, IndexModel, IndexOptions, Indexes, ReturnDocument, Updates}
-import org.mongodb.scala.bson.{BsonDocument, Document, codecs}
-import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.model.Filters.equal
-import play.api.http.Status.OK
-import play.shaded.ahc.org.asynchttpclient.Dsl.options
+import uk.gov.hmrc.mongo.play.json.formats.{ MongoJavatimeFormats}
+import org.mongodb.scala.model.{Filters,  FindOneAndUpdateOptions, IndexModel, IndexOptions, Indexes, ReturnDocument, Updates}
+import org.mongodb.scala.bson.Document
 
-import scala.collection.script.Index
+import org.mongodb.scala.model.Filters.equal
+
+import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
+
+
+
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 // $COVERAGE-OFF$
@@ -93,8 +92,15 @@ class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(
 /**
   * An injectible factory for creating new MongoCacheClients
   */
-class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCrypto: ApplicationCrypto, mongo: MongoComponent) {
-  def createClient: MongoCacheClient = new MongoCacheClient(config, applicationCrypto, mongo: MongoComponent)
+class MongoCacheClientFactory @Inject()(
+  config: ApplicationConfig,
+  applicationCrypto: ApplicationCrypto,
+  timestampSupport: TimestampSupport,
+  mongo: MongoComponent) {
+  def createClient: MongoCacheClient = new MongoCacheClient(
+    config, applicationCrypto,
+    timestampSupport: TimestampSupport,
+    mongo: MongoComponent)
 }
 
 /**
@@ -103,7 +109,12 @@ class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCr
   * @param appConfig The application configuration
   */
 
-class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: ApplicationCrypto, mongo: MongoComponent)
+@Singleton
+class MongoCacheClient @Inject()(
+   appConfig: ApplicationConfig,
+   applicationCrypto: ApplicationCrypto,
+   timestampSupport: TimestampSupport,
+   mongo: MongoComponent)
   extends PlayMongoRepository[Cache](
     mongoComponent = mongo,
     collectionName = "app-cache",
@@ -160,16 +171,23 @@ class MongoCacheClient(appConfig: ApplicationConfig, applicationCrypto: Applicat
       val cache: Cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
 
       val document = Json.toJson(cache.data + (key -> jsonData))
+      val timestamp = timestampSupport.timestamp()
 
-      val m = collection.findOneAndUpdate(
-        filter = Filters.eq("_id", credId),
-        update = Updates.combine(Updates.set("data", Codecs.toBson(document)),
-          Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))),
-        options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
-      ).toFuture
-      m.map{ result => Cache(result.id,result.data,result.lastUpdated)
+      MongoUtils.retryOnDuplicateKey(retries = 3) {
+        val m = collection.findOneAndUpdate(
+          filter = Filters.eq("_id", credId),
+          update = Updates.combine(Updates.set("data", Codecs.toBson(document)),
+            Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC)),
+            Updates.set("modifiedDetails.lastUpdated", timestamp),
+            Updates.setOnInsert("id", cache.id),
+            Updates.setOnInsert("modifiedDetails.createdAt", timestamp)
+          ),
+          options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+        ).toFuture
+        m.map { result => Cache(result.id, result.data, result.lastUpdated)
+        }
+        m
       }
-      m
     }
   }
 
