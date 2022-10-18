@@ -132,15 +132,6 @@ class MongoCacheClient @Inject()(
     with Logging
 {
 
-  createIndex("lastUpdated", "cacheExpiry", cacheExpiryInSeconds)
-  private def createIndex(field: String, indexName: String, ttl: Int): Future[Boolean] = {
-    collection.createIndex(Indexes.ascending(field)).toFuture() map { result =>
-      debug(s"Index $indexName set with value $ttl -> result: $result")
-      true
-    } recover {
-      case e => error("Failed to set TTL index", e); false
-    }
-  }
   private val logPrefix = "[MongoCacheClient]"
 
   // $COVERAGE-OFF$
@@ -175,17 +166,12 @@ class MongoCacheClient @Inject()(
 
       MongoUtils.retryOnDuplicateKey(retries = 3) {
         val m = collection.findOneAndUpdate(
-          filter = Filters.eq("_id", credId),
-          update = Updates.combine(Updates.set("data", Codecs.toBson(document)),
-            Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC)),
-            Updates.set("modifiedDetails.lastUpdated", timestamp),
-            Updates.setOnInsert("id", cache.id),
-            Updates.setOnInsert("modifiedDetails.createdAt", timestamp)
+          filter = Filters.eq("id", credId),
+          update = Updates.combine(Updates.set("data", Codecs.toBson(jsonData)),
+            Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))
           ),
           options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
         ).toFuture
-        m.map { result => Cache(result.id, result.data, result.lastUpdated)
-        }
         m
       }
     }
