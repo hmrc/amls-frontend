@@ -152,32 +152,36 @@ class MongoCacheClient @Inject()(
     } else {
       Json.toJson(data)
     }
-    fetchAll(Some(credId)) flatMap { maybeNewCache =>
 
+    fetchAll(Some(credId)) flatMap { maybeNewCache =>
       val cache: Cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
 
-      val document = Json.toJson(cache.data + (key -> jsonData))
-      val timestamp = timestampSupport.timestamp()
+      val d= cache.data + (key -> jsonData)
 
-      val updatedCache: Cache = cache.copy(
-        id = credId,
-        data = cache.data + (key -> jsonData),
-        lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
-      )
-
-      MongoUtils.retryOnDuplicateKey(retries = 3) {
-        val m = collection.findOneAndReplace(
-          filter = Filters.eq("id", credId),
-          replacement = updatedCache,
-          options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
-        ).toFuture
-        m.onComplete{ case _ =>
-          Thread.sleep((10000))
-          print(s"waited on m.\nm = ${m}")
-          //this ends up finding the correct data -> so is it just that the db isn't accepting futures?
-        }
-        m
+      val n=MongoUtils.retryOnDuplicateKey(retries = 3) {
+        collection.findOneAndUpdate(
+          filter = Filters.equal("id", credId),
+          update = Updates.combine(
+            Updates.set("data", Codecs.toBson(d)),
+            Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))
+          ),
+          options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+        ).toFuture()
       }
+
+//      val m  = MongoUtils.retryOnDuplicateKey(retries = 3) {
+//        collection.findOneAndReplace(
+//          filter = Filters.eq("id", credId),
+//          replacement = updatedCache,
+//          options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+//        ).toFuture
+//      }
+
+      collection.find (filter = Filters.equal ("id",credId)).toFuture().map {res =>
+        println(" res1 is ::"+res)
+      }
+      n
+
     }
   }
 
@@ -236,17 +240,19 @@ class MongoCacheClient @Inject()(
     * Fetches the whole cache
     */
 
-  def fetchAll(credId: String): Future[Option[Cache]] = collection.find(filter = Filters.equal(
-    "_id" ,Codecs.toBson(credId))).toFuture().map {
-    case c if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c.head, compositeSymmetricCrypto))
-    case _      => None
+  def fetchAll(credId: String): Future[Option[Cache]] = {
+    collection.find(filter = Filters.equal(
+      "id" ,Codecs.toBson(credId))).toFuture().map {
+      case c if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c.head, compositeSymmetricCrypto))
+      case _      => None
+    }
   }
 
   def fetchAll(credId: Option[String]): Future[Option[Cache]] = {
     credId match {
-      case Some(x) => collection.find (filter = Filters.equal ("_id", Codecs.toBson(x))).toFuture ().map {
-        case c if appConfig.mongoEncryptionEnabled => Some (new CryptoCache (c.head, compositeSymmetricCrypto) )
-        case _ => None
+      case Some(x) => collection.find (filter = Filters.equal ("id", x)).headOption().map {
+        case Some(c) if appConfig.mongoEncryptionEnabled => Some (new CryptoCache (c, compositeSymmetricCrypto) )
+        case c => c
       }
       case _ => Future.successful(None)
     }
