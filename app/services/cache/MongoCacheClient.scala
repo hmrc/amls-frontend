@@ -19,26 +19,21 @@ package services.cache
 import com.mongodb.bulk.BulkWriteResult
 import config.ApplicationConfig
 import connectors.cache.Conversions
-import play.api.{Configuration, Logging}
-
-import javax.inject.{Inject, Singleton}
-import java.time.{LocalDateTime, ZoneOffset}
+import org.mongodb.scala.bson.Document
+import org.mongodb.scala.model.Filters.equal
+import org.mongodb.scala.model._
+import play.api.Logging
+import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json._
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.mongo.{MongoComponent, MongoUtils, TimestampSupport}
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
-import uk.gov.hmrc.mongo.play.json.formats.{ MongoJavatimeFormats}
-import org.mongodb.scala.model.{Filters,  FindOneAndUpdateOptions, IndexModel, IndexOptions, Indexes, ReturnDocument, Updates}
-import org.mongodb.scala.bson.Document
+import uk.gov.hmrc.mongo.{MongoComponent, MongoUtils, TimestampSupport}
 
-import org.mongodb.scala.model.Filters.equal
-
-import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
-
-
-
+import java.time.{LocalDateTime, ZoneOffset}
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
@@ -164,14 +159,23 @@ class MongoCacheClient @Inject()(
       val document = Json.toJson(cache.data + (key -> jsonData))
       val timestamp = timestampSupport.timestamp()
 
+      val updatedCache: Cache = cache.copy(
+        id = credId,
+        data = cache.data + (key -> jsonData),
+        lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
+      )
+
       MongoUtils.retryOnDuplicateKey(retries = 3) {
-        val m = collection.findOneAndUpdate(
+        val m = collection.findOneAndReplace(
           filter = Filters.eq("id", credId),
-          update = Updates.combine(Updates.set("data", Codecs.toBson(jsonData)),
-            Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))
-          ),
-          options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+          replacement = updatedCache,
+          options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
         ).toFuture
+        m.onComplete{ case _ =>
+          Thread.sleep((10000))
+          print(s"waited on m.\nm = ${m}")
+          //this ends up finding the correct data -> so is it just that the db isn't accepting futures?
+        }
         m
       }
     }
