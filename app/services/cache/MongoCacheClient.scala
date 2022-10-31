@@ -166,22 +166,10 @@ class MongoCacheClient @Inject()(
             Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))
           ),
           options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
-        ).toFuture()
+        ).toFuture().map(result => Cache(result.id,result.data,result.lastUpdated))
       }
 
-//      val m  = MongoUtils.retryOnDuplicateKey(retries = 3) {
-//        collection.findOneAndReplace(
-//          filter = Filters.eq("id", credId),
-//          replacement = updatedCache,
-//          options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
-//        ).toFuture
-//      }
-
-      collection.find (filter = Filters.equal ("id",credId)).toFuture().map {res =>
-        println(" res1 is ::"+res)
-      }
       n
-
     }
   }
 
@@ -189,7 +177,7 @@ class MongoCacheClient @Inject()(
     * Removes the item with the specified key from the cache
     */
   def removeByKey[T](credId: String, key: String): Future[Cache] = {
-
+    println("remove by key")
     fetchAll(Some(credId)) flatMap { maybeNewCache =>
       val cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
 
@@ -226,7 +214,8 @@ class MongoCacheClient @Inject()(
   /**
     * Finds an item in the cache with the specified key. If the item cannot be found, None is returned.
     */
-  def find[T](credId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] =
+  def find[T](credId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
+    println("find")
     fetchAll(credId) map {
       case Some(cache) => if (appConfig.mongoEncryptionEnabled) {
         decryptValue[T](cache, key)(new JsonDecryptor[T]())
@@ -235,12 +224,14 @@ class MongoCacheClient @Inject()(
       }
       case _ => None
     }
+  }
 
   /**
     * Fetches the whole cache
     */
 
   def fetchAll(credId: String): Future[Option[Cache]] = {
+    println("fetch all")
     collection.find(filter = Filters.equal(
       "id" ,Codecs.toBson(credId))).toFuture().map {
       case c if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c.head, compositeSymmetricCrypto))
@@ -249,6 +240,7 @@ class MongoCacheClient @Inject()(
   }
 
   def fetchAll(credId: Option[String]): Future[Option[Cache]] = {
+    println("fetch all option")
     credId match {
       case Some(x) => collection.find (filter = Filters.equal ("id", x)).headOption().map {
         case Some(c) if appConfig.mongoEncryptionEnabled => Some (new CryptoCache (c, compositeSymmetricCrypto) )
@@ -261,24 +253,31 @@ class MongoCacheClient @Inject()(
   /**
     * Fetches the whole cache and returns default where not exists
     */
-  def fetchAllWithDefault(credId: String): Future[Cache] =
+  def fetchAllWithDefault(credId: String): Future[Cache] = {
+    println("fetch all with default")
     fetchAll(Some(credId)).map {
       _.getOrElse(Cache(credId, Map.empty))
     }
+  }
 
   /**
     * Removes the item with the specified id from the cache
     */
-  def removeById(credId: String):Future[Boolean] =
+  def removeById(credId: String):Future[Boolean] = {
+    println("remove by id")
     collection.findOneAndDelete(key(credId)).toFuture()
       .map { result => true
       }
       .recover { case _ => false }
+  }
+
+
 
   /**
     * Saves the cache data into the database
     */
   def saveAll(cache: Cache): Future[Boolean] = {
+    println("save all")
     // Rebuild the cache and decrypt each key if necessary
     val rebuiltCache = Cache(cache.id, cache.data.foldLeft(Map.empty[String, JsValue]) { (acc, value) =>
       val plainText = tryDecrypt(Crypted(value._2.toString))
@@ -290,13 +289,14 @@ class MongoCacheClient @Inject()(
       }
     })
     collection.findOneAndUpdate(
-      filter= equal("_id" ,Codecs.toBson(cache.id)),
-      update = Updates.set("data",Codecs.toBson(rebuiltCache)),
+      filter= equal("id" ,Codecs.toBson(cache.id)),
+      update = Updates.set("data",Codecs.toBson(rebuiltCache.data)),
       options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
     ).toFuture.map(result => true)
   }
 
   def saveAll(cache: Cache, credId: String): Future[Boolean] = {
+    println("save all w/ credId")
     // Rebuild the cache and decrypt each key if necessary
     val rebuiltCache = Cache(credId, cache.data.foldLeft(Map.empty[String, JsValue]) { (acc, value) =>
       val plainText = tryDecrypt(Crypted(value._2.toString))
@@ -309,8 +309,12 @@ class MongoCacheClient @Inject()(
     })
 
     collection.findOneAndUpdate(
-      filter= equal("_id",Codecs.toBson(rebuiltCache.id)),
-      update = Updates.set("data",Codecs.toBson(rebuiltCache)),
+      filter= equal("id",Codecs.toBson(rebuiltCache.id)),
+      update = Updates.combine(
+        Updates.set("id", credId),
+        Updates.set("data",Codecs.toBson(rebuiltCache.data)),
+        Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))
+      ),
       options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
     ).toFuture.map(result => true)
   }
@@ -323,7 +327,7 @@ class MongoCacheClient @Inject()(
   /**
     * Generates a BSON document query for an id
     */
-  private def bsonIdQuery(id: String) = Document("_id" -> id)
+  private def bsonIdQuery(id: String) = Document("id" -> id)
 
   private def key(id: String) = bsonIdQuery(id)
 
