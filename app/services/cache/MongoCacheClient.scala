@@ -21,7 +21,7 @@ import config.ApplicationConfig
 import connectors.cache.Conversions
 import org.mongodb.scala.bson.Document
 import org.mongodb.scala.model.Filters.equal
-import org.mongodb.scala.model._
+import org.mongodb.scala.model.{Updates, _}
 import play.api.Logging
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json._
@@ -160,8 +160,9 @@ class MongoCacheClient @Inject()(
 
       val n=MongoUtils.retryOnDuplicateKey(retries = 3) {
         collection.findOneAndUpdate(
-          filter = Filters.equal("id", credId),
+          filter = Filters.equal("_id", credId),
           update = Updates.combine(
+            Updates.set("id", credId),
             Updates.set("data", Codecs.toBson(d)),
             Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))
           ),
@@ -188,8 +189,11 @@ class MongoCacheClient @Inject()(
 
       val document = Json.toJson(updatedCache)
       collection.findOneAndUpdate(
-        filter=bsonIdQuery(credId),
-        update = Updates.set("data",Codecs.toBson(updatedCache)),
+        filter= Filters.equal("_id", credId),
+        update =Updates.combine(
+                Updates.set("id", credId),
+                Updates.set("data",Codecs.toBson(updatedCache)),
+                Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))),
         options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       ).toFuture
 
@@ -232,8 +236,7 @@ class MongoCacheClient @Inject()(
 
   def fetchAll(credId: String): Future[Option[Cache]] = {
     println("fetch all")
-    collection.find(filter = Filters.equal(
-      "id" ,Codecs.toBson(credId))).toFuture().map {
+    collection.find(filter = Filters.equal("_id" ,Codecs.toBson(credId))).toFuture().map {
       case c if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c.head, compositeSymmetricCrypto))
       case _      => None
     }
@@ -289,8 +292,11 @@ class MongoCacheClient @Inject()(
       }
     })
     collection.findOneAndUpdate(
-      filter= equal("id" ,Codecs.toBson(cache.id)),
-      update = Updates.set("data",Codecs.toBson(rebuiltCache.data)),
+      filter= equal("_id" ,Codecs.toBson(cache.id)),
+      update = Updates.combine(
+        Updates.set("id", rebuiltCache.id),
+        Updates.set("data",Codecs.toBson(rebuiltCache.data)),
+        Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))),
       options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
     ).toFuture.map(result => true)
   }
@@ -309,9 +315,9 @@ class MongoCacheClient @Inject()(
     })
 
     collection.findOneAndUpdate(
-      filter= equal("id",Codecs.toBson(rebuiltCache.id)),
+      filter= equal("_id",cache.id),
       update = Updates.combine(
-        Updates.set("id", credId),
+        Updates.set("id",rebuiltCache.id),
         Updates.set("data",Codecs.toBson(rebuiltCache.data)),
         Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))
       ),
@@ -327,7 +333,7 @@ class MongoCacheClient @Inject()(
   /**
     * Generates a BSON document query for an id
     */
-  private def bsonIdQuery(id: String) = Document("id" -> id)
+  private def bsonIdQuery(id: String) = Document("_id" -> id)
 
   private def key(id: String) = bsonIdQuery(id)
 
