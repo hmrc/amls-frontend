@@ -19,6 +19,7 @@ package services.cache
 import com.mongodb.bulk.BulkWriteResult
 import config.ApplicationConfig
 import connectors.cache.Conversions
+import org.joda.time.{DateTime, DateTimeZone}
 import org.mongodb.scala.bson.Document
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.{Updates, _}
@@ -36,6 +37,7 @@ import java.time.{LocalDateTime, ZoneOffset}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.duration.SECONDS
 import scala.util.{Failure, Success, Try}
 
 // $COVERAGE-OFF$
@@ -117,11 +119,7 @@ class MongoCacheClient @Inject()(
     indexes = Seq(
       IndexModel(
         Indexes.ascending("lastUpdated"),
-        IndexOptions()
-          .name("cacheExpiry")
-          .unique(false))
-    )
-  )
+        IndexOptions().name("cacheExpiry").expireAfter( appConfig.cacheExpiryInSeconds, SECONDS))))
     with Conversions
     with CacheOps
     with Logging
@@ -138,8 +136,6 @@ class MongoCacheClient @Inject()(
   // $COVERAGE-ON$
 
   implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto
-
-  val cacheExpiryInSeconds: Int = appConfig.cacheExpiryInSeconds
 
   /**
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.
@@ -158,7 +154,12 @@ class MongoCacheClient @Inject()(
 
       val d= cache.data + (key -> jsonData)
 
-      val n=MongoUtils.retryOnDuplicateKey(retries = 3) {
+      val updatedCache: Cache = cache.copy(
+        id = credId,
+        data = cache.data + (key -> jsonData),
+        lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
+      )
+
         collection.findOneAndUpdate(
           filter = Filters.equal("_id", credId),
           update = Updates.combine(
@@ -167,10 +168,7 @@ class MongoCacheClient @Inject()(
             Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))
           ),
           options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
-        ).toFuture().map(result => Cache(result.id,result.data,result.lastUpdated))
-      }
-
-      n
+        ).toFuture() map { _ => updatedCache }
     }
   }
 
@@ -189,14 +187,13 @@ class MongoCacheClient @Inject()(
 
       val document = Json.toJson(updatedCache)
       collection.findOneAndUpdate(
-        filter= Filters.equal("_id", credId),
+        filter= bsonIdQuery(credId),
         update =Updates.combine(
                 Updates.set("id", credId),
                 Updates.set("data",Codecs.toBson(updatedCache)),
                 Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))),
         options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
-      ).toFuture
-
+      ).toFuture map {_ => updatedCache}
     }
   }
 
@@ -236,16 +233,16 @@ class MongoCacheClient @Inject()(
 
   def fetchAll(credId: String): Future[Option[Cache]] = {
     println("fetch all")
-    collection.find(filter = Filters.equal("_id" ,Codecs.toBson(credId))).toFuture().map {
-      case c if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c.head, compositeSymmetricCrypto))
-      case _      => None
+    collection.find(bsonIdQuery(credId)).headOption().map {
+      case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
+      case c  => c
     }
   }
 
   def fetchAll(credId: Option[String]): Future[Option[Cache]] = {
     println("fetch all option")
     credId match {
-      case Some(x) => collection.find (filter = Filters.equal ("id", x)).headOption().map {
+      case Some(x) => collection.find(key(x)).headOption().map {
         case Some(c) if appConfig.mongoEncryptionEnabled => Some (new CryptoCache (c, compositeSymmetricCrypto) )
         case c => c
       }
@@ -292,7 +289,7 @@ class MongoCacheClient @Inject()(
       }
     })
     collection.findOneAndUpdate(
-      filter= equal("_id" ,Codecs.toBson(cache.id)),
+      filter= bsonIdQuery(cache.id),
       update = Updates.combine(
         Updates.set("id", rebuiltCache.id),
         Updates.set("data",Codecs.toBson(rebuiltCache.data)),
@@ -315,7 +312,7 @@ class MongoCacheClient @Inject()(
     })
 
     collection.findOneAndUpdate(
-      filter= equal("_id",cache.id),
+      filter= bsonIdQuery(rebuiltCache.id),
       update = Updates.combine(
         Updates.set("id",rebuiltCache.id),
         Updates.set("data",Codecs.toBson(rebuiltCache.data)),
@@ -340,11 +337,6 @@ class MongoCacheClient @Inject()(
   /**
     * Handles logging for write results
     */
-  private def handleWriteResult(writeResult: BulkWriteResult) = writeResult match {
-    case w if w.wasAcknowledged() => true
-    case _ =>
-      throw new RuntimeException("Error while removing the session data")
-  }
 
   private def tryDecrypt(value: Crypted): PlainText = Try {
     compositeSymmetricCrypto.decrypt(value).value
