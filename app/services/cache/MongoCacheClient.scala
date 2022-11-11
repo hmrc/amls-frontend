@@ -20,7 +20,7 @@ import com.mongodb.bulk.BulkWriteResult
 import config.ApplicationConfig
 import connectors.cache.Conversions
 import org.joda.time.{DateTime, DateTimeZone}
-import org.mongodb.scala.bson.Document
+import org.mongodb.scala.bson.{BsonDocument, Document}
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.{Updates, _}
 import play.api.Logging
@@ -50,7 +50,6 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: LocalDateT
     * If the data to be inserted is null then remove the entry by key
     */
   def upsert[T](key: String, data: JsValue, hasValue: Boolean) = {
-    println("upsert")
     val updated = if (hasValue) {
       this.data + (key -> data)
     }
@@ -141,7 +140,6 @@ class MongoCacheClient @Inject()(
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.
     */
   def createOrUpdate[T](credId: String, data: T, key: String)(implicit writes: Writes[T]): Future[Cache] = {
-    println("createOrUpdate")
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
       val jsonEncryptor = new JsonEncryptor[T]()
       Json.toJson(Protected(data))(jsonEncryptor)
@@ -160,15 +158,11 @@ class MongoCacheClient @Inject()(
         lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
       )
 
-        collection.findOneAndUpdate(
+        collection.replaceOne(
           filter = Filters.equal("_id", credId),
-          update = Updates.combine(
-            Updates.set("id", credId),
-            Updates.set("data", Codecs.toBson(d)),
-            Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))
-          ),
-          options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
-        ).toFuture() map { _ => updatedCache }
+          replacement = updatedCache,
+          ReplaceOptions().upsert(true)
+        ).toFuture().map { _ => updatedCache}
     }
   }
 
@@ -176,7 +170,6 @@ class MongoCacheClient @Inject()(
     * Removes the item with the specified key from the cache
     */
   def removeByKey[T](credId: String, key: String): Future[Cache] = {
-    println("remove by key")
     fetchAll(Some(credId)) flatMap { maybeNewCache =>
       val cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
 
@@ -187,13 +180,13 @@ class MongoCacheClient @Inject()(
 
       val document = Json.toJson(updatedCache)
       collection.findOneAndUpdate(
-        filter= bsonIdQuery(credId),
-        update =Updates.combine(
-                Updates.set("id", credId),
-                Updates.set("data",Codecs.toBson(updatedCache)),
-                Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))),
+        filter = bsonIdQuery(credId),
+        update = Updates.combine(
+          Updates.set("id", credId),
+          Updates.set("data", Codecs.toBson(updatedCache.data)),
+          Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))),
         options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
-      ).toFuture map {_ => updatedCache}
+      ).toFuture
     }
   }
 
@@ -201,7 +194,6 @@ class MongoCacheClient @Inject()(
     * Inserts data into the existing cache object in memory given the specified key. If the data does not exist, it will be created.
     */
   def upsert[T](targetCache: CacheMap, data: T, key: String)(implicit writes: Writes[T]): CacheMap = {
-    println("upsert")
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
       val jsonEncryptor = new JsonEncryptor[T]()
       Json.toJson(Protected(data))(jsonEncryptor)
@@ -216,7 +208,6 @@ class MongoCacheClient @Inject()(
     * Finds an item in the cache with the specified key. If the item cannot be found, None is returned.
     */
   def find[T](credId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
-    println("find")
     fetchAll(credId) map {
       case Some(cache) => if (appConfig.mongoEncryptionEnabled) {
         decryptValue[T](cache, key)(new JsonDecryptor[T]())
@@ -232,7 +223,6 @@ class MongoCacheClient @Inject()(
     */
 
   def fetchAll(credId: String): Future[Option[Cache]] = {
-    println("fetch all")
     collection.find(bsonIdQuery(credId)).headOption().map {
       case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
       case c  => c
@@ -240,7 +230,6 @@ class MongoCacheClient @Inject()(
   }
 
   def fetchAll(credId: Option[String]): Future[Option[Cache]] = {
-    println("fetch all option")
     credId match {
       case Some(x) => collection.find(key(x)).headOption().map {
         case Some(c) if appConfig.mongoEncryptionEnabled => Some (new CryptoCache (c, compositeSymmetricCrypto) )
@@ -254,7 +243,6 @@ class MongoCacheClient @Inject()(
     * Fetches the whole cache and returns default where not exists
     */
   def fetchAllWithDefault(credId: String): Future[Cache] = {
-    println("fetch all with default")
     fetchAll(Some(credId)).map {
       _.getOrElse(Cache(credId, Map.empty))
     }
@@ -264,7 +252,6 @@ class MongoCacheClient @Inject()(
     * Removes the item with the specified id from the cache
     */
   def removeById(credId: String):Future[Boolean] = {
-    println("remove by id")
     collection.findOneAndDelete(key(credId)).toFuture()
       .map { result => true
       }
@@ -277,7 +264,6 @@ class MongoCacheClient @Inject()(
     * Saves the cache data into the database
     */
   def saveAll(cache: Cache): Future[Boolean] = {
-    println("save all")
     // Rebuild the cache and decrypt each key if necessary
     val rebuiltCache = Cache(cache.id, cache.data.foldLeft(Map.empty[String, JsValue]) { (acc, value) =>
       val plainText = tryDecrypt(Crypted(value._2.toString))
@@ -299,7 +285,6 @@ class MongoCacheClient @Inject()(
   }
 
   def saveAll(cache: Cache, credId: String): Future[Boolean] = {
-    println("save all w/ credId")
     // Rebuild the cache and decrypt each key if necessary
     val rebuiltCache = Cache(credId, cache.data.foldLeft(Map.empty[String, JsValue]) { (acc, value) =>
       val plainText = tryDecrypt(Crypted(value._2.toString))
@@ -330,7 +315,7 @@ class MongoCacheClient @Inject()(
   /**
     * Generates a BSON document query for an id
     */
-  private def bsonIdQuery(id: String) = Document("_id" -> id)
+  private def bsonIdQuery(id: String) = BsonDocument("_id" -> id)
 
   private def key(id: String) = bsonIdQuery(id)
 
