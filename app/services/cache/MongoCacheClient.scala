@@ -16,13 +16,10 @@
 
 package services.cache
 
-import com.mongodb.bulk.BulkWriteResult
 import config.ApplicationConfig
 import connectors.cache.Conversions
-import org.joda.time.{DateTime, DateTimeZone}
-import org.mongodb.scala.bson.{BsonDocument, Document}
-import org.mongodb.scala.model.Filters.equal
-import org.mongodb.scala.model.{Updates, _}
+import org.mongodb.scala.bson.BsonDocument
+import org.mongodb.scala.model._
 import play.api.Logging
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json._
@@ -31,7 +28,7 @@ import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
-import uk.gov.hmrc.mongo.{MongoComponent, MongoUtils, TimestampSupport}
+import uk.gov.hmrc.mongo.{MongoComponent, TimestampSupport}
 
 import java.time.{LocalDateTime, ZoneOffset}
 import javax.inject.{Inject, Singleton}
@@ -150,8 +147,6 @@ class MongoCacheClient @Inject()(
     fetchAll(Some(credId)) flatMap { maybeNewCache =>
       val cache: Cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
 
-      val d= cache.data + (key -> jsonData)
-
       val updatedCache: Cache = cache.copy(
         id = credId,
         data = cache.data + (key -> jsonData),
@@ -174,16 +169,14 @@ class MongoCacheClient @Inject()(
       val cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
 
       val updatedCache = cache.copy(
-        data = cache.data - (key),
-        lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
+        data = cache.data - (key)
       )
 
-      val document = Json.toJson(updatedCache)
       collection.findOneAndUpdate(
         filter = bsonIdQuery(credId),
         update = Updates.combine(
           Updates.set("id", credId),
-          Updates.set("data", Codecs.toBson(updatedCache.data)),
+          Updates.set("data", Codecs.toBson(cache.data - (key))),
           Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))),
         options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       ).toFuture
@@ -251,7 +244,7 @@ class MongoCacheClient @Inject()(
   /**
     * Removes the item with the specified id from the cache
     */
-  def removeById(credId: String):Future[Boolean] = {
+  def removeById(credId: String): Unit = {
     collection.findOneAndDelete(key(credId)).toFuture()
       .map { result => true
       }
