@@ -168,10 +168,6 @@ class MongoCacheClient @Inject()(
     fetchAll(Some(credId)) flatMap { maybeNewCache =>
       val cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
 
-      val updatedCache = cache.copy(
-        data = cache.data - (key)
-      )
-
       collection.findOneAndUpdate(
         filter = bsonIdQuery(credId),
         update = Updates.combine(
@@ -244,7 +240,7 @@ class MongoCacheClient @Inject()(
   /**
     * Removes the item with the specified id from the cache
     */
-  def removeById(credId: String): Unit = {
+  def removeById(credId: String): Future[Boolean] = {
     collection.findOneAndDelete(key(credId)).toFuture()
       .map { result => true
       }
