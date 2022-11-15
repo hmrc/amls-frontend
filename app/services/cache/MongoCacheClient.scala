@@ -18,30 +18,29 @@ package services.cache
 
 import config.ApplicationConfig
 import connectors.cache.Conversions
-
-import javax.inject.Inject
-import org.joda.time.{DateTime, DateTimeZone}
+import org.mongodb.scala.bson.BsonDocument
+import org.mongodb.scala.model._
+import play.api.Logging
+import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json._
-import play.modules.reactivemongo.ReactiveMongoComponent
-import reactivemongo.api.DefaultDB
-import reactivemongo.api.commands.WriteResult
-import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.{BSONDocument, BSONObjectID}
-import reactivemongo.play.json.ImplicitBSONHandlers._
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.mongo.ReactiveRepository
-import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
+import uk.gov.hmrc.mongo.{MongoComponent, TimestampSupport}
 
+import java.time.{LocalDateTime, ZoneOffset}
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.duration.SECONDS
 import scala.util.{Failure, Success, Try}
 
 // $COVERAGE-OFF$
 // Coverage has been turned off for these types, as the only things we can really do with them
 // is mock out the mongo connection, which is bad craic. This has all been manually tested in the running application.
-case class Cache(id: String, data: Map[String, JsValue], lastUpdated: DateTime = DateTime.now(DateTimeZone.UTC)) {
+case class Cache(id: String, data: Map[String, JsValue], lastUpdated: LocalDateTime = LocalDateTime.now(ZoneOffset.UTC)) {
 
   /**
     * Upsert a value into the cache given its key.
@@ -57,13 +56,13 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: DateTime =
 
     this.copy(
       data = updated,
-      lastUpdated = DateTime.now(DateTimeZone.UTC)
+      lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
     )
   }
 }
 
 object Cache {
-  implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
+  implicit val dateFormat = MongoJavatimeFormats.localDateTimeFormat
   implicit val format = Json.format[Cache]
 
   def apply(cacheMap: CacheMap): Cache = Cache(cacheMap.id, cacheMap.data)
@@ -86,8 +85,15 @@ class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(
 /**
   * An injectible factory for creating new MongoCacheClients
   */
-class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCrypto: ApplicationCrypto, component: ReactiveMongoComponent) {
-  def createClient: MongoCacheClient = new MongoCacheClient(config, component.mongoConnector.db, applicationCrypto)
+class MongoCacheClientFactory @Inject()(
+  config: ApplicationConfig,
+  applicationCrypto: ApplicationCrypto,
+  timestampSupport: TimestampSupport,
+  mongo: MongoComponent) {
+  def createClient: MongoCacheClient = new MongoCacheClient(
+    config, applicationCrypto,
+    timestampSupport: TimestampSupport,
+    mongo: MongoComponent)
 }
 
 /**
@@ -95,10 +101,24 @@ class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCr
   *
   * @param appConfig The application configuration
   */
-class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applicationCrypto: ApplicationCrypto)
-  extends ReactiveRepository[Cache, BSONObjectID]("app-cache", db, Cache.format)
+
+@Singleton
+class MongoCacheClient @Inject()(
+   appConfig: ApplicationConfig,
+   applicationCrypto: ApplicationCrypto,
+   timestampSupport: TimestampSupport,
+   mongo: MongoComponent)
+  extends PlayMongoRepository[Cache](
+    mongoComponent = mongo,
+    collectionName = "app-cache",
+    domainFormat = Cache.format,
+    indexes = Seq(
+      IndexModel(
+        Indexes.ascending("lastUpdated"),
+        IndexOptions().name("cacheExpiry").expireAfter( appConfig.cacheExpiryInSeconds, SECONDS))))
     with Conversions
     with CacheOps
+    with Logging
 {
 
   private val logPrefix = "[MongoCacheClient]"
@@ -113,10 +133,6 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
 
   implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto
 
-  val cacheExpiryInSeconds: Int = appConfig.cacheExpiryInSeconds
-
-  createIndex("lastUpdated", "cacheExpiry", cacheExpiryInSeconds)
-
   /**
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.
     */
@@ -129,40 +145,37 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
     }
 
     fetchAll(Some(credId)) flatMap { maybeNewCache =>
-
       val cache: Cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
 
       val updatedCache: Cache = cache.copy(
         id = credId,
         data = cache.data + (key -> jsonData),
-        lastUpdated = DateTime.now(DateTimeZone.UTC)
+        lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
       )
 
-      val document = Json.toJson(updatedCache)
-      val modifier = BSONDocument("$set" -> document)
-
-      collection.update(ordered = false).one(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
+        collection.replaceOne(
+          filter = Filters.equal("_id", credId),
+          replacement = updatedCache,
+          ReplaceOptions().upsert(true)
+        ).toFuture().map { _ => updatedCache}
     }
   }
-
 
   /**
     * Removes the item with the specified key from the cache
     */
   def removeByKey[T](credId: String, key: String): Future[Cache] = {
-
     fetchAll(Some(credId)) flatMap { maybeNewCache =>
       val cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
 
-      val updatedCache = cache.copy(
-        data = cache.data - (key),
-        lastUpdated = DateTime.now(DateTimeZone.UTC)
-      )
-
-      val document = Json.toJson(updatedCache)
-      val modifier = BSONDocument("$set" -> document)
-
-      collection.update(ordered = false).one(bsonIdQuery(credId), modifier, upsert = true) map { _ => updatedCache }
+      collection.findOneAndUpdate(
+        filter = bsonIdQuery(credId),
+        update = Updates.combine(
+          Updates.set("id", credId),
+          Updates.set("data", Codecs.toBson(cache.data - (key))),
+          Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))),
+        options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+      ).toFuture
     }
   }
 
@@ -183,7 +196,7 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
   /**
     * Finds an item in the cache with the specified key. If the item cannot be found, None is returned.
     */
-  def find[T](credId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] =
+  def find[T](credId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
     fetchAll(credId) map {
       case Some(cache) => if (appConfig.mongoEncryptionEnabled) {
         decryptValue[T](cache, key)(new JsonDecryptor[T]())
@@ -192,19 +205,23 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
       }
       case _ => None
     }
+  }
 
   /**
     * Fetches the whole cache
     */
-  def fetchAll(credId: String): Future[Option[Cache]] = collection.find(bsonIdQuery(credId), Option.empty[Cache]).one[Cache] map {
-    case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
-    case c => c
+
+  def fetchAll(credId: String): Future[Option[Cache]] = {
+    collection.find(bsonIdQuery(credId)).headOption().map {
+      case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
+      case c  => c
+    }
   }
 
   def fetchAll(credId: Option[String]): Future[Option[Cache]] = {
     credId match {
-      case Some(x) => collection.find(key(x), Option.empty[Cache]).one[Cache] map {
-        case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
+      case Some(x) => collection.find(key(x)).headOption().map {
+        case Some(c) if appConfig.mongoEncryptionEnabled => Some (new CryptoCache (c, compositeSymmetricCrypto) )
         case c => c
       }
       case _ => Future.successful(None)
@@ -214,16 +231,23 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
   /**
     * Fetches the whole cache and returns default where not exists
     */
-  def fetchAllWithDefault(credId: String): Future[Cache] =
+  def fetchAllWithDefault(credId: String): Future[Cache] = {
     fetchAll(Some(credId)).map {
       _.getOrElse(Cache(credId, Map.empty))
     }
+  }
 
   /**
     * Removes the item with the specified id from the cache
     */
-  def removeById(credId: String) =
-    collection.delete().one(key(credId)) map handleWriteResult
+  def removeById(credId: String): Future[Boolean] = {
+    collection.findOneAndDelete(key(credId)).toFuture()
+      .map { result => true
+      }
+      .recover { case _ => false }
+  }
+
+
 
   /**
     * Saves the cache data into the database
@@ -239,8 +263,14 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
         acc + (value._1 -> Json.parse(plainText.value))
       }
     })
-
-    collection.update(ordered = false).one(bsonIdQuery(cache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
+    collection.findOneAndUpdate(
+      filter= bsonIdQuery(cache.id),
+      update = Updates.combine(
+        Updates.set("id", rebuiltCache.id),
+        Updates.set("data",Codecs.toBson(rebuiltCache.data)),
+        Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))),
+      options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+    ).toFuture.map(result => true)
   }
 
   def saveAll(cache: Cache, credId: String): Future[Boolean] = {
@@ -255,43 +285,32 @@ class MongoCacheClient(appConfig: ApplicationConfig, db: () => DefaultDB, applic
       }
     })
 
-    collection.update(ordered = false).one(bsonIdQuery(rebuiltCache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
+    collection.findOneAndUpdate(
+      filter= bsonIdQuery(rebuiltCache.id),
+      update = Updates.combine(
+        Updates.set("id",rebuiltCache.id),
+        Updates.set("data",Codecs.toBson(rebuiltCache.data)),
+        Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))
+      ),
+      options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+    ).toFuture.map(result => true)
   }
 
   /**
     * Creates a new index on the specified field, using the specified name and the ttl
     */
-  private def createIndex(field: String, indexName: String, ttl: Int): Future[Boolean] = {
-    collection.indexesManager.ensure(Index(
-      Seq((field, IndexType.Ascending)),
-      Some(indexName),
-      options = BSONDocument("expireAfterSeconds" -> ttl))
-    ) map { result =>
-      debug(s"Index $indexName set with value $ttl -> result: $result")
-      result
-    } recover {
-      case e => error("Failed to set TTL index", e); false
-    }
-  }
+
 
   /**
     * Generates a BSON document query for an id
     */
-  private def bsonIdQuery(id: String) = BSONDocument("_id" -> id)
+  private def bsonIdQuery(id: String) = BsonDocument("_id" -> id)
 
   private def key(id: String) = bsonIdQuery(id)
 
   /**
     * Handles logging for write results
     */
-  private def handleWriteResult(writeResult: WriteResult) = writeResult match {
-    case w if w.ok => true
-    case w if w.writeErrors.nonEmpty =>
-      w.writeErrors.map(_.errmsg).foreach(e => error(e))
-      throw new RuntimeException(w.writeErrors.map(_.errmsg).mkString("; "))
-    case _ =>
-      throw new RuntimeException("Error while removing the session data")
-  }
 
   private def tryDecrypt(value: Crypted): PlainText = Try {
     compositeSymmetricCrypto.decrypt(value).value
