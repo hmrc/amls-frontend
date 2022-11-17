@@ -21,6 +21,7 @@ import models.notifications.RejectedReason._
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json.{JsValue, Writes, _}
+import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
 import utils.ContactTypeHelper
 
 case class NotificationRow(
@@ -84,7 +85,7 @@ case class NotificationRow(
 }
 
 object NotificationRow {
-
+  implicit val dateFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat
   implicit val dateTimeRead: Reads[DateTime] = {
     (__ \ "$date").read[Long].map { dateTime =>
       new DateTime(dateTime, DateTimeZone.UTC)

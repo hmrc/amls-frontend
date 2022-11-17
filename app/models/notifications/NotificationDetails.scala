@@ -21,6 +21,7 @@ import models.confirmation.Currency
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import play.api.libs.json._
+import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
 import utils.ContactTypeHelper
 
 case class NotificationDetails(contactType: Option[ContactType],
@@ -47,7 +48,6 @@ case class NotificationDetails(contactType: Option[ContactType],
 }
 
 object NotificationDetails {
-
   val dateTimeFormat = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC
 
   private val parseDate: String => LocalDate =
@@ -93,7 +93,7 @@ object NotificationDetails {
       new DateTime(dateTime, DateTimeZone.UTC)
     }
   }
-
+  implicit val dateFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat
   implicit val reads = Json.reads[NotificationDetails]
 
 }

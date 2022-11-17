@@ -17,8 +17,9 @@
 package models.notifications
 
 import org.joda.time.format.ISODateTimeFormat
-import org.joda.time.{DateTimeZone, LocalDateTime}
+import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
 import play.api.libs.json._
+import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
 
 case class NotificationResponse(processingDate: LocalDateTime, secureCommText: String)
 
@@ -35,6 +36,6 @@ object NotificationResponse {
   implicit val localDateTimeWrite: Writes[LocalDateTime] = new Writes[LocalDateTime] {
     def writes(dateTime: LocalDateTime): JsValue = JsString(dateTimeFormat.print(dateTime.toDateTime(DateTimeZone.UTC)))
   }
-
+  implicit val dateFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat
   implicit val format = Json.format[NotificationResponse]
 }

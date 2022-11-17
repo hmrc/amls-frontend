@@ -20,6 +20,7 @@ import models.ResponseType.AmendOrVariationResponseType
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionReadyForReview, SubmissionStatus}
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
+import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
 
 sealed trait ResponseType
 
@@ -82,4 +83,5 @@ object FeeResponse {
     )
   }
   implicit val format = Json.format[FeeResponse]
+  implicit val dateFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat
 }
