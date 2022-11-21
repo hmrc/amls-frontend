@@ -93,26 +93,26 @@
                 draggable = false
             )
         } else {
-        </ul>
-        @if(index == 1) {
-            @anchor(
-                attrHref = controllers.tradingpremises.routes.ConfirmAddressController.get(index).toString,
-                attrRole = true,
-                linkText = Messages("button.continue"),
-                returnLink = true,
-                id = Some("tpwhatyouneed-button"),
-                draggable = false
-            )
-        } else {
-            @anchor(
-                attrHref = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index).toString,
-                attrRole = true,
-                linkText = Messages("button.continue"),
-                returnLink = true,
-                id = Some("tpwhatyouneed-button"),
-                draggable = false
-            )
+            </ul>
+            @if(index == 1) {
+                @anchor(
+                    attrHref = controllers.tradingpremises.routes.ConfirmAddressController.get(index).toString,
+                    attrRole = true,
+                    linkText = Messages("button.continue"),
+                    returnLink = true,
+                    id = Some("tpwhatyouneed-button"),
+                    draggable = false
+                )
+            } else {
+                @anchor(
+                    attrHref = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index).toString,
+                    attrRole = true,
+                    linkText = Messages("button.continue"),
+                    returnLink = true,
+                    id = Some("tpwhatyouneed-button"),
+                    draggable = false
+                )
+            }
         }
     }
-}
 }
