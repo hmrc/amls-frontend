@@ -127,7 +127,6 @@
         @model.servicesOfAnotherTCSP.map { s =>
             @checkYourAnswersRow(
                 question = Messages("tcsp.anothertcspsupervision.title"),
-                editLinkTag = "anothertcspsupervision-edit",
                 editUrl = controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).toString
             ) {
                 @s match {
@@ -141,7 +140,6 @@
             @if(s != ServicesOfAnotherTCSPNo) {
                     @checkYourAnswersRow(
                         question = Messages("tcsp.anothertcspsupervision.cya.additional.header"),
-                        editLinkTag = "anothertcspsupervision-edit",
                         editUrl = controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).toString
                     ) {
                         @s match {

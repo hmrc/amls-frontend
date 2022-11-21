@@ -112,7 +112,6 @@
         @checkYourAnswersRow(
             question = Messages("businessactivities.businessfranchise.title"),
             editUrl = controllers.businessactivities.routes.BusinessFranchiseController.get(true).toString,
-            editLinkTag = "businessfranchise-edit"
         ) {
             @model.businessFranchise.map {
                 case BusinessFranchiseNo        => { @Messages("lbl.no") }
@@ -126,7 +125,6 @@
                 @checkYourAnswersRow(
                     question = Messages("businessactivities.businessfranchise.lbl.franchisename"),
                     editUrl = controllers.businessactivities.routes.BusinessFranchiseController.get(true).toString,
-                    editLinkTag = "businessfranchise-edit"
                 ) {
                     @name
                 }
@@ -168,7 +166,6 @@
             @checkYourAnswersRow(
                 question = Messages("businessactivities.do.keep.records"),
                 editUrl = controllers.businessactivities.routes.TransactionTypesController.get(true).toString,
-                editLinkTag = "howrecordskept-edit"
             ) {
                     @if(t.types.size > 1) {
                         <ul class="list list-bullet">
@@ -200,7 +197,6 @@
                         @checkYourAnswersRow(
                             question = Messages("businessactivities.name.software.pkg.lbl"),
                             editUrl = controllers.businessactivities.routes.TransactionTypesController.get(true).toString,
-                            editLinkTag = "howrecordskept-edit"
                         ) {
                             @software
                         }

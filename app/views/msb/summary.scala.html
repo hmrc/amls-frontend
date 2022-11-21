@@ -272,7 +272,6 @@
             @model.whichCurrencies.map { wc =>
                 @checkYourAnswersRow(
                     question = Messages("msb.which_currencies.title"),
-                    editLinkTag = "msbwhichcurrencies-edit",
                     editUrl = controllers.msb.routes.WhichCurrenciesController.get(true).toString
                 ) {
                     @if(wc.currencies.size == 1){
