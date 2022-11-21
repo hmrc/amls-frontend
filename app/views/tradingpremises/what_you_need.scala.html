@@ -70,17 +70,21 @@
                 <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.5")</li>
             }
         }
+    }
+    </ul>
 
+    @activities.map { ba =>
         @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness)) {
             <h3 class="heading-medium">@Messages("tradingpremises.whatyouneed.agents.sub.heading")</h3>
 
             <p>@Messages("tradingpremises.whatyouneed.agents.desc.1")</p>
 
             <p>@Messages("tradingpremises.whatyouneed.agents.desc.2")</p>
-
+            <ul class="list list-bullet">
                 <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.6")</li>
                 <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.7")</li>
                 <li>@Messages("tradingpremises.whatyouneed.requiredinfo.text.8")</li>
+            </ul>
         }
 
         @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness)) {
@@ -93,7 +97,6 @@
                 draggable = false
             )
         } else {
-            </ul>
             @if(index == 1) {
                 @anchor(
                     attrHref = controllers.tradingpremises.routes.ConfirmAddressController.get(index).toString,
