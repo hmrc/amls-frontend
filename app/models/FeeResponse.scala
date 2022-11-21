@@ -83,5 +83,4 @@ object FeeResponse {
     )
   }
   implicit val format = Json.format[FeeResponse]
-  implicit val dateFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat
 }

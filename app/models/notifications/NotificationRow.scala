@@ -19,22 +19,23 @@ package models.notifications
 import models.notifications.ContactType._
 import models.notifications.RejectedReason._
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
-import org.joda.time.{DateTime, DateTimeZone}
+import org.joda.time.DateTime
+import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsValue, Writes, _}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
 import utils.ContactTypeHelper
 
-case class NotificationRow(
-                            status: Option[Status],
-                            contactType: Option[ContactType],
-                            contactNumber: Option[String],
-                            variation: Boolean,
-                            receivedAt: DateTime,
-                            isRead: Boolean,
-                            amlsRegistrationNumber: String,
-                            templatePackageVersion: String,
-                            _id: IDType
-                          ) {
+case class NotificationRow (
+                             status: Option[Status],
+                             contactType: Option[ContactType],
+                             contactNumber: Option[String],
+                             variation: Boolean,
+                             receivedAt: DateTime,
+                             isRead: Boolean,
+                             amlsRegistrationNumber: String,
+                             templatePackageVersion: String,
+                             _id: IDType
+                           ) {
 
   def dateReceived: String = {
     val fmt: DateTimeFormatter = DateTimeFormat.forPattern("d MMMM Y")
@@ -85,20 +86,34 @@ case class NotificationRow(
 }
 
 object NotificationRow {
-  implicit val dateFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat
-  implicit val dateTimeRead: Reads[DateTime] = {
-    (__ \ "$date").read[Long].map { dateTime =>
-      new DateTime(dateTime, DateTimeZone.UTC)
-    }
-  }
+  implicit val dateTimeFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat
+  val reads: Reads[NotificationRow] =
+    (
+      (JsPath \ "status").readNullable[Status] and
+        (JsPath \ "contactType").readNullable[ContactType] and
+        (JsPath \ "contactNumber").readNullable[String] and
+        (JsPath \ "variation").read[Boolean] and
+        (JsPath \ "receivedAt").read[DateTime](MongoJodaFormats.dateTimeReads) and
+        (JsPath \ "isRead").read[Boolean] and
+        (JsPath \ "amlsRegistrationNumber").read[String] and
+        (JsPath \ "templatePackageVersion").read[String] and
+        (JsPath \ "_id").read[IDType]
+      )(NotificationRow.apply _)
 
-  implicit val dateTimeWrite: Writes[DateTime] = new Writes[DateTime] {
-    def writes(dateTime: DateTime): JsValue = Json.obj(
-      "$date" -> dateTime.getMillis
-    )
-  }
+  val writes : OWrites[NotificationRow] =
+    (
+      (JsPath \ "status").writeNullable[Status] and
+        (JsPath \ "contactType").writeNullable[ContactType] and
+        (JsPath \ "contactNumber").writeNullable[String] and
+        (JsPath \ "variation").write[Boolean] and
+        (JsPath \ "receivedAt").write[DateTime](MongoJodaFormats.dateTimeWrites) and
+        (JsPath \ "isRead").write[Boolean] and
+        (JsPath \ "amlsRegistrationNumber").write[String] and
+        (JsPath \ "templatePackageVersion").write[String] and
+        (JsPath \ "_id").write[IDType]
+      )(unlift(NotificationRow.unapply))
 
-  implicit val format = Json.format[NotificationRow]
+  implicit val format: OFormat[NotificationRow] = OFormat(reads, writes)
 }
 
 case class IDType(id: String)
