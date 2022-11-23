@@ -24,7 +24,7 @@ $(window).load(function () {
         // =====================================================
         // Back link mimics browser back functionality
         // =====================================================
-        $('#back-link').on('click', function(e){
+        $('.link-back').on('click', function(e) {
           e.preventDefault();
           history.go(-1); // go(-1) needed for mobile browsers!
         })

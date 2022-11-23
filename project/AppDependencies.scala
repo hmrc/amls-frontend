@@ -11,20 +11,20 @@ private object AppDependencies {
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
   private val jsonEncryptionVersion = "4.10.0-play-28"
-  private val playReactivemongoVersion = "8.0.0-play-28"
+  private val hmrcMongoVersion = "0.71.0"
   private val domain = "6.2.0-play-28"
 
   val compile = Seq(
     ws,
-    "uk.gov.hmrc" %% "domain" % domain,
-    "uk.gov.hmrc" %% "play-partials" % playPartialsVersion,
-    "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,
-    "uk.gov.hmrc" %% "json-encryption" % jsonEncryptionVersion,
-    "uk.gov.hmrc" %% "simple-reactivemongo" % playReactivemongoVersion,
-    "uk.gov.hmrc" %% "play-ui" % "9.6.0-play-28",
-    "uk.gov.hmrc" %% "bootstrap-frontend-play-28" % "5.12.0",
-    "uk.gov.hmrc" %% "govuk-template" % "5.69.0-play-28",
-    "uk.gov.hmrc" %% "play-frontend-hmrc" % "1.31.0-play-28",
+    "uk.gov.hmrc"       %% "domain"                     % domain,
+    "uk.gov.hmrc"       %% "play-partials"              % playPartialsVersion,
+    "uk.gov.hmrc"       %% "http-caching-client"        % httpCachingClientVersion,
+    "uk.gov.hmrc"       %% "json-encryption"            % jsonEncryptionVersion,
+    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"         % hmrcMongoVersion,
+    "uk.gov.hmrc"       %% "play-ui"                    % "9.6.0-play-28",
+    "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "5.12.0",
+    "uk.gov.hmrc"       %% "govuk-template"             % "5.69.0-play-28",
+    "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "1.31.0-play-28",
 
 
     "io.github.jto" %% "validation-core"      % validationVersion,
