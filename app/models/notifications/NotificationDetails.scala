@@ -21,6 +21,8 @@ import models.confirmation.Currency
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import play.api.libs.json._
+import uk.gov.hmrc.mongo.play.json.formats.{MongoJavatimeFormats, MongoJodaFormats}
+import play.api.libs.functional.syntax._
 import utils.ContactTypeHelper
 
 case class NotificationDetails(contactType: Option[ContactType],
@@ -47,8 +49,25 @@ case class NotificationDetails(contactType: Option[ContactType],
 }
 
 object NotificationDetails {
+  val reads: Reads[NotificationDetails ] =
+    (
+      (JsPath \ "contactType").readNullable[ContactType] and
+        (JsPath \ "status").readNullable[Status] and
+        (JsPath \ "messageText").readNullable[String] and
+        (JsPath \ "variation").read[Boolean] and
+        (JsPath \ "receivedAt").read[DateTime]((MongoJodaFormats.dateTimeFormat))
+      )(NotificationDetails.apply _)
 
-  val dateTimeFormat = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC
+  val writes : OWrites[NotificationDetails ] =
+    (
+      (JsPath \ "contactType").writeNullable[ContactType] and
+        (JsPath \ "status").writeNullable[Status] and
+        (JsPath \ "messageText").writeNullable[String] and
+        (JsPath \ "variation").write[Boolean] and
+        (JsPath \ "receivedAt").write[DateTime]((MongoJodaFormats.dateTimeFormat))
+      )(unlift(NotificationDetails.unapply))
+
+  implicit val format: OFormat[NotificationDetails] = OFormat(reads, writes)
 
   private val parseDate: String => LocalDate =
     input => LocalDate.parse(input, DateTimeFormat.forPattern("dd/MM/yyyy"))
@@ -87,13 +106,4 @@ object NotificationDetails {
   }
 
   private def splitByDash(s: String): String = s.split("-")(1)
-
-  implicit val dateTimeRead: Reads[DateTime] = {
-    (__ \ "$date").read[Long].map { dateTime =>
-      new DateTime(dateTime, DateTimeZone.UTC)
-    }
-  }
-
-  implicit val reads = Json.reads[NotificationDetails]
-
 }
