@@ -62,7 +62,6 @@
         @model.vatRegistered.map { vatRegistered =>
             @checkYourAnswersRow(
                 question = Messages("businessdetails.registeredforvat.title"),
-                editLinkTag = "businessdetailsregisteredvat-edit",
                 editUrl = controllers.businessdetails.routes.VATRegisteredController.get(true).toString
             ) {
                 @vatRegistered match {
@@ -78,7 +77,6 @@
                 case VATRegisteredYes(vatNo) => {
                     @checkYourAnswersRow(
                         question = Messages("lbl.vat.reg.number"),
-                        editLinkTag = "businessdetailsregisteredvat-edit",
                         editUrl = controllers.businessdetails.routes.VATRegisteredController.get(true).toString
                     ) {
                           @vatNo

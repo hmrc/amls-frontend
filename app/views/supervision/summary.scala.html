@@ -59,7 +59,7 @@
 
             @checkYourAnswersRow(
                 question = Messages("supervision.another_body.lbl.supervisor"),
-                editLinkTag = "supervisionanotherbody-edit-name",
+                editLinkTag = "supervisionanotherbody-edit-previous-name",
                 editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
             ) {
                 @supervisorName
@@ -156,7 +156,6 @@
 
     @checkYourAnswersRow(
         question = Messages("supervision.penalisedbyprofessional.title"),
-        editLinkTag = "supervisionpenalised-edit",
         editUrl = controllers.supervision.routes.PenalisedByProfessionalController.get(true).toString
     ) {
         @model.professionalBody.map {
@@ -170,7 +169,6 @@
         case ProfessionalBodyYes(v) => {
             @checkYourAnswersRow(
                 question = Messages("supervision.penalisedbyprofessional.details.lbl"),
-                editLinkTag = "supervisionpenalised-edit",
                 editUrl = controllers.supervision.routes.PenalisedByProfessionalController.get(true).toString
             ) {
                 @v

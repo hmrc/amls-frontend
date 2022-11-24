@@ -213,7 +213,6 @@
                     @model.businessAppliedForPSRNumber.map { psr =>
                         @checkYourAnswersRow(
                             question = Messages("businessmatching.psr.number.title"),
-                            editUrl = controllers.businessmatching.routes.PSRNumberController.get(true).toString,
                             editLinkTag = "edit-psr-number"
                         ) {
                             <p id="psr">@psr match {

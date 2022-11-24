@@ -231,7 +231,6 @@
             @model.whichCurrencies.map { wc =>
                 @checkYourAnswersRow(
                     question = Messages("renewal.msb.whichcurrencies.header"),
-                    editLinkTag = "msbwhichcurrencies-edit",
                     editUrl = controllers.renewal.routes.WhichCurrenciesController.get(edit = true).toString
                 ) {
                     @if(wc.currencies.size > 1) {
@@ -252,7 +251,6 @@
                 @wc.usesForeignCurrencies.map { ufc =>
                     @checkYourAnswersRow(
                         question = Messages("renewal.msb.foreign_currencies.header"),
-                        editLinkTag = "msbwhichcurrencies-edit",
                         editUrl = controllers.renewal.routes.UsesForeignCurrenciesController.get(true).toString
                     ) {
                         @ufc match {
@@ -272,7 +270,6 @@
                     @if(ms.bankMoneySource.isDefined | ms.wholesalerMoneySource.isDefined | ms.customerMoneySource.isDefined) {
                         @checkYourAnswersRow(
                             question = Messages("renewal.msb.money_sources.header"),
-                            editLinkTag = "msbwhichcurrencies-edit",
                             editUrl = controllers.renewal.routes.MoneySourcesController.get(true).toString
                         ) {
 
@@ -308,7 +305,6 @@
                   @if(ms.bankMoneySource.isDefined) {
                       @checkYourAnswersRow(
                           question = Messages("msb.which_currencies.source.which_banks"),
-                          editLinkTag = "msbwhichcurrencies-edit",
                           editUrl = controllers.renewal.routes.MoneySourcesController.get(true).toString
                       ) {
                           @ms.bankMoneySource.map { bms =>
@@ -319,7 +315,6 @@
                     @if(ms.wholesalerMoneySource.isDefined) {
                         @checkYourAnswersRow(
                             question = Messages("msb.which_currencies.source.which_wholesalers"),
-                            editLinkTag = "msbwhichcurrencies-edit",
                             editUrl = controllers.renewal.routes.MoneySourcesController.get(true).toString
                         ) {
                             @ms.wholesalerMoneySource.map { wms =>
