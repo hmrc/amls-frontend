@@ -918,8 +918,19 @@ h2#complete-header {
   border-bottom: 1px solid #b1b4b6;
 }
 
-.cya-summary-list__key {
+.cya-summary-list__value {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   width: 50%;
+}
+
+.cya-summary-list {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.cya-summary-list__key {
+  width: 30%;
 }
 
 @media (max-width: 640px) {
