@@ -115,30 +115,6 @@
     </div>
 }
 
-@PublicMessageBanner = {
-    <section id="public-message-banner">
-        <div class="js-hidden notice-banner" id="notice-banner" style="background-color: #D4351C;">
-            <div class="centered-content">
-                <div class="notice-banner__wrapper amls-notice-banner__wrapper">
-                    <div class="grid-layout__column--1-4 bold">
-                        @hmrcNewTabLink(
-                            NewTabLink(
-                                classList = Some("notice-banner__content"),
-                                href=Some("https://www.gov.uk/government/publications/guidance-to-employers-and-businesses-about-covid-19"),
-                                text=Messages("Coronavirus (COVID-19): what you need to do")
-                            )
-                        )
-                    </div>
-                    <div class="grid-layout__column--1-4 text--right">
-                        <a id="dismiss-user-panel" class="notice-banner__close notice-banner__content" href="#"
-                        data-journey-click="link - click:Your business taxes:Dismiss public Announcement">Hide message</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-}
-
 @getHelpForm = {
     @{viewHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
 }
@@ -147,9 +123,7 @@
 
 @content = {
     <main id="wrapper" role="main">
-        @if(appConfig.publicMessageBannerToggle) {
-            @PublicMessageBanner
-        } else if(showURRBanner) {
+        @if(showURRBanner) {
             @URRBanner
         }
         <div id="content">
