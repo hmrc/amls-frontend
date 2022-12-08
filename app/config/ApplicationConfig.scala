@@ -60,7 +60,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
   lazy val eabRedressUrl     = s"${servicesConfig.getConfString("amls-estate-agency-business-frontend.redress-url", "")}/change-redress-scheme"
 
   def businessCustomerUrl = getConfigString("business-customer.url")
-  
+
   lazy val mongoCacheUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.get-file-url")
 
   def amlsUrl = baseUrl("amls")
@@ -70,8 +70,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
   def enrolmentStoreToggle = servicesConfig.getConfBool("feature-toggle.enrolment-store", false)
 
   def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
-  
-  def publicMessageBannerToggle = servicesConfig.getConfBool("feature-toggle.public-message-banner", true)
 
   lazy val authUrl = baseUrl("auth")
 
