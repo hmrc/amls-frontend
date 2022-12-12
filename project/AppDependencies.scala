@@ -22,7 +22,7 @@ private object AppDependencies {
     "uk.gov.hmrc"       %% "json-encryption"            % jsonEncryptionVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"         % hmrcMongoVersion,
     "uk.gov.hmrc"       %% "play-ui"                    % "9.6.0-play-28",
-    "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "5.12.0",
+    "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "7.12.0",
     "uk.gov.hmrc"       %% "govuk-template"             % "5.69.0-play-28",
     "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "1.31.0-play-28",
 
