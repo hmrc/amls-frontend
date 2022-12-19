@@ -59,9 +59,6 @@ lazy val microservice = Project(appName, file("."))
     addTestReportOption(IntegrationTest, "int-test-reports"),
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
     parallelExecution in IntegrationTest := false)
-  .settings(
-    resolvers += Resolver.bintrayRepo("hmrc", "releases")
-  )
  .settings(
     scalacOptions ++= List(
       "-Yrangepos",
