@@ -689,6 +689,8 @@ error.required.declaration.add.position.for.unicorporated.body = Select if you a
 ######################################      Custom Page Titles and Labels     ##########################################
 ########################################################################################################################
 
+site.service_name = Manage your anti-money laundering supervision
+
 title.gov = GOV.UK
 title.amls = Manage your anti-money laundering supervision
 title.services = Which services does your business provide?

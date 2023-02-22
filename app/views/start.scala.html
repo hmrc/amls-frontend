@@ -14,41 +14,44 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 @import include._
-@import config.{ ApplicationConfig}
+@import components.{Heading, Button}
+@import config.ApplicationConfig
 
-@this(main: include.main)
+@this(layout: Layout, heading: Heading, button: Button)
 
-@()(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@()(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
-@header = {
+@layout(
+    pageTitle = s"${messages("start.title")}",
+    showBackLink = false,
+    timeoutEnabled = false,
+    canSignOut = false
+){
+
     @heading("start.title")
-}
 
-@main(
-    title = Messages("start.title") + " - " + Messages("summary.start"),
-    heading = header,
-    userLoggedIn = false
-) {
-    <p>@Messages("start.line.1")</p>
+    <p class="govuk-body">@messages("start.line.1")</p>
 
-    <ul class="list list-bullet">
-        <li>@Messages("start.line.2")</li>
-        <li>@Messages("start.line.3")</li>
-        <li>@Messages("start.line.4")</li>
-        <li>@Messages("start.line.5")</li>
-        <li>@Messages("start.line.6")</li>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("start.line.2")</li>
+        <li>@messages("start.line.3")</li>
+        <li>@messages("start.line.4")</li>
+        <li>@messages("start.line.5")</li>
+        <li>@messages("start.line.6")</li>
     </ul>
 
-    <p>@Messages("start.line.7")</p>
+    <p class="govuk-body">@messages("start.line.7")</p>
 
-    <a class="button button--get-started" href="@controllers.routes.LandingController.get" role="button" draggable="false">@Messages("start.button.text")</a>
+    @button(msg = messages("start.button.text"), hrefOpt = Some(controllers.routes.LandingController.get.url), startButton = true)
 
-    <p class="heading-medium">@Messages("start.line.8")</p>
+    <p class="govuk-heading-m">@messages("start.line.8")</p>
 
-    <a href="https://www.gov.uk/topic/business-tax/money-laundering-regulations">@Messages("")</a>
+    <a class="govuk-link" href="https://www.gov.uk/topic/business-tax/money-laundering-regulations">@messages("")</a>
 
-    <p>@Messages("start.line.9") <a href="https://www.gov.uk/topic/business-tax/money-laundering-regulations">@Messages("start.line.9.middle")</a> @Messages("start.line.9.end")</p>
-    <p>@Messages("start.line.10") <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees">@Messages("start.line.10.middle")</a>@Messages("full.stop")</p>
-    <p>@Messages("start.line.11")</p>
+    <p class="govuk-body">@messages("start.line.9") <a href="https://www.gov.uk/topic/business-tax/money-laundering-regulations">@Messages("start.line.9.middle")</a> @Messages("start.line.9.end")</p>
+    <p class="govuk-body">@messages("start.line.10") <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees">@Messages("start.line.10.middle")</a>@Messages("full.stop")</p>
+    <p class="govuk-body">@messages("start.line.11")</p>
 }

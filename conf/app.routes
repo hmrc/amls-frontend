@@ -1,4 +1,5 @@
 # microservice specific routes
+->          /hmrc-frontend                                                            hmrcfrontend.Routes
 
 ->          /business-details                                                         businessDetails.Routes
 ->          /business-activities                                                      businessActivities.Routes
