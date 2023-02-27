@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package views
+package models
 
-import play.api.data.Form
-import play.api.i18n.Messages
+import play.api.mvc.JavascriptLiteral
 
-object ViewUtils {
+sealed trait Mode
 
-  def errorPrefix(form: Form[_])(implicit messages: Messages): String = {
-    if (form.hasErrors || form.hasGlobalErrors) messages("error.browser.title.prefix") else ""
+case object CheckMode extends Mode
+case object NormalMode extends Mode
+
+object Mode {
+
+  implicit val jsLiteral: JavascriptLiteral[Mode] = new JavascriptLiteral[Mode] {
+    override def to(value: Mode): String = value match {
+      case NormalMode => "NormalMode"
+      case CheckMode => "CheckMode"
+    }
   }
 }

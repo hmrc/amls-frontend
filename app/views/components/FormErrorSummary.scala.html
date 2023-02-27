@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package views
+@this(errorSummary: GovukErrorSummary)
 
-import play.api.data.Form
-import play.api.i18n.Messages
+@(form: Form[_], mapping: Option[Map[String, String]] = None)(implicit messages: Messages)
 
-object ViewUtils {
-
-  def errorPrefix(form: Form[_])(implicit messages: Messages): String = {
-    if (form.hasErrors || form.hasGlobalErrors) messages("error.browser.title.prefix") else ""
-  }
+@if(form.errors.nonEmpty) {
+    @errorSummary(
+        mapping.fold(ErrorSummary().withFormErrorsAsText(form)){ value =>
+            ErrorSummary().withFormErrorsAsText(form, mapping = value)
+        }
+    )
 }

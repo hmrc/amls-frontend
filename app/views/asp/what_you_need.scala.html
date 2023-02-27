@@ -14,40 +14,35 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
-@import config.{ ApplicationConfig}
+@import config.ApplicationConfig
 
-@this(main: include.main,
-      whatyouneed: include.whatyouneed)
+@this(
+    layout: Layout,
+    button: components.Button,
+    heading: components.Heading,
+    notificationBanner: components.UserAttentionSaving,
+    appConfig: ApplicationConfig,
+    anchor: components.Anchor
+)
 
-@()(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@()(implicit request: Request[_], messages: Messages)
 
-@header = {
-    @components.back_link()
-    @heading("title.wyn", "summary.asp")
-}
+@layout(pageTitle = messages("title.wyn")) {
 
-@whatyouneed(
-    title = Messages("title.wyn") + " - " + Messages("summary.asp"),
-    heading = header
-) {
+    @components.PageHeading("summary.asp")
 
-    @components.user_attention_saving()
+    @heading("title.wyn")
 
-    <p>@Messages("asp.whatyouneed.subheading")</p>
+    @notificationBanner(messages("whatYouNeed.attention.information"))
 
-    <ul class="list list-bullet">
-        <li>@Messages("asp.whatyouneed.line_1")</li>
-        <li>@Messages("asp.whatyouneed.line_2")</li>
+    <p class="govuk-body">@messages("asp.whatyouneed.subheading")</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("asp.whatyouneed.line_1")</li>
+        <li>@messages("asp.whatyouneed.line_2")</li>
     </ul>
 
-    @anchor(
-        attrHref = controllers.asp.routes.ServicesOfBusinessController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.continue"),
-        returnLink = true,
-        id=Some("aspwhatyouneed-button"),
-        draggable = false
-    )
+    @button("button.continue", "aspwhatyouneed-button", Some("services"))
+
+    @anchor()
 }

@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package views
+@import config.ApplicationConfig
 
-import play.api.data.Form
-import play.api.i18n.Messages
+@this(appConfig: ApplicationConfig)
 
-object ViewUtils {
+@(returnLocation: Option[String] = None)(implicit m: Messages)
 
-  def errorPrefix(form: Form[_])(implicit messages: Messages): String = {
-    if (form.hasErrors || form.hasGlobalErrors) messages("error.browser.title.prefix") else ""
-  }
+<p class="govuk-link">
+@if(returnLocation == Some("renewal")) {
+    <a href="@controllers.renewal.routes.RenewalProgressController.get.url">@Messages("link.return.renewal.progress")</a>
+} else {
+    <a href="@controllers.routes.RegistrationProgressController.get.url">@Messages("link.return.registration.progress")</a>
 }
+</p>
+

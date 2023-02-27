@@ -16,11 +16,10 @@
 
 @this(govukButton: GovukButton)
 
-@(msg: String, id: String = "button", hrefOpt: Option[String] = None, startButton: Boolean = false)(implicit messages: Messages)
+@(msg: String, id: String = "button", hrefOpt: Option[String] = None)(implicit messages: Messages)
 
 @govukButton(Button(
 href = hrefOpt,
 content = Text(messages(msg)),
-isStartButton = startButton,
 attributes = Map("id" -> id)
 ))

@@ -14,59 +14,57 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
-@import config.{ ApplicationConfig}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
+@import models.asp.ServicesOfBusiness
+@import controllers.asp.routes.ServicesOfBusinessController
+@import config.ApplicationConfig
+@import views.ViewUtils
 
-@this(main: include.main)
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    button: Button,
+    errorSummary: components.FormErrorSummary,
+    govukCheckboxes : GovukCheckboxes,
+    appConfig: ApplicationConfig,
+    anchor: components.Anchor
+)
 
-@(f: forms.Form2[_], edit: Boolean)(implicit   m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
+@(form: Form[Seq[ServicesOfBusiness]], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@header = {
-    @components.back_link()
-    @errorSummary(f)
-}
+@layout(pageTitle = s"${errorPrefix(form)} ${messages("typeOfParticipant.title")}") {
 
-@main(
-    title = Messages("asp.services.title") + " - " + Messages("summary.asp"),
-    heading = header
-) {
+    @formHelper(action = ServicesOfBusinessController.post(edit), 'autoComplete -> "off") {
 
-    @form(f, controllers.asp.routes.ServicesOfBusinessController.post(edit)) {
+        @errorSummary(form, Some(Map("value" -> "value_0")))
 
-        @fieldsetWithErrorGroup(
-            f = f("services"),
-            heading = "asp.services.title",
-            section = "summary.asp",
-            panel = false,
-            hint = "lbl.select.all"
-        ) {
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.01",
-                value = "01"
+        @components.page_heading("amp.heading")
+
+        @govukCheckboxes(
+            Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(
+                        Legend(
+                            content = Text(messages("typeOfParticipant.heading")),
+                            classes = "govuk-fieldset__legend--xl",
+                            isPageHeading = true
+                        )
+                    )
+                )),
+                hint = Some(
+                    Hint(
+                        content = Text(messages("typeOfParticipant.hint"))
+                    )
+                ),
+                name = "value",
+                items = TypeOfParticipant.options
             )
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.04",
-                value = "04"
-            )
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.03",
-                value = "03"
-            )
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.05",
-                value = "05"
-            )
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.02",
-                value = "02"
-            )
-        }
-        @submit(edit)
+            .withFormField(form("value"))
+        )
+
+        @button("site.continue", "submit")
+
+        @anchor()
     }
 }
