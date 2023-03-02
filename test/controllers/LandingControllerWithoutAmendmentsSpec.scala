@@ -41,7 +41,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.AmlsSpec
-import views.html.start
+import views.html.Start
 
 import scala.concurrent.Future
 
@@ -54,7 +54,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
     val request = addToken(authRequest)
     val config = mock[ApplicationConfig]
-    lazy val view = app.injector.instanceOf[start]
+    lazy val view = app.injector.instanceOf[Start]
     lazy val headerCarrierForPartialsConverter = app.injector.instanceOf[HeaderCarrierForPartialsConverter]
     val controllerNoAmlsNumber = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],

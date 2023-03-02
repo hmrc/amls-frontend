@@ -16,6 +16,7 @@
 
 package views
 
+import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.Html
 
@@ -23,5 +24,9 @@ object ViewUtils {
 
   def errorPrefix(content: Html)(implicit messages: Messages): String = {
     if (content.toString().contains("error-notification")) messages("error.browser.title.prefix").concat(" ") else ""
+  }
+
+  def errorPrefix(form: Form[_])(implicit messages: Messages): String = {
+    if (form.hasErrors || form.hasGlobalErrors) messages("error.browser.title.prefix") else ""
   }
 }

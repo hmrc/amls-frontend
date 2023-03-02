@@ -14,13 +14,13 @@
  * limitations under the License.
  *@
 
-@this(govukButton: GovukButton)
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 
-@(msg: String = "button.saveandcontinue", id: String = "button", hrefOpt: Option[String] = None, startButton: Boolean = false)(implicit messages: Messages)
+@this(errorSummary: GovukErrorSummary)
 
-@govukButton(Button(
-href = hrefOpt,
-content = Text(messages(msg)),
-isStartButton = startButton,
-attributes = Map("id" -> id)
-))
+@(form: Form[_])(implicit messages: Messages)
+
+@if(form.errors.nonEmpty) {
+    @errorSummary(ErrorSummary().withFormErrorsAsText(form))
+}

@@ -18,12 +18,12 @@ package views
 
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
-import views.html.start
+import views.html.Start
 
-class startSpec extends AmlsViewSpec with MustMatchers {
+class StartViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    lazy val start = app.injector.instanceOf[start]
+    lazy val start = app.injector.instanceOf[Start]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -52,8 +52,8 @@ class startSpec extends AmlsViewSpec with MustMatchers {
       html must include("deregister, if you no longer need to be registered under the Money Laundering Regulations")
       html must include("To sign in, you need a Government Gateway user ID and password. If you do not have a user ID, you can create one when you first register.")
 
-      doc.getElementsByClass("button button--get-started").text() mustBe "Sign in"
-      doc.getElementsByClass("heading-medium").text() mustBe "Before you start"
+      doc.getElementById("button").text() mustBe "Sign in"
+      doc.getElementsByClass("govuk-heading-m").text() mustBe "Before you start"
 
       html must include("Check our <a href=\"https://www.gov.uk/topic/business-tax/money-laundering-regulations\">Money Laundering Regulations guidance</a> before applying to register.")
       html must include("Check <a href=\"https://www.gov.uk/guidance/money-laundering-regulations-registration-fees\">fees for anti-money laundering supervision</a>.")

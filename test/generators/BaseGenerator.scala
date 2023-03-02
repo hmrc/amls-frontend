@@ -17,18 +17,30 @@
 package generators
 
 import org.joda.time.LocalDate
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
+import org.scalacheck.Gen.listOfN
 
 //noinspection ScalaStyle
 trait BaseGenerator {
 
-  def stringOfLengthGen(maxLength: Int) = {
+  def stringOfLengthGen(maxLength: Int): Gen[String] = {
     Gen.listOfN(maxLength, Gen.alphaNumChar).map(x => x.mkString)
   }
 
-  def alphaNumOfLengthGen(maxLength: Int) = {
+  def alphaNumOfLengthGen(maxLength: Int): Gen[String] = {
     Gen.listOfN(maxLength, Gen.alphaNumChar).map(x => x.mkString)
   }
+
+  def stringsLongerThan(minLength: Int): Gen[String] = for {
+    length    <- Gen.chooseNum(minLength + 1, (minLength * 2).max(100))
+    chars     <- listOfN(length, arbitrary[Char])
+  } yield chars.mkString
+
+  def stringsShorterThan(minLength: Int): Gen[String] = for {
+    length    <- Gen.chooseNum(0, minLength - 1)
+    chars     <- listOfN(length, arbitrary[Char])
+  } yield chars.mkString
 
   def numSequence(maxLength: Int) =
     Gen.listOfN(maxLength, Gen.chooseNum(1, 9)) map {_.mkString}

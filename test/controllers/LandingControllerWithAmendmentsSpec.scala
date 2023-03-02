@@ -54,7 +54,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AmlsSpec, AuthorisedFixture}
-import views.html.start
+import views.html.Start
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -93,7 +93,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
     val request = addToken(authRequest)
     val config = mock[ApplicationConfig]
-    lazy val view = app.injector.instanceOf[start]
+    lazy val view = app.injector.instanceOf[Start]
     val controller = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
       landingService = mock[LandingService],
@@ -259,7 +259,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
     val request = addToken(authRequest)
     val config = mock[ApplicationConfig]
-    lazy val view = app.injector.instanceOf[start]
+    lazy val view = app.injector.instanceOf[Start]
     val controller = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
       landingService = mock[LandingService],

@@ -14,41 +14,60 @@
  * limitations under the License.
  *@
 
-@import forms.Form2
-@import include.{main, heading}
-@import include.forms2._
 @import models.businessdetails._
 @import config.{ ApplicationConfig}
+@import components.Button
+@import components.forms.{InputText, ErrorSummary}
+@import views.ViewUtils._
 
-@this(main: include.main)
+@this(
+    formHelper: FormWithCSRF,
+    layout: Layout,
+    input: InputText,
+    errorSummary: ErrorSummary,
+    button: Button
+)
 
-@(f: Form2[_], edit: Boolean, showReturnLink: Boolean = true,  isPreSubmission: Boolean = true)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean, showReturnLink: Boolean = true,  isPreSubmission: Boolean = true)(implicit request: Request[_], messages:Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
-    @errorSummary(f)
 }
 
 @section = @{
     if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation"
 }
 
-@main(
-    title = Messages("businessmatching.registrationnumber.title") + " - " + Messages(section),
-    heading = header
-) {
+@layout(
+    pageTitle = s"""${errorPrefix(form)} ${messages("businessmatching.registrationnumber.title")} - ${messages(section)}"""
+){
 
-    @form(f, controllers.businessmatching.routes.CompanyRegistrationNumberController.post(edit)) {
+    @errorSummary(form)
+
+    <span id="stage-caption" class="govuk-caption-xl">@messages(section)</span>
+
+    @formHelper(action = controllers.businessmatching.routes.CompanyRegistrationNumberController.post(edit), 'autoComplete -> "off") {
+
         @input(
-            attrPattern = "[0-9]*",
-            attrType = "text",
-            field = f("companyRegistrationNumber"),
-            hintText = "lbl.hint.crn",
-            heading = "businessmatching.registrationnumber.title",
-            section = section,
-            inputMode = "numeric"
+            input = Input(
+                label = Label(
+                    isPageHeading = true,
+                    content = Text(messages("businessmatching.registrationnumber.title")),
+                    classes = "govuk-label--xl"
+                ),
+                hint = Some(
+                    Hint(
+                        content = Text(messages("lbl.hint.crn"))
+                    )
+                ),
+               name = "value",
+               id = "value",
+               inputmode = Some("numeric"),
+               classes = "govuk-!-width-one-quarter"
+            ),
+            field = form("value")
         )
 
-        @submit(edit, returnLink = showReturnLink)
+        @button()
     }
 }
