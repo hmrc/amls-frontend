@@ -19,7 +19,6 @@ package models
 import models.ResponseType.AmendOrVariationResponseType
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionReadyForReview, SubmissionStatus}
 import org.joda.time.{DateTime, DateTimeZone}
-import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 sealed trait ResponseType
@@ -85,37 +84,8 @@ object FeeResponse {
     }.orElse {
       (__ \ "$date" \ "$numberLong").read[String].map(dateTime => new DateTime(dateTime.toLong))
     }
-
-
+  
   implicit val dateTimeWrite: Writes[DateTime] = (dateTime: DateTime) => Json.obj("$date" -> dateTime.getMillis)
-
-  implicit val reads: Reads[FeeResponse] =
-    (
-      (__ \ "responseType").read[ResponseType] and
-        (__ \ "amlsReferenceNumber").read[String] and
-        (__ \ "registrationFee").read[BigDecimal] and
-        (__ \ "fpFee").readNullable[BigDecimal] and
-        (__ \ "approvalCheckFee").readNullable[BigDecimal] and
-        (__ \ "premiseFee").read[BigDecimal] and
-        (__ \ "totalFees").read[BigDecimal] and
-        (__ \ "paymentReference").readNullable[String] and
-        (__ \ "difference").readNullable[BigDecimal] and
-        (__ \ "createdAt").read[DateTime](dateTimeRead)
-      ) (FeeResponse.apply _)
-
-  implicit val writes: OWrites[FeeResponse] =
-    (
-      (__ \ "responseType").write[ResponseType] and
-        (__ \ "amlsReferenceNumber").write[String] and
-        (__ \ "registrationFee").write[BigDecimal] and
-        (__ \ "fpFee").writeNullable[BigDecimal] and
-        (__ \ "approvalCheckFee").writeNullable[BigDecimal] and
-        (__ \ "premiseFee").write[BigDecimal] and
-        (__ \ "totalFees").write[BigDecimal] and
-        (__ \ "paymentReference").writeNullable[String] and
-        (__ \ "difference").writeNullable[BigDecimal] and
-        (__ \ "createdAt").write[DateTime](dateTimeWrite)
-      ) (unlift(FeeResponse.unapply))
 
   implicit val format = Json.format[FeeResponse]
 }
