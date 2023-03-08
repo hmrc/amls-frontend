@@ -20,6 +20,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.renewal.{MoneySources, Renewal, UsesForeignCurrenciesYes, WhichCurrencies}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor

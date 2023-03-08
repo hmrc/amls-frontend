@@ -20,7 +20,8 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.{MoneyServiceBusiness => _, _}
+import models.businessmatching._
+import models.businessmatching.BusinessActivity.{MoneyServiceBusiness => _}
 import models.moneyservicebusiness._
 import play.api.mvc.{MessagesControllerComponents, Result}
 import utils.AuthAction

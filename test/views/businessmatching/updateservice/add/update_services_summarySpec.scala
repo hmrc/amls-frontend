@@ -17,16 +17,11 @@
 package views.businessmatching.updateservice.add
 
 import forms.EmptyForm
-import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
-import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.flowmanagement.AddBusinessTypeFlowModel
-import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
-import utils.AmlsViewSpec
-import views.Fixture
-import views.html.businessmatching.updateservice.add._
 import utils.UpdateServicesSummaryFixtures
+import views.html.businessmatching.updateservice.add._
 
 class update_services_summarySpec extends UpdateServicesSummaryFixtures {
   lazy val update_services_summary = app.injector.instanceOf[update_services_summary]

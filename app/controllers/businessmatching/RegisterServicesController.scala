@@ -20,20 +20,21 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
+import forms.RegisterBusinessActivitiesFormProvider
 import models.businessactivities.BusinessActivities
+import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, RepeatingSection}
-import views.html.businessmatching._
+import views.html.businessmatching.RegisterServicesView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -43,31 +44,31 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
                                            val dataCacheConnector: DataCacheConnector,
                                            val businessMatchingService: BusinessMatchingService,
                                            val cc: MessagesControllerComponents,
-                                           register_services: register_services) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                           formProvider: RegisterBusinessActivitiesFormProvider,
+                                           view: RegisterServicesView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
+
         statusService.isPreSubmission(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { isPreSubmission =>
           (for {
             businessMatching <- businessMatchingService.getModel(request.credId)
             businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
+            existing = getActivityValues(isPreSubmission, Some(businessActivities.businessActivities))
+            form = formProvider().fill(businessActivities.businessActivities.toSeq)
           } yield {
-            val form = Form2[BusinessMatchingActivities](businessActivities)
-            val (newActivities, existing) = getActivityValues(form, isPreSubmission, Some(businessActivities.businessActivities))
-
-            Ok(register_services(form, edit, sortActivities(newActivities), existing, isPreSubmission, businessMatching.preAppComplete))
+            Ok(view(form, edit, existing, isPreSubmission, businessMatching.preAppComplete))
           }) getOrElse {
-            val (newActivities, existing) = getActivityValues(EmptyForm, isPreSubmission, None)
-            Ok(register_services(EmptyForm, edit, sortActivities(newActivities), existing, isPreSubmission, showReturnLink = false))
+            Ok(view(formProvider(), edit, getActivityValues(isPreSubmission, None), isPreSubmission, showReturnLink = false))
           }
         }
   }
 
-  def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
-        import jto.validation.forms.Rules._
-        Form2[BusinessMatchingActivities](request.body) match {
-          case invalidForm: InvalidForm =>
+
+        formProvider().bindFromRequest().fold(
+          formWithErrors => {
             statusService.isPreSubmission(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { isPreSubmission =>
               (for {
                 bm <- businessMatchingService.getModel(request.credId)
@@ -75,24 +76,19 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
               } yield {
                 businessActivities.businessActivities
               }).value map { activities =>
-                val (newActivities, existing) = getActivityValues(
-                  invalidForm,
-                  isPreSubmission,
-                  activities
-                )
                 BadRequest(
-                  register_services(
-                    invalidForm,
+                  view(
+                    formWithErrors,
                     edit,
-                    sortActivities(newActivities),
-                    existing,
+                    getActivityValues(isPreSubmission, activities),
                     isPreSubmission
                   )
                 )
               }
             }
-          case ValidForm(_, data) =>
-            businessActivities(request.amlsRefNumber, request.accountTypeId, request.credId, data) flatMap { ba =>
+          },
+          value => {
+            businessActivities(request.amlsRefNumber, request.accountTypeId, request.credId, new BusinessMatchingActivities(value.toSet)) flatMap { ba =>
               getData[ResponsiblePerson](request.credId) flatMap { responsiblePeople =>
 
                 val workFlow =
@@ -105,11 +101,12 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
                 val rps = responsiblePeople.map(rp => workFlow((rp, activities, isRemovingActivity)))
 
                 updateResponsiblePeople(request.credId, rps) map { _ =>
-                  redirectTo(data.businessActivities, includeCompanyNotRegistered)
+                  redirectTo(value.toSet, includeCompanyNotRegistered)
                 }
               }
             }
-        }
+          }
+        )
   }
 
   private def businessActivities(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, data: BusinessMatchingActivities)
@@ -195,38 +192,25 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
     }
   }
 
-  private def redirectTo(businessActivities: Set[BusinessActivity], includeCompanyNotRegistered: Boolean = false) = if (businessActivities.contains(MoneyServiceBusiness)) {
+  private def redirectTo(businessActivities: Set[BusinessActivity], includeCompanyNotRegistered: Boolean): Result =
+    if (businessActivities.contains(MoneyServiceBusiness)) {
     Redirect(routes.MsbSubSectorsController.get())
-  } else {
-    if (includeCompanyNotRegistered){
-      Redirect(routes.CheckCompanyController.get)
-    }else {
-      Redirect(routes.SummaryController.get)
-    }
+    } else {
+      if (includeCompanyNotRegistered){
+        Redirect(routes.CheckCompanyController.get)
+      } else {
+        Redirect(routes.SummaryController.get)
+      }
   }
 
-  private def getActivityValues(f: Form2[_], isPreSubmission: Boolean, existingActivities: Option[Set[BusinessActivity]]): (Set[String], Set[String]) = {
-
-    val activities: Set[String] = Set(
-      AccountancyServices,
-      ArtMarketParticipant,
-      BillPaymentServices,
-      EstateAgentBusinessService,
-      HighValueDealing,
-      MoneyServiceBusiness,
-      TrustAndCompanyServices,
-      TelephonePaymentService
-    ) map BusinessMatchingActivities.getValue
-
-    existingActivities.fold[(Set[String], Set[String])]((activities, Set.empty)) { ea =>
+  private def getActivityValues(isPreSubmission: Boolean, existingActivities: Option[Set[BusinessActivity]]): Seq[BusinessActivity] =
+    existingActivities.fold[Seq[BusinessActivity]](Seq.empty) { ea =>
       if (isPreSubmission) {
-        (activities, Set.empty)
+        Seq.empty
       } else {
-        (activities diff (ea map BusinessMatchingActivities.getValue), activities intersect (ea map BusinessMatchingActivities.getValue))
+        (BusinessMatchingActivities.all intersect ea).toSeq
       }
     }
-
-  }
 
   private def newModel(existingActivities: Option[BusinessMatchingActivities],
                        added: BusinessMatchingActivities,
@@ -319,10 +303,5 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
     } else {
       (rp, activities)
     }
-  }
-
-
-  private def sortActivities(activities: Set[String]): Seq[String] = {
-    (activities map BusinessMatchingActivities.getBusinessActivity).toSeq.sortBy(_.getMessage()) map BusinessMatchingActivities.getValue
   }
 }

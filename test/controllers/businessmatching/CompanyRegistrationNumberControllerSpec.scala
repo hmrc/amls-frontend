@@ -33,7 +33,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, CacheMocks, StatusMocks}
-import views.html.businessmatching.company_registration_number
+import views.html.businessmatching.CompanyRegistrationNumberView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,7 +44,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
     self => val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
-    lazy val view = app.injector.instanceOf[company_registration_number]
+    lazy val view = app.injector.instanceOf[CompanyRegistrationNumberView]
     val controller = new CompanyRegistrationNumberController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,

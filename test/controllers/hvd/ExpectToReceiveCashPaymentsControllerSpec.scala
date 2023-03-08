@@ -17,7 +17,7 @@
 package controllers.hvd
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.HighValueDealing
+import models.businessmatching.BusinessActivity.HighValueDealing
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd.Hvd
 import models.status.{SubmissionDecisionApproved, SubmissionReady}

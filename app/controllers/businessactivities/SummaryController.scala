@@ -23,7 +23,8 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.EmptyForm
 import models.businessactivities.BusinessActivities
-import models.businessmatching.{AccountancyServices, BusinessMatching}
+import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessActivity.AccountancyServices
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.AuthAction

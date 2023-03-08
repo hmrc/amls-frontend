@@ -19,6 +19,7 @@ package services.businessmatching
 import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.tradingpremises.TradingPremisesMsbServices._
 import models.businessmatching.{BusinessMatchingMsbServices => BMMsbServices}
 import models.tradingpremises.{TradingPremisesMsbServices => TPMsbServices, WhatDoesYourBusinessDo}

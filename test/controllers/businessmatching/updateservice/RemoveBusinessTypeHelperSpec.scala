@@ -19,7 +19,8 @@ package controllers.businessmatching.updateservice
 import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import models.asp.Asp
-import models.businessmatching.{BillPaymentServices, BusinessActivities => BMBusinessActivities, _}
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.businessmatching.BusinessActivity._
 import models.eab.Eab
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.hvd.Hvd

@@ -24,6 +24,7 @@ import generators.businessmatching.BusinessActivitiesGenerator
 import models.businessactivities.{AccountantForAMLSRegulations, InvolvedInOtherNo, TaxMatters, WhoIsYourAccountant, BusinessActivities => BABusinessActivities}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.businessmatching.BusinessActivity._
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.supervision._
 import org.joda.time.LocalDate

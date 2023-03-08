@@ -20,20 +20,16 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
+import models.businessmatching.BusinessActivity._
 import models.businessmatching._
 import models.businessmatching.updateservice.{Add, Remove}
 import models.flowmanagement.ChangeBusinessTypesPageId
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import play.api.mvc.Results.Redirect
-import models.businessmatching.updateservice.{Add, Remove}
-import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
-import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, DependencyMocks}
-import utils.{AmlsSpec, DependencyMocks}
-
 
 import scala.concurrent.Future
 

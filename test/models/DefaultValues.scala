@@ -16,7 +16,7 @@
 
 package models
 
-import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
+import models.businessmatching.BusinessActivity.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises, _}
 import org.joda.time.LocalDate
 

@@ -17,7 +17,7 @@
 package controllers.businessmatching.updateservice.remove
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.AccountancyServices
+import models.businessmatching.BusinessActivity.AccountancyServices
 import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
 import play.api.i18n.Messages
 import org.jsoup.Jsoup

@@ -22,7 +22,8 @@ import cats.data.OptionT
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessMatching, HighValueDealing}
+import models.businessmatching.BusinessActivity.HighValueDealing
+import models.businessmatching.BusinessMatching
 import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
 import org.joda.time.LocalDate
 import play.api.mvc.MessagesControllerComponents

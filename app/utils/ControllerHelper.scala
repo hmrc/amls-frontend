@@ -21,6 +21,7 @@ import connectors.DataCacheConnector
 import forms.InvalidForm
 import models.businessactivities.{BusinessActivities => BA}
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.eab.Eab
 import models.renewal.CustomersOutsideUK

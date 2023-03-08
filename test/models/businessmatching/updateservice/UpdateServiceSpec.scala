@@ -16,7 +16,7 @@
 
 package models.businessmatching.updateservice
 
-import models.businessmatching.HighValueDealing
+import models.businessmatching.BusinessActivity.HighValueDealing
 import play.api.libs.json.{JsSuccess, Json}
 import utils.AmlsSpec
 

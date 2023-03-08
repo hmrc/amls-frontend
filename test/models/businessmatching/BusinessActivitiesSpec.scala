@@ -16,93 +16,18 @@
 
 package models.businessmatching
 
-import org.scalatestplus.mockito.MockitoSugar
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import models.DateOfChange
+import models.businessmatching.BusinessActivity._
 import org.joda.time.LocalDate
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.libs.json._
 import utils.AmlsSpec
 
 
 class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
-  import jto.validation.forms.Rules._
 
   "The BusinessActivities model" must {
-    "successfully validate" when {
-      "a few check boxes are selected" in {
-        val model1 = Map("businessActivities[]" -> Seq("04", "01", "03"))
-
-        BusinessActivities.formReads.validate(model1) must
-          be(Valid(BusinessActivities(Set(EstateAgentBusinessService, AccountancyServices, BillPaymentServices))))
-
-        val model2 = Map("businessActivities[]" -> Seq("05", "06", "07"))
-
-        BusinessActivities.formReads.validate(model2) must
-          be(Valid(BusinessActivities(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices))))
-
-        BusinessActivities.formReads.validate(Map("businessActivities[]" -> Seq("08"))) must
-          be(Valid(BusinessActivities(Set(TelephonePaymentService))))
-      }
-
-      "residential business activity check box is selected" in {
-        val model = Map("businessActivities" -> Seq("08"))
-
-        BusinessActivities.formReads.validate(model) must
-          be(Valid(BusinessActivities(Set(TelephonePaymentService))))
-      }
-    }
-
-    "fail validation" when {
-      "given missing data represented by an empty Map" in {
-
-        BusinessActivities.formReads.validate(Map.empty) must
-          be(Invalid(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.required.bm.register.service")))))
-      }
-
-      "given invalid data" in {
-
-        val model = Map("businessActivities[]" -> Seq("01", "99", "04"))
-
-        BusinessActivities.formReads.validate(model) must
-          be(Invalid(Seq((Path \ "businessActivities" \ 1 \ "businessActivities") -> Seq(ValidationError("error.invalid")))))
-      }
-    }
-
-    "write correct data for businessActivities value" when {
-
-      "additionalActivities are not present" when {
-
-        "single activities selected" in {
-
-          BusinessActivities.formWrites.writes(BusinessActivities(Set(AccountancyServices))) must
-            be(Map("businessActivities[]" -> Seq("01")))
-        }
-
-        "multiple activities selected" in {
-          BusinessActivities.formWrites.writes(BusinessActivities(Set(TelephonePaymentService, TrustAndCompanyServices, HighValueDealing))) must
-            be(Map("businessActivities[]" -> Seq("08", "07", "05")))
-        }
-
-      }
-      "additionalActivities are present" when {
-
-        "single activities selected" in {
-
-          BusinessActivities.formWrites.writes(BusinessActivities(Set(AccountancyServices), Some(Set(HighValueDealing)))) must
-            be(Map("businessActivities[]" -> Seq("05")))
-        }
-
-        "multiple activities selected" in {
-          BusinessActivities.formWrites.writes(BusinessActivities(
-            Set(TelephonePaymentService, TrustAndCompanyServices, HighValueDealing),
-            Some(Set(AccountancyServices, TelephonePaymentService))
-          )) must be(Map("businessActivities[]" -> Seq("01", "08")))
-        }
-
-      }
-    }
 
     "get the value for each activity type" in {
       BusinessActivities.getValue(EstateAgentBusinessService) must be("04")

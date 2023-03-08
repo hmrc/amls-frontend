@@ -22,6 +22,7 @@ import controllers.actions.{SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefN
 import generators.PaymentGenerator
 import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.BusinessActivity._
 import models.businessmatching._
 import models.notifications.{IDType, NotificationRow}
 import models.registrationdetails.RegistrationDetails

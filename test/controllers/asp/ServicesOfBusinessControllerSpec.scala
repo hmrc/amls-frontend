@@ -18,7 +18,7 @@ package controllers.asp
 
 import controllers.actions.SuccessfulAuthAction
 import models.asp._
-import models.businessmatching.AccountancyServices
+import models.businessmatching.BusinessActivity.AccountancyServices
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document

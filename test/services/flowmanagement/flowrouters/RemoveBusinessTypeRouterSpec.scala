@@ -22,7 +22,7 @@ import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
 import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
-import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement._
 import models.tradingpremises.TradingPremises

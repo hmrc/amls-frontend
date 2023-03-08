@@ -18,6 +18,7 @@ package generators.businessmatching
 
 import generators.BaseGenerator
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import org.scalacheck.Gen
 
 trait BusinessActivitiesGenerator extends BaseGenerator {

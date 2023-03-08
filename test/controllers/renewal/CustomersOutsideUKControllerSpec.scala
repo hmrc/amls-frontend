@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._

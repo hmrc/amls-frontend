@@ -17,7 +17,8 @@
 package controllers.responsiblepeople
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures

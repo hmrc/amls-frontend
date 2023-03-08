@@ -16,7 +16,8 @@
 
 package views.responsiblepeople
 
-import models.businessmatching.{BusinessActivities, MoneyServiceBusiness}
+import models.businessmatching.BusinessActivities
+import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec

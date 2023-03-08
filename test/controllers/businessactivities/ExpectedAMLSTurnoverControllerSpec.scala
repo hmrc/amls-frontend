@@ -21,7 +21,8 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.ExpectedAMLSTurnover.First
 import models.businessactivities._
-import models.businessmatching.{BusinessActivities => Activities, _}
+import models.businessmatching.{BusinessMatching, BusinessActivities => Activities}
+import models.businessmatching.BusinessActivity._
 import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}

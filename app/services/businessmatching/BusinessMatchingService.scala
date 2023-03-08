@@ -24,6 +24,7 @@ import javax.inject.Inject
 import models.ViewResponse
 import models.asp.Asp
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.eab.Eab
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}

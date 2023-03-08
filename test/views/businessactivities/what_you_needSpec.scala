@@ -17,7 +17,8 @@
 package views.businessactivities
 
 import forms.{EmptyForm, Form2}
-import models.businessmatching.{AccountancyServices, BusinessActivities, MoneyServiceBusiness}
+import models.businessmatching.BusinessActivities
+import models.businessmatching.BusinessActivity.{AccountancyServices, MoneyServiceBusiness}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec

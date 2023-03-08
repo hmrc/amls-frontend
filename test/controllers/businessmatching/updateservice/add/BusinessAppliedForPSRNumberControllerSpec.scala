@@ -20,6 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.businessmatching.BusinessActivity.{HighValueDealing, MoneyServiceBusiness}
 import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
 import models.status.SubmissionDecisionApproved
 import org.jsoup.Jsoup

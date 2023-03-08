@@ -19,8 +19,12 @@
 
 @this(errorSummary: GovukErrorSummary)
 
-@(form: Form[_])(implicit messages: Messages)
+@(form: Form[_], mapping: Option[Map[String, String]] = None)(implicit messages: Messages)
 
 @if(form.errors.nonEmpty) {
-    @errorSummary(ErrorSummary().withFormErrorsAsText(form))
+    @errorSummary(
+        mapping.fold(ErrorSummary().withFormErrorsAsText(form)){ value =>
+            ErrorSummary().withFormErrorsAsText(form, mapping = value)
+        }
+    )
 }

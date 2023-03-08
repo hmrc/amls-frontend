@@ -19,6 +19,7 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessActivities, _}
+import models.businessmatching.BusinessActivity._
 import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor

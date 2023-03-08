@@ -23,6 +23,7 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
+import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing}
 import models.renewal._
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService

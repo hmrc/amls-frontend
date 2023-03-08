@@ -20,8 +20,10 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
+import forms.RemoveBusinessActivitiesFormProvider
 import models.DateOfChange
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -33,7 +35,6 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.remove.remove_activities
-
 
 import scala.concurrent.Future
 
@@ -57,6 +58,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       removeBusinessTypeHelper = mockRemoveBusinessTypeHelper,
       router = createRouter[RemoveBusinessTypeFlowModel],
       cc = mockMcc,
+      formProvider = new RemoveBusinessActivitiesFormProvider,
       remove_activities = view
     )
 
@@ -107,7 +109,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
         val result = controller.post()(requestWithUrlEncodedBody(
-          "businessActivities[]" -> "04"
+          "value[1]" -> "estateAgentBusinessService"
         ))
 
         status(result) mustBe SEE_OTHER

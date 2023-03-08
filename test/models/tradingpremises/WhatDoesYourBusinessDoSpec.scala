@@ -16,7 +16,7 @@
 
 package models.tradingpremises
 
-import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
+import models.businessmatching.BusinessActivity.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import org.scalatest.{MustMatchers, WordSpec}
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError

@@ -16,7 +16,7 @@
 
 package models.tradingpremises
 
-import models.businessmatching.MoneyServiceBusiness
+import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap

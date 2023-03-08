@@ -22,6 +22,7 @@ import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.ResponsiblePersonGenerator
 import models.businessmatching._
+import models.businessmatching.BusinessActivity.{BillPaymentServices, HighValueDealing}
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.responsiblepeople.ResponsiblePerson
 import org.jsoup.Jsoup

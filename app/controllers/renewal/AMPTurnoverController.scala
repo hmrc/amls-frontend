@@ -20,7 +20,8 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing, MoneyServiceBusiness}
 import models.renewal.{AMPTurnover, Renewal}
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService

@@ -17,7 +17,7 @@
 package controllers.hvd
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.HighValueDealing
+import models.businessmatching.BusinessActivity.HighValueDealing
 import models.hvd.{HowWillYouSellGoods, Hvd, Retail, Wholesale}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup

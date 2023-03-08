@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.businessmatching.BusinessActivity._
 import models.registrationprogress.{Completed, Section}
 import models.renewal._
 import org.mockito.ArgumentCaptor

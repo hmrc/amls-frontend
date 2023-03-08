@@ -19,7 +19,8 @@ package controllers.businessactivities
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
-import models.businessmatching.{BusinessActivities => BMActivities, _}
+import models.businessmatching.{BusinessMatching, BusinessActivities => BMActivities}
+import models.businessmatching.BusinessActivity._
 import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.Matchers._

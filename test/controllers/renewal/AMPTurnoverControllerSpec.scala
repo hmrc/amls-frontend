@@ -19,6 +19,7 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessActivities => Activities, _}
+import models.businessmatching.BusinessActivity._
 import models.renewal.{AMPTurnover, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -53,7 +54,7 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     )
 
     val businessMatching = BusinessMatching(
-      activities = Some(Activities(Set(models.businessmatching.ArtMarketParticipant)))
+      activities = Some(Activities(Set(BusinessActivity.ArtMarketParticipant)))
     )
 
     def testRenewal: Option[Renewal] = None

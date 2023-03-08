@@ -19,6 +19,7 @@ package services
 import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal._
 import org.mockito.Matchers.{eq => eqTo, _}

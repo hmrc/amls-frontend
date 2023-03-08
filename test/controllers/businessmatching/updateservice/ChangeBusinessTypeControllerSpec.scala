@@ -20,6 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
+import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService, HighValueDealing}
 import models.businessmatching.updateservice.Remove
 import models.businessmatching.updateservice.{Add, ChangeBusinessType}
 import models.flowmanagement.{ChangeBusinessTypesPageId, RemoveBusinessTypeFlowModel}

@@ -23,6 +23,7 @@ import controllers.actions.SuccessfulAuthAction
 import generators.businessmatching.BusinessMatchingGenerator
 import models.ReadStatusResponse
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.registrationprogress._
 import models.responsiblepeople.{ResponsiblePeopleValues, ResponsiblePerson}
 import models.status.{ReadyForRenewal, RenewalSubmitted}

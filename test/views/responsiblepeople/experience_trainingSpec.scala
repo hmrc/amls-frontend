@@ -17,13 +17,13 @@
 package views.responsiblepeople
 
 import forms.{Form2, InvalidForm, ValidForm}
-import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching, MoneyServiceBusiness}
+import jto.validation.{Path, ValidationError}
+import models.businessmatching.BusinessActivity.AccountancyServices
+import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.responsiblepeople.{ExperienceTraining, ExperienceTrainingYes}
 import org.scalatest.MustMatchers
-import utils.AmlsViewSpec
-import jto.validation.Path
-import jto.validation.ValidationError
 import play.api.i18n.Messages
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.experience_training
 

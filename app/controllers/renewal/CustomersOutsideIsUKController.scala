@@ -19,13 +19,14 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BusinessActivity, BusinessMatching, HighValueDealing}
+import models.businessmatching.{BusinessActivity, BusinessMatching}
+import models.businessmatching.BusinessActivity.HighValueDealing
 import models.renewal.{CustomersOutsideIsUK, Renewal}
 import play.api.mvc.MessagesControllerComponents
 import services.{AutoCompleteService, RenewalService}
 import utils.AuthAction
-
 import views.html.renewal._
 
 import scala.concurrent.Future

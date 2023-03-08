@@ -15,8 +15,8 @@
  *@
 
 @import models.businessdetails._
-@import config.{ ApplicationConfig}
-@import components.Button
+@import config.ApplicationConfig
+@import components.{Button, ReturnLink}
 @import components.forms.{InputText, ErrorSummary}
 @import views.ViewUtils._
 
@@ -25,7 +25,8 @@
     layout: Layout,
     input: InputText,
     errorSummary: ErrorSummary,
-    button: Button
+    button: Button,
+    returnLink: ReturnLink
 )
 
 @(form: Form[_], edit: Boolean, showReturnLink: Boolean = true,  isPreSubmission: Boolean = true)(implicit request: Request[_], messages:Messages, lang: Lang, appConfig: ApplicationConfig)
@@ -36,6 +37,10 @@
 
 @section = @{
     if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation"
+}
+
+@optionalReturnLink = @{
+    if(showReturnLink) returnLink(true)
 }
 
 @layout(
@@ -69,5 +74,7 @@
         )
 
         @button()
+
+        @optionalReturnLink
     }
 }

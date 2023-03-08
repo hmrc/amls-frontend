@@ -19,6 +19,7 @@ package views.businessmatching
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
@@ -26,7 +27,6 @@ import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
 import forms.EmptyForm
-import org.mockito.Mockito.when
 import views.html.businessmatching.summary
 
 import scala.collection.JavaConversions._

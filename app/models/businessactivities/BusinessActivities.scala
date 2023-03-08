@@ -17,7 +17,8 @@
 package models.businessactivities
 
 import models.businessactivities.TransactionTypes._
-import models.businessmatching.{AccountancyServices, BusinessMatching, BusinessActivities => BusinessMatchingActivities}
+import models.businessmatching.BusinessActivity.AccountancyServices
+import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.Logging
 import uk.gov.hmrc.http.cache.client.CacheMap

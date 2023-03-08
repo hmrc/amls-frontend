@@ -20,16 +20,15 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{CompanyRegistrationNumberFormProvider, EmptyForm, Form2, InvalidForm, ValidForm}
-
-import javax.inject.Inject
-import models.businessmatching.{BusinessMatching, CompanyRegistrationNumber}
+import forms.CompanyRegistrationNumberFormProvider
+import models.businessmatching.BusinessMatching
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import views.html.businessmatching.company_registration_number
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import utils.AuthAction
+import views.html.businessmatching.CompanyRegistrationNumberView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class CompanyRegistrationNumberController @Inject()(authAction: AuthAction,
@@ -39,7 +38,7 @@ class CompanyRegistrationNumberController @Inject()(authAction: AuthAction,
                                                    val businessMatchingService:BusinessMatchingService,
                                                    val cc: MessagesControllerComponents,
                                                    formProvider: CompanyRegistrationNumberFormProvider,
-                                                   view: company_registration_number) extends AmlsBaseController(ds, cc) {
+                                                   view: CompanyRegistrationNumberView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
@@ -57,7 +56,7 @@ class CompanyRegistrationNumberController @Inject()(authAction: AuthAction,
     implicit request => {
 
       val form = formProvider().bindFromRequest()
-      
+
       form.fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, edit))),

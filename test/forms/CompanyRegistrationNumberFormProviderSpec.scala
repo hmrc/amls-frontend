@@ -56,6 +56,13 @@ class CompanyRegistrationNumberFormProviderSpec extends StringFieldBehaviours wi
       }
     }
 
+    "not bind submissions with lower case letters" in {
+      forAll(companyRegNumberGen) { companyRegNum =>
+        val result = form.bind(Map(fieldName -> companyRegNum.toLowerCase)).apply(fieldName)
+        result.errors shouldEqual Seq(FormError(fieldName, Seq("error.invalid.bm.registration.number.allowed"), Seq("^[A-Z0-9]{8}$")))
+      }
+    }
+
     s"not bind strings longer than $length characters" in {
       forAll(companyRegNumberGen, Gen.alphaNumChar) { (companyRegNum, char) =>
         val result = form.bind(Map(fieldName -> s"$companyRegNum$char")).apply(fieldName)

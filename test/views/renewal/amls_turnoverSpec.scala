@@ -18,7 +18,8 @@ package views.renewal
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessmatching.{AccountancyServices, BusinessActivities}
+import models.businessmatching.BusinessActivities
+import models.businessmatching.BusinessActivity.AccountancyServices
 import models.renewal.AMLSTurnover
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages

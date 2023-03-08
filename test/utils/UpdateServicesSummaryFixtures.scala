@@ -18,6 +18,7 @@ package utils
 
 import forms.EmptyForm
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import models.tradingpremises.Address

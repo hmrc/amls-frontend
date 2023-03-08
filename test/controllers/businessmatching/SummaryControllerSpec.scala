@@ -21,6 +21,7 @@ import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.businessmatching.BusinessActivity.EstateAgentBusinessService
 import models.businessmatching.updateservice._
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.status.NotCompleted

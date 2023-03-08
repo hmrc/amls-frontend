@@ -17,7 +17,7 @@
 package controllers.hvd
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.HighValueDealing
+import models.businessmatching.BusinessActivity.HighValueDealing
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
 import models.status.NotCompleted

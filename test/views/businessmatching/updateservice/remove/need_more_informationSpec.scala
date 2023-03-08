@@ -16,7 +16,7 @@
 
 package views.businessmatching.updateservice.remove
 
-import models.businessmatching.{AccountancyServices, MoneyServiceBusiness}
+import models.businessmatching.BusinessActivity.{AccountancyServices, MoneyServiceBusiness}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec

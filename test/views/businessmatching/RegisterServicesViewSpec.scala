@@ -16,20 +16,21 @@
 
 package views.businessmatching
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
-import models.businessmatching.{AccountancyServices, ArtMarketParticipant, BillPaymentServices, BusinessActivities, EstateAgentBusinessService, HighValueDealing, MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
+import forms.RegisterBusinessActivitiesFormProvider
+import models.businessmatching.BusinessActivity._
+import models.businessmatching.{BusinessActivities, BusinessActivity}
 import org.scalatest.MustMatchers
+import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
-import play.twirl.api.HtmlFormat
 import views.Fixture
-import views.html.businessmatching.register_services
+import views.html.businessmatching.RegisterServicesView
 
-class register_servicesSpec extends AmlsViewSpec with MustMatchers  {
+class RegisterServicesViewSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    lazy val register_services = app.injector.instanceOf[register_services]
+    lazy val formProvider = app.injector.instanceOf[RegisterBusinessActivitiesFormProvider]
+    lazy val register_services = app.injector.instanceOf[RegisterServicesView]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -37,20 +38,21 @@ class register_servicesSpec extends AmlsViewSpec with MustMatchers  {
     "have correct title" when {
       "pre-submission" in new ViewFixture {
 
-        val form2: ValidForm[BusinessActivities] = Form2(BusinessActivities(Set(AccountancyServices)))
+        val filledForm: Form[Seq[BusinessActivity]] = formProvider().fill(Seq(AccountancyServices))
 
-        def view = register_services(form2, edit = true, Seq("01"), Set.empty, isPreSubmission = true)
+        def view = register_services(filledForm, edit = true, Seq(AccountancyServices), isPreSubmission = true)
 
         doc.title must startWith(Messages("businessmatching.registerservices.title") + " - " + Messages("summary.businessmatching"))
         heading.html must be(Messages("businessmatching.registerservices.title"))
         subHeading.html must include(Messages("summary.businessmatching"))
 
       }
+
       "post-submission" in new ViewFixture {
 
-        val form2: ValidForm[BusinessActivities] = Form2(BusinessActivities(Set(AccountancyServices)))
+        val filledForm: Form[Seq[BusinessActivity]] = formProvider().fill(Seq(AccountancyServices))
 
-        def view = register_services(form2, edit = true, Seq("01"), Set.empty, isPreSubmission = false)
+        def view = register_services(filledForm, edit = true, Seq.empty, isPreSubmission = false)
 
         doc.title must startWith(Messages("businessmatching.registerservices.other.title") + " - " + Messages("summary.businessmatching"))
         heading.html must be(Messages("businessmatching.registerservices.other.title"))
@@ -62,7 +64,7 @@ class register_servicesSpec extends AmlsViewSpec with MustMatchers  {
     "notify of services already selected" when {
       "status is post submission" in new ViewFixture {
 
-        def view = register_services(EmptyForm, edit = true, Seq("01"), Set.empty, isPreSubmission = false)
+        def view = register_services(formProvider(), edit = true, Seq(AccountancyServices), isPreSubmission = false)
 
         html must include(Messages("businessmatching.registerservices.existing"))
 
@@ -71,49 +73,42 @@ class register_servicesSpec extends AmlsViewSpec with MustMatchers  {
 
     "show errors in the correct locations" in new ViewFixture {
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "businessActivities") -> Seq(ValidationError("not a message Key"))
-        ))
+      val messageKey = "error.required.bm.register.service"
 
-      def view = register_services(form2, edit = true, Seq("01"), Set.empty, isPreSubmission = true)
+      val filledForm: Form[Seq[BusinessActivity]] = formProvider().withError(FormError("value", messageKey))
 
-      errorSummary.html() must include("not a message Key")
+      def view = register_services(filledForm, edit = true, Seq.empty, isPreSubmission = true)
 
-      doc.getElementById("businessActivities")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+      doc.getElementsByClass("govuk-list govuk-error-summary__list")
+        .first.text() mustBe messages(messageKey)
+
+      doc.getElementById("value-error").text() mustBe(s"Error: ${messages(messageKey)}")
 
     }
+
     "hide the return to progress link" in new ViewFixture {
-      def view = register_services(EmptyForm, edit = true, Seq("01"), Set.empty, isPreSubmission = true, showReturnLink = false)
+      def view = register_services(formProvider(), edit = true, Seq.empty, isPreSubmission = true, showReturnLink = false)
 
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
 
     "have a back link in pre-submission mode" in new ViewFixture {
-      def view =register_services(EmptyForm, edit = true, Seq("01"), Set.empty, isPreSubmission = true)
+      def view = register_services(formProvider(), edit = true, Seq.empty, isPreSubmission = true)
 
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+      doc.getElementById("back-link").text() must be("Back")
     }
 
     "have a back link in non pre-submission mode" in new ViewFixture {
-      def view = register_services(EmptyForm, edit = true, Seq("01"), Set.empty, isPreSubmission = false)
+      def view = register_services(formProvider(), edit = true, Seq.empty, isPreSubmission = false)
 
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+      doc.getElementById("back-link").text() must be("Back")
     }
 
     "have correct hint content" in new ViewFixture {
-      val form2: ValidForm[BusinessActivities] = Form2(BusinessActivities(Set(
-        AccountancyServices,
-        MoneyServiceBusiness,
-        TrustAndCompanyServices,
-        TelephonePaymentService,
-        ArtMarketParticipant,
-        BillPaymentServices,
-        EstateAgentBusinessService,
-        HighValueDealing)))
 
-      def view = register_services(form2, edit = true, Seq("01", "02", "03", "04", "05", "06", "07", "08"), Set.empty, isPreSubmission = false)
+      val filledForm: Form[Seq[BusinessActivity]] = formProvider().fill(BusinessActivities.all.toSeq)
+
+      def view = register_services(filledForm, edit = true, Seq.empty, isPreSubmission = false)
 
       doc.html must include("They provide services like professional bookkeeping, accounts preparation and signing, and tax advice.")
       doc.html must include("They facilitate and engage in the selling of art for €10,000 or more. Roles include things like art agents, art auctioneers, art dealers, and gallery owners.")

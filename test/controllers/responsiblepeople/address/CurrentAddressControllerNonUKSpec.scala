@@ -21,7 +21,8 @@ import controllers.actions.SuccessfulAuthAction
 import models.autocomplete.NameValuePair
 import models.businessactivities.BusinessActivities
 import models.businessdetails.BusinessDetails
-import models.businessmatching.{BillPaymentServices, BusinessMatching, BusinessActivities => BMActivities}
+import models.businessmatching.{BusinessMatching, BusinessActivities => BMActivities}
+import models.businessmatching.BusinessActivity.BillPaymentServices
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}

@@ -17,6 +17,7 @@
 package utils
 
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 
 object ActivitiesHelper {
   def fpSectors(activities: Set[BusinessActivity]): Boolean = {

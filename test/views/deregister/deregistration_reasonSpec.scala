@@ -22,7 +22,8 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
-import models.businessmatching.{BusinessActivities, EstateAgentBusinessService, HighValueDealing}
+import models.businessmatching.BusinessActivities
+import models.businessmatching.BusinessActivity.{EstateAgentBusinessService, HighValueDealing}
 import views.html.deregister.deregistration_reason
 
 class deregistration_reasonSpec extends AmlsViewSpec with MustMatchers  {

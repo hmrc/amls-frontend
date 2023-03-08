@@ -17,7 +17,8 @@
 package controllers.businessactivities
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessActivity.AccountancyServices
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any

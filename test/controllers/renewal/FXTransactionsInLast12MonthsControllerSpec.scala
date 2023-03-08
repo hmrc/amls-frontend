@@ -19,6 +19,7 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.renewal.{FXTransactionsInLast12Months, Renewal}
 import org.mockito.Matchers._
 import org.mockito.Mockito._

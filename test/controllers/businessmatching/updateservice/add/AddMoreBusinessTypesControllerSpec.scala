@@ -20,6 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.businessmatching.BusinessActivity.{BillPaymentServices, TelephonePaymentService, HighValueDealing}
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddMoreBusinessTypesPageId}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any

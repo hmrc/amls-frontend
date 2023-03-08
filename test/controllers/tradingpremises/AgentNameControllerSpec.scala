@@ -19,7 +19,7 @@ package controllers.tradingpremises
 import controllers.actions.SuccessfulAuthAction
 import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
-import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
+import models.businessmatching.BusinessActivity.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
 import org.joda.time.LocalDate

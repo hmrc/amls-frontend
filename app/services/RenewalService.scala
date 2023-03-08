@@ -21,6 +21,7 @@ import cats.data.Validated.Valid
 import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
+import models.businessmatching.BusinessActivity._
 import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.Renewal.ValidationRules._

@@ -25,6 +25,7 @@ import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
+import models.businessmatching.BusinessActivity.{TrustAndCompanyServices, HighValueDealing, BillPaymentServices}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPageId}
 import models.status.SubmissionDecisionApproved

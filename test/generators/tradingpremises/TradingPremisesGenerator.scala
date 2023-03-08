@@ -19,6 +19,7 @@ package generators.tradingpremises
 import generators.businessmatching.BusinessActivitiesGenerator
 import generators.BaseGenerator
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.tradingpremises._
 
 import org.scalacheck.Gen

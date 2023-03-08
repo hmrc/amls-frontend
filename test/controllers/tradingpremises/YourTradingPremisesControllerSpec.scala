@@ -20,7 +20,8 @@ import java.util.UUID
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatching, EstateAgentBusinessService, BusinessActivities => BusinessMatchingActivities, _}
+import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities, _}
+import models.businessmatching.BusinessActivity._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises._
 import org.joda.time.LocalDate

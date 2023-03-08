@@ -21,7 +21,8 @@ import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import models.DateOfChange
-import models.businessmatching.{BusinessMatching, MoneyServiceBusiness}
+import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, RemoveBusinessTypesSummaryPageId}
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises

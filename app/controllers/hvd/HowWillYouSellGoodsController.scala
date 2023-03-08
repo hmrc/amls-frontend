@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.HighValueDealing
+import models.businessmatching.BusinessActivity.HighValueDealing
 import models.hvd.{HowWillYouSellGoods, Hvd}
 import play.api.mvc.{Call, MessagesControllerComponents}
 import services.StatusService

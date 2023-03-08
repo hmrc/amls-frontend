@@ -21,6 +21,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessactivities.{BusinessActivities, ExpectedBusinessTurnover, InvolvedInOtherYes}
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import models.businessmatching.BusinessActivity. _
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady}
 import models.tradingpremises._
 import models.{DateOfChange, TradingPremisesSection}

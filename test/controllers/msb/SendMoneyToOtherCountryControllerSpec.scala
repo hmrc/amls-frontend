@@ -19,6 +19,7 @@ package controllers.msb
 import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching._
+import models.businessmatching.BusinessActivity.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.moneyservicebusiness.{MoneyServiceBusiness, _}
 import org.jsoup.Jsoup
@@ -282,7 +283,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       "MSB has just been added to the application with Currency Exchange, and we're not in pre-application mode" in new NotPreSubmissionCEFixture {
         mockCacheGetEntry[ServiceChangeRegister](Some(
-          ServiceChangeRegister(addedActivities = Some(Set(models.businessmatching.MoneyServiceBusiness)))), ServiceChangeRegister.key)
+          ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -294,7 +295,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
 
         mockCacheGetEntry[ServiceChangeRegister](Some(
-          ServiceChangeRegister(addedActivities = Some(Set(models.businessmatching.MoneyServiceBusiness)))), ServiceChangeRegister.key)
+          ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -334,7 +335,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       "MSB has just been added to the application with Foreign Exchange, and we're not in pre-application mode" in new NotPreSubmissionFXFixture {
         mockCacheGetEntry[ServiceChangeRegister](Some(
-          ServiceChangeRegister(addedActivities = Some(Set(models.businessmatching.MoneyServiceBusiness)))), ServiceChangeRegister.key)
+          ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)

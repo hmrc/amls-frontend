@@ -17,6 +17,7 @@
 package models.tradingpremises
 
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.registrationprogress.{Completed, NotStarted, Started}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}

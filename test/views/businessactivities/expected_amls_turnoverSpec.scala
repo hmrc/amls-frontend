@@ -22,7 +22,8 @@ import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import jto.validation.Path
 import jto.validation.ValidationError
-import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching, EstateAgentBusinessService}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessActivity.{AccountancyServices, EstateAgentBusinessService}
 import play.api.i18n.Messages
 import views.Fixture
 import views.html.businessactivities.expected_amls_turnover

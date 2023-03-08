@@ -17,7 +17,8 @@
 package views.responsiblepeople
 
 import controllers.responsiblepeople.NinoUtil
-import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching, MoneyServiceBusiness}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessActivity.{AccountancyServices, MoneyServiceBusiness}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.{Country, DateOfChange}

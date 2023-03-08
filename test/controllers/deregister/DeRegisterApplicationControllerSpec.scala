@@ -20,7 +20,8 @@ import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.actions.SuccessfulAuthAction
 import models.businesscustomer.ReviewDetails
-import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessActivity, BusinessMatching}
+import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
+import models.businessmatching.BusinessActivity.AccountancyServices
 import models.deregister.DeRegisterSubscriptionResponse
 import models.registrationdetails.RegistrationDetails
 import org.joda.time.LocalDateTime

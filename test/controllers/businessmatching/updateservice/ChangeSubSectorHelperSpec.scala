@@ -18,6 +18,7 @@ package controllers.businessmatching.updateservice
 
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{ForeignExchange, _}
+import models.businessmatching.BusinessActivity._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.ChangeSubSectorFlowModel
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSB, _}

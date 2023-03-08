@@ -17,6 +17,7 @@
 package models.businessmatching.updateservice
 
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 

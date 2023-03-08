@@ -18,7 +18,7 @@ package controllers.businessmatching.updateservice.add
 
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
-import models.businessmatching._
+import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId}
 import org.jsoup.Jsoup

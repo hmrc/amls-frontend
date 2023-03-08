@@ -14,47 +14,74 @@
  * limitations under the License.
  *@
 
-@import forms.Form2
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 @import include._
-@import include.forms2._
-@import config.{ ApplicationConfig}
+@import components.{Button, ReturnLink, SectionSubtitle}
+@import components.forms.{InputCheckbox, ErrorSummary}
 @import config.ApplicationConfig
+@import models.businessmatching.BusinessActivities
 
-@this(main: include.main)
+@this(
+    formHelper: FormWithCSRF,
+    layout: Layout,
+    subtitle: SectionSubtitle,
+    inputCheckbox: InputCheckbox,
+    errorSummary: ErrorSummary,
+    button: Button,
+    returnLink: ReturnLink
+)
 
-@(f: Form2[_], edit: Boolean, activityValues: Seq[String])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean, activityValues: Seq[String])(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @header = {
     @components.back_link()
-    @errorSummary(f)
 }
 
-@supportingContent = {
-    <p>@Messages("businessmatching.updateservice.removeactivities.summary")</p>
-    <p>@Messages("businessmatching.updateservice.removeactivities.list.heading")</p>
+@messageSuffix = @{
+    if(activityValues.size == 2) {
+        "twobusinesses"
+    } else {
+        "multibusinesses"
+    }
 }
 
-@main(
-    title = if(activityValues.size == 2) Messages("businessmatching.updateservice.removeactivities.title.twobusinesses")
-    else Messages("businessmatching.updateservice.removeactivities.title.multibusinesses"),
-    heading = header
-) {
+@hintContent = @{
+    "<p>" + messages("businessmatching.updateservice.removeactivities.summary." + messageSuffix) + "</p><p>" +
+    messages("businessmatching.updateservice.removeactivities.list.heading." + messageSuffix) + "</p>"
+}
 
-    @form(f, controllers.businessmatching.updateservice.remove.routes.RemoveBusinessTypesController.post(edit)) {
 
-        @fieldsetWithErrorGroup(
-            f = f("businessActivities"),
-            section = "summary.updateservice",
-            heading = if(activityValues.size == 2) Messages("businessmatching.updateservice.removeactivities.heading.twobusinesses") else Messages("businessmatching.updateservice.removeactivities.heading.multibusinesses"),
-            panel = false,
-            supportingContent = numerous_business_types(activityValues)
-        ) {
-            @{activityValues map (value => checkbox(
-                f = f("businessActivities[]"),
-                labelText = s"businessmatching.registerservices.servicename.lbl.$value",
-                value = value
-            ))}
-        }
-        @submit(returnLink = false, buttonMessageKey = Some("businessmatching.updateservice.removeactivities.button"), buttonId = Some("removeactivities-submit"))
+@layout(pageTitle = messages("businessmatching.updateservice.removeactivities.title." + messageSuffix)) {
+
+    @formHelper(action = controllers.businessmatching.updateservice.remove.routes.RemoveBusinessTypesController.post(edit)) {
+
+        @errorSummary(form)
+
+        @subtitle("summary.updateservice")
+
+        @inputCheckbox(
+            Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(
+                        Legend(
+                            content = Text(messages("businessmatching.updateservice.removeactivities.title." + messageSuffix)),
+                            classes = "govuk-fieldset__legend--xl",
+                            isPageHeading = true
+                        )
+                    )
+                )),
+                hint = Some(
+                    Hint(
+                        content = HtmlContent(hintContent)
+                    )
+                ),
+                name = "value",
+                items = BusinessActivities.formValues(Some(activityValues.map(BusinessActivities.getBusinessActivity)), false)
+            ).withFormField(form("value"))
+        )
+
+        @button(msg = "businessmatching.updateservice.removeactivities.button")
+
     }
 }

@@ -17,7 +17,8 @@
 package controllers.renewal
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
 import models.registrationprogress.{Completed, NotStarted, Section}
 import models.renewal.Renewal
 import org.mockito.Matchers.{any, eq => meq}

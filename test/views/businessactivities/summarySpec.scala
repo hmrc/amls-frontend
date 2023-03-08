@@ -18,7 +18,8 @@ package views.businessactivities
 
 import forms.EmptyForm
 import models.businessactivities._
-import models.businessmatching.{BusinessMatching, MoneyServiceBusiness, BusinessActivities => BMBusinessActivities}
+import models.businessmatching.{BusinessMatching, BusinessActivities => BMBusinessActivities}
+import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages

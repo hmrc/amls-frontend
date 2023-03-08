@@ -18,6 +18,7 @@ package models.businessactivities
 
 import models.Country
 import models.businessmatching.{BusinessActivities => ba, _}
+import models.businessmatching.BusinessActivity._
 import play.api.libs.json.Json
 import utils.AmlsSpec
 

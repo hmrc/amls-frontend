@@ -22,13 +22,13 @@ import org.scalatest.MustMatchers
 import play.api.data.Form
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.businessmatching.company_registration_number
+import views.html.businessmatching.CompanyRegistrationNumberView
 
 
 class CompanyRegistrationNumberViewSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    lazy val viewUnderTest = app.injector.instanceOf[company_registration_number]
+    lazy val viewUnderTest = app.injector.instanceOf[CompanyRegistrationNumberView]
     implicit val requestWithToken = addTokenForView()
   }
 

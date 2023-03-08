@@ -19,7 +19,8 @@ package controllers.deregister
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessActivity.{HighValueDealing, MoneyServiceBusiness}
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse, DeregistrationReason}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor

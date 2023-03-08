@@ -17,7 +17,8 @@
 package controllers.businessmatching.updateservice.remove
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 import play.api.i18n.Messages
 import play.api.test.Helpers.{contentAsString, status}
 import utils.{AmlsSpec, DependencyMocks}

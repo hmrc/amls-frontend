@@ -18,6 +18,7 @@ package controllers.renewal
 
 import controllers.actions.SuccessfulAuthAction
 import models.businessactivities._
+import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessActivities => Activities, _}
 import models.renewal.AMLSTurnover.First
 import models.renewal.Renewal
@@ -54,7 +55,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     )
 
     val businessMatching = BusinessMatching(
-      activities = Some(Activities(Set(models.businessmatching.AccountancyServices)))
+      activities = Some(Activities(Set(AccountancyServices)))
     )
 
     def testRenewal: Option[Renewal] = None
@@ -360,7 +361,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "return error message for multiple services" when {
           "there's more than one business activity" in new Fixture with PrivateMethodTester {
             override val businessMatching = BusinessMatching(
-              activities = Some(Activities(Set(models.businessmatching.AccountancyServices, models.businessmatching.MoneyServiceBusiness)))
+              activities = Some(Activities(Set(AccountancyServices, MoneyServiceBusiness)))
             )
 
             when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))

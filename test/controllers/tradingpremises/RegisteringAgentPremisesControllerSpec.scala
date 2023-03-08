@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.TradingPremisesSection
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import models.businessmatching.BusinessActivity._
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
