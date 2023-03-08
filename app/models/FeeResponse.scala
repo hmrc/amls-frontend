@@ -78,6 +78,8 @@ object FeeResponse {
       (__ \ "$date" \ "$numberLong").read[Long].map { dateTime =>
         new DateTime(dateTime, DateTimeZone.UTC)
       }
+    }.orElse {
+      (__ \ "$date" \ "$numberLong ").read[String].map(dateTime => new DateTime(dateTime.toLong))
     }
 
 
