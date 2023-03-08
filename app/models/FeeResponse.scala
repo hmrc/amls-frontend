@@ -19,6 +19,7 @@ package models
 import models.ResponseType.AmendOrVariationResponseType
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionReadyForReview, SubmissionStatus}
 import org.joda.time.{DateTime, DateTimeZone}
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 sealed trait ResponseType
@@ -28,6 +29,7 @@ object ResponseType {
   import utils.MappingUtils.Implicits._
 
   case object SubscriptionResponseType extends ResponseType
+
   case object AmendOrVariationResponseType extends ResponseType
 
   implicit val jsonWrites = Writes[ResponseType] {
@@ -35,7 +37,7 @@ object ResponseType {
     case AmendOrVariationResponseType => JsString("AmendOrVariationResponse")
   }
 
-  implicit val jsonReads : Reads[ResponseType] = {
+  implicit val jsonReads: Reads[ResponseType] = {
     import play.api.libs.json.Reads.StringReads
     __.read[String] flatMap {
       case "SubscriptionReponse" => SubscriptionResponseType
@@ -58,7 +60,9 @@ case class FeeResponse(responseType: ResponseType,
                        createdAt: DateTime) {
 
   def toPay(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus] = None): BigDecimal = {
-    val isRenewalAmendment: Boolean = submissionRequestStatus exists { _.isRenewalAmendment.getOrElse(false) }
+    val isRenewalAmendment: Boolean = submissionRequestStatus exists {
+      _.isRenewalAmendment.getOrElse(false)
+    }
     status match {
       case (RenewalSubmitted(_) | ReadyForRenewal(_)) if isRenewalAmendment => difference.getOrElse(0)
       case SubmissionReadyForReview if responseType == AmendOrVariationResponseType => difference.getOrElse(0)
@@ -79,14 +83,39 @@ object FeeResponse {
         new DateTime(dateTime, DateTimeZone.UTC)
       }
     }.orElse {
-      (__ \ "$date" \ "$numberLong ").read[String].map(dateTime => new DateTime(dateTime.toLong))
+      (__ \ "$date" \ "$numberLong").read[String].map(dateTime => new DateTime(dateTime.toLong))
     }
 
 
-  implicit val dateTimeWrite: Writes[DateTime] = new Writes[DateTime] {
-    def writes(dateTime: DateTime): JsValue = Json.obj(
-      "$date" -> dateTime.getMillis
-    )
-  }
+  implicit val dateTimeWrite: Writes[DateTime] = (dateTime: DateTime) => Json.obj("$date" -> dateTime.getMillis)
+
+  implicit val reads: Reads[FeeResponse] =
+    (
+      (__ \ "responseType").read[ResponseType] and
+        (__ \ "amlsReferenceNumber").read[String] and
+        (__ \ "registrationFee").read[BigDecimal] and
+        (__ \ "fpFee").readNullable[BigDecimal] and
+        (__ \ "approvalCheckFee").readNullable[BigDecimal] and
+        (__ \ "premiseFee").read[BigDecimal] and
+        (__ \ "totalFees").read[BigDecimal] and
+        (__ \ "paymentReference").readNullable[String] and
+        (__ \ "difference").readNullable[BigDecimal] and
+        (__ \ "createdAt").read[DateTime](dateTimeRead)
+      ) (FeeResponse.apply _)
+
+  implicit val writes: OWrites[FeeResponse] =
+    (
+      (__ \ "responseType").write[ResponseType] and
+        (__ \ "amlsReferenceNumber").write[String] and
+        (__ \ "registrationFee").write[BigDecimal] and
+        (__ \ "fpFee").writeNullable[BigDecimal] and
+        (__ \ "approvalCheckFee").writeNullable[BigDecimal] and
+        (__ \ "premiseFee").write[BigDecimal] and
+        (__ \ "totalFees").write[BigDecimal] and
+        (__ \ "paymentReference").writeNullable[String] and
+        (__ \ "difference").writeNullable[BigDecimal] and
+        (__ \ "createdAt").write[DateTime](dateTimeWrite)
+      ) (unlift(FeeResponse.unapply))
+
   implicit val format = Json.format[FeeResponse]
 }
