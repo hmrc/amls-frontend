@@ -16,11 +16,13 @@
 
 package models.payments
 
-import java.time.LocalDateTime
-
 import enumeratum.{Enum, EnumEntry}
 import models.EnumFormat
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import play.custom.JsPathSupport.RichJsPath
+
+import java.time.LocalDateTime
 
 sealed abstract class PaymentStatus(val isFinal: Boolean, val validNextStates: Seq[PaymentStatus] = Seq()) extends EnumEntry
 
@@ -48,6 +50,22 @@ case class Payment(
 
 object Payment {
   implicit val statusFormat = EnumFormat(PaymentStatuses)
+
+  implicit val writes: OWrites[Payment] = Json.writes[Payment]
+
+  implicit val reads: Reads[Payment] =
+    (
+      (__ \ "_id").read[String] and
+        (__ \ "amlsRefNo").read[String] and
+        (__ \ "safeId").read[String] and
+        (__ \ "reference").read[String] and
+        (__ \ "description").readNullable[String] and
+        (__ \ "amountInPence").read[Int] and
+        (__ \ "status").read[PaymentStatus] and
+        (__ \ "createdAt").readLocalDateTime and
+        (__ \ "isBacs").readNullable[Boolean] and
+        (__ \ "updatedAt").readNullable[LocalDateTime]
+      ) (Payment(_, _, _, _, _, _, _, _, _, _))
 
   implicit val format = Json.format[Payment]
 }
