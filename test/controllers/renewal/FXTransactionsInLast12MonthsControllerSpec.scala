@@ -93,7 +93,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         cacheMap.getEntry[Renewal](Renewal.key)
       } thenReturn Some(Renewal())
 
-      when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+      when(mockRenewalService.updateRenewal(any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -111,7 +111,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         cacheMap.getEntry[Renewal](Renewal.key)
       } thenReturn Some(Renewal())
 
-      when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+      when(mockRenewalService.updateRenewal(any(), any())(any()))
               .thenReturn(Future.successful(mock[CacheMap]))
     }
 

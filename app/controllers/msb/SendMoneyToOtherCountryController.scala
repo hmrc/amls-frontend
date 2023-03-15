@@ -21,7 +21,8 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, ForeignExchange}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService}
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange}
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry}
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService

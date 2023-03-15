@@ -20,6 +20,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._

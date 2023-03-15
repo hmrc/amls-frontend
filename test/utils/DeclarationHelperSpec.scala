@@ -206,7 +206,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
           when(renewalService.isRenewalComplete(any(), any())(any(), any()))
             .thenReturn(Future.successful(false))
 
-          when(renewalService.getRenewal(any())(any(), any()))
+          when(renewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(inCompleteRenewal)))
 
           await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(true)
@@ -222,7 +222,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
           when(renewalService.isRenewalComplete(any(), any())(any(), any()))
             .thenReturn(Future.successful(false))
 
-          when(renewalService.getRenewal(any())(any(), any()))
+          when(renewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(None))
 
           await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(true)
@@ -238,7 +238,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
           when(renewalService.isRenewalComplete(any(), any())(any(), any()))
             .thenReturn(Future.successful(true))
 
-          when(renewalService.getRenewal(any())(any(), any()))
+          when(renewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(completeRenewal)))
 
           await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(false)
@@ -255,7 +255,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
         when(renewalService.isRenewalComplete(any(), any())(any(), any()))
           .thenReturn(Future.successful(true))
 
-        when(renewalService.getRenewal(any())(any(), any()))
+        when(renewalService.getRenewal(any())(any()))
           .thenReturn(Future.successful(Some(completeRenewal)))
 
         await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(false)
@@ -268,7 +268,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
           statusService.getStatus(any(),any(),any())(any(),any())
         } thenReturn Future.successful(SubmissionReady)
 
-        when(renewalService.getRenewal(any())(any(), any()))
+        when(renewalService.getRenewal(any())(any()))
           .thenReturn(Future.successful(None))
 
         await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(false)

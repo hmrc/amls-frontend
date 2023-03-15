@@ -16,11 +16,11 @@
 
 package models.businessmatching
 
-import models.FormTypes._
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
+import play.api.i18n.Messages
 import play.api.libs.json._
-import cats.data.Validated.Valid
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 
 sealed trait BusinessAppliedForPSRNumber
 case class BusinessAppliedForPSRNumberYes(regNumber: String) extends BusinessAppliedForPSRNumber
@@ -28,30 +28,18 @@ case object BusinessAppliedForPSRNumberNo extends BusinessAppliedForPSRNumber
 
 object BusinessAppliedForPSRNumber {
 
-  import utils.MappingUtils.Implicits._
+  def formValues(html: Html)(implicit messages: Messages): Seq[RadioItem] = HmrcYesNoRadioItems().map { radioItem =>
 
-  val maxPSRNumberLength = 6
-  val minPSRNumberLength = 6
-  val PSRNumberMinLength = minWithMsg(minPSRNumberLength, "error.max.length.msb.psr.number")
-  val PSRNumberLength = maxWithMsg(maxPSRNumberLength, "error.max.length.msb.psr.number")
-  val PSRCorrectFormat = regexWithMsg(numbersOnlyRegex, "error.max.msb.psr.number.format")
-  val PSRNumberRequired = required("error.invalid.msb.psr.number")
-  val registrationNumberType = notEmptyStrip andThen PSRCorrectFormat andThen PSRNumberRequired andThen PSRNumberLength andThen PSRNumberMinLength
-
-  implicit val formRule: Rule[UrlFormEncoded, BusinessAppliedForPSRNumber] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "appliedFor").read[Boolean].withMessage("error.required.msb.psr.options") flatMap {
-      case true =>
-         (__ \ "regNumber").read(registrationNumberType) map BusinessAppliedForPSRNumberYes.apply
-      case false => Rule.fromMapping { _ => Valid(BusinessAppliedForPSRNumberNo) }
+    if(radioItem.value.contains("true")) {
+      radioItem.copy(
+        id = Some("appliedFor-true"),
+        conditionalHtml = Some(html)
+      )
+    } else {
+      radioItem.copy(
+        id = Some("appliedFor-false")
+      )
     }
-  }
-
-  implicit val formWrites: Write[BusinessAppliedForPSRNumber, UrlFormEncoded] = Write {
-    case BusinessAppliedForPSRNumberYes(regNum) => Map("appliedFor" -> Seq("true"),
-                                                       "regNumber" -> Seq(regNum))
-    case BusinessAppliedForPSRNumberNo => Map("appliedFor" -> Seq("false"))
-
   }
 
   implicit val jsonReads: Reads[BusinessAppliedForPSRNumber] =

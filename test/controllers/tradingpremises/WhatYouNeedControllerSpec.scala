@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
@@ -49,8 +50,11 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
   "WhatYouNeedController" must {
 
     "load the what you need page" in new Fixture {
-      when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), None, None, None))))
-        val result = controller.get(1)(request)
+      when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(
+        Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), None, None, None)))
+      )
+
+      val result = controller.get(1)(request)
       status(result) mustBe OK
     }
 

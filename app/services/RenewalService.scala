@@ -20,13 +20,16 @@ import cats.data.OptionT
 import cats.data.Validated.Valid
 import cats.implicits._
 import connectors.DataCacheConnector
+
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.Renewal.ValidationRules._
 import models.renewal._
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.MappingUtils._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -54,13 +57,13 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     }
   }
 
-  def getRenewal(cacheId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) =
+  def getRenewal(cacheId: String)(implicit headerCarrier: HeaderCarrier): Future[Option[Renewal]] =
     dataCache.fetch[Renewal](cacheId, Renewal.key)
 
-  def updateRenewal(credId: String, renewal: Renewal)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) =
+  def updateRenewal(credId: String, renewal: Renewal)(implicit headerCarrier: HeaderCarrier): Future[CacheMap] =
     dataCache.save[Renewal](credId, Renewal.key, renewal)
 
-  def isRenewalComplete(renewal: Renewal, credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
+  def isRenewalComplete(renewal: Renewal, credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
 
     val isComplete = for {
       cache <- OptionT(dataCache.fetchAll(credId))

@@ -22,6 +22,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching._
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService._
 import models.renewal.{MostTransactions, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -62,10 +63,10 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
     def formData(valid: Boolean) = if (valid) "mostTransactionsCountries[0]" -> "GB" else "mostTransactionsCountries[0]" -> ""
     def formRequest(valid: Boolean) = requestWithUrlEncodedBody(formData(valid))
 
-    when(mockRenewalService.getRenewal(any())(any(), any()))
+    when(mockRenewalService.getRenewal(any())(any()))
       .thenReturn(Future.successful(None))
 
-    when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+    when(mockRenewalService.updateRenewal(any(), any())(any()))
       .thenReturn(Future.successful(emptyCache))
 
     def post(edit: Boolean = false, valid: Boolean = true)(block: Result => Unit) =

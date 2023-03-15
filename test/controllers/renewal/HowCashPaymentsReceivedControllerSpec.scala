@@ -49,17 +49,17 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
       how_cash_payments_received = view
     )
 
-    when(mockRenewalService.getRenewal(any())(any(), any()))
+    when(mockRenewalService.getRenewal(any())(any()))
       .thenReturn(Future.successful(None))
 
-    when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+    when(mockRenewalService.updateRenewal(any(), any())(any()))
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
 
   "HowCashPaymentsReceived controller" when {
     "get is called" must {
       "load the page if renewal data is found" in new Fixture {
-          when(mockRenewalService.getRenewal(any())(any(), any()))
+          when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
 
           val result = controller.get()(request)

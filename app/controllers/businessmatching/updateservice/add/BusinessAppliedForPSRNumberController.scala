@@ -16,19 +16,18 @@
 
 package controllers.businessmatching.updateservice.add
 
-import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import _root_.forms.PSRNumberFormProvider
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import javax.inject.{Inject, Singleton}
-import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
 import play.api.mvc.MessagesControllerComponents
 import services.flowmanagement.Router
 import utils.AuthAction
 import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -38,13 +37,14 @@ class BusinessAppliedForPSRNumberController @Inject()(
                                                        implicit val dataCacheConnector: DataCacheConnector,
                                                        val router: Router[AddBusinessTypeFlowModel],
                                                        val cc: MessagesControllerComponents,
+                                                       formProvider: PSRNumberFormProvider,
                                                        business_applied_for_psr_number: business_applied_for_psr_number) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false) = authAction.async {
       implicit request =>
         OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)) map {
           case model if model.isMsbTmDefined =>
-          val form = model.businessAppliedForPSRNumber map { v => Form2(v) } getOrElse EmptyForm
+          val form = model.businessAppliedForPSRNumber.fold(formProvider())(formProvider().fill)
           Ok(business_applied_for_psr_number(form, edit))
           case _ => Redirect(controllers.routes.RegistrationProgressController.get)
         } getOrElse InternalServerError("Get: Unable to show Business Applied For PSR Number page")
@@ -52,11 +52,11 @@ class BusinessAppliedForPSRNumberController @Inject()(
 
   def post(edit: Boolean = false) = authAction.async {
       implicit request =>
-        Form2[BusinessAppliedForPSRNumber](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(business_applied_for_psr_number(f, edit)))
 
-          case ValidForm(_, data) => {
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(business_applied_for_psr_number(formWithErrors, edit))),
+          data => {
             dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) => model.businessAppliedForPSRNumber(data)
               case None => throw new Exception("An UnknownException has occurred: BusinessAppliedForPSRNumberController")
@@ -65,7 +65,6 @@ class BusinessAppliedForPSRNumberController @Inject()(
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: BusinessAppliedForPSRNumberController"))
             }
           }
-          case _ => Future.successful(InternalServerError("Post: An UnknowException has occurred: BusinessAppliedForPSRNumberController"))
-        }
+        )
   }
 }

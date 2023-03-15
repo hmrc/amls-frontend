@@ -34,7 +34,7 @@ class RegisterServicesViewSpec extends AmlsViewSpec with MustMatchers  {
     implicit val requestWithToken = addTokenForView()
   }
 
-  "register_services view" must {
+  "RegisterServicesView" must {
     "have correct title" when {
       "pre-submission" in new ViewFixture {
 
@@ -42,9 +42,9 @@ class RegisterServicesViewSpec extends AmlsViewSpec with MustMatchers  {
 
         def view = register_services(filledForm, edit = true, Seq(AccountancyServices), isPreSubmission = true)
 
-        doc.title must startWith(Messages("businessmatching.registerservices.title") + " - " + Messages("summary.businessmatching"))
-        heading.html must be(Messages("businessmatching.registerservices.title"))
-        subHeading.html must include(Messages("summary.businessmatching"))
+        doc.title must startWith(messages("businessmatching.registerservices.title") + " - " + messages("summary.businessmatching"))
+        heading.html must be(messages("businessmatching.registerservices.title"))
+        subHeading.html must include(messages("summary.businessmatching"))
 
       }
 
@@ -54,9 +54,9 @@ class RegisterServicesViewSpec extends AmlsViewSpec with MustMatchers  {
 
         def view = register_services(filledForm, edit = true, Seq.empty, isPreSubmission = false)
 
-        doc.title must startWith(Messages("businessmatching.registerservices.other.title") + " - " + Messages("summary.businessmatching"))
-        heading.html must be(Messages("businessmatching.registerservices.other.title"))
-        subHeading.html must include(Messages("summary.businessmatching"))
+        doc.title must startWith(messages("businessmatching.registerservices.other.title") + " - " + messages("summary.businessmatching"))
+        heading.html must be(messages("businessmatching.registerservices.other.title"))
+        subHeading.html must include(messages("summary.businessmatching"))
 
       }
     }
@@ -66,7 +66,7 @@ class RegisterServicesViewSpec extends AmlsViewSpec with MustMatchers  {
 
         def view = register_services(formProvider(), edit = true, Seq(AccountancyServices), isPreSubmission = false)
 
-        html must include(Messages("businessmatching.registerservices.existing"))
+        html must include(messages("businessmatching.registerservices.existing"))
 
       }
     }
@@ -89,7 +89,7 @@ class RegisterServicesViewSpec extends AmlsViewSpec with MustMatchers  {
     "hide the return to progress link" in new ViewFixture {
       def view = register_services(formProvider(), edit = true, Seq.empty, isPreSubmission = true, showReturnLink = false)
 
-      doc.body().text() must not include Messages("link.return.registration.progress")
+      doc.body().text() must not include messages("link.return.registration.progress")
     }
 
     "have a back link in pre-submission mode" in new ViewFixture {

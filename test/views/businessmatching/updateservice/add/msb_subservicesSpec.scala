@@ -16,9 +16,12 @@
 
 package views.businessmatching.updateservice.add
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, MsbSubSectorsFormProvider, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessmatching.{BusinessMatchingMsbServices, TransmittingMoney}
+import models.businessmatching.{BusinessMatchingMsbService, BusinessMatchingMsbServices}
+import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
+import org.jsoup.nodes.Element
+import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
@@ -28,61 +31,60 @@ class msb_subservicesSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
     lazy val msb_subservices = app.injector.instanceOf[msb_subservices]
+    lazy val formProvider = app.injector.instanceOf[MsbSubSectorsFormProvider]
     implicit val requestWithToken = addTokenForView()
 
-    def view = msb_subservices(EmptyForm, edit = false)
+    def view = msb_subservices(formProvider(), edit = false)
   }
 
   "The msb_subservices view" must {
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+      val filledForm: Form[Seq[BusinessMatchingMsbService]] = formProvider().fill(Seq(TransmittingMoney))
 
-      override def view = msb_subservices(form2, edit = false)
+      override def view = msb_subservices(filledForm, edit = false)
 
       doc.title must startWith(Messages("businessmatching.updateservice.msb.services.title") + " - " + Messages("summary.updateservice"))
       heading.html must be(Messages("businessmatching.updateservice.msb.services.title"))
       subHeading.html must include(Messages("summary.updateservice"))
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+      doc.getElementById("back-link").isInstanceOf[Element] mustBe true
 
     }
 
     "show errors in the correct locations" in new ViewFixture {
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "msbServices") -> Seq(ValidationError("not a message Key"))
-        ))
+      val messageKey = "error.required.msb.services"
 
-      override def view = msb_subservices(form2, edit = false)
+      val filledForm: Form[Seq[BusinessMatchingMsbService]] = formProvider().withError(FormError("value", messageKey))
 
-      errorSummary.html() must include("not a message Key")
+      override def view = msb_subservices(filledForm, edit = false)
 
-      doc.getElementById("msbServices")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+      doc.getElementsByClass("govuk-list govuk-error-summary__list")
+        .first.text() mustBe messages(messageKey)
 
+      doc.getElementById("value-error").text() mustBe(s"Error: ${messages(messageKey)}")
     }
-    "hide the return to progress link" in new ViewFixture {
-      val form2: ValidForm[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(Set(TransmittingMoney)))
 
-      override def view = msb_subservices(form2, edit = false)
+    "hide the return to progress link" in new ViewFixture {
+      val filledForm: Form[Seq[BusinessMatchingMsbService]] = formProvider().fill(Seq(TransmittingMoney))
+
+      override def view = msb_subservices(filledForm, edit = false)
 
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
 
     "show the correct number of checkboxes when fxToggle is disabled" in new ViewFixture {
-      override def view = msb_subservices(EmptyForm, edit=false)
+      override def view = msb_subservices(formProvider(), edit=false)
       doc.body().getElementsByAttributeValue("type", "checkbox").size() mustEqual 4
     }
 
     "show the correct label for the checkboxes when fxToggle is disabled" in new ViewFixture {
-      override def view = msb_subservices(EmptyForm, edit = false)
+      override def view = msb_subservices(formProvider(), edit = false)
 
       val checkboxes = doc.body().getElementsByAttributeValue("type", "checkbox")
-      val labels = Seq("03", "04", "05", "01")
       (0 until checkboxes.size()) foreach { i =>
-        checkboxes.get(i).attr("value") mustEqual labels(i)
+        checkboxes.get(i).attr("value") mustEqual BusinessMatchingMsbServices.all(i).toString
       }
     }
   }

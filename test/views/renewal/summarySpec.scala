@@ -20,6 +20,7 @@ import forms.EmptyForm
 import models.Country
 import models.businessmatching._
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService._
 import models.renewal._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks

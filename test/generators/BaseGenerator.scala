@@ -45,6 +45,12 @@ trait BaseGenerator {
   def numSequence(maxLength: Int) =
     Gen.listOfN(maxLength, Gen.chooseNum(1, 9)) map {_.mkString}
 
+  def numsLongerThan(length: Int): Gen[Int] =
+    Gen.listOfN(length + 1, Gen.chooseNum(1, 9)).map(_.mkString.toInt)
+  def numsShorterThan(length: Int): Gen[Int] =
+    Gen.listOfN(length - 1, Gen.chooseNum(1, 9)).map(_.mkString.toInt)
+
+
   def numGen = Gen.chooseNum(0,1000)
 
   val paymentAmountGen = Gen.chooseNum[Double](100, 200)
@@ -71,4 +77,9 @@ trait BaseGenerator {
     suffix <- stringOfLengthGen(15)
   } yield s"$prefix@$suffix.com"
 
+  val nonBooleans: Gen[String] =
+    arbitrary[String]
+      .suchThat (_.nonEmpty)
+      .suchThat (_ != "true")
+      .suchThat (_ != "false")
 }

@@ -141,10 +141,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             "details" -> "test"
           )
 
-          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockRenewalService.getRenewal(any())(any(), any()))
+          when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post()(newRequest)
@@ -158,10 +158,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             "involvedInOther" -> "false"
           )
 
-          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockRenewalService.getRenewal(any())(any(), any()))
+          when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post()(newRequest)
@@ -177,10 +177,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             "details" -> "test"
           )
 
-          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockRenewalService.getRenewal(any())(any(), any()))
+          when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post()(newRequest)
@@ -194,10 +194,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             "involvedInOther" -> "false"
           )
 
-          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockRenewalService.getRenewal(any())(any(), any()))
+          when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post()(newRequest)
@@ -211,10 +211,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             "involvedInOther" -> "false"
           )
 
-          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockRenewalService.getRenewal(any())(any(), any()))
+          when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post(true)(newRequest)
@@ -229,10 +229,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             "details" -> "test"
           )
 
-          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(mockRenewalService.getRenewal(any())(any(), any()))
+          when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           val result = controller.post(true)(newRequest)

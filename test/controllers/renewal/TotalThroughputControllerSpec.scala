@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessActivities, _}
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney, ChequeCashingScrapMetal}
 import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
@@ -64,7 +65,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
     val cache = mock[CacheMap]
 
     when {
-      renewalService.updateRenewal(any(),any())(any(), any())
+      renewalService.updateRenewal(any(),any())(any())
     } thenReturn Future.successful(cache)
 
     when {
@@ -84,7 +85,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
   "The MSB throughput controller" must {
     "return the view with an empty form when no data exists yet" in new Fixture {
 
-      when(renewalService.getRenewal(any())(any(), any()))
+      when(renewalService.getRenewal(any())(any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -107,7 +108,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
 
     "return the view with prepopulated data" in new Fixture {
 
-      when(renewalService.getRenewal(any())(any(), any()))
+      when(renewalService.getRenewal(any())(any()))
         .thenReturn(Future.successful(Some(Renewal(totalThroughput = Some(TotalThroughput("01"))))))
 
       val result = controller.get()(request)
@@ -212,7 +213,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
       post() { result =>
         result.header.status mustBe SEE_OTHER
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
-        verify(renewalService).updateRenewal(any(), captor.capture())(any(), any())
+        verify(renewalService).updateRenewal(any(), captor.capture())(any())
         captor.getValue.totalThroughput mustBe Some(TotalThroughput("01"))
       }
     }

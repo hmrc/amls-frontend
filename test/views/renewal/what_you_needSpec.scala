@@ -16,8 +16,9 @@
 
 package views.renewal
 
-import models.businessmatching.{BusinessActivities, BusinessMatchingMsbServices, CurrencyExchange, ForeignExchange, TransmittingMoney}
+import models.businessmatching.{BusinessActivities, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessActivity.{AccountancyServices, ArtMarketParticipant, HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec

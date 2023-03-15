@@ -18,6 +18,7 @@ package models.businessmatching
 
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, UnincorporatedBody}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.i18n.Messages

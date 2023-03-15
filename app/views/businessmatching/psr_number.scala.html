@@ -14,23 +14,24 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
-@import config.{ ApplicationConfig}
-@import utils.HtmlElementHelpers._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import config.ApplicationConfig
+@import models.businessmatching.BusinessAppliedForPSRNumber
+@import components.{Button, ReturnLink, SectionSubtitle}
+@import components.forms.{InputText, InputYesNo, ErrorSummary}
 
-@this(main: include.main)
+@this(
+    formHelper: FormWithCSRF,
+    layout: Layout,
+    subtitle: SectionSubtitle,
+    inputText: InputText,
+    inputYesNo: InputYesNo,
+    errorSummary: ErrorSummary,
+    button: Button,
+    returnLink: ReturnLink
+)
 
-@(f: forms.Form2[_], edit: Boolean, showReturnLink: Boolean = true, isPreSubmission: Boolean = true, isPsrDefined: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
-
-@target = @{
-    s"""${f("regNumber").id}-panel"""
-}
-
-@header = {
-    @components.back_link()
-    @errorSummary(f)
-}
+@(form: Form[_], edit: Boolean, showReturnLink: Boolean = true, isPreSubmission: Boolean = true, isPsrDefined: Boolean = false)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @section = @{
    if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation"
@@ -40,62 +41,107 @@
     if(isPreSubmission || !isPsrDefined) "businessmatching.psr.number.title" else "businessmatching.psr.number.title.post.submission"
 }
 
-@main(
-    title = Messages(title) + " - " + Messages(section),
-    heading = header
-)  {
+@hasPsrNumberError = @{
+    form.errors match {
+        case Nil => false
+        case x if x.head.key == "regNumber" => true
+        case _ => false
+    }
+}
 
-    @form(f, controllers.businessmatching.routes.PSRNumberController.post(edit)) {
+@preparedErrorSummary = @{
+    if(hasPsrNumberError) {
+        errorSummary(form, Some(Map("regNumber" -> "regNumber")))
+    } else {
+        errorSummary(form, Some(Map("appliedFor" -> "appliedFor-true")))
+    }
+}
+
+@maybeReturnLink = {
+    @if(showReturnLink) {
+        @returnLink(true)
+    }
+}
+
+@conditionalInput = @{
+    inputText(
+        input = Input(
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("businessmatching.updateservice.psr.number.lbl")),
+                classes = "govuk-label"
+            ),
+            hint = None,
+           name = "regNumber",
+           id = "regNumber",
+           inputmode = Some("numeric"),
+           classes = "govuk-!-width-one-quarter"
+        ),
+        field = form("regNumber")
+    )
+}
+
+@layout(pageTitle = messages(title) + " - " + messages(section)) {
+
+    @formHelper(action = controllers.businessmatching.routes.PSRNumberController.post(edit)) {
 
         @(edit, isPreSubmission, isPsrDefined) match {
             case (true, false, true) | (false, false, true) => {
+
+                @errorSummary(form)
+
+                @subtitle(section)
+
                 <input type="hidden" name="appliedFor" value=true />
-                @input(
-                    attrPattern = "[0-9]*",
-                    attrType = "text",
-                    dataAttrs = digitsOnlyAttributes,
-                    field = f("regNumber"),
-                    heading = "businessmatching.psr.number.title.post.submission",
-                    section = section,
-                    hintText = "businessmatching.psr.number.hint",
-                    inputMode = "numeric"
+
+                @inputText(
+                    input = Input(
+                        label = Label(
+                            isPageHeading = true,
+                            content = Text(messages("businessmatching.psr.number.title.post.submission")),
+                            classes = "govuk-label--xl"
+                        ),
+                        hint = Some(
+                            Hint(
+                                content = Text(messages("businessmatching.psr.number.hint"))
+                            )
+                        ),
+                       name = "regNumber",
+                       id = "regNumber",
+                       inputmode = Some("numeric"),
+                       classes = "govuk-!-width-one-quarter"
+                    ),
+                    field = form("regNumber")
                 )
             }
             case (false, true, true) | (true, true, true) | (_, _, false) => {
-                @fieldsetWithErrorGroup(
-                    f = f("appliedFor"),
-                    heading = "businessmatching.psr.number.title",
-                    hint = "businessmatching.psr.number.hint",
-                    section = section,
-                    panel = false
-                ) {
-                    @radio(
-                        f = f("appliedFor"),
-                        labelText = "lbl.yes",
-                        value = "true",
-                        target = s"#$target"
-                    )
-                    @panel(
-                        field = Some(f(s"$target")),
-                        id = target
-                    ) {
-                        @input(
-                            attrPattern = "[0-9]*",
-                            attrType = "text",
-                            field = f("regNumber"),
-                            labelText = "businessmatching.psr.number.lbl",
-                            inputMode = "numeric"
-                        )
-                    }
-                    @radio(
-                        f = f("appliedFor"),
-                        labelText = "lbl.no",
-                        value = "false"
-                    )
-                }
+
+
+                @preparedErrorSummary
+
+                @subtitle(section)
+
+                @inputYesNo(
+                    Radios(
+                        fieldset = Some(Fieldset(
+                          legend = Some(Legend(
+                            content = Text(messages("businessmatching.psr.number.title")),
+                            classes = "govuk-fieldset__legend--xl",
+                            isPageHeading = true
+                          ))
+                        )),
+                        hint = Some(Hint(content = Text(messages("businessmatching.psr.number.hint")))),
+                        name = "appliedFor",
+                        items = BusinessAppliedForPSRNumber.formValues(conditionalInput)
+                      )
+                    .withFormField(form("appliedFor"))
+
+                )
             }
         }
 
-        @submit(edit, returnLink = showReturnLink)
+        @button()
+
+        @maybeReturnLink
    }
 }

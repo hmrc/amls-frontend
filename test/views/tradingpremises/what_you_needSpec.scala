@@ -16,8 +16,9 @@
 
 package views.tradingpremises
 
-import models.businessmatching.{BusinessActivities, BusinessMatchingMsbServices, CurrencyExchange, TransmittingMoney}
+import models.businessmatching.{BusinessActivities, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec

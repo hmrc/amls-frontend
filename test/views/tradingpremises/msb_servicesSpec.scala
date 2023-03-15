@@ -18,7 +18,8 @@ package views.tradingpremises
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, TransmittingMoney}
+import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec

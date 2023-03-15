@@ -16,7 +16,8 @@
 
 package models.moneyservicebusiness
 
-import models.businessmatching.{BusinessMatching, CurrencyExchange, ForeignExchange, TransmittingMoney}
+import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json._
 import uk.gov.hmrc.http.cache.client.CacheMap

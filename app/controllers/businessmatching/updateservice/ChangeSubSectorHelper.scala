@@ -19,6 +19,8 @@ package controllers.businessmatching.updateservice
 import connectors.DataCacheConnector
 import javax.inject.Inject
 import models.businessmatching._
+import models.businessmatching.BusinessMatchingMsbService._
+import models.businessmatching.BusinessMatchingMsbServices
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.ChangeSubSectorFlowModel
 import models.moneyservicebusiness.MoneyServiceBusiness

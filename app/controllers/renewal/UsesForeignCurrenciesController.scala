@@ -21,14 +21,15 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+
 import javax.inject.Inject
 import models.businessmatching._
 import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing}
+import models.businessmatching.BusinessMatchingMsbService.ForeignExchange
 import models.renewal._
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
-
 import views.html.renewal.uses_foreign_currencies
 
 import scala.concurrent.Future

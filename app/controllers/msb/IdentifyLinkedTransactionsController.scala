@@ -22,10 +22,10 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.businessmatching.BusinessActivity.{MoneyServiceBusiness => _}
+import models.businessmatching.BusinessMatchingMsbService.{TransmittingMoney, CurrencyExchange, ForeignExchange}
 import models.moneyservicebusiness._
 import play.api.mvc.{MessagesControllerComponents, Result}
 import utils.AuthAction
-
 import views.html.msb.identify_linked_transactions
 
 import scala.concurrent.Future

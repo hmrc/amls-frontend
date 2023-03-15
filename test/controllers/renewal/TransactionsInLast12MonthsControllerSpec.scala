@@ -22,6 +22,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching._
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.moneyservicebusiness.{SendMoneyToOtherCountry, MoneyServiceBusiness => moneyServiceBusiness}
 import models.renewal.{CustomersOutsideUK, Renewal, TransactionsInLast12Months}
 import org.jsoup.Jsoup
@@ -56,7 +57,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       transactions_in_last_12_months = view)
 
     when {
-      renewalService.getRenewal(any())(any(), any())
+      renewalService.getRenewal(any())(any())
     } thenReturn Future.successful(Renewal().some)
 
     val msbModel = moneyServiceBusiness(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)))
@@ -70,7 +71,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
     val cache = mock[CacheMap]
 
     when {
-      renewalService.updateRenewal(any(),any())(any(), any())
+      renewalService.updateRenewal(any(),any())(any())
     } thenReturn Future.successful(cache)
 
     when {
@@ -104,7 +105,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       "reads the current value from the renewals model" in new Fixture {
 
         when {
-          renewalService.getRenewal(any())(any(), any())
+          renewalService.getRenewal(any())(any())
         } thenReturn Future.successful(Renewal(transactionsInLast12Months = TransactionsInLast12Months("2500").some).some)
 
         val result = controller.get(true)(request)
@@ -112,7 +113,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
         doc.select("input[name=txnAmount]").first.attr("value") mustBe "2500"
 
-        verify(renewalService).getRenewal(any())(any(), any())
+        verify(renewalService).getRenewal(any())(any())
       }
     }
   }
@@ -283,7 +284,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
           post(valid = false) { result =>
             result.header.status mustBe BAD_REQUEST
-            verify(renewalService, never()).updateRenewal(any(),any())(any(), any())
+            verify(renewalService, never()).updateRenewal(any(),any())(any())
           }
         }
       }
@@ -307,7 +308,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
         post() { _ =>
           val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
-          verify(renewalService).updateRenewal(any(), captor.capture())(any(), any())
+          verify(renewalService).updateRenewal(any(), captor.capture())(any())
 
           captor.getValue.transactionsInLast12Months mustBe TransactionsInLast12Months("1500").some
         }

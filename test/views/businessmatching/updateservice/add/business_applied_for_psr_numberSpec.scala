@@ -16,9 +16,10 @@
 
 package views.businessmatching.updateservice.add
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, PSRNumberFormProvider, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
+import play.api.data.FormError
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
@@ -28,18 +29,19 @@ class business_applied_for_psr_numberSpec extends AmlsViewSpec {
 
   trait ViewFixture extends Fixture {
     lazy val business_applied_for_psr_number = app.injector.instanceOf[business_applied_for_psr_number]
+    lazy val formProvider = app.injector.instanceOf[PSRNumberFormProvider]
     implicit val requestWithToken = addTokenForView()
 
-    def view = business_applied_for_psr_number(EmptyForm, edit = false)
+    def view = business_applied_for_psr_number(formProvider(), edit = false)
   }
 
   "The psr_number view" must {
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
+      val filledForm = formProvider().fill(BusinessAppliedForPSRNumberYes("1234"))
 
-      override def view = business_applied_for_psr_number(form2, edit = false)
+      override def view = business_applied_for_psr_number(filledForm, edit = false)
 
       doc.title must startWith(Messages("businessmatching.updateservice.psr.number.title") + " - " + Messages("summary.updateservice"))
       heading.html must be(Messages("businessmatching.updateservice.psr.number.title"))
@@ -50,29 +52,29 @@ class business_applied_for_psr_numberSpec extends AmlsViewSpec {
 
     "show errors in the correct locations" in new ViewFixture {
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "appliedFor") -> Seq(ValidationError("not a message Key")),
-          (Path \ "regNumber-panel") -> Seq(ValidationError("second not a message Key"))
-        ))
+      val messageKey = ""
 
-      override def view = business_applied_for_psr_number(form2, edit = false)
+      val filledForm = formProvider().withError(FormError("appliedFor", messageKey))
 
-      errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
+      override def view = business_applied_for_psr_number(filledForm, edit = false)
 
-      doc.getElementById("appliedFor")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+      doc.getElementsByClass("govuk-list govuk-error-summary__list")
+        .first.text() mustBe messages(messageKey)
 
-      doc.getElementById("regNumber-panel")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
+      doc.getElementById("value-error").text() mustBe(s"Error: ${messages(messageKey)}")
+
+//      doc.getElementById("appliedFor")
+//        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+//
+//      doc.getElementById("regNumber-panel")
+//        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }
 
     "hide the return to progress link" in new ViewFixture {
-      val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
+      val filledForm = formProvider().fill(BusinessAppliedForPSRNumberYes("1234"))
 
-      override def view = business_applied_for_psr_number(form2, edit = true)
+      override def view = business_applied_for_psr_number(filledForm, edit = true)
 
       doc.body().text() must not include Messages("link.return.registration.progress")
     }

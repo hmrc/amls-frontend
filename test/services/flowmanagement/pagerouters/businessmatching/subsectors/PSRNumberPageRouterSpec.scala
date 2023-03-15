@@ -17,11 +17,10 @@
 package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes, TransmittingMoney}
+import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
+import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
 import models.flowmanagement.ChangeSubSectorFlowModel
 import utils.AmlsSpec
-
-
 import play.api.test.Helpers._
 
 class PSRNumberPageRouterSpec extends AmlsSpec {

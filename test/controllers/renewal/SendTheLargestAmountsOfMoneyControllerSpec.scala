@@ -63,10 +63,10 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
     def formData(valid: Boolean) = if (valid) "largestAmountsOfMoney[0]" -> "GB" else "largestAmountsOfMoney[0]" -> ""
     def formRequest(valid: Boolean) = requestWithUrlEncodedBody(formData(valid))
 
-    when(mockRenewalService.getRenewal(any())(any(), any()))
+    when(mockRenewalService.getRenewal(any())(any()))
       .thenReturn(Future.successful(None))
 
-    when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+    when(mockRenewalService.updateRenewal(any(), any())(any()))
       .thenReturn(Future.successful(emptyCache))
 
     def post(edit: Boolean = false, valid: Boolean = true)(block: Result => Unit) =
@@ -126,7 +126,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
           "CustomersOutsideUK is contains countries" when {
             "MostTransactions is None" in new FormSubmissionFixture {
 
-              when(mockRenewalService.getRenewal(any())(any(), any()))
+              when(mockRenewalService.getRenewal(any())(any()))
                 .thenReturn(Future.successful(Some(Renewal(
                   customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB","GB"))))),
                   mostTransactions = None

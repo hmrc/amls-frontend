@@ -20,6 +20,7 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService._
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks

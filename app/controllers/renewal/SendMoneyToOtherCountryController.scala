@@ -24,11 +24,11 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing}
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange}
 import models.renewal.{Renewal, SendMoneyToOtherCountry}
 import play.api.mvc.MessagesControllerComponents
 import services.RenewalService
 import utils.AuthAction
-
 import views.html.renewal.send_money_to_other_country
 
 import scala.concurrent.Future

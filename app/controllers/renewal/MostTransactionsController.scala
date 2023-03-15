@@ -22,6 +22,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing}
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange}
 import models.renewal.{MostTransactions, Renewal}
 import play.api.mvc.{MessagesControllerComponents, Result}
 import services.{AutoCompleteService, RenewalService}

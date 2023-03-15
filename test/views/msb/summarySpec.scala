@@ -18,7 +18,8 @@ package views.msb
 
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatchingMsbServices, CurrencyExchange, ForeignExchange, TransmittingMoney}
+import models.businessmatching.BusinessMatchingMsbServices
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.moneyservicebusiness._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks

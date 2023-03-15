@@ -20,7 +20,13 @@ import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, ValidationError, _}
 import models.DateOfChange
-import models.businessmatching.{ChequeCashingNotScrapMetal => BMChequeCashingNotScrapMetal, ChequeCashingScrapMetal => BMChequeCashingScrapMetal, CurrencyExchange => BMCurrencyExchange, ForeignExchange => BMForeignExchange, TransmittingMoney => BMTransmittingMoney}
+import models.businessmatching.BusinessMatchingMsbService.{
+  ChequeCashingNotScrapMetal => BMChequeCashingNotScrapMetal,
+  ChequeCashingScrapMetal => BMChequeCashingScrapMetal,
+  CurrencyExchange => BMCurrencyExchange,
+  ForeignExchange => BMForeignExchange,
+  TransmittingMoney => BMTransmittingMoney
+}
 import play.api.i18n.Messages
 import play.api.libs.json.{Reads, Writes, _}
 import utils.TraversableValidators

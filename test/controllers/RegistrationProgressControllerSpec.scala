@@ -525,7 +525,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
             .thenReturn(Future.successful(true))
 
-          when(controller.renewalService.getRenewal(any())(any(), any()))
+          when(controller.renewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(completeRenewal)))
 
           when {
@@ -551,10 +551,10 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
             .thenReturn(Future.successful(false))
 
-          when(controller.renewalService.getRenewal(any())(any(), any()))
+          when(controller.renewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(inCompleteRenewal)))
 
-          when(controller.renewalService.getRenewal(any())(any(), any()))
+          when(controller.renewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(inCompleteRenewal)))
 
           val result = controller.post()(request)
@@ -571,7 +571,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
           .thenReturn(Future.successful(true))
 
-        when(controller.renewalService.getRenewal(any())(any(), any()))
+        when(controller.renewalService.getRenewal(any())(any()))
           .thenReturn(Future.successful(Some(completeRenewal)))
 
         when {

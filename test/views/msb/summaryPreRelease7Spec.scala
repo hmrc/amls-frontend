@@ -17,7 +17,8 @@
 package views.msb
 
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatchingMsbServices, CurrencyExchange}
+import models.businessmatching.BusinessMatchingMsbServices
+import models.businessmatching.BusinessMatchingMsbService.CurrencyExchange
 import models.moneyservicebusiness.{MoneyServiceBusiness, MoneySources, UsesForeignCurrenciesYes, WhichCurrencies}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages

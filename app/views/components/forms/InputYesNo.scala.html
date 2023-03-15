@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,25 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package forms
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 
-import forms.mappings.Mappings
-import models.businessmatching.BusinessActivity
-import play.api.data.Form
-import play.api.data.Forms.seq
+@this(govukRadios : GovukRadios)
 
-import javax.inject.Inject
+@(radios: Radios)(implicit messages: Messages)
 
-class RegisterBusinessActivitiesFormProvider @Inject()() extends Mappings {
-
-  def apply(): Form[Seq[BusinessActivity]] = {
-
-    Form[Seq[BusinessActivity]](
-      "value" -> seq(enumerable[BusinessActivity]("error.required.bm.register.service")).verifying(
-        nonEmptySeq("error.required.bm.register.service")
-      )
-    )
-  }
-}
+@govukRadios(radios)

@@ -18,8 +18,9 @@ package controllers.msb
 
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessActivities, BusinessMatching, BusinessMatchingMsbServices, ForeignExchange}
+import models.businessmatching.{BusinessActivities, BusinessMatching, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessActivity.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.BusinessMatchingMsbService.ForeignExchange
 import models.moneyservicebusiness._
 import models.status.NotCompleted
 import org.jsoup.Jsoup

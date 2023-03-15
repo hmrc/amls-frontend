@@ -21,21 +21,23 @@ import cats.implicits._
 import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
+import forms.MsbSubSectorsFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching._
 import models.businessmatching.BusinessActivity.{AccountancyServices, MoneyServiceBusiness}
+import models.businessmatching.BusinessMatchingMsbService._
+import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, SubSectorsPageId}
 import models.moneyservicebusiness.MoneyServiceBusinessTestData
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.add.msb_subservices
-
 
 import scala.concurrent.Future
 
@@ -58,6 +60,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       router = createRouter[AddBusinessTypeFlowModel],
       config = config,
       cc = mockMcc,
+      formProvider = app.injector.instanceOf[MsbSubSectorsFormProvider],
       msb_subservices = view
     )
 
@@ -158,9 +161,11 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
             hasChanged = true))
 
-          val result = controller.post()(requestWithUrlEncodedBody(
-            "msbServices[]" -> "01"
-          ))
+          val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
+            "value[1]" -> TransmittingMoney.toString
+          )
+
+          val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
           controller.router.verify("internalId", SubSectorsPageId,
@@ -176,10 +181,12 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             hasChanged = true)
           )
 
-          val result = controller.post()(requestWithUrlEncodedBody(
-            "msbServices[]" -> "03",
-            "msbServices[]" -> "04"
-          ))
+          val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
+            "value[1]" -> ChequeCashingNotScrapMetal.toString,
+            "value[2]" -> ChequeCashingScrapMetal.toString
+          )
+
+          val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
           controller.router.verify("internalId", SubSectorsPageId,
@@ -196,10 +203,12 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             hasChanged = true)
           )
 
-          val result = controller.post()(requestWithUrlEncodedBody(
-            "msbServices[]" -> "03",
-            "msbServices[]" -> "04"
-          ))
+          val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
+            "value[1]" -> ChequeCashingNotScrapMetal.toString,
+            "value[2]" -> ChequeCashingScrapMetal.toString
+          )
+
+          val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
           controller.router.verify("internalId", SubSectorsPageId,
@@ -216,10 +225,12 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             hasChanged = true)
           )
 
-          val result = controller.post()(requestWithUrlEncodedBody(
-            "msbServices[]" -> "03",
-            "msbServices[]" -> "04"
-          ))
+          val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
+            "value[1]" -> ChequeCashingNotScrapMetal.toString,
+            "value[2]" -> ChequeCashingScrapMetal.toString
+          )
+
+          val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
           controller.router.verify("internalId", SubSectorsPageId,
@@ -236,10 +247,12 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             hasChanged = true)
           )
 
-          val result = controller.post()(requestWithUrlEncodedBody(
-            "msbServices[]" -> "03",
-            "msbServices[]" -> "04"
-          ))
+          val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
+            "value[1]" -> ChequeCashingNotScrapMetal.toString,
+            "value[2]" -> ChequeCashingScrapMetal.toString
+          )
+
+          val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
           controller.router.verify("internalId", SubSectorsPageId,

@@ -102,10 +102,10 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
             "percentage" -> "01"
           )
 
-          when(mockRenewalService.getRenewal(any())(any(), any()))
+          when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(None))
 
-          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post()(newRequest)
@@ -121,10 +121,10 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
             "percentage" -> "01"
           )
 
-          when(mockRenewalService.getRenewal(any())(any(), any()))
+          when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(None))
 
-          when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+          when(mockRenewalService.updateRenewal(any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(true)(newRequest)

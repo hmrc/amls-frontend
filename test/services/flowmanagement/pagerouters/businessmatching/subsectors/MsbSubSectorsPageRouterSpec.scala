@@ -16,7 +16,7 @@
 
 package services.flowmanagement.pagerouters.businessmatching.subsectors
 
-import models.businessmatching.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, TransmittingMoney}
+import models.businessmatching.BusinessMatchingMsbService._
 import models.flowmanagement.ChangeSubSectorFlowModel
 import org.scalatest.concurrent.ScalaFutures
 import utils.AmlsSpec

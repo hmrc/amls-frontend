@@ -18,8 +18,9 @@ package models
 
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails.{ActivityStartDate, BusinessDetails, ContactingYou, CorporationTaxRegisteredYes, CorrespondenceAddress, CorrespondenceAddressUk, PreviouslyRegisteredYes, RegisteredOfficeUK, VATRegisteredYes}
-import models.businessmatching.{BusinessActivities, BusinessAppliedForPSRNumberYes, BusinessMatching, BusinessMatchingMsbServices, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CompanyRegistrationNumber, CurrencyExchange, TransmittingMoney, TypeOfBusiness}
+import models.businessmatching.{BusinessActivities, BusinessAppliedForPSRNumberYes, BusinessMatching, BusinessMatchingMsbServices, CompanyRegistrationNumber, TypeOfBusiness}
 import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
+import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, TransmittingMoney}
 import models.businessmatching.BusinessType.SoleProprietor
 import org.joda.time.LocalDate
 import play.api.libs.json.{JsNull, JsSuccess, Json}

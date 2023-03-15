@@ -20,6 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching._
+import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching.BusinessActivity.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, _}
 import models.status.{NotCompleted, SubmissionDecisionApproved}

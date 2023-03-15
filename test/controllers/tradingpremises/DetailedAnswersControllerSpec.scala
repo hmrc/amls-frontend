@@ -17,11 +17,11 @@
 package controllers.tradingpremises
 
 import java.util.UUID
-
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities, _}
 import models.businessmatching.BusinessActivity.{AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate

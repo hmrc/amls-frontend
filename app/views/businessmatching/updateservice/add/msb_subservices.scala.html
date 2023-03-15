@@ -14,64 +14,56 @@
  * limitations under the License.
  *@
 
-@import forms.Form2
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 @import include._
-@import include.forms2._
-@import config.{ ApplicationConfig}
+@import components.{Button, ReturnLink, SectionSubtitle}
+@import components.forms.{InputCheckbox, ErrorSummary}
+@import config.ApplicationConfig
+@import models.businessmatching.BusinessMatchingMsbServices
 
-@this(main: include.main)
+@this(
+    formHelper: FormWithCSRF,
+    layout: Layout,
+    subtitle: SectionSubtitle,
+    inputCheckbox: InputCheckbox,
+    errorSummary: ErrorSummary,
+    button: Button
+)
 
-@(f: Form2[_], edit: Boolean, isFxEnabled:Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean, isFxEnabled: Boolean = false)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
-@header = {
-    @components.back_link()
-    @errorSummary(f)
-}
-
-@main(
-    title = Messages("businessmatching.updateservice.msb.services.title") + " - " + Messages("summary.updateservice"),
-    heading = header
+@layout(
+    pageTitle = messages("businessmatching.updateservice.msb.services.title") + " - " + messages("summary.updateservice")
 ) {
 
-    @form(f, controllers.businessmatching.updateservice.add.routes.SubSectorsController.post(edit)) {
+    @formHelper(action = controllers.businessmatching.updateservice.add.routes.SubSectorsController.post(edit)) {
 
-      @fieldsetWithErrorGroup(
-        f = f("msbServices"),
-        heading = "businessmatching.updateservice.msb.services.title",
-        section = "summary.updateservice",
-        panel = false,
-        hint = "businessmatching.updateservice.msb.services.list.heading"
-      ) {
-          @checkbox(
-            f = f("msbServices[]"),
-            labelText = "businessmatching.updateservice.msb.services.list.lbl.03",
-            value = "03"
-          )
-          @checkbox(
-            f = f("msbServices[]"),
-            labelText = "businessmatching.updateservice.msb.services.list.lbl.04",
-            value = "04"
-          )
+        @errorSummary(form, Some(Map("value" -> "value_1")))
 
-          @if(isFxEnabled) {
-              @checkbox(
-                  f = f("msbServices[]"),
-                  labelText = "businessmatching.updateservice.msb.services.list.lbl.02",
-                  value = "02"
-              )
-          }
-          @checkbox(
-            f = f("msbServices[]"),
-            labelText = "businessmatching.updateservice.msb.services.list.lbl.05",
-            value = "05"
-          )
-          @checkbox(
-            f = f("msbServices[]"),
-            labelText = "businessmatching.updateservice.msb.services.list.lbl.01",
-            value = "01"
-          )
-      }
-      @submit(edit, returnLink = false, buttonMessageKey = Some("button.continue"), buttonId = Some("msbsubservice-submit"))
+        @subtitle("summary.updateservice")
+
+        @inputCheckbox(
+            Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(
+                        Legend(
+                            content = Text(messages("businessmatching.updateservice.msb.services.title")),
+                            classes = "govuk-label--xl",
+                            isPageHeading = true
+                        )
+                    )
+                )),
+                hint = Some(
+                    Hint(
+                        content = Text(messages("businessmatching.updateservice.msb.services.list.heading"))
+                    )
+                ),
+                name = "msbServices",
+                items = BusinessMatchingMsbServices.formValues(isFxEnabled)
+            ).withFormField(form("value"))
+        )
+
+        @button("button.continue", "msbsubservice-submit")
     }
-
 }

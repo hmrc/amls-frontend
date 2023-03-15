@@ -19,7 +19,8 @@ package controllers.tradingpremises
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.TradingPremisesSection
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, CurrencyExchange, TransmittingMoney}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices}
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, TradingPremises, TradingPremisesMsbService, CurrencyExchange => TPCurrencyExchange, TradingPremisesMsbServices => TPMsbServices, TransmittingMoney => TPTransmittingMoney}
 import org.jsoup.Jsoup

@@ -18,6 +18,7 @@ package models.flowmanagement
 
 import models.businessmatching._
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import play.api.i18n.Messages
 import play.api.libs.json.Json
 

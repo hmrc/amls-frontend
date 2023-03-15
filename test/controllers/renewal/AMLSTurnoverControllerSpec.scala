@@ -259,10 +259,10 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
               activities = Some(Activities(Set(BillPaymentServices)))
             )
 
-            when(mockRenewalService.getRenewal(any())(any(), any()))
+            when(mockRenewalService.getRenewal(any())(any()))
               .thenReturn(Future.successful(None))
 
-            when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+            when(mockRenewalService.updateRenewal(any(), any())(any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             mockCacheFetch[BusinessMatching](Some(bMatching), Some(BusinessMatching.key))
@@ -283,9 +283,9 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
             mockCacheFetch(Some(bMatching))
 
-            when(mockRenewalService.getRenewal(any())(any(), any()))
+            when(mockRenewalService.getRenewal(any())(any()))
               .thenReturn(Future.successful(None))
-            when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+            when(mockRenewalService.updateRenewal(any(), any())(any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post()(newRequest)
@@ -306,9 +306,9 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
             mockCacheFetch(Some(bMatching))
 
-            when(mockRenewalService.getRenewal(any())(any(), any()))
+            when(mockRenewalService.getRenewal(any())(any()))
               .thenReturn(Future.successful(None))
-            when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+            when(mockRenewalService.updateRenewal(any(), any())(any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post()(newRequest)
@@ -330,9 +330,9 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
             mockCacheFetch(Some(bMatching))
 
-            when(mockRenewalService.getRenewal(any())(any(), any()))
+            when(mockRenewalService.getRenewal(any())(any()))
               .thenReturn(Future.successful(None))
-            when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+            when(mockRenewalService.updateRenewal(any(), any())(any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post()(newRequest)

@@ -21,8 +21,10 @@ import cats.implicits._
 import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
+import forms.MsbSubSectorsFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.businessmatching.BusinessMatchingMsbService._
 import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MoneyServiceBusinessTestData}
 import models.status.NotCompleted
@@ -30,12 +32,12 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.services
-
 
 import scala.concurrent.Future
 
@@ -56,6 +58,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       mock[ChangeSubSectorHelper],
       config,
       cc = mockMcc,
+      formProvider = app.injector.instanceOf[MsbSubSectorsFormProvider],
       services = view
     )
 
@@ -92,7 +95,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       document.select("input[type=checkbox]").size mustBe 4
       document.select("input[type=checkbox][checked]").size mustBe 0
-      document.select(".amls-error-summary").size mustBe 0
+      document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
     }
 
     "show an empty form on get with no data in store when fx enabled" in new Fixture {
@@ -108,7 +111,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       document.select("input[type=checkbox]").size mustBe 5
       document.select("input[type=checkbox][checked]").size mustBe 0
-      document.select(".amls-error-summary").size mustBe 0
+      document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
     }
 
     "show a pre-filled form when there is data in the store" in new Fixture {
@@ -127,16 +130,15 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       status(result) mustBe OK
 
       document.select("input[type=checkbox][checked]").size mustBe 2
-      document.select("input[value=01]").hasAttr("checked") mustBe true
-      document.select("input[value=02]").hasAttr("checked") mustBe true
-      document.select(".amls-error-summary").size mustBe 0
+      document.select(s"input[value=${TransmittingMoney.toString}]").hasAttr("checked") mustBe true
+      document.select(s"input[value=${CurrencyExchange.toString}]").hasAttr("checked") mustBe true
+      document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
     }
 
     "return a Bad Request with errors on invalid submission" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "msbServices[0]" -> "invalid"
-      )
+      val newRequest = FakeRequest(POST, routes.MsbSubSectorsController.post().url)
+        .withFormUrlEncodedBody("value[1]" -> "")
 
       val result = controller.post()(newRequest)
       val document = Jsoup.parse(contentAsString(result))
@@ -151,9 +153,8 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       when(config.fxEnabledToggle) thenReturn true
 
-      val newRequest = requestWithUrlEncodedBody(
-        "msbServices[0]" -> "invalid"
-      )
+      val newRequest = FakeRequest(POST, routes.MsbSubSectorsController.post().url)
+        .withFormUrlEncodedBody("value[1]" -> "")
 
       val result = controller.post()(newRequest)
       val document = Jsoup.parse(contentAsString(result))
@@ -168,8 +169,9 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel())
 
-      val newRequest = requestWithUrlEncodedBody(
-        "msbServices[0]" -> "01"
+      val newRequest = FakeRequest(POST, routes.MsbSubSectorsController.post().url)
+        .withFormUrlEncodedBody(
+          "value[1]" -> TransmittingMoney.toString
       )
 
       val result = controller.post()(newRequest)
@@ -183,11 +185,12 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(ChequeCashingNotScrapMetal))))
 
-      val newRequest = requestWithUrlEncodedBody(
-        "msbServices[1]" -> "02",
-        "msbServices[2]" -> "03",
-        "msbServices[3]" -> "04",
-        "msbServices[4]" -> "05"
+      val newRequest = FakeRequest(POST, routes.MsbSubSectorsController.post().url)
+        .withFormUrlEncodedBody(
+          "value[1]" -> CurrencyExchange.toString,
+          "value[2]" -> ChequeCashingNotScrapMetal.toString,
+          "value[3]" -> ChequeCashingScrapMetal.toString,
+          "value[4]" -> ForeignExchange.toString
       )
 
       val result = controller.post()(newRequest)

@@ -14,65 +14,69 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
-@import config.{ ApplicationConfig}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
+@import config.ApplicationConfig
+@import models.businessmatching.BusinessAppliedForPSRNumber
+@import components.Button
+@import components.forms.{InputText, InputYesNo, ErrorSummary}
+@import views.ViewUtils._
 @import utils.HtmlElementHelpers._
 
-@this(main: include.main)
+@this(
+    formHelper: FormWithCSRF,
+    layout: Layout,
+    inputText: InputText,
+    inputYesNo: InputYesNo,
+    errorSummary: ErrorSummary,
+    button: Button
+)
 
-@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
-@target = @{
-    s"""${f("regNumber").id}-panel"""
+@conditionalInput = @{
+    inputText(
+        input = Input(
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("businessmatching.updateservice.psr.number.lbl")),
+                classes = "govuk-label"
+            ),
+            hint = None,
+           name = "regNumber",
+           id = "regNumber",
+           inputmode = Some("numeric"),
+           classes = "govuk-!-width-one-quarter"
+        ),
+        field = form("regNumber")
+    )
 }
 
-@header = {
-    @components.back_link()
-    @errorSummary(f)
-}
-
-@main(
-    title = Messages("businessmatching.psr.number.title") + " - " + Messages("summary.updateservice"),
-    heading = header
+@layout(
+    pageTitle = messages("businessmatching.psr.number.title") + " - " + messages("summary.updateservice")
 )  {
 
-    @form(f, controllers.businessmatching.updateservice.add.routes.BusinessAppliedForPSRNumberController.post(edit)) {
+    @formHelper(action = controllers.businessmatching.updateservice.add.routes.BusinessAppliedForPSRNumberController.post(edit)) {
 
-        @fieldsetWithErrorGroup(
-            f = f("appliedFor"),
-            heading = "businessmatching.updateservice.psr.number.title",
-            section = "summary.updateservice",
-            panel = false,
-            hint = "businessmatching.updateservice.psr.number.hint"
-        ) {
-            @radio(
-                f = f("appliedFor"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = s"#$target"
-            )
-            @panel(
-                field = Some(f(s"$target")),
-                id = target
-            ) {
-                @input(
-                    attrMaxlength = "6",
-                    attrPattern = "[0-9]{1,6}",
-                    attrType = "number",
-                    dataAttrs = digitsOnlyAttributes,
-                    field = f("regNumber"),
-                    hintText = "businessmatching.psr.number.hint",
-                    labelText = "businessmatching.updateservice.psr.number.lbl"
-                )
-            }
-            @radio(
-                f = f("appliedFor"),
-                labelText = "lbl.no",
-                value = "false"
-            )
-        }
-        @submit(edit, returnLink = false, buttonMessageKey = Some("button.continue"), buttonId = Some("appliedspsr-submit"))
+        @errorSummary(form)
+
+        @inputYesNo(
+            Radios(
+                fieldset = Some(Fieldset(
+                  legend = Some(Legend(
+                    content = Text(messages("businessmatching.psr.number.title")),
+                    classes = "govuk-fieldset__legend--xl",
+                    isPageHeading = true
+                  ))
+                )),
+                hint = Some(Hint(content = Text(messages("businessmatching.psr.number.hint")))),
+                name = "value",
+                items = BusinessAppliedForPSRNumber.formValues(conditionalInput)
+              )
+            .withFormField(form("appliedFor"))
+        )
+
+        @button("button.continue", "appliedspsr-submit")
     }
 
 }

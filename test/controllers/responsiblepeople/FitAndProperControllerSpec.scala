@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
 import org.mockito.Matchers.{any, eq => meq}

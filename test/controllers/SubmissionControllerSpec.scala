@@ -353,7 +353,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now.plusDays(15))))
 
         when {
-          controller.renewalService.getRenewal(any[String]())(any(), any())
+          controller.renewalService.getRenewal(any[String]())(any())
         } thenReturn Future.successful(Some(mock[Renewal]))
 
         val result = controller.post()(request)
@@ -361,7 +361,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
 
-        verify(controller.renewalService).getRenewal(any[String]())(any(), any())
+        verify(controller.renewalService).getRenewal(any[String]())(any())
       }
 
       "do a variation if user is in renewal period but has no renewal object" in new Fixture {
@@ -378,7 +378,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now.plusDays(15))))
 
         when {
-          controller.renewalService.getRenewal(any[String]())(any(), any())
+          controller.renewalService.getRenewal(any[String]())(any())
         } thenReturn Future.successful(None)
 
        await(controller.post()(request))
@@ -400,7 +400,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now.plusDays(15))))
 
         when {
-          controller.renewalService.getRenewal(any[String]())(any(), any())
+          controller.renewalService.getRenewal(any[String]())(any())
         } thenReturn Future.successful(None)
 
         val result = controller.post()(request)
@@ -427,7 +427,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         } thenReturn Future.successful(RenewalSubmitted(Some(LocalDate.now.plusDays(15))))
 
         when {
-          controller.renewalService.getRenewal(any[String]())(any(), any())
+          controller.renewalService.getRenewal(any[String]())(any())
         } thenReturn Future.successful(Some(mock[Renewal]))
 
         val result = controller.post()(request)
@@ -450,7 +450,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         } thenReturn Future.successful(RenewalSubmitted(Some(LocalDate.now.plusDays(15))))
 
         when {
-          controller.renewalService.getRenewal(any[String]())(any(), any())
+          controller.renewalService.getRenewal(any[String]())(any())
         } thenReturn Future.successful(Some(mock[Renewal]))
 
         val result = controller.post()(request)

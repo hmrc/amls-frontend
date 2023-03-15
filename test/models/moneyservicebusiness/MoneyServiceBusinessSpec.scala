@@ -17,6 +17,7 @@
 package models.moneyservicebusiness
 
 import models.Country
+import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.mockito.Mockito._

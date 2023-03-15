@@ -21,6 +21,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService._
 import models.renewal.{Renewal, SendMoneyToOtherCountry}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -57,11 +58,11 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
     )
 
     when {
-      mockRenewalService.getRenewal(any())(any(), any())
+      mockRenewalService.getRenewal(any())(any())
     } thenReturn Future.successful(Renewal().some)
 
     when {
-      mockRenewalService.updateRenewal(any(),any())(any(), any())
+      mockRenewalService.updateRenewal(any(),any())(any())
     } thenReturn Future.successful(cacheMap)
 
     when {
@@ -89,7 +90,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "load the page 'Do you send money to other countries?' with pre populated data" in new Fixture {
       when {
-        mockRenewalService.getRenewal(any())(any(), any())
+        mockRenewalService.getRenewal(any())(any())
       } thenReturn Future.successful(Renewal(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))).some)
 
       val result = controller.get()(request)

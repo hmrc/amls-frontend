@@ -82,7 +82,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       when(controller.dataCacheConnector.fetch[Renewal](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
 
-      when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+      when(mockRenewalService.updateRenewal(any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -99,7 +99,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       when(controller.dataCacheConnector.fetch[Renewal](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
 
-      when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+      when(mockRenewalService.updateRenewal(any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -119,7 +119,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       when(controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))
         (any(), any())).thenReturn(Future.successful(Some(incomingModel)))
 
-      when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+      when(mockRenewalService.updateRenewal(any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)

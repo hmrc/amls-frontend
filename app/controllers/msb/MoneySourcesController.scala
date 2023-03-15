@@ -20,7 +20,8 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.{BusinessMatching, ForeignExchange}
+import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessMatchingMsbService.ForeignExchange
 import models.moneyservicebusiness._
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
