@@ -14,33 +14,33 @@
  * limitations under the License.
  *@
 
-@import config.{ApplicationConfig}
-@import include._
-@import include.forms2._
+@import config.ApplicationConfig
+@import components.{Heading, Button, SectionSubtitle}
 
-@this(main: include.main)
+@this(
+    layout: Layout,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    button: Button
+)
 
-@()(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@()(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
-@header = {
-    @components.back_link()
-    @heading("businessmatching.cannotcontinuewiththeapplication.title", "summary.businessmatching")
-}
-
-@main(
-    title = Messages("businessmatching.cannotcontinuewiththeapplication.title") + " - " + Messages("summary.businessmatching"),
-    heading = header
+@layout(
+    pageTitle = messages("businessmatching.cannotcontinuewiththeapplication.title") + " - " + messages("summary.businessmatching")
 ) {
 
-    <p>@Messages("businessmatching.cannotcontinuewiththeapplication.requiredinfo.first")</p>
-    <p>@Messages("businessmatching.cannotcontinuewiththeapplication.requiredinfo.second")</p>
+    @subtitle("summary.businessmatching")
 
-    @anchor(
-        attrHref = appConfig.logoutUrl.toString,
-        attrRole = true,
-        linkText = Messages("button.logout"),
-        visuallyhidden = Messages("summary.businessmatching"),
-        id=Some("cannot-continue-with-application"),
-        draggable = false
+    @heading("businessmatching.cannotcontinuewiththeapplication.title", "summary.businessmatching")
+
+    <p class="govuk-body">@messages("businessmatching.cannotcontinuewiththeapplication.requiredinfo.first")</p>
+    <p class="govuk-body">@messages("businessmatching.cannotcontinuewiththeapplication.requiredinfo.second")</p>
+
+    @button(
+        "button.logout",
+        "cannot-continue-with-application",
+        Some(appConfig.logoutUrl),
+        false
     )
 }
