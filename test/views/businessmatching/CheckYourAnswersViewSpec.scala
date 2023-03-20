@@ -18,24 +18,25 @@ package views.businessmatching
 
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching._
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService._
+import models.businessmatching._
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
-import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.AmlsViewSpec
+import utils.businessmatching.CheckYourAnswersHelper
 import views.Fixture
-import forms.EmptyForm
-import views.html.businessmatching.summary
+import views.html.businessmatching.CheckYourAnswersView
 
 import scala.collection.JavaConversions._
 
-class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropertyChecks {
+class CheckYourAnswersViewSpec extends AmlsViewSpec with MustMatchers with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
-    lazy val summary = app.injector.instanceOf[summary]
+    lazy val checkYourAnswersView = app.injector.instanceOf[CheckYourAnswersView]
+    lazy val cyaHelper = app.injector.instanceOf[CheckYourAnswersHelper]
     implicit val requestWithToken = addTokenForView()
 
     val defaultActivitiesUrl = controllers.businessmatching.routes.RegisterServicesController.get().url
@@ -44,7 +45,7 @@ class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropert
   "businessmatching view" must {
     "have correct title when presubmission" in new ViewFixture {
 
-      def view = summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl, true)
+      def view = checkYourAnswersView(SummaryList(Seq.empty), None, true)
 
       doc.title must startWith("Check your answers before starting your application" + " - " + "Pre-application")
       heading.html must be("Check your answers before starting your application")
@@ -54,7 +55,7 @@ class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropert
 
     "have correct title when not presubmission" in new ViewFixture {
 
-      def view = summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl, false)
+      def view = checkYourAnswersView(SummaryList(Seq.empty), None, false)
 
       doc.title must startWith("Check your answers" + " - " + "Update information")
       heading.html must be("Check your answers")
@@ -64,14 +65,14 @@ class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropert
     def checkElementTextIncludes(el:Element, keys : String*) = {
       val t = el.text()
       keys.foreach { k =>
-        t must include (Messages(k))
+        t must include (messages(k))
       }
       true
     }
 
     def checkListContainsItems(parent:Element, keysToFind:Set[String]) = {
       val texts = parent.select("li").toSet.map((el:Element) => el.text())
-      texts must be (keysToFind.map(k => Messages(k)))
+      texts must be (keysToFind.map(k => messages(k)))
       true
     }
 
@@ -79,7 +80,6 @@ class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropert
 
       val msbServices = BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, ForeignExchange))
       val BusinessActivitiesModel = BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-      val BusinessActivitiesWithouMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
       val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
       val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0000000000000")
       val TypeOfBusinessModel = TypeOfBusiness("test")
@@ -94,7 +94,12 @@ class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropert
         Some(CompanyRegistrationNumberModel),
         Some(BusinessAppliedForPSRNumberModel))
 
-      def view = summary(EmptyForm, testBusinessMatching, defaultActivitiesUrl)
+      val isPreSubmission = true
+
+      val summaryList = cyaHelper.createSummaryList(testBusinessMatching, isPreSubmission, isPending = false)
+      val submitButton = cyaHelper.getSubmitButton(testBusinessMatching.businessAppliedForPSRNumber, isPreSubmission, testBusinessMatching.preAppComplete)
+
+      def view = checkYourAnswersView(summaryList, submitButton, isPreSubmission)
 
       val sectionChecks = Table[String, Element => Boolean, String](
         ("title key", "check", "editLink"),
@@ -121,47 +126,43 @@ class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropert
           controllers.businessmatching.routes.PSRNumberController.get(true).toString)
       )
 
-      html must not include Messages("businessmatching.typeofbusiness.title")
+      html must not include messages("businessmatching.typeofbusiness.title")
 
-      html must not include Messages("button.logout")
-      html must include(Messages("businessmatching.button.confirm.start"))
+      html must not include messages("button.logout")
+      html must include(messages("businessmatching.button.confirm.start"))
 
       val sections = doc.getElementsByTag("section").zipWithIndex
 
       for((section, index) <- sections) {
         val (key, check, editLink) = sectionChecks(index)
-        section.select("h2").text() must be(Messages(key))
+        section.select("h2").text() must be(messages(key))
         check(section) must be(true)
         section.select("a[href]").attr("href") must be(editLink)
       }
     }
 
-    "include the provided data for an UnincorporatedBody with BusinessAppliedForPSRNumberNo" in new ViewFixture {
+    "include the provided data for an UnincorporatedBody with No MSB Services" in new ViewFixture {
 
-      val msbServices = BusinessMatchingMsbServices(Set(CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))
-      val BusinessActivitiesModel = BusinessActivities(Set(
-        AccountancyServices,
-        BillPaymentServices,
-        EstateAgentBusinessService,
-        HighValueDealing,
-        TrustAndCompanyServices,
-        TelephonePaymentService))
-      val BusinessActivitiesWithouMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
+      val businessActivitiesWithoutMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
       val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
       val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0000000000000")
       val TypeOfBusinessModel = TypeOfBusiness("test")
       val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
-      val BusinessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberNo
 
       val testBusinessMatching = BusinessMatching(
         Some(ReviewDetailsModel),
-        Some(BusinessActivitiesModel),
-        Some(msbServices),
+        Some(businessActivitiesWithoutMSB),
+        None,
         Some(TypeOfBusinessModel),
         Some(CompanyRegistrationNumberModel),
-        Some(BusinessAppliedForPSRNumberModel))
+        Some(BusinessAppliedForPSRNumberNo))
 
-      def view = summary(EmptyForm, testBusinessMatching, defaultActivitiesUrl)
+      val isPreSubmission = true
+
+      val summaryList = cyaHelper.createSummaryList(testBusinessMatching, isPreSubmission, isPending = false)
+      val submitButton = cyaHelper.getSubmitButton(testBusinessMatching.businessAppliedForPSRNumber, isPreSubmission, testBusinessMatching.preAppComplete)
+
+      def view = checkYourAnswersView(summaryList, submitButton, isPreSubmission)
 
       val sectionChecks = Table[String, Element => Boolean, String](
         ("title key", "check", "editLink"),
@@ -169,26 +170,22 @@ class summarySpec extends AmlsViewSpec with MustMatchers with TableDrivenPropert
         ("businessmatching.typeofbusiness.title", checkElementTextIncludes(_, "test"),
           controllers.businessmatching.routes.TypeOfBusinessController.get(true).toString),
         ("businessmatching.registerservices.title", checkListContainsItems(_, Set(
-          "businessmatching.registerservices.servicename.lbl.01",
-          "businessmatching.registerservices.servicename.lbl.03",
-          "businessmatching.registerservices.servicename.lbl.04",
-          "businessmatching.registerservices.servicename.lbl.05",
-          "businessmatching.registerservices.servicename.lbl.07",
-          "businessmatching.registerservices.servicename.lbl.08")),
+          s"businessmatching.registerservices.servicename.lbl.${TrustAndCompanyServices.value}",
+          s"businessmatching.registerservices.servicename.lbl.${TelephonePaymentService.value}")),
           defaultActivitiesUrl
         )
       )
 
-      html must not include Messages("businessmatching.services.title")
-      html must not include Messages("businessmatching.registrationnumber.title")
+      html must not include messages("businessmatching.services.title")
+      html must not include messages("businessmatching.registrationnumber.title")
 
-      html must include(Messages("button.logout"))
-      html must not include Messages("businessmatching.button.confirm.start")
+      html must include(messages("button.logout"))
+      html must not include messages("businessmatching.button.confirm.start")
       val sections = doc.getElementsByTag("section").zipWithIndex
 
       for((section, index) <- sections) {
         val (key, check, editLink) = sectionChecks(index)
-        section.select("h2").text() must be(Messages(key))
+        section.select("h2").text() must be(messages(key))
         check(section) must be(true)
         section.select("a[href]").attr("href") must be(editLink)
       }

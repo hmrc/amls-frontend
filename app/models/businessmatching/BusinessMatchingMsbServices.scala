@@ -18,7 +18,7 @@ package models.businessmatching
 
 import jto.validation.{Rule, ValidationError, _}
 import models.tradingpremises.{ChequeCashingNotScrapMetal => TPChequeCashingNotScrapMetal, ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, ForeignExchange => TPForeignExchange, TransmittingMoney => TPTransmittingMoney}
-import models.{Enumerable, WithName}
+import models.{CheckYourAnswersField, Enumerable, WithName}
 import play.api.i18n.Messages
 import play.api.libs.json._
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
@@ -27,7 +27,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
 case class BusinessMatchingMsbServices(msbServices : Set[BusinessMatchingMsbService])
 
-sealed trait BusinessMatchingMsbService {
+sealed trait BusinessMatchingMsbService extends CheckYourAnswersField {
 
   import BusinessMatchingMsbService._
 

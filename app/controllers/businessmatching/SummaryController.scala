@@ -19,14 +19,15 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.EmptyForm
+
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import utils.AuthAction
-import views.html.businessmatching.summary
+import utils.businessmatching.CheckYourAnswersHelper
+import views.html.businessmatching.CheckYourAnswersView
 
 import scala.concurrent.Future
 
@@ -36,10 +37,11 @@ class SummaryController @Inject()(
                                    val ds: CommonPlayDependencies,
                                    val statusService: StatusService,
                                    val businessMatchingService: BusinessMatchingService,
+                                   cyaHelper: CheckYourAnswersHelper,
                                    val cc: MessagesControllerComponents,
-                                   summary: summary) extends AmlsBaseController(ds, cc) {
+                                   view: CheckYourAnswersView) extends AmlsBaseController(ds, cc) {
 
-  def get() = authAction.async {
+  def get(): Action[AnyContent] = authAction.async {
       implicit request =>
 
         (for {
@@ -54,22 +56,20 @@ class SummaryController @Inject()(
             ))
           )
 
-          val changeActivitiesUrl = if (isPreSubmission) {
-            controllers.businessmatching.routes.RegisterServicesController.get().url
-          } else {
-            controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get.url
-          }
+          val summaryList = cyaHelper.createSummaryList(
+            bmWithAdditionalActivities, isPreSubmission, statusService.isPending(status)
+          )
 
-          Ok(summary(EmptyForm,
-            bmWithAdditionalActivities,
-            changeActivitiesUrl,
-            isPreSubmission,
-            statusService.isPending(status)))
+          val submissionButton = cyaHelper.getSubmitButton(
+            bmWithAdditionalActivities.businessAppliedForPSRNumber, isPreSubmission, bmWithAdditionalActivities.preAppComplete
+          )
+
+          Ok(view(summaryList, submissionButton, isPreSubmission))
 
         }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
   }
 
-  def post() = authAction.async {
+  def post(): Action[AnyContent] = authAction.async {
       implicit request => {
         for {
           businessMatching <- businessMatchingService.getModel(request.credId)

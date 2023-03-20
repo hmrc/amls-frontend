@@ -18,7 +18,7 @@ package models.businessmatching
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Rule, ValidationError, _}
-import models.{DateOfChange, Enumerable, WithName}
+import models.{CheckYourAnswersField, DateOfChange, Enumerable, WithName}
 import play.api.Logging
 import play.api.i18n.Messages
 import play.api.libs.functional.syntax._
@@ -37,7 +37,7 @@ case class BusinessActivities(businessActivities: Set[BusinessActivity],
 
 }
 
-sealed trait BusinessActivity {
+sealed trait BusinessActivity extends CheckYourAnswersField {
 
   val value: String
 

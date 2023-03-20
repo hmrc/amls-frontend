@@ -20,8 +20,8 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching._
 import models.businessmatching.BusinessActivity.EstateAgentBusinessService
+import models.businessmatching._
 import models.businessmatching.updateservice._
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.status.NotCompleted
@@ -32,9 +32,9 @@ import org.mockito.Mockito._
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.businessmatching.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.summary
-
+import views.html.businessmatching.CheckYourAnswersView
 
 import scala.concurrent.Future
 
@@ -43,14 +43,15 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
   sealed trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    lazy val view = app.injector.instanceOf[summary]
+    lazy val cyaView = app.injector.instanceOf[CheckYourAnswersView]
     val controller = new SummaryController (
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       cc = mockMcc,
-      summary = view)
+      cyaHelper = app.injector.instanceOf[CheckYourAnswersHelper],
+      view = cyaView)
 
     when {
       mockStatusService.isPreSubmission(any())
@@ -111,7 +112,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
       status(result) must be(OK)
 
       val doc = Jsoup.parse(contentAsString(result))
-      val editUrl = doc.select("a#businessactivities-edit.change-answer").first().attr("href")
+      val editUrl = doc.getElementById("businessactivities-edit").attr("href")
 
       editUrl mustBe controllers.businessmatching.routes.RegisterServicesController.get().url
     }
