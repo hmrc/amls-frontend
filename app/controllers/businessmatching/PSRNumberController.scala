@@ -29,7 +29,7 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router2
 import utils.AuthAction
-import views.html.businessmatching.psr_number
+import views.html.businessmatching.PsrNumberView
 
 import javax.inject.Inject
 
@@ -42,7 +42,7 @@ class PSRNumberController @Inject()(authAction: AuthAction,
                                     val helper: ChangeSubSectorHelper,
                                     val cc: MessagesControllerComponents,
                                     formProvider: PSRNumberFormProvider,
-                                    psr_number: psr_number) extends AmlsBaseController(ds, cc) {
+                                    psr_number: PsrNumberView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>

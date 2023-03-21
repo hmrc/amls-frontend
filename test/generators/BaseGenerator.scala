@@ -28,9 +28,9 @@ trait BaseGenerator {
     Gen.listOfN(maxLength, Gen.alphaNumChar).map(x => x.mkString)
   }
 
-  def alphaNumOfLengthGen(maxLength: Int): Gen[String] = {
-    Gen.listOfN(maxLength, Gen.alphaNumChar).map(x => x.mkString)
-  }
+//  def alphaNumOfLengthGen(maxLength: Int): Gen[String] = {
+//    Gen.listOfN(maxLength, Gen.alphaNumChar).map(x => x.mkString)
+//  }
 
   def stringsLongerThan(minLength: Int): Gen[String] = for {
     length    <- Gen.chooseNum(minLength + 1, (minLength * 2).max(100))
@@ -62,7 +62,7 @@ trait BaseGenerator {
   } yield new LocalDate(year, month, day)
 
   def safeIdGen = for {
-    ref <- alphaNumOfLengthGen(9)
+    ref <- stringOfLengthGen(9)
   } yield s"X${ref.toUpperCase}"
 
   val postcodeGen: Gen[String] = for {

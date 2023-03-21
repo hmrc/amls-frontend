@@ -21,7 +21,7 @@ import models.FormTypes.numbersOnlyRegex
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
 import play.api.data.Form
 import play.api.data.Forms.mapping
-import uk.gov.voa.play.form.ConditionalMappings.{mandatory, mandatoryIfTrue}
+import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject
 

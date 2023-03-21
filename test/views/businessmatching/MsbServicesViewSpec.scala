@@ -26,13 +26,13 @@ import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.businessmatching.services
+import views.html.businessmatching.MsbServicesView
 
 
-class ServicesViewSpec extends AmlsViewSpec with MustMatchers  {
+class MsbServicesViewSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    lazy val services = app.injector.instanceOf[services]
+    lazy val services = app.injector.instanceOf[MsbServicesView]
     lazy val formProvider = app.injector.instanceOf[MsbSubSectorsFormProvider]
     implicit val requestWithToken = addTokenForView()
   }
@@ -118,8 +118,6 @@ class ServicesViewSpec extends AmlsViewSpec with MustMatchers  {
   }
 
   "services fx-enabled view" must {
-    lazy val services = app.injector.instanceOf[services]
-    lazy val formProvider = app.injector.instanceOf[MsbSubSectorsFormProvider]
 
     "show the correct amount of checkboxes" in new ViewFixture {
       def view = services(formProvider(), edit = false, fxEnabledToggle = true)

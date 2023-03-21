@@ -37,7 +37,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.services
+import views.html.businessmatching.MsbServicesView
 
 import scala.concurrent.Future
 
@@ -48,7 +48,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
     val request = addToken(authRequest)
 
     val config = mock[ApplicationConfig]
-    lazy val view = app.injector.instanceOf[services]
+    lazy val view = app.injector.instanceOf[MsbServicesView]
     val controller = new MsbSubSectorsController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,

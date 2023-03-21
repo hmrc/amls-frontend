@@ -23,7 +23,7 @@ import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.{cannot_add_services, cannot_continue_with_the_application}
+import views.html.businessmatching.{cannot_add_services, CannotContinueWithApplicationView}
 
 //noinspection ScalaStyle
 class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
@@ -34,14 +34,14 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
     lazy val view1 = app.injector.instanceOf[cannot_add_services]
-    lazy val view2 = app.injector.instanceOf[cannot_continue_with_the_application]
+    lazy val view2 = app.injector.instanceOf[CannotContinueWithApplicationView]
     val controller = new NoPsrController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockStatusService,
       cc = mockMcc,
       cannot_add_services = view1,
-      cannot_continue_with_the_application = view2
+      cannotContinueView = view2
     )
   }
 

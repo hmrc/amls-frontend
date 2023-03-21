@@ -30,7 +30,7 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router2
 import utils.AuthAction
-import views.html.businessmatching.services
+import views.html.businessmatching.MsbServicesView
 
 import javax.inject.Inject
 import scala.concurrent.Future
@@ -45,7 +45,7 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
                                         val config: ApplicationConfig,
                                         val cc: MessagesControllerComponents,
                                         formProvider: MsbSubSectorsFormProvider,
-                                        services: services) extends AmlsBaseController(ds, cc) {
+                                        services: MsbServicesView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>

@@ -34,7 +34,7 @@ class CompanyRegistrationNumberFormProviderSpec extends StringFieldBehaviours wi
     val length = 8
 
     val companyRegNumberGen = for {
-      str <- alphaNumOfLengthGen(length)
+      str <- stringOfLengthGen(length)
     } yield str.toUpperCase
 
     val invalidStringGen = for {

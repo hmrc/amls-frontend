@@ -18,49 +18,45 @@ package controllers.businessmatching
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.businessmatching.{BusinessMatching, TypeOfBusiness}
-import play.api.mvc.MessagesControllerComponents
+import forms.TypeOfBusinessFormProvider
+import models.businessmatching.BusinessMatching
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import views.html.businessmatching.type_of_business
+import views.html.businessmatching.TypeOfBusinessView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class TypeOfBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
                                          authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
                                          val cc: MessagesControllerComponents,
-                                         type_of_business: type_of_business) extends AmlsBaseController(ds, cc) {
+                                         formProvider: TypeOfBusinessFormProvider,
+                                         view: TypeOfBusinessView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map {
         response =>
-          val form: Form2[TypeOfBusiness] = (for {
-            businessMatching <- response
-            business <- businessMatching.typeOfBusiness
-          } yield Form2[TypeOfBusiness](business)).getOrElse(EmptyForm)
-          Ok(type_of_business(form, edit))
+          Ok(view(response.typeOfBusiness.fold(formProvider())(formProvider().fill), edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[TypeOfBusiness](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(type_of_business(f, edit)))
-        case ValidForm(_, data) =>
-          for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-            _ <- dataCacheConnector.save[BusinessMatching](request.credId, BusinessMatching.key,
-              businessMatching.typeOfBusiness(data)
-            )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get)
-            case false => Redirect(routes.RegisterServicesController.get())
-          }
-      }
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => for {
+          businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+          _ <- dataCacheConnector.save[BusinessMatching](request.credId, BusinessMatching.key,
+            businessMatching.typeOfBusiness(data)
+          )
+        } yield if (edit) {
+          Redirect(routes.SummaryController.get)
+        } else {
+          Redirect(routes.RegisterServicesController.get())
+        }
+      )
     }
   }
 }

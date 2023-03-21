@@ -18,6 +18,7 @@ package controllers.businessmatching
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.TypeOfBusinessFormProvider
 import models.businessmatching.{BusinessMatching, TypeOfBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -25,10 +26,11 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessmatching.type_of_business
+import views.html.businessmatching.TypeOfBusinessView
 
 import scala.concurrent.Future
 
@@ -36,13 +38,16 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[type_of_business]
+    lazy val view: TypeOfBusinessView = app.injector.instanceOf[TypeOfBusinessView]
+    lazy val formProvider: TypeOfBusinessFormProvider = app.injector.instanceOf[TypeOfBusinessFormProvider]
     val controller = new TypeOfBusinessController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      type_of_business = view)
+      formProvider = formProvider,
+      view = view
+    )
   }
 
   "TypeOfBusinessController" must {
@@ -55,9 +60,9 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      val pageTitle = Messages("businessmatching.typeofbusiness.title") + " - " +
-        Messages("summary.businessmatching") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov")
+      val pageTitle = messages("businessmatching.typeofbusiness.title") + " - " +
+        messages("summary.businessmatching") + " - " +
+        messages("title.amls") + " - " + messages("title.gov")
       document.title() mustBe pageTitle
     }
 
@@ -69,16 +74,16 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      val pageTitle = Messages("businessmatching.typeofbusiness.title") + " - " +
-        Messages("summary.businessmatching") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov")
+      val pageTitle = messages("businessmatching.typeofbusiness.title") + " - " +
+        messages("summary.businessmatching") + " - " +
+        messages("title.amls") + " - " + messages("title.gov")
       document.title() mustBe pageTitle
       document.select("input[type=text]").`val`() must be("test")
     }
 
     "post with valid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.TypeOfBusinessController.post().url).withFormUrlEncodedBody(
         "typeOfBusiness" -> "text"
       )
 
@@ -95,7 +100,7 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
     "post with valid data in edit mode" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.TypeOfBusinessController.post(true).url).withFormUrlEncodedBody(
         "typeOfBusiness" -> "text"
       )
 
@@ -113,7 +118,7 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
     "post with invalid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.TypeOfBusinessController.post().url).withFormUrlEncodedBody(
         "typeOfBusiness" -> "11"*40
       )
 
@@ -125,14 +130,14 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.max.length.bm.businesstype.type"))
+      contentAsString(result) must include(messages("error.max.length.bm.businesstype.type"))
 
     }
 
     "post with missing mandatory field" in new Fixture {
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.TypeOfBusinessController.post().url).withFormUrlEncodedBody(
+        "typeOfBusiness" -> ""
       )
-
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
 
@@ -141,7 +146,7 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required"))
+      contentAsString(result) must include(messages("error.required.bm.businesstype.type"))
     }
   }
 }

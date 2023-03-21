@@ -52,7 +52,7 @@ class BusinessAppliedForPSRNumberSpec extends PlaySpec with MessagesImplicits {
 
       radioButtons.last.id mustBe Some("appliedFor-false")
       radioButtons.last.value mustBe Some("false")
-      radioButtons.head.conditionalHtml.isDefined mustBe false
+      radioButtons.last.conditionalHtml.isDefined mustBe false
     }
   }
 }
