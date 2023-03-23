@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package forms
+package forms.businessmatching
 
 import forms.behaviours.BooleanFieldBehaviours
 import generators.BaseGenerator

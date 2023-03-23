@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package forms
+package forms.businessmatching
 
 import forms.mappings.Mappings
-import models.FormTypes
-import models.businessmatching.TypeOfBusiness
+import models.businessmatching.BusinessActivity
 import play.api.data.Form
+import play.api.data.Forms.seq
 
 import javax.inject.Inject
 
-class TypeOfBusinessFormProvider @Inject()() extends Mappings {
+class RegisterBusinessActivitiesFormProvider @Inject()() extends Mappings {
 
-  val maxLength = 40
-  def apply(): Form[TypeOfBusiness] = Form[TypeOfBusiness](
-    "typeOfBusiness" -> text("error.required.bm.businesstype.type")
-      .verifying(
-        firstError(
-          maxLength(maxLength, "error.max.length.bm.businesstype.type"),
-          regexp(FormTypes.basicPunctuationRegex.toString(), "error.bm.businesstype.type.characters")
-        )
-      ).transform[TypeOfBusiness](TypeOfBusiness(_), _.typeOfBusiness)
-  )
+  def apply(): Form[Seq[BusinessActivity]] = {
+
+    Form[Seq[BusinessActivity]](
+      "value" -> seq(enumerable[BusinessActivity]("error.required.bm.register.service")).verifying(
+        nonEmptySeq("error.required.bm.register.service")
+      )
+    )
+  }
 }

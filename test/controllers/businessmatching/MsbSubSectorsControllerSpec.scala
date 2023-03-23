@@ -21,7 +21,7 @@ import cats.implicits._
 import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
-import forms.MsbSubSectorsFormProvider
+import forms.businessmatching.MsbSubSectorsFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.BusinessMatchingMsbService._

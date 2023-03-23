@@ -19,8 +19,9 @@ package models.businessactivities
 import models.businessactivities.TransactionTypes._
 import models.businessmatching.BusinessActivity.AccountancyServices
 import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities}
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
 import play.api.Logging
+import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.ControllerHelper
 
@@ -165,6 +166,35 @@ object BusinessActivities extends Logging {
           Section(messageKey, Completed, model.hasChanged, controllers.businessactivities.routes.SummaryController.get)
         } else {
           Section(messageKey, Started, model.hasChanged, controllers.businessactivities.routes.WhatYouNeedController.get)
+        }
+    }
+  }
+
+  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+    val messageKey = "businessactivities"
+    val notStarted = TaskRow(
+      messageKey,
+      controllers.businessactivities.routes.WhatYouNeedController.get.url,
+      hasChanged = false,
+      TaskRow.notStartedTag
+    )
+    val bmBusinessActivities = ControllerHelper.getBusinessActivity(cache.getEntry[BusinessMatching](BusinessMatching.key))
+    cache.getEntry[BusinessActivities](key).fold(notStarted) {
+      model =>
+        if (model.isComplete(bmBusinessActivities)) {
+          TaskRow(
+            messageKey,
+            controllers.businessactivities.routes.SummaryController.get.url,
+            model.hasChanged,
+            TaskRow.completedTag
+          )
+        } else {
+          TaskRow(
+            messageKey,
+            controllers.businessactivities.routes.WhatYouNeedController.get.url,
+            model.hasChanged,
+            TaskRow.incompleteTag
+          )
         }
     }
   }

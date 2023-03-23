@@ -21,7 +21,7 @@ import cats.implicits._
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.MsbSubSectorsFormProvider
+import forms.businessmatching.MsbSubSectorsFormProvider
 import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, SubSectorsPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

@@ -17,8 +17,9 @@
 package models.amp
 
 import config.ApplicationConfig
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
 import models.renewal.AMPTurnover
+import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
@@ -90,6 +91,33 @@ object Amp {
           Section(key, Completed, model.hasChanged, generateRedirect(appConfig.ampSummaryUrl))
         } else {
           Section(key, Started, model.hasChanged, generateRedirect(appConfig.ampWhatYouNeedUrl))
+        }
+    }
+  }
+
+  def taskRow(appConfig: ApplicationConfig)(implicit cache: CacheMap, messages: Messages): TaskRow = {
+    val notStarted = TaskRow(
+      key,
+      generateRedirect(appConfig.ampWhatYouNeedUrl).url,
+      hasChanged = false,
+      TaskRow.notStartedTag
+    )
+    cache.getEntry[Amp](key).fold(notStarted) {
+      model =>
+        if (model.isComplete && model.hasAccepted) {
+          TaskRow(
+            key,
+            generateRedirect(appConfig.ampSummaryUrl).url,
+            model.hasChanged,
+            TaskRow.completedTag
+          )
+        } else {
+          TaskRow(
+            key,
+            generateRedirect(appConfig.ampWhatYouNeedUrl).url,
+            model.hasChanged,
+            TaskRow.incompleteTag
+          )
         }
     }
   }

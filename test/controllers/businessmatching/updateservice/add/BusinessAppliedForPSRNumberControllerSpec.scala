@@ -18,7 +18,7 @@ package controllers.businessmatching.updateservice.add
 
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
-import forms.PSRNumberFormProvider
+import forms.businessmatching.PSRNumberFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.BusinessActivity.{HighValueDealing, MoneyServiceBusiness}

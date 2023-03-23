@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.RegisterBusinessActivitiesFormProvider
+import forms.businessmatching.RegisterBusinessActivitiesFormProvider
 import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}

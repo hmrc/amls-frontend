@@ -18,7 +18,8 @@ package models.moneyservicebusiness
 
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import play.api.i18n.Messages
 import play.api.libs.json._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.ControllerHelper
@@ -139,6 +140,35 @@ object MoneyServiceBusiness {
           Section(messageKey, Completed, model.hasChanged, controllers.msb.routes.SummaryController.get)
         } else {
           Section(messageKey, Started, model.hasChanged, controllers.msb.routes.WhatYouNeedController.get)
+        }
+    }
+  }
+
+  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+    val notStarted = TaskRow(
+      key,
+      controllers.msb.routes.WhatYouNeedController.get.url,
+      hasChanged = false,
+      TaskRow.notStartedTag
+    )
+
+    cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {
+      model =>
+        val msbService = ControllerHelper.getMsbServices(cache.getEntry[BusinessMatching](BusinessMatching.key)).getOrElse(Set.empty)
+        if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange))) {
+          TaskRow(
+            key,
+            controllers.msb.routes.SummaryController.get.url,
+            model.hasChanged,
+            TaskRow.completedTag
+          )
+        } else {
+          TaskRow(
+            key,
+            controllers.msb.routes.WhatYouNeedController.get.url,
+            model.hasChanged,
+            TaskRow.incompleteTag
+          )
         }
     }
   }

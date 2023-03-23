@@ -18,7 +18,7 @@ package controllers.businessmatching
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.TypeOfBusinessFormProvider
+import forms.businessmatching.TypeOfBusinessFormProvider
 import models.businessmatching.BusinessMatching
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction

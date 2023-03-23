@@ -19,21 +19,22 @@ package controllers
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivity, BusinessMatching}
-import models.registrationprogress.{Completed, Section}
+import models.registrationprogress.{Completed, Section, TaskList, TaskRow}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePerson
 import models.status._
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
+import play.api.i18n.Messages
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import services._
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
-import services.{AuthEnrolmentsService, ProgressService, RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, DeclarationHelper}
 import views.html.registrationamendment.registration_amendment
-import views.html.registrationprogress.registration_progress
+import views.html.registrationprogress.RegistrationProgressView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -48,10 +49,10 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                                                protected[controllers] val serviceFlow: ServiceFlow,
                                                implicit val renewalService: RenewalService,
                                                val cc: MessagesControllerComponents,
-                                               registration_progress: registration_progress,
+                                               registration_progress: RegistrationProgressView,
                                                registration_amendment: registration_amendment) extends AmlsBaseController(ds, cc) {
 
-  def get() = authAction.async {
+  def get(): Action[AnyContent] = authAction.async {
       implicit request =>
         isRenewalFlow(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap {
           case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get))
@@ -65,16 +66,24 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
               newActivities <- getNewActivities(request.credId) orElse OptionT.some(Set.empty[BusinessActivity])
             } yield {
               businessMatching.reviewDetails map { reviewDetails =>
-                val newSections = sectionsProvider.sectionsFromBusinessActivities(newActivities, businessMatching.msbServices)(cacheMap).toSeq
+
+                //TODO Replace use of sections with TaskList/TaskRow and Tags when migrating registration_amendment
+
+                val newSections = sectionsProvider.sectionsFromBusinessActivities(newActivities, businessMatching.msbServices)(cacheMap)
+                val newTaskRows = sectionsProvider.taskRowsFromBusinessActivities(
+                  newActivities, businessMatching.msbServices)(cacheMap, messages.preferred(request)
+                )
                 val sections = sectionsProvider.sections(cacheMap)
+                val taskRows = sectionsProvider.taskRows(cacheMap) //TODO taskRows is null
+                val taskListToDisplay = TaskList(taskRows.filter(tr => tr.msgKey != BusinessMatching.messageKey) diff newTaskRows)
                 val sectionsToDisplay = sections.filter(s => s.name != BusinessMatching.messageKey) diff newSections
                 val canEditPreapplication = Set(NotCompleted, SubmissionReady, SubmissionDecisionApproved).contains(status)
                 val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage()).toSeq)
                 val hasCompleteNominatedOfficer = ControllerHelper.hasCompleteNominatedOfficer(Option(responsiblePeople))
                 val nominatedOfficerName = ControllerHelper.completeNominatedOfficerTitleName(Option(responsiblePeople))
 
-                completePreApp match {
-                  case true => Ok(registration_amendment(
+                if (completePreApp) {
+                  Ok(registration_amendment(
                     sectionsToDisplay,
                     amendmentDeclarationAvailable(sections),
                     reviewDetails.businessName,
@@ -84,9 +93,10 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                     hasCompleteNominatedOfficer,
                     nominatedOfficerName
                   ))
-                  case _ => Ok(registration_progress(
-                    sectionsToDisplay,
-                    declarationAvailable(sections),
+                } else {
+                  Ok(registration_progress(
+                    taskListToDisplay,
+                    declarationAvailable(taskRows),
                     reviewDetails.businessName,
                     activities,
                     canEditPreapplication,
@@ -112,10 +122,12 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
     }
   }
 
-  private def declarationAvailable(seq: Seq[Section]): Boolean =
+  private def declarationAvailable(seq: Seq[TaskRow])(implicit messages: Messages): Boolean = {
+    val completed = TaskRow.completedTag
     seq forall {
-      _.status == Completed
+      _.tag == completed
     }
+  }
 
   private def amendmentDeclarationAvailable(sections: Seq[Section]) = {
 
@@ -154,7 +166,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
   private def getNewActivities(cacheId: String)(implicit hc: HeaderCarrier): OptionT[Future, Set[BusinessActivity]] =
     businessMatchingService.getAdditionalBusinessActivities(cacheId)
 
-  def post() = authAction.async {
+  def post(): Action[AnyContent] = authAction.async {
     implicit request =>
       DeclarationHelper.promptRenewal(request.amlsRefNumber, request.accountTypeId, request.credId).flatMap {
         case true => Future.successful(Redirect(controllers.declaration.routes.RenewRegistrationController.get))

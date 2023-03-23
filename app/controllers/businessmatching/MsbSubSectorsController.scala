@@ -22,7 +22,7 @@ import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.MsbSubSectorsFormProvider
+import forms.businessmatching.MsbSubSectorsFormProvider
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

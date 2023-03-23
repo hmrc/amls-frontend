@@ -24,8 +24,8 @@ import generators.businesscustomer.ReviewDetailsGenerator
 import models.Country
 import models.businessmatching.BusinessActivity.{AccountancyServices, BillPaymentServices, EstateAgentBusinessService}
 import models.businessmatching._
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import models.renewal.{AMLSTurnover, AMPTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherNo, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
+import models.registrationprogress._
+import models.renewal.{Renewal, _}
 import models.responsiblepeople.{ResponsiblePeopleValues, ResponsiblePerson}
 import models.status._
 import org.joda.time.LocalDate
@@ -33,7 +33,6 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
 import play.api.http.Status.OK
-import play.api.i18n.Messages
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
@@ -41,7 +40,7 @@ import services.{AuthEnrolmentsService, ProgressService, RenewalService, Section
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.registrationamendment.registration_amendment
-import views.html.registrationprogress.registration_progress
+import views.html.registrationprogress.RegistrationProgressView
 
 import scala.concurrent.Future
 
@@ -56,7 +55,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
     val mockBusinessMatching = mock[BusinessMatching]
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    lazy val view1 = app.injector.instanceOf[registration_progress]
+    val mockSectionsProvider = mock[SectionsProvider]
+    lazy val view1 = app.injector.instanceOf[RegistrationProgressView]
     lazy val view2 = app.injector.instanceOf[registration_amendment]
 
     val controller = new RegistrationProgressController(
@@ -65,7 +65,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       dataCache = mockCacheConnector,
       enrolmentsService = mock[AuthEnrolmentsService],
       statusService = mockStatusService,
-      sectionsProvider = mock[SectionsProvider],
+      sectionsProvider = mockSectionsProvider,
       businessMatchingService = mockBusinessMatchingService,
       serviceFlow = mockServiceFlow,
       renewalService = mock[RenewalService],
@@ -82,8 +82,15 @@ class RegistrationProgressControllerSpec extends AmlsSpec
     when(mockBusinessMatchingService.getAdditionalBusinessActivities(any[String]())(any(), any())) thenReturn OptionT.none[Future, Set[BusinessActivity]]
 
     when {
-      controller.sectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
+      mockSectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
     } thenReturn Seq.empty[Section]
+
+    when {
+      mockSectionsProvider.taskRowsFromBusinessActivities(any(), any())(any(), any())
+    } thenReturn Seq.empty[TaskRow]
+
+    when(mockSectionsProvider.taskRows(any())(any()))
+      .thenReturn(Seq.empty[TaskRow])
 
     when {
       mockBusinessMatching.activities
@@ -101,14 +108,14 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-          when(controller.sectionsProvider.sections(mockCacheMap))
+          when(mockSectionsProvider.sections(mockCacheMap))
             .thenReturn(Seq.empty[Section])
 
           val responseF = controller.get()(request)
           status(responseF) must be(OK)
 
-          val pageTitle = Messages("amendment.title") + " - " +
-            Messages("title.amls") + " - " + Messages("title.gov")
+          val pageTitle = messages("amendment.title") + " - " +
+            messages("title.amls") + " - " + messages("title.gov")
 
           Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
         }
@@ -131,10 +138,16 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       "status is renewal submitted and renewal data exists in mongoCache" must {
         "show the registration amendment page" in new Fixture {
 
-          when(controller.sectionsProvider.sections(mockCacheMap))
+          when(mockSectionsProvider.sections(mockCacheMap))
             .thenReturn(Seq(
               Section("TESTSECTION1", Completed, false, mock[Call]),
               Section("TESTSECTION2", Completed, true, mock[Call])
+            ))
+
+          when(mockSectionsProvider.taskRows(any())(any()))
+            .thenReturn(Seq(
+              TaskRow("TESTSECTION1", "/foo", false, TaskRow.completedTag),
+              TaskRow("TESTSECTION2", "/bar", true, TaskRow.completedTag)
             ))
 
           mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
@@ -145,8 +158,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           val responseF = controller.get()(request)
           status(responseF) must be(OK)
-          val pageTitle = Messages("amendment.title") + " - " +
-            Messages("title.amls") + " - " + Messages("title.gov")
+          val pageTitle = messages("amendment.title") + " - " +
+            messages("title.amls") + " - " + messages("title.gov")
 
           Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
         }
@@ -161,14 +174,17 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
             mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
+            when(mockSectionsProvider.taskRows(any())(any()))
+              .thenReturn(Seq.empty[TaskRow])
+
             when(controller.sectionsProvider.sections(mockCacheMap))
               .thenReturn(Seq.empty[Section])
 
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
 
-            val pageTitle = Messages("progress.title") + " - " +
-              Messages("title.amls") + " - " + Messages("title.gov")
+            val pageTitle = messages("progress.title") + " - " +
+              messages("title.amls") + " - " + messages("title.gov")
             Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
 
           }
@@ -182,10 +198,16 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           "application is pre-submission" must {
             "enable the submission button" in new Fixture {
 
-              when(controller.sectionsProvider.sections(mockCacheMap))
+              when(mockSectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", Completed, false, mock[Call]),
                   Section("TESTSECTION2", Completed, true, mock[Call])
+                ))
+
+              when(mockSectionsProvider.taskRows(any())(any()))
+                .thenReturn(Seq(
+                  TaskRow("TESTSECTION1", "/foo", false, TaskRow.completedTag),
+                  TaskRow("TESTSECTION2", "/bar", true, TaskRow.completedTag)
                 ))
 
               mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
@@ -206,20 +228,26 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-              when(controller.sectionsProvider.sections(mockCacheMap))
+              when(mockSectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", Completed, false, mock[Call]),
                   Section("TESTSECTION2", Completed, true, mock[Call])
                 ))
 
+              when(mockSectionsProvider.taskRows(any())(any()))
+                .thenReturn(Seq(
+                  TaskRow("TESTSECTION1", "/foo", false, TaskRow.completedTag),
+                  TaskRow("TESTSECTION2", "/bar", true, TaskRow.completedTag)
+                ))
+
               val responseF = controller.get()(request)
               status(responseF) must be(OK)
 
-              contentAsString(responseF)  must include(Messages("progress.submit.updates"))
+              contentAsString(responseF)  must include(messages("progress.submit.updates"))
 
               val submitForm = Jsoup.parse(contentAsString(responseF)).select(".submit-application form")
               submitForm.attr("action") must be(controllers.routes.RegistrationProgressController.post().url)
-              submitForm.select("button").text() must be(Messages("button.continue"))
+              submitForm.select("button").text() must be(messages("button.continue"))
             }
           }
 
@@ -230,10 +258,16 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           "application is pre-submission" must {
             "enable the submission button" in new Fixture {
 
-              when(controller.sectionsProvider.sections(mockCacheMap))
+              when(mockSectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", Completed, false, mock[Call]),
                   Section("TESTSECTION2", Completed, false, mock[Call])
+                ))
+
+              when(mockSectionsProvider.taskRows(any())(any()))
+                .thenReturn(Seq(
+                  TaskRow("TESTSECTION1", "/foo", false, TaskRow.completedTag),
+                  TaskRow("TESTSECTION2", "/bar", false, TaskRow.completedTag)
                 ))
 
               mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
@@ -254,10 +288,16 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-              when(controller.sectionsProvider.sections(mockCacheMap))
+              when(mockSectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", Completed, false, mock[Call]),
                   Section("TESTSECTION2", Completed, false, mock[Call])
+                ))
+
+              when(mockSectionsProvider.taskRows(any())(any()))
+                .thenReturn(Seq(
+                  TaskRow("TESTSECTION1", "/foo", false, TaskRow.completedTag),
+                  TaskRow("TESTSECTION2", "/bar", false, TaskRow.completedTag)
                 ))
 
               val responseF = controller.get()(request)
@@ -266,7 +306,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
               val submitDiv = Jsoup.parse(contentAsString(responseF)).select(".submit-application")
               val submitAnchor = submitDiv.select("#progress-continue")
 
-              submitDiv.text() must include(Messages("progress.view.status"))
+              submitDiv.text() must include(messages("progress.view.status"))
               submitAnchor.attr("href") must be(controllers.routes.StatusController.get().url)
               submitAnchor.text() must include("Check your status and messages")
             }
@@ -280,10 +320,16 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           "application is pre-submission" must {
             "disable the submission button" in new Fixture {
 
-              when(controller.sectionsProvider.sections(mockCacheMap))
+              when(mockSectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", NotStarted, false, mock[Call]),
                   Section("TESTSECTION2", Completed, true, mock[Call])
+                ))
+
+              when(mockSectionsProvider.taskRows(any())(any()))
+                .thenReturn(Seq(
+                  TaskRow("TESTSECTION1", "/foo", false, TaskRow.notStartedTag),
+                  TaskRow("TESTSECTION2", "/bar", true, TaskRow.completedTag)
                 ))
 
               mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
@@ -303,10 +349,16 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-              when(controller.sectionsProvider.sections(mockCacheMap))
+              when(mockSectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", NotStarted, false, mock[Call]),
                   Section("TESTSECTION2", Completed, true, mock[Call])
+                ))
+
+              when(mockSectionsProvider.taskRows(any())(any()))
+                .thenReturn(Seq(
+                  TaskRow("TESTSECTION1", "/foo", false, TaskRow.notStartedTag),
+                  TaskRow("TESTSECTION2", "/bar", true, TaskRow.completedTag)
                 ))
 
               val responseF = controller.get()(request)
@@ -315,7 +367,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
               val submitDiv = Jsoup.parse(contentAsString(responseF)).select(".submit-application")
               val submitAnchor = submitDiv.select("#progress-continue")
 
-              submitDiv.text() must include(Messages("progress.view.status"))
+              submitDiv.text() must include(messages("progress.view.status"))
               submitAnchor.attr("href") must be(controllers.routes.StatusController.get().url)
               submitAnchor.text() must include("Check your status and messages")
             }
@@ -326,10 +378,16 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         "no section has changed" must {
           "disable the submission button" in new Fixture {
 
-            when(controller.sectionsProvider.sections(mockCacheMap))
+            when(mockSectionsProvider.sections(mockCacheMap))
               .thenReturn(Seq(
                 Section("TESTSECTION1", NotStarted, false, mock[Call]),
                 Section("TESTSECTION2", Completed, false, mock[Call])
+              ))
+
+            when(mockSectionsProvider.taskRows(any())(any()))
+              .thenReturn(Seq(
+                TaskRow("TESTSECTION1", "/foo", false, TaskRow.notStartedTag),
+                TaskRow("TESTSECTION2", "/bar", false, TaskRow.completedTag)
               ))
 
             mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
@@ -351,25 +409,32 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
             mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-            val sections = Seq(
-              Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
-              Section("TESTSECTION2", Completed, false, mock[Call])
-            )
-
-            when(controller.sectionsProvider.sections(mockCacheMap))
-              .thenReturn(sections)
+            when(mockSectionsProvider.sections(mockCacheMap))
+              .thenReturn(
+                Seq(
+                  Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
+                  Section("TESTSECTION2", Completed, false, mock[Call])
+                )
+              )
+            when(mockSectionsProvider.taskRows(any())(any()))
+              .thenReturn(
+                Seq(
+                  TaskRow(BusinessMatching.messageKey, "/foo", false, TaskRow.completedTag),
+                  TaskRow("TESTSECTION2", "/bar", false, TaskRow.completedTag)
+                )
+              )
 
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
 
-            contentAsString(responseF) must not include Messages(s"progress.${BusinessMatching.messageKey}.name")
+            contentAsString(responseF) must not include messages(s"progress.${BusinessMatching.messageKey}.name")
 
             Seq(
               "businessmatching.registerservices.servicename.lbl.01",
               "businessmatching.registerservices.servicename.lbl.03",
               "businessmatching.registerservices.servicename.lbl.04"
             ) foreach { msg =>
-              contentAsString(responseF) must include(Messages(msg))
+              contentAsString(responseF) must include(messages(msg))
             }
           }
         }
@@ -387,25 +452,31 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             Section("TESTSECTION2", Completed, false, mock[Call])
           )
 
-          when(controller.sectionsProvider.sections(mockCacheMap))
+          when(mockSectionsProvider.sections(mockCacheMap))
             .thenReturn(sections)
+
+          when(mockSectionsProvider.taskRows(any())(any()))
+            .thenReturn(Seq(
+              TaskRow(BusinessMatching.messageKey, "/foo", false, TaskRow.completedTag),
+              TaskRow("TESTSECTION2", "/bar", false, TaskRow.completedTag)
+            ))
 
           val responseF = controller.get()(request)
           status(responseF) must be(OK)
 
           val doc = Jsoup.parse(contentAsString((responseF)))
-          doc.getElementsMatchingOwnText(Messages("amendment.text.1")).hasText must be(true)
+          doc.getElementsMatchingOwnText(messages("amendment.text.1")).hasText must be(true)
 
-          val elements = doc.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.amend"))
+          val elements = doc.getElementsMatchingOwnText(messages("progress.visuallyhidden.view.amend"))
           elements.size() must be(sections.size - 1)
 
-          doc.select("a.edit-preapp").text must include(Messages("progress.preapplication.canedit"))
+          doc.select("a.edit-preapp").text must include(messages("progress.preapplication.canedit"))
         }
       }
 
       "the user is not enrolled into the AMLS Account" must {
         "show the registration progress page" in new Fixture {
-          when(controller.sectionsProvider.sections(mockCacheMap))
+          when(mockSectionsProvider.sections(mockCacheMap))
             .thenReturn(Seq.empty[Section])
 
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
@@ -413,8 +484,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           val responseF = controller.get()(request)
           status(responseF) must be(OK)
 
-          val pageTitle = Messages("progress.title") + " - " +
-            Messages("title.amls") + " - " + Messages("title.gov")
+          val pageTitle = messages("progress.title") + " - " +
+            messages("title.amls") + " - " + messages("title.gov")
           Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
         }
       }
@@ -427,7 +498,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
           val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get)
-          when(controller.sectionsProvider.sections(mockCacheMap)) thenReturn Seq(completeSection)
+          when(mockSectionsProvider.sections(mockCacheMap)) thenReturn Seq(completeSection)
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -446,6 +517,9 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get)
           when(controller.sectionsProvider.sections(mockCacheMap)) thenReturn Seq(completeSection)
+
+          val completeTaskRow = TaskRow(BusinessMatching.messageKey, controllers.routes.LandingController.get.url, true, TaskRow.incompleteTag)
+          when(mockSectionsProvider.taskRows(any())(any())) thenReturn Seq(completeTaskRow)
 
           val result = controller.get()(request)
           status(result) mustBe OK
@@ -466,11 +540,20 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           mockCacheGetEntry(Some(msb), models.moneyservicebusiness.MoneyServiceBusiness.key)
           mockCacheGetEntry(Some(hvd), models.hvd.Hvd.key)
 
+          val taskRow = Seq(models.moneyservicebusiness.MoneyServiceBusiness.taskRow)
           val sections = Seq(models.moneyservicebusiness.MoneyServiceBusiness.section)
 
+          when(mockSectionsProvider.taskRows(any())(any()))
+            .thenReturn(taskRow)
+
           when {
-            controller.sectionsProvider.sections(any[CacheMap])
+            mockSectionsProvider.sections(any[CacheMap])
           } thenReturn sections
+
+          val newTaskRows = Seq(
+            models.moneyservicebusiness.MoneyServiceBusiness.taskRow,
+            models.hvd.Hvd.taskRow
+          )
 
           val newSections = Seq(
             models.moneyservicebusiness.MoneyServiceBusiness.section,
@@ -478,8 +561,12 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           )
 
           when {
-            controller.sectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
+            mockSectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
           } thenReturn newSections
+
+          when {
+            mockSectionsProvider.taskRowsFromBusinessActivities(any(), any())(any(), any())
+          } thenReturn newTaskRows
 
           mockApplicationStatus(SubmissionDecisionApproved)
 
@@ -490,7 +577,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           val html = Jsoup.parse(contentAsString(result))
 
-          html.select("#existing-sections-list").text() must include(Messages("progress.hvd.name"))
+          html.select("#existing-sections-list").text() must include(messages("progress.hvd.name"))
         }
       }
     }

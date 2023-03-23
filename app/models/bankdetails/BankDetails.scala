@@ -16,7 +16,7 @@
 
 package models.bankdetails
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
 import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -92,6 +92,43 @@ object BankDetails {
       } => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.YourBankAccountsController.get)
       case bds@_ =>
         Section(msgKey, Started, anyChanged(bds), controllers.bankdetails.routes.YourBankAccountsController.get)
+    }
+  }
+
+  def taskRow(implicit cache: CacheMap, messages: Messages) = {
+
+    val messageKey = "bankdetails"
+    val notStarted = TaskRow(
+      messageKey,
+      controllers.bankdetails.routes.WhatYouNeedController.get.url,
+      hasChanged = false,
+      TaskRow.notStartedTag
+    )
+
+    cache.getEntry[Seq[BankDetails]](key).fold(notStarted) {
+      case model if model.isEmpty =>
+        TaskRow(
+          messageKey,
+          controllers.bankdetails.routes.YourBankAccountsController.get().url,
+          hasChanged = false,
+          TaskRow.completedTag
+        )
+      case bds @ model if model forall {
+        _.isComplete
+      } =>
+        TaskRow(
+          messageKey,
+          controllers.bankdetails.routes.YourBankAccountsController.get().url,
+          anyChanged(bds),
+          TaskRow.completedTag
+        )
+      case bds @ _ =>
+        TaskRow(
+          messageKey,
+          controllers.businessdetails.routes.WhatYouNeedController.get.url,
+          anyChanged(bds),
+          TaskRow.incompleteTag
+        )
     }
   }
 

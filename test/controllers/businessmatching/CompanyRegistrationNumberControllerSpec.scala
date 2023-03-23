@@ -19,7 +19,7 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
-import forms.CompanyRegistrationNumberFormProvider
+import forms.businessmatching.CompanyRegistrationNumberFormProvider
 import models.businessmatching.{BusinessMatching, CompanyRegistrationNumber}
 import models.status.NotCompleted
 import org.jsoup.Jsoup

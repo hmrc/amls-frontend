@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.CompanyRegistrationNumberFormProvider
+import forms.businessmatching.CompanyRegistrationNumberFormProvider
 import models.businessmatching.BusinessMatching
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService

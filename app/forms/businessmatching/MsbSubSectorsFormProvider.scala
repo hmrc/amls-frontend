@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package forms
+package forms.businessmatching
 
 import forms.mappings.Mappings
-import models.businessmatching.BusinessActivity
+import models.businessmatching.BusinessMatchingMsbService
 import play.api.data.Form
 import play.api.data.Forms.seq
 
 import javax.inject.Inject
 
-class RegisterBusinessActivitiesFormProvider @Inject()() extends Mappings {
+class MsbSubSectorsFormProvider @Inject()() extends Mappings {
 
-  def apply(): Form[Seq[BusinessActivity]] = {
-
-    Form[Seq[BusinessActivity]](
-      "value" -> seq(enumerable[BusinessActivity]("error.required.bm.register.service")).verifying(
-        nonEmptySeq("error.required.bm.register.service")
+  def apply(): Form[Seq[BusinessMatchingMsbService]] =
+    Form(
+        "value" -> seq(enumerable[BusinessMatchingMsbService]("error.required.msb.services")).verifying(
+        nonEmptySeq("error.required.msb.services")
       )
     )
-  }
 }

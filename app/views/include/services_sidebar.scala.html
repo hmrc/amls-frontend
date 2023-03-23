@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import views.html.status.change_officer
 @import config.ApplicationConfig
 
 @(canEditPreApplication: Boolean,
@@ -24,40 +23,49 @@
     hasCompleteNominatedOfficer: Boolean,
     nominatedOfficerName: Option[String])(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
-    <div class="grid-layout">
-        <div class="grid-layout__column grid-layout__column--1-3">
-            <h2 class="heading-small">Your business</h2>
-            <p>
+
+@gridClass = @{
+    if(hasCompleteNominatedOfficer) {
+        "govuk-grid-column-one-third"
+    } else {
+        "govuk-grid-column-one-half"
+    }
+}
+    <div class="govuk-grid-row">
+
+        <div class="@gridClass" id="your-business">
+            <h2 class="govuk-heading-s">@messages("status.business")</h2>
+            <p class="govuk-body">
                 @Html(businessName)
             </p>
         </div>
 
-        <div class="grid-layout__column grid-layout__column--1-3">
-            <h2 class="heading-small">Your services</h2>
+        <div class="@gridClass" id="your-services">
+            <h2 class="govuk-heading-s">@messages("status.deregister.services")</h2>
             @if(serviceNames.length == 1) {
-                <p>@Html(serviceNames(0))</p>
+                <p class="govuk-body">@Html(serviceNames.head)</p>
             } else {
-                <ul class="list list-bullet">
+                <ul class="govuk-list govuk-list--bullet">
                     @serviceNames.map(name => Html("<li>" + name + "</li>"))
                 </ul>
             }
 
             @if(displayLink) {
-                <p class="sidebar-top-spacing">
+                <p class="govuk-body sidebar-top-spacing">
                     <a id="view-details" href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp">
-                        @(if(canEditPreApplication) Messages("progress.preapplication.canedit") else Messages("progress.preapplication.readonly"))
+                        @(if(canEditPreApplication) messages("progress.preapplication.canedit") else messages("progress.preapplication.readonly"))
                     </a>
                 </p>
             }
         </div>
 
-        @if(hasCompleteNominatedOfficer) {
-            <div id="nominated-officer" class="grid-layout__column grid-layout__column--1-3">
-                <p>@change_officer(nominatedOfficerName)</p>
-            </div>
-        }else{
-            <div class="grid-layout__column grid-layout__column--1-3">
-                @* empty for layout reasons *@
-            </div>
+        @(hasCompleteNominatedOfficer, nominatedOfficerName) match {
+            case (true, Some(name)) => {
+                <div id="nominated-officer" class="@gridClass">
+                    <h2 class="govuk-heading-s">@messages("changeofficer.changelink.heading")</h2>
+                    <p class="govuk-body">@name</p>
+                </div>
+            }
+            case _ => {}
         }
     </div>

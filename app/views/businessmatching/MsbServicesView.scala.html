@@ -43,11 +43,15 @@
     }
 }
 
+@checkboxItems = @{
+    BusinessMatchingMsbServices.formValues(fxEnabledToggle)
+}
+
 @layout(pageTitle = messages("msb.services.title") + " - " + messages(section)) {
 
     @formHelper(action = controllers.businessmatching.routes.MsbSubSectorsController.post(edit)) {
 
-        @errorSummary(form, Some(Map("value" -> "value_0")))
+        @errorSummary(form, Some(Map("value" -> checkboxItems.map(_.id.getOrElse("value_2")).head)))
 
         @subtitle(section)
 
@@ -68,12 +72,10 @@
                     )
                 ),
                 name = "msbServices",
-                items = BusinessMatchingMsbServices.formValues(fxEnabledToggle)
+                items = checkboxItems
             ).withFormField(form("value"))
         )
 
         @button()
-
-        @maybeReturnLink
     }
 }

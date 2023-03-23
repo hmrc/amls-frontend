@@ -16,9 +16,10 @@
 
 package models.responsiblepeople
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
+import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
@@ -259,6 +260,51 @@ object ResponsiblePerson {
               case _ => false
             }
             Section(messageKey, Started, anyChanged(rp), controllers.responsiblepeople.routes.YourResponsiblePeopleController.get)
+        }
+      }
+    }
+  }
+
+  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+
+    val messageKey = "responsiblepeople"
+    val notStarted = TaskRow(
+      messageKey,
+      controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get().url,
+      hasChanged = false,
+      TaskRow.notStartedTag
+    )
+
+    cache.getEntry[Seq[ResponsiblePerson]](key).fold(notStarted) { rp =>
+
+      if (filter(rp).equals(Nil)) {
+        TaskRow(
+          messageKey,
+          controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get().url,
+          anyChanged(rp),
+          TaskRow.notStartedTag
+        )
+      } else {
+        filter(rp) match {
+          case responsiblePeople if responsiblePeople.nonEmpty && responsiblePeople.forall {
+            _.isComplete
+          } => TaskRow(
+            messageKey,
+            controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
+            anyChanged(rp),
+            TaskRow.completedTag
+          )
+          case _ =>
+            rp.indexWhere {
+              case model if !model.isComplete && !model.status.contains(StatusConstants.Deleted) => true
+              case _ => false
+            }
+            TaskRow(
+              messageKey,
+              controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
+              anyChanged(rp),
+              TaskRow.incompleteTag
+            )
         }
       }
     }

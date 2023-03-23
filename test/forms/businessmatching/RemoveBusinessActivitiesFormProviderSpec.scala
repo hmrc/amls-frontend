@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package forms
+package forms.businessmatching
 
 import forms.behaviours.CheckboxFieldBehaviours
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import play.api.data.FormError
 
-class RegisterBusinessActivitiesFormProviderSpec extends CheckboxFieldBehaviours {
+class RemoveBusinessActivitiesFormProviderSpec extends CheckboxFieldBehaviours {
 
-  val form = new RegisterBusinessActivitiesFormProvider()()
+  val form = new RemoveBusinessActivitiesFormProvider()(Seq.empty)
 
   ".value" must {
 
     val fieldName = "value"
-    val requiredKey = "error.required.bm.register.service"
+    val requiredKey = "error.required.bm.remove.service"
 
     behave like checkboxField[BusinessActivity](
       form,

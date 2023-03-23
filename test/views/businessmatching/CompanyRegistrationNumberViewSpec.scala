@@ -16,7 +16,7 @@
 
 package views.businessmatching
 
-import forms.CompanyRegistrationNumberFormProvider
+import forms.businessmatching.CompanyRegistrationNumberFormProvider
 import models.businessmatching.CompanyRegistrationNumber
 import org.scalatest.MustMatchers
 import play.api.data.Form

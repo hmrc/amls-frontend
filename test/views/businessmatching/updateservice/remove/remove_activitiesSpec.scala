@@ -16,7 +16,8 @@
 
 package views.businessmatching.updateservice.remove
 
-import forms.{EmptyForm, InvalidForm, RemoveBusinessActivitiesFormProvider}
+import forms.businessmatching.RemoveBusinessActivitiesFormProvider
+import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.BusinessActivities
 import models.businessmatching.BusinessActivity.{AccountancyServices, BillPaymentServices, MoneyServiceBusiness}

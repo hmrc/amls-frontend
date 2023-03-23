@@ -851,6 +851,7 @@ status.referenceno.short = Registration number
 status.incomplete = Incomplete
 status.status = Status
 status.complete = Completed
+status.notstarted = Not started
 status.notsubmitted = Not submitted
 status.submitted = Submitted
 status.feepaid = Fee paid
@@ -867,6 +868,9 @@ status.submissionready.description3 = To submit your application you need to com
 status.hassomethingchanged = About your business
 status.submissionready.changelink1 = Check or update your business information
 status.submissionready.buttontext = Continue
+status.visuallyhidden.text = This section is
+status.progress.add = Add {0}
+status.progress.edit = Edit {0}
 
 your.registration = Your registration
 your.registration.status = Registration status

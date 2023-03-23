@@ -132,14 +132,17 @@ class renewal_progressSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "show the Nominated officer box with correct title, name and link" in new ViewFixture {
+
+      val officerName = "FirstName LastName"
+
       def view = renewal_progress(Seq.empty, businessName, serviceNames, false, true, readyForRenewal, false,
         hasCompleteNominatedOfficer = true,
-        nominatedOfficerName = Some("FirstName LastName"))
+        nominatedOfficerName = Some(officerName))
 
-      val element = doc.getElementById("nominated-officer")
+      val element = doc.getElementById("nominated-officer").text()
 
-      element.getElementsByClass("heading-small").text() must be("Nominated officer")
-      element.html() must include("FirstName LastName")
+      element must include("Nominated officer")
+      element must include(officerName)
     }
 
     "do not show the Nominated officer box if NO is not defined" in new ViewFixture {

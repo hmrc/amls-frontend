@@ -21,7 +21,7 @@ import cats.implicits._
 import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
-import forms.MsbSubSectorsFormProvider
+import forms.businessmatching.MsbSubSectorsFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessActivity.{AccountancyServices, MoneyServiceBusiness}
 import models.businessmatching.BusinessMatchingMsbService._

@@ -16,7 +16,7 @@
 
 package views.businessmatching
 
-import forms.RegisterBusinessActivitiesFormProvider
+import forms.businessmatching.RegisterBusinessActivitiesFormProvider
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import org.scalatest.MustMatchers

@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.RemoveBusinessActivitiesFormProvider
+import forms.businessmatching.RemoveBusinessActivitiesFormProvider
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}

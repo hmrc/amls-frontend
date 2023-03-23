@@ -18,7 +18,7 @@ package views.registrationprogress
 
 import forms.EmptyForm
 import generators.businesscustomer.AddressGenerator
-import models.registrationprogress.{Completed, Section}
+import models.registrationprogress.{Completed, Section, TaskList, TaskRow}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
@@ -26,9 +26,9 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.registrationprogress._
 
-class registration_progressSpec extends AmlsViewSpec with MockitoSugar with AddressGenerator {
+class RegistrationProgressViewSpec extends AmlsViewSpec with MockitoSugar with AddressGenerator {
 
-  lazy val registration_progress = app.injector.instanceOf[registration_progress]
+  lazy val registration_progress = app.injector.instanceOf[RegistrationProgressView]
   val businessName = "BusinessName"
   val serviceNames = Seq("Service 1", "Service 2", "Service 3")
 
@@ -38,56 +38,63 @@ class registration_progressSpec extends AmlsViewSpec with MockitoSugar with Addr
     val sections = Seq(
       Section("section1", Completed, true, mock[Call])
     )
+
+    val taskList = TaskList(
+      Seq(TaskRow(
+        "section1", "/foo", true, TaskRow.completedTag
+      )
+    ))
   }
 
   "The registration progress view" must {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = registration_progress(sections, true, "biz name", Seq.empty[String], true)
+      def view = registration_progress(taskList, true, "biz name", Seq.empty[String], true)
 
       doc.title must be(Messages("progress.title") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov"))
       heading.html must be(Messages("progress.title"))
 
-      doc.select("h2.heading-small").first().ownText() must be("Your business")
+      doc.getElementById("your-business").text() must include("Your business")
     }
 
     "show the business name and services" in new ViewFixture {
-      def view = registration_progress(sections, true, businessName, serviceNames, true)
+      def view = registration_progress(taskList, true, businessName, serviceNames, true)
 
-      val element = doc.getElementsByClass("grid-layout")
-      serviceNames.foreach(name => element.text() must include {
-        name
-      })
+      val elementText = doc.getElementById("your-services").text()
+      serviceNames.foreach(elementText must include(_))
     }
 
     "show the view details link under services section" in new ViewFixture {
-      def view = registration_progress(sections, true, businessName, serviceNames, true)
+      def view = registration_progress(taskList, true, businessName, serviceNames, true)
 
       val element = Option(doc.getElementById("view-details"))
       element mustNot be(None)
     }
 
     "show the Nominated officer box with correct title, name and link" in new ViewFixture {
+
+      val officerName = "FirstName LastName"
+
       def view = registration_progress(
-        sections = sections,
+        taskList,
         declarationAvailable = true,
         businessName = businessName,
         serviceNames = serviceNames,
         canEditPreApplication = true,
         hasCompleteNominatedOfficer = true,
-        nominatedOfficerName = Some("FirstName LastName"))
+        nominatedOfficerName = Some(officerName))
 
-      val element = doc.getElementById("nominated-officer")
+      val element = doc.getElementById("nominated-officer").text()
 
-      element.getElementsByClass("heading-small").text() must be("Nominated officer")
-      element.html() must include("FirstName LastName")
+      element must include("Nominated officer")
+      element must include(officerName)
     }
 
     "do not show the Nominated officer box if NO is not defined" in new ViewFixture {
       def view = registration_progress(
-        sections = sections,
+        taskList,
         declarationAvailable = true,
         businessName = businessName,
         serviceNames = serviceNames,

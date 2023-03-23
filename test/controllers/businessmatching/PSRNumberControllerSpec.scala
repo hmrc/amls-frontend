@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
-import forms.PSRNumberFormProvider
+import forms.businessmatching.PSRNumberFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.BusinessMatchingMsbService._

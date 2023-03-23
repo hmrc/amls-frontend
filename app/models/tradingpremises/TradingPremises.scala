@@ -17,7 +17,8 @@
 package models.tradingpremises
 
 import models.businessmatching.BusinessActivity.MoneyServiceBusiness
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
@@ -163,9 +164,52 @@ object TradingPremises {
             Section(messageKey, Started, anyChanged(tp), controllers.tradingpremises.routes.YourTradingPremisesController.get())
         }
       }
-
     }
+  }
 
+  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+
+    val messageKey = "tradingpremises"
+    val notStarted = TaskRow(
+      messageKey,
+      controllers.tradingpremises.routes.TradingPremisesAddController.get().url,
+      hasChanged = false,
+      TaskRow.notStartedTag
+    )
+
+    cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) { tp =>
+
+      if (filter(tp).equals(Nil)) {
+        TaskRow(
+          messageKey,
+          controllers.tradingpremises.routes.TradingPremisesAddController.get().url,
+          anyChanged(tp),
+          TaskRow.notStartedTag
+        )
+      } else {
+        filter(tp) match {
+          case premises if premises.nonEmpty && premises.forall {
+            _.isComplete
+          } => TaskRow(
+            messageKey,
+            controllers.tradingpremises.routes.YourTradingPremisesController.get().url,
+            anyChanged(tp),
+            TaskRow.completedTag
+          )
+          case _ =>
+            tp.indexWhere {
+              case model if !model.isComplete => true
+              case _ => false
+            }
+            TaskRow(
+              messageKey,
+              controllers.tradingpremises.routes.YourTradingPremisesController.get().url,
+              anyChanged(tp),
+              TaskRow.incompleteTag
+            )
+        }
+      }
+    }
   }
 
   implicit val mongoKey = new MongoKey[TradingPremises] {

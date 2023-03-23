@@ -16,7 +16,8 @@
 
 package views.businessmatching
 
-import forms.{EmptyForm, Form2, InvalidForm, TypeOfBusinessFormProvider, ValidForm}
+import forms.businessmatching.TypeOfBusinessFormProvider
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.TypeOfBusiness
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec

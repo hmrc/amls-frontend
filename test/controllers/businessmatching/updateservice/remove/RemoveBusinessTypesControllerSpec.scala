@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
-import forms.RemoveBusinessActivitiesFormProvider
+import forms.businessmatching.RemoveBusinessActivitiesFormProvider
 import models.DateOfChange
 import models.businessmatching._
 import models.businessmatching.BusinessActivity._

@@ -16,7 +16,8 @@
 
 package views.businessmatching
 
-import forms.{EmptyForm, Form2, InvalidForm, MsbSubSectorsFormProvider, ValidForm}
+import forms.businessmatching.MsbSubSectorsFormProvider
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessMatchingMsbService, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney

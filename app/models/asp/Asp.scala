@@ -16,7 +16,8 @@
 
 package models.asp
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -54,6 +55,34 @@ object Asp {
           Section(messageKey, Completed, model.hasChanged, controllers.asp.routes.SummaryController.get)
         } else {
           Section(messageKey, Started, model.hasChanged, controllers.asp.routes.WhatYouNeedController.get)
+        }
+    }
+  }
+
+  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+    val messageKey = "asp"
+    val notStarted = TaskRow(
+      messageKey,
+      controllers.asp.routes.WhatYouNeedController.get.url,
+      hasChanged = false,
+      TaskRow.notStartedTag
+    )
+    cache.getEntry[Asp](key).fold(notStarted) {
+      model =>
+        if (model.isComplete) {
+          TaskRow(
+            messageKey,
+            controllers.asp.routes.SummaryController.get.url,
+            model.hasChanged,
+            TaskRow.completedTag
+          )
+        } else {
+          TaskRow(
+            messageKey,
+            controllers.asp.routes.WhatYouNeedController.get.url,
+            model.hasChanged,
+            TaskRow.incompleteTag
+          )
         }
     }
   }
