@@ -30,7 +30,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
-import views.html.businessdetails.registered_office_is_uk
+import views.html.businessdetails.RegisteredOfficeIsUKView
 
 import scala.concurrent.Future
 
@@ -41,14 +41,14 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     val mockCacheMap = mock[CacheMap]
-    lazy val view = app.injector.instanceOf[registered_office_is_uk]
+    lazy val view = app.injector.instanceOf[RegisteredOfficeIsUKView]
     val controller = new RegisteredOfficeIsUKController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = app.injector.instanceOf[RegisteredOfficeIsUKFormProvider],
-      registered_office_is_uk = view)
+      view = view)
 
     when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
       .thenReturn(Future.successful(None))

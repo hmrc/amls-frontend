@@ -23,7 +23,7 @@ import forms.businessdetails.RegisteredOfficeIsUKFormProvider
 import models.businessdetails._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, DateOfChangeHelper}
-import views.html.businessdetails._
+import views.html.businessdetails.RegisteredOfficeIsUKView
 
 import scala.concurrent.Future
 
@@ -34,7 +34,7 @@ class RegisteredOfficeIsUKController @Inject ()(
                                                 val ds: CommonPlayDependencies,
                                                 val cc: MessagesControllerComponents,
                                                 formProvider: RegisteredOfficeIsUKFormProvider,
-                                                registered_office_is_uk: registered_office_is_uk) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                                                view: RegisteredOfficeIsUKView) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
@@ -43,15 +43,15 @@ class RegisteredOfficeIsUKController @Inject ()(
             response.flatMap(businessDetails =>
               businessDetails.registeredOfficeIsUK.map(isUk => isUk.isUK)
                 .orElse(businessDetails.registeredOffice.flatMap(ro => ro.isUK)))
-              .map(isUk => Ok(registered_office_is_uk(formProvider().fill(RegisteredOfficeIsUK(isUk)), edit)) )
-              .getOrElse(Ok(registered_office_is_uk(formProvider(), edit)))
+              .map(isUk => Ok(view(formProvider().fill(RegisteredOfficeIsUK(isUk)), edit)) )
+              .getOrElse(Ok(view(formProvider(), edit)))
         }
   }
 
   def post(edit: Boolean = false) = authAction.async {
     implicit request =>
       formProvider().bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(registered_office_is_uk(formWithErrors, edit))),
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
           for {
             businessDetails: Option[BusinessDetails] <- dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key)

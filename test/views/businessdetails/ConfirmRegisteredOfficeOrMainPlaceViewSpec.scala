@@ -17,27 +17,24 @@
 package views.businessdetails
 
 import forms.businessdetails.ConfirmRegisteredOfficeFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{ConfirmRegisteredOffice, RegisteredOfficeUK}
-import org.scalatest.MustMatchers
-import utils.AmlsViewSpec
-import jto.validation.Path
-import jto.validation.ValidationError
 import org.jsoup.nodes.Element
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import utils.AmlsViewSpec
 import views.Fixture
-import views.html.businessdetails.confirm_registered_office_or_main_place
+import views.html.businessdetails.ConfirmRegisteredOfficeOrMainPlaceView
 
 
-class confirm_registered_office_or_main_placeSpec extends AmlsViewSpec with MustMatchers {
+class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    lazy val place = app.injector.instanceOf[confirm_registered_office_or_main_place]
+    lazy val place = app.injector.instanceOf[ConfirmRegisteredOfficeOrMainPlaceView]
     lazy val formProvider = app.injector.instanceOf[ConfirmRegisteredOfficeFormProvider]
     implicit val requestWithToken = addTokenForView()
   }
 
-  "confirm_registered_office_or_main_place view" must {
+  "ConfirmRegisteredOfficeOrMainPlaceView" must {
     "have correct title" in new ViewFixture {
 
       val formWithData = formProvider().fill(ConfirmRegisteredOffice(true))

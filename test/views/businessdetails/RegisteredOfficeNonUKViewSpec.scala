@@ -26,12 +26,12 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
-import views.html.businessdetails.registered_office_non_uk
+import views.html.businessdetails.RegisteredOfficeNonUKView
 
 
-class registered_office_non_ukSpec extends AmlsViewSpec with MustMatchers with AutoCompleteServiceMocks {
+class RegisteredOfficeNonUKViewSpec extends AmlsViewSpec with MustMatchers with AutoCompleteServiceMocks {
 
-  lazy val registered_office_non_uk = app.injector.instanceOf[registered_office_non_uk]
+  lazy val registered_office_non_uk = app.injector.instanceOf[RegisteredOfficeNonUKView]
   lazy val formProvider = app.injector.instanceOf[RegisteredOfficeNonUkFormProvider]
 
   implicit val request = FakeRequest()

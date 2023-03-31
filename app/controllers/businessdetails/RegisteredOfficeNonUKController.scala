@@ -21,7 +21,6 @@ import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
 import forms.businessdetails.RegisteredOfficeNonUkFormProvider
 import models.businessdetails.{BusinessDetails, RegisteredOffice}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
@@ -29,7 +28,7 @@ import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AuthAction, DateOfChangeHelper}
-import views.html.businessdetails._
+import views.html.businessdetails.RegisteredOfficeNonUKView
 
 import scala.concurrent.Future
 
@@ -42,13 +41,13 @@ class RegisteredOfficeNonUKController @Inject ()(
                                                   val ds: CommonPlayDependencies,
                                                   val cc: MessagesControllerComponents,
                                                   formProvider: RegisteredOfficeNonUkFormProvider,
-                                                  registered_office_non_uk: registered_office_non_uk) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                                                  view: RegisteredOfficeNonUKView) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         businessDetails =>
-          Ok(registered_office_non_uk(
+          Ok(view(
             businessDetails.registeredOffice.fold(formProvider())(formProvider().fill), edit, autoCompleteService.formOptions
           ))
       }
@@ -57,7 +56,7 @@ class RegisteredOfficeNonUKController @Inject ()(
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       formProvider().bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(registered_office_non_uk(formWithErrors, edit, autoCompleteService.formOptions))),
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
         data =>
           for {
             businessDetails <- dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key)

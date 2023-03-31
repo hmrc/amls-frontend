@@ -32,7 +32,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessdetails.confirm_registered_office_or_main_place
+import views.html.businessdetails.ConfirmRegisteredOfficeOrMainPlaceView
 
 import scala.concurrent.Future
 
@@ -40,14 +40,14 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[confirm_registered_office_or_main_place]
+    lazy val view = app.injector.instanceOf[ConfirmRegisteredOfficeOrMainPlaceView]
     val controller = new ConfirmRegisteredOfficeController (
       dataCache = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = app.injector.instanceOf[ConfirmRegisteredOfficeFormProvider],
-      confirm_registered_office_or_main_place = view)
+      view = view)
   }
 
   private val ukAddress = RegisteredOfficeUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")

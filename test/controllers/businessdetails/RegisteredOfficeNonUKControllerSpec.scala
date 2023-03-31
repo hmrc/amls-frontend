@@ -36,7 +36,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
-import views.html.businessdetails.registered_office_non_uk
+import views.html.businessdetails.RegisteredOfficeNonUKView
 
 import scala.concurrent.Future
 
@@ -44,7 +44,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar {
 
   trait Fixture extends AutoCompleteServiceMocks {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[registered_office_non_uk]
+    lazy val view = app.injector.instanceOf[RegisteredOfficeNonUKView]
     val controller = new RegisteredOfficeNonUKController(
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
@@ -54,7 +54,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar {
       ds = commonDependencies,
       cc = mockMcc,
       formProvider = app.injector.instanceOf[RegisteredOfficeNonUkFormProvider],
-      registered_office_non_uk = view)
+      view = view)
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())

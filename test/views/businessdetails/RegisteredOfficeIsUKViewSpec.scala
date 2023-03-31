@@ -17,22 +17,16 @@
 package views.businessdetails
 
 import forms.businessdetails.RegisteredOfficeIsUKFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessdetails.{RegisteredOffice, RegisteredOfficeIsUK, RegisteredOfficeUK}
+import models.businessdetails.RegisteredOfficeIsUK
 import org.scalatest.MustMatchers
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
-import jto.validation.Path
-import jto.validation.ValidationError
-import org.jsoup.Jsoup
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import views.Fixture
-import views.html.businessdetails.registered_office_is_uk
+import views.html.businessdetails.RegisteredOfficeIsUKView
 
+class RegisteredOfficeIsUKViewSpec extends AmlsViewSpec with MustMatchers  {
 
-class registered_office_is_ukSpec extends AmlsViewSpec with MustMatchers  {
-
-  lazy val registered_office_is_uk = app.injector.instanceOf[registered_office_is_uk]
+  lazy val registered_office_is_uk = app.injector.instanceOf[RegisteredOfficeIsUKView]
   lazy val formProvider = app.injector.instanceOf[RegisteredOfficeIsUKFormProvider]
 
   implicit val request = FakeRequest()

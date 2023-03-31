@@ -27,7 +27,7 @@ import models.businessdetails._
 import models.businessmatching.BusinessMatching
 import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
-import views.html.businessdetails._
+import views.html.businessdetails.ConfirmRegisteredOfficeOrMainPlaceView
 
 import scala.concurrent.Future
 
@@ -36,7 +36,7 @@ class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConn
                                                     val ds: CommonPlayDependencies,
                                                     val cc: MessagesControllerComponents,
                                                     formProvider: ConfirmRegisteredOfficeFormProvider,
-                                                    confirm_registered_office_or_main_place: confirm_registered_office_or_main_place) extends AmlsBaseController(ds, cc) {
+                                                    view: ConfirmRegisteredOfficeOrMainPlaceView) extends AmlsBaseController(ds, cc) {
 
   def updateBMAddress(bm: BusinessMatching): Option[RegisteredOffice] = {
     bm.reviewDetails.fold[Option[RegisteredOffice]](None)(rd =>
@@ -81,7 +81,7 @@ class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConn
         hasRegisteredAddress <- OptionT.liftF(hasRegisteredAddress(dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)))
         businessMatchingAddress <- OptionT.liftF(getAddress(dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key)))
       } yield (hasRegisteredAddress, businessMatchingAddress) match {
-        case (Some(false),Some(data)) => Ok(confirm_registered_office_or_main_place(formProvider(), data))
+        case (Some(false),Some(data)) => Ok(view(formProvider(), data))
         case _ => Redirect(routes.RegisteredOfficeIsUKController.get(edit))
       }).getOrElse(Redirect(routes.RegisteredOfficeIsUKController.get(edit)))
   }
@@ -91,7 +91,7 @@ class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConn
       formProvider().bindFromRequest().fold(
         formWithErrors =>
           getAddress(dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key)) map {
-            case Some(data) => BadRequest(confirm_registered_office_or_main_place(formWithErrors, data))
+            case Some(data) => BadRequest(view(formWithErrors, data))
             case _ => Redirect(routes.RegisteredOfficeIsUKController.get(edit))
           },
         data => {
