@@ -21,7 +21,7 @@ import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.businessdetails.ConfirmRegisteredOfficeFormProvider
 import models.businesscustomer.Address
 import models.businessdetails._
 import models.businessmatching.BusinessMatching
@@ -29,13 +29,13 @@ import play.api.mvc.MessagesControllerComponents
 import utils.AuthAction
 import views.html.businessdetails._
 
-
 import scala.concurrent.Future
 
 class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConnector,
                                                     val authAction: AuthAction,
                                                     val ds: CommonPlayDependencies,
                                                     val cc: MessagesControllerComponents,
+                                                    formProvider: ConfirmRegisteredOfficeFormProvider,
                                                     confirm_registered_office_or_main_place: confirm_registered_office_or_main_place) extends AmlsBaseController(ds, cc) {
 
   def updateBMAddress(bm: BusinessMatching): Option[RegisteredOffice] = {
@@ -78,24 +78,23 @@ class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConn
   def get(edit: Boolean = false) = authAction.async {
     implicit request =>
       (for {
-        hra <- OptionT.liftF(hasRegisteredAddress(dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)))
-        bma <- OptionT.liftF(getAddress(dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key)))
-      } yield (hra,bma) match {
-        case (Some(false),Some(data)) => Ok(confirm_registered_office_or_main_place(EmptyForm, data))
+        hasRegisteredAddress <- OptionT.liftF(hasRegisteredAddress(dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)))
+        businessMatchingAddress <- OptionT.liftF(getAddress(dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key)))
+      } yield (hasRegisteredAddress, businessMatchingAddress) match {
+        case (Some(false),Some(data)) => Ok(confirm_registered_office_or_main_place(formProvider(), data))
         case _ => Redirect(routes.RegisteredOfficeIsUKController.get(edit))
       }).getOrElse(Redirect(routes.RegisteredOfficeIsUKController.get(edit)))
   }
 
   def post(edit: Boolean = false) = authAction.async {
     implicit request =>
-      Form2[ConfirmRegisteredOffice](request.body) match {
-        case f: InvalidForm =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
           getAddress(dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key)) map {
-            case Some(data) => BadRequest(confirm_registered_office_or_main_place(f, data))
+            case Some(data) => BadRequest(confirm_registered_office_or_main_place(formWithErrors, data))
             case _ => Redirect(routes.RegisteredOfficeIsUKController.get(edit))
-          }
-        case ValidForm(_, data) =>
-
+          },
+        data => {
           def updateRegisteredOfficeAndRedirect(bm: BusinessMatching,
                                                 businessDetails: BusinessDetails) = {
 
@@ -122,6 +121,7 @@ class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConn
           } yield {
             result
           }).getOrElse(Redirect(routes.RegisteredOfficeIsUKController.get(edit)))
-      }
+        }
+      )
   }
 }

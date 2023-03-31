@@ -17,13 +17,11 @@
 package models.registrationprogress
 
 import play.api.i18n.Messages
-import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
-import uk.gov.hmrc.govukfrontend.views.html.components.GovukTag
 import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
 
 case class TaskList(rows: Seq[TaskRow])
-case class TaskRow(msgKey: String, href: String, hasChanged: Boolean = false, tag: Tag)
+case class TaskRow(msgKey: String, href: String, hasChanged: Boolean = false, status: Status, tag: Tag)
 
 object TaskRow {
 

@@ -16,10 +16,9 @@
 
 package models.businessdetails
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.registrationprogress._
 import play.api.i18n.Messages
 import play.api.libs.json.{Json, Reads}
-import uk.gov.hmrc.govukfrontend.views.Aliases.{Tag, Text}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class BusinessDetails(
@@ -109,6 +108,7 @@ object BusinessDetails {
       messageKey,
       controllers.businessdetails.routes.WhatYouNeedController.get.url,
       hasChanged = false,
+      NotStarted,
       TaskRow.notStartedTag
     )
 
@@ -118,6 +118,7 @@ object BusinessDetails {
           messageKey,
           controllers.businessdetails.routes.SummaryController.get.url,
           model.hasChanged,
+          Completed,
           TaskRow.completedTag
         )
       case BusinessDetails(None, None, None, None, None, _, None, None, None, None, _, _) =>
@@ -127,7 +128,8 @@ object BusinessDetails {
           messageKey,
           controllers.businessdetails.routes.WhatYouNeedController.get.url,
           model.hasChanged,
-          TaskRow.notStartedTag
+          Started,
+          TaskRow.incompleteTag
         )
     }
   }

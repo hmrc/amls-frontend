@@ -149,6 +149,7 @@ object MoneyServiceBusiness {
       key,
       controllers.msb.routes.WhatYouNeedController.get.url,
       hasChanged = false,
+      NotStarted,
       TaskRow.notStartedTag
     )
 
@@ -160,6 +161,7 @@ object MoneyServiceBusiness {
             key,
             controllers.msb.routes.SummaryController.get.url,
             model.hasChanged,
+            Completed,
             TaskRow.completedTag
           )
         } else {
@@ -167,6 +169,7 @@ object MoneyServiceBusiness {
             key,
             controllers.msb.routes.WhatYouNeedController.get.url,
             model.hasChanged,
+            Started,
             TaskRow.incompleteTag
           )
         }

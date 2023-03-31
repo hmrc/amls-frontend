@@ -18,17 +18,17 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessdetails.RegisteredOfficeNonUkFormProvider
 import models.Country
 import models.businessdetails._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.select.Elements
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -38,10 +38,9 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.html.businessdetails.registered_office_non_uk
 
-import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
+class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar {
 
   trait Fixture extends AutoCompleteServiceMocks {
     self => val request = addToken(authRequest)
@@ -54,6 +53,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
+      formProvider = app.injector.instanceOf[RegisteredOfficeNonUkFormProvider],
       registered_office_non_uk = view)
 
     when {
@@ -74,11 +74,11 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include (Messages("businessdetails.registeredoffice.where.title"))
+      contentAsString(result) must include (messages("businessdetails.registeredoffice.where.title"))
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[name=isUK]").`val` must be("false")
-      document.select("input[name=addressLineNonUK2]").`val` must be("")
+      document.select("input[name=addressLine2]").`val` must be("")
 
     }
 
@@ -102,13 +102,14 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when (controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.RegisteredOfficeNonUKController.post().url).withFormUrlEncodedBody(
         "isUK"-> "false",
-        "addressLineNonUK1"->"line1",
-        "addressLineNonUK2"->"line2",
-        "addressLineNonUK3"->"",
-        "addressLineNonUK4"->"",
-        "country"->"AL")
+        "addressLine1"->"line1",
+        "addressLine2"->"line2",
+        "addressLine3"->"",
+        "addressLine4"->"",
+        "country"->"AL"
+      )
 
       val result = controller.post()(newRequest)
 
@@ -135,12 +136,12 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when (controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.RegisteredOfficeNonUKController.post(true).url).withFormUrlEncodedBody(
         "isUK"-> "false",
-        "addressLineNonUK1"->"line1",
-        "addressLineNonUK2"->"line2",
-        "addressLineNonUK3"->"",
-        "addressLineNonUK4"->"",
+        "addressLine1"->"line1",
+        "addressLine2"->"line2",
+        "addressLine3"->"",
+        "addressLine4"->"",
         "country"->"AL")
 
       val result = controller.post(edit = true)(newRequest)
@@ -172,23 +173,23 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when (controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.RegisteredOfficeNonUKController.post().url).withFormUrlEncodedBody(
         "isUK"-> "false",
-        "addressLineNonUK1"->"line1 &",
-        "addressLineNonUK2"->"line2 *",
-        "addressLineNonUK3"->"",
-        "addressLineNonUK4"->"",
+        "addressLine1"->"line1 &",
+        "addressLine2"->"line2 *",
+        "addressLine3"->"",
+        "addressLine4"->"",
         "country"->"AL")
 
       val result = controller.post()(newRequest)
       val document: Document  = Jsoup.parse(contentAsString(result))
-      val errorCount = 2
-      val elementsWithError : Elements = document.getElementsByClass("error-notification")
-      elementsWithError.size() must be(errorCount)
 
-      elementsWithError.asScala.map(_.text()) must contain allOf(
-        "Error: " + Messages("error.text.validation.address.line1"),
-        "Error: " + Messages("error.text.validation.address.line2"))
+      val errorSummary = document.getElementsByClass("govuk-error-summary__list").first().text()
+
+      errorSummary must include(messages("error.text.validation.address.line1"))
+      errorSummary must include(messages("error.text.validation.address.line2"))
+      document.getElementById("addressLine1-error").text() must include(messages("error.text.validation.address.line1"))
+      document.getElementById("addressLine2-error").text() must include(messages("error.text.validation.address.line2"))
     }
 
     "respond with BAD_REQUEST" when {
@@ -198,15 +199,15 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
         when(controller.dataCacheConnector.fetch(any(), any())(any(), any())).thenReturn(Future.successful(None))
         when(controller.dataCacheConnector.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.RegisteredOfficeNonUKController.post().url).withFormUrlEncodedBody(
           "isUK" -> "false",
-          "addressLineNonUK2" -> "line2",
-          "addressLineNonUK3" -> "",
-          "addressLineNonUK4" -> "",
+          "addressLine2" -> "line2",
+          "addressLine3" -> "",
+          "addressLine4" -> "",
           "country" -> "AL")
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("err.summary"))
+        contentAsString(result) must include(messages("err.summary"))
 
       }
 
@@ -222,12 +223,12 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
         when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.RegisteredOfficeNonUKController.post().url).withFormUrlEncodedBody(
           "isUK" -> "false",
-          "addressLineNonUK1" -> "line1",
-          "addressLineNonUK2" -> "line2",
-          "addressLineNonUK3" -> "",
-          "addressLineNonUK4" -> "",
+          "addressLine1" -> "line1",
+          "addressLine2" -> "line2",
+          "addressLine3" -> "",
+          "addressLine4" -> "",
           "country" -> "AL")
 
         val result = controller.post()(newRequest)
@@ -245,12 +246,12 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar{
         when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
           .thenReturn(Future.successful(ReadyForRenewal(None)))
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.RegisteredOfficeNonUKController.post().url).withFormUrlEncodedBody(
           "isUK" -> "false",
-          "addressLineNonUK1" -> "line1",
-          "addressLineNonUK2" -> "line2",
-          "addressLineNonUK3" -> "",
-          "addressLineNonUK4" -> "",
+          "addressLine1" -> "line1",
+          "addressLine2" -> "line2",
+          "addressLine3" -> "",
+          "addressLine4" -> "",
           "country" -> "AL")
 
         val result = controller.post()(newRequest)

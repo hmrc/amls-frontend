@@ -15,6 +15,7 @@
  *@
 
 @import models.registrationprogress.TaskRow
+@import models.registrationprogress.Completed
 
 @this(govukTag: GovukTag)
 
@@ -22,9 +23,8 @@
 
 @sectionName = @{messages(s"progress.${taskRow.msgKey}.name")}
 @message = @{
-    val completed = TaskRow.completedTag
-    taskRow.tag match {
-        case completed =>
+    taskRow.status match {
+        case Completed =>
             messages("status.progress.edit", sectionName)
         case _ =>
             messages("status.progress.add", sectionName)

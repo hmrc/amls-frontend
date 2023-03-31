@@ -107,6 +107,7 @@ object Tcsp {
       key,
       controllers.tcsp.routes.WhatYouNeedController.get.url,
       hasChanged = false,
+      NotStarted,
       TaskRow.notStartedTag
     )
     cache.getEntry[Tcsp](key).fold(notStarted) {
@@ -116,6 +117,7 @@ object Tcsp {
             key,
             controllers.tcsp.routes.SummaryController.get.url,
             model.hasChanged,
+            Completed,
             TaskRow.completedTag
           )
         } else {
@@ -123,6 +125,7 @@ object Tcsp {
             key,
             controllers.tcsp.routes.WhatYouNeedController.get.url,
             model.hasChanged,
+            Started,
             TaskRow.incompleteTag
           )
         }

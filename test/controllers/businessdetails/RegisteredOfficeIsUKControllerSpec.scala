@@ -18,21 +18,20 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessdetails.RegisteredOfficeIsUKFormProvider
 import models.Country
 import models.businessdetails._
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{Document, Element}
-import org.jsoup.select.Elements
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.html.businessdetails.registered_office_is_uk
 
-import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
@@ -48,6 +47,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
+      formProvider = app.injector.instanceOf[RegisteredOfficeIsUKFormProvider],
       registered_office_is_uk = view)
 
     when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
@@ -60,13 +60,13 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
     "load the where is your registered office or main place of business place page" in new Fixture {
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include (Messages("businessdetails.registeredoffice.title"))
+      contentAsString(result) must include (messages("businessdetails.registeredoffice.title"))
     }
 
     "successfully submit form and navigate to RegisteredOfficeUK when true and edit false" in new Fixture {
       when(mockDataCacheConnector.save[BusinessDetails](any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.RegisteredOfficeIsUKController.post().url).withFormUrlEncodedBody(
         "isUK"-> "true"
       )
 
@@ -78,7 +78,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
     "successfully submit form and navigate to RegisteredOfficeNonUK when false and edit false" in new Fixture {
       when(mockDataCacheConnector.save[BusinessDetails](any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.RegisteredOfficeIsUKController.post().url).withFormUrlEncodedBody(
         "isUK"-> "false"
       )
 
@@ -93,7 +93,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(RegisteredOfficeIsUK(true)), Some(ukAddress), None))))
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.RegisteredOfficeIsUKController.post().url).withFormUrlEncodedBody(
         "isUK"-> "true"
       )
 
@@ -108,7 +108,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(RegisteredOfficeIsUK(false)), Some(ukAddress), None))))
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.RegisteredOfficeIsUKController.post().url).withFormUrlEncodedBody(
         "isUK"-> "false"
       )
 
@@ -123,7 +123,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(RegisteredOfficeIsUK(true)), Some(nonUKAddress), None))))
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.RegisteredOfficeIsUKController.post().url).withFormUrlEncodedBody(
         "isUK"-> "true"
       )
 
@@ -138,7 +138,7 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, Some(RegisteredOfficeIsUK(false)), Some(nonUKAddress), None))))
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.RegisteredOfficeIsUKController.post().url).withFormUrlEncodedBody(
         "isUK"-> "false"
       )
 
@@ -149,17 +149,18 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
     }
 
     "fail submission on invalid isUK" in new Fixture {
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.RegisteredOfficeIsUKController.post().url).withFormUrlEncodedBody(
         "isUK"-> ""
       )
 
       val result = controller.post()(newRequest)
       val document: Document  = Jsoup.parse(contentAsString(result))
-      val elementsWithError : Elements = document.getElementsByClass("error-notification")
-      elementsWithError.size() must be(1)
-      for (ele: Element <- elementsWithError.asScala) {
-        ele.html() must include(Messages("error.required.atb.registered.office.uk.or.overseas"))
-      }
+      val elementsWithError = List(
+        document.getElementsByClass("govuk-error-summary__list").first(),
+        document.getElementById("isUK-error")
+      )
+      elementsWithError.size must be(2)
+      elementsWithError.foreach(_.text() must include(messages("error.required.atb.registered.office.uk.or.overseas")))
     }
 
     "respond with BAD_REQUEST" when {
@@ -168,16 +169,14 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
         when(controller.dataCacheConnector.fetch(any(), any())(any(), any())).thenReturn(Future.successful(None))
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.RegisteredOfficeIsUKController.post().url).withFormUrlEncodedBody(
           "isUK" -> "*"
         )
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("err.summary"))
+        contentAsString(result) must include(messages("err.summary"))
 
       }
-
     }
-
   }
 }

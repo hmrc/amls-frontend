@@ -176,6 +176,7 @@ object BusinessActivities extends Logging {
       messageKey,
       controllers.businessactivities.routes.WhatYouNeedController.get.url,
       hasChanged = false,
+      NotStarted,
       TaskRow.notStartedTag
     )
     val bmBusinessActivities = ControllerHelper.getBusinessActivity(cache.getEntry[BusinessMatching](BusinessMatching.key))
@@ -186,6 +187,7 @@ object BusinessActivities extends Logging {
             messageKey,
             controllers.businessactivities.routes.SummaryController.get.url,
             model.hasChanged,
+            Completed,
             TaskRow.completedTag
           )
         } else {
@@ -193,6 +195,7 @@ object BusinessActivities extends Logging {
             messageKey,
             controllers.businessactivities.routes.WhatYouNeedController.get.url,
             model.hasChanged,
+            Started,
             TaskRow.incompleteTag
           )
         }

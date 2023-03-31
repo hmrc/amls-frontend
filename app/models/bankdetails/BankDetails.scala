@@ -102,6 +102,7 @@ object BankDetails {
       messageKey,
       controllers.bankdetails.routes.WhatYouNeedController.get.url,
       hasChanged = false,
+      NotStarted,
       TaskRow.notStartedTag
     )
 
@@ -111,6 +112,7 @@ object BankDetails {
           messageKey,
           controllers.bankdetails.routes.YourBankAccountsController.get().url,
           hasChanged = false,
+          Completed,
           TaskRow.completedTag
         )
       case bds @ model if model forall {
@@ -120,6 +122,7 @@ object BankDetails {
           messageKey,
           controllers.bankdetails.routes.YourBankAccountsController.get().url,
           anyChanged(bds),
+          Completed,
           TaskRow.completedTag
         )
       case bds @ _ =>
@@ -127,6 +130,7 @@ object BankDetails {
           messageKey,
           controllers.businessdetails.routes.WhatYouNeedController.get.url,
           anyChanged(bds),
+          Started,
           TaskRow.incompleteTag
         )
     }

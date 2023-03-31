@@ -14,49 +14,53 @@
  * limitations under the License.
  *@
 
-@import forms.Form2
-@import include.{main, heading, registered_office_helper}
-@import include.forms2._
+@import config.ApplicationConfig
+@import include.registered_office_helper
 @import models.businessdetails._
-@import config.{ ApplicationConfig}
-@import play.api.i18n.Messages
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
+@import views.html.components.{SectionSubtitle, Button, Heading, ReturnLink}
+@import views.html.components.forms.{InputYesNo, ErrorSummary}
 
-@this(main: include.main)
 
-@(f: Form2[_], model: RegisteredOffice, edit: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
-@header = {
-    @components.back_link()
-    @errorSummary(f)
-}
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    errorSummary: ErrorSummary,
+    heading: Heading,
+    subtitle: SectionSubtitle,
+    inputYesNo: InputYesNo,
+    button: Button,
+    returnLink: ReturnLink
+)
 
-@main(
-    title = Messages("businessdetails.confirmingyouraddress.title") + " - " + Messages("summary.businessdetails"),
-    heading = header
+@(form: Form[_], model: RegisteredOffice, edit: Boolean = false)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@layout(
+    pageTitle = messages("businessdetails.confirmingyouraddress.title") + " - " + messages("summary.businessdetails"),
 ) {
 
-    @form(f, controllers.businessdetails.routes.ConfirmRegisteredOfficeController.post(edit)) {
+    @errorSummary(form)
 
-        @fieldsetWithErrorGroup(
-            f = f("isRegOfficeOrMainPlaceOfBusiness"),
-            heading = "businessdetails.confirmingyouraddress.title",
-            section = "summary.businessdetails",
-            supportingContent = registered_office_helper(model),
-            panel = false,
-            classes = Seq("inline")
-        ) {
-            @radio(
-                f = f("isRegOfficeOrMainPlaceOfBusiness"),
-                labelText = "lbl.yes",
-                value = "true"
-            )
-            @radio(
-                f = f("isRegOfficeOrMainPlaceOfBusiness"),
-                labelText = "lbl.no",
-                value = "false"
-            )
-        }
+    @subtitle("summary.businessdetails")
 
-        @submit(edit)
+    @heading("businessdetails.confirmingyouraddress.title")
+
+    @registered_office_helper(model)
+
+    @formHelper(action = controllers.businessdetails.routes.ConfirmRegisteredOfficeController.post(edit)) {
+
+        @inputYesNo(
+            Radios(
+                items = HmrcYesNoRadioItems(),
+                classes = "govuk-radios govuk-radios--inline"
+            ).withFormField(form("isRegOfficeOrMainPlaceOfBusiness"))
+        )
+
+        @button()
+
+        @returnLink(true)
+
     }
 }

@@ -18,6 +18,7 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessdetails.PreviouslyRegisteredFormProvider
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails._
@@ -28,23 +29,25 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessdetails.previously_registered
+import views.html.businessdetails.PreviouslyRegisteredView
 
 import scala.concurrent.Future
 
 class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[previously_registered]
+    lazy val view = app.injector.instanceOf[PreviouslyRegisteredView]
     val controller = new PreviouslyRegisteredController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
+      formProvider = app.injector.instanceOf[PreviouslyRegisteredFormProvider],
       previously_registered = view)
   }
 
@@ -74,8 +77,8 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
     "on post with valid data and businesstype is corporate" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "previouslyRegistered" -> "true",
+      val newRequest = FakeRequest(POST, routes.PreviouslyRegisteredController.post().url).withFormUrlEncodedBody(
+        "value" -> "true",
         "prevMLRRegNo" -> "12345678"
       )
 
@@ -100,8 +103,8 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
     "on post with valid data and load confirm address page when businessType is SoleProprietor" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "previouslyRegistered" -> "false",
+      val newRequest = FakeRequest(POST, routes.PreviouslyRegisteredController.post().url).withFormUrlEncodedBody(
+        "value" -> "false",
         "prevMLRRegNo" -> "12345678"
       )
       val reviewDtls = ReviewDetails("BusinessName", None,
@@ -124,9 +127,8 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
     "on post with valid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "previouslyRegistered" -> "true",
-        "prevMLRRegNo" -> "12345678"
+      val newRequest = FakeRequest(POST, routes.PreviouslyRegisteredController.post().url).withFormUrlEncodedBody(
+        "value" -> "false"
       )
       val reviewDtls = ReviewDetails("BusinessName", None,
         Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"),Country("United Kingdom", "GB")), "ghghg")
@@ -148,8 +150,8 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
     "on post with valid data in edit mode and load summary page" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "previouslyRegistered" -> "true",
+      val newRequest = FakeRequest(POST, routes.PreviouslyRegisteredController.post().url).withFormUrlEncodedBody(
+        "value" -> "true",
         "prevMLRRegNo" -> "12345678"
       )
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
@@ -174,7 +176,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.PreviouslyRegisteredController.post().url).withFormUrlEncodedBody(
         "prevMLRRegNo" -> "12345678"
       )
 

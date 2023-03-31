@@ -107,7 +107,7 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
           )
         ) must be(Valid(SendTheLargestAmountsOfMoney(Seq(
           Country("United Kingdom", "GB"),
-          Country("Macedonia, the Former Yugoslav Republic of", "MK"),
+          Country("North Macedonia", "MK"),
           Country("Jordan", "JO")
         ))))
       }

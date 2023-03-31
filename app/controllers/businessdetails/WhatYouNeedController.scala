@@ -18,9 +18,9 @@ package controllers.businessdetails
 
 import com.google.inject.Inject
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import views.html.businessdetails._
+import views.html.businessdetails.WhatYouNeedView
 
 import scala.concurrent.Future
 
@@ -28,9 +28,9 @@ class WhatYouNeedController @Inject () (
                                          val authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
                                          val cc: MessagesControllerComponents,
-                                         what_you_need: what_you_need) extends AmlsBaseController(ds, cc) {
+                                         what_you_need: WhatYouNeedView) extends AmlsBaseController(ds, cc) {
 
-  def get = authAction.async {
+  def get: Action[AnyContent] = authAction.async {
     implicit request =>
       Future.successful(Ok(what_you_need()))
   }

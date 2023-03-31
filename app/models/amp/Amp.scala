@@ -100,6 +100,7 @@ object Amp {
       key,
       generateRedirect(appConfig.ampWhatYouNeedUrl).url,
       hasChanged = false,
+      NotStarted,
       TaskRow.notStartedTag
     )
     cache.getEntry[Amp](key).fold(notStarted) {
@@ -109,6 +110,7 @@ object Amp {
             key,
             generateRedirect(appConfig.ampSummaryUrl).url,
             model.hasChanged,
+            Completed,
             TaskRow.completedTag
           )
         } else {
@@ -116,6 +118,7 @@ object Amp {
             key,
             generateRedirect(appConfig.ampWhatYouNeedUrl).url,
             model.hasChanged,
+            Started,
             TaskRow.incompleteTag
           )
         }

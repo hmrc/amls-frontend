@@ -143,6 +143,7 @@ object Eab {
       messageKey,
       generateRedirect(appConfig.eabWhatYouNeedUrl).url,
       hasChanged = false,
+      NotStarted,
       TaskRow.notStartedTag
     )
     cache.getEntry[Eab](key).fold(notStarted) {
@@ -152,6 +153,7 @@ object Eab {
             messageKey,
             generateRedirect(appConfig.eabSummaryUrl).url,
             model.hasChanged,
+            Completed,
             TaskRow.completedTag
           )
         } else {
@@ -159,6 +161,7 @@ object Eab {
             messageKey,
             generateRedirect(appConfig.eabWhatYouNeedUrl).url,
             model.hasChanged,
+            Started,
             TaskRow.incompleteTag
           )
         }

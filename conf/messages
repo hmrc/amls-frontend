@@ -18,13 +18,10 @@ err.text.role.in.business.text.validation = Role in the business must only inclu
 
 error.browser.title.prefix = Error:
 
-error.required.date.day = Date your business started or will start activities must include a day
-error.required.date.month = Date your business started or will start activities must include a month
-error.required.date.year = Date your business started or will start activities must include a year
-error.required.date.month.day = Date your business started or will start activities must include a day and month
+error.required.date.required.one = Date your business started or will start activities must include a {0}
+error.required.date.required.two = Date your business started or will start activities must include a {0} and {1}
+error.required.date.required.all = Enter the date your business did or will start activities that need to be registered
 error.required.date.year.month = Date your business started or will start activities must include a month and year
-error.required.date.year.month.day = Enter the date your business did or will start activities that need to be registered
-error.required.date.year.day = Date your business started or will start activities must include a day and year
 
 error.invalid.date.after.1700 = The date your business started or will start activities must be on or after 1700
 error.invalid.date.tp.after.1700 = The date your business started or will start trading must be on or after 1700
@@ -743,7 +740,7 @@ lbl.na = Not applicable
 lbl.day = Day
 lbl.month = Month
 lbl.year = Year
-lbl.date.example = For example, 31 03 2017.
+lbl.date.example = For example, 31 03 2017
 lbl.nationality = Country of nationality
 lbl.nationality.hint = If your nationality is British, select ‘United Kingdom’
 lbl.nino = National Insurance number

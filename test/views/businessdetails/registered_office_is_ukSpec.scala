@@ -16,66 +16,65 @@
 
 package views.businessdetails
 
+import forms.businessdetails.RegisteredOfficeIsUKFormProvider
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessdetails.{RegisteredOffice, RegisteredOfficeUK}
+import models.businessdetails.{RegisteredOffice, RegisteredOfficeIsUK, RegisteredOfficeUK}
 import org.scalatest.MustMatchers
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import jto.validation.Path
 import jto.validation.ValidationError
+import org.jsoup.Jsoup
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import views.Fixture
 import views.html.businessdetails.registered_office_is_uk
 
 
 class registered_office_is_ukSpec extends AmlsViewSpec with MustMatchers  {
 
+  lazy val registered_office_is_uk = app.injector.instanceOf[registered_office_is_uk]
+  lazy val formProvider = app.injector.instanceOf[RegisteredOfficeIsUKFormProvider]
+
+  implicit val request = FakeRequest()
   trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
-    lazy val registered_office_is_uk = app.injector.instanceOf[registered_office_is_uk]
     implicit val requestWithToken = addTokenForView()
   }
 
   "registered_office view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
+      val formWithData = formProvider().fill(RegisteredOfficeIsUK(true))
 
-      def view = registered_office_is_uk(form2, true)
+      def view = registered_office_is_uk(formWithData, true)
 
-      doc.title must startWith(Messages("businessdetails.registeredoffice.title") + " - " + Messages("summary.businessdetails"))
+      doc.title must startWith(messages("businessdetails.registeredoffice.title") + " - " + messages("summary.businessdetails"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
+      val formWithData = formProvider().fill(RegisteredOfficeIsUK(true))
 
-      def view = registered_office_is_uk(form2, true)
+      def view = registered_office_is_uk(formWithData, true)
 
-      heading.html must be(Messages("businessdetails.registeredoffice.title"))
-      subHeading.html must include(Messages("summary.businessdetails"))
-
+      heading.html must be(messages("businessdetails.registeredoffice.title"))
+      subHeading.html must include(messages("summary.businessdetails"))
     }
 
     "show errors in the correct locations" in new ViewFixture {
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "isUK") -> Seq(ValidationError("not a message Key"))
-        ))
+      val errorKey = "error.required.atb.registered.office.uk.or.overseas"
 
-      def view = registered_office_is_uk(form2, true)
+      val invalidForm = formProvider().bind(
+        Map("isUK" -> errorKey)
+      )
 
-      errorSummary.html() must include("not a message Key")
+      def view = registered_office_is_uk(invalidForm, true)
 
-      doc.getElementById("isUK")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+      doc.getElementsByClass("govuk-error-summary__list").text() must include(messages(errorKey))
+
+      doc.getElementById("isUK-error").text() must include(messages(errorKey))
     }
 
-    "have a back link" in new ViewFixture {
-      val form2: Form2[_] = EmptyForm
-
-      def view = registered_office_is_uk(form2, true)
-
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
-    }
+    behave like pageWithBackLink(registered_office_is_uk(formProvider(), true))
   }
 }

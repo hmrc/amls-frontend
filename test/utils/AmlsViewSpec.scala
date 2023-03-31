@@ -20,6 +20,8 @@ import akka.stream.Materializer
 import config.ApplicationConfig
 import connectors.KeystoreConnector
 import controllers.CommonPlayDependencies
+import org.jsoup.Jsoup
+import org.jsoup.nodes.{Document, Element}
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatestplus.mockito.MockitoSugar
@@ -31,6 +33,7 @@ import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.{Application, Mode}
+import play.twirl.api.Html
 import uk.gov.hmrc.http.HeaderCarrier
 
 trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with MustMatchers with AuthorisedFixture {
@@ -62,4 +65,15 @@ trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar w
   }
 
   when(appConfig.logoutUrl).thenReturn("some url")
+
+
+  // Assertion helper methods
+  def pageWithBackLink(html: Html): Unit = {
+
+    "have a back link" in {
+      def doc: Document = Jsoup.parse(html.body)
+      assert(doc.getElementById("back-link").isInstanceOf[Element])
+    }
+  }
+
 }

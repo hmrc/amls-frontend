@@ -65,6 +65,7 @@ object Asp {
       messageKey,
       controllers.asp.routes.WhatYouNeedController.get.url,
       hasChanged = false,
+      NotStarted,
       TaskRow.notStartedTag
     )
     cache.getEntry[Asp](key).fold(notStarted) {
@@ -74,6 +75,7 @@ object Asp {
             messageKey,
             controllers.asp.routes.SummaryController.get.url,
             model.hasChanged,
+            Completed,
             TaskRow.completedTag
           )
         } else {
@@ -81,6 +83,7 @@ object Asp {
             messageKey,
             controllers.asp.routes.WhatYouNeedController.get.url,
             model.hasChanged,
+            Started,
             TaskRow.incompleteTag
           )
         }

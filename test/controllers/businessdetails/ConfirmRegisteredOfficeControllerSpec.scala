@@ -18,6 +18,7 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessdetails.ConfirmRegisteredOfficeFormProvider
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails._
@@ -26,6 +27,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -44,6 +46,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
+      formProvider = app.injector.instanceOf[ConfirmRegisteredOfficeFormProvider],
       confirm_registered_office_or_main_place = view)
   }
 
@@ -100,7 +103,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
     "Post" must {
       "successfully redirect to the page on selection of 'Yes' [this is registered address] for UK address" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.ConfirmRegisteredOfficeController.post().url).withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
 
@@ -123,7 +126,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "successfully redirect to the page on selection of 'Yes' [this is registered address] for non-UK address" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.ConfirmRegisteredOfficeController.post().url).withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
 
@@ -147,7 +150,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to the page on selection of Option 'No' [this is not registered address]" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.ConfirmRegisteredOfficeController.post().url).withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "false"
         )
 
@@ -173,7 +176,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to the page on selection of Option 'Yes' [this is registered address] and review details is None" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.ConfirmRegisteredOfficeController.post().url).withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
 
@@ -200,7 +203,8 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "on post invalid data" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.ConfirmRegisteredOfficeController.post().url).withFormUrlEncodedBody(
+          "isRegOfficeOrMainPlaceOfBusiness" -> "foo"
         )
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(),any()))
           .thenReturn(Future.successful(Some(bm)))
@@ -211,7 +215,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "on post with invalid data show error" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.ConfirmRegisteredOfficeController.post().url).withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> ""
         )
         when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(),any()))

@@ -27,7 +27,7 @@ import views.Fixture
 import views.html.tradingpremises.activity_start_date
 
 
-class activit_start_dateSpec extends AmlsViewSpec with MustMatchers {
+class activity_start_dateSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     lazy val activity_start_date = app.injector.instanceOf[activity_start_date]
@@ -48,7 +48,7 @@ class activit_start_dateSpec extends AmlsViewSpec with MustMatchers {
         activity_start_date(form2, 1, false, address)
       }
 
-      val expectedAddressInHtml = "<p> line 1<br> Line 2<br> postcode<br> </p>"
+      val expectedAddressInHtml = """<p class="govuk-body"> line 1<br> Line 2<br> postcode<br> </p>"""
 
       doc.html must include(expectedAddressInHtml)
       doc.title must be(pageTitle)

@@ -19,65 +19,67 @@ package controllers.businessdetails
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.businessdetails.ActivityStartDateFormProvider
 import models.businessdetails._
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership, UnincorporatedBody}
 import models.businessmatching.{BusinessMatching, BusinessType}
-import play.api.mvc.{MessagesControllerComponents, Result}
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import utils.{AuthAction, ControllerHelper}
-import views.html.businessdetails.activity_start_date
+import views.html.businessdetails.ActivityStartDateView
 
 import scala.concurrent.Future
 
-class ActivityStartDateController @Inject () (val dataCache: DataCacheConnector,
-                                              val authAction: AuthAction,
-                                              val ds: CommonPlayDependencies,
-                                              val cc: MessagesControllerComponents,
-                                              activity_start_date: activity_start_date,
-                                              implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+class ActivityStartDateController @Inject ()(val dataCache: DataCacheConnector,
+                                             val authAction: AuthAction,
+                                             val ds: CommonPlayDependencies,
+                                             val cc: MessagesControllerComponents,
+                                             formProvider: ActivityStartDateFormProvider,
+                                             activity_start_date: ActivityStartDateView,
+                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response =>
-          val form: Form2[ActivityStartDate] = (for {
+          val form: Form[ActivityStartDate] = (for {
             businessDetails <- response
             activityStartDate <- businessDetails.activityStartDate
-          } yield Form2[ActivityStartDate](activityStartDate)).getOrElse(EmptyForm)
+          } yield formProvider().fill(activityStartDate)).getOrElse(formProvider())
           Ok(activity_start_date(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[ActivityStartDate](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(activity_start_date(f, edit)))
-        case ValidForm(_, data) => {
-            dataCache.fetchAll(request.credId) flatMap  { maybeCache =>
-              val businessMatching = for {
-                cacheMap <- maybeCache
-                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-              } yield bm
 
-              val businessType = for {
-                bt <- ControllerHelper.getBusinessType(businessMatching)
-              } yield bt
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(activity_start_date(formWithErrors, edit))),
+        data => {
+          dataCache.fetchAll(request.credId) flatMap { maybeCache =>
+            val businessMatching = for {
+              cacheMap <- maybeCache
+              bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+            } yield bm
 
-              val businessDetails = for {
-                cacheMap <- maybeCache
-                atb <- cacheMap.getEntry[BusinessDetails](BusinessDetails.key)
-              } yield atb
+            val businessType = for {
+              bt <- ControllerHelper.getBusinessType(businessMatching)
+            } yield bt
 
-              for {
-                _ <- dataCache.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.activityStartDate(data))
-              } yield  getRouting(businessType, edit)
+            val businessDetails = for {
+              cacheMap <- maybeCache
+              atb <- cacheMap.getEntry[BusinessDetails](BusinessDetails.key)
+            } yield atb
 
-            }
-          } recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+            for {
+              _ <- dataCache.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.activityStartDate(data))
+            } yield getRouting(businessType, edit)
+
           }
-      }
+        } recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+        }
+      )
   }
 
   private def getRouting(businessType: Option[BusinessType], edit: Boolean): Result = {

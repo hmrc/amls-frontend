@@ -83,6 +83,7 @@ object Supervision {
       key,
       controllers.supervision.routes.WhatYouNeedController.get.url,
       hasChanged = false,
+      NotStarted,
       TaskRow.notStartedTag
     )
 
@@ -91,6 +92,7 @@ object Supervision {
         key,
         controllers.supervision.routes.SummaryController.get.url,
         model.hasChanged,
+        Completed,
         TaskRow.completedTag
       )
       case m if m.isEmpty => notStarted
@@ -98,6 +100,7 @@ object Supervision {
         key,
         controllers.supervision.routes.WhatYouNeedController.get.url,
         model.hasChanged,
+        Started,
         TaskRow.incompleteTag
       )
     }

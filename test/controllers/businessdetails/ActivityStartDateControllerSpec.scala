@@ -18,6 +18,7 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessdetails.ActivityStartDateFormProvider
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails._
@@ -28,11 +29,12 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessdetails.activity_start_date
+import views.html.businessdetails.ActivityStartDateView
 
 import scala.concurrent.Future
 
@@ -41,14 +43,16 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
-    lazy val view = app.injector.instanceOf[activity_start_date]
+    lazy val view = app.injector.instanceOf[ActivityStartDateView]
     val controller = new ActivityStartDateController (
       dataCache = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
       activity_start_date = view,
-      errorView)
+      formProvider = app.injector.instanceOf[ActivityStartDateFormProvider],
+      error = errorView
+    )
   }
 
   // scalastyle:off
@@ -76,8 +80,8 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
           .thenReturn(Future.successful(Some(businessDetails)))
         val result = controller.get()(request)
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[name=startDate.day]").`val` must include("22")
-        document.select("input[name=startDate.month]").`val` must include("2")
+        document.select("input[name=value.day]").`val` must include("22")
+        document.select("input[name=value.month]").`val` must include("2")
 
       }
     }
@@ -86,10 +90,10 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to ConfirmRegisteredOfficeController if not org or partnership" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "startDate.day" -> "12",
-          "startDate.month" -> "5",
-          "startDate.year" -> "1999"
+        val newRequest = FakeRequest(POST, routes.ActivityStartDateController.post().url).withFormUrlEncodedBody(
+          "value.day" -> "12",
+          "value.month" -> "5",
+          "value.year" -> "1999"
         )
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
@@ -113,10 +117,10 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to VATRegisteredController org or partnership" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "startDate.day" -> "12",
-          "startDate.month" -> "5",
-          "startDate.year" -> "1999"
+        val newRequest = FakeRequest(POST, routes.ActivityStartDateController.post().url).withFormUrlEncodedBody(
+          "value.day" -> "12",
+          "value.month" -> "5",
+          "value.year" -> "1999"
         )
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
@@ -139,47 +143,80 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.VATRegisteredController.get().url))
       }
 
-      "show error with invalid" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
-          "startDate.day" -> "",
-          "startDate.month" -> "",
-          "startDate.year" -> ""
+      "show error with empty form" in new Fixture {
+
+        val newRequest = FakeRequest(POST, routes.ActivityStartDateController.post().url).withFormUrlEncodedBody(
+          "value.day" -> "",
+          "value.month" -> "",
+          "value.year" -> ""
         )
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.required.date.year.month.day"))
+        contentAsString(result) must include(messages("error.required.date.required.all"))
+
+      }
+
+      "show error with one empty field" in new Fixture {
+
+        val newRequest = FakeRequest(POST, routes.ActivityStartDateController.post().url).withFormUrlEncodedBody(
+          "value.day" -> "",
+          "value.month" -> "12",
+          "value.year" -> "1990"
+        )
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(businessDetails)))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
+        contentAsString(result) must include(messages("error.required.date.required.one", "day"))
+
+      }
+
+      "show error with two empty fields" in new Fixture {
+
+        val newRequest = FakeRequest(POST, routes.ActivityStartDateController.post().url).withFormUrlEncodedBody(
+          "value.day" -> "",
+          "value.month" -> "11",
+          "value.year" -> ""
+        )
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some(businessDetails)))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
+        contentAsString(result) must include(messages("error.required.date.required.two", "day", "year"))
 
       }
 
       "show error with year field too short" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
-          "startDate.day" -> "1",
-          "startDate.month" -> "3",
-          "startDate.year" -> "16"
+        val newRequest = FakeRequest(POST, routes.ActivityStartDateController.post().url).withFormUrlEncodedBody(
+          "value.day" -> "1",
+          "value.month" -> "3",
+          "value.year" -> "16"
         )
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.invalid.date.after.1900"))
+        contentAsString(result) must include(messages("error.invalid.date.after.1900"))
       }
 
       "show error with year field too long" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
-          "startDate.day" -> "1",
-          "startDate.month" -> "3",
-          "startDate.year" -> "19782"
+        val newRequest = FakeRequest(POST, routes.ActivityStartDateController.post().url).withFormUrlEncodedBody(
+          "value.day" -> "1",
+          "value.month" -> "3",
+          "value.year" -> "19782"
         )
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.invalid.date.before.2100"))
+        contentAsString(result) must include(messages("error.invalid.date.before.2100"))
       }
     }
   }

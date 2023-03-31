@@ -109,7 +109,7 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
       rule.validate(form) mustBe Valid(CustomersOutsideUK(Some(Seq(
         Country("United Kingdom", "GB"),
-        Country("United States of America", "US")
+        Country("United States", "US")
       ))))
     }
 

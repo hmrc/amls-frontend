@@ -16,10 +16,12 @@
 
 package generators
 
-import org.joda.time.LocalDate
+import org.joda.time.{LocalDate => JodaLocalDate}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Gen.listOfN
+import org.scalacheck.Gen.{alphaNumChar, alphaStr, listOfN, numChar}
+
+import java.time.{LocalDate, ZoneId}
 
 //noinspection ScalaStyle
 trait BaseGenerator {
@@ -28,18 +30,18 @@ trait BaseGenerator {
     Gen.listOfN(maxLength, Gen.alphaNumChar).map(x => x.mkString)
   }
 
-//  def alphaNumOfLengthGen(maxLength: Int): Gen[String] = {
-//    Gen.listOfN(maxLength, Gen.alphaNumChar).map(x => x.mkString)
-//  }
-
   def stringsLongerThan(minLength: Int): Gen[String] = for {
     length    <- Gen.chooseNum(minLength + 1, (minLength * 2).max(100))
-    chars     <- listOfN(length, arbitrary[Char])
+    chars     <- listOfN(length, alphaNumChar)
   } yield chars.mkString
 
   def stringsShorterThan(minLength: Int): Gen[String] = for {
     length    <- Gen.chooseNum(0, minLength - 1)
-    chars     <- listOfN(length, arbitrary[Char])
+    chars     <- listOfN(length, alphaNumChar)
+  } yield chars.mkString
+
+  def numStringOfLength(length: Int): Gen[String] = for {
+    chars <- listOfN(length, numChar)
   } yield chars.mkString
 
   def numSequence(maxLength: Int) =
@@ -59,7 +61,13 @@ trait BaseGenerator {
     day <- Gen.chooseNum(1, 27)
     month <- Gen.chooseNum(1, 12)
     year <- Gen.chooseNum(1990, 2016)
-  } yield new LocalDate(year, month, day)
+  } yield LocalDate.of(year, month, day)
+
+  val jodaLocalDateGen: Gen[JodaLocalDate] = for {
+    day <- Gen.chooseNum(1, 27)
+    month <- Gen.chooseNum(1, 12)
+    year <- Gen.chooseNum(1990, 2016)
+  } yield new JodaLocalDate(year, month, day)
 
   def safeIdGen = for {
     ref <- stringOfLengthGen(9)
@@ -82,4 +90,14 @@ trait BaseGenerator {
       .suchThat (_.nonEmpty)
       .suchThat (_ != "true")
       .suchThat (_ != "false")
+
+  def jodaDatesBetween(min: JodaLocalDate, max: JodaLocalDate): Gen[JodaLocalDate] = {
+
+    def toMillis(date: JodaLocalDate): Long =
+      date.toDateTimeAtStartOfDay.toInstant.getMillis
+
+    Gen.choose(toMillis(min), toMillis(max)).map {
+      millis => new JodaLocalDate(millis)
+    }
+  }
 }

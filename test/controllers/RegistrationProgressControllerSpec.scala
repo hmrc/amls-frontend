@@ -146,8 +146,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           when(mockSectionsProvider.taskRows(any())(any()))
             .thenReturn(Seq(
-              TaskRow("TESTSECTION1", "/foo", false, TaskRow.completedTag),
-              TaskRow("TESTSECTION2", "/bar", true, TaskRow.completedTag)
+              TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
+              TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
             ))
 
           mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
@@ -206,8 +206,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               when(mockSectionsProvider.taskRows(any())(any()))
                 .thenReturn(Seq(
-                  TaskRow("TESTSECTION1", "/foo", false, TaskRow.completedTag),
-                  TaskRow("TESTSECTION2", "/bar", true, TaskRow.completedTag)
+                  TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
+                  TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
                 ))
 
               mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
@@ -236,8 +236,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               when(mockSectionsProvider.taskRows(any())(any()))
                 .thenReturn(Seq(
-                  TaskRow("TESTSECTION1", "/foo", false, TaskRow.completedTag),
-                  TaskRow("TESTSECTION2", "/bar", true, TaskRow.completedTag)
+                  TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
+                  TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
                 ))
 
               val responseF = controller.get()(request)
@@ -266,8 +266,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               when(mockSectionsProvider.taskRows(any())(any()))
                 .thenReturn(Seq(
-                  TaskRow("TESTSECTION1", "/foo", false, TaskRow.completedTag),
-                  TaskRow("TESTSECTION2", "/bar", false, TaskRow.completedTag)
+                  TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
+                  TaskRow("TESTSECTION2", "/bar", false, Completed, TaskRow.completedTag)
                 ))
 
               mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
@@ -296,8 +296,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               when(mockSectionsProvider.taskRows(any())(any()))
                 .thenReturn(Seq(
-                  TaskRow("TESTSECTION1", "/foo", false, TaskRow.completedTag),
-                  TaskRow("TESTSECTION2", "/bar", false, TaskRow.completedTag)
+                  TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
+                  TaskRow("TESTSECTION2", "/bar", false, Completed, TaskRow.completedTag)
                 ))
 
               val responseF = controller.get()(request)
@@ -328,8 +328,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               when(mockSectionsProvider.taskRows(any())(any()))
                 .thenReturn(Seq(
-                  TaskRow("TESTSECTION1", "/foo", false, TaskRow.notStartedTag),
-                  TaskRow("TESTSECTION2", "/bar", true, TaskRow.completedTag)
+                  TaskRow("TESTSECTION1", "/foo", false, NotStarted, TaskRow.notStartedTag),
+                  TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
                 ))
 
               mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
@@ -357,8 +357,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               when(mockSectionsProvider.taskRows(any())(any()))
                 .thenReturn(Seq(
-                  TaskRow("TESTSECTION1", "/foo", false, TaskRow.notStartedTag),
-                  TaskRow("TESTSECTION2", "/bar", true, TaskRow.completedTag)
+                  TaskRow("TESTSECTION1", "/foo", false, NotStarted, TaskRow.notStartedTag),
+                  TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
                 ))
 
               val responseF = controller.get()(request)
@@ -386,8 +386,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
             when(mockSectionsProvider.taskRows(any())(any()))
               .thenReturn(Seq(
-                TaskRow("TESTSECTION1", "/foo", false, TaskRow.notStartedTag),
-                TaskRow("TESTSECTION2", "/bar", false, TaskRow.completedTag)
+                TaskRow("TESTSECTION1", "/foo", false, NotStarted, TaskRow.notStartedTag),
+                TaskRow("TESTSECTION2", "/bar", false, Completed, TaskRow.completedTag)
               ))
 
             mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
@@ -419,8 +419,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             when(mockSectionsProvider.taskRows(any())(any()))
               .thenReturn(
                 Seq(
-                  TaskRow(BusinessMatching.messageKey, "/foo", false, TaskRow.completedTag),
-                  TaskRow("TESTSECTION2", "/bar", false, TaskRow.completedTag)
+                  TaskRow(BusinessMatching.messageKey, "/foo", false, Completed, TaskRow.completedTag),
+                  TaskRow("TESTSECTION2", "/bar", false, Completed, TaskRow.completedTag)
                 )
               )
 
@@ -457,8 +457,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           when(mockSectionsProvider.taskRows(any())(any()))
             .thenReturn(Seq(
-              TaskRow(BusinessMatching.messageKey, "/foo", false, TaskRow.completedTag),
-              TaskRow("TESTSECTION2", "/bar", false, TaskRow.completedTag)
+              TaskRow(BusinessMatching.messageKey, "/foo", false, Completed, TaskRow.completedTag),
+              TaskRow("TESTSECTION2", "/bar", false, Completed, TaskRow.completedTag)
             ))
 
           val responseF = controller.get()(request)
@@ -518,7 +518,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get)
           when(controller.sectionsProvider.sections(mockCacheMap)) thenReturn Seq(completeSection)
 
-          val completeTaskRow = TaskRow(BusinessMatching.messageKey, controllers.routes.LandingController.get.url, true, TaskRow.incompleteTag)
+          val completeTaskRow = TaskRow(BusinessMatching.messageKey, controllers.routes.LandingController.get.url, true, Started, TaskRow.incompleteTag)
           when(mockSectionsProvider.taskRows(any())(any())) thenReturn Seq(completeTaskRow)
 
           val result = controller.get()(request)

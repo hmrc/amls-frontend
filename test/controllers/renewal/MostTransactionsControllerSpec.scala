@@ -124,7 +124,11 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       val model = Renewal(
         mostTransactions = Some(
           MostTransactions(
-            models.countries.take(3)
+            Seq(
+              Country("United Kingdom", "GB"),
+              Country("American Samoa", "AS"),
+              Country("Algeria", "DZ")
+            )
           )
         )
       )

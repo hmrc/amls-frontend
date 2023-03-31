@@ -16,9 +16,9 @@
 
 @import models.businessdetails._
 
-@(model: RegisteredOffice)(implicit m:Messages, lang: Lang)
+@(model: RegisteredOffice)
 
-      <p>@model.toLines.map { line =>
-          @line<br />
+      <p class="govuk-body">@model.toLines.map { line =>
+          @line<br/>
       }</p>
 

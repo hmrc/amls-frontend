@@ -20,12 +20,8 @@ import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, UnincorporatedBody}
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.registrationprogress._
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.Aliases.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Content
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class BusinessMatching(
@@ -191,6 +187,7 @@ object BusinessMatching {
       messageKey,
       controllers.businessmatching.routes.RegisterServicesController.get().url,
       hasChanged = false,
+      NotStarted,
       TaskRow.notStartedTag
     )
     cache.getEntry[BusinessMatching](key).fold(incomplete) {
@@ -200,6 +197,7 @@ object BusinessMatching {
             messageKey,
             controllers.businessmatching.routes.SummaryController.get.url,
             model.hasChanged,
+            Completed,
             TaskRow.completedTag
           )
         } else {
@@ -207,6 +205,7 @@ object BusinessMatching {
             messageKey,
             controllers.businessmatching.routes.SummaryController.get.url,
             model.hasChanged,
+            Started,
             TaskRow.incompleteTag
           )
         }

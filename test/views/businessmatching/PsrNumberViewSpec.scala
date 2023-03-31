@@ -48,7 +48,7 @@ class PsrNumberViewSpec extends AmlsViewSpec {
 
         }
 
-        "have correct title for non-pre-submisson mode" in new ViewFixture {
+        "have correct title for non-pre-submission mode" in new ViewFixture {
 
             val filledForm = formProvider().fill(BusinessAppliedForPSRNumberYes("1234"))
 

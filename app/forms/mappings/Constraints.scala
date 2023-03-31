@@ -16,6 +16,7 @@
 
 package forms.mappings
 
+import org.joda.time.{LocalDate => JodaLocalDate}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 
 import java.time.LocalDate
@@ -120,12 +121,20 @@ trait Constraints {
         Valid
     }
 
-  protected def nonEmptySet(errorKey: String): Constraint[Set[_]] =
+  protected def jodaMaxDate(maximum: JodaLocalDate, errorKey: String, args: Any*): Constraint[JodaLocalDate] =
     Constraint {
-      case set if set.nonEmpty =>
-        Valid
+      case date if date.isAfter(maximum) =>
+        Invalid(errorKey, args: _*)
       case _ =>
-        Invalid(errorKey)
+        Valid
+    }
+
+  protected def jodaMinDate(minimum: JodaLocalDate, errorKey: String, args: Any*): Constraint[JodaLocalDate] =
+    Constraint {
+      case date if date.isBefore(minimum) =>
+        Invalid(errorKey, args: _*)
+      case _ =>
+        Valid
     }
 
   protected def nonEmptySeq(errorKey: String): Constraint[Seq[_]] =

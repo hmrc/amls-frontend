@@ -332,7 +332,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Brunei Darussalam"
+      "en-GB": "Brunei"
     }
   },
   "country:BO": {
@@ -348,7 +348,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Bolivia, Plurinational State of"
+      "en-GB": "Bolivia"
     }
   },
   "country:BR": {
@@ -380,7 +380,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Bahamas"
+      "en-GB": "The Bahamas"
     }
   },
   "country:BT": {
@@ -476,7 +476,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Congo, the Democratic Republic of the"
+      "en-GB": "Congo (Democratic Republic)"
     }
   },
   "country:CF": {
@@ -540,7 +540,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Côte d'Ivoire"
+      "en-GB": "Ivory Coast"
     }
   },
   "country:CL": {
@@ -623,6 +623,22 @@
       "en-GB": "Costa Rica"
     }
   },
+  "country:CS": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Czechoslovakia"
+    }
+  },
   "country:CU": {
     "edges": {
       "from": [
@@ -652,7 +668,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Cabo Verde"
+      "en-GB": "Cape Verde"
     }
   },
   "country:CY": {
@@ -685,6 +701,22 @@
     "names": {
       "cy": false,
       "en-GB": "Czechia"
+    }
+  },
+  "country:DD": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "East Germany"
     }
   },
   "country:DE": {
@@ -924,7 +956,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Micronesia, Federated States of"
+      "en-GB": "Micronesia"
     }
   },
   "country:FR": {
@@ -1036,7 +1068,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Gambia"
+      "en-GB": "The Gambia"
     }
   },
   "country:GN": {
@@ -1292,7 +1324,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Iran, Islamic Republic of"
+      "en-GB": "Iran"
     }
   },
   "country:IS": {
@@ -1468,7 +1500,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Saint Kitts and Nevis"
+      "en-GB": "St Kitts and Nevis"
     }
   },
   "country:KP": {
@@ -1484,7 +1516,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Korea, Democratic People's Republic of"
+      "en-GB": "North Korea"
     }
   },
   "country:KR": {
@@ -1500,7 +1532,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Korea, Republic of"
+      "en-GB": "South Korea"
     }
   },
   "country:KW": {
@@ -1548,7 +1580,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Lao People's Democratic Republic"
+      "en-GB": "Laos"
     }
   },
   "country:LB": {
@@ -1580,7 +1612,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Saint Lucia"
+      "en-GB": "St Lucia"
     }
   },
   "country:LI": {
@@ -1756,7 +1788,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Moldova, Republic of"
+      "en-GB": "Moldova"
     }
   },
   "country:ME": {
@@ -1820,7 +1852,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Macedonia, the Former Yugoslav Republic of"
+      "en-GB": "North Macedonia"
     }
   },
   "country:ML": {
@@ -1852,7 +1884,8 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Myanmar"}
+      "en-GB": "Myanmar (Burma)"
+    }
   },
   "country:MN": {
     "edges": {
@@ -2363,7 +2396,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Russian Federation"
+      "en-GB": "Russia"
     }
   },
   "country:RW": {
@@ -2622,6 +2655,22 @@
       "en-GB": "Sao Tome and Principe"
     }
   },
+  "country:SU": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "USSR"
+    }
+  },
   "country:SV": {
     "edges": {
       "from": [
@@ -2651,7 +2700,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Syrian Arab Republic"
+      "en-GB": "Syria"
     }
   },
   "country:SZ": {
@@ -2667,7 +2716,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Swaziland"
+      "en-GB": "Eswatini"
     }
   },
   "country:TD": {
@@ -2747,7 +2796,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Timor-Leste"
+      "en-GB": "East Timor"
     }
   },
   "country:TM": {
@@ -2859,7 +2908,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Tanzania, United Republic of"
+      "en-GB": "Tanzania"
     }
   },
   "country:UA": {
@@ -2907,7 +2956,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "United States of America"
+      "en-GB": "United States"
     }
   },
   "country:UY": {
@@ -2955,7 +3004,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Holy See"
+      "en-GB": "Vatican City"
     }
   },
   "country:VC": {
@@ -2971,7 +3020,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Saint Vincent and the Grenadines"
+      "en-GB": "St Vincent"
     }
   },
   "country:VE": {
@@ -2987,7 +3036,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Venezuela, Bolivarian Republic of"
+      "en-GB": "Venezuela"
     }
   },
   "country:VN": {
@@ -3003,7 +3052,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Viet Nam"
+      "en-GB": "Vietnam"
     }
   },
   "country:VU": {
@@ -3038,6 +3087,22 @@
       "en-GB": "Samoa"
     }
   },
+  "country:XK": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Kosovo"
+    }
+  },
   "country:YE": {
     "edges": {
       "from": [
@@ -3052,6 +3117,22 @@
     "names": {
       "cy": false,
       "en-GB": "Yemen"
+    }
+  },
+  "country:YU": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Yugoslavia"
     }
   },
   "country:ZA": {
@@ -4292,6 +4373,23 @@
       "en-GB": "As-Sudan"
     }
   },
+  "nym:Ascension Island": {
+    "edges": {
+      "from": [
+        "territory:SH-AC"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Ascension Island"
+    }
+  },
   "nym:Ayiti": {
     "edges": {
       "from": [
@@ -4853,6 +4951,23 @@
       "en-GB": "Bailiwick of Jersey"
     }
   },
+  "nym:Baker Island": {
+    "edges": {
+      "from": [
+        "territory:UM-81"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Baker Island"
+    }
+  },
   "nym:Bangla Desh": {
     "edges": {
       "from": [
@@ -5275,13 +5390,13 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Bolivia, Plurinational State of"
+      "en-GB": "Bolivia"
     }
   },
-  "nym:Bonaire, Sint Eustatius and Saba": {
+  "nym:Bonaire": {
     "edges": {
       "from": [
-        "territory:BQ"
+        "territory:BQ-BO"
       ]
     },
     "meta": {
@@ -5292,7 +5407,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Bonaire, Sint Eustatius and Saba"
+      "en-GB": "Bonaire"
     }
   },
   "nym:Bosna i Hercegovina": {
@@ -5448,6 +5563,23 @@
       "en-GB": "Britiain"
     }
   },
+  "nym:British Antarctic Territory": {
+    "edges": {
+      "from": [
+        "territory:BAT"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "British Antarctic Territory"
+    }
+  },
   "nym:British Guiana": {
     "edges": {
       "from": [
@@ -5499,7 +5631,7 @@
       "en-GB": "Brtain"
     }
   },
-  "nym:Brunei": {
+  "nym:Brunei Darussalam": {
     "edges": {
       "from": [
         "country:BN"
@@ -5958,6 +6090,23 @@
       "en-GB": "CR"
     }
   },
+  "nym:CS": {
+    "edges": {
+      "from": [
+        "country:CS"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": false,
+      "stable-name": false
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "CS"
+    }
+  },
   "nym:CU": {
     "edges": {
       "from": [
@@ -6075,23 +6224,6 @@
     "names": {
       "cy": false,
       "en-GB": "Cabo"
-    }
-  },
-  "nym:Cape Verde": {
-    "edges": {
-      "from": [
-        "country:CV"
-      ]
-    },
-    "meta": {
-      "canonical": false,
-      "canonical-mask": 0,
-      "display-name": false,
-      "stable-name": false
-    },
-    "names": {
-      "cy": false,
-      "en-GB": "Cape Verde"
     }
   },
   "nym:Cabo Verde": {
@@ -6279,6 +6411,23 @@
     "names": {
       "cy": false,
       "en-GB": "Ceska"
+    }
+  },
+  "nym:Ceuta": {
+    "edges": {
+      "from": [
+        "territory:ES-CE"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Ceuta"
     }
   },
   "nym:Ceylon": {
@@ -6638,7 +6787,7 @@
       "en-GB": "Curaçao"
     }
   },
-  "nym:Czechia": {
+  "nym:Czech Republic": {
     "edges": {
       "from": [
         "country:CZ"
@@ -6652,7 +6801,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Czechia"
+      "en-GB": "Czech Republic"
     }
   },
   "nym:Czechoslav": {
@@ -6670,6 +6819,23 @@
     "names": {
       "cy": false,
       "en-GB": "Czechoslav"
+    }
+  },
+  "nym:Czechoslovak Republic": {
+    "edges": {
+      "from": [
+        "country:CS"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Czechoslovak Republic"
     }
   },
   "nym:DD": {
@@ -6859,7 +7025,7 @@
       "en-GB": "Dawlat ul-Kuwayt"
     }
   },
-  "nym:Democratic People's Republic of Korea": {
+  "nym:Democratic People's Republic of Koread": {
     "edges": {
       "from": [
         "country:KP"
@@ -6873,7 +7039,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Democratic People's Republic of Korea"
+      "en-GB": "Democratic People's Republic of Koread"
     }
   },
   "nym:Democratic Republic of Sao Tome and Principe": {
@@ -7522,6 +7688,91 @@
       "en-GB": "Emirate of Ajman"
     }
   },
+  "nym:Emirate of Dubai": {
+    "edges": {
+      "from": [
+        "territory:AE-DU"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Emirate of Dubai"
+    }
+  },
+  "nym:Emirate of Fujairah": {
+    "edges": {
+      "from": [
+        "territory:AE-FU"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Emirate of Fujairah"
+    }
+  },
+  "nym:Emirate of Ras al-Khaimah": {
+    "edges": {
+      "from": [
+        "territory:AE-RK"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Emirate of Ras al-Khaimah"
+    }
+  },
+  "nym:Emirate of Sharjah": {
+    "edges": {
+      "from": [
+        "territory:AE-SH"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Emirate of Sharjah"
+    }
+  },
+  "nym:Emirate of Umm al-Quwain": {
+    "edges": {
+      "from": [
+        "territory:AE-UQ"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Emirate of Umm al-Quwain"
+    }
+  },
   "nym:England": {
     "edges": {
       "from": [
@@ -7828,7 +8079,7 @@
       "en-GB": "FRG"
     }
   },
-  "nym:Falkland Islands (Malvinas)": {
+  "nym:Falkland Islands": {
     "edges": {
       "from": [
         "territory:FK"
@@ -7842,7 +8093,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Falkland Islands (Malvinas)"
+      "en-GB": "Falkland Islands"
     }
   },
   "nym:Faroe Islands": {
@@ -9324,6 +9575,23 @@
       "en-GB": "Hong Kong Special Administrative Region"
     }
   },
+  "nym:Howland Island": {
+    "edges": {
+      "from": [
+        "territory:UM-84"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Howland Island"
+    }
+  },
   "nym:Hrvatska": {
     "edges": {
       "from": [
@@ -10106,6 +10374,40 @@
       "en-GB": "Japan"
     }
   },
+  "nym:Jarvis Island": {
+    "edges": {
+      "from": [
+        "territory:UM-86"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Jarvis Island"
+    }
+  },
+  "nym:Johnston Atoll": {
+    "edges": {
+      "from": [
+        "territory:UM-67"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Johnston Atoll"
+    }
+  },
   "nym:Jugoslavija": {
     "edges": {
       "from": [
@@ -10735,6 +11037,23 @@
       "en-GB": "Kingdom of the Netherlands"
     }
   },
+  "nym:Kingman Reef": {
+    "edges": {
+      "from": [
+        "territory:UM-89"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Kingman Reef"
+    }
+  },
   "nym:Kirghizia": {
     "edges": {
       "from": [
@@ -10852,6 +11171,23 @@
     "names": {
       "cy": false,
       "en-GB": "Komori"
+    }
+  },
+  "nym:Kosova": {
+    "edges": {
+      "from": [
+        "country:XK"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": false,
+      "stable-name": false
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Kosova"
     }
   },
   "nym:Koweit": {
@@ -12500,24 +12836,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Myanmar"
-    }
-  },
-  "nym:Myanmar": {
-    "edges": {
-      "from": [
-        "country:MM"
-      ]
-    },
-    "meta": {
-      "canonical": false,
-      "canonical-mask": 0,
-      "display-name": false,
-      "stable-name": false
-    },
-    "names": {
-      "cy": false,
-      "en-GB": "Myanmar"
+      "en-GB": "Myanma"
     }
   },
   "nym:México": {
@@ -13149,7 +13468,7 @@
       "en-GB": "Norge"
     }
   },
-  "nym:Korea, Democratic People's Republic of": {
+  "nym:North Korea": {
     "edges": {
       "from": [
         "country:KP"
@@ -13163,7 +13482,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Korea, Democratic People's Republic of"
+      "en-GB": "North Korea"
     }
   },
   "nym:Northern Ireland": {
@@ -13285,7 +13604,7 @@
       "en-GB": "OM"
     }
   },
-  "nym:Palestine, State of": {
+  "nym:Occupied Palestinian Territories": {
     "edges": {
       "from": [
         "territory:PS"
@@ -13996,7 +14315,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Pitcairn"
+      "en-GB": "Pitcairn, Henderson, Ducie and Oeno Islands"
     }
   },
   "nym:Plurinational State of Bolivia": {
@@ -15187,6 +15506,23 @@
     "names": {
       "cy": false,
       "en-GB": "Republic of Korea"
+    }
+  },
+  "nym:Republic of Kosovo": {
+    "edges": {
+      "from": [
+        "country:XK"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": false,
+      "stable-name": false
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Republic of Kosovo"
     }
   },
   "nym:Republic of Latvia": {
@@ -16498,10 +16834,10 @@
       "en-GB": "SH-AC"
     }
   },
-  "nym:SH": {
+  "nym:SH-HL": {
     "edges": {
       "from": [
-        "territory:SH"
+        "territory:SH-HL"
       ]
     },
     "meta": {
@@ -16512,7 +16848,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "SH"
+      "en-GB": "SH-HL"
     }
   },
   "nym:SH-TA": {
@@ -16787,10 +17123,44 @@
       "en-GB": "SZ"
     }
   },
+  "nym:Saba": {
+    "edges": {
+      "from": [
+        "territory:BQ-SA"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Saba"
+    }
+  },
+  "nym:Saint Barthélemy": {
+    "edges": {
+      "from": [
+        "territory:BL"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Saint Barthélemy"
+    }
+  },
   "nym:Saint Helena": {
     "edges": {
       "from": [
-        "territory:SH"
+        "territory:SH-HL"
       ]
     },
     "meta": {
@@ -17433,7 +17803,7 @@
       "en-GB": "South Georgia and the South Sandwich Islands"
     }
   },
-  "nym:Korea, Republic of": {
+  "nym:South Korea": {
     "edges": {
       "from": [
         "country:KR"
@@ -17447,7 +17817,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Korea, Republic of"
+      "en-GB": "South Korea"
     }
   },
   "nym:South west africa": {
@@ -17465,6 +17835,23 @@
     "names": {
       "cy": false,
       "en-GB": "South west africa"
+    }
+  },
+  "nym:Sovereign Base Areas of Akrotiri and Dhekelia": {
+    "edges": {
+      "from": [
+        "territory:XXD"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Sovereign Base Areas of Akrotiri and Dhekelia"
     }
   },
   "nym:Spanish Guinea": {
@@ -17940,7 +18327,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Syrian Arab Republic"
+      "en-GB": "Syria"
     }
   },
   "nym:Syrian Arab Republic": {
@@ -18314,7 +18701,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Taiwan, Province of China"
+      "en-GB": "Taiwan"
     }
   },
   "nym:Tajik": {
@@ -18623,7 +19010,7 @@
       "en-GB": "The Commonwealth of The Bahamas"
     }
   },
-  "nym:The Czechia": {
+  "nym:The Czech Republic": {
     "edges": {
       "from": [
         "country:CZ"
@@ -18637,7 +19024,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "The Czechia"
+      "en-GB": "The Czech Republic"
     }
   },
   "nym:The Democratic People's Republic of Korea": {
@@ -19371,7 +19758,7 @@
       "en-GB": "The Lebanese Republic"
     }
   },
-  "nym:Palestine, State of": {
+  "nym:The Occupied Palestinian Territories": {
     "edges": {
       "from": [
         "territory:PS"
@@ -19385,7 +19772,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Palestine, State of"
+      "en-GB": "The Occupied Palestinian Territories"
     }
   },
   "nym:The Oriental Republic of Uruguay": {
@@ -20236,6 +20623,23 @@
     "names": {
       "cy": false,
       "en-GB": "The Republic of Korea"
+    }
+  },
+  "nym:The Republic of Kosovo": {
+    "edges": {
+      "from": [
+        "country:XK"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "The Republic of Kosovo"
     }
   },
   "nym:The Republic of Latvia": {
@@ -21360,7 +21764,7 @@
       "en-GB": "The United States of America"
     }
   },
-  "nym:Virgin Islands, British": {
+  "nym:The Virgin Islands": {
     "edges": {
       "from": [
         "territory:VG"
@@ -21374,7 +21778,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Virgin Islands, British"
+      "en-GB": "The Virgin Islands"
     }
   },
   "nym:Timor Lorosa'e": {
@@ -21494,6 +21898,23 @@
     "names": {
       "cy": false,
       "en-GB": "Toçikiston"
+    }
+  },
+  "nym:Tristan da Cunha": {
+    "edges": {
+      "from": [
+        "territory:SH-TA"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Tristan da Cunha"
     }
   },
   "nym:Tunes": {
@@ -22142,23 +22563,6 @@
       "en-GB": "Union of Soviet Socialist Republics"
     }
   },
-  "nym:Myanmar": {
-    "edges": {
-      "from": [
-        "country:MM"
-      ]
-    },
-    "meta": {
-      "canonical": false,
-      "canonical-mask": 0,
-      "display-name": false,
-      "stable-name": false
-    },
-    "names": {
-      "cy": false,
-      "en-GB": "Myanmar"
-    }
-  },
   "nym:Union of the Comoros": {
     "edges": {
       "from": [
@@ -22601,7 +23005,7 @@
       "en-GB": "VU"
     }
   },
-  "nym:Holy See": {
+  "nym:Vatican City State": {
     "edges": {
       "from": [
         "country:VA"
@@ -22615,7 +23019,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Holy See"
+      "en-GB": "Vatican City State"
     }
   },
   "nym:Veitnam": {
@@ -22649,7 +23053,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Venezuela, Bolivarian Republic of"
+      "en-GB": "Venezuela"
     }
   },
   "nym:Venezula": {
@@ -22973,6 +23377,23 @@
     "names": {
       "cy": false,
       "en-GB": "Wuliwya"
+    }
+  },
+  "nym:XK": {
+    "edges": {
+      "from": [
+        "country:XK"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": false,
+      "stable-name": false
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "XK"
     }
   },
   "nym:XQZ": {
@@ -24792,6 +25213,23 @@
     "names": {
       "cy": false,
       "en-GB": "Киргизия"
+    }
+  },
+  "nym:Косово": {
+    "edges": {
+      "from": [
+        "country:XK"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": false,
+      "stable-name": false
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Косово"
     }
   },
   "nym:Кыргызстан": {
@@ -26849,6 +27287,86 @@
       "en-GB": "Abu Dhabi"
     }
   },
+  "territory:AE-DU": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Dubai"
+    }
+  },
+  "territory:AE-FU": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Fujairah"
+    }
+  },
+  "territory:AE-RK": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Ras al-Khaimah"
+    }
+  },
+  "territory:AE-SH": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Sharjah"
+    }
+  },
+  "territory:AE-UQ": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Umm al-Quwain"
+    }
+  },
   "territory:AI": {
     "edges": {
       "from": [
@@ -26929,6 +27447,38 @@
       "en-GB": "Åland Islands"
     }
   },
+  "territory:BAT": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "British Antarctic Territory"
+    }
+  },
+  "territory:BL": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Saint Barthélemy"
+    }
+  },
   "territory:BM": {
     "edges": {
       "from": [
@@ -26945,7 +27495,7 @@
       "en-GB": "Bermuda"
     }
   },
-  "territory:BQ": {
+  "territory:BQ-BO": {
     "edges": {
       "from": [
       ]
@@ -26958,7 +27508,23 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Bonaire, Sint Eustatius and Saba"
+      "en-GB": "Bonaire"
+    }
+  },
+  "territory:BQ-SA": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Saba"
     }
   },
   "territory:BQ-SE": {
@@ -27073,6 +27639,22 @@
       "en-GB": "Western Sahara"
     }
   },
+  "territory:ES-CE": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Ceuta"
+    }
+  },
   "territory:ES-ML": {
     "edges": {
       "from": [
@@ -27102,7 +27684,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Falkland Islands (Malvinas)"
+      "en-GB": "Falkland Islands"
     }
   },
   "territory:FO": {
@@ -27502,7 +28084,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Pitcairn"
+      "en-GB": "Pitcairn, Henderson, Ducie and Oeno Islands"
     }
   },
   "territory:PR": {
@@ -27534,7 +28116,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Palestine, State of"
+      "en-GB": "Occupied Palestinian Territories"
     }
   },
   "territory:RE": {
@@ -27553,7 +28135,7 @@
       "en-GB": "Réunion"
     }
   },
-  "territory:SH": {
+  "territory:SH-AC": {
     "edges": {
       "from": [
       ]
@@ -27566,7 +28148,39 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Saint Helena, Ascension and Tristan da Cunha"
+      "en-GB": "Ascension"
+    }
+  },
+  "territory:SH-HL": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Saint Helena"
+    }
+  },
+  "territory:SH-TA": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Tristan da Cunha"
     }
   },
   "territory:SJ": {
@@ -27662,7 +28276,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Taiwan, Province of China"
+      "en-GB": "Taiwan"
     }
   },
   "territory:UM-67": {
@@ -27713,6 +28327,102 @@
       "en-GB": "Navassa Island"
     }
   },
+  "territory:UM-79": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Wake Island"
+    }
+  },
+  "territory:UM-81": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Baker Island"
+    }
+  },
+  "territory:UM-84": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Howland Island"
+    }
+  },
+  "territory:UM-86": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Jarvis Island"
+    }
+  },
+  "territory:UM-89": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Kingman Reef"
+    }
+  },
+  "territory:UM-95": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Palmyra Atoll"
+    }
+  },
   "territory:VG": {
     "edges": {
       "from": [
@@ -27726,7 +28436,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Virgin Islands, British"
+      "en-GB": "British Virgin Islands"
     }
   },
   "territory:VI": {
@@ -27742,7 +28452,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Virgin Islands, U.S."
+      "en-GB": "United States Virgin Islands"
     }
   },
   "territory:WF": {
@@ -27775,6 +28485,22 @@
     "names": {
       "cy": false,
       "en-GB": "Akrotiri"
+    }
+  },
+  "territory:XXD": {
+    "edges": {
+      "from": [
+      ]
+    },
+    "meta": {
+      "canonical": true,
+      "canonical-mask": 1,
+      "display-name": true,
+      "stable-name": true
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Dhekelia"
     }
   },
   "territory:YT": {

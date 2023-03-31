@@ -16,7 +16,6 @@
 
 package views.registrationprogress
 
-import forms.EmptyForm
 import generators.businesscustomer.AddressGenerator
 import models.registrationprogress.{Completed, Section, TaskList, TaskRow}
 import org.scalatestplus.mockito.MockitoSugar
@@ -41,20 +40,19 @@ class RegistrationProgressViewSpec extends AmlsViewSpec with MockitoSugar with A
 
     val taskList = TaskList(
       Seq(TaskRow(
-        "section1", "/foo", true, TaskRow.completedTag
+        "section1", "/foo", true, Completed, TaskRow.completedTag
       )
     ))
   }
 
   "The registration progress view" must {
     "have correct title, headings and form fields" in new ViewFixture {
-      val form2 = EmptyForm
 
       def view = registration_progress(taskList, true, "biz name", Seq.empty[String], true)
 
-      doc.title must be(Messages("progress.title") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov"))
-      heading.html must be(Messages("progress.title"))
+      doc.title must be(messages("progress.title") + " - " +
+        messages("title.amls") + " - " + messages("title.gov"))
+      heading.html must be(messages("progress.title"))
 
       doc.getElementById("your-business").text() must include("Your business")
     }

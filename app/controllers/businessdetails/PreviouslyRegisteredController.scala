@@ -16,15 +16,16 @@
 
 package controllers.businessdetails
 
-import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.businessdetails.PreviouslyRegisteredFormProvider
 import models.businessdetails._
 import models.businessmatching.{BusinessMatching, BusinessType}
-import play.api.mvc.{MessagesControllerComponents, Result}
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import utils.{AuthAction, ControllerHelper}
-import views.html.businessdetails._
+import views.html.businessdetails.PreviouslyRegisteredView
 
 import scala.concurrent.Future
 
@@ -33,39 +34,42 @@ class PreviouslyRegisteredController @Inject () (
                                                   val authAction: AuthAction,
                                                   val ds: CommonPlayDependencies,
                                                   val cc: MessagesControllerComponents,
-                                                  previously_registered: previously_registered) extends AmlsBaseController(ds, cc) {
+                                                  formProvider: PreviouslyRegisteredFormProvider,
+                                                  previously_registered: PreviouslyRegisteredView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response =>
-          val form: Form2[PreviouslyRegistered] = (for {
+          val form: Form[PreviouslyRegistered] = (for {
             businessDetails <- response
             prevRegistered <- businessDetails.previouslyRegistered
-          } yield Form2[PreviouslyRegistered](prevRegistered)).getOrElse(EmptyForm)
+            fp = formProvider()
+          } yield fp.fill(prevRegistered)).getOrElse(formProvider())
           Ok(previously_registered(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[PreviouslyRegistered](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(previously_registered(f, edit)))
-        case ValidForm(_, data) =>
+
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(previously_registered(formWithErrors, edit))),
+        data =>
           dataCacheConnector.fetchAll(request.credId) flatMap {
             optionalCache =>
               (for {
                 cache <- optionalCache
                 businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
                 saved <- Option(dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
-                  getUpdatedModel(businessType,  cache.getEntry[BusinessDetails](BusinessDetails.key), data))
+                  getUpdatedModel(businessType, cache.getEntry[BusinessDetails](BusinessDetails.key), data))
                 )
               } yield {
-                saved.map(_ => getRouting(businessType, edit, data))
+                saved.map(_ => getRouting(edit))
               }).getOrElse(Future.successful(Redirect(routes.ConfirmRegisteredOfficeController.get(edit))))
           }
-      }
+      )
     }
   }
 
@@ -73,10 +77,11 @@ class PreviouslyRegisteredController @Inject () (
     businessDetails.copy(previouslyRegistered = Some(data), hasChanged = true)
   }
 
-  private def getRouting(businessType: BusinessType, edit: Boolean, data: PreviouslyRegistered): Result = {
-    (edit) match {
-      case true => Redirect(routes.SummaryController.get)
-      case _    => Redirect (routes.ActivityStartDateController.get(edit))
+  private def getRouting(edit: Boolean): Result = {
+    if (edit) {
+      Redirect(routes.SummaryController.get)
+    } else {
+      Redirect(routes.ActivityStartDateController.get(edit))
     }
   }
 }

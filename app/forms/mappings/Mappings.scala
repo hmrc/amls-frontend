@@ -16,6 +16,7 @@
 
 package forms.mappings
 
+import org.joda.time.{LocalDate => JodaLocalDate}
 import java.time.LocalDate
 
 import play.api.data.FieldMapping
@@ -41,11 +42,19 @@ trait Mappings extends Formatters with Constraints {
                               invalidKey: String = "error.invalid")(implicit ev: Enumerable[A]): FieldMapping[A] =
     of(enumerableFormatter[A](requiredKey, invalidKey))
 
-//  protected def localDate(
-//                           invalidKey: String,
-//                           allRequiredKey: String,
-//                           twoRequiredKey: String,
-//                           requiredKey: String,
-//                           args: Seq[String] = Seq.empty): FieldMapping[LocalDate] =
-//    of(new LocalDateFormatter(invalidKey, allRequiredKey, twoRequiredKey, requiredKey, args))
+  protected def localDate(
+                           invalidKey: String,
+                           allRequiredKey: String,
+                           twoRequiredKey: String,
+                           requiredKey: String,
+                           args: Seq[String] = Seq.empty): FieldMapping[LocalDate] =
+    of(new LocalDateFormatter(invalidKey, allRequiredKey, twoRequiredKey, requiredKey, args))
+
+  protected def jodaLocalDate(
+                           invalidKey: String,
+                           allRequiredKey: String,
+                           twoRequiredKey: String,
+                           requiredKey: String,
+                           args: Seq[String] = Seq.empty): FieldMapping[JodaLocalDate] =
+    of(new JodaLocalDateFormatter(invalidKey, allRequiredKey, twoRequiredKey, requiredKey, args))
 }

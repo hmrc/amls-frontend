@@ -14,46 +14,52 @@
  * limitations under the License.
  *@
 
-@import forms.Form2
-@import include._
-@import include.forms2._
-@import config.{ ApplicationConfig}
-@import models.autocomplete._
+@import config.ApplicationConfig
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
+@import views.html.components.{SectionSubtitle, Button, Heading, ReturnLink}
+@import views.html.components.forms.{InputYesNo, ErrorSummary}
 
-@this(main: include.main)
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    errorSummary: ErrorSummary,
+    heading: Heading,
+    subtitle: SectionSubtitle,
+    inputYesNo: InputYesNo,
+    button: Button,
+    returnLink: ReturnLink
+)
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
 
-@header = {
-    @components.back_link()
-    @errorSummary(f)
-}
+@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
-@main(
-    title = Messages("businessdetails.registeredoffice.title") + " - " + Messages("summary.businessdetails"),
-    heading = header
+@layout(
+    pageTitle = messages("businessdetails.registeredoffice.title") + " - " + messages("summary.businessdetails"),
 ) {
 
-    @form(f, controllers.businessdetails.routes.RegisteredOfficeIsUKController.post(edit)) {
+    @errorSummary(form)
 
-        @fieldsetWithErrorGroup(
-            f = f("isUK"),
-            heading = "businessdetails.registeredoffice.title",
-            section = "summary.businessdetails",
-            panel = false,
-            classes = Seq("form-group", "inline")
-        ) {
-            @radio(
-                f = f("isUK"),
-                labelText = "lbl.yes",
-                value = "true"
-            )
-            @radio(
-                f = f("isUK"),
-                labelText = "lbl.no",
-                value = "false"
-            )
-        }
-        @submit(edit, Some(Messages("button.saveandcontinue")))
+    @subtitle("summary.businessdetails")
+
+    @formHelper(action = controllers.businessdetails.routes.RegisteredOfficeIsUKController.post(edit)) {
+
+        @inputYesNo(
+            Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("businessdetails.registeredoffice.title")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
+                items = HmrcYesNoRadioItems(),
+                classes = "govuk-radios govuk-radios--inline"
+            ).withFormField(form("isUK"))
+        )
+
+        @button()
+
+        @returnLink(true)
     }
 }

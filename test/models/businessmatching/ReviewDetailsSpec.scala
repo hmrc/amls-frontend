@@ -123,7 +123,7 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
         Some("Address line 3"),
         Some("Address line4"),
         None,
-        Country("United States of America", "US"))
+        Country("United States", "US"))
 
       ReviewDetails.convert(bmAddressModel) mustBe(expectedAddressModel)
     }

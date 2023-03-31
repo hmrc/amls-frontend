@@ -16,27 +16,29 @@
 
 package views.businessdetails
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
+import forms.businessdetails.PreviouslyRegisteredFormProvider
 import models.businessdetails.{PreviouslyRegistered, PreviouslyRegisteredYes}
+import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
+import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.businessdetails.previously_registered
+import views.html.businessdetails.PreviouslyRegisteredView
 
 
-class previously_registeredSpec extends AmlsViewSpec with MustMatchers  {
+class PreviouslyRegisteredViewSpec extends AmlsViewSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
-    lazy val previously_registered = app.injector.instanceOf[previously_registered]
+    lazy val previously_registered = app.injector.instanceOf[PreviouslyRegisteredView]
+    lazy val formProvider = app.injector.instanceOf[PreviouslyRegisteredFormProvider]
     implicit val requestWithToken = addTokenForView()
   }
 
   "previously_registered view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes(Some("prevMLRRegNo")))
+      val form2: Form[PreviouslyRegistered] = formProvider().fill(PreviouslyRegisteredYes(Some("prevMLRRegNo")))
 
       def view = previously_registered(form2, true)
 
@@ -45,7 +47,7 @@ class previously_registeredSpec extends AmlsViewSpec with MustMatchers  {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes(Some("prevMLRRegNo")))
+      val form2: Form[PreviouslyRegistered] = formProvider().fill(PreviouslyRegisteredYes(Some("prevMLRRegNo")))
 
       def view = previously_registered(form2, true)
 
@@ -56,26 +58,22 @@ class previously_registeredSpec extends AmlsViewSpec with MustMatchers  {
 
     "show errors in the correct locations" in new ViewFixture {
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "previouslyRegistered") -> Seq(ValidationError("not a message Key"))
-        ))
+      val errorKey = "error.required.atb.previously.registered"
+
+      val form2: Form[PreviouslyRegistered] = formProvider().withError(FormError("value", "error.required.atb.previously.registered"))
 
       def view = previously_registered(form2, true)
 
-      errorSummary.html() must include("not a message Key")
+      doc.getElementsByClass("govuk-error-summary__list").text() must include(messages(errorKey))
 
-      doc.getElementById("previouslyRegistered")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+      doc.getElementById("value-error").text() must include(messages(errorKey))
 
     }
 
     "have a back link" in new ViewFixture {
-      val form2: Form2[_] = EmptyForm
+      def view = previously_registered(formProvider(), true)
 
-      def view = previously_registered(form2, true)
-
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+      assert(doc.getElementById("back-link").isInstanceOf[Element])
     }
   }
 }

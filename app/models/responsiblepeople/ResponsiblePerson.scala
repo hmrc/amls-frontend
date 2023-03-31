@@ -272,6 +272,7 @@ object ResponsiblePerson {
       messageKey,
       controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get().url,
       hasChanged = false,
+      NotStarted,
       TaskRow.notStartedTag
     )
 
@@ -282,6 +283,7 @@ object ResponsiblePerson {
           messageKey,
           controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get().url,
           anyChanged(rp),
+          NotStarted,
           TaskRow.notStartedTag
         )
       } else {
@@ -292,6 +294,7 @@ object ResponsiblePerson {
             messageKey,
             controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
             anyChanged(rp),
+            Completed,
             TaskRow.completedTag
           )
           case _ =>
@@ -303,6 +306,7 @@ object ResponsiblePerson {
               messageKey,
               controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
               anyChanged(rp),
+              Started,
               TaskRow.incompleteTag
             )
         }

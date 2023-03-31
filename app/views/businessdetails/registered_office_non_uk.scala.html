@@ -14,65 +14,51 @@
  * limitations under the License.
  *@
 
-@import forms.Form2
-@import include._
-@import include.forms2._
-@import config.{ ApplicationConfig}
-@import models.autocomplete._
+@import components.forms.{ErrorSummary, InputAddressLines, InputCountry}
+@import components.{Button, Heading, ReturnLink, SectionSubtitle}
+@import config.ApplicationConfig
 
-@this(main: include.main)
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    formHelper: FormWithCSRF,
+    inputAddressLines: InputAddressLines,
+    inputCountry: InputCountry,
+    button: Button,
+    returnLink: ReturnLink
+)
 
-@(f: Form2[_], edit: Boolean, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean, countryData: Seq[SelectItem])(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
-@header = {
-    @components.back_link()
-    @errorSummary(f)
-    @heading("businessdetails.registeredoffice.where.title", "summary.businessdetails")
+@preparedErrorSummaryMapping = @{
+
+    if(form.error("country").isDefined) {
+        Some(Map("country" -> "location-autocomplete"))
+    } else None
 }
 
-@main(
-    title = Messages("businessdetails.registeredoffice.where.title") + " - " + Messages("summary.businessdetails"),
-    heading = header
+@layout(
+    pageTitle = messages("businessdetails.registeredoffice.where.title") + " - " + messages("summary.businessdetails")
 ) {
 
-    @form(f, controllers.businessdetails.routes.RegisteredOfficeNonUKController.post(edit)) {
+    @errorSummary(form, preparedErrorSummaryMapping)
 
-        @fieldset(
-            f = f("country-fieldset"),
-            legendHidden = true,
-            legend = "businessdetails.correspondenceaddress.address",
-            jsHidden = false,
-            panel = false
-        ) {
-            <input type="hidden" name="isUK" value=false />
-            @input(
-                field = f("addressLineNonUK1"),
-                labelText = "lbl.address.line1",
-                labelHidden = false
-            )
-            @input(
-                field = f("addressLineNonUK2"),
-                labelText = "lbl.address.line2",
-                labelHidden = false
-            )
-            @input(
-                field = f("addressLineNonUK3"),
-                labelText = "lbl.address.line3",
-                labelHidden = false
-            )
-            @input(
-                field = f("addressLineNonUK4"),
-                labelText = "lbl.address.line4",
-                labelHidden = false
-            )
-            @country_autocomplete(
-                field = f("country"),
-                labelText = "businessdetails.correspondenceaddress.country",
-                data = countryData.getOrElse(Seq.empty)
-            )
-        }
+    @subtitle("summary.businessdetails")
 
-        @submit(edit, Some(Messages("button.saveandcontinue")))
+    @heading("businessdetails.registeredoffice.where.title")
 
+    @formHelper(action = controllers.businessdetails.routes.RegisteredOfficeNonUKController.post(edit)) {
+
+        <input type="hidden" name="isUK" value=false />
+
+        @inputAddressLines(form)
+
+        @inputCountry(form, countryData)
+
+        @button()
+
+        @returnLink(true)
     }
 }

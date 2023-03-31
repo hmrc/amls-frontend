@@ -125,6 +125,7 @@ object Hvd {
       key,
       controllers.hvd.routes.WhatYouNeedController.get.url,
       hasChanged = false,
+      NotStarted,
       TaskRow.notStartedTag
     )
     cache.getEntry[Hvd](key).fold(notStarted) {
@@ -134,6 +135,7 @@ object Hvd {
             key,
             controllers.hvd.routes.SummaryController.get.url,
             model.hasChanged,
+            Completed,
             TaskRow.completedTag
           )
         } else {
@@ -141,6 +143,7 @@ object Hvd {
             key,
             controllers.hvd.routes.WhatYouNeedController.get.url,
             model.hasChanged,
+            Started,
             TaskRow.incompleteTag
           )
         }

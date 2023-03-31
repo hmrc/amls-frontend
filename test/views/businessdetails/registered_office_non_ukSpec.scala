@@ -16,66 +16,64 @@
 
 package views.businessdetails
 
+import forms.businessdetails.RegisteredOfficeNonUkFormProvider
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessdetails.{RegisteredOffice, RegisteredOfficeUK}
 import org.scalatest.MustMatchers
+import play.api.data.Form
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.businessdetails.registered_office_non_uk
 
 
-class registered_office_non_ukSpec extends AmlsViewSpec with MustMatchers  {
+class registered_office_non_ukSpec extends AmlsViewSpec with MustMatchers with AutoCompleteServiceMocks {
 
-  trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
-    lazy val registered_office_non_uk = app.injector.instanceOf[registered_office_non_uk]
+  lazy val registered_office_non_uk = app.injector.instanceOf[registered_office_non_uk]
+  lazy val formProvider = app.injector.instanceOf[RegisteredOfficeNonUkFormProvider]
+
+  implicit val request = FakeRequest()
+
+  trait ViewFixture extends Fixture {
     implicit val requestWithToken = addTokenForView()
   }
 
   "registered_office view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
+      val formWithData: Form[RegisteredOffice] = formProvider().fill(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
 
-      def view = registered_office_non_uk(form2, true, mockAutoComplete.getCountries)
+      def view = registered_office_non_uk(formWithData, true, mockAutoComplete.formOptions)
 
-      doc.title must startWith(Messages("businessdetails.registeredoffice.where.title") + " - " + Messages("summary.businessdetails"))
+      doc.title must startWith(messages("businessdetails.registeredoffice.where.title") + " - " + messages("summary.businessdetails"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
+      val formWithData: Form[RegisteredOffice] = formProvider().fill(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
 
-      def view = registered_office_non_uk(form2, true, mockAutoComplete.getCountries)
+      def view = registered_office_non_uk(formWithData, true, mockAutoComplete.formOptions)
 
-      heading.html must be(Messages("businessdetails.registeredoffice.where.title"))
-      subHeading.html must include(Messages("summary.businessdetails"))
-
+      heading.html must be(messages("businessdetails.registeredoffice.where.title"))
+      subHeading.html must include(messages("summary.businessdetails"))
     }
 
     "show errors in the correct locations" in new ViewFixture {
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "country-fieldset") -> Seq(ValidationError("not a message Key"))
-        ))
+      val errorMessage = "error.required.address.line1"
 
-      def view = registered_office_non_uk(form2, true, mockAutoComplete.getCountries)
+      val formWithInvalidData: Form[RegisteredOffice] = formProvider().withError("addressLine1", errorMessage)
 
-      errorSummary.html() must include("not a message Key")
+      def view = registered_office_non_uk(formWithInvalidData, true, mockAutoComplete.formOptions)
 
-      doc.getElementById("country-fieldset")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+      doc.getElementsByClass("govuk-error-summary__list").first().text() must include(messages(errorMessage))
+
+      doc.getElementById("addressLine1-error").text() must include(messages(errorMessage))
 
     }
 
-    "have a back link" in new ViewFixture {
-      val form2: Form2[_] = EmptyForm
-
-      def view = registered_office_non_uk(form2, true, mockAutoComplete.getCountries)
-
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
-    }
+    behave like pageWithBackLink(registered_office_non_uk(formProvider(), true, mockAutoComplete.formOptions))
   }
 }

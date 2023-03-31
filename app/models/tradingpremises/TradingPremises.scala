@@ -174,6 +174,7 @@ object TradingPremises {
       messageKey,
       controllers.tradingpremises.routes.TradingPremisesAddController.get().url,
       hasChanged = false,
+      NotStarted,
       TaskRow.notStartedTag
     )
 
@@ -184,6 +185,7 @@ object TradingPremises {
           messageKey,
           controllers.tradingpremises.routes.TradingPremisesAddController.get().url,
           anyChanged(tp),
+          NotStarted,
           TaskRow.notStartedTag
         )
       } else {
@@ -194,6 +196,7 @@ object TradingPremises {
             messageKey,
             controllers.tradingpremises.routes.YourTradingPremisesController.get().url,
             anyChanged(tp),
+            Completed,
             TaskRow.completedTag
           )
           case _ =>
@@ -205,6 +208,7 @@ object TradingPremises {
               messageKey,
               controllers.tradingpremises.routes.YourTradingPremisesController.get().url,
               anyChanged(tp),
+              Started,
               TaskRow.incompleteTag
             )
         }
