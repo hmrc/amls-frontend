@@ -17,53 +17,27 @@
 package forms.businessdetails
 
 import forms.behaviours.AddressFieldBehaviours
-import play.api.data.FormError
+import models.businessdetails.RegisteredOffice
+import play.api.data.Form
 
 class RegisteredOfficeNonUkFormProviderSpec extends AddressFieldBehaviours {
 
   val formProvider = new RegisteredOfficeNonUkFormProvider()
-  val form = formProvider()
+
+  override val form: Form[RegisteredOffice] = formProvider()
+
+  override val maxLength: Int = formProvider.length
+
+  override val regexString: String = formProvider.addressTypeRegex
 
   "RegisteredOfficeNonUkFormProvider" when {
 
-    val addressLineList = Seq(1, 2, 3, 4) //TODO bump up to 1, 2, 3, 4 when all tests pass
+    behave like formWithAddressFields(
+      "error.required.address",
+      "error.max.length.address",
+      "error.text.validation.address"
+    )
 
-    addressLineList foreach { line =>
-
-      val fieldName = s"addressLine$line"
-
-      s"Address Line $line is validated" must {
-
-        val dataToBind: collection.mutable.Map[String, String] =
-          collection.mutable.Map(addressLineList.filterNot(_ == line).map { l =>
-            s"addressLine$l" -> s"Fake Address Line $l"
-          }.toMap.toSeq: _*) += "country" -> "US"
-
-        if (line == 1 || line == 2) {
-
-          behave like mandatoryField(
-            form,
-            fieldName,
-            FormError(fieldName, s"error.required.address.line$line")
-          )
-        }
-
-        behave like fieldWithMaxLength(
-          form,
-          dataToBind,
-          fieldName,
-          formProvider.length,
-          FormError(fieldName, s"error.max.length.address.line$line", Seq(formProvider.length))
-        )
-
-        behave like fieldWithRegexValidation(
-          form,
-          dataToBind,
-          fieldName,
-          formProvider.addressTypeRegex,
-          FormError(fieldName, s"error.text.validation.address.line$line", Seq(formProvider.addressTypeRegex))
-        )
-      }
-    }
+    behave like countryField("error.required.atb.registered.office.not.uk")
   }
 }
