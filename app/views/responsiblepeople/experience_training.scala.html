@@ -29,7 +29,7 @@
         @if(types.size > 1) {
             @Messages("error.required.rp.experiencetraining.one")
         } else {
-            @types.head
+            @types.mkString
         }
     }
 }
@@ -59,7 +59,7 @@
     @if(types.size > 1) {
         @Messages("responsiblepeople.experiencetraining.heading.multiple", personName)
     } else {
-        @Messages("responsiblepeople.experiencetraining.heading", personName, types.head)
+        @Messages("responsiblepeople.experiencetraining.heading", personName, types.mkString)
     }
   }
 }
