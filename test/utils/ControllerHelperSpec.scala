@@ -358,5 +358,65 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
         ControllerHelper.completeNominatedOfficerTitleName(inCompleteAndNoNominatedOff) mustBe Some("")
       }
     }
+
+    "getNominatedOfficer" must {
+      "return the nominated officer when there is one" in {
+        ControllerHelper.getNominatedOfficer(oneCompleteNominatedOff.get) mustBe Some(completeResponsiblePerson)
+      }
+
+      "not return the nominated officer when there isn't one" in {
+        ControllerHelper.getNominatedOfficer(Seq(completeRpAndNotNominated, inCompleteRpAndNotNominated)) mustBe None
+      }
+    }
+
+    "getCompleteNominatedOfficer" must {
+      "return the nominated officer" when {
+        "the responsible person is a nominated officer and is complete" in {
+          val vatRegisteredCompleteNominatedPerson = completeResponsiblePerson.copy(
+            soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true)))
+
+          ControllerHelper.getCompleteNominatedOfficer(
+            Seq(completeRpAndNotNominated, inCompleteRpAndNominated, vatRegisteredCompleteNominatedPerson)) mustBe Some(vatRegisteredCompleteNominatedPerson)
+        }
+      }
+
+      "return no nominated officer" when {
+        "there is no nominated officer" in {
+          ControllerHelper.getCompleteNominatedOfficer(Seq(completeRpAndNotNominated, inCompleteRpAndNotNominated)) mustBe None
+        }
+
+        "there is no complete responsible person" ignore {
+          val nominatedButNotCompleteResponsiblePerson = completeResponsiblePerson.copy(
+            positions = completeResponsiblePerson.positions.map(pos => pos.copy(startDate = None)),
+            soleProprietorOfAnotherBusiness = None,
+            addressHistory = None
+          )
+
+          ControllerHelper.getCompleteNominatedOfficer(Seq(nominatedButNotCompleteResponsiblePerson))
+        }
+      }
+    }
+
+    "isComplete" must {
+      "return true" when {
+        "a start date is defined and the company is VAT registered and there is a full address history" ignore {
+          //
+        }
+      }
+
+      "return false" when {
+        "the person's position has no start date defined" ignore {
+          //
+        }
+
+        "the person's secondary business is not VAT registered" ignore {
+          //
+        }
+
+        "the person does not have a full address history" ignore {
+          //
+        }
+      }
+    }
   }
 }
