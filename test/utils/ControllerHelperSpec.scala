@@ -396,27 +396,5 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
         }
       }
     }
-
-    "isComplete" must {
-      "return true" when {
-        "a start date is defined and the company is VAT registered and there is a full address history" ignore {
-          //
-        }
-      }
-
-      "return false" when {
-        "the person's position has no start date defined" ignore {
-          //
-        }
-
-        "the person's secondary business is not VAT registered" ignore {
-          //
-        }
-
-        "the person does not have a full address history" ignore {
-          //
-        }
-      }
-    }
   }
 }
