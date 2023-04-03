@@ -29,6 +29,17 @@ trait AddressFieldBehaviours extends FieldBehaviours {
   val maxLength: Int
   val regexString: String
 
+  val addressLinesData: MutableMap[String, String] = collection.mutable.Map(
+    "addressLine1" -> "123 Test Street",
+    "addressLine2" -> "Test Village",
+    "addressLine3" -> "Test City",
+    "addressLine4" -> "Test County"
+  )
+
+  private val validAddressLineGen: Gen[String] = Gen.alphaNumStr.suchThat(_.length <= maxLength)
+
+  private def bindForm(formData: MutableMap[String, String]): Form[_] = form.bind(Map(formData.toSeq.sortBy(_._1): _*))
+
   def formWithAddressFields(requiredErrorKey: String, lengthErrorKey: String, regexErrorKey: String): Unit = {
 
     val addressLineList = (1 to 4).toList
@@ -46,10 +57,10 @@ trait AddressFieldBehaviours extends FieldBehaviours {
 
         "must bind correctly" in {
 
-          forAll(Gen.alphaNumStr.suchThat(_.length <= maxLength)) { addressLine =>
+          forAll(validAddressLineGen) { addressLine =>
 
             val formData: MutableMap[String, String] = dataToBind += (fieldName -> addressLine)
-            val newForm = form.bind(Map(formData.toSeq.sortBy(_._1): _*))
+            val newForm = bindForm(formData)
 
             newForm(fieldName).value shouldBe Some(addressLine)
           }
@@ -88,7 +99,7 @@ trait AddressFieldBehaviours extends FieldBehaviours {
       forAll(Gen.alphaNumStr.suchThat(_.length > maxLength)) { string =>
 
         val formData: MutableMap[String, String] = extraData += (fieldName -> string)
-        val newForm = form.bind(Map(formData.toSeq.sortBy(_._1): _*))
+        val newForm = bindForm(formData)
 
         newForm(fieldName).errors shouldEqual Seq(lengthError)
       }
@@ -100,23 +111,55 @@ trait AddressFieldBehaviours extends FieldBehaviours {
 
     s"not bind strings that violate regex" in {
 
-      val invalidAddressLines = List(
-        "WXN\"XYd*`Zvigcpmip7t",
-        "E8TplR(!:FnxTmZ9{eSni+^.%ln)",
-        "(?YJ.M2^OAJ<!AXM%kp",
-        "@DzziLxs^k|~fXC}z]#EIHi?5Xwzn",
-        ",7&2V X~Ksa!U;",
-        ".zxtNH+Z,#xon1slaz3bwU2\"XC*[<",
-        "/BUWD.-%LiY1Wj7uq%0R^s",
-        "Ii+VI[VMpUJ2UJPXC"
-      )
+      forAll(validAddressLineGen, invalidChar) { (line, invalidChar) =>
 
-      forAll(Gen.oneOf(invalidAddressLines)) { line =>
-
-        val formData: MutableMap[String, String] = extraData += (fieldName -> line)
-        val newForm = form.bind(Map(formData.toSeq.sortBy(_._1): _*))
+        val invalidLine = line.dropRight(1) + invalidChar
+        val formData: MutableMap[String, String] = extraData += (fieldName -> invalidLine)
+        val newForm = bindForm(formData)
 
         newForm(fieldName).errors shouldEqual Seq(regexError)
+      }
+    }
+  }
+
+  def postcodeField(postcodeRegex: String): Unit = {
+
+    val postcodeField = "postCode"
+
+    "postcode is validated" must {
+
+      "bind a valid postcode" in {
+
+        forAll(postcodeGen) { postcode =>
+
+          val formData: MutableMap[String, String] = addressLinesData += (postcodeField -> postcode)
+          val newForm = bindForm(formData)
+
+          newForm(postcodeField).value shouldBe Some(postcode)
+        }
+      }
+
+      "fail to bind" when {
+
+        "postcode is empty" in {
+
+          val formData: MutableMap[String, String] = addressLinesData += (postcodeField -> "")
+          val newForm = bindForm(formData)
+
+          newForm(postcodeField).error shouldBe Some(FormError(postcodeField, "error.required.postcode"))
+        }
+
+        "postcode is invalid" in {
+
+          forAll(postcodeGen.suchThat(_.nonEmpty), invalidChar) { case (postcode: String, invalidChar: String) =>
+
+            val invalidPostcode = postcode.dropRight(1) + invalidChar
+            val formData: MutableMap[String, String] = addressLinesData += (postcodeField -> invalidPostcode)
+            val newForm = bindForm(formData)
+
+            newForm(postcodeField).error shouldBe Some(FormError(postcodeField, "error.invalid.postcode", Seq(postcodeRegex)))
+          }
+        }
       }
     }
   }
@@ -126,21 +169,14 @@ trait AddressFieldBehaviours extends FieldBehaviours {
     val countryField = "country"
     val uk = Country("United Kingdom", "GB")
 
-    val extraData = collection.mutable.Map(
-      "addressLine1" -> "123 Test Street",
-      "addressLine2" -> "Test Village",
-      "addressLine3" -> "Test City",
-      "addressLine4" -> "Test County"
-    )
-
     "country is validated" must {
 
       "bind a valid country" in {
 
         forAll(Gen.oneOf(models.countries)) { country =>
 
-          val formData: MutableMap[String, String] = extraData += (countryField -> country.code)
-          val newForm = form.bind(Map(formData.toSeq.sortBy(_._1): _*))
+          val formData: MutableMap[String, String] = addressLinesData += (countryField -> country.code)
+          val newForm = bindForm(formData)
 
           newForm(countryField).value shouldBe Some(country.code)
         }
@@ -150,24 +186,24 @@ trait AddressFieldBehaviours extends FieldBehaviours {
 
         "the given country is UK" in {
 
-          val formData: MutableMap[String, String] = extraData += (countryField -> uk.code)
-          val newForm = form.bind(Map(formData.toSeq.sortBy(_._1): _*))
+          val formData: MutableMap[String, String] = addressLinesData += (countryField -> uk.code)
+          val newForm = bindForm(formData)
 
           newForm(countryField).error shouldBe Some(FormError(countryField, isUKErrorKey))
         }
 
         "country is empty" in {
 
-          val formData: MutableMap[String, String] = extraData += (countryField -> "")
-          val newForm = form.bind(Map(formData.toSeq.sortBy(_._1): _*))
+          val formData: MutableMap[String, String] = addressLinesData += (countryField -> "")
+          val newForm = bindForm(formData)
 
           newForm(countryField).error shouldBe Some(FormError(countryField, "error.required.country"))
         }
 
         "country is invalid" in {
 
-          val formData: MutableMap[String, String] = extraData += (countryField -> "foo")
-          val newForm = form.bind(Map(formData.toSeq.sortBy(_._1): _*))
+          val formData: MutableMap[String, String] = addressLinesData += (countryField -> "foo")
+          val newForm = bindForm(formData)
 
           newForm(countryField).error shouldBe Some(FormError(countryField, "error.invalid.country"))
         }

@@ -63,7 +63,7 @@ trait AddressFormProvider[A] extends Mappings {
   }
   private def postcodeOrCountryMapping(isUKAddress: Boolean): (String, Mapping[String]) = {
     if(isUKAddress){
-      "postcode" -> text("error.required.postcode")
+      "postCode" -> text("error.required.postcode")
         .verifying(regexp(postcodeRegex, "error.invalid.postcode"))
     } else {
       "country" -> text("error.required.country").verifying(countryConstraint)

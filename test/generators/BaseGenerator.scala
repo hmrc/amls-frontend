@@ -91,6 +91,13 @@ trait BaseGenerator {
       .suchThat (_ != "true")
       .suchThat (_ != "false")
 
+  val invalidChar: Gen[String] =
+    Gen.oneOf[String](
+      Seq(
+        "@", "£", "$", "%", "^", "&", "*", "~", ">", "<", "|", "]", "[", "}", "{", "=", "+"
+      )
+    ).suchThat(_.nonEmpty)
+
   def jodaDatesBetween(min: JodaLocalDate, max: JodaLocalDate): Gen[JodaLocalDate] = {
 
     def toMillis(date: JodaLocalDate): Long =
