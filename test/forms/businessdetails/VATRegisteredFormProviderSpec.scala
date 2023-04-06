@@ -23,12 +23,15 @@ import models.businessdetails.{VATRegistered, VATRegisteredNo, VATRegisteredYes}
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
-class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours with BaseGenerator {
+class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours[VATRegistered] with BaseGenerator {
 
   val formProvider: VATRegisteredFormProvider = new VATRegisteredFormProvider()
-  val form: Form[VATRegistered] = formProvider()
 
-  val radioFieldName: String = "registeredForVAT"
+  override val form: Form[VATRegistered] = formProvider()
+
+  override val fieldName: String = "registeredForVAT"
+  override val errorMessage: String = "error.required.atb.registered.for.vat"
+
   val inputFieldName: String = "vrnNumber"
 
   "form" must {
@@ -37,7 +40,7 @@ class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours with BaseGene
 
       "'No' is submitted" in {
 
-        val boundForm = form.bind(Map(radioFieldName -> "false"))
+        val boundForm = form.bind(Map(fieldName -> "false"))
 
         boundForm.value shouldBe Some(VATRegisteredNo)
         boundForm.errors shouldBe Nil
@@ -47,7 +50,7 @@ class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours with BaseGene
 
         forAll(numSequence(formProvider.length)) { vatNum =>
 
-          val boundForm = form.bind(Map(radioFieldName -> "true", inputFieldName -> vatNum))
+          val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> vatNum))
 
           boundForm.value shouldBe Some(VATRegisteredYes(vatNum))
           boundForm.errors shouldBe Nil
@@ -59,23 +62,23 @@ class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours with BaseGene
 
       "an empty value is submitted" in {
 
-        val boundForm = form.bind(Map(radioFieldName -> ""))
+        val boundForm = form.bind(Map(fieldName -> ""))
 
-        boundForm.errors.headOption shouldBe Some(FormError(radioFieldName, "error.required.atb.registered.for.vat"))
+        boundForm.errors.headOption shouldBe Some(FormError(fieldName, errorMessage))
       }
 
       "an invalid value is submitted" in {
 
         forAll(stringsLongerThan(1)) { invalidFormValue =>
-          val boundForm = form.bind(Map(radioFieldName -> invalidFormValue))
+          val boundForm = form.bind(Map(fieldName -> invalidFormValue))
 
-          boundForm.errors.headOption shouldBe Some(FormError(radioFieldName, "error.required.atb.registered.for.vat"))
+          boundForm.errors.headOption shouldBe Some(FormError(fieldName, errorMessage))
         }
       }
 
       "'Yes' is submitted without a VAT number" in {
 
-        val boundForm = form.bind(Map(radioFieldName -> "true"))
+        val boundForm = form.bind(Map(fieldName -> "true"))
 
         boundForm.errors.headOption shouldBe Some(FormError(inputFieldName, "error.required.vat.number"))
       }
@@ -84,7 +87,7 @@ class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours with BaseGene
         "is too long" in {
 
           forAll(numStringOfLength(formProvider.length + 1)) { longVatNum =>
-            val boundForm = form.bind(Map(radioFieldName -> "true", inputFieldName -> longVatNum.toString))
+            val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> longVatNum.toString))
             boundForm.errors.headOption shouldBe Some(
               FormError(inputFieldName, "error.invalid.vat.number.length", Seq(formProvider.length))
             )
@@ -94,7 +97,7 @@ class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours with BaseGene
         "is too short" in {
 
           forAll(numStringOfLength(formProvider.length - 1)) { shortVatNum =>
-            val boundForm = form.bind(Map(radioFieldName -> "true", inputFieldName -> shortVatNum.toString))
+            val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> shortVatNum.toString))
             boundForm.errors.headOption shouldBe Some(
               FormError(inputFieldName, "error.invalid.vat.number.length", Seq(formProvider.length))
             )
@@ -104,7 +107,7 @@ class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours with BaseGene
         "is invalid" in {
 
           forAll(numStringOfLength(formProvider.length), Gen.alphaChar) { (vatNum, char) =>
-            val boundForm = form.bind(Map(radioFieldName -> "true", inputFieldName -> s"${vatNum.dropRight(1)}$char"))
+            val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> s"${vatNum.dropRight(1)}$char"))
             boundForm.errors.headOption shouldBe Some(
               FormError(inputFieldName, "error.invalid.vat.number", Seq(vrnTypeRegex.regex))
             )
@@ -113,5 +116,4 @@ class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours with BaseGene
       }
     }
   }
-
 }

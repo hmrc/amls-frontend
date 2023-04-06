@@ -16,18 +16,16 @@
 
 package forms.businessdetails
 
-import forms.behaviours.BooleanFieldBehaviours
-import models.businessdetails.{PreviouslyRegistered, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
+import forms.generic.BooleanFormProvider
+import models.businessdetails.CorrespondenceAddressIsUk
 import play.api.data.Form
 
-class PreviouslyRegisteredFormProviderSpec extends BooleanFieldBehaviours[PreviouslyRegistered] {
+import javax.inject.Inject
 
+class CorrespondenceAddressIsUKFormProvider @Inject()() extends BooleanFormProvider {
 
-  override val form: Form[PreviouslyRegistered] = new PreviouslyRegisteredFormProvider()()
-  override val fieldName: String = "value"
-  override val errorMessage: String = "error.required.atb.previously.registered"
-
-  "PreviouslyRegistered form" must {
-    behave like booleanFieldWithModel(PreviouslyRegisteredYes(Some("")), PreviouslyRegisteredNo)
-  }
+  def apply(): Form[CorrespondenceAddressIsUk] = createForm[CorrespondenceAddressIsUk](
+    "isUk",
+    "businessdetails.correspondenceaddress.isuk.error"
+  )(CorrespondenceAddressIsUk(_), _.isUk)
 }

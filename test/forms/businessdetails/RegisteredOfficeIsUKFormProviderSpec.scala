@@ -20,43 +20,14 @@ import forms.behaviours.BooleanFieldBehaviours
 import models.businessdetails.RegisteredOfficeIsUK
 import play.api.data.{Form, FormError}
 
-class RegisteredOfficeIsUKFormProviderSpec extends BooleanFieldBehaviours {
+class RegisteredOfficeIsUKFormProviderSpec extends BooleanFieldBehaviours[RegisteredOfficeIsUK] {
 
-  val formProvider: RegisteredOfficeIsUKFormProvider = new RegisteredOfficeIsUKFormProvider()
-  val form: Form[RegisteredOfficeIsUK] = formProvider()
-
-  val fieldName = "isUK"
-  val errorKey = "error.required.atb.registered.office.uk.or.overseas"
+  override val form: Form[RegisteredOfficeIsUK] = new RegisteredOfficeIsUKFormProvider()()
+  override val fieldName: String = "isUK"
+  override val errorMessage: String = "error.required.atb.registered.office.uk.or.overseas"
 
   "RegisteredOfficeIsUKFormProvider" must {
 
-    "bind true" in {
-
-      val result = form.bind(Map(fieldName -> "true"))
-
-      result.hasErrors shouldBe false
-      result.value shouldBe Some(RegisteredOfficeIsUK(true))
-    }
-
-    "bind false" in {
-
-      val result = form.bind(Map(fieldName -> "false"))
-
-      result.hasErrors shouldBe false
-      result.value shouldBe Some(RegisteredOfficeIsUK(false))
-    }
-
-    "fail to bind" when {
-
-      "value is invalid" in {
-
-        val result = form.bind(Map(fieldName -> "foo"))
-
-        result.value shouldBe None
-        result.errors shouldBe Seq(FormError(fieldName, errorKey))
-      }
-    }
-
-    behave like mandatoryField(form, fieldName, FormError(fieldName, errorKey))
+    behave like booleanFieldWithModel(RegisteredOfficeIsUK(true), RegisteredOfficeIsUK(false))
   }
 }

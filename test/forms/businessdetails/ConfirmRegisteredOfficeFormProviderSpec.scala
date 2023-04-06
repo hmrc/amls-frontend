@@ -18,38 +18,16 @@ package forms.businessdetails
 
 import forms.behaviours.BooleanFieldBehaviours
 import models.businessdetails.ConfirmRegisteredOffice
-import play.api.data.{Form, FormError}
+import play.api.data.Form
 
-class ConfirmRegisteredOfficeFormProviderSpec extends BooleanFieldBehaviours {
+class ConfirmRegisteredOfficeFormProviderSpec extends BooleanFieldBehaviours[ConfirmRegisteredOffice] {
 
-  val form: Form[ConfirmRegisteredOffice] = new ConfirmRegisteredOfficeFormProvider()()
-  val fieldName: String = "isRegOfficeOrMainPlaceOfBusiness"
-
-  def map(str: String): Map[String, String] = Map(fieldName -> str)
+  override val form: Form[ConfirmRegisteredOffice] = new ConfirmRegisteredOfficeFormProvider()()
+  override val fieldName: String = "isRegOfficeOrMainPlaceOfBusiness"
+  override val errorMessage: String = "error.required.atb.confirm.office"
 
   "ConfirmRegisteredOfficeFormProvider" must {
 
-    "bind true" in {
-
-      form.bind(map("true")).value shouldBe Some(ConfirmRegisteredOffice(true))
-    }
-
-    "bind false" in {
-
-      form.bind(map("false")).value shouldBe Some(ConfirmRegisteredOffice(false))
-    }
-
-    "fail to bind" when {
-
-      "given an invalid value" in {
-
-        form.bind(map("foo")).errors shouldBe Seq(FormError(fieldName, "error.required.atb.confirm.office"))
-      }
-
-      "given an empty value" in {
-
-        form.bind(map("")).errors shouldBe Seq(FormError(fieldName, "error.required.atb.confirm.office"))
-      }
-    }
+    behave like booleanFieldWithModel(ConfirmRegisteredOffice(true), ConfirmRegisteredOffice(false))
   }
 }

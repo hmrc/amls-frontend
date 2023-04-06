@@ -70,7 +70,7 @@ class RegisteredOfficeNonUKController @Inject ()(
               if (edit) {
                 Redirect(routes.SummaryController.get)
               } else {
-                Redirect(routes.ContactingYouController.get())
+                Redirect(routes.BusinessEmailAddressController.get())
               }
             }
           }

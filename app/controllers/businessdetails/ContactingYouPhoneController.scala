@@ -20,10 +20,12 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
+import forms.businessdetails.BusinessTelephoneFormProvider
 import models.businessdetails._
-import play.api.mvc.MessagesControllerComponents
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import views.html.businessdetails._
+import views.html.businessdetails.BusinessTelephoneView
 
 import scala.concurrent.Future
 
@@ -31,31 +33,32 @@ class ContactingYouPhoneController @Inject () (val dataCache: DataCacheConnector
                                                val authAction: AuthAction,
                                                val ds: CommonPlayDependencies,
                                                val cc: MessagesControllerComponents,
-                                               contacting_you_phone: contacting_you_phone) extends AmlsBaseController(ds, cc) {
+                                               formProvider: BusinessTelephoneFormProvider,
+                                               view: BusinessTelephoneView) extends AmlsBaseController(ds, cc) {
 
   def updateData(contactingYou: Option[ContactingYou], data: ContactingYouPhone): ContactingYou = {
     contactingYou.fold[ContactingYou](ContactingYou())(x => x.copy(phoneNumber = Some(data.phoneNumber)))
   }
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
+      implicit val form: Form[ContactingYouPhone] = formProvider()
       for {
         businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
       } yield businessDetails match {
         case Some(BusinessDetails(_, _, _, _, Some(details), _, _, _, _, _, _, _)) if details.phoneNumber.isDefined =>
           Ok(
-            contacting_you_phone(Form2[ContactingYouPhone](ContactingYouPhone(details.phoneNumber.getOrElse(""))), edit)
+            view(details.phoneNumber.fold(form)(x => form.fill(ContactingYouPhone(x))), edit)
           )
-        case _ => Ok(contacting_you_phone(EmptyForm, edit))
+        case _ => Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[ContactingYouPhone](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(contacting_you_phone(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithError => Future.successful(BadRequest(view(formWithError, edit))),
+        data =>
           for {
             businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
             _ <- dataCache.save[BusinessDetails](
@@ -64,11 +67,12 @@ class ContactingYouPhoneController @Inject () (val dataCache: DataCacheConnector
               )
             )
           } yield {
-            edit match {
-              case true => Redirect(routes.SummaryController.get)
-              case _ => Redirect(routes.LettersAddressController.get(edit))
+            if (edit) {
+              Redirect(routes.SummaryController.get)
+            } else {
+              Redirect(routes.LettersAddressController.get(edit))
             }
           }
-      }
+      )
   }
 }

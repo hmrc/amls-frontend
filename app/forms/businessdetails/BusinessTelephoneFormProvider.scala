@@ -16,18 +16,25 @@
 
 package forms.businessdetails
 
-import forms.behaviours.BooleanFieldBehaviours
-import models.businessdetails.{PreviouslyRegistered, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
+import forms.mappings.Mappings
+import models.businessdetails.ContactingYouPhone
 import play.api.data.Form
+import play.api.data.Forms.mapping
 
-class PreviouslyRegisteredFormProviderSpec extends BooleanFieldBehaviours[PreviouslyRegistered] {
+import javax.inject.Inject
 
+class BusinessTelephoneFormProvider @Inject()() extends Mappings {
 
-  override val form: Form[PreviouslyRegistered] = new PreviouslyRegisteredFormProvider()()
-  override val fieldName: String = "value"
-  override val errorMessage: String = "error.required.atb.previously.registered"
-
-  "PreviouslyRegistered form" must {
-    behave like booleanFieldWithModel(PreviouslyRegisteredYes(Some("")), PreviouslyRegisteredNo)
-  }
+  val length = 24
+  val regex = "^[0-9 ()+\u2010\u002d]{1,24}$"
+  def apply(): Form[ContactingYouPhone] = Form[ContactingYouPhone](
+    mapping(
+    "phoneNumber" -> text("error.required.phone.number").verifying(
+        firstError(
+          maxLength(length, "error.max.length.phone"),
+          regexp(regex, "err.invalid.phone.number")
+        )
+      )
+    )(ContactingYouPhone.apply)(ContactingYouPhone.unapply)
+  )
 }

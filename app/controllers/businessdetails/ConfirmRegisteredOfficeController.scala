@@ -106,7 +106,7 @@ class ConfirmRegisteredOfficeController @Inject () (val dataCache: DataCacheConn
 
             dataCache.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.copy(registeredOffice = address)) map { _ =>
               if (data.isRegOfficeOrMainPlaceOfBusiness && address.isDefined) {
-                Redirect(routes.ContactingYouController.get(edit))
+                Redirect(routes.BusinessEmailAddressController.get(edit))
               } else {
                 Redirect(routes.RegisteredOfficeIsUKController.get(edit))
               }

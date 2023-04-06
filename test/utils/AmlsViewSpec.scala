@@ -27,6 +27,7 @@ import org.scalatest.MustMatchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.data.Form
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
@@ -48,7 +49,7 @@ trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar w
   val commonDependencies = app.injector.instanceOf(classOf[CommonPlayDependencies])
 
   implicit lazy val messagesApi = app.injector.instanceOf(classOf[MessagesApi])
-  implicit lazy  val messages = messagesApi.preferred(FakeRequest())
+  implicit lazy val messages = messagesApi.preferred(FakeRequest())
 
   implicit val headerCarrier = HeaderCarrier()
 
@@ -73,6 +74,19 @@ trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar w
     "have a back link" in {
       def doc: Document = Jsoup.parse(html.body)
       assert(doc.getElementById("back-link").isInstanceOf[Element])
+    }
+  }
+
+  def pageWithErrors(view: Html, idSelectorPrefix: String, errorMessage: String): Unit = {
+
+    s"show errors correctly for $idSelectorPrefix field" in {
+
+      def doc: Document = Jsoup.parse(view.body)
+
+      doc.getElementsByClass("govuk-error-summary__list").first().text() must include(messages(errorMessage))
+
+      doc.getElementById(s"$idSelectorPrefix-error").text() must include(messages(errorMessage))
+
     }
   }
 

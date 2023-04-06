@@ -17,17 +17,17 @@
 package forms.businessdetails
 
 import forms.behaviours.BooleanFieldBehaviours
-import models.businessdetails.{PreviouslyRegistered, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
-import play.api.data.Form
+import models.businessdetails.LettersAddress
+import play.api.data.{Form, FormError}
 
-class PreviouslyRegisteredFormProviderSpec extends BooleanFieldBehaviours[PreviouslyRegistered] {
+class LettersAddressFormProviderSpec extends BooleanFieldBehaviours[LettersAddress] {
 
+  override val form: Form[LettersAddress] = new LettersAddressFormProvider()()
+  override val fieldName: String = "lettersAddress"
+  override val errorMessage: String = "error.required.atb.lettersaddress"
 
-  override val form: Form[PreviouslyRegistered] = new PreviouslyRegisteredFormProvider()()
-  override val fieldName: String = "value"
-  override val errorMessage: String = "error.required.atb.previously.registered"
+  "LettersAddressFormProvider" must {
 
-  "PreviouslyRegistered form" must {
-    behave like booleanFieldWithModel(PreviouslyRegisteredYes(Some("")), PreviouslyRegisteredNo)
+    behave like booleanFieldWithModel(LettersAddress(true), LettersAddress(false))
   }
 }

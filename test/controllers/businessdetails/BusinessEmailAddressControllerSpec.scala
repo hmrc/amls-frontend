@@ -17,9 +17,9 @@
 package controllers.businessdetails
 
 import java.util.UUID
-
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessdetails.BusinessEmailAddressFormProvider
 import models.businessdetails.{BusinessDetails, ContactingYou}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -27,14 +27,15 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessdetails.contacting_you
+import views.html.businessdetails.BusinessEmailAddressView
 
 import scala.concurrent.Future
 
-class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
+class BusinessEmailAddressControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val userId = s"user-${UUID.randomUUID}"
   val contactingYou = Some(ContactingYou(Some("+44 (0)123 456-7890"), Some("test@test.com")))
@@ -42,13 +43,14 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[contacting_you]
-    val controller = new ContactingYouController (
+    lazy val view = app.injector.instanceOf[BusinessEmailAddressView]
+    val controller = new BusinessEmailAddressController(
       dataCache = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      contacting_you = view)
+      formProvider = app.injector.instanceOf[BusinessEmailAddressFormProvider],
+      view = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -90,8 +92,7 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
     "Post" must {
 
       "on post of valid data" in new Fixture {
-
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.BusinessEmailAddressController.post().url).withFormUrlEncodedBody(
           "confirmEmail" -> "test@test.com",
           "email" -> "test@test.com"
         )
@@ -110,7 +111,7 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
       "on post of incomplete data" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.BusinessEmailAddressController.post().url).withFormUrlEncodedBody(
           "email" -> "test@test.com"
         )
 
@@ -126,7 +127,7 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
       "on post of different email addresses" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.BusinessEmailAddressController.post().url).withFormUrlEncodedBody(
           "confirmEmail" -> "test@test.com",
           "email" -> "test1@test.com"
         )

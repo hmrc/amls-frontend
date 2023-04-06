@@ -21,7 +21,6 @@ import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
 import forms.businessdetails.RegisteredOfficeUKFormProvider
 import models.businessdetails.{BusinessDetails, RegisteredOffice}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
@@ -71,7 +70,7 @@ class RegisteredOfficeUKController @Inject ()(
               if (edit) {
                 Redirect(routes.SummaryController.get)
               } else {
-                Redirect(routes.ContactingYouController.get())
+                Redirect(routes.BusinessEmailAddressController.get())
               }
             }
           }

@@ -19,9 +19,9 @@ package generators
 import org.joda.time.{LocalDate => JodaLocalDate}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Gen.{alphaNumChar, alphaStr, listOfN, numChar}
+import org.scalacheck.Gen.{alphaNumChar, listOfN, numChar}
 
-import java.time.{LocalDate, ZoneId}
+import java.time.LocalDate
 
 //noinspection ScalaStyle
 trait BaseGenerator {

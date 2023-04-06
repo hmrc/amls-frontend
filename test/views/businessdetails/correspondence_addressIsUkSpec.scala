@@ -16,21 +16,24 @@
 
 package views.businessdetails
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
+import forms.businessdetails.CorrespondenceAddressIsUKFormProvider
 import models.autocomplete.NameValuePair
 import models.businessdetails.CorrespondenceAddressIsUk
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
+import play.api.mvc.Request
+import play.api.test.{FakeRequest, Injecting}
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.businessdetails.correspondence_address_is_uk
+import views.html.businessdetails.CorrespondenceAddressIsUKView
 
 
-class correspondence_addressIsUkSpec extends AmlsViewSpec with MustMatchers  {
+class correspondence_addressIsUkSpec extends AmlsViewSpec with MustMatchers with Injecting {
 
+  lazy val correspondence_address_is_uk: CorrespondenceAddressIsUKView = inject[CorrespondenceAddressIsUKView]
+  lazy val formProvider: CorrespondenceAddressIsUKFormProvider = inject[CorrespondenceAddressIsUKFormProvider]
+
+  implicit val request: Request[_] = FakeRequest()
   trait ViewFixture extends Fixture {
-    lazy val correspondence_address_is_uk = app.injector.instanceOf[correspondence_address_is_uk]
     implicit val requestWithToken = addTokenForView()
     val countries = Some(Seq(
       NameValuePair("Country 1", "country:1")
@@ -40,45 +43,30 @@ class correspondence_addressIsUkSpec extends AmlsViewSpec with MustMatchers  {
   "correspondence_address view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[CorrespondenceAddressIsUk] = Form2(CorrespondenceAddressIsUk(true))
+      val formWithData = formProvider().fill(CorrespondenceAddressIsUk(true))
 
-      def view = correspondence_address_is_uk(form2, true)
+      def view = correspondence_address_is_uk(formWithData, true)
 
-      doc.title must startWith(Messages("businessdetails.correspondenceaddress.isuk.title") + " - " + Messages("summary.businessdetails"))
+      doc.title must startWith(messages("businessdetails.correspondenceaddress.isuk.title") + " - " + messages("summary.businessdetails"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[CorrespondenceAddressIsUk] = Form2(CorrespondenceAddressIsUk(true))
+      val formWithData = formProvider().fill(CorrespondenceAddressIsUk(true))
 
-      def view = correspondence_address_is_uk(form2, true)
+      def view = correspondence_address_is_uk(formWithData, true)
 
-      heading.html must be(Messages("businessdetails.correspondenceaddress.isuk.title"))
-      subHeading.html must include(Messages("summary.businessdetails"))
+      heading.html must be(messages("businessdetails.correspondenceaddress.isuk.title"))
+      subHeading.html must include(messages("summary.businessdetails"))
 
     }
 
-    "show errors in the correct locations" in new ViewFixture {
+    behave like pageWithErrors(
+      correspondence_address_is_uk(formProvider().bind(Map("isUk" -> "")), true),
+      "isUk",
+      "businessdetails.correspondenceaddress.isuk.error"
+    )
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "isUK") -> Seq(ValidationError("second not a message Key"))
-        ))
-
-      def view = correspondence_address_is_uk(form2, true)
-
-      errorSummary.html() must include("second not a message Key")
-
-      doc.getElementById("isUK")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
-    }
-
-    "have a back link" in new ViewFixture {
-      val form2: Form2[_] = EmptyForm
-
-      def view = correspondence_address_is_uk(form2, true)
-
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
-    }
+    behave like pageWithBackLink(correspondence_address_is_uk(formProvider(), true))
   }
 }

@@ -16,14 +16,14 @@
 
 package controllers.businessdetails
 
-import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.businessdetails.LettersAddressFormProvider
 import models.businessdetails.{BusinessDetails, LettersAddress, RegisteredOffice}
-import play.api.mvc.{MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import utils.AuthAction
-import views.html.businessdetails._
+import views.html.businessdetails.LettersAddressView
 
 import scala.concurrent.Future
 
@@ -32,9 +32,10 @@ class LettersAddressController @Inject () (val dataCache: DataCacheConnector,
                                            val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
                                            val cc: MessagesControllerComponents,
-                                           letters_address: letters_address) extends AmlsBaseController(ds, cc) {
+                                           formProvider: LettersAddressFormProvider,
+                                           view: LettersAddressView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response =>
@@ -44,29 +45,30 @@ class LettersAddressController @Inject () (val dataCache: DataCacheConnector,
           } yield {
             (for {
               altCorrespondenceAddress <- atb.altCorrespondenceAddress
-            } yield Ok(letters_address(Form2[LettersAddress](LettersAddress(!altCorrespondenceAddress)), registeredOffice, edit)))
-              .getOrElse (Ok(letters_address(EmptyForm, registeredOffice, edit)))
+            } yield Ok(view(formProvider().fill(LettersAddress(!altCorrespondenceAddress)), registeredOffice, edit)))
+              .getOrElse (Ok(view(formProvider(), registeredOffice, edit)))
           }) getOrElse Redirect(routes.CorrespondenceAddressIsUkController.get(edit))
       }
 
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[LettersAddress](request.body) match {
-        case f: InvalidForm =>
+
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
           dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
             response =>
               val regOffice: Option[RegisteredOffice] = (for {
                 businessDetails <- response
                 registeredOffice <- businessDetails.registeredOffice
-              } yield Option[RegisteredOffice](registeredOffice)).getOrElse(None)
+              } yield Option[RegisteredOffice](registeredOffice)).flatten
               regOffice match {
-                case Some(data) => BadRequest(letters_address(f, data))
+                case Some(data) => BadRequest(view(formWithErrors, data))
                 case _ => Redirect(routes.CorrespondenceAddressIsUkController.get(edit))
               }
-          }
-        case ValidForm(_, data) =>
+          },
+        data =>
           dataCache.fetchAll(request.credId) flatMap {
             optionalCache =>
               val result = for {
@@ -84,13 +86,14 @@ class LettersAddressController @Inject () (val dataCache: DataCacheConnector,
               }
               result getOrElse Future.successful(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
           }
-      }
+      )
   }
 
   private def getRouting(altCorrespondenceAddress: Boolean, edit: Boolean): Result = {
-    altCorrespondenceAddress match {
-      case true => Redirect(routes.SummaryController.get)
-      case false => Redirect(routes.CorrespondenceAddressIsUkController.get(edit))
+    if (altCorrespondenceAddress) {
+      Redirect(routes.SummaryController.get)
+    } else {
+      Redirect(routes.CorrespondenceAddressIsUkController.get(edit))
     }
   }
 }

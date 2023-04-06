@@ -16,23 +16,21 @@
 
 package forms.businessdetails
 
-import forms.mappings.Mappings
+import forms.generic.BooleanFormProvider
 import models.businessdetails.{PreviouslyRegistered, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import play.api.data.Form
 
 import javax.inject.Inject
 
 
-class PreviouslyRegisteredFormProvider @Inject()() extends Mappings {
+class PreviouslyRegisteredFormProvider @Inject()() extends BooleanFormProvider {
 
-  def apply(): Form[PreviouslyRegistered] = Form[PreviouslyRegistered](
-    "value" -> boolean("error.required.atb.previously.registered")
-      .transform[PreviouslyRegistered](
-        if(_) PreviouslyRegisteredYes(Some("")) else PreviouslyRegisteredNo, //TODO Check this transformation, only code used stupid type
-        {
-          case PreviouslyRegisteredYes(_) => true
-          case _ => false
-        }
-      )
-  )
+  def apply(): Form[PreviouslyRegistered] =
+    createForm[PreviouslyRegistered]("value", "error.required.atb.previously.registered")(
+      bool => if (bool) PreviouslyRegisteredYes(Some("")) else PreviouslyRegisteredNo, //TODO check if this silly model can be changed
+      {
+        case PreviouslyRegisteredYes(_) => true
+        case PreviouslyRegisteredNo => false
+      }
+    )
 }

@@ -23,12 +23,14 @@ import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForP
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
-class PSRNumberFormProviderSpec extends BooleanFieldBehaviours with BaseGenerator {
+class PSRNumberFormProviderSpec extends BooleanFieldBehaviours[BusinessAppliedForPSRNumber] with BaseGenerator {
 
   val formProvider: PSRNumberFormProvider = new PSRNumberFormProvider()
-  val form: Form[BusinessAppliedForPSRNumber] = formProvider()
+  override val form: Form[BusinessAppliedForPSRNumber] = formProvider()
 
-  val radioFieldName: String = "appliedFor"
+  override val fieldName: String = "appliedFor"
+  override val errorMessage: String = "error.required.msb.psr.options"
+
   val inputFieldName: String = "regNumber"
 
   "form" must {
@@ -37,7 +39,7 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours with BaseGenerato
 
       "'No' is submitted" in {
 
-        val boundForm = form.bind(Map(radioFieldName -> "false"))
+        val boundForm = form.bind(Map(fieldName -> "false"))
 
         boundForm.value shouldBe Some(BusinessAppliedForPSRNumberNo)
         boundForm.errors shouldBe Nil
@@ -47,7 +49,7 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours with BaseGenerato
 
         forAll(numSequence(formProvider.length)) { psrNum =>
 
-          val boundForm = form.bind(Map(radioFieldName -> "true", inputFieldName -> psrNum))
+          val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> psrNum))
 
           boundForm.value shouldBe Some(BusinessAppliedForPSRNumberYes(psrNum))
           boundForm.errors shouldBe Nil
@@ -59,23 +61,23 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours with BaseGenerato
 
       "an empty value is submitted" in {
 
-        val boundForm = form.bind(Map(radioFieldName -> ""))
+        val boundForm = form.bind(Map(fieldName -> ""))
 
-        boundForm.errors.headOption shouldBe Some(FormError(radioFieldName, "error.required.msb.psr.options"))
+        boundForm.errors.headOption shouldBe Some(FormError(fieldName, errorMessage))
       }
 
       "an invalid value is submitted" in {
 
         forAll(stringsLongerThan(1)) { invalidFormValue =>
-          val boundForm = form.bind(Map(radioFieldName -> invalidFormValue))
+          val boundForm = form.bind(Map(fieldName -> invalidFormValue))
 
-          boundForm.errors.headOption shouldBe Some(FormError(radioFieldName, "error.required.msb.psr.options"))
+          boundForm.errors.headOption shouldBe Some(FormError(fieldName, errorMessage))
         }
       }
 
       "'Yes' is submitted without a PSR number" in {
 
-        val boundForm = form.bind(Map(radioFieldName -> "true"))
+        val boundForm = form.bind(Map(fieldName -> "true"))
 
         boundForm.errors.headOption shouldBe Some(FormError(inputFieldName, "error.invalid.msb.psr.number"))
       }
@@ -84,7 +86,7 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours with BaseGenerato
         "is too long" in {
 
           forAll(numsLongerThan(formProvider.length + 1)) { longPsrNum =>
-            val boundForm = form.bind(Map(radioFieldName -> "true", inputFieldName -> longPsrNum.toString))
+            val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> longPsrNum.toString))
             boundForm.errors.headOption shouldBe Some(
               FormError(inputFieldName, "error.max.length.msb.psr.number", Seq(formProvider.length))
             )
@@ -94,7 +96,7 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours with BaseGenerato
         "is too short" in {
 
           forAll(numsShorterThan(formProvider.length - 1)) { shortPsrNum =>
-            val boundForm = form.bind(Map(radioFieldName -> "true", inputFieldName -> shortPsrNum.toString))
+            val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> shortPsrNum.toString))
             boundForm.errors.headOption shouldBe Some(
               FormError(inputFieldName, "error.max.length.msb.psr.number", Seq(formProvider.length))
             )
@@ -104,7 +106,7 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours with BaseGenerato
         "is invalid" in {
 
           forAll(numSequence(formProvider.length).suchThat(_.length == formProvider.length), Gen.alphaChar) { (psrNum, char) =>
-            val boundForm = form.bind(Map(radioFieldName -> "true", inputFieldName -> s"${psrNum.dropRight(1)}$char"))
+            val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> s"${psrNum.dropRight(1)}$char"))
             boundForm.errors.headOption shouldBe Some(
               FormError(inputFieldName, "error.max.msb.psr.number.format", Seq(numbersOnlyRegex.regex))
             )

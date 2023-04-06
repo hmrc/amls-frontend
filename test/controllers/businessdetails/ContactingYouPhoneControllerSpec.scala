@@ -16,10 +16,9 @@
 
 package controllers.businessdetails
 
-import java.util.UUID
-
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessdetails.BusinessTelephoneFormProvider
 import models.businessdetails.{BusinessDetails, ContactingYou}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -27,11 +26,13 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessdetails.contacting_you_phone
+import views.html.businessdetails.BusinessTelephoneView
 
+import java.util.UUID
 import scala.concurrent.Future
 
 class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
@@ -42,13 +43,14 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[contacting_you_phone]
+    lazy val view = app.injector.instanceOf[BusinessTelephoneView]
     val controller = new ContactingYouPhoneController (
       dataCache = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      contacting_you_phone = view)
+      formProvider = app.injector.instanceOf[BusinessTelephoneFormProvider],
+      view = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -83,9 +85,8 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
       "on post of valid data" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "phoneNumber" -> "+44 (0)123 456-7890"
-        )
+        val newRequest = FakeRequest(POST, routes.ContactingYouPhoneController.post(false).url)
+          .withFormUrlEncodedBody("phoneNumber" -> "+44 (0)123 456-7890")
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())
           (any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
@@ -101,9 +102,8 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
       "on post of incomplete data" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "phoneNumber" -> ""
-        )
+        val newRequest = FakeRequest(POST, routes.ContactingYouPhoneController.post(false).url)
+          .withFormUrlEncodedBody("phoneNumber" -> "")
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())
           (any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))

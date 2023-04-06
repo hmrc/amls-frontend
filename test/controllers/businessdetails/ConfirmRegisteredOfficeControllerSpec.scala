@@ -119,7 +119,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.ContactingYouController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.BusinessEmailAddressController.get().url))
         verify(
           controller.dataCache).save[BusinessDetails](any(), any(),
           meq(businessDetails.copy(registeredOffice = Some(ukAddress))))(any(), any())
@@ -142,7 +142,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.ContactingYouController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.BusinessEmailAddressController.get().url))
         verify(
           controller.dataCache).save[BusinessDetails](any(), any(),
           meq(businessDetails.copy(registeredOffice = Some(nonUkAddress))))(any(), any())
