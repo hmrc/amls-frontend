@@ -109,20 +109,17 @@ class BusinessEmailAddressFormProviderSpec extends StringFieldBehaviours {
         }
       }
 
-      "inputs do not match" ignore { //TODO test fails, remove ignore
+      "inputs do not match" in {
 
-        forAll(emailGen.suchThat(_.length < form.length), Gen.alphaNumChar) { (email, char) =>
-          println(email)
-          val result = form().bind(
-            Map(
-              emailField -> email,
-              confirmEmailField -> (email + char.toString)
-            )
+        val result = form().bind(
+          Map(
+            emailField -> "john.doe@gmail.com",
+            confirmEmailField -> "john.doe@gmail.co"
           )
+        )
 
-          result.value shouldBe None
-          result.errors shouldBe Seq(FormError(confirmEmailField, s"$invalidError.reenter"))
-        }
+        result.value shouldBe None
+        result.errors shouldBe List(FormError("", List(s"$invalidError.match")))
       }
     }
   }

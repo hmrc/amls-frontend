@@ -20,16 +20,31 @@ import forms.mappings.AddressMappings
 import play.api.data.Form
 import play.api.data.Forms.{mapping, optional}
 
-trait AddressFormProvider[A] extends AddressMappings {
+trait CorrespondenceAddressFormProvider[A] extends AddressMappings {
 
-  val countryErrorKey: String
+  def toObject: (String, String, String, String, Option[String], Option[String], String) => A
 
-  def toObject: (String, String, Option[String], Option[String], String) => A
+  def fromObject: A => Option[(String, String, String, String, Option[String], Option[String], String)]
 
-  def fromObject: A => Option[(String, String, Option[String], Option[String], String)]
+  val nameMaxLength = 140
+  val businessNameMaxLength = 120
+
+  val regex: String = "^[a-zA-Z0-9\u00C0-\u00FF !#$%&'‘’\"“”«»()*+,./:;=?@\\[\\]|~£€¥\\u005C\u2014\u2013\u2010\u005F\u005E\u0060\u000A\u000D\u002d]+$"
 
   def createForm(isUKAddress: Boolean): Form[A] = Form[A](
     mapping(
+      "yourName" -> text("error.required.yourname").verifying(
+        firstError(
+          maxLength(nameMaxLength, "error.invalid.yourname"),
+          regexp(regex, "error.invalid.yourname.validation")
+        )
+      ),
+      "businessName" -> text("error.required.name.of.business").verifying(
+        firstError(
+          maxLength(businessNameMaxLength, "error.invalid.name.of.business"),
+          regexp(regex, "error.invalid.name.of.business.validation")
+        )
+      ),
       "addressLine1" -> addressLineMapping("line1"),
       "addressLine2" -> addressLineMapping("line2"),
       "addressLine3" -> optional(addressLineMapping("line3")),

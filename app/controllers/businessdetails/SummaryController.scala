@@ -22,10 +22,11 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
 import models.businessdetails.BusinessDetails
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import utils.AuthAction
-import views.html.businessdetails._
+import utils.businessdetails.CheckYourAnswersHelper
+import views.html.businessdetails.CheckYourAnswersView
 
 
 class SummaryController @Inject () (
@@ -34,9 +35,10 @@ class SummaryController @Inject () (
                                      val authAction: AuthAction,
                                      val ds: CommonPlayDependencies,
                                      val cc: MessagesControllerComponents,
-                                     summary: summary) extends AmlsBaseController(ds, cc) {
+                                     cyaHelper: CheckYourAnswersHelper,
+                                     view: CheckYourAnswersView) extends AmlsBaseController(ds, cc) {
 
-  def get = authAction.async {
+  def get: Action[AnyContent] = authAction.async {
     implicit request =>
       for {
         businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)
@@ -47,13 +49,14 @@ class SummaryController @Inject () (
             case NotCompleted | SubmissionReady | SubmissionReadyForReview => true
             case _ => false
           }
-          Ok(summary(EmptyForm, data, showRegisteredForMLR))
+          val summaryListRows = cyaHelper.createSummaryList(data, showRegisteredForMLR)
+          Ok(view(summaryListRows))
         }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get)
       }
   }
 
-  def post = authAction.async {
+  def post: Action[AnyContent] = authAction.async {
     implicit request =>
       for {
         businessDetails <- dataCache.fetch[BusinessDetails](request.credId, BusinessDetails.key)

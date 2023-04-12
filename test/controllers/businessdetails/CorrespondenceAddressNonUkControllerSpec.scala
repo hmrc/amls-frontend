@@ -18,6 +18,7 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessdetails.CorrespondenceAddressNonUKFormProvider
 import models.Country
 import models.autocomplete.NameValuePair
 import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressNonUk}
@@ -29,25 +30,26 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.AutoCompleteService
+import uk.gov.hmrc.govukfrontend.views.viewmodels.select
+import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AmlsSpec
-import views.html.businessdetails.correspondence_address_non_uk
+import views.html.businessdetails.CorrespondenceAddressNonUKView
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
 
-    lazy val view = app.injector.instanceOf[correspondence_address_non_uk]
     val controller = new CorrespondenceAddressNonUkController (
       dataConnector = mock[DataCacheConnector],
       auditConnector = mock[AuditConnector],
@@ -55,14 +57,15 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      correspondence_address_non_uk = view)
+      formProvider = inject[CorrespondenceAddressNonUKFormProvider],
+      view = inject[CorrespondenceAddressNonUKView])
 
     when {
-      controller.autoCompleteService.getCountries
-    } thenReturn Some(Seq(
-      NameValuePair("United Kingdom", "UK"),
-      NameValuePair("Albania", "AL")
-    ))
+      controller.autoCompleteService.formOptions
+    } thenReturn Seq(
+      SelectItem(text = "United Kingdom", value = Some("UK")),
+      SelectItem(text = "Albania", value = Some("AL"))
+    )
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())
@@ -89,11 +92,11 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         page.getElementById("yourName").`val` must be("Name Test")
         page.getElementById("businessName").`val` must be("Test")
-        page.getElementById("addressLineNonUK1").`val` must be("Test")
-        page.getElementById("addressLineNonUK2").`val` must be("Test")
-        page.getElementById("addressLineNonUK3").`val` must be("test")
-        page.getElementById("addressLineNonUK4").`val` must be("")
-        page.getElementById("country").getElementsByAttribute("selected").`val` must be("AL")
+        page.getElementById("addressLine1").`val` must be("Test")
+        page.getElementById("addressLine2").`val` must be("Test")
+        page.getElementById("addressLine3").`val` must be("test")
+        page.getElementById("addressLine4").`val` must be("")
+        page.getElementById("location-autocomplete").getElementsByAttribute("selected").`val` must be("AL")
       }
 
       "no data exists in the keystore" in new Fixture {
@@ -103,7 +106,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val result = controller.get(false)(request)
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title must include(Messages("businessdetails.correspondenceaddress.title"))
+        Jsoup.parse(contentAsString(result)).title must include(messages("businessdetails.correspondenceaddress.title"))
 
       }
     }
@@ -118,13 +121,13 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, Some(CorrespondenceAddress(None, Some(address))))))
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.CorrespondenceAddressNonUkController.post().url).withFormUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
-          "addressLineNonUK1" -> "Add Line 1",
-          "addressLineNonUK2" -> "Add Line 2",
-          "addressLineNonUK3" -> "",
-          "addressLineNonUK4" -> "",
+          "addressLine1" -> "Add Line 1",
+          "addressLine2" -> "Add Line 2",
+          "addressLine3" -> "",
+          "addressLine4" -> "",
           "country" -> "AL"
         )
 
@@ -152,13 +155,13 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, Some(CorrespondenceAddress(None, Some(address))))))
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.CorrespondenceAddressNonUkController.post(true).url).withFormUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
-          "addressLineNonUK1" -> "Add Line 1",
-          "addressLineNonUK2" -> "Add Line 2",
-          "addressLineNonUK3" -> "",
-          "addressLineNonUK4" -> "",
+          "addressLine1" -> "Add Line 1",
+          "addressLine2" -> "Add Line 2",
+          "addressLine3" -> "",
+          "addressLine4" -> "",
           "country" -> "AL"
         )
 
@@ -190,13 +193,13 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val fetchResult = Future.successful(None)
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.CorrespondenceAddressNonUkController.post().url).withFormUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
-          "addressLineNonUK1" -> "Add Line 1 & 3",
-          "addressLineNonUK2" -> "Add Line 2 *",
-          "addressLineNonUK3" -> "$$$",
-          "addressLineNonUK4" -> "##",
+          "addressLine1" -> "Add Line 1 & 3",
+          "addressLine2" -> "Add Line 2 *",
+          "addressLine3" -> "$$$",
+          "addressLine4" -> "##",
           "country" -> "AL"
         )
 
@@ -211,19 +214,19 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
         val document: Document  = Jsoup.parse(contentAsString(result))
         val errorCount = 4
-        val elementsWithError : Elements = document.getElementsByClass("error-notification")
+        val elementsWithError: Elements = document.select(".govuk-error-summary__list li")
         elementsWithError.size() must be(errorCount)
 
         elementsWithError.asScala.map(_.text()) must contain allOf(
-          "Error: " + Messages("error.text.validation.address.line1"),
-          "Error: " + Messages("error.text.validation.address.line2"),
-          "Error: " + Messages("error.text.validation.address.line3"),
-          "Error: " + Messages("error.text.validation.address.line4"))
+          messages("error.text.validation.address.line1"),
+          messages("error.text.validation.address.line2"),
+          messages("error.text.validation.address.line3"),
+          messages("error.text.validation.address.line4"))
       }
 
       "an invalid form request is sent in the body" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.CorrespondenceAddressNonUkController.post().url).withFormUrlEncodedBody(
           "yourName" -> "Name",
           "businessName" -> "Business Name",
           "invalid" -> "AL"

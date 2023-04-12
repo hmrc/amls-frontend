@@ -19,7 +19,7 @@ package generators
 import org.joda.time.{LocalDate => JodaLocalDate}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Gen.{alphaNumChar, listOfN, numChar}
+import org.scalacheck.Gen.{alphaNumChar, choose, listOfN, numChar}
 
 import java.time.LocalDate
 
@@ -95,6 +95,14 @@ trait BaseGenerator {
     Gen.oneOf[String](
       Seq(
         "@", "£", "$", "%", "^", "&", "*", "~", ">", "<", "|", "]", "[", "}", "{", "=", "+"
+      )
+    ).suchThat(_.nonEmpty)
+
+  val invalidCharForNames: Gen[String] = //TODO Might have a few characters that actuall pass regex, double check
+    Gen.oneOf[String](
+      Seq(
+        "ƒ", "„", "…", "†", "‡", "ˆ", "‰", "‹", "Œ", "•", "™", "œ", "¡", "¢", "¤", "¦", "§", "¨", "©", "ª",
+        "¬", "®", "°", "±", "²", "³", "¶", "¸", "¹", "º", "¼", "½", "¾", "¿"
       )
     ).suchThat(_.nonEmpty)
 

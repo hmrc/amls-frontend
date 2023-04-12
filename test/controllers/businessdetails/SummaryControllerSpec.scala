@@ -27,25 +27,28 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessdetails.summary
+import utils.businessdetails.CheckYourAnswersHelper
+import views.html.businessdetails.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
+class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[summary]
+    lazy val view = inject[CheckYourAnswersView]
     val controller = new SummaryController (
       dataCache = mock[DataCacheConnector],
       statusService = mock[StatusService],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      summary = view)
+      cyaHelper = inject[CheckYourAnswersHelper],
+      view = view)
 
     val testBusinessName = "Ubunchews Accountancy Services"
 

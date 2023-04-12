@@ -23,15 +23,16 @@ import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.businessdetails.CorrespondenceAddressNonUKFormProvider
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressNonUk}
-import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import services.AutoCompleteService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.AuthAction
-import views.html.businessdetails._
+import views.html.businessdetails.CorrespondenceAddressNonUKView
 
 import scala.concurrent.Future
 
@@ -41,35 +42,40 @@ class CorrespondenceAddressNonUkController @Inject ()(val dataConnector: DataCac
                                                       val authAction: AuthAction,
                                                       val ds: CommonPlayDependencies,
                                                       val cc: MessagesControllerComponents,
-                                                      correspondence_address_non_uk: correspondence_address_non_uk) extends AmlsBaseController(ds, cc) {
+                                                      formProvider: CorrespondenceAddressNonUKFormProvider,
+                                                      view: CorrespondenceAddressNonUKView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response =>
-          val form: Form2[CorrespondenceAddressNonUk] = (for {
+          val form = for {
             businessDetails <- response
             correspondenceAddress <- businessDetails.correspondenceAddress
-            ukAddress <- correspondenceAddress.nonUkAddress
-          } yield Form2[CorrespondenceAddressNonUk](ukAddress)).getOrElse(EmptyForm)
-          Ok(correspondence_address_non_uk(form, edit, autoCompleteService.getCountries))
+            address <- correspondenceAddress.nonUkAddress
+          } yield {
+            formProvider().fill(address)
+          }
+
+          Ok(view(form.getOrElse(formProvider()), edit, autoCompleteService.formOptions))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[CorrespondenceAddressNonUk](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(correspondence_address_non_uk(f, edit, autoCompleteService.getCountries)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
+        data => {
           val doUpdate = for {
-            businessDetails:BusinessDetails <- OptionT(dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key))
+            businessDetails: BusinessDetails <- OptionT(dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key))
             _ <- OptionT.liftF(dataConnector.save[BusinessDetails]
               (request.credId, BusinessDetails.key, businessDetails.correspondenceAddress(CorrespondenceAddress(None, Some(data)))))
             _ <- OptionT.liftF(auditAddressChange(data, businessDetails.correspondenceAddress.flatMap(a => a.nonUkAddress), edit)) orElse OptionT.some(Success)
           } yield Redirect(routes.SummaryController.get)
           doUpdate getOrElse InternalServerError("Could not update correspondence address")
-      }
+        }
+      )
     }
   }
 

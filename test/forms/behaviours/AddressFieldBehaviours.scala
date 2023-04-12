@@ -29,16 +29,16 @@ trait AddressFieldBehaviours extends FieldBehaviours {
   val maxLength: Int
   val regexString: String
 
-  val addressLinesData: MutableMap[String, String] = collection.mutable.Map(
+  val addressLinesData: MutableMap[String, String] = MutableMap(
     "addressLine1" -> "123 Test Street",
     "addressLine2" -> "Test Village",
     "addressLine3" -> "Test City",
     "addressLine4" -> "Test County"
   )
 
-  private val validAddressLineGen: Gen[String] = Gen.alphaNumStr.suchThat(_.length <= maxLength)
+  protected def validAddressLineGen(maxLength: Int): Gen[String] = Gen.alphaNumStr.suchThat(_.length <= maxLength)
 
-  private def bindForm(formData: MutableMap[String, String]): Form[_] = form.bind(Map(formData.toSeq.sortBy(_._1): _*))
+  protected def bindForm(formData: MutableMap[String, String]): Form[_] = form.bind(Map(formData.toSeq.sortBy(_._1): _*))
 
   def formWithAddressFields(requiredErrorKey: String, lengthErrorKey: String, regexErrorKey: String): Unit = {
 
@@ -57,7 +57,7 @@ trait AddressFieldBehaviours extends FieldBehaviours {
 
         "must bind correctly" in {
 
-          forAll(validAddressLineGen) { addressLine =>
+          forAll(validAddressLineGen(maxLength)) { addressLine =>
 
             val formData: MutableMap[String, String] = dataToBind += (fieldName -> addressLine)
             val newForm = bindForm(formData)
@@ -76,12 +76,14 @@ trait AddressFieldBehaviours extends FieldBehaviours {
         }
 
         behave like fieldWithMaxLength(
+          maxLength,
           dataToBind,
           fieldName,
           FormError(fieldName, s"$lengthErrorKey.line$line", Seq(maxLength))
         )
 
         behave like fieldWithRegexValidation(
+          maxLength,
           dataToBind,
           fieldName,
           FormError(fieldName, s"$regexErrorKey.line$line", Seq(regexString))
@@ -90,7 +92,8 @@ trait AddressFieldBehaviours extends FieldBehaviours {
     }
   }
 
-  def fieldWithMaxLength(extraData: MutableMap[String, String],
+  def fieldWithMaxLength(maxLength: Int,
+                         extraData: MutableMap[String, String],
                          fieldName: String,
                          lengthError: FormError): Unit = {
 
@@ -105,13 +108,15 @@ trait AddressFieldBehaviours extends FieldBehaviours {
       }
     }
   }
-  def fieldWithRegexValidation(extraData: MutableMap[String, String],
+  def fieldWithRegexValidation(
+                               length: Int,
+                               extraData: MutableMap[String, String],
                                fieldName: String,
                                regexError: FormError): Unit = {
 
     s"not bind strings that violate regex" in {
 
-      forAll(validAddressLineGen, invalidChar) { (line, invalidChar) =>
+      forAll(validAddressLineGen(length), invalidChar) { (line, invalidChar) =>
 
         val invalidLine = line.dropRight(1) + invalidChar
         val formData: MutableMap[String, String] = extraData += (fieldName -> invalidLine)

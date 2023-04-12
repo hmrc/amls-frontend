@@ -17,10 +17,9 @@
 package forms.businessdetails
 
 import forms.generic.AddressFormProvider
-import models.{Country, countries}
 import models.businessdetails.{RegisteredOffice, RegisteredOfficeNonUK}
+import models.{Country, countries}
 import play.api.data.Form
-import services.AutoCompleteService
 
 import javax.inject.Inject
 
@@ -38,10 +37,4 @@ class RegisteredOfficeNonUkFormProvider @Inject()() extends AddressFormProvider[
     case _ => None
   }
   def apply(): Form[RegisteredOffice] = createForm(isUKAddress = false)
-
-  private def parseCountry(input: String): Country = {
-    countries.collectFirst {
-      case e @ Country(_, c) if c == input => e
-    }.getOrElse(throw new IllegalArgumentException(s"Invalid country code submitted: $input"))
-  }
 }
