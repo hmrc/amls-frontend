@@ -78,7 +78,7 @@
     @if(types.businessActivities.size > 1) {
         @Messages("responsiblepeople.experiencetraining.heading.multiple", personName)
     } else {
-        @Messages("responsiblepeople.experiencetraining.heading", personName, businessMatching.prefixedAlphabeticalBusinessTypes(true).fold("")(names => names.head))
+        @Messages("responsiblepeople.experiencetraining.heading", personName, businessMatching.prefixedAlphabeticalBusinessTypes(true).fold("")(names => names.mkString))
     }
 }
 }
