@@ -19,7 +19,7 @@ package generators
 import org.joda.time.{LocalDate => JodaLocalDate}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Gen.{alphaNumChar, choose, listOfN, numChar}
+import org.scalacheck.Gen.{alphaChar, alphaNumChar, choose, listOfN, numChar}
 
 import java.time.LocalDate
 
@@ -38,6 +38,11 @@ trait BaseGenerator {
   def stringsShorterThan(minLength: Int): Gen[String] = for {
     length    <- Gen.chooseNum(0, minLength - 1)
     chars     <- listOfN(length, alphaNumChar)
+  } yield chars.mkString
+
+  def alphaStringsShorterThan(minLength: Int): Gen[String] = for {
+    length <- Gen.chooseNum(0, minLength - 1)
+    chars <- listOfN(length, alphaChar)
   } yield chars.mkString
 
   def numStringOfLength(length: Int): Gen[String] = for {
@@ -98,7 +103,7 @@ trait BaseGenerator {
       )
     ).suchThat(_.nonEmpty)
 
-  val invalidCharForNames: Gen[String] = //TODO Might have a few characters that actuall pass regex, double check
+  val invalidCharForNames: Gen[String] = //TODO Might have a few characters that actually pass regex, double check
     Gen.oneOf[String](
       Seq(
         "ƒ", "„", "…", "†", "‡", "ˆ", "‰", "‹", "Œ", "•", "™", "œ", "¡", "¢", "¤", "¦", "§", "¨", "©", "ª",

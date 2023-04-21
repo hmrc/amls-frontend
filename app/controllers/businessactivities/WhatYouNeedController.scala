@@ -18,34 +18,34 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import javax.inject.Inject
 import models.businessmatching.BusinessMatching
-import play.api.mvc.MessagesControllerComponents
-import services.StatusService
+import play.api.Logging
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.AuthAction
-import views.html.businessactivities._
-import play.api.Logging
+import views.html.businessactivities.WhatYouNeedView
+
+import javax.inject.Inject
 
 class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,
                                       val authConnector: AuthConnector,
-                                      statusService: StatusService,
                                       authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
                                       val cc: MessagesControllerComponents,
-                                      what_you_need: what_you_need) extends AmlsBaseController(ds, cc) with Logging {
+                                      view: WhatYouNeedView) extends AmlsBaseController(ds, cc) with Logging {
 
-  def get = authAction.async {
+  def get: Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
         (for {
           bm <- businessMatching
           ba <- bm.activities
         } yield {
-          Ok(what_you_need(routes.InvolvedInOtherController.get().url, Some(ba)))
+          Ok(view(Some(ba)))
         }).getOrElse {
-            logger.info("Unable to retrieve business activities in [businessactivities][WhatYouNeedController]")
-            throw new Exception("Unable to retrieve business activities in [businessactivities][WhatYouNeedController]")
+            val errorMessage = "Unable to retrieve business activities in [businessactivities][WhatYouNeedController]"
+            logger.info(errorMessage)
+            throw new Exception(errorMessage)
           }
       }
   }

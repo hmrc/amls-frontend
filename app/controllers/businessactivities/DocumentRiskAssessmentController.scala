@@ -19,12 +19,12 @@ package controllers.businessactivities
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, RiskAssessmentPolicy, RiskAssessmentTypes}
+import forms.businessactivities.DocumentRiskAssessmentPolicyFormProvider
+import models.businessactivities.{BusinessActivities, RiskAssessmentPolicy}
 import models.businessmatching.BusinessMatching
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper}
-import views.html.businessactivities._
+import views.html.businessactivities.DocumentRiskAssessmentPolicyView
 
 import scala.concurrent.Future
 
@@ -33,28 +33,29 @@ class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCac
                                                  val authAction: AuthAction,
                                                  val ds: CommonPlayDependencies,
                                                  val cc: MessagesControllerComponents,
-                                                 document_risk_assessment_policy: document_risk_assessment_policy,
+                                                 formProvider: DocumentRiskAssessmentPolicyFormProvider,
+                                                 view: DocumentRiskAssessmentPolicyView,
                                                  implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
-          val form: Form2[RiskAssessmentTypes] = (for {
+          val form = (for {
             businessActivities <- response
             riskAssessmentPolicy: RiskAssessmentPolicy <- businessActivities.riskAssessmentPolicy
-          } yield Form2[RiskAssessmentTypes](riskAssessmentPolicy.riskassessments)).getOrElse(EmptyForm)
-          Ok(document_risk_assessment_policy(form, edit))
+          } yield formProvider().fill(riskAssessmentPolicy.riskassessments)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      import jto.validation.forms.Rules._
-      Form2[RiskAssessmentTypes](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(document_risk_assessment_policy(f, edit)))
-        case ValidForm(_, data: RiskAssessmentTypes) => {
+
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => {
           dataCacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
             val businessMatching = for {
               cacheMap <- maybeCache
@@ -64,13 +65,13 @@ class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCac
             for {
               businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
               _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, businessActivities.riskAssessmentTypes(data))
-            } yield redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)))
+            } yield redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(businessMatching))
 
           }
         } recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
-      }
+      )
   }
 
   private def redirectDependingOnEdit(edit: Boolean, accountancyServices: Boolean) =

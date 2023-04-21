@@ -18,6 +18,7 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.WhoIsYourAccountantNameFormProvider
 import models.businessactivities.{BusinessActivities, WhoIsYourAccountant, WhoIsYourAccountantName}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -26,28 +27,31 @@ import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
-import views.html.businessactivities.who_is_your_accountant
+import views.html.businessactivities.WhoIsYourAccountantNameView
 
 import scala.concurrent.Future
 
 class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
   with MockitoSugar
   with ScalaFutures
-  with PrivateMethodTester {
+  with PrivateMethodTester
+  with Injecting {
 
-  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks{
+  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
     self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[who_is_your_accountant]
+    lazy val view = inject[WhoIsYourAccountantNameView]
     val controller = new WhoIsYourAccountantNameController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       autoCompleteService = mockAutoComplete,
       ds = commonDependencies,
       cc = mockMcc,
-      who_is_your_accountant = view
+      formProvider = inject[WhoIsYourAccountantNameFormProvider],
+      view = view
     )
   }
 
@@ -104,7 +108,8 @@ class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
       "edit is true" must {
         "respond with SEE_OTHER and redirect to the SummaryController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhoIsYourAccountantNameController.post(true).url)
+          .withFormUrlEncodedBody(
             "name" -> "testName",
             "tradingName" -> "tradingName"
           )
@@ -125,7 +130,8 @@ class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
       "edit is false" must {
         "respond with SEE_OTHER and redirect to the TaxMattersController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhoIsYourAccountantNameController.post(false).url)
+          .withFormUrlEncodedBody(
             "name" -> "testName",
             "tradingName" -> "tradingName"
           )

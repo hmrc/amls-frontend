@@ -19,24 +19,25 @@ package controllers.businessactivities
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
+import forms.businessactivities.InvolvedInOtherFormProvider
 import models.businessactivities.{BusinessActivities, _}
 import models.businessmatching._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import utils.AuthAction
-import views.html.businessactivities._
+import views.html.businessactivities.InvolvedInOtherNameView
 
 
 
-class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheConnector,
-                                            implicit val statusService: StatusService,
-                                            val authAction: AuthAction,
-                                            val ds: CommonPlayDependencies,
-                                            val cc: MessagesControllerComponents,
-                                            involved_in_other_name: involved_in_other_name) extends AmlsBaseController(ds, cc) {
+class InvolvedInOtherController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                           implicit val statusService: StatusService,
+                                           val authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
+                                           val cc: MessagesControllerComponents,
+                                           formProvider: InvolvedInOtherFormProvider,
+                                           view: InvolvedInOtherNameView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetchAll(request.credId) map {
         optionalCache =>
@@ -47,29 +48,28 @@ class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheCon
             (for {
               businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
               involvedInOther <- businessActivities.involvedInOther
-            } yield Ok(involved_in_other_name(Form2[InvolvedInOther](involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false))))
-              .getOrElse(Ok(involved_in_other_name(EmptyForm, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false))))
-          }) getOrElse Ok(involved_in_other_name(EmptyForm, edit, None))
+            } yield Ok(view(formProvider().fill(involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false), formProvider.length)))
+              .getOrElse(Ok(view(formProvider(), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false), formProvider.length)))
+          }) getOrElse Ok(view(formProvider(), edit, None, formProvider.length))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[InvolvedInOther](request.body) match {
-        case f: InvalidForm =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
           } yield businessMatching match {
-            case Some(x) => BadRequest(involved_in_other_name(f, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
-            case None => BadRequest(involved_in_other_name(f, edit, None))
-          }
-        case ValidForm(_, data) =>
+            case Some(x) => BadRequest(view(formWithErrors, edit, businessMatching.prefixedAlphabeticalBusinessTypes(false), formProvider.length))
+            case None => BadRequest(view(formWithErrors, edit, None, formProvider.length))
+          },
+        data =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, getUpdatedBA(businessActivities, data))
-
           } yield redirectDependingOnResponse(data, edit)
-      }
+      )
     }
   }
 

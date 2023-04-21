@@ -28,23 +28,22 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessactivities.what_you_need
+import views.html.businessactivities.WhatYouNeedView
 
 import scala.concurrent.Future
 
-class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[what_you_need]
+    lazy val view = app.injector.instanceOf[WhatYouNeedView]
     val controller = new WhatYouNeedController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
-      statusService = mockStatusService,
       authConnector = mock[AuthConnector],
       cc = mockMcc,
-      what_you_need = view)
+      view = view)
   }
 
   "WhatYouNeedController" must {
@@ -62,7 +61,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.InvolvedInOtherController.get().url
+          doc.getElementById("button").attr("href") mustBe routes.InvolvedInOtherController.get().url
         }
 
         "performing a variation" in new Fixture {
@@ -76,7 +75,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.InvolvedInOtherController.get().url
+          doc.getElementById("button").attr("href") mustBe routes.InvolvedInOtherController.get().url
         }
 
         "in a renewal pending status" in new Fixture {
@@ -90,7 +89,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.InvolvedInOtherController.get().url
+          doc.getElementById("button").attr("href") mustBe routes.InvolvedInOtherController.get().url
         }
 
         "in a renewal submitted status" in new Fixture {
@@ -104,7 +103,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.InvolvedInOtherController.get().url
+          doc.getElementById("button").attr("href") mustBe routes.InvolvedInOtherController.get().url
         }
       }
 

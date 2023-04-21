@@ -17,7 +17,7 @@
 package forms.businessdetails
 
 import forms.mappings.Mappings
-import models.businessdetails.{ActivityStartDate, PreviouslyRegistered}
+import models.businessdetails.ActivityStartDate
 import org.joda.time.LocalDate
 import play.api.data.Form
 

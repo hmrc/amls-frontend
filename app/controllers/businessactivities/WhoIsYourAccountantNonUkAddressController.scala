@@ -19,23 +19,22 @@ package controllers.businessactivities
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{AccountantsAddress, BusinessActivities, NonUkAccountantsAddress}
-import play.api.mvc.MessagesControllerComponents
+import forms.businessactivities.AccountantNonUKAddressFormProvider
+import models.businessactivities.BusinessActivities
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper}
-import views.html.businessactivities.who_is_your_accountant_non_uk_address
-
-
+import views.html.businessactivities.AccountantNonUKAddressView
 
 class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                           val autoCompleteService: AutoCompleteService,
                                                           val authAction: AuthAction,
                                                           val ds: CommonPlayDependencies,
                                                           val cc: MessagesControllerComponents,
-                                                          who_is_your_accountant_non_uk_address: who_is_your_accountant_non_uk_address) extends AmlsBaseController(ds, cc) {
+                                                          formProvider: AccountantNonUKAddressFormProvider,
+                                                          view: AccountantNonUKAddressView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
@@ -43,21 +42,21 @@ class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector
             businessActivities <- response
             whoIsYourAccountant <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.address)
           } yield {
-            if(!whoIsYourAccountant.isUk) { Form2[AccountantsAddress](whoIsYourAccountant) } else { EmptyForm }
-          }).getOrElse(EmptyForm)
-          Ok(who_is_your_accountant_non_uk_address(form, edit, ControllerHelper.accountantName(response), autoCompleteService.getCountries))
+            if(!whoIsYourAccountant.isUk) formProvider().fill(whoIsYourAccountant) else formProvider()
+          }).getOrElse(formProvider())
+          Ok(view(form, edit, ControllerHelper.accountantName(response), autoCompleteService.formOptions))
       }
   }
 
-  def post(edit : Boolean = false) = authAction.async {
+  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[NonUkAccountantsAddress](request.body) match {
-        case f: InvalidForm =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
           dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-            response => BadRequest(who_is_your_accountant_non_uk_address(
-              f, edit, ControllerHelper.accountantName(response), autoCompleteService.getCountries))
-          }
-        case ValidForm(_, data) => {
+            response => BadRequest(view(
+              formWithErrors, edit, ControllerHelper.accountantName(response), autoCompleteService.formOptions))
+          },
+        data =>
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
@@ -68,7 +67,6 @@ class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector
           } else {
             Redirect(routes.TaxMattersController.get())
           }
-        }
-      }
+      )
   }
 }

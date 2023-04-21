@@ -18,6 +18,7 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.AccountantUKAddressFormProvider
 import models.businessactivities._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -26,27 +27,30 @@ import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
-import views.html.businessactivities.who_is_your_accountant_uk_address
+import views.html.businessactivities.AccountantUKAddressView
 
 import scala.concurrent.Future
 
 class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
   with MockitoSugar
   with ScalaFutures
-  with PrivateMethodTester {
+  with PrivateMethodTester
+  with Injecting {
 
   trait Fixture extends AutoCompleteServiceMocks{
     self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[who_is_your_accountant_uk_address]
+    lazy val view = inject[AccountantUKAddressView]
     val controller = new WhoIsYourAccountantUkAddressController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       autoCompleteService = mockAutoComplete,
       cc = mockMcc,
-      who_is_your_accountant_uk_address = view
+      formProvider = inject[AccountantUKAddressFormProvider],
+      view = view
     )
   }
 
@@ -114,7 +118,8 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
       "edit is true" must {
         "respond with SEE_OTHER and redirect to the SummaryController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhoIsYourAccountantUkAddressController.post(true).url)
+          .withFormUrlEncodedBody(
             "addressLine1" -> "line1",
             "addressLine2" -> "line2",
             "addressLine3" -> "line3",
@@ -138,7 +143,8 @@ class WhoIsYourAccountantUkAddressControllerSpec extends AmlsSpec
       "edit is false" must {
         "respond with SEE_OTHER and redirect to the TaxMattersController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhoIsYourAccountantUkAddressController.post(false).url)
+          .withFormUrlEncodedBody(
             "addressLine1" -> "line1",
             "addressLine2" -> "line2",
             "addressLine3" -> "line3",

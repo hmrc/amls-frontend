@@ -19,12 +19,12 @@ package controllers.businessactivities
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.businessactivities.RiskAssessmentFormProvider
 import models.businessactivities.{BusinessActivities, RiskAssessmentHasPolicy}
 import models.businessmatching.BusinessMatching
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper}
-import views.html.businessactivities._
+import views.html.businessactivities.RiskAssessmentPolicyView
 
 import scala.concurrent.Future
 
@@ -33,28 +33,29 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
                                           val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           val cc: MessagesControllerComponents,
-                                          risk_assessment_policy: risk_assessment_policy,
+                                          formProvider: RiskAssessmentFormProvider,
+                                          view: RiskAssessmentPolicyView,
                                           implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
-          val form: Form2[RiskAssessmentHasPolicy] = (for {
+          val form = (for {
             businessActivities <- response
             riskAssessmentPolicy <- businessActivities.riskAssessmentPolicy
-          } yield Form2[RiskAssessmentHasPolicy](riskAssessmentPolicy.hasPolicy)).getOrElse(EmptyForm)
-          Ok(risk_assessment_policy(form, edit))
+          } yield formProvider().fill(riskAssessmentPolicy.hasPolicy)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
 
-      Form2[RiskAssessmentHasPolicy](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(risk_assessment_policy(f, edit)))
-        case ValidForm(_, data: RiskAssessmentHasPolicy) => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => {
           dataCacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
             val businessMatching = for {
               cacheMap <- maybeCache
@@ -64,18 +65,19 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
             for {
               businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
               _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, businessActivities.riskAssessmentHasPolicy(data))
-            } yield redirectDependingOnAccountancyServices(ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)), data)
+            } yield redirectDependingOnAccountancyServices(ControllerHelper.isAccountancyServicesSelected(businessMatching), data) //TODO Don't think this works, investigate
           }
         } recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
-      }
+    )
   }
 
-  private def redirectDependingOnAccountancyServices(accountancyServices: Boolean, data: RiskAssessmentHasPolicy) =
+  private def redirectDependingOnAccountancyServices(accountancyServices: Boolean, data: RiskAssessmentHasPolicy) = {
     accountancyServices match {
       case _ if data == RiskAssessmentHasPolicy(true) => Redirect(routes.DocumentRiskAssessmentController.get())
       case true => Redirect(routes.SummaryController.get)
       case false => Redirect(routes.AccountantForAMLSRegulationsController.get())
     }
+  }
 }

@@ -18,6 +18,7 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.ExpectedBusinessTurnoverFormProvider
 import models.businessactivities.{BusinessActivities, ExpectedBusinessTurnover}
 import models.status.NotCompleted
 import org.jsoup.Jsoup
@@ -26,26 +27,28 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessactivities.expected_business_turnover
+import views.html.businessactivities.ExpectedBusinessTurnoverView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    implicit val ec = app.injector.instanceOf[ExecutionContext]
+    implicit val ec = inject[ExecutionContext]
 
-    lazy val view = app.injector.instanceOf[expected_business_turnover]
+    lazy val view = inject[ExpectedBusinessTurnoverView]
     val controller = new ExpectedBusinessTurnoverController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       cc = mockMcc,
-      expected_business_turnover = view
+      formProvider = inject[ExpectedBusinessTurnoverFormProvider],
+      view = view
     )
   }
 
@@ -68,14 +71,9 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
         val html = contentAsString(result)
         val document = Jsoup.parse(html)
 
-        document.select("input[value=01]").hasAttr("checked") must be(false)
-        document.select("input[value=02]").hasAttr("checked") must be(false)
-        document.select("input[value=03]").hasAttr("checked") must be(false)
-        document.select("input[value=04]").hasAttr("checked") must be(false)
-        document.select("input[value=05]").hasAttr("checked") must be(false)
-        document.select("input[value=06]").hasAttr("checked") must be(false)
-        document.select("input[value=07]").hasAttr("checked") must be(false)
-
+        ExpectedBusinessTurnover.all.foreach { value =>
+          document.select(s"input[value=${value.toString}]").hasAttr("checked") must be(false)
+        }
       }
 
       "display the Expected Business Turnover page with pre populated data" in new Fixture {
@@ -90,7 +88,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[value=01]").hasAttr("checked") must be(true)
+        document.select("input[value=zeroPlus]").hasAttr("checked") must be(true)
       }
     }
 
@@ -99,7 +97,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.ExpectedBusinessTurnoverController.post().url).withFormUrlEncodedBody(
             "expectedBusinessTurnover" -> ""
           )
 
@@ -111,8 +109,8 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
       "respond with SEE_OTHER" when {
         "edit is false and redirect to the ExpectedAMLSTurnoverController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "expectedBusinessTurnover" -> "01"
+          val newRequest = FakeRequest(POST, routes.ExpectedBusinessTurnoverController.post().url).withFormUrlEncodedBody(
+            "expectedBusinessTurnover" -> "zeroPlus"
           )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
@@ -128,8 +126,8 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
 
         "edit is true and redirect to the SummaryController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "expectedBusinessTurnover" -> "01"
+          val newRequest = FakeRequest(POST, routes.ExpectedBusinessTurnoverController.post(true).url).withFormUrlEncodedBody(
+            "expectedBusinessTurnover" -> "zeroPlus"
           )
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))

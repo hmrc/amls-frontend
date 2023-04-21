@@ -1,0 +1,101 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
+@import config.ApplicationConfig
+@import models.businessactivities.TransactionTypes
+@import views.html.components.forms.{InputCheckbox, InputText, ErrorSummary}
+@import views.html.components.{SectionSubtitle, ReturnLink, Button}
+
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    formHelper: FormWithCSRF,
+    inputCheckbox: InputCheckbox,
+    inputText: InputText,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean)(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
+
+@hasSoftwareNameError = @{
+    form.errors match {
+        case Nil => false
+        case x if x.head.key == "software" => true
+        case _ => false
+    }
+}
+
+@preparedErrorSummary = @{
+    if(hasSoftwareNameError) {
+        errorSummary(form, Some(Map("software" -> "software")))
+    } else {
+        errorSummary(form, Some(Map("types" -> "types_1")))
+    }
+}
+
+@conditionalHtml = @{
+    inputText(
+        Input(
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("businessactivities.name.software.pkg.lbl")),
+                classes = "govuk-label"
+            ),
+            id = "software",
+            name = "software",
+            classes = ""
+        ),
+        form("software")
+    )
+}
+
+@layout(pageTitle = messages("businessactivities.do.keep.records") + " - " + messages("summary.businessactivities")) {
+
+    @preparedErrorSummary
+
+    @subtitle("summary.businessactivities")
+
+    @formHelper(action = controllers.businessactivities.routes.TransactionTypesController.post(edit)) {
+
+        @inputCheckbox(
+            Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(
+                        Legend(
+                            content = Text(messages("businessactivities.do.keep.records")),
+                            classes = "govuk-label--xl",
+                            isPageHeading = true
+                        )
+                    )
+                )),
+                hint = Some(
+                    Hint(
+                        content = Text(messages("lbl.select.all"))
+                    )
+                ),
+                name = "types",
+                items = TransactionTypes.formValues(conditionalHtml)
+            ).withFormField(form("types"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

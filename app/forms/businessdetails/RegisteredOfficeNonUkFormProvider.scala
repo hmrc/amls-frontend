@@ -18,7 +18,6 @@ package forms.businessdetails
 
 import forms.generic.AddressFormProvider
 import models.businessdetails.{RegisteredOffice, RegisteredOfficeNonUK}
-import models.{Country, countries}
 import play.api.data.Form
 
 import javax.inject.Inject

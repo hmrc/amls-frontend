@@ -16,11 +16,8 @@
 
 package models.businessdetails
 
-import cats.data.Validated.{Invalid, Valid}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.Path
-import jto.validation.ValidationError
 import play.api.libs.json.Json
 
 class ConfirmRegisteredOfficeSpec extends PlaySpec with MockitoSugar {

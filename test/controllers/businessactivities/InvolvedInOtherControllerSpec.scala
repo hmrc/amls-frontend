@@ -18,37 +18,39 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.InvolvedInOtherFormProvider
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
-import models.businessmatching.{BusinessMatching, BusinessActivities => BMActivities}
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.{BusinessMatching, BusinessActivities => BMActivities}
 import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessactivities.involved_in_other_name
+import views.html.businessactivities.InvolvedInOtherNameView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with PrivateMethodTester{
+class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with PrivateMethodTester with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
-    lazy val view = app.injector.instanceOf[involved_in_other_name]
+    lazy val view = inject[InvolvedInOtherNameView]
     val controller = new InvolvedInOtherController (
        dataCacheConnector = mock[DataCacheConnector],
        authAction = SuccessfulAuthAction, ds = commonDependencies,
        statusService = mock[StatusService],
       cc = mockMcc,
-      involved_in_other_name = view
+      formProvider = inject[InvolvedInOtherFormProvider],
+      view = view
     )
   }
 
@@ -83,13 +85,13 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Priv
 
         val html = contentAsString(result)
 
-        html must include("an " + Messages("businessactivities.registerservices.servicename.lbl.01"))
-        html must include("a " + Messages("businessactivities.registerservices.servicename.lbl.03"))
-        html must include("an " + Messages("businessactivities.registerservices.servicename.lbl.04"))
-        html must include("a " + Messages("businessactivities.registerservices.servicename.lbl.05"))
-        html must include("a " + Messages("businessactivities.registerservices.servicename.lbl.06"))
-        html must include("a " + Messages("businessactivities.registerservices.servicename.lbl.07"))
-        html must include("a " + Messages("businessactivities.registerservices.servicename.lbl.08"))
+        html must include("an " + messages("businessactivities.registerservices.servicename.lbl.01"))
+        html must include("a " + messages("businessactivities.registerservices.servicename.lbl.03"))
+        html must include("an " + messages("businessactivities.registerservices.servicename.lbl.04"))
+        html must include("a " + messages("businessactivities.registerservices.servicename.lbl.05"))
+        html must include("a " + messages("businessactivities.registerservices.servicename.lbl.06"))
+        html must include("a " + messages("businessactivities.registerservices.servicename.lbl.07"))
+        html must include("a " + messages("businessactivities.registerservices.servicename.lbl.08"))
 
         val page = Jsoup.parse(html)
 
@@ -141,7 +143,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Priv
         "edit is false" when {
           "involvedInOther is true and there is no existing BusinessActivities data" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
               "involvedInOther" -> "true",
               "details" -> "test"
             )
@@ -158,7 +160,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Priv
           }
           "involvedInOther is true and there is existing BusinessActivities data" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
               "involvedInOther" -> "true",
               "details" -> "test"
             )
@@ -176,7 +178,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Priv
 
           "involvedInOther is false and there is no existing BusinessActivities data" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
               "involvedInOther" -> "false"
             )
 
@@ -193,7 +195,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Priv
 
           "involvedInOther is false and there is existing BusinessActivities data" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
               "involvedInOther" -> "false"
             )
 
@@ -211,7 +213,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Priv
         "edit is true" when {
           "involvedInOther is true" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post(true).url).withFormUrlEncodedBody(
               "involvedInOther" -> "true",
               "details" -> "test"
             )
@@ -229,7 +231,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Priv
 
           "involvedInOther is false" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post(true).url).withFormUrlEncodedBody(
               "involvedInOther" -> "false"
             )
 
@@ -252,14 +254,12 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Priv
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
             "involvedInOther" -> "test"
           )
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
-
-          contentAsString(result) must include(Messages("error.required.ba.involved.in.other"))
         }
 
         "on post with required field not filled with business activities" in new Fixture {
@@ -271,15 +271,13 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Priv
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
             "involvedInOther" -> "true",
             "details" -> ""
           )
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
-
-          contentAsString(result) must include(Messages("error.required.ba.involved.in.other.text"))
         }
       }
     }

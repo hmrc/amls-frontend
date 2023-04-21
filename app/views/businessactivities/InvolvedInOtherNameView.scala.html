@@ -1,0 +1,119 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import models.businessactivities.InvolvedInOther
+@import uk.gov.hmrc.govukfrontend.views.Aliases.CharacterCount
+@import uk.gov.hmrc.govukfrontend.views.Implicits.{RichCharacterCount, RichRadios}
+@import views.html.components.forms.{ErrorSummary, InputYesNo}
+@import views.html.components.{Button, Heading, ReturnLink, SectionSubtitle}
+
+
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    formHelper: FormWithCSRF,
+    inputTextArea: GovukCharacterCount,
+    inputYesNo: InputYesNo,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean, businessTypes: Option[List[String]], maxLength: Int)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
+
+@hasInvolvedInOtherError = @{
+    form.errors match {
+        case Nil => false
+        case x if x.head.key == "details" => true
+        case _ => false
+    }
+}
+
+@preparedErrorSummary = @{
+    if(hasInvolvedInOtherError) {
+        errorSummary(form, Some(Map("details" -> "details")))
+    } else {
+        errorSummary(form, Some(Map("involvedInOther" -> "involvedInOther-true")))
+    }
+}
+
+@conditionalInput = @{
+
+    inputTextArea(
+        CharacterCount(
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("businessactivities.confirm-activities.lbl.details")),
+                classes = "govuk-label"
+            ),
+            hint = Some(Hint(
+                content = Text(messages("businessactivities.involved.hint"))
+            )),
+            id = "details",
+            name = "details",
+            rows = 6,
+            errorMessage = form("details").error.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*)))),
+            maxLength = Some(maxLength)
+        ).withFormField(form("details"))
+    )
+
+}
+
+@layout(pageTitle = s"${messages("businessactivities.involved.other.title")} - ${messages("summary.businessactivities")}") {
+
+    @preparedErrorSummary
+
+    @subtitle(messages("summary.businessactivities"))
+
+    @heading("businessactivities.involved.other.title")
+
+    @businessTypes.map { types =>
+        @if(types.size > 1) {
+            <p class="govuk-body">@messages("businessactivities.confirm-activities.subtitle_4"):</p>
+
+            <ul class="govuk-list govuk-list--bullet">
+            @types.map { businessType =>
+                <li>@businessType</li>
+            }
+            </ul>
+        } else {
+            <p class="govuk-body">@messages("businessactivities.confirm-activities.subtitle_4") @(types.head)</p>
+        }
+    }
+
+    <p class="govuk-body">@messages("businessactivities.involved.other.hint")</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("businessactivities.involved.listline1")</li>
+        <li>@messages("businessactivities.involved.listline2")</li>
+        <li>@messages("businessactivities.involved.listline3")</li>
+    </ul>
+
+    @formHelper(action = controllers.businessactivities.routes.InvolvedInOtherController.post(edit)) {
+
+        @inputYesNo(
+            Radios(
+                name = "involvedInOther",
+                items = InvolvedInOther.formValues(conditionalInput)
+            ).withFormField(form("involvedInOther"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

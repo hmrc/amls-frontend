@@ -16,10 +16,7 @@
 
 package models.businessdetails
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
-import cats.data.Validated.{Valid}
 
 sealed trait PreviouslyRegistered
 

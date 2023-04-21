@@ -17,20 +17,17 @@
 package views.businessdetails
 
 import forms.businessdetails.CorrespondenceAddressUKFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
 import models.autocomplete.NameValuePair
 import models.businessdetails.CorrespondenceAddressUk
 import org.scalatest.MustMatchers
 import play.api.data.Form
-import play.api.i18n.Messages
-import play.api.test.{FakeRequest, Injecting}
+import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.CorrespondenceAddressUKView
 
 
-class CorrespondenceAddressUKViewSpec extends AmlsViewSpec with MustMatchers with Injecting {
+class CorrespondenceAddressUKViewSpec extends AmlsViewSpec with MustMatchers {
 
   lazy val correspondence_address_uk: CorrespondenceAddressUKView = inject[CorrespondenceAddressUKView]
   lazy val formProvider: CorrespondenceAddressUKFormProvider = inject[CorrespondenceAddressUKFormProvider]

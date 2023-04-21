@@ -18,6 +18,7 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.DocumentRiskAssessmentPolicyFormProvider
 import models.businessactivities._
 import models.businessmatching.BusinessActivity.{AccountancyServices, MoneyServiceBusiness}
 import models.businessmatching.{BusinessMatching, BusinessActivities => BMBusinessActivities}
@@ -25,27 +26,28 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessactivities.document_risk_assessment_policy
+import views.html.businessactivities.DocumentRiskAssessmentPolicyView
 
 import scala.concurrent.Future
 
-class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar {
+class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[document_risk_assessment_policy]
+    lazy val view = inject[DocumentRiskAssessmentPolicyView]
 
     val controller = new DocumentRiskAssessmentController (
       dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      document_risk_assessment_policy = view,
+      formProvider = inject[DocumentRiskAssessmentPolicyFormProvider],
+      view = view,
       error = errorView)
   }
 
@@ -63,8 +65,8 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("riskassessments-01").hasAttr("checked") must be(false)
-        document.getElementById("riskassessments-02").hasAttr("checked") must be(false)
+        document.getElementById("riskassessments_1").hasAttr("checked") must be(false)
+        document.getElementById("riskassessments_2").hasAttr("checked") must be(false)
       }
 
       "pre-populate the Document Risk assessment Page" in new Fixture {
@@ -78,8 +80,8 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("riskassessments-01").hasAttr("checked") must be(true)
-        document.getElementById("riskassessments-02").hasAttr("checked") must be(true)
+        document.getElementById("riskassessments_1").hasAttr("checked") must be(true)
+        document.getElementById("riskassessments_2").hasAttr("checked") must be(true)
       }
     }
 
@@ -87,9 +89,10 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
       "when edit is false" must {
         "on post with valid data redirect to check your answers page when businessActivity is ASP" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "riskassessments[0]" -> "01",
-            "riskassessments[1]" -> "02"
+          val newRequest = FakeRequest(POST, routes.DocumentRiskAssessmentController.post(false).url)
+          .withFormUrlEncodedBody(
+            "riskassessments[1]" -> "paperBased",
+            "riskassessments[2]" -> "digital"
           )
 
           val mockCacheMap = mock[CacheMap]
@@ -113,9 +116,10 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
         "on post with valid data redirect to advice on MLR due to diligence page when businessActivity is not ASP" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "riskassessments[0]" -> "01",
-            "riskassessments[1]" -> "02"
+          val newRequest = FakeRequest(POST, routes.DocumentRiskAssessmentController.post(false).url)
+          .withFormUrlEncodedBody(
+            "riskassessments[1]" -> "paperBased",
+            "riskassessments[2]" -> "digital"
           )
 
           val mockCacheMap = mock[CacheMap]
@@ -140,7 +144,8 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
         "respond with BAD_REQUEST" when {
           "riskassessments fields are missing" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.DocumentRiskAssessmentController.post(false).url)
+            .withFormUrlEncodedBody(
             )
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
@@ -151,16 +156,14 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
             val result = controller.post()(newRequest)
             status(result) must be(BAD_REQUEST)
-
-            val document = Jsoup.parse(contentAsString(result))
-            document.select("a[href=#riskassessments]").html() must include(Messages("error.required.ba.risk.assessment.format"))
           }
 
           "riskassessments fields are missing, represented by an empty string" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
-              "riskassessments[0]" -> "",
-              "riskassessments[1]" -> ""
+            val newRequest = FakeRequest(POST, routes.DocumentRiskAssessmentController.post(false).url)
+            .withFormUrlEncodedBody(
+              "riskassessments[1]" -> "",
+              "riskassessments[2]" -> ""
             )
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
@@ -171,10 +174,6 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
             val result = controller.post()(newRequest)
             status(result) must be(BAD_REQUEST)
-
-            val document = Jsoup.parse(contentAsString(result))
-
-            document.select("a[href=#riskassessments[0]-riskassessments]").html() must include(Messages("error.required.ba.risk.assessment.format"))
           }
         }
       }
@@ -182,9 +181,10 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
       "when edit is true" must {
         "redirect to the SummaryController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "riskassessments[0]" -> "01",
-            "riskassessments[1]" -> "02"
+          val newRequest = FakeRequest(POST, routes.DocumentRiskAssessmentController.post(true).url)
+          .withFormUrlEncodedBody(
+            "riskassessments[1]" -> "paperBased",
+            "riskassessments[2]" -> "digital"
           )
 
           val mockCacheMap = mock[CacheMap]

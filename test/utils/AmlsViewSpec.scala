@@ -27,17 +27,16 @@ import org.scalatest.MustMatchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.data.Form
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.mvc.MessagesControllerComponents
-import play.api.test.FakeRequest
+import play.api.test.{FakeRequest, Injecting}
 import play.api.{Application, Mode}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.HeaderCarrier
 
-trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with MustMatchers with AuthorisedFixture {
+trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with MustMatchers with AuthorisedFixture with Injecting {
 
   protected val bindModules: Seq[GuiceableModule] = Seq(bind[KeystoreConnector].to(mock[KeystoreConnector]))
 

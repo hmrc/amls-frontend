@@ -21,6 +21,10 @@ import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 import cats.data.Validated.Valid
+import play.api.i18n.Messages
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.RadioItem
+import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 
 sealed trait InvolvedInOther
 
@@ -29,6 +33,20 @@ case class InvolvedInOtherYes(details: String) extends InvolvedInOther
 case object InvolvedInOtherNo extends InvolvedInOther
 
 object InvolvedInOther {
+
+  def formValues(html: Html)(implicit messages: Messages): Seq[RadioItem] = HmrcYesNoRadioItems().map { radioItem =>
+
+    if (radioItem.value.contains("true")) {
+      radioItem.copy(
+        id = Some("involvedInOther-true"),
+        conditionalHtml = Some(html)
+      )
+    } else {
+      radioItem.copy(
+        id = Some("involvedInOther-false")
+      )
+    }
+  }
 
   import models.FormTypes._
   import utils.MappingUtils.Implicits._

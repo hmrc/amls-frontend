@@ -18,45 +18,41 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.businessactivities.TransactionRecordFormProvider
 import models.businessactivities.BusinessActivities
-import views.html.businessactivities._
-import javax.inject.Inject
-import play.api.mvc.MessagesControllerComponents
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import utils.BooleanFormReadWrite._
+import views.html.businessactivities.CustomerTransactionRecordsView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class TransactionRecordController @Inject()(val authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
                                             val dataCacheConnector: DataCacheConnector,
                                             val cc: MessagesControllerComponents,
-                                            customer_transaction_records: customer_transaction_records) extends AmlsBaseController(ds, cc) {
+                                            formProvider: TransactionRecordFormProvider,
+                                            view: CustomerTransactionRecordsView) extends AmlsBaseController(ds, cc) {
 
-  val fieldName = "isRecorded"
-  implicit val reader = formRule(fieldName, "error.required.ba.select.transaction.record")
-  implicit val writer = formWrites(fieldName)
-
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
-          val form: Form2[Boolean] = (for {
+          val form: Form[Boolean] = (for {
             businessActivities <- response
             transactionRecord <- businessActivities.transactionRecord
-          } yield Form2[Boolean](transactionRecord)).getOrElse(EmptyForm)
-
-          Ok(customer_transaction_records(form, edit))
+          } yield formProvider().fill(transactionRecord)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit : Boolean = false) = authAction.async {
+  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[Boolean](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(customer_transaction_records(f, edit)))
-        case ValidForm(_, data) => {
+      formProvider().bindFromRequest().fold(
+        formWithError =>
+          Future.successful(BadRequest(view(formWithError, edit))),
+        data => {
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, businessActivity.transactionRecord(data))
@@ -67,6 +63,6 @@ class TransactionRecordController @Inject()(val authAction: AuthAction,
             case _ => Redirect(routes.SummaryController.get)
           }
         }
-      }
+    )
   }
 }

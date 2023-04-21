@@ -19,39 +19,42 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.ExpectedAMLSTurnoverFormProvider
 import models.businessactivities.ExpectedAMLSTurnover.First
 import models.businessactivities._
-import models.businessmatching.{BusinessMatching, BusinessActivities => Activities}
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.{BusinessMatching, BusinessActivities => Activities}
 import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
+import play.api.test
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessactivities.expected_amls_turnover
+import views.html.businessactivities.ExpectedAMLSTurnoverView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
     self =>
     val request = addToken(authRequest)
-    implicit val ec = app.injector.instanceOf[ExecutionContext]
+    implicit val ec = inject[ExecutionContext]
 
-    lazy val view = app.injector.instanceOf[expected_amls_turnover]
+    lazy val view = inject[ExpectedAMLSTurnoverView]
     val controller = new ExpectedAMLSTurnoverController (
       dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       cc = mockMcc,
-      expected_amls_turnover = view
+      formProvider = inject[ExpectedAMLSTurnoverFormProvider],
+      view = view
     )
 
     val mockCache = mock[CacheMap]
@@ -70,6 +73,7 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           val businessMatching = BusinessMatching(
             activities = Some(Activities(Set(
               AccountancyServices,
+              ArtMarketParticipant,
               BillPaymentServices,
               EstateAgentBusinessService,
               HighValueDealing,
@@ -97,22 +101,12 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           val html = contentAsString(result)
           val document = Jsoup.parse(html)
 
-          document.select("input[value=01]").hasAttr("checked") must be(false)
-          document.select("input[value=02]").hasAttr("checked") must be(false)
-          document.select("input[value=03]").hasAttr("checked") must be(false)
-          document.select("input[value=04]").hasAttr("checked") must be(false)
-          document.select("input[value=05]").hasAttr("checked") must be(false)
-          document.select("input[value=06]").hasAttr("checked") must be(false)
-          document.select("input[value=07]").hasAttr("checked") must be(false)
+          ExpectedAMLSTurnover.all.foreach { value =>
+            document.select(s"input[value=${value.toString}]").hasAttr("checked") must be(false)
+            html must include(messages(s"businessactivities.registerservices.servicename.lbl.${value.value}"))
+          }
 
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.01"))
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.03"))
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.04"))
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.05"))
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.06"))
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.07"))
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.08"))
-
+          html must include(messages("businessactivities.registerservices.servicename.lbl.08"))
         }
 
         "there is existing data" in new Fixture {
@@ -147,7 +141,7 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("input[value=01]").hasAttr("checked") must be(true)
+          document.select("input[value=zeroPlus]").hasAttr("checked") must be(true)
         }
 
         "there is no cache data" in new Fixture {
@@ -170,8 +164,8 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
     "post is called" must {
       "on post with valid data" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "expectedAMLSTurnover" -> "01"
+        val newRequest = FakeRequest(POST, routes.ExpectedAMLSTurnoverController.post().url).withFormUrlEncodedBody(
+          "expectedAMLSTurnover" -> "zeroPlus"
         )
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
@@ -187,8 +181,8 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
 
       "on post with valid data in edit mode" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "expectedAMLSTurnover" -> "01"
+        val newRequest = test.FakeRequest(POST, routes.ExpectedAMLSTurnoverController.post().url).withFormUrlEncodedBody(
+          "expectedAMLSTurnover" -> "zeroPlus"
         )
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))

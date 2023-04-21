@@ -20,7 +20,6 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.businessdetails.CorrespondenceAddressNonUKFormProvider
 import models.Country
-import models.autocomplete.NameValuePair
 import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressNonUk}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -33,7 +32,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.AutoCompleteService
-import uk.gov.hmrc.govukfrontend.views.viewmodels.select
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector

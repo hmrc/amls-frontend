@@ -18,6 +18,7 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.AccountantNonUKAddressFormProvider
 import models.Country
 import models.businessactivities._
 import org.jsoup.Jsoup
@@ -27,29 +28,32 @@ import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
-import views.html.businessactivities.who_is_your_accountant_non_uk_address
+import views.html.businessactivities.AccountantNonUKAddressView
 
 import scala.concurrent.Future
 
 class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
   with MockitoSugar
   with ScalaFutures
-  with PrivateMethodTester {
+  with PrivateMethodTester
+  with Injecting {
 
   trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks{
     self =>
     val request = addToken(authRequest)
 
-    lazy val view = app.injector.instanceOf[who_is_your_accountant_non_uk_address]
+    lazy val view = inject[AccountantNonUKAddressView]
     val controller = new WhoIsYourAccountantNonUkAddressController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       autoCompleteService = mockAutoComplete,
       ds = commonDependencies,
       cc = mockMcc,
-      who_is_your_accountant_non_uk_address = view
+      formProvider = inject[AccountantNonUKAddressFormProvider],
+      view = view
     )
   }
 
@@ -69,11 +73,12 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
         status(result) must be(OK)
 
         val page = Jsoup.parse(contentAsString(result))
-        page.getElementById("addressLineNonUK1").`val` must be("")
-        page.getElementById("addressLineNonUK2").`val` must be("")
-        page.getElementById("addressLineNonUK3").`val` must be("")
-        page.getElementById("addressLineNonUK4").`val` must be("")
-        page.select("#country option[selected]").attr("value") must be("")
+
+        page.getElementById("addressLine1").`val` must be("")
+        page.getElementById("addressLine2").`val` must be("")
+        page.getElementById("addressLine3").`val` must be("")
+        page.getElementById("addressLine4").`val` must be("")
+        page.select("#location-autocomplete option[selected]").size() mustBe 0
       }
 
       "show the who is your accountant page when there is existing data" in new Fixture {
@@ -91,11 +96,12 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
         status(result) must be(OK)
 
         val page = Jsoup.parse(contentAsString(result))
-        page.getElementById("addressLineNonUK1").`val` must be("line1")
-        page.getElementById("addressLineNonUK2").`val` must be("line2")
-        page.getElementById("addressLineNonUK3").`val` must be("line3")
-        page.getElementById("addressLineNonUK4").`val` must be("line4")
-        page.select("#country option[selected]").attr("value") must be("AL")
+
+        page.getElementById("addressLine1").`val` must be("line1")
+        page.getElementById("addressLine2").`val` must be("line2")
+        page.getElementById("addressLine3").`val` must be("line3")
+        page.getElementById("addressLine4").`val` must be("line4")
+        page.select("#location-autocomplete option[selected]").text() mustBe "Albania"
       }
     }
 
@@ -121,11 +127,12 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
       "edit is true" must {
         "respond with SEE_OTHER and redirect to the SummaryController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "addressLineNonUK1" -> "line1",
-            "addressLineNonUK2" -> "line2",
-            "addressLineNonUK3" -> "line3",
-            "addressLineNonUK4" -> "line4",
+          val newRequest = FakeRequest(POST, routes.WhoIsYourAccountantNonUkAddressController.post(true).url)
+          .withFormUrlEncodedBody(
+            "addressLine1" -> "line1",
+            "addressLine2" -> "line2",
+            "addressLine3" -> "line3",
+            "addressLine4" -> "line4",
             "country" -> "AL"
           )
 
@@ -145,11 +152,12 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
       "edit is false" must {
         "respond with SEE_OTHER and redirect to the TaxMattersController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "addressLineNonUK1" -> "line1",
-            "addressLineNonUK2" -> "line2",
-            "addressLineNonUK3" -> "line3",
-            "addressLineNonUK4" -> "line4",
+          val newRequest = FakeRequest(POST, routes.WhoIsYourAccountantNonUkAddressController.post(false).url)
+          .withFormUrlEncodedBody(
+            "addressLine1" -> "line1",
+            "addressLine2" -> "line2",
+            "addressLine3" -> "line3",
+            "addressLine4" -> "line4",
             "country" -> "AL"
           )
 

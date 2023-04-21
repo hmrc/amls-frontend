@@ -19,11 +19,11 @@ package controllers.businessactivities
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.businessactivities.EmployeeCountFormProvider
 import models.businessactivities.{BusinessActivities, EmployeeCount, HowManyEmployees}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import views.html.businessactivities._
+import views.html.businessactivities.BusinessEmployeesCountView
 
 import scala.concurrent.Future
 
@@ -31,41 +31,44 @@ class HowManyEmployeesController @Inject() (val dataCacheConnector: DataCacheCon
                                             val authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
                                             val cc: MessagesControllerComponents,
-                                            business_employees: business_employees) extends AmlsBaseController(ds, cc) {
+                                            formProvider: EmployeeCountFormProvider,
+                                            view: BusinessEmployeesCountView) extends AmlsBaseController(ds, cc) {
 
   def updateData(howManyEmployees: Option[HowManyEmployees], data: EmployeeCount): HowManyEmployees = {
     howManyEmployees.fold[HowManyEmployees](HowManyEmployees(employeeCount = Some(data.employeeCount)))(x =>
       x.copy(employeeCount = Some(data.employeeCount)))
   }
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request => {
         dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
           response =>
-            val form: Form2[HowManyEmployees] = (for {
+            val form = (for {
               businessActivities <- response
               employees <- businessActivities.howManyEmployees
-            } yield Form2[HowManyEmployees](employees)).getOrElse(EmptyForm)
-            Ok(business_employees(form, edit))
+              formData <- employees.employeeCount
+            } yield formProvider().fill(EmployeeCount(formData))).getOrElse(formProvider())
+            Ok(view(form, edit))
         }
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[EmployeeCount](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(business_employees(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.howManyEmployees(updateData(businessActivities.howManyEmployees, data)))
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get)
-            case false => Redirect(routes.TransactionRecordController.get())
+          } yield if (edit) {
+            Redirect(routes.SummaryController.get)
+          } else {
+            Redirect(routes.TransactionRecordController.get())
           }
-      }
+      )
     }
   }
 }

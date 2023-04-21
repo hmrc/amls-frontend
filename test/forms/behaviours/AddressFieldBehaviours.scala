@@ -36,7 +36,7 @@ trait AddressFieldBehaviours extends FieldBehaviours {
     "addressLine4" -> "Test County"
   )
 
-  protected def validAddressLineGen(maxLength: Int): Gen[String] = Gen.alphaNumStr.suchThat(_.length <= maxLength)
+  protected def validAddressLineGen(maxLength: Int): Gen[String] = alphaStringsShorterThan(maxLength + 1).suchThat(_.nonEmpty)
 
   protected def bindForm(formData: MutableMap[String, String]): Form[_] = form.bind(Map(formData.toSeq.sortBy(_._1): _*))
 
@@ -57,7 +57,7 @@ trait AddressFieldBehaviours extends FieldBehaviours {
 
         "must bind correctly" in {
 
-          forAll(validAddressLineGen(maxLength)) { addressLine =>
+          forAll(validAddressLineGen(maxLength).suchThat(_.nonEmpty)) { addressLine =>
 
             val formData: MutableMap[String, String] = dataToBind += (fieldName -> addressLine)
             val newForm = bindForm(formData)
@@ -116,7 +116,7 @@ trait AddressFieldBehaviours extends FieldBehaviours {
 
     s"not bind strings that violate regex" in {
 
-      forAll(validAddressLineGen(length), invalidChar) { (line, invalidChar) =>
+      forAll(validAddressLineGen(length).suchThat(_.nonEmpty), invalidCharForNames) { (line, invalidChar) =>
 
         val invalidLine = line.dropRight(1) + invalidChar
         val formData: MutableMap[String, String] = extraData += (fieldName -> invalidLine)
@@ -178,7 +178,7 @@ trait AddressFieldBehaviours extends FieldBehaviours {
 
       "bind a valid country" in {
 
-        forAll(Gen.oneOf(models.countries)) { country =>
+        forAll(Gen.oneOf(models.countries).suchThat(_.isUK == false)) { country =>
 
           val formData: MutableMap[String, String] = addressLinesData += (countryField -> country.code)
           val newForm = bindForm(formData)

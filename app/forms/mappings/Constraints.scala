@@ -105,6 +105,14 @@ trait Constraints {
         Invalid(errorKey, correctLength)
     }
 
+  protected def maxLengthInt(maximum: Int, errorKey: String): Constraint[Int] =
+    Constraint {
+      case str if str <= maximum =>
+        Valid
+      case _ =>
+        Invalid(errorKey, maximum)
+    }
+
   protected def maxDate(maximum: LocalDate, errorKey: String, args: Any*): Constraint[LocalDate] =
     Constraint {
       case date if date.isAfter(maximum) =>

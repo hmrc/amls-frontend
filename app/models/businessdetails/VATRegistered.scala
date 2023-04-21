@@ -16,11 +16,8 @@
 
 package models.businessdetails
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-import play.api.libs.json._
-import cats.data.Validated.Valid
 import play.api.i18n.Messages
+import play.api.libs.json._
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems

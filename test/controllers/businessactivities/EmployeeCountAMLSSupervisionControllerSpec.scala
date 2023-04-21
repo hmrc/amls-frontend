@@ -18,30 +18,34 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.EmployeeCountAMLSSupervisionFormProvider
 import models.businessactivities.{BusinessActivities, HowManyEmployees}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.test
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessactivities.business_employees_amls_supervision
+import views.html.businessactivities.BusinessEmployeesAMLSSupervisionView
 
 import scala.concurrent.Future
 
-class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[business_employees_amls_supervision]
+    lazy val view = app.injector.instanceOf[BusinessEmployeesAMLSSupervisionView]
     val controller = new EmployeeCountAMLSSupervisionController (
       dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      business_employees_amls_supervision = view)
+      formProvider = inject[EmployeeCountAMLSSupervisionFormProvider],
+      view = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -79,7 +83,8 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
     "post is called" must {
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.EmployeeCountAMLSSupervisionController.post().url)
+          .withFormUrlEncodedBody(
           "employeeCountAMLSSupervision" -> ""
         )
         val result = controller.post()(newRequest)
@@ -88,7 +93,8 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
       "redirect to the TransactionRecordController when given valid data and edit is false" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = test.FakeRequest(POST, routes.EmployeeCountAMLSSupervisionController.post().url)
+          .withFormUrlEncodedBody(
           "employeeCountAMLSSupervision" -> "123"
         )
 
@@ -105,7 +111,8 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
       "redirect to the SummaryController when given valid data and edit is true" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = test.FakeRequest(POST, routes.EmployeeCountAMLSSupervisionController.post(true).url)
+          .withFormUrlEncodedBody(
           "employeeCountAMLSSupervision" -> "12345"
         )
 
