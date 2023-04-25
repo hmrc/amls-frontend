@@ -23,11 +23,11 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.mvc.Request
-import play.api.test.FakeRequest
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.auth.core.AuthConnector
 import views.HtmlAssertions
 
-trait AmlsSummaryViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with MustMatchers with HtmlAssertions {
+trait AmlsSummaryViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with MustMatchers with HtmlAssertions with Injecting {
 
   var authConnector = mock[AuthConnector]
 

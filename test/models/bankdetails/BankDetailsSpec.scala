@@ -17,6 +17,7 @@
 package models.bankdetails
 
 import models.CharacterSets
+import models.bankdetails.BankAccountType._
 import models.bankdetails.BankDetails._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json.Json

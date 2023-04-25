@@ -18,15 +18,15 @@ package controllers.bankdetails
 
 import connectors.DataCacheConnector
 import controllers.CommonPlayDependencies
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
+import forms.bankdetails.BankAccountTypeFormProvider
+import models.bankdetails.BankAccountType._
 import models.bankdetails._
-import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import utils.AuthAction
-import views.html.bankdetails.bank_account_types
+import views.html.bankdetails.BankAccountTypesView
 
-
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -35,50 +35,50 @@ class BankAccountTypeController @Inject()(val authAction: AuthAction,
                                           val dataCacheConnector: DataCacheConnector,
                                           val statusService: StatusService,
                                           val mcc: MessagesControllerComponents,
-                                          bank_account_types: bank_account_types,
+                                          formProvider: BankAccountTypeFormProvider,
+                                          view: BankAccountTypesView,
                                           implicit val error: views.html.error) extends BankDetailsController(ds, mcc) {
 
-  def get(index: Int, edit: Boolean = false) = authAction.async {
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request => {
         for {
           bankDetail <- getData[BankDetails](request.credId, index)
           status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
         } yield bankDetail match {
           case Some(details@BankDetails(Some(data), _, _, _, _, _, _)) if details.canEdit(status) =>
-            Ok(view.apply(Form2[Option[BankAccountType]](Some(data)), edit, index))
+            Ok(view(formProvider().fill(data), edit, index))
           case Some(details) if details.canEdit(status) =>
-            Ok(view.apply(EmptyForm, edit, index))
+            Ok(view(formProvider(), edit, index))
           case _ => NotFound(notFoundView)
         }
       }
   }
 
-  def post(index: Int, edit: Boolean = false, count: Int = 0) = authAction.async {
+  def post(index: Int, edit: Boolean = false, count: Int = 0): Action[AnyContent] = authAction.async {
       implicit request => {
-        Form2[Option[BankAccountType]](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(view(request)(f, edit, index)))
-          case ValidForm(_, data) => {
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, edit, index))),
+          data => {
             for {
               _ <- updateDataStrict[BankDetails](request.credId, index) { bd =>
                 data match {
-                  case Some(NoBankAccountUsed) => bd.bankAccountType(data).bankAccount(None)
-                  case _ => bd.bankAccountType(data)
+                  case NoBankAccountUsed => bd.bankAccountType(Some(data)).bankAccount(None)
+                  case _ => bd.bankAccountType(Some(data))
                 }
               }
             } yield router(data, edit, index)
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
-        }
+        )
       }
   }
 
-  private def view(implicit request: Request[_]) = bank_account_types.apply _
-
-  private val router = (data: Option[BankAccountType], edit: Boolean, index: Int) => data match {
-    case Some(NoBankAccountUsed) => Redirect(routes.SummaryController.get(index))
-    case Some(_) if !edit => Redirect(routes.BankAccountIsUKController.get(index))
+  private val router = (data: BankAccountType, edit: Boolean, index: Int) => data match {
+    case NoBankAccountUsed => Redirect(routes.SummaryController.get(index))
+    case PersonalAccount | BelongsToBusiness | BelongsToOtherBusiness if !edit =>
+      Redirect(routes.BankAccountIsUKController.get(index))
     case _ => Redirect(routes.SummaryController.get(index))
   }
 

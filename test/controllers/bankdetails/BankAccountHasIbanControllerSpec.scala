@@ -17,20 +17,23 @@
 package controllers.bankdetails
 
 import controllers.actions.SuccessfulAuthAction
+import forms.bankdetails.BankAccountHasIBANFormProvider
+import models.bankdetails.BankAccountType.PersonalAccount
 import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import views.html.bankdetails.bank_account_account_has_iban
+import views.html.bankdetails.BankAccountHasIBANView
 
 import scala.concurrent.Future
 
-class BankAccountHasIbanControllerSpec extends AmlsSpec {
+class BankAccountHasIbanControllerSpec extends AmlsSpec with Injecting {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
@@ -39,7 +42,7 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec {
 
     val accountType = PersonalAccount
 
-    lazy val bankAccountHasIban = app.injector.instanceOf[bank_account_account_has_iban]
+    lazy val bankAccountHasIban = inject[BankAccountHasIBANView]
 
     val controller = new BankAccountHasIbanController(
       mockCacheConnector,
@@ -48,6 +51,7 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec {
       mockStatusService,
       commonDependencies,
       mockMcc,
+      inject[BankAccountHasIBANFormProvider],
       bankAccountHasIban,
       errorView
     )
@@ -124,7 +128,8 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec {
         "given valid data in edit mode" in new Fixture {
 
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountHasIbanController.post(1, true).url)
+            .withFormUrlEncodedBody(
             "hasIBAN" -> "true"
           )
 
@@ -141,7 +146,8 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec {
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountHasIbanController.post(1, false).url)
+            .withFormUrlEncodedBody(
             "hasIBAN" -> "false"
           )
 
@@ -162,7 +168,8 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountHasIbanController.post(50, true).url)
+            .withFormUrlEncodedBody(
             "hasIBAN" -> "true"
           )
 
@@ -179,7 +186,8 @@ class BankAccountHasIbanControllerSpec extends AmlsSpec {
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountHasIbanController.post(1, true).url)
+            .withFormUrlEncodedBody(
             "hasIBAN" -> ""
           )
 

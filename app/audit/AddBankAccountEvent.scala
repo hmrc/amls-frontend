@@ -20,6 +20,7 @@ import cats.implicits._
 import models.bankdetails._
 import play.api.libs.json.{JsString, Writes}
 import Utils._
+import models.bankdetails.BankAccountType._
 import utils.AuditHelper
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
@@ -52,7 +53,7 @@ object AddBankAccountEvent {
       import play.api.libs.json._
       (
         (__ \ "accountName").write[String] and
-          (__ \ "accountType").writeNullable[BankAccountType] and
+          (__ \ "accountType").writeNullable[BankAccountType](accountTypeWrites) and
           (__ \ "isUkBankAccount").write[Boolean] and
           (__ \ "sortCode").writeNullable[String] and
           (__ \ "accountNumber").writeNullable[String] and

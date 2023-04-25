@@ -16,6 +16,7 @@
 
 package models.bankdetails
 
+import models.bankdetails.BankAccountType.NoBankAccountUsed
 import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
 import play.api.i18n.Messages
 import typeclasses.MongoKey
@@ -128,7 +129,7 @@ object BankDetails {
       case bds @ _ =>
         TaskRow(
           messageKey,
-          controllers.businessdetails.routes.WhatYouNeedController.get.url,
+          controllers.bankdetails.routes.YourBankAccountsController.get.url,
           anyChanged(bds),
           Started,
           TaskRow.incompleteTag

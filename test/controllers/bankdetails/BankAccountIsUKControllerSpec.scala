@@ -17,30 +17,32 @@
 package controllers.bankdetails
 
 import controllers.actions.SuccessfulAuthAction
+import forms.bankdetails.BankAccountIsUKFormProvider
+import models.bankdetails.BankAccountType.PersonalAccount
 import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import views.html.bankdetails.bank_account_account_is_uk
+import views.html.bankdetails.BankAccountIsUKView
 
 import scala.concurrent.Future
 
-class BankAccountIsUKControllerSpec extends AmlsSpec {
+class BankAccountIsUKControllerSpec extends AmlsSpec with Injecting {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
-
     val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
 
     val accountType = PersonalAccount
-    lazy val bankAccountisUk = app.injector.instanceOf[bank_account_account_is_uk]
+    lazy val bankAccountisUk = app.injector.instanceOf[BankAccountIsUKView]
 
     val controller = new BankAccountIsUKController(
       mockCacheConnector,
@@ -49,6 +51,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec {
       mock[AuditConnector],
       mockStatusService,
       mockMcc,
+      inject[BankAccountIsUKFormProvider],
       bankAccountisUk,
       errorView
     )
@@ -125,7 +128,8 @@ class BankAccountIsUKControllerSpec extends AmlsSpec {
         "given valid data in edit mode" in new Fixture {
 
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountIsUKController.post(1, true).url)
+            .withFormUrlEncodedBody(
             "isUK" -> "false"
           )
 
@@ -142,7 +146,8 @@ class BankAccountIsUKControllerSpec extends AmlsSpec {
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountIsUKController.post(1, false).url)
+            .withFormUrlEncodedBody(
             "isUK" -> "false"
           )
 
@@ -163,12 +168,14 @@ class BankAccountIsUKControllerSpec extends AmlsSpec {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountIsUKController.post(50, true).url)
+            .withFormUrlEncodedBody(
             "isUK" -> "false"
           )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
-          mockCacheSave[Seq[BankDetails]]
+          when(mockCacheConnector.save[Seq[BankDetails]](any(), any(), any())(any(), any())
+          ).thenThrow(new IndexOutOfBoundsException("error"))
 
           val result = controller.post(50, true)(newRequest)
 
@@ -180,7 +187,8 @@ class BankAccountIsUKControllerSpec extends AmlsSpec {
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountIsUKController.post(1, true).url)
+            .withFormUrlEncodedBody(
             "isUK" -> ""
           )
 

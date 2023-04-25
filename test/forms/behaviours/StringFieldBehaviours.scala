@@ -49,4 +49,32 @@ trait StringFieldBehaviours extends FieldBehaviours {
       }
     }
   }
+
+  def numberFieldWithMaxLength(form: Form[_],
+                         fieldName: String,
+                         maxLength: Int,
+                         lengthError: FormError): Unit = {
+
+    s"not bind number strings longer than $maxLength characters" in {
+
+      forAll(numsLongerThan(maxLength).map(_.toString).suchThat(_.nonEmpty)) { string =>
+        val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+        result.errors shouldEqual Seq(lengthError)
+      }
+    }
+  }
+
+  def numberFieldWithMinLength(form: Form[_],
+                         fieldName: String,
+                         minLength: Int,
+                         lengthError: FormError): Unit = {
+
+    s"not bind number strings shorter than $minLength characters" in {
+
+      forAll(numsShorterThan(minLength).map(_.toString)) { string =>
+        val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+        result.errors shouldEqual Seq(lengthError)
+      }
+    }
+  }
 }

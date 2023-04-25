@@ -17,6 +17,7 @@
 package generators.bankdetails
 
 import generators.BaseGenerator
+import models.bankdetails.BankAccountType._
 import models.bankdetails._
 import org.scalacheck.Gen
 

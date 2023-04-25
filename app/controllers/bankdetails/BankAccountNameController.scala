@@ -18,19 +18,15 @@ package controllers.bankdetails
 
 import connectors.DataCacheConnector
 import controllers.CommonPlayDependencies
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
-import jto.validation.forms.Rules._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Write}
-import models.FormTypes
+import forms.bankdetails.BankAccountNameFormProvider
 import models.bankdetails.BankDetails
 import play.api.mvc._
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, StatusConstants}
-import views.html.bankdetails.bank_account_name
+import views.html.bankdetails.BankAccountNameView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -40,16 +36,9 @@ class BankAccountNameController @Inject()(
                                            val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
                                            val mcc: MessagesControllerComponents,
-                                           bank_account_name: bank_account_name,
+                                           formProvider: BankAccountNameFormProvider,
+                                           view: BankAccountNameView,
                                            implicit val error: views.html.error) extends BankDetailsController(ds, mcc) {
-
-  implicit def write: Write[String, UrlFormEncoded] = Write { data =>
-    Map("accountName" -> Seq(data))
-  }
-
-  implicit val read = From[UrlFormEncoded] { __ =>
-    (__ \ "accountName").read(FormTypes.accountNameType)
-  }
 
   def getNoIndex: Action[AnyContent] = authAction.async {
     implicit request =>
@@ -69,7 +58,7 @@ class BankAccountNameController @Inject()(
       handlePost(request.credId)
   }
 
-  def postIndex(index: Int, edit: Boolean = false) = authAction.async {
+  def postIndex(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       handlePost(request.credId, Some(index), edit)
   }
@@ -83,21 +72,21 @@ class BankAccountNameController @Inject()(
       } yield data match {
         case Some(x) if !x.canEdit(status) => NotFound(notFoundView)
         case Some(BankDetails(_, Some(name), _, _, _, _, _)) =>
-          Ok(bank_account_name(Form2[String](name), edit, Some(i)))
+          Ok(view(formProvider().fill(name), edit, Some(i)))
         case Some(_) =>
-          Ok(bank_account_name(EmptyForm, edit, Some(i)))
+          Ok(view(formProvider(), edit, Some(i)))
       }
 
-      case _ => Future.successful(Ok(bank_account_name(EmptyForm, edit, None)))
+      case _ => Future.successful(Ok(view(formProvider(), edit, None)))
     }
   }
 
   private def handlePost(credId: String, index: Option[Int] = None, edit: Boolean = false)
                         (implicit hc: HeaderCarrier, request: Request[AnyContent]) = {
-    Form2[String](request.body) match {
-      case f: InvalidForm =>
-        Future.successful(BadRequest(bank_account_name(f, edit, index)))
-      case ValidForm(_, data) =>
+    formProvider().bindFromRequest().fold(
+      formWithErrors =>
+        Future.successful(BadRequest(view(formWithErrors, edit, index))),
+      data => {
         val newBankDetails = BankDetails(accountName = Some(data))
         index match {
           case Some(i) => updateDataStrict[BankDetails](credId, i) { bd =>
@@ -124,7 +113,8 @@ class BankAccountNameController @Inject()(
             }
           }
         }
-    }
+      }
+    )
   } recoverWith {
     case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
   }

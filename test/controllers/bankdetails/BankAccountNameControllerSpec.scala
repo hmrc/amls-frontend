@@ -17,29 +17,33 @@
 package controllers.bankdetails
 
 import controllers.actions.SuccessfulAuthAction
+import forms.bankdetails.BankAccountNameFormProvider
+import models.bankdetails.BankAccountType.PersonalAccount
 import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.bankdetails.bank_account_name
+import views.html.bankdetails.BankAccountNameView
 
-class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
+class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
 
-    lazy val bankAccountName = app.injector.instanceOf[bank_account_name]
+    lazy val bankAccountName = inject[BankAccountNameView]
 
     val controller = new BankAccountNameController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
       mockMcc,
+      inject[BankAccountNameFormProvider],
       bankAccountName,
       errorView
     )
@@ -123,7 +127,8 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with SEE_OTHER" when {
         "given valid data in edit mode" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountNameController.postIndex(1, true).url)
+          .withFormUrlEncodedBody(
             "accountName" -> "test"
           )
 
@@ -139,7 +144,8 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountNameController.postIndex(1, false).url)
+          .withFormUrlEncodedBody(
             "accountName" -> "test"
           )
 
@@ -154,7 +160,8 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "given valid data when NOT in edit mode and without index" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountNameController.postIndex(1, false).url)
+          .withFormUrlEncodedBody(
             "accountName" -> "test"
           )
 
@@ -173,7 +180,8 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
       "save new index in session and respond with SEE_OTHER" when {
         "given valid data when NOT in edit mode and adding new account (no index)" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountNameController.postNoIndex.url)
+          .withFormUrlEncodedBody(
             "accountName" -> "test"
           )
 
@@ -192,7 +200,8 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountNameController.postIndex(50, true).url)
+          .withFormUrlEncodedBody(
             "accountName" -> "test"
           )
 
@@ -209,7 +218,8 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountNameController.postIndex(1, true).url)
+          .withFormUrlEncodedBody(
             "accountName" -> ""
           )
 

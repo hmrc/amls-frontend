@@ -20,43 +20,43 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.CommonPlayDependencies
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
-import models.bankdetails.Account._
+import forms.bankdetails.BankAccountNonUKFormProvider
 import models.bankdetails.{BankAccount, BankDetails, NonUKAccountNumber}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, StatusConstants}
-import views.html.bankdetails.bank_account_account_number_non_uk
+import views.html.bankdetails.BankAccountNonUKView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class BankAccountNonUKController @Inject()( val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction,
-                                            val auditConnector: AuditConnector,
-                                            val statusService: StatusService,
-                                            val ds: CommonPlayDependencies,
-                                            val mcc: MessagesControllerComponents,
-                                            bank_account_account_number_non_uk: bank_account_account_number_non_uk,
-                                            implicit val error: views.html.error) extends BankDetailsController(ds, mcc) {
+class BankAccountNonUKController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                           val authAction: AuthAction,
+                                           val auditConnector: AuditConnector,
+                                           val statusService: StatusService,
+                                           val ds: CommonPlayDependencies,
+                                           val mcc: MessagesControllerComponents,
+                                           formProvider: BankAccountNonUKFormProvider,
+                                           view: BankAccountNonUKView,
+                                           implicit val error: views.html.error) extends BankDetailsController(ds, mcc) {
 
-  def get(index: Int, edit: Boolean = false) = authAction.async{
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
         for {
           bankDetails <- getData[BankDetails](request.credId, index)
           status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
         } yield bankDetails match {
           case Some(x@BankDetails(_, _, Some(BankAccount(_, _, Some(data@NonUKAccountNumber(_)))), _, _, _, _)) if x.canEdit(status) =>
-            Ok(bank_account_account_number_non_uk(Form2[NonUKAccountNumber](data), edit, index))
+            Ok(view(formProvider().fill(data), edit, index))
           case Some(x) if x.canEdit(status) =>
-            Ok(bank_account_account_number_non_uk(EmptyForm, edit, index))
+            Ok(view(formProvider(), edit, index))
           case _ => NotFound(notFoundView)
         }
   }
 
-  def post(index: Int, edit: Boolean = false) = authAction.async {
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request => {
 
         lazy val sendAudit = for {
@@ -64,10 +64,10 @@ class BankAccountNonUKController @Inject()( val dataCacheConnector: DataCacheCon
           result <- OptionT.liftF(auditConnector.sendEvent(audit.AddBankAccountEvent(details)))
         } yield result
 
-        Form2[NonUKAccountNumber](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(bank_account_account_number_non_uk(f, edit, index)))
-          case ValidForm(_, data) =>
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, edit, index))),
+          data =>
             updateDataStrict[BankDetails](request.credId, index) { bd =>
               bd.copy(
                 bankAccount = Option(bd.bankAccount.getOrElse(BankAccount(None, None, None)).account(data)),
@@ -87,7 +87,7 @@ class BankAccountNonUKController @Inject()( val dataCacheConnector: DataCacheCon
                 }) getOrElse redirect
               }
             }
-        }
+        )
       }.recoverWith {
         case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
       }

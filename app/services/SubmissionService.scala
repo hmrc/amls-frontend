@@ -24,7 +24,8 @@ import javax.inject.Inject
 import models._
 import models.amp.Amp
 import models.asp.Asp
-import models.bankdetails.{BankDetails, NoBankAccountUsed}
+import models.bankdetails.BankAccountType.NoBankAccountUsed
+import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessdetails.{BusinessDetails, RegisteredOfficeUK}
 import models.businessmatching.BusinessMatching

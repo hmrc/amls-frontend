@@ -18,45 +18,39 @@ package controllers.bankdetails
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.bankdetails.HasBankAccountFormProvider
 import models.bankdetails.BankDetails
-import play.api.mvc.{Call, MessagesControllerComponents, Request}
-import utils.{AuthAction, BooleanFormReadWrite}
-import views.html.bankdetails._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.AuthAction
+import views.html.bankdetails.HasBankAccountView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class HasBankAccountController @Inject()(val authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
                                          cacheConnector: DataCacheConnector,
                                          val cc: MessagesControllerComponents,
-                                         has_bank_account: has_bank_account) extends AmlsBaseController(ds, cc) {
+                                         formProvider: HasBankAccountFormProvider,
+                                         view: HasBankAccountView) extends AmlsBaseController(ds, cc) {
 
-  val router: Boolean => Call = {
-    case true => routes.BankAccountNameController.getNoIndex
-    case _ => routes.YourBankAccountsController.get
+  def get: Action[AnyContent] = authAction.async {
+      implicit request =>
+        Future.successful(Ok(view.apply(formProvider())))
   }
 
-  def view(implicit request: Request[_]) = has_bank_account.apply _
-
-  implicit val formReads = BooleanFormReadWrite.formRule("hasBankAccount", "bankdetails.hasbankaccount.validation")
-
-  def get = authAction.async {
+  def post: Action[AnyContent] = authAction.async {
       implicit request =>
-        Future.successful(Ok(view.apply(EmptyForm)))
-  }
-
-  def post = authAction.async {
-      implicit request =>
-        Form2[Boolean](request.body) match {
-          case ValidForm(_, data) if data =>
-            Future.successful(Redirect(router(data)))
-
-          case ValidForm(_, data) =>
-            cacheConnector.save(request.credId, BankDetails.key, Seq.empty[BankDetails]) map { _ => Redirect(router(data)) }
-
-          case f: InvalidForm => Future.successful(BadRequest(view.apply(f)))
-        }
+        formProvider().bindFromRequest().fold(
+          formWithErrors => Future.successful(BadRequest(view.apply(formWithErrors))),
+          data =>
+            if(data) {
+              Future.successful(Redirect(routes.BankAccountNameController.getNoIndex))
+            } else {
+              cacheConnector.save(request.credId, BankDetails.key, Seq.empty[BankDetails]) map { _ =>
+                Redirect(routes.YourBankAccountsController.get())
+              }
+            }
+        )
   }
 }

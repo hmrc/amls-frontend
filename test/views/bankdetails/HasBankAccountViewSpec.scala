@@ -16,37 +16,37 @@
 
 package views.bankdetails
 
-import forms.{EmptyForm, InvalidForm}
-import jto.validation.{Path, ValidationError}
+import forms.bankdetails.HasBankAccountFormProvider
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.bankdetails._
+import views.html.bankdetails.HasBankAccountView
 
 class HasBankAccountViewSpec extends AmlsViewSpec {
 
+  lazy val hasBankAccount = inject[HasBankAccountView]
+  lazy val fp = inject[HasBankAccountFormProvider]
+
+  implicit val request = FakeRequest()
   trait ViewFixture extends Fixture {
-    lazy val hasBankAccount = app.injector.instanceOf[has_bank_account]
     implicit val csrfRequest = addTokenForView()
   }
 
-  "The view" should {
+  "HasBankAccountView" should {
     "have all the correct titles, headings and content" in new ViewFixture {
-      override def view = hasBankAccount(EmptyForm)
+      override def view = hasBankAccount(fp())
 
       doc.select("h1").text mustBe Messages("bankdetails.hasbankaccount.title")
       validateTitle(s"${Messages("bankdetails.hasbankaccount.title")} - ${Messages("summary.bankdetails")}")
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
-    "displays validation messages in the correct place" in new ViewFixture {
-      override def view = hasBankAccount(InvalidForm(
-        Map.empty[String, Seq[String]],
-        Seq(Path \ "hasBankDetails" -> Seq(ValidationError("bankdetails.hasbankaccount.validation")))
-      ))
+    behave like pageWithErrors(
+      hasBankAccount(fp().withError("hasBankAccount", "bankdetails.hasbankaccount.validation")),
+      "hasBankAccount",
+      "bankdetails.hasbankaccount.validation"
+    )
 
-      errorSummary.text must include(Messages("bankdetails.hasbankaccount.validation"))
-    }
+    behave like pageWithBackLink(hasBankAccount(fp()))
   }
-
 }
