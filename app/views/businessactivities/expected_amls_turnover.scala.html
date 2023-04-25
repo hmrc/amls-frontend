@@ -62,7 +62,7 @@
     @if(types.size > 1) {
             @Messages("businessactivities.turnover.heading.multiple")
         } else {
-            @Messages("businessactivities.turnover.heading", types.head)
+            @Messages("businessactivities.turnover.heading", types.mkString)
         }
     }
 }
