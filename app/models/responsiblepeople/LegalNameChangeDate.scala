@@ -41,7 +41,7 @@ object LegalNameChangeDate {
 
   implicit def formWrites = Write[LegalNameChangeDate, UrlFormEncoded] { data =>
     Map(
-      "date.day" -> Seq(data.date.get(DateTimeFieldType.monthOfYear()).toString),
+      "date.day" -> Seq(data.date.get(DateTimeFieldType.dayOfMonth()).toString),
       "date.month" -> Seq(data.date.get(DateTimeFieldType.monthOfYear()).toString),
       "date.year" -> Seq(data.date.get(DateTimeFieldType.year()).toString)
     )
