@@ -1,0 +1,96 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.{ApplicationConfig}
+@import views.html.components.{Heading, SectionSubtitle, Button}
+@import models.asp._
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    button: Button
+)
+
+@(model: Asp)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@header = {
+    @heading("title.cya", "summary.asp")
+}
+
+@servicesValue(services: Set[Service]) = @{
+    services.toList match {
+        case service :: Nil => Value(Text(service.getMessage))
+        case services =>
+            Value(HtmlContent(
+                "<ul class=\"govuk-list govuk-list--bullet\">" +
+                services.map { x =>
+                    s"<li>${x.getMessage}</li>"
+                }.mkString +
+                "</ul>"
+            ))
+    }
+}
+
+@yesNoValue(answer: OtherBusinessTaxMatters) = @{
+    answer match {
+        case OtherBusinessTaxMattersNo => Value(Text(messages("lbl.no")))
+        case OtherBusinessTaxMattersYes => Value(Text(messages("lbl.yes")))
+    }
+}
+
+@layout(pageTitle = messages("title.cya") + " - " + messages("summary.asp")) {
+
+    @subtitle("summary.asp")
+
+    @heading("title.cya")
+
+    @SummaryList(
+        Seq(
+            model.services.map { servicesOfBusiness =>
+                SummaryListRow(
+                    Key(Text(messages("asp.services.title"))),
+                    servicesValue(servicesOfBusiness.services),
+                    actions = Some(Actions(
+                        items = Seq(ActionItem(
+                            controllers.asp.routes.ServicesOfBusinessController.get(true).url,
+                            Text(messages("button.edit")),
+                            attributes = Map("id" -> "aspservices-edit")
+                        ))
+                    ))
+                )
+            },
+            model.otherBusinessTaxMatters.map { otm =>
+                SummaryListRow(
+                    Key(Text(messages("asp.other.business.tax.matters.title"))),
+                    yesNoValue(otm),
+                    actions = Some(Actions(
+                        items = Seq(ActionItem(
+                            controllers.asp.routes.OtherBusinessTaxMattersController.get(true).url,
+                            Text(messages("button.edit")),
+                            attributes = Map("id" -> "aspotherbusinesstaxmatters-edit")
+                        ))
+                    ))
+                )
+            }
+        ).flatten
+    )
+
+    @formHelper(action = controllers.asp.routes.SummaryController.post()) {
+        @button("button.checkyouranswers.acceptandcomplete")
+    }
+}

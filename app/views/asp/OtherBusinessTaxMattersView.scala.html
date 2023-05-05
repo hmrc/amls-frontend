@@ -62,4 +62,49 @@
     }
 }
 
+@import config.ApplicationConfig
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
+@import views.html.components.forms.{ErrorSummary, InputYesNo}
+@import views.html.components.{Button, ReturnLink, SectionSubtitle}
 
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    formHelper: FormWithCSRF,
+    inputYesNo: InputYesNo,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean, index: Int)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@layout(pageTitle = messages("bankdetails.bankaccount.accounttype.title") + " - " + messages("summary.bankdetails")) {
+
+    @errorSummary(form)
+
+    @subtitle("summary.bankdetails")
+
+    @formHelper(action = controllers.bankdetails.routes.BankAccountIsUKController.post(index, edit)) {
+
+        @inputYesNo(
+            Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("bankdetails.bankaccount.accounttype.title")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
+                name = "isUK",
+                items = HmrcYesNoRadioItems(),
+                classes = "govuk-radios govuk-radios--inline"
+            ).withFormField(form("isUK"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}
