@@ -41,6 +41,38 @@ trait CheckboxFieldBehaviours extends FormSpec {
     }
   }
 
+  def checkboxFieldWithWrapper[T, A](form: Form[_],
+                       fieldName: String,
+                       validValues: Seq[T],
+                       toWrapperSingle: T => A,
+                       toWrapperMulti: Seq[T] => A,
+                       invalidError: FormError): Unit = {
+    for {
+      (value, i) <- validValues.zipWithIndex
+    } yield s"bind `$value` successfully" in {
+      val data = Map(
+        s"$fieldName[$i]" -> value.toString
+      )
+      form.bind(data).get shouldEqual toWrapperSingle(value)
+    }
+
+    "bind all valid values at once" in {
+
+      val data = for {
+        (value, i) <- validValues.zipWithIndex
+      } yield s"$fieldName[$i]" -> value.toString
+
+      form.bind(data.toMap).get shouldEqual toWrapperMulti(validValues)
+    }
+
+    "fail to bind when the answer is invalid" in {
+      val data = Map(
+        s"$fieldName[0]" -> "invalid value"
+      )
+      form.bind(data).errors should contain(invalidError)
+    }
+  }
+
   def mandatoryCheckboxField(form: Form[_],
                              fieldName: String,
                              requiredKey: String): Unit = {

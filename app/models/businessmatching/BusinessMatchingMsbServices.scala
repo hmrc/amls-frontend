@@ -17,7 +17,13 @@
 package models.businessmatching
 
 import jto.validation.{Rule, ValidationError, _}
-import models.tradingpremises.{ChequeCashingNotScrapMetal => TPChequeCashingNotScrapMetal, ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, ForeignExchange => TPForeignExchange, TransmittingMoney => TPTransmittingMoney}
+import models.tradingpremises.TradingPremisesMsbService.{
+  ChequeCashingNotScrapMetal => TPChequeCashingNotScrapMetal,
+  ChequeCashingScrapMetal => TPChequeCashingScrapMetal,
+  CurrencyExchange => TPCurrencyExchange,
+  ForeignExchange => TPForeignExchange,
+  TransmittingMoney => TPTransmittingMoney
+}
 import models.{CheckYourAnswersField, Enumerable, WithName}
 import play.api.i18n.Messages
 import play.api.libs.json._

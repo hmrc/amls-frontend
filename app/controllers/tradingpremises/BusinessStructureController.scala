@@ -18,17 +18,17 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
-import javax.inject.{Inject, Singleton}
+import forms.tradingpremises.BusinessStructureFormProvider
+import models.tradingpremises.BusinessStructure._
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, RepeatingSection}
-import views.html.tradingpremises.business_structure
+import views.html.tradingpremises.BusinessStructureView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
-
 
 @Singleton
 class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -36,47 +36,50 @@ class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheCon
                                             val ds: CommonPlayDependencies,
                                             override val messagesApi: MessagesApi,
                                             val cc: MessagesControllerComponents,
-                                            business_structure: business_structure,
+                                            formProvider: BusinessStructureFormProvider,
+                                            view: BusinessStructureView,
                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false) = authAction.async {
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       getData[TradingPremises](request.credId, index) map {
         response =>
           val form = (for {
             tp <- response
             services <- tp.businessStructure
-          } yield Form2[BusinessStructure](services)).getOrElse(EmptyForm)
+          } yield formProvider().fill(services)).getOrElse(formProvider())
 
-          Ok(business_structure(form, index, edit))
+          Ok(view(form, index, edit))
       }
   }
 
-  def redirectToPage(data: BusinessStructure, edit: Boolean, index: Int, result: Option[CacheMap])(implicit request: Request[AnyContent]) = {
+  private def redirectToPage(
+                              data: BusinessStructure,
+                              edit: Boolean,
+                              index: Int,
+                              result: Option[CacheMap]
+                            )(implicit request: Request[AnyContent]): Result = {
     data match {
       case SoleProprietor => Redirect(routes.AgentNameController.get(index, edit))
       case LimitedLiabilityPartnership | IncorporatedBody => Redirect(routes.AgentCompanyDetailsController.get(index, edit))
       case Partnership => Redirect(routes.AgentPartnershipController.get(index, edit))
-      case UnincorporatedBody => edit match {
-        case true => Redirect(routes.DetailedAnswersController.get(index))
-        case false => TPControllerHelper.redirectToNextPage(result, index, edit)
-      }
-      case _ => Redirect(routes.AgentCompanyNameController.get(index, edit))
+      case UnincorporatedBody if edit => Redirect(routes.CheckYourAnswersController.get(index))
+      case _ => TPControllerHelper.redirectToNextPage(result, index, edit)
     }
   }
 
-  def post(index: Int, edit: Boolean = false) = authAction.async {
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[BusinessStructure](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(business_structure(f, index, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithError =>
+          Future.successful(BadRequest(view(formWithError, index, edit))),
+        data =>
           for {
             result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_, tp) =>
               resetAgentValues(tp.businessStructure(data), data)
             }
           } yield redirectToPage(data, edit, index, result)
-      }
+      )
   }
 
   private def resetAgentValues(tp: TradingPremises, data: BusinessStructure): TradingPremises = data match {

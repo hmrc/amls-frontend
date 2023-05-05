@@ -29,6 +29,7 @@ trait Formatters {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
       data.get(key) match {
         case None | Some("") => Left(Seq(FormError(key, errorKey)))
+        case Some(s) if s.trim == "" => Left(Seq(FormError(key, errorKey)))
         case Some(s) => Right(s)
       }
 

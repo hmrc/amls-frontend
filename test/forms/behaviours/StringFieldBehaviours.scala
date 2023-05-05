@@ -42,7 +42,7 @@ trait StringFieldBehaviours extends FieldBehaviours {
 
     s"not bind strings shorter than $minLength characters" in {
 
-      forAll(stringsLongerThan(minLength) -> "shortString") {
+      forAll(stringsShorterThan(minLength).suchThat(_.nonEmpty)) {
         string =>
           val result = form.bind(Map(fieldName -> string)).apply(fieldName)
           result.errors shouldEqual Seq(lengthError)

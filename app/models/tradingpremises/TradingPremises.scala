@@ -18,6 +18,7 @@ package models.tradingpremises
 
 import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.tradingpremises.BusinessStructure._
 import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap

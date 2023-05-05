@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching._
 import models.businessmatching.BusinessActivity._
-import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
+import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingNotScrapMetal, TransmittingMoney}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
@@ -28,7 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AmlsSpec
 import org.scalatest.concurrent.ScalaFutures
-import views.html.tradingpremises.what_you_need
+import views.html.tradingpremises.WhatYouNeedView
 
 import scala.concurrent.Future
 
@@ -38,13 +38,13 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[what_you_need]
+    lazy val view = app.injector.instanceOf[WhatYouNeedView]
     val controller = new WhatYouNeedController (
       mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      what_you_need = view)
+      view = view)
   }
 
   "WhatYouNeedController" must {
@@ -65,7 +65,29 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
       when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(bm))
       val result = controller.get(1)(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("tradingpremises.whatyouneed.agents.sub.heading"))
+      contentAsString(result) must include(messages("tradingpremises.whatyouneed.agents.sub.heading"))
+
+    }
+
+    "load the what you need page when msb is not selected" in new Fixture {
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any())) thenReturn {
+        Future.successful(
+          Some(
+            BusinessMatching(
+              None,
+              Some(BusinessActivities(Set(ArtMarketParticipant))),
+              Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))),
+              None,
+              None,
+              None
+            )
+          )
+        )
+      }
+
+      val result = controller.get(1)(request)
+      status(result) must be(OK)
+      contentAsString(result) mustNot include(messages("tradingpremises.whatyouneed.agents.sub.heading"))
 
     }
 

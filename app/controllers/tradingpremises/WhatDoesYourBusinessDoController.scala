@@ -19,6 +19,7 @@ package controllers.tradingpremises
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.tradingpremises.WhatDoesYourBusinessDoFormProvider
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessmatching._
@@ -26,13 +27,14 @@ import models.businessmatching.BusinessActivity._
 import models.status.SubmissionStatus
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import play.api.Logging
-import play.api.mvc.{MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.StatusService
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import views.html.date_of_change
-import views.html.tradingpremises._
+import views.html.tradingpremises.WhatDoesYourBusinessDoView
 
 import scala.concurrent.Future
 
@@ -42,7 +44,8 @@ class WhatDoesYourBusinessDoController @Inject () (
                                                     val ds: CommonPlayDependencies,
                                                     val statusService: StatusService,
                                                     val cc: MessagesControllerComponents,
-                                                    what_does_your_business_do: what_does_your_business_do,
+                                                    formProvider: WhatDoesYourBusinessDoFormProvider,
+                                                    activitiesView: WhatDoesYourBusinessDoView,
                                                     date_of_change: date_of_change,
                                                     implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with FormHelpers with DateOfChangeHelper with Logging {
 
@@ -69,7 +72,7 @@ class WhatDoesYourBusinessDoController @Inject () (
   }
 
   // scalastyle:off cyclomatic.complexity
-  def get(index: Int, edit: Boolean = false) = authAction.async {
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       data(request.credId, index, edit) flatMap {
         case Right((_, activities)) =>
@@ -81,9 +84,10 @@ class WhatDoesYourBusinessDoController @Inject () (
                 Some(tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities)))
               }.map {
                 _ =>
-                  activities.contains(MoneyServiceBusiness) match {
-                    case true => Redirect(routes.MSBServicesController.get(index))
-                    case false => Redirect(routes.DetailedAnswersController.get(index))
+                  if (activities.contains(MoneyServiceBusiness)) {
+                    Redirect(routes.MSBServicesController.get(index))
+                  } else {
+                    Redirect(routes.CheckYourAnswersController.get(index))
                   }
             }.recover {
                 case _ =>
@@ -91,15 +95,13 @@ class WhatDoesYourBusinessDoController @Inject () (
                 NotFound(notFoundView)
               }
           } else {
-            val ba = BusinessActivities(activities)
-
-              getData[TradingPremises](request.credId, index).map(tp => { tp match {
-                case Some(TradingPremises(_,_, _, _,_,_,Some(wdbd),_,_,_,_,_,_,_,_)) =>
-                  Ok(what_does_your_business_do(Form2[WhatDoesYourBusinessDo](wdbd), ba, edit, index))
-                case Some(TradingPremises(_,_,  _,_,_,_, None, _,_,_,_,_,_,_,_)) =>
-                  Ok(what_does_your_business_do(EmptyForm, ba, edit, index))
-                case _ => NotFound(notFoundView)
-              }})
+            getData[TradingPremises](request.credId, index).map(tp => { tp match {
+              case Some(TradingPremises(_,_, _, _,_,_,Some(wdbd),_,_,_,_,_,_,_,_)) =>
+                Ok(activitiesView(formProvider().fill(wdbd), getFormValues(activities), edit, index))
+              case Some(TradingPremises(_,_,  _,_,_,_, None, _,_,_,_,_,_,_,_)) =>
+                Ok(activitiesView(formProvider(), getFormValues(activities), edit, index))
+              case _ => NotFound(notFoundView)
+            }})
           }
         case Left(result) => Future.successful(result)
       }
@@ -115,22 +117,22 @@ class WhatDoesYourBusinessDoController @Inject () (
       } else {
         data.activities.contains(MoneyServiceBusiness)  match {
           case true => Redirect(routes.MSBServicesController.get(index, edit, modelHasChanged(tradingPremises, data)))
-          case _ => Redirect(routes.DetailedAnswersController.get(index))
+          case _ => Redirect(routes.CheckYourAnswersController.get(index))
         }
       }
   }
 
-  def post(index: Int, edit: Boolean = false) = authAction.async {
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       data(request.credId, index, edit) flatMap {
         case Right((_, activities)) =>
-          Form2[WhatDoesYourBusinessDo](request.body) match {
-            case f: InvalidForm =>
-              val ba = BusinessActivities(activities)
+          formProvider().bindFromRequest().fold(
+            formWithErrors => {
               Future.successful {
-                BadRequest(what_does_your_business_do(f, ba, edit, index))
+                BadRequest(activitiesView(formWithErrors, getFormValues(activities), edit, index))
               }
-            case ValidForm(_, data) => {
+            },
+            data => {
               for {
                 tradingPremises <- getData[TradingPremises](request.credId, index)
                 _ <- updateDataStrict[TradingPremises](request.credId, index) {
@@ -157,7 +159,7 @@ class WhatDoesYourBusinessDoController @Inject () (
             }.recoverWith{
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
             }
-          }
+        )
         case Left(result) => Future.successful(result)
       }
   }
@@ -181,8 +183,15 @@ class WhatDoesYourBusinessDoController @Inject () (
               _ <- updateDataStrict[TradingPremises](request.credId, index) { tradingPremises =>
                 tradingPremises.whatDoesYourBusinessDoAtThisAddress(tradingPremises.whatDoesYourBusinessDoAtThisAddress.get.copy(dateOfChange = Some(dateOfChange)))
               }
-            } yield Redirect(routes.DetailedAnswersController.get(index))
+            } yield Redirect(routes.CheckYourAnswersController.get(index))
         }
+    }
+  }
+
+  private def getFormValues(activities: Set[BusinessActivity]): Seq[CheckboxItem] = {
+    BusinessActivities.all.diff(activities).toSeq match {
+      case seq if seq.isEmpty => BusinessActivities.formValues(None, false)
+      case seq => BusinessActivities.formValues(Some(seq), false)
     }
   }
 

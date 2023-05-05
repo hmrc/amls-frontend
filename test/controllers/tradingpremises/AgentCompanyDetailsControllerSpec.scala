@@ -18,34 +18,38 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.tradingpremises.AgentCompanyDetailsFormProvider
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching.BusinessActivity.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
+import models.tradingpremises.BusinessStructure.SoleProprietor
+import models.tradingpremises.TradingPremisesMsbService._
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.tradingpremises.agent_company_details
+import views.html.tradingpremises.AgentCompanyDetailsView
 
 import scala.concurrent.Future
 
-class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGenerator {
+class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGenerator with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[agent_company_details]
+    lazy val view = inject[AgentCompanyDetailsView]
     val controller = new AgentCompanyDetailsController (
       mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
       messagesApi,
       cc = mockMcc,
-      agent_company_details = view,
+      formProvider = inject[AgentCompanyDetailsFormProvider],
+      view = view,
       error = errorView)
   }
 
@@ -92,7 +96,8 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
     "post is called" must {
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentCompanyDetailsController.post(19).url)
+          .withFormUrlEncodedBody(
             "agentCompanyName" -> "text",
             "companyRegistrationNumber" -> "12345678"
           )
@@ -111,7 +116,8 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
       "respond with SEE_OTHER" when {
         "edit is false and given valid data" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentCompanyDetailsController.post(1).url)
+          .withFormUrlEncodedBody(
             "agentCompanyName" -> "text",
             "companyRegistrationNumber" -> "12345678"
           )
@@ -131,7 +137,8 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
 
         "edit is true and given valid data" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentCompanyDetailsController.post(1, true).url)
+          .withFormUrlEncodedBody(
             "agentCompanyName" -> "text",
             "companyRegistrationNumber" -> "12345678"
           )
@@ -147,7 +154,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
 
           val result = controller.post(1, true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+          redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
         }
       }
@@ -155,30 +162,33 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentCompanyDetailsController.post(1).url)
+          .withFormUrlEncodedBody(
             "agentCompanyName" -> "11111111111" * 40
           )
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.invalid.tp.agent.company.details"))
+          contentAsString(result) must include(messages("error.invalid.tp.agent.company.details"))
 
         }
 
         "given missing mandatory field" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentCompanyDetailsController.post(1).url)
+          .withFormUrlEncodedBody(
             "agentCompanyName" -> " "
           )
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.required.tp.agent.company.details"))
+          contentAsString(result) must include(messages("error.required.tp.agent.company.details"))
         }
       }
 
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody("agentCompanyName" -> "text", "companyRegistrationNumber" -> "12345678")
+        val newRequest = FakeRequest(POST, routes.AgentCompanyDetailsController.post(1).url)
+        .withFormUrlEncodedBody("agentCompanyName" -> "text", "companyRegistrationNumber" -> "12345678")
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))

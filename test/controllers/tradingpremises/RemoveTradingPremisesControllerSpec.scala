@@ -18,35 +18,39 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.tradingpremises.RemoveTradingPremisesFormProvider
 import models.businessmatching.BusinessActivity.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.status._
+import models.tradingpremises.BusinessStructure.SoleProprietor
+import models.tradingpremises.TradingPremisesMsbService._
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, StatusConstants}
-import views.html.tradingpremises.remove_trading_premises
+import views.html.tradingpremises.RemoveTradingPremisesView
 
 import scala.concurrent.Future
 
-class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
+class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[remove_trading_premises]
+    lazy val view = inject[RemoveTradingPremisesView]
     val controller = new RemoveTradingPremisesController (
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      remove_trading_premises = view,
+      formProvider = inject[RemoveTradingPremisesFormProvider],
+      view = view,
       error = errorView)
   }
 
@@ -73,7 +77,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.get(1, false)(request)
         val contentString = contentAsString(result)
         val doc =  Jsoup.parse(contentString)
-        doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
+        doc.getElementsMatchingOwnText(messages("lbl.day")).hasText must be(true)
       }
 
       "application status is ready for renewal" in new Fixture {
@@ -88,7 +92,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
         val contentString = contentAsString(result)
         val doc =  Jsoup.parse(contentString)
-        doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
+        doc.getElementsMatchingOwnText(messages("lbl.day")).hasText must be(true)
       }
 
       "application status is ready for renewal amendment" in new Fixture {
@@ -103,7 +107,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
         val contentString = contentAsString(result)
         val doc =  Jsoup.parse(contentString)
-        doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
+        doc.getElementsMatchingOwnText(messages("lbl.day")).hasText must be(true)
       }
 
       "application status is NotCompleted" in new Fixture {
@@ -117,7 +121,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.get(1, false)(request)
         val contentString = contentAsString(result)
         val doc =  Jsoup.parse(contentString)
-        doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(false)
+        doc.getElementsMatchingOwnText(messages("lbl.day")).hasText must be(false)
 
       }
     }
@@ -210,7 +214,8 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
         "removing a trading premises (with line id) from an application with status SubmissionReadyForReview" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.RemoveTradingPremisesController.remove(1).url)
+          .withFormUrlEncodedBody(
             "endDate.day" -> "1",
             "endDate.month" -> "1",
             "endDate.year" -> "2001"
@@ -259,7 +264,8 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
         "removing a trading premises from an application with status SubmissionDecisionApproved" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.RemoveTradingPremisesController.remove(1).url)
+          .withFormUrlEncodedBody(
             "endDate.day" -> "1",
             "endDate.month" -> "1",
             "endDate.year" -> "2001"
@@ -310,7 +316,8 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
         "removing a trading premises from an application with no date" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.RemoveTradingPremisesController.remove(1, true).url)
+          .withFormUrlEncodedBody(
             "endDate.day" -> "",
             "endDate.month" -> "",
             "endDate.year" -> ""
@@ -330,7 +337,8 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
         "removing a trading premises from an application a year too great in length" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.RemoveTradingPremisesController.remove(1, true).url)
+          .withFormUrlEncodedBody(
             "endDate.day" -> "1",
             "endDate.month" -> "12",
             "endDate.year" -> "123456789"
@@ -351,7 +359,8 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
         "removing a trading premises from an application with future date" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.RemoveTradingPremisesController.remove(1, true).url)
+          .withFormUrlEncodedBody(
             "endDate.day" -> "15",
             "endDate.month" -> "1",
             "endDate.year" -> "2030"
@@ -375,7 +384,8 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
           val tradingPremisesEndDateList = Seq(completeTradingPremises1)
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.RemoveTradingPremisesController.remove(1, true).url)
+          .withFormUrlEncodedBody(
             "endDate.day" -> "15",
             "endDate.month" -> "1",
             "endDate.year" -> "1989"
@@ -396,8 +406,6 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
     }
   }
-
-
 
   val ytp = YourTradingPremises(
     "foo",

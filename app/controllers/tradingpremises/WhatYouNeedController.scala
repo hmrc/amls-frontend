@@ -18,27 +18,41 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import models.businessmatching.BusinessActivity.MoneyServiceBusiness
+
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
 import play.api.Logging
-import views.html.tradingpremises._
+import views.html.tradingpremises.WhatYouNeedView
 
 @Singleton
 class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,
                                       val authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
                                       val cc: MessagesControllerComponents,
-                                      what_you_need: what_you_need) extends AmlsBaseController(ds, cc) with Logging {
+                                      view: WhatYouNeedView) extends AmlsBaseController(ds, cc) with Logging {
 
-  def get(index: Int) = authAction.async {
+  def get(index: Int): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
         (for {
           bm <- businessMatching
           ba <- bm.activities
-        } yield { Ok(what_you_need(index, Some(ba), bm.msbServices))
+        } yield {
+
+          val call = if (ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness)) {
+            controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index)
+          } else {
+            if(index == 1) {
+              controllers.tradingpremises.routes.ConfirmAddressController.get(index)
+            } else {
+              controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index)
+            }
+          }
+
+          Ok(view(call, index, Some(ba), bm.msbServices))
       }).getOrElse {
           logger.info("Unable to retrieve business activities in [tradingpremises][WhatYouNeedController]")
           throw new Exception("Unable to retrieve business activities in [tradingpremises][WhatYouNeedController]")

@@ -95,7 +95,9 @@
 
 
 @govukLayout(
-    pageTitle = Some(s"""$pageTitle - ${messages("title.amls")} - ${messages("title.gov")}"""),
+    pageTitle = Some(
+        s"""${views.ViewUtils.errorTitlePrefix(mainContent)} $pageTitle - ${messages("title.amls")} - ${messages("title.gov")}"""
+    ),
     headBlock = Some(
         hmrcHead(headBlock = Some(headScripts))
     ),

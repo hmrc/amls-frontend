@@ -18,6 +18,7 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.tradingpremises.RegisteringAgentPremisesFormProvider
 import models.TradingPremisesSection
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.businessmatching.BusinessActivity._
@@ -27,24 +28,26 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.tradingpremises.registering_agent_premises
+import views.html.tradingpremises.RegisteringAgentPremisesView
 
 import scala.concurrent.Future
 
-class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar {
+class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture  {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[registering_agent_premises]
+    lazy val view = inject[RegisteringAgentPremisesView]
     val controller = new RegisteringAgentPremisesController (
       mock[DataCacheConnector],
       SuccessfulAuthAction, ds = commonDependencies,
       messagesApi,
       cc = mockMcc,
-      registering_agent_premises = view,
+      formProvider = inject[RegisteringAgentPremisesFormProvider],
+      view = view,
       error = errorView)
   }
 
@@ -118,7 +121,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
             status(result) must be(OK)
 
             val htmlValue = Jsoup.parse(contentAsString(result))
-            htmlValue.getElementById("agentPremises-true").attr("checked") mustBe "checked"
+            htmlValue.getElementById("agentPremises").hasAttr("checked") mustBe true
 
           }
           "load No when mongoCache returns false" in new Fixture {
@@ -141,7 +144,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
             status(result) must be(OK)
 
             val htmlValue = Jsoup.parse(contentAsString(result))
-            htmlValue.getElementById("agentPremises-false").attr("checked") mustBe "checked"
+            htmlValue.getElementById("agentPremises-2").hasAttr("checked") mustBe true
 
           }
 
@@ -184,7 +187,8 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
     "post is called" must {
 
       "on post invalid data show error" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody("" -> "")
+        val newRequest = FakeRequest(POST, routes.RegisteringAgentPremisesController.post(1).url)
+        .withFormUrlEncodedBody("" -> "")
         val result = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)
 
@@ -198,7 +202,8 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           )
         )
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.RegisteringAgentPremisesController.post(1, true).url)
+        .withFormUrlEncodedBody(
           "agentPremises" -> "false"
         )
 
@@ -213,7 +218,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         val result = controller.post(1,edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
+        redirectLocation(result) mustBe Some(routes.CheckYourAnswersController.get(1).url)
       }
 
       "redirect to the Trading Premises details page on submitting false and edit false" in new Fixture {
@@ -224,7 +229,8 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           )
         )
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.RegisteringAgentPremisesController.post(1).url)
+        .withFormUrlEncodedBody(
           "agentPremises" -> "false"
         )
 
@@ -249,7 +255,8 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           )
         )
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.RegisteringAgentPremisesController.post(1).url)
+        .withFormUrlEncodedBody(
           "agentPremises" -> "true"
         )
 
@@ -270,7 +277,8 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
       "respond with NOT_FOUND" when {
         "the given index is out of bounds" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.RegisteringAgentPremisesController.post(1).url)
+          .withFormUrlEncodedBody(
             "agentPremises" -> "true"
           )
           when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
@@ -287,7 +295,8 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
 
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.RegisteringAgentPremisesController.post(1).url)
+        .withFormUrlEncodedBody(
           "agentPremises" -> "false"
         )
         when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))

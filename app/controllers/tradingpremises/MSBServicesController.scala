@@ -19,28 +19,30 @@ package controllers.tradingpremises
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{Form2, _}
+import forms._
+import forms.tradingpremises.MSBServicesFormProvider
 import models.businessmatching.BusinessMatching
 import models.status.SubmissionStatus
 import models.tradingpremises.TradingPremisesMsbServices._
-import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices}
-import play.api.mvc.MessagesControllerComponents
+import models.tradingpremises.{TradingPremises, TradingPremisesMsbService, TradingPremisesMsbServices}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
+import uk.gov.hmrc.govukfrontend.views.Aliases.CheckboxItem
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
-import views.html.tradingpremises.msb_services
+import views.html.tradingpremises.MSBServicesView
 
 import scala.concurrent.Future
 
-class MSBServicesController @Inject () (
-                                       val dataCacheConnector: DataCacheConnector,
+class MSBServicesController @Inject ()(val dataCacheConnector: DataCacheConnector,
                                        val authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
                                        val statusService: StatusService,
                                        val cc: MessagesControllerComponents,
-                                       msb_services: msb_services,
+                                       formProvider: MSBServicesFormProvider,
+                                       view: MSBServicesView,
                                        implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
-  def get(index: Int, edit: Boolean = false, changed: Boolean = false) = authAction.async {
+  def get(index: Int, edit: Boolean = false, changed: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetchAll(request.credId).map {
         optionalCache =>
@@ -57,19 +59,23 @@ class MSBServicesController @Inject () (
             (for {
               tp <- getData[TradingPremises](cache, index)
             } yield {
-                if (msbServices.size == 1) {
-                  updateDataStrict[TradingPremises](request.credId, index) { utp =>
-                    Some(utp.msbServices(Some(TradingPremisesMsbServices(msbServices))))
-                  }
-                  Redirect(routes.DetailedAnswersController.get(index))
-                } else {
-                  (for {
-                    tps <- tp.msbServices
-                  } yield {
-                    Ok(msb_services(Form2[TradingPremisesMsbServices](tps), index, edit, changed, businessMatching))
-                  }) getOrElse Ok(msb_services(EmptyForm, index, edit, changed, businessMatching))
 
+              val checkboxes = getFormValues(
+                TradingPremisesMsbServices.convertServices(msbServices).toSeq
+              )
+
+              if (msbServices.size == 1) {
+                updateDataStrict[TradingPremises](request.credId, index) { utp =>
+                  Some(utp.msbServices(Some(TradingPremisesMsbServices(msbServices))))
                 }
+                Redirect(routes.CheckYourAnswersController.get(index))
+              } else {
+                (for {
+                  tps <- tp.msbServices
+                } yield {
+                  Ok(view(formProvider().fill(tps), index, edit, changed, checkboxes))
+                }) getOrElse Ok(view(formProvider(), index, edit, changed, checkboxes))
+              }
             }) getOrElse NotFound(notFoundView)
           }) getOrElse NotFound(notFoundView)
       }
@@ -85,24 +91,30 @@ class MSBServicesController @Inject () (
       && edit && tradingPremises.lineId.isDefined) {
       Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
     } else {
-      Redirect(routes.DetailedAnswersController.get(index))
+      Redirect(routes.CheckYourAnswersController.get(index))
     }
   }
 
-  def post(index: Int, edit: Boolean = false, changed: Boolean = false) = authAction.async {
+  def post(index: Int, edit: Boolean = false, changed: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[TradingPremisesMsbServices](request.body) match {
-        case f: InvalidForm => {
+      formProvider().bindFromRequest().fold(
+        formWithError => {
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
           } yield {
-            BadRequest(msb_services(f, index, edit, changed, businessMatching))
+            val checkboxes = businessMatching.msbServices match {
+              case Some(msb) => getFormValues(
+                TradingPremisesMsbServices.convertServices(msb.msbServices).toSeq
+              )
+              case None => getFormValues(Seq.empty[TradingPremisesMsbService])
+            }
+
+            BadRequest(view(formWithError, index, edit, changed, checkboxes))
           }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
-
-        case ValidForm(_, data) => {
+        },
+        data => {
           for {
             tradingPremises <- getData[TradingPremises](request.credId, index)
             _ <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
@@ -113,7 +125,14 @@ class MSBServicesController @Inject () (
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
-      }
+      )
+  }
+
+  private def getFormValues(activities: Seq[TradingPremisesMsbService]): Seq[CheckboxItem] = {
+    TradingPremisesMsbService.all.diff(activities) match {
+      case seq if seq.isEmpty => TradingPremisesMsbService.formValues(None)
+      case seq => TradingPremisesMsbService.formValues(Some(seq))
+    }
   }
 
   private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], msbServices: TradingPremisesMsbServices, force: Boolean, status: SubmissionStatus) =

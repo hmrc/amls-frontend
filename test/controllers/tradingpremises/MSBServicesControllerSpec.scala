@@ -18,39 +18,49 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.tradingpremises.MSBServicesFormProvider
 import models.TradingPremisesSection
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
-import models.tradingpremises.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, TradingPremises, TradingPremisesMsbService, CurrencyExchange => TPCurrencyExchange, TradingPremisesMsbServices => TPMsbServices, TransmittingMoney => TPTransmittingMoney}
+import models.tradingpremises.{TradingPremises, TradingPremisesMsbService, TradingPremisesMsbServices => TPMsbServices}
+import models.tradingpremises.TradingPremisesMsbService.{
+  ChequeCashingNotScrapMetal,
+  ChequeCashingScrapMetal,
+  ForeignExchange,
+  CurrencyExchange => TPCurrencyExchange,
+  TransmittingMoney => TPTransmittingMoney,
+}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.tradingpremises.msb_services
+import views.html.tradingpremises.MSBServicesView
 
 import scala.concurrent.Future
 
-class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
+class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
-    lazy val view = app.injector.instanceOf[msb_services]
+    lazy val view = inject[MSBServicesView]
     val controller = new MSBServicesController (
       dataCacheConnector = cache,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       statusService = mock[StatusService],
       cc = mockMcc,
-      msb_services = view,
+      formProvider = inject[MSBServicesFormProvider],
+      view = view,
       error = errorView
     )
 
@@ -107,17 +117,18 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
       status(result) mustBe OK
 
       document.select("input[type=checkbox][checked]").size mustBe 2
-      document.select("input[value=01]").hasAttr("checked") mustBe true
-      document.select("input[value=02]").hasAttr("checked") mustBe true
-      document.select(".amls-error-summary").size mustBe 0
+      document.select(s"input[value=${TPTransmittingMoney.toString}]").hasAttr("checked") mustBe true
+      document.select(s"input[value=${TPCurrencyExchange.toString}]").hasAttr("checked") mustBe true
+      document.select(".govuk-error-summary").size mustBe 0
     }
 
     "respond with NOT_FOUND" when {
 
       "the index is out of bounds" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "msbServices[0]" -> "01"
+        val newRequest = FakeRequest(POST, routes.MSBServicesController.post(50, false, false).url)
+          .withFormUrlEncodedBody(
+          "value[1]" -> TPTransmittingMoney.toString
         )
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -149,8 +160,9 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
     "return a Bad Request with errors on invalid submission" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "msbServices[0]" -> "invalid"
+      val newRequest = FakeRequest(POST, routes.MSBServicesController.post(1, false, false).url)
+      .withFormUrlEncodedBody(
+        "value[1]" -> "invalid"
       )
 
       when (controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(),any())) thenReturn(Future.successful(None))
@@ -165,8 +177,9 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
       "on valid submission" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "msbServices[0]" -> "01"
+        val newRequest = FakeRequest(POST, routes.MSBServicesController.post(1, false, false).url)
+        .withFormUrlEncodedBody(
+          "value[1]" -> TPTransmittingMoney.toString
         )
 
         when(cache.fetch[Seq[TradingPremises]](any(), any())
@@ -180,7 +193,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = false)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
+        redirectLocation(result) mustBe Some(routes.CheckYourAnswersController.get(1).url)
       }
 
     }
@@ -189,11 +202,12 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
       "adding 'Transmitting Money' as a service during edit" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "msbServices[0]" -> "01",
-          "msbServices[1]" -> "02",
-          "msbServices[2]" -> "03",
-          "msbServices[3]" -> "04"
+        val newRequest = FakeRequest(POST, routes.MSBServicesController.post(1, true, false).url)
+        .withFormUrlEncodedBody(
+          "value[1]" -> TPCurrencyExchange.toString,
+          "value[2]" -> TPTransmittingMoney.toString,
+          "value[3]" -> ForeignExchange.toString,
+          "value[4]" -> ChequeCashingScrapMetal.toString
         )
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
@@ -205,15 +219,16 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
+        redirectLocation(result) mustBe Some(routes.CheckYourAnswersController.get(1).url)
       }
 
       "adding 'CurrencyExchange' as a service during edit" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "msbServices[1]" -> "02",
-          "msbServices[2]" -> "03",
-          "msbServices[3]" -> "04"
+        val newRequest = FakeRequest(POST, routes.MSBServicesController.post(1, true, false).url)
+        .withFormUrlEncodedBody(
+          "value[1]" -> ChequeCashingScrapMetal.toString,
+          "value[2]" -> ChequeCashingNotScrapMetal.toString,
+          "value[3]" -> ForeignExchange.toString
         )
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
@@ -225,7 +240,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
+        redirectLocation(result) mustBe Some(routes.CheckYourAnswersController.get(1).url)
       }
 
     }
@@ -234,12 +249,13 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
       "adding 'Cheque Cashing' as a service during edit" in new Fixture {
 
-        Seq[(TradingPremisesMsbService, String)]((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
-          case (model, id) =>
-            val newRequest = requestWithUrlEncodedBody(
-              "msbServices[1]" -> "01",
-              "msbServices[2]" -> "02",
-              "msbServices[3]" -> id
+        Seq[TradingPremisesMsbService](ChequeCashingNotScrapMetal, ChequeCashingScrapMetal) foreach {
+          model =>
+            val newRequest = FakeRequest(POST, routes.MSBServicesController.post(1, true, false).url)
+            .withFormUrlEncodedBody(
+              "value[1]" -> TPCurrencyExchange.toString,
+              "value[2]" -> TPTransmittingMoney.toString,
+              "value[3]" -> model.toString
             )
 
             when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
@@ -251,7 +267,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
             val result = controller.post(1, edit = true)(newRequest)
 
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
+            redirectLocation(result) mustBe Some(routes.CheckYourAnswersController.get(1).url)
         }
       }
 
@@ -261,9 +277,10 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
       "services have changed for a variation" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "msbServices[0]" -> "01",
-          "msbServices[1]" -> "02"
+        val newRequest = FakeRequest(POST, routes.MSBServicesController.post(1, true, false).url)
+        .withFormUrlEncodedBody(
+          "value[1]" -> TPTransmittingMoney.toString,
+          "value[2]" -> TPCurrencyExchange.toString
         )
 
         when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
@@ -282,9 +299,10 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
       "the services have changed for a ready for renewal status" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "msbServices[0]" -> "01",
-          "msbServices[1]" -> "02"
+        val newRequest = FakeRequest(POST, routes.MSBServicesController.post(1, true, false).url)
+        .withFormUrlEncodedBody(
+          "value[1]" -> TPTransmittingMoney.toString,
+          "value[2]" -> TPCurrencyExchange.toString
         )
 
         when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(ReadyForRenewal(None))
@@ -303,8 +321,9 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
       "the MsbServices haven't changed, but a change from previous services page has been flagged" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "msbServices[0]" -> "01"
+        val newRequest = FakeRequest(POST, routes.MSBServicesController.post(1, true, true).url)
+        .withFormUrlEncodedBody(
+          "value[1]" -> TPTransmittingMoney.toString
         )
 
         when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
@@ -333,9 +352,10 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           ))
         )
 
-        val newRequest = requestWithUrlEncodedBody(
-          "msbServices[0]" -> "01",
-          "msbServices[1]" -> "02"
+        val newRequest = FakeRequest(POST, routes.MSBServicesController.post(1, true, false).url)
+        .withFormUrlEncodedBody(
+          "value[1]" -> TPTransmittingMoney.toString,
+          "value[2]" -> TPCurrencyExchange.toString
         )
 
         when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
@@ -349,16 +369,17 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
+        redirectLocation(result) mustBe Some(routes.CheckYourAnswersController.get(1).url)
       }
     }
 
     "set the hasChanged flag to true" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "msbServices[1]" -> "01",
-        "msbServices[2]" -> "02",
-        "msbServices[3]" -> "03"
+      val newRequest = FakeRequest(POST, routes.MSBServicesController.post(1, false, false).url)
+      .withFormUrlEncodedBody(
+        "value[1]" -> TPTransmittingMoney.toString,
+        "value[2]" -> TPCurrencyExchange.toString,
+        "value[3]" -> ChequeCashingNotScrapMetal.toString
       )
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -370,7 +391,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
       val result = controller.post(1)(newRequest)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+      redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
       verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
         any(),

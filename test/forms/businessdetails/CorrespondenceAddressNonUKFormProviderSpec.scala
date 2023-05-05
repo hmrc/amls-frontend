@@ -23,7 +23,7 @@ import play.api.data.{Form, FormError}
 
 import scala.collection.mutable.{Map => MutableMap}
 
-class CorrespondenceAddressNonUKFormProviderSpec extends AddressFieldBehaviours { //TODO flakey tests
+class CorrespondenceAddressNonUKFormProviderSpec extends AddressFieldBehaviours {
 
   val formProvider = new CorrespondenceAddressNonUKFormProvider()
 

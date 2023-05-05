@@ -25,11 +25,16 @@ import models.flowmanagement.ChangeSubSectorFlowModel
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSB, _}
 import org.mockito.Mockito.{never, verify}
 import org.mockito.Matchers.{any, eq => eqTo}
-import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo, ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, TransmittingMoney => TPTransmittingMoney, ChequeCashingNotScrapMetal => _}
+import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo}
+import models.tradingpremises.TradingPremisesMsbService.{
+  ChequeCashingScrapMetal => TPChequeCashingScrapMetal,
+  CurrencyExchange => TPCurrencyExchange,
+  TransmittingMoney => TPTransmittingMoney,
+  ChequeCashingNotScrapMetal => _
+}
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
-
 
 class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
 

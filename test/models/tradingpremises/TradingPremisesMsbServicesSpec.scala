@@ -18,6 +18,7 @@ package models.tradingpremises
 
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
+import models.tradingpremises.TradingPremisesMsbService._
 import play.api.libs.json._
 import utils.AmlsSpec
 

@@ -23,6 +23,7 @@ import connectors.{AmlsConnector, DataCacheConnector, TestOnlyStubConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessActivity.HighValueDealing
+import models.tradingpremises.BusinessStructure.LimitedLiabilityPartnership
 import models.tradingpremises._
 import play.api.libs.json.Json
 import play.api.mvc.MessagesControllerComponents
@@ -31,7 +32,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.confirmation._
 import views.html.submission.{duplicate_enrolment, duplicate_submission, wrong_credential_type}
-
 
 import scala.concurrent.Future
 

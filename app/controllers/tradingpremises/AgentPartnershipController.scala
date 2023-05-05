@@ -18,13 +18,13 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
+import forms.tradingpremises.AgentPartnershipFormProvider
 import javax.inject.{Inject, Singleton}
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, RepeatingSection}
-import views.html.tradingpremises.agent_partnership
+import views.html.tradingpremises.AgentPartnershipView
 
 import scala.concurrent.Future
 
@@ -34,29 +34,30 @@ class AgentPartnershipController @Inject()(val dataCacheConnector: DataCacheConn
                                            val ds: CommonPlayDependencies,
                                            override val messagesApi: MessagesApi,
                                            val cc: MessagesControllerComponents,
-                                           agent_partnership: agent_partnership,
+                                           formProvider: AgentPartnershipFormProvider,
+                                           view: AgentPartnershipView,
                                            implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-    def get(index: Int, edit: Boolean = false) = authAction.async {
+    def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
         getData[TradingPremises](request.credId, index) map {
           case Some(tp) => {
             val form = tp.agentPartnership match {
-              case Some(data) => Form2[AgentPartnership](data)
-              case None => EmptyForm
+              case Some(data) => formProvider().fill(data)
+              case None => formProvider()
             }
-            Ok(agent_partnership(form, index, edit))
+            Ok(view(form, index, edit))
           }
           case None => NotFound(notFoundView)
         }
     }
 
-   def post(index: Int ,edit: Boolean = false) = authAction.async {
+   def post(index: Int ,edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[AgentPartnership](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(agent_partnership(f, index,edit)))
-        case ValidForm(_, data) => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, index,edit))),
+        data => {
           for {
             result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_,tp) =>
                 TradingPremises(tp.registeringAgentPremises,
@@ -65,13 +66,13 @@ class AgentPartnershipController @Inject()(val dataCacheConnector: DataCacheConn
                   tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
             }
           } yield edit match {
-            case true => Redirect(routes.DetailedAnswersController.get(index))
+            case true => Redirect(routes.CheckYourAnswersController.get(index))
             case false => TPControllerHelper.redirectToNextPage(result, index, edit)
           }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
-      }
+      )
     }
   }
 }

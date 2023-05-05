@@ -293,14 +293,12 @@ error.invalid.char.tp.agent.registered.company.name = The company name can inclu
 error.required.tp.agent.name = Enter your agent’s full name
 error.length.tp.agent.name = Your agent’s name must be 140 characters or less
 error.char.tp.agent.name = Your agent’s name can include letters a to z, numbers, spaces and punctuation
-error.required.tp.agent.date.day = Your agent’s date of birth must include a day
-error.required.tp.agent.date.month = Your agent’s date of birth must include a month
-error.required.tp.agent.date.year = Your agent’s date of birth must include a year
-error.required.tp.agent.date.month.day = Your agent’s date of birth must include a day and month
-error.required.tp.agent.date.year.month = Your agent’s date of birth must include a month and year
-error.required.tp.agent.date.year.month.day = Enter your agent’s date of birth
-error.required.tp.agent.date.year.day = Your agent’s date of birth must include a day and year
+
+error.required.tp.agent.date.one = Your agent’s date of birth must include a {0}
+error.required.tp.agent.date.two = Your agent’s date of birth must include a {0} and {1}
+error.required.tp.agent.date.all = Enter your agent’s date of birth
 error.required.tp.agent.date.past = Your agent’s date of birth must be in the past
+
 error.required.tp.agent.partnership = Enter your agent’s partners
 error.invalid.tp.agent.partnership = Your agent’s partners must be 140 characters or less
 error.char.tp.agent.partnership = Your agent’s partners can include letters a to z, numbers, spaces and punctuation
@@ -309,13 +307,11 @@ error.required.tp.register.another.premises = Select yes if you want to register
 error.expected.tp.date.after.start = The date must be after you started trading at these premises, which was {0}
 error.expected.tp.dateofchange.after.startdate = The date must be after you started trading at these premises, which was {0}
 error.required.tp.confirm.address = Select yes if this is your trading premises address
-error.required.tp.address.date.day = Date your business started or will start trading from these premises must include a day
-error.required.tp.address.date.month = Date your business started or will start trading from these premises must include a month
-error.required.tp.address.date.year = Date your business started or will start trading from these premises must include a year
-error.required.tp.address.date.month.day = Date your business started or will start trading from these premises must include a day and month
-error.required.tp.address.date.year.month = Date your business started or will start trading from these premises must include a month and year
-error.required.tp.address.date.year.month.day = Enter the date your business did or will start trading from these premises
-error.required.tp.address.date.year.day = Date your business started or will start trading from these premises must include a day and year
+
+error.required.tp.address.date.one = Date your business started or will start trading from these premises must include a {0}
+error.required.tp.address.date.two = Date your business started or will start trading from these premises must include a {0} and {1}
+error.required.tp.address.date.all = Enter the date your business did or will start trading from these premises
+
 error.required.tp.services = Select which money service business activities take place at these premises
 
 ###############################  Estate Agency Business ###############################
@@ -1516,9 +1512,8 @@ tradingpremises.yourpremises.complete = Complete
 tradingpremises.subheading = Trading premises
 tradingpremises.nodetails = Unspecified trading premises
 tradingpremises.virtualoffice.text_1.1 = You must tell us about
-tradingpremises.virtualoffice.text_1.1.link = https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register
 tradingpremises.virtualoffice.text_1.1.link.text = all premises (opens in a new tab)
-tradingpremises.virtualoffice.text_1.2 =where you carry out activities covered by the Money Laundering Regulations.
+tradingpremises.virtualoffice.text_1.2 = where you carry out activities covered by the Money Laundering Regulations.
 tradingpremises.virtualoffice.text_2 = This includes virtual offices.
 tradingpremises.virtualoffice.text_3 = You will need to pay a fee for each trading premises you register.
 

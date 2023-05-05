@@ -17,6 +17,7 @@
 package controllers.tradingpremises
 
 import controllers.actions.SuccessfulAuthAction
+import forms.tradingpremises.IsResidentialFormProvider
 import models.businessmatching.BusinessMatching
 import models.tradingpremises._
 import org.joda.time.LocalDate
@@ -26,12 +27,12 @@ import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
-import views.html.tradingpremises.is_residential
+import views.html.tradingpremises.IsResidentialView
 
-class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with PrivateMethodTester {
+class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with PrivateMethodTester with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
 
@@ -39,20 +40,21 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
     val ytp = YourTradingPremises("foo", Address("1st line of address","2nd line of address",Some("3rd line of address"),Some("4th line of address"),"AA1 1BB",None), Some(true), Some(new LocalDate(2010, 10, 10)), None)
 
-    val pageTitle = Messages("tradingpremises.isResidential.title", "firstname lastname") + " - " +
-      Messages("summary.tradingpremises") + " - " +
-      Messages("title.amls") + " - " + Messages("title.gov")
+    val pageTitle = messages("tradingpremises.isResidential.title", "firstname lastname") + " - " +
+      messages("summary.tradingpremises") + " - " +
+      messages("title.amls") + " - " + messages("title.gov")
 
     mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(TradingPremises())), TradingPremises.key)
     mockCacheGetEntry[BusinessMatching](Some(BusinessMatching()), BusinessMatching.key)
-    lazy val view = app.injector.instanceOf[is_residential]
+    lazy val view = app.injector.instanceOf[IsResidentialView]
     val controller = new IsResidentialController(
       messagesApi,
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockCacheConnector,
       cc = mockMcc,
-      is_residential = view,
+      inject[IsResidentialFormProvider],
+      view = view,
       error = errorView)
 
     mockCacheSave[Seq[TradingPremises]]
@@ -117,7 +119,8 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
       "on valid request" must {
 
         "redirect to WhatDoesYourBusinessDoController" in new Fixture {
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.IsResidentialController.post(1, false).url)
+          .withFormUrlEncodedBody(
             "isResidential" -> "true"
           )
 
@@ -133,7 +136,8 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
         }
 
         "redirect to DetailedAnswersController in edit mode" in new Fixture {
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.IsResidentialController.post(1, true).url)
+          .withFormUrlEncodedBody(
             "isResidential" -> "false"
           )
 
@@ -145,7 +149,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
           val result = controller.post(1, true)(postRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+          redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
         }
 
@@ -153,7 +157,8 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
       "on invalid request" must {
         "respond with BAD_REQUEST" in new Fixture {
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.IsResidentialController.post(1, false).url)
+          .withFormUrlEncodedBody(
             "isResidential" -> ""
           )
 
@@ -238,7 +243,8 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
   it must {
 
     "save an updated Trading Premises model" in new Fixture {
-      val postRequest = requestWithUrlEncodedBody(
+      val postRequest = FakeRequest(POST, routes.IsResidentialController.post(1, false).url)
+      .withFormUrlEncodedBody(
         "isResidential" -> "true"
       )
 

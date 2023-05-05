@@ -18,6 +18,7 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.tradingpremises.AgentNameFormProvider
 import forms.{Form2, _}
 import javax.inject.{Inject, Singleton}
 import models.DateOfChange
@@ -25,14 +26,14 @@ import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import play.api.libs.json.Format
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import views.html.date_of_change
-import views.html.tradingpremises.agent_name
+import views.html.tradingpremises.AgentNameView
 
 import scala.concurrent.Future
 
@@ -43,19 +44,20 @@ class AgentNameController @Inject()(
                                      val ds: CommonPlayDependencies,
                                      val statusService: StatusService,
                                      val cc: MessagesControllerComponents,
-                                     agent_name: agent_name,
+                                     formProvider: AgentNameFormProvider,
+                                     agent_name: AgentNameView,
                                      date_of_change: date_of_change,
                                      implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
-  def get(index: Int, edit: Boolean = false) = authAction.async {
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
 
         getData[TradingPremises](request.credId, index) map {
 
           case Some(tp) => {
             val form = tp.agentName match {
-              case Some(data) => Form2[AgentName](data)
-              case None => EmptyForm
+              case Some(data) => formProvider().fill(data)
+              case None => formProvider()
             }
             Ok(agent_name(form, index, edit))
           }
@@ -63,12 +65,12 @@ class AgentNameController @Inject()(
         }
   }
 
-  def post(index: Int, edit: Boolean = false) = authAction.async {
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request => {
-        Form2[AgentName](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(agent_name(f, index, edit)))
-          case ValidForm(_, data) => {
+        formProvider().bindFromRequest().fold(
+          formWithError =>
+            Future.successful(BadRequest(agent_name(formWithError, index, edit))),
+          data => {
             for {
               result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_, tp) =>
                 TradingPremises(
@@ -89,7 +91,7 @@ class AgentNameController @Inject()(
                 case SubmissionDecisionApproved if redirectToAgentNameDateOfChange(getTradingPremises(result, index), data) =>
                   Redirect(routes.AgentNameController.dateOfChange(index))
                 case _ => if (edit) {
-                  Redirect(routes.DetailedAnswersController.get(index))
+                  Redirect(routes.CheckYourAnswersController.get(index))
                 } else {
                   TPControllerHelper.redirectToNextPage(result, index, edit)
                 }
@@ -99,9 +101,7 @@ class AgentNameController @Inject()(
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
-
-          case _ => Future.successful(NotFound(notFoundView))
-        }
+        )
       }
 
   }
@@ -130,7 +130,7 @@ class AgentNameController @Inject()(
                 _ <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
                   tp.agentName(tradingPremises.agentName.get.copy(dateOfChange = Some(dateOfChange)))
                 }
-              } yield Redirect(routes.DetailedAnswersController.get(index))
+              } yield Redirect(routes.CheckYourAnswersController.get(index))
           }
         }
   }

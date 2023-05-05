@@ -20,19 +20,17 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview, SubmissionStatus}
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.tradingpremises.your_trading_premises
+import views.html.tradingpremises.YourTradingPremisesView
 
 import scala.concurrent.Future
-
 
 @Singleton
 class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -40,7 +38,7 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
                                               val authAction: AuthAction,
                                               val ds: CommonPlayDependencies,
                                               val cc: MessagesControllerComponents,
-                                              your_trading_premises: your_trading_premises,
+                                              view: YourTradingPremisesView,
                                               implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   private def updateTradingPremises(tradingPremises: Option[Seq[TradingPremises]]) : Future[Option[Seq[TradingPremises]]] = {
@@ -55,7 +53,7 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
     }
   }
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       (for {
         status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
@@ -70,13 +68,13 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
         case (Some(data), status) => {
           val (completeTp, incompleteTp) = TradingPremises.filterWithIndex(data)
             .partition(_._1.isComplete)
-          Ok(your_trading_premises(EmptyForm, edit, status, completeTp, incompleteTp))
+          Ok(view(edit, status, completeTp, incompleteTp))
         }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get)
       }
   }
 
-  def post = authAction.async {
+  def post: Action[AnyContent] = authAction.async {
     implicit request =>
       (for {
         tp <- dataCacheConnector.fetch[Seq[TradingPremises]](request.credId, TradingPremises.key)
@@ -87,7 +85,7 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
       }
   }
 
-  def post(index: Int) = authAction.async{
+  def post(index: Int): Action[AnyContent] = authAction.async{
     implicit request =>
       for {
         _ <- updateDataStrict[TradingPremises](request.credId, index){ tp =>
@@ -96,9 +94,9 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
       } yield Redirect(controllers.tradingpremises.routes.YourTradingPremisesController.get())
   }
 
-  def answers = get(true)
+  def answers: Action[AnyContent] = get(true)
 
-  def getIndividual(index: Int, edit: Boolean = false) = authAction.async {
+  def getIndividual(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
 
       (for {
@@ -108,7 +106,7 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
       } yield {
         edit match {
           case true if tp.isComplete & tp.hasAccepted =>
-            Redirect(controllers.tradingpremises.routes.DetailedAnswersController.get(index))
+            Redirect(controllers.tradingpremises.routes.CheckYourAnswersController.get(index))
           case true if !tp.isComplete & ControllerHelper.isMSBSelected(Some(bm)) =>
             Redirect(controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index))
           case true if !tp.isComplete =>

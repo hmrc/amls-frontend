@@ -16,19 +16,18 @@
 
 package controllers.tradingpremises
 
-import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{Form2, _}
+import forms.tradingpremises.RegisteringAgentPremisesFormProvider
 import models.businessmatching.BusinessMatching
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import play.api.i18n.MessagesApi
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.tradingpremises.registering_agent_premises
+import views.html.tradingpremises.RegisteringAgentPremisesView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
-
 
 @Singleton
 class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -36,10 +35,11 @@ class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataC
                                                    val ds: CommonPlayDependencies,
                                                    override val messagesApi: MessagesApi,
                                                    val cc: MessagesControllerComponents,
-                                                   registering_agent_premises: registering_agent_premises,
+                                                   formProvider: RegisteringAgentPremisesFormProvider,
+                                                   view: RegisteringAgentPremisesView,
                                                    implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false) = authAction.async {
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
    implicit request =>
       dataCacheConnector.fetchAll(request.credId).map {
         cache =>
@@ -47,10 +47,10 @@ class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataC
             getData[TradingPremises](c, index) match {
               case Some(tp) if ControllerHelper.isMSBSelected(c.getEntry[BusinessMatching](BusinessMatching.key)) => {
                 val form = tp.registeringAgentPremises match {
-                  case Some(service) => Form2[RegisteringAgentPremises](service)
-                  case None => EmptyForm
+                  case Some(service) => formProvider().fill(service)
+                  case None => formProvider()
                 }
-                Ok(registering_agent_premises(form, index, edit))
+                Ok(view(form, index, edit))
               }
               case Some(tp) if !edit => {
                 TPControllerHelper.redirectToNextPage(cache, index, edit)
@@ -61,25 +61,25 @@ class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataC
       }
   }
 
-  def post(index: Int, edit: Boolean = false) = authAction.async {
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[RegisteringAgentPremises](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(registering_agent_premises(f, index, edit)))
-        case ValidForm(_, data) => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, index, edit))),
+        data => {
           for {
             result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_,tp) =>
               resetAgentValues(tp.registeringAgentPremises(data), data)
             }
           } yield (data.agentPremises, edit) match {
             case (true, _) => Redirect(routes.BusinessStructureController.get(index,edit))
-            case (false, true) => Redirect(routes.DetailedAnswersController.get(index))
+            case (false, true) => Redirect(routes.CheckYourAnswersController.get(index))
             case (false, false) => TPControllerHelper.redirectToNextPage(result, index, edit)
           }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
-      }
+      )
   }
 
   private def resetAgentValues(tp:TradingPremises, data:RegisteringAgentPremises):TradingPremises = data.agentPremises match {

@@ -19,43 +19,46 @@ package controllers.tradingpremises
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.tradingpremises.RemoveAgentPremisesReasonsFormProvider
 import models.tradingpremises.{AgentRemovalReason, TradingPremises}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, RepeatingSection}
-import views.html.tradingpremises.remove_agent_premises_reasons
+import views.html.tradingpremises.RemoveAgentPremisesReasonsView
 
 import scala.concurrent.Future
 
 
 class RemoveAgentPremisesReasonsController @Inject () (
-                                                      val dataCacheConnector: DataCacheConnector,
-                                                      val authAction: AuthAction,
-                                                      val ds: CommonPlayDependencies,
-                                                      val cc: MessagesControllerComponents,
-                                                      remove_agent_premises_reasons: remove_agent_premises_reasons,
-                                                      implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                        val dataCacheConnector: DataCacheConnector,
+                                                        val authAction: AuthAction,
+                                                        val ds: CommonPlayDependencies,
+                                                        val cc: MessagesControllerComponents,
+                                                        formProvider: RemoveAgentPremisesReasonsFormProvider,
+                                                        view: RemoveAgentPremisesReasonsView,
+                                                        implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, complete: Boolean = false) = authAction.async {
+  def get(index: Int, complete: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
         for {
           tp <- getData[TradingPremises](request.credId, index)
         } yield tp match {
-          case (Some(tradingPremises)) => {
-            Ok(remove_agent_premises_reasons(EmptyForm, index, complete))
-          }
+          case (Some(tradingPremises)) =>
+            val form = tradingPremises.removalReason.fold(formProvider())(
+              reason => formProvider().fill(AgentRemovalReason(reason, tradingPremises.removalReasonOther))
+            )
+            Ok(view(form, index, complete))
+
           case _ => NotFound(notFoundView)
         }
   }
 
-  def post(index: Int, complete: Boolean = false) =
+  def post(index: Int, complete: Boolean = false): Action[AnyContent] =
     authAction.async {
         implicit request =>
-          Form2[AgentRemovalReason](request.body) match {
-            case form: InvalidForm => Future.successful(
-              BadRequest(remove_agent_premises_reasons(form, index, complete)))
-
-            case ValidForm(_, data) => updateDataStrict[TradingPremises](request.credId, index) {
+          formProvider().bindFromRequest().fold(
+            formWithErrors => Future.successful(
+              BadRequest(view(formWithErrors, index, complete))),
+            data => updateDataStrict[TradingPremises](request.credId, index) {
               _.copy(
                 removalReason = Some(data.removalReason),
                 removalReasonOther = data.removalReasonOther
@@ -63,7 +66,7 @@ class RemoveAgentPremisesReasonsController @Inject () (
             } map { _ =>
               Redirect(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(index, complete))
             }
-          }
+          )
     }
 
 }

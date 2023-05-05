@@ -23,17 +23,18 @@ import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.tradingpremises.TradingAddressFormProvider
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.status.SubmissionStatus
 import models.tradingpremises._
-import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
 import views.html.date_of_change
-import views.html.tradingpremises._
+import views.html.tradingpremises.WhereAreTradingPremisesView
 
 import scala.concurrent.Future
 
@@ -44,28 +45,29 @@ class WhereAreTradingPremisesController @Inject () (
                                                      val authAction: AuthAction,
                                                      val ds: CommonPlayDependencies,
                                                      val cc: MessagesControllerComponents,
-                                                     where_are_trading_premises: where_are_trading_premises,
+                                                     formProvider: TradingAddressFormProvider,
+                                                     view: WhereAreTradingPremisesView,
                                                      date_of_change: date_of_change,
                                                      implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
-  def get(index: Int, edit: Boolean = false) = authAction.async {
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       getData[TradingPremises](request.credId, index) map {
         case Some(TradingPremises(_, Some(data), _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
-          Ok(where_are_trading_premises(Form2[YourTradingPremises](data), edit, index))
+          Ok(view(formProvider().fill(data), edit, index))
         case Some(_) =>
-          Ok(where_are_trading_premises(EmptyForm, edit, index))
+          Ok(view(formProvider(), edit, index))
         case _ =>
           NotFound(notFoundView)
       }
   }
 
-  def post(index: Int, edit: Boolean = false) = authAction.async {
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[YourTradingPremises](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(where_are_trading_premises(f, edit, index)))
-        case ValidForm(_, ytp) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit, index))),
+        ytp => {
           val block = for {
             tradingPremises <- OptionT(getData[TradingPremises](request.credId, index))
             _ <- OptionT.liftF(updateDataStrict[TradingPremises](request.credId, index)(updateTradingPremises(ytp, _)))
@@ -76,7 +78,8 @@ class WhereAreTradingPremisesController @Inject () (
           } yield redirectTo(index, edit, ytp, tradingPremises, status)
 
           block getOrElse NotFound(notFoundView)
-      }
+        }
+      )
   }
 
   private def sendAudits(address: Address, oldAddress: Option[Address], edit: Boolean)
@@ -106,9 +109,10 @@ class WhereAreTradingPremisesController @Inject () (
     if (redirectToDateOfChange(Some(tp), ytp) && edit && isEligibleForDateOfChange(status)) {
       Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
     } else {
-      edit match {
-        case true => Redirect(routes.DetailedAnswersController.get(index))
-        case _ => Redirect(routes.ActivityStartDateController.get(index, edit))
+      if (edit) {
+        Redirect(routes.CheckYourAnswersController.get(index))
+      } else {
+        Redirect(routes.ActivityStartDateController.get(index, edit))
       }
     }
   }
@@ -138,7 +142,7 @@ class WhereAreTradingPremisesController @Inject () (
                   )))
               }
             } map { _ =>
-              Redirect(routes.DetailedAnswersController.get(1))
+              Redirect(routes.CheckYourAnswersController.get(1))
             }
         }
       }

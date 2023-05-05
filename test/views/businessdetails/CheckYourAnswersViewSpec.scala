@@ -58,19 +58,6 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
     "include the provided data" in new Fixture {
 
-    val sectionChecks = Seq[(String, String)](
-      ("businessdetails.activity.start.date.title", "2 January 2016"),
-      ("businessdetails.registeredformlr.title", messages("lbl.yes")),
-      ("businessdetails.registeredforvat.title", messages("lbl.yes")),
-      ("businessdetails.registeredforvat.lbl.vatNumber", "2345"),
-      ("businessdetails.registeredoffice.title", messages("lbl.yes")),
-      ("businessdetails.registeredoffice.where.title", Seq("line1","line2","line3","line4","AB12CD").mkString(" ")),
-      ("businessdetails.contactingyou.email.title", "test@test.com"),
-      ("businessdetails.contactingyou.phone.title", "01234567890"),
-      ("businessdetails.correspondenceaddress.title",
-        Seq("your name", "business name","line1","line2","line3","line4","AB12CD").mkString(" "))
-    )
-
       val list = cyaHelper.createSummaryList(
         BusinessDetails(
           Some(PreviouslyRegisteredYes(Some("1234"))),

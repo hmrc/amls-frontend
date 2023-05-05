@@ -235,7 +235,7 @@ object BusinessMatching {
       model =>
         Seq(
           Json.toJson(model.reviewDetails).asOpt[JsObject],
-          Json.toJson(model.activities).asOpt[JsObject],
+          Json.toJson(model.activities).asOpt[JsObject], //TODO can end up as NULL, check this
           Json.toJson(model.msbServices).asOpt[JsObject],
           Json.toJson(model.typeOfBusiness).asOpt[JsObject],
           Json.toJson(model.companyRegistrationNumber).asOpt[JsObject],

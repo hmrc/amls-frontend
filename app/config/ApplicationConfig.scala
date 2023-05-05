@@ -110,4 +110,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
   lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
 
   lazy val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
+
+  val tradingPremisesVirtualOfficeLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register"
+
 }
