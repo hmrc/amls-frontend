@@ -23,6 +23,7 @@
     formHelper: FormWithCSRF,
     subtitle: SectionSubtitle,
     heading: Heading,
+    govukSummaryList: GovukSummaryList,
     button: Button
 )
 
@@ -38,7 +39,7 @@
         case services =>
             Value(HtmlContent(
                 "<ul class=\"govuk-list govuk-list--bullet\">" +
-                services.map { x =>
+                services.sortBy(_.toString).map { x =>
                     s"<li>${x.getMessage}</li>"
                 }.mkString +
                 "</ul>"
@@ -53,41 +54,46 @@
     }
 }
 
-@layout(pageTitle = messages("title.cya") + " - " + messages("summary.asp")) {
+@layout(
+    pageTitle = messages("title.cya") + " - " + messages("summary.asp"),
+    showBackLink = false
+) {
 
     @subtitle("summary.asp")
 
     @heading("title.cya")
 
-    @SummaryList(
-        Seq(
-            model.services.map { servicesOfBusiness =>
-                SummaryListRow(
-                    Key(Text(messages("asp.services.title"))),
-                    servicesValue(servicesOfBusiness.services),
-                    actions = Some(Actions(
-                        items = Seq(ActionItem(
-                            controllers.asp.routes.ServicesOfBusinessController.get(true).url,
-                            Text(messages("button.edit")),
-                            attributes = Map("id" -> "aspservices-edit")
+    @govukSummaryList(
+        SummaryList(
+            Seq(
+                model.services.map { servicesOfBusiness =>
+                    SummaryListRow(
+                        Key(Text(messages("asp.services.title"))),
+                        servicesValue(servicesOfBusiness.services),
+                        actions = Some(Actions(
+                            items = Seq(ActionItem(
+                                controllers.asp.routes.ServicesOfBusinessController.get(true).url,
+                                Text(messages("button.edit")),
+                                attributes = Map("id" -> "aspservices-edit")
+                            ))
                         ))
-                    ))
-                )
-            },
-            model.otherBusinessTaxMatters.map { otm =>
-                SummaryListRow(
-                    Key(Text(messages("asp.other.business.tax.matters.title"))),
-                    yesNoValue(otm),
-                    actions = Some(Actions(
-                        items = Seq(ActionItem(
-                            controllers.asp.routes.OtherBusinessTaxMattersController.get(true).url,
-                            Text(messages("button.edit")),
-                            attributes = Map("id" -> "aspotherbusinesstaxmatters-edit")
+                    )
+                },
+                model.otherBusinessTaxMatters.map { otm =>
+                    SummaryListRow(
+                        Key(Text(messages("asp.other.business.tax.matters.title"))),
+                        yesNoValue(otm),
+                        actions = Some(Actions(
+                            items = Seq(ActionItem(
+                                controllers.asp.routes.OtherBusinessTaxMattersController.get(true).url,
+                                Text(messages("button.edit")),
+                                attributes = Map("id" -> "aspotherbusinesstaxmatters-edit")
+                            ))
                         ))
-                    ))
-                )
-            }
-        ).flatten
+                    )
+                }
+            ).flatten
+        )
     )
 
     @formHelper(action = controllers.asp.routes.SummaryController.post()) {

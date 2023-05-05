@@ -14,54 +14,6 @@
  * limitations under the License.
  *@
 
-@import config.{ ApplicationConfig}
-@import include._
-@import include.forms2._
-
-@this(main: include.main)
-
-@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang, appConfig: ApplicationConfig)
-
-@header = {
-    @components.back_link()
-    @errorSummary(f)
-}
-
-@supportingContent = {
-    <p>@Messages("asp.other.business.tax.matters.lbl")</p>
-}
-
-@main(
-    title = Messages("asp.other.business.tax.matters.title") + " - " + Messages("summary.asp"),
-    heading = header
-) {
-
-    @form(f, controllers.asp.routes.OtherBusinessTaxMattersController.post(edit)) {
-
-        @fieldsetWithErrorGroup(
-            f = f("otherBusinessTaxMatters"),
-            heading = "asp.other.business.tax.matters.title",
-            section = "summary.asp",
-            panel = false,
-            classes = Seq("inline"),
-            supportingContent = supportingContent
-        ) {
-            @radio(
-                f = f("otherBusinessTaxMatters"),
-                labelText = "lbl.yes",
-                value = "true"
-            )
-            @radio(
-                f = f("otherBusinessTaxMatters"),
-                labelText = "lbl.no",
-                value = "false"
-            )
-        }
-
-        @submit(edit)
-    }
-}
-
 @import config.ApplicationConfig
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
@@ -78,29 +30,29 @@
     returnLink: ReturnLink
 )
 
-@(form: Form[_], edit: Boolean, index: Int)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
-@layout(pageTitle = messages("bankdetails.bankaccount.accounttype.title") + " - " + messages("summary.bankdetails")) {
+@layout(pageTitle = messages("asp.other.business.tax.matters.title") + " - " + messages("summary.asp")) {
 
     @errorSummary(form)
 
-    @subtitle("summary.bankdetails")
+    @subtitle("summary.asp")
 
-    @formHelper(action = controllers.bankdetails.routes.BankAccountIsUKController.post(index, edit)) {
+    @formHelper(action = controllers.asp.routes.OtherBusinessTaxMattersController.post(edit)) {
 
         @inputYesNo(
             Radios(
                 fieldset = Some(Fieldset(
                     legend = Some(Legend(
-                        content = Text(messages("bankdetails.bankaccount.accounttype.title")),
+                        content = Text(messages("asp.other.business.tax.matters.title")),
                         classes = "govuk-fieldset__legend--xl",
                         isPageHeading = true
                     ))
                 )),
-                name = "isUK",
+                name = "otherBusinessTaxMatters",
                 items = HmrcYesNoRadioItems(),
                 classes = "govuk-radios govuk-radios--inline"
-            ).withFormField(form("isUK"))
+            ).withFormField(form("otherBusinessTaxMatters"))
         )
 
         @button()

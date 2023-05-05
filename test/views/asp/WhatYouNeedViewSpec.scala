@@ -17,46 +17,44 @@
 package views.asp
 
 import org.scalatest.MustMatchers
+import play.api.test.FakeRequest
 import utils.AmlsViewSpec
-import play.api.i18n.Messages
 import views.Fixture
-import views.html.asp.what_you_need
+import views.html.asp.WhatYouNeedView
 
-class what_you_needSpec extends AmlsViewSpec with MustMatchers {
+class WhatYouNeedViewSpec extends AmlsViewSpec with MustMatchers {
+
+  lazy val whatYouNeed = app.injector.instanceOf[WhatYouNeedView]
+  val call = controllers.asp.routes.ServicesOfBusinessController.get()
+  implicit val request = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    lazy val whatYouNeed = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
   }
 
-  "What you need View" must {
-
-    "have a back link" in new ViewFixture {
-
-      def view = whatYouNeed()
-
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
-    }
+  "WhatYouNeedView" must {
 
     "Have the correct title" in new ViewFixture {
-      def view = whatYouNeed()
+      def view = whatYouNeed(call)
 
-      doc.title must startWith(Messages("title.wyn"))
+      doc.title must startWith(messages("title.wyn"))
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = whatYouNeed()
+      def view = whatYouNeed(call)
 
-      heading.html must be (Messages("title.wyn"))
-      subHeading.html must include (Messages("summary.asp"))
+      heading.html must be (messages("title.wyn"))
+      subHeading.html must include (messages("summary.asp"))
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = whatYouNeed()
+      def view = whatYouNeed(call)
 
-      html must include(Messages("You’ll need to tell us:"))
-      html must include(Messages("which accountancy services your business provides"))
-      html must include(Messages("if you’re registered with HMRC to handle other businesses’ tax matters"))
+      html must include(messages("You’ll need to tell us:"))
+      html must include(messages("which accountancy services your business provides"))
+      html must include(messages("if you’re registered with HMRC to handle other businesses’ tax matters"))
     }
+
+    behave like pageWithBackLink(whatYouNeed(call))
   }
 }

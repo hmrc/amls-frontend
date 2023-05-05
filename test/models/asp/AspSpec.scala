@@ -16,6 +16,7 @@
 
 package models.asp
 
+import models.asp.Service._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.mockito.Mockito._
 import play.api.libs.json.Json

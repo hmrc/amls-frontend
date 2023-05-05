@@ -19,15 +19,21 @@ package models.asp
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, ValidationError, _}
-import models.DateOfChange
+import models.{DateOfChange, Enumerable, WithName}
 import play.api.i18n.Messages
 import play.api.libs.json.{Reads, Writes, _}
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import utils.TraversableValidators._
-
 
 case class ServicesOfBusiness(services: Set[Service], dateOfChange: Option[DateOfChange] = None)
 
 sealed trait Service {
+
+  import Service._
+
+  val value: String
+
   val message = "asp.service.lbl."
   def getMessage(implicit messages: Messages): String =
     this match {
@@ -39,17 +45,46 @@ sealed trait Service {
     }
 }
 
-case object Accountancy extends Service
+object Service extends Enumerable.Implicits {
 
-case object PayrollServices extends Service
+  case object Accountancy extends WithName("accountancy") with Service {
+    override val value = "01"
+  }
 
-case object BookKeeping extends Service
+  case object PayrollServices extends WithName("payrollServices") with Service {
+    override val value = "02"
+  }
 
-case object Auditing extends Service
+  case object BookKeeping extends WithName("bookKeeping") with Service {
+    override val value = "03"
+  }
 
-case object FinancialOrTaxAdvice extends Service
+  case object Auditing extends WithName("auditing") with Service {
+    override val value = "04"
+  }
 
-object Service {
+  case object FinancialOrTaxAdvice extends WithName("financialOrTaxAdvice") with Service {
+    override val value = "05"
+  }
+
+  def formValues(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex.map { case (service, index) =>
+    CheckboxItem(
+      content = Text(messages(s"asp.service.lbl.${service.value}")),
+      value = service.toString,
+      id = Some(s"services_$index"),
+      name = Some(s"services[$index]")
+    )
+  }
+
+  val all: Seq[Service] = Seq(
+    Accountancy,
+    PayrollServices,
+    BookKeeping,
+    Auditing,
+    FinancialOrTaxAdvice
+  )
+
+  implicit val enumerable: Enumerable[Service] = Enumerable(all.map(v => v.toString -> v): _*)
 
   implicit val servicesFormRead = Rule[String, Service] {
       case "01" => Valid(Accountancy)

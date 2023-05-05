@@ -16,68 +16,49 @@
 
 package views.asp
 
-import forms.{Form2, InvalidForm, ValidForm}
-import models.asp.{OtherBusinessTaxMatters, OtherBusinessTaxMattersNo, OtherBusinessTaxMattersYes}
+import forms.asp.OtherBusinessTaxMattersFormProvider
+import models.asp.{OtherBusinessTaxMattersNo, OtherBusinessTaxMattersYes}
 import org.scalatest.MustMatchers
+import play.api.test.FakeRequest
 import utils.AmlsViewSpec
-import jto.validation.Path
-import jto.validation.ValidationError
-import play.api.i18n.Messages
 import views.Fixture
-import views.html.asp.other_business_tax_matters
+import views.html.asp.OtherBusinessTaxMattersView
 
+class OtherBusinessTaxMattersViewSpec extends AmlsViewSpec with MustMatchers  {
 
-class other_business_tax_mattersSpec extends AmlsViewSpec with MustMatchers  {
+  lazy val taxMatters = inject[OtherBusinessTaxMattersView]
+  lazy val fp = inject[OtherBusinessTaxMattersFormProvider]
+
+  implicit val request = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    lazy val taxMatters = app.injector.instanceOf[other_business_tax_matters]
     implicit val requestWithToken = addTokenForView()
   }
 
-  "other_business_tax_matters view" must {
-
-    "have a back link" in new ViewFixture {
-
-      val form2: ValidForm[OtherBusinessTaxMatters] = Form2(OtherBusinessTaxMattersYes)
-
-      def view = taxMatters(form2, true)
-
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
-    }
+  "OtherBusinessTaxMattersView" must {
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[OtherBusinessTaxMatters] = Form2(OtherBusinessTaxMattersYes)
+      def view = taxMatters(fp().fill(OtherBusinessTaxMattersYes), true)
 
-      def view = taxMatters(form2, true)
-
-      doc.title must startWith(Messages("asp.other.business.tax.matters.title") + " - " + Messages("summary.asp"))
+      doc.title must startWith(messages("asp.other.business.tax.matters.title") + " - " + messages("summary.asp"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[OtherBusinessTaxMatters] = Form2(OtherBusinessTaxMattersNo)
+      def view = taxMatters(fp().fill(OtherBusinessTaxMattersNo), true)
 
-      def view = taxMatters(form2, true)
-
-      heading.html must be(Messages("asp.other.business.tax.matters.title"))
-      subHeading.html must include(Messages("summary.asp"))
+      heading.html must be(messages("asp.other.business.tax.matters.title"))
+      subHeading.html must include(messages("summary.asp"))
 
     }
 
-    "show errors in the correct locations" in new ViewFixture {
+    behave like pageWithErrors(
+      taxMatters(fp().withError("otherBusinessTaxMatters", "error.required.asp.other.business.tax.matters"), true),
+      "otherBusinessTaxMatters",
+      "error.required.asp.other.business.tax.matters"
+    )
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "otherBusinessTaxMatters") -> Seq(ValidationError("not a message Key"))
-        ))
-
-      def view = taxMatters(form2, true)
-
-      errorSummary.html() must include("not a message Key")
-
-      doc.getElementById("otherBusinessTaxMatters")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
-    }
+    behave like pageWithBackLink(taxMatters(fp(), false))
   }
 }

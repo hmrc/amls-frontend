@@ -18,47 +18,48 @@ package controllers.asp
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.asp.{Asp, OtherBusinessTaxMatters}
-import play.api.mvc.MessagesControllerComponents
+import forms.asp.OtherBusinessTaxMattersFormProvider
+import models.asp.Asp
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import views.html.asp.other_business_tax_matters
+import views.html.asp.OtherBusinessTaxMattersView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class OtherBusinessTaxMattersController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                   authAction: AuthAction,
                                                   val ds: CommonPlayDependencies,
                                                   val cc: MessagesControllerComponents,
-                                                  other_business_tax_matters: other_business_tax_matters) extends AmlsBaseController(ds, cc) {
+                                                  formProvider: OtherBusinessTaxMattersFormProvider,
+                                                  view: OtherBusinessTaxMattersView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetch[Asp](request.credId, Asp.key) map {
-          response =>
-            val form: Form2[OtherBusinessTaxMatters] = (for {
-              asp <- response
-              otherTax <- asp.otherBusinessTaxMatters
-            } yield Form2[OtherBusinessTaxMatters](otherTax)).getOrElse(EmptyForm)
-            Ok(other_business_tax_matters(form, edit))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Asp](request.credId, Asp.key) map {
+        response =>
+          val form = (for {
+            asp <- response
+            otherTax <- asp.otherBusinessTaxMatters
+          } yield formProvider().fill(otherTax)).getOrElse(formProvider())
+          Ok(view(form, edit))
+      }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request => {
-        Form2[OtherBusinessTaxMatters](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(other_business_tax_matters(f, edit)))
-          case ValidForm(_, data) =>
-            for {
-              asp <- dataCacheConnector.fetch[Asp](request.credId, Asp.key)
-              _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
-                asp.otherBusinessTaxMatters(data)
-              )
-            } yield Redirect(routes.SummaryController.get)
-        }
-      }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
+          for {
+            asp <- dataCacheConnector.fetch[Asp](request.credId, Asp.key)
+            _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
+              asp.otherBusinessTaxMatters(data)
+            )
+          } yield Redirect(routes.SummaryController.get)
+      )
+    }
   }
 
 }

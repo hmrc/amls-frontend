@@ -21,9 +21,10 @@ import models.asp.Asp
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.asp.summary
+import views.html.asp.SummaryView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,7 +35,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
 
     implicit val ec = app.injector.instanceOf[ExecutionContext]
-    lazy val summaryView = app.injector.instanceOf[summary]
+    lazy val summaryView = app.injector.instanceOf[SummaryView]
     val controller = new SummaryController(mockCacheConnector, mockServiceFlow, mockStatusService, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc, summaryView)
 
     mockCacheSave[Asp]
@@ -67,7 +68,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
   "Post" must {
     "load the Asp model and set hasAccepted to true" in new Fixture {
-      val postRequest = requestWithUrlEncodedBody("" -> "")
+      val postRequest = FakeRequest(POST, routes.SummaryController.post().url).withFormUrlEncodedBody("" -> "")
 
       val model = Asp(None, None)
       mockCacheFetch(Some(model))

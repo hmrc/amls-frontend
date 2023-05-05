@@ -21,7 +21,8 @@ import java.time.LocalDate
 import connectors._
 import models._
 import models.amp.Amp
-import models.asp.{Accountancy, Asp, BookKeeping, ServicesOfBusiness}
+import models.asp.Service._
+import models.asp.{Asp, ServicesOfBusiness}
 import models.bankdetails.BankDetails
 import models.businessactivities.{CustomersOutsideUK => BACustomersOutsideUK, InvolvedInOtherYes => BAInvolvedInOtherYes, _}
 import models.businesscustomer.{Address, ReviewDetails}

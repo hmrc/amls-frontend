@@ -20,7 +20,8 @@ import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.amp.Amp
-import models.asp.{Accountancy, Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
+import models.asp.Service.Accountancy
+import models.asp.{Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
 import models.bankdetails.BankAccountType.PersonalAccount
 import models.bankdetails.{BankAccount, BankAccountIsUk, BankDetails, UKAccount}
 import models.businessactivities.TransactionTypes.Paper

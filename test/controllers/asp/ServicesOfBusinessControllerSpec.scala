@@ -17,7 +17,9 @@
 package controllers.asp
 
 import controllers.actions.SuccessfulAuthAction
+import forms.asp.ServicesOfBusinessFormProvider
 import models.asp._
+import models.asp.Service._
 import models.businessmatching.BusinessActivity.AccountancyServices
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
@@ -25,11 +27,12 @@ import org.jsoup.nodes.Document
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.asp.services_of_business
+import views.html.asp.ServicesOfBusinessView
 
-class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
+class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   val emptyCache = CacheMap("", Map.empty)
 
@@ -37,7 +40,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
 
-    lazy val servicesOfBusiness = app.injector.instanceOf[services_of_business]
+    lazy val servicesOfBusiness = inject[ServicesOfBusinessView]
     val controller = new ServicesOfBusinessController(
       mockCacheConnector,
       mockStatusService,
@@ -45,6 +48,7 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
       ds = commonDependencies,
       mockServiceFlow,
       mockMcc,
+      inject[ServicesOfBusinessFormProvider],
       servicesOfBusiness
     )
 
@@ -64,9 +68,10 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
 
     "submit with valid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "services" -> "02",
-        "services" -> "04"
+      val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
+        .withFormUrlEncodedBody(
+        "services[1]" -> BookKeeping.toString,
+        "services[2]" -> Accountancy.toString
       )
 
       mockApplicationStatus(SubmissionDecisionRejected)
@@ -84,39 +89,43 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) must be(OK)
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("input[value=03]").hasAttr("checked") must be(true)
-      document.select("input[value=01]").hasAttr("checked") must be(true)
+      document.select(s"input[value=${BookKeeping.toString}]").hasAttr("checked") must be(true)
+      document.select(s"input[value=${Accountancy.toString}]").hasAttr("checked") must be(true)
     }
 
-    "fail submission on error" in new Fixture {
+    "fail submission on invalid value" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "services" -> "0299999"
-      )
+      val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
+        .withFormUrlEncodedBody(
+          "services[1]" -> "foo"
+        )
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include("Invalid value")
+      val document: Document = Jsoup.parse(contentAsString(result))
+      document.getElementsByClass("govuk-error-summary").text() must include(messages("error.required.asp.business.services"))
     }
 
     "fail submission when no check boxes were selected" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-
+      val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
+      .withFormUrlEncodedBody(
+        "services[1]" -> ""
       )
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#services]").html() must include(Messages("error.required.asp.business.services"))
+      document.getElementsByClass("govuk-error-summary").text() must include(messages("error.required.asp.business.services"))
     }
 
     "submit with valid data in edit mode" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "services[1]" -> "02",
-        "services[0]" -> "01",
-        "services[2]" -> "03"
+      val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post(true).url)
+      .withFormUrlEncodedBody(
+        "services[1]" -> BookKeeping.toString,
+        "services[2]" -> Accountancy.toString,
+        "services[3]" -> Auditing.toString
       )
 
       mockApplicationStatus(SubmissionDecisionRejected)
@@ -131,10 +140,12 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
 
         mockApplicationStatus(SubmissionDecisionApproved)
 
-        val newRequest = requestWithUrlEncodedBody(
-          "services[0]" -> "02",
-          "services[1]" -> "01",
-          "services[2]" -> "03")
+        val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
+        .withFormUrlEncodedBody(
+          "services[1]" -> BookKeeping.toString,
+          "services[2]" -> Accountancy.toString,
+          "services[3]" -> Auditing.toString
+        )
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
@@ -147,10 +158,12 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
 
         mockApplicationStatus(ReadyForRenewal(None))
 
-        val newRequest = requestWithUrlEncodedBody(
-          "services[0]" -> "02",
-          "services[1]" -> "01",
-          "services[2]" -> "03")
+        val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
+        .withFormUrlEncodedBody(
+          "services[1]" -> BookKeeping.toString,
+          "services[2]" -> Accountancy.toString,
+          "services[3]" -> Auditing.toString
+        )
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
@@ -162,10 +175,12 @@ class ServicesOfBusinessControllerSpec extends AmlsSpec with MockitoSugar {
       "the status is approved" when {
         "the service has just been added" must {
           "redirect to the next page in the flow" in new Fixture {
-            val newRequest = requestWithUrlEncodedBody(
-              "services[0]" -> "02",
-              "services[1]" -> "01",
-              "services[2]" -> "03")
+            val newRequest = FakeRequest(POST, routes.ServicesOfBusinessController.post().url)
+            .withFormUrlEncodedBody(
+              "services[1]" -> BookKeeping.toString,
+              "services[2]" -> Accountancy.toString,
+              "services[3]" -> Auditing.toString
+            )
 
             mockApplicationStatus(SubmissionDecisionApproved)
             mockIsNewActivityNewAuth(true, Some(AccountancyServices))

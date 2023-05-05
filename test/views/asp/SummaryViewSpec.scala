@@ -16,7 +16,6 @@
 
 package views.asp
 
-import models.asp.Service._
 import models.asp._
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.test.FakeRequest
@@ -76,8 +75,4 @@ class SummaryViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks
       }
     }
   }
-}
-
-object SummaryViewSpec {
-
 }

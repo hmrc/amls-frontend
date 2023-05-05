@@ -14,59 +14,45 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
-@import config.{ ApplicationConfig}
+@import config.ApplicationConfig
+@import models.asp.Service
+@import views.html.components.{Button, Heading, SectionSubtitle, ReturnLink}
+@import views.html.components.forms.{ErrorSummary, InputCheckbox}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
 
-@this(main: include.main)
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    inputCheckbox: InputCheckbox,
+    button: Button,
+    returnLink: ReturnLink
+)
 
-@(f: forms.Form2[_], edit: Boolean)(implicit   m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
+@(form: Form[_], edit: Boolean)(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
 
-@header = {
-    @components.back_link()
-    @errorSummary(f)
-}
+@layout(pageTitle = messages("asp.services.title") + " - " + messages("summary.asp")) {
 
-@main(
-    title = Messages("asp.services.title") + " - " + Messages("summary.asp"),
-    heading = header
-) {
+    @errorSummary(form, Some(Map("services" -> "services_0")))
 
-    @form(f, controllers.asp.routes.ServicesOfBusinessController.post(edit)) {
+    @subtitle("summary.asp")
 
-        @fieldsetWithErrorGroup(
-            f = f("services"),
-            heading = "asp.services.title",
-            section = "summary.asp",
-            panel = false,
-            hint = "lbl.select.all"
-        ) {
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.01",
-                value = "01"
-            )
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.04",
-                value = "04"
-            )
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.03",
-                value = "03"
-            )
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.05",
-                value = "05"
-            )
-            @checkbox(
-                f = f("services[]"),
-                labelText = "asp.service.lbl.02",
-                value = "02"
-            )
-        }
-        @submit(edit)
+    @heading("asp.services.title")
+
+    @formHelper(action = controllers.asp.routes.ServicesOfBusinessController.post(edit)) {
+
+        @inputCheckbox(
+            Checkboxes(
+                name = "services",
+                hint = Some(Hint(content = Text(messages("lbl.select.all")))),
+                items = Service.formValues
+            ).withFormField(form("services"))
+        )
+
+        @button()
+
+        @returnLink(true)
     }
 }
