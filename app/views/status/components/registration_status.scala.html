@@ -34,7 +34,11 @@
 
 @status match {
     case SubmissionReadyForReview => {
-        <p>@Messages("your.registration.status.pending")
+        <p>
+            @Messages("your.registration.status.pending")
+            <br />
+            @Messages("your.registration.number", amlsRegNo.getOrElse(""))
+            <br />
             @canOrCannotTradeInformation
         </p>
     }
