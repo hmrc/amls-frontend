@@ -17,6 +17,7 @@
 package controllers.tcsp
 
 import controllers.actions.SuccessfulAuthAction
+import forms.tcsp.ServicesOfAnotherTCSPFormProvider
 import generators.AmlsReferenceNumberGenerator
 import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -24,19 +25,21 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.tcsp.services_of_another_tcsp
+import views.html.tcsp.ServicesOfAnotherTCSPView
 
-class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator {
+class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[services_of_another_tcsp]
+    lazy val view = inject[ServicesOfAnotherTCSPView]
     val controller = new ServicesOfAnotherTCSPController (
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       cc = mockMcc,
-      services_of_another_tcsp = view
+      formProvider = inject[ServicesOfAnotherTCSPFormProvider],
+      view = view
     )
   }
 
@@ -76,7 +79,8 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
               mockCacheFetch[Tcsp](Some(Tcsp(servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber)))))
               mockCacheSave[Tcsp]
 
-              val newRequest = requestWithUrlEncodedBody(
+              val newRequest = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post(true).url)
+              .withFormUrlEncodedBody(
                 "servicesOfAnotherTCSP" -> "true"
               )
 
@@ -93,7 +97,8 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
               mockCacheFetch[Tcsp](None)
               mockCacheSave[Tcsp]
 
-              val newRequest = requestWithUrlEncodedBody(
+              val newRequest = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post().url)
+              .withFormUrlEncodedBody(
                 "servicesOfAnotherTCSP" -> "false"
               )
 
@@ -113,7 +118,8 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
             mockCacheFetch[Tcsp](None)
             mockCacheSave[Tcsp]
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post().url)
+            .withFormUrlEncodedBody(
               "servicesOfAnotherTCSP" -> "true"
             )
 
@@ -129,7 +135,8 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
               mockCacheFetch[Tcsp](None)
               mockCacheSave[Tcsp]
 
-              val newRequest = requestWithUrlEncodedBody(
+              val newRequest = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post().url)
+              .withFormUrlEncodedBody(
                 "servicesOfAnotherTCSP" -> "true"
               )
 
@@ -147,7 +154,8 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
       "respond with BAD_REQUEST" when {
         "invalid data" in new Fixture {
 
-          val newRequestInvalid = requestWithUrlEncodedBody(
+          val newRequestInvalid = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post().url)
+          .withFormUrlEncodedBody(
             "servicesOfAnotherTCSP" -> ""
           )
 
@@ -168,7 +176,8 @@ class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar wit
         mockCacheFetch[Tcsp](Some(Tcsp(doesServicesOfAnotherTCSP = Some(true), servicesOfAnotherTCSP = Some(ServicesOfAnotherTCSPYes(amlsRegistrationNumber)))))
         mockCacheSave[Tcsp]
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.ServicesOfAnotherTCSPController.post(true).url)
+        .withFormUrlEncodedBody(
           "servicesOfAnotherTCSP" -> "false"
         )
 

@@ -22,57 +22,38 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.Inject
 import models.tcsp._
-import play.api.i18n.Messages
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
-import views.html.tcsp.summary
+import views.html.tcsp.CheckYourAnswersView
 import play.api.Logging
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
+import utils.tcsp.CheckYourAnswersHelper
+
+import scala.concurrent.Future
 
 class SummaryController @Inject()(
-                                  val dataCache: DataCacheConnector,
-                                  val authAction: AuthAction,
-                                  val ds: CommonPlayDependencies,
-                                  val serviceFlow: ServiceFlow,
-                                  val statusService: StatusService,
-                                  val cc: MessagesControllerComponents,
-                                  val summary: summary,
-                                  implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with Logging {
+                                   val dataCache: DataCacheConnector,
+                                   val authAction: AuthAction,
+                                   val ds: CommonPlayDependencies,
+                                   val serviceFlow: ServiceFlow,
+                                   val statusService: StatusService,
+                                   val cc: MessagesControllerComponents,
+                                   cyaHelper: CheckYourAnswersHelper,
+                                   val view: CheckYourAnswersView,
+                                   implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with Logging {
 
-  def sortProviders(data: Tcsp): List[String] = {
-
-    val sortedList = (for {
-      types <- data.tcspTypes
-      providers <- Some(types.serviceProviders)
-      labels <- Some(providers.collect {
-          case provider if !provider.value.eq("05") => Messages(s"tcsp.service.provider.lbl.${provider.value}")
-        }
-      )
-      specialCase <- Some(providers.collect {
-          case provider if provider.value.eq("05") => Messages(s"tcsp.service.provider.lbl.05")
-        }
-      )
-    } yield labels.toList.sorted ++ specialCase.toList).getOrElse(List())
-
-
-    if (sortedList.isEmpty) {
-      logger.warn(s"[tcsp][SummaryController][sortProviders] - tcsp provider list is empty")
-    }
-
-    sortedList
-  }
-
-  def get = authAction.async {
+  def get: Action[AnyContent] = authAction.async {
       implicit request =>
         fetchModel(request.credId) map {
-          case Some(data) if data.copy(hasAccepted = true).isComplete => Ok(summary(data, sortProviders(data)))
+          case Some(data) if data.copy(hasAccepted = true).isComplete =>
+            Ok(view(cyaHelper.getSummaryList(data)))
           case _ => Redirect(controllers.routes.RegistrationProgressController.get)
         }
   }
 
-  def post = authAction.async {
+  def post: Action[AnyContent] = authAction.async {
       implicit request =>
         (for {
           model <- OptionT(fetchModel(request.credId))
@@ -80,5 +61,5 @@ class SummaryController @Inject()(
         } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Cannot update Tcsp")
   }
 
-  private def fetchModel(credId: String)(implicit hc: HeaderCarrier) = dataCache.fetch[Tcsp](credId, Tcsp.key)
+  private def fetchModel(credId: String)(implicit hc: HeaderCarrier): Future[Option[Tcsp]] = dataCache.fetch[Tcsp](credId, Tcsp.key)
 }

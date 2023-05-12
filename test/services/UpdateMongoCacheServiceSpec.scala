@@ -35,7 +35,9 @@ import models.hvd._
 import models.moneyservicebusiness._
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision.{ProfessionalBodyYes => SupervisionProfessionalBodyYes, _}
-import models.tcsp.{Other, _}
+import models.tcsp._
+import models.tcsp.TcspTypes._
+import models.tcsp.ProvidedServices.{PhonecallHandling, Other => PSOther}
 import models.tradingpremises.TradingPremises
 import models.{DataImport, _}
 import org.joda.time.LocalDate
@@ -173,7 +175,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
         TrusteeProvider))),
       None,
       None,
-      Some(ProvidedServices(Set(PhonecallHandling, Other("other service")))),
+      Some(ProvidedServices(Set(PhonecallHandling, PSOther("other service")))),
       Some(true),
       None,
       hasAccepted = true

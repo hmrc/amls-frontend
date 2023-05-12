@@ -17,6 +17,7 @@
 package models.tcsp
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.tcsp.TcspTypes._
 import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap

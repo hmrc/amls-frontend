@@ -19,28 +19,57 @@ package models.tcsp
 import jto.validation.forms.UrlFormEncoded
 import jto.validation._
 import jto.validation.forms.Rules.{minLength => _, _}
+import models.{Enumerable, WithName}
+import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.Aliases.{CheckboxItem, Text}
 import utils.TraversableValidators.minLengthR
 
 case class TcspTypes(serviceProviders: Set[ServiceProvider])
 
 sealed trait ServiceProvider {
-  val value: String =
-    this match {
-      case NomineeShareholdersProvider => "01"
-      case TrusteeProvider => "02"
-      case RegisteredOfficeEtc => "03"
-      case CompanyDirectorEtc => "04"
-      case CompanyFormationAgent => "05"
-    }
+  val value: String
 }
 
-case object NomineeShareholdersProvider extends ServiceProvider
-case object TrusteeProvider extends ServiceProvider
-case object RegisteredOfficeEtc extends ServiceProvider
-case object CompanyDirectorEtc extends ServiceProvider
-case object CompanyFormationAgent extends ServiceProvider
+object TcspTypes extends Enumerable.Implicits {
 
-object TcspTypes {
+  case object NomineeShareholdersProvider extends WithName("nomineeShareholdersProvider") with ServiceProvider {
+    override val value: String = "01"
+  }
+
+  case object TrusteeProvider extends WithName("trusteeProvider") with ServiceProvider {
+    override val value: String = "02"
+  }
+
+  case object RegisteredOfficeEtc extends WithName("registeredOfficeEtc") with ServiceProvider {
+    override val value: String = "03"
+  }
+
+  case object CompanyDirectorEtc extends WithName("companyDirectorEtc") with ServiceProvider {
+    override val value: String = "04"
+  }
+
+  case object CompanyFormationAgent extends WithName("companyFormationAgent") with ServiceProvider {
+    override val value: String = "05"
+  }
+
+  val all: Seq[ServiceProvider] = Seq(
+    NomineeShareholdersProvider,
+    TrusteeProvider,
+    RegisteredOfficeEtc,
+    CompanyDirectorEtc,
+    CompanyFormationAgent
+  )
+
+  def formValues(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex.map { case (sp, index) =>
+    CheckboxItem(
+      content = Text(messages(s"tcsp.service.provider.lbl.${sp.value}")),
+      value = sp.toString,
+      id = Some(s"serviceProviders_$index"),
+      name = Some(s"serviceProviders[$index]")
+    )
+  }.sortBy(_.content.asHtml.body)
+
+  implicit val enumerable: Enumerable[ServiceProvider] = Enumerable(all.map(v => v.toString -> v): _*)
 
   import utils.MappingUtils.Implicits._
   import cats.data.Validated.{Invalid, Valid}

@@ -2355,7 +2355,6 @@ tcsp.off-the-shelf.companies.lbl = Do you sell off-the-shelf companies?
 tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
 tcsp.servicesOfAnotherTcsp.title = Do you provide services at the address of another business?
 tcsp.servicesOfAnotherTcsp.hint.1 = You must tell us about
-tcsp.servicesOfAnotherTcsp.hint.1.link = https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register
 tcsp.servicesOfAnotherTcsp.hint.1.link.text = every premises (opens in a new tab)
 tcsp.servicesOfAnotherTcsp.hint.2 = you use, including virtual offices.
 tcsp.servicesOfAnotherTcsp.other.hint = Only include companies which are based in the UK and supervised by HM Revenue and Customs for Money Laundering Regulations.

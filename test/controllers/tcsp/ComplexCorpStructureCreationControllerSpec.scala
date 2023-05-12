@@ -18,31 +18,36 @@ package controllers.tcsp
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.tcsp.ComplexCorpStructureCreationFormProvider
 import models.tcsp._
+import models.tcsp.ProvidedServices._
+import models.tcsp.TcspTypes._
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
-import views.html.tcsp.complex_corp_structure_creation
+import views.html.tcsp.ComplexCorpStructureCreationView
 
 import scala.concurrent.Future
 
-class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
 
     val cache = mock[DataCacheConnector]
-    lazy val view = app.injector.instanceOf[complex_corp_structure_creation]
+    lazy val view = inject[ComplexCorpStructureCreationView]
     lazy val controller = new ComplexCorpStructureCreationController(
       SuccessfulAuthAction,
       commonDependencies,
       cache,
       cc = mockMcc,
-      complex_corp_structure_creation = view)
+      formProvider = inject[ComplexCorpStructureCreationFormProvider],
+      view = view)
 
     val tcsp = Tcsp(
       Some(TcspTypes(Set(
@@ -69,7 +74,8 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
       "respond with BAD_REQUEST" when {
         "given invalid data" in new TestFixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.ComplexCorpStructureCreationController.post().url)
+          .withFormUrlEncodedBody(
             "complexCorpStructureCreation" -> "invalid"
           )
 
@@ -110,7 +116,8 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
               hasChanged = true
             )
 
-            val result = controller.post(true)(requestWithUrlEncodedBody("complexCorpStructureCreation" -> "true"))
+            val result = controller.post(true)(FakeRequest(POST, routes.ComplexCorpStructureCreationController.post(true).url)
+            .withFormUrlEncodedBody("complexCorpStructureCreation" -> "true"))
 
             status(result) mustBe SEE_OTHER
             verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
@@ -150,7 +157,8 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
                 hasChanged = true
               )
 
-              val result = controller.post(false)(requestWithUrlEncodedBody("complexCorpStructureCreation" -> "false"))
+              val result = controller.post(false)(FakeRequest(POST, routes.ComplexCorpStructureCreationController.post().url)
+              .withFormUrlEncodedBody("complexCorpStructureCreation" -> "false"))
               status(result) mustBe SEE_OTHER
               verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.ProvidedServicesController.get().url)
@@ -173,7 +181,8 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
                 hasChanged = true
               )
 
-              val result = controller.post(false)(requestWithUrlEncodedBody("complexCorpStructureCreation" -> "false"))
+              val result = controller.post(false)(FakeRequest(POST, routes.ComplexCorpStructureCreationController.post().url)
+              .withFormUrlEncodedBody("complexCorpStructureCreation" -> "false"))
               status(result) mustBe SEE_OTHER
               verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.ServicesOfAnotherTCSPController.get().url)

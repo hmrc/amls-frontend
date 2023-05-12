@@ -18,56 +18,49 @@ package controllers.tcsp
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.tcsp.ComplexCorpStructureCreationFormProvider
+import models.tcsp.TcspTypes.RegisteredOfficeEtc
 import models.tcsp._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import utils.AuthAction
+import views.html.tcsp.ComplexCorpStructureCreationView
 
-import views.html.tcsp._
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class ComplexCorpStructureCreationController @Inject()(val authAction: AuthAction,
                                                        val ds: CommonPlayDependencies,
                                                        val dataCacheConnector: DataCacheConnector,
                                                        val cc: MessagesControllerComponents,
-                                                       complex_corp_structure_creation: complex_corp_structure_creation) extends AmlsBaseController(ds, cc) {
+                                                       formProvider: ComplexCorpStructureCreationFormProvider,
+                                                       view: ComplexCorpStructureCreationView) extends AmlsBaseController(ds, cc) {
 
-  val NAME = "complexCorpStructureCreation"
-  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
-  implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.tcsp.complex.corporate.structures")
-
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key) map {
         response =>
-          val form: Form2[ComplexCorpStructureCreation] = (for {
+          val form = (for {
             tcsp <- response
             model <- tcsp.complexCorpStructureCreation
-          } yield Form2[ComplexCorpStructureCreation](model)) getOrElse EmptyForm
-          Ok(complex_corp_structure_creation(form, edit))
+          } yield formProvider().fill(model)) getOrElse formProvider()
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[Boolean](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(complex_corp_structure_creation(f, edit)))
-        case ValidForm(_, data) =>
-          val res = data match {
-            case true => ComplexCorpStructureCreationYes
-            case false => ComplexCorpStructureCreationNo
-          }
+      formProvider().bindFromRequest().fold(
+        formWithError =>
+          Future.successful(BadRequest(view(formWithError, edit))),
+        data =>
           for {
             tcsp <- dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key)
-            _ <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key, tcsp.complexCorpStructureCreation(res))
+            _ <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key, tcsp.complexCorpStructureCreation(data))
           } yield redirectTo(edit, tcsp)
-      }
+      )
   }
 
-  def redirectTo(edit: Boolean, tcsp: Tcsp) = {
+  def redirectTo(edit: Boolean, tcsp: Tcsp): Result = {
     (edit, tcsp.tcspTypes.map(t => t.serviceProviders.contains(RegisteredOfficeEtc))) match {
       case (_, Some(true)) => Redirect(routes.ProvidedServicesController.get(edit))
       case (false, Some(false)) => Redirect(routes.ServicesOfAnotherTCSPController.get(edit))

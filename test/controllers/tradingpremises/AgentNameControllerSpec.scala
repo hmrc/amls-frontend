@@ -103,7 +103,6 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
         val document = Jsoup.parse(contentAsString(result))
 
         val title = s"${messages("tradingpremises.agentname.title")} - ${messages("summary.tradingpremises")} - ${messages("title.amls")} - ${messages("title.gov")}"
-        println(document)
         document.title() must be(title)
 
         document.getElementById("agentName").`val`() must include("John Doe")

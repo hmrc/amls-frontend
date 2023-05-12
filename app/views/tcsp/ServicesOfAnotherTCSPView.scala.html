@@ -1,0 +1,71 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
+@import views.html.components.forms.{ErrorSummary, InputYesNo}
+@import views.html.components.{Button, ReturnLink, SectionSubtitle, Heading}
+
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    hmrcNewTabLink: HmrcNewTabLink,
+    formHelper: FormWithCSRF,
+    inputYesNo: InputYesNo,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@layout(pageTitle = messages("tcsp.servicesOfAnotherTcsp.title") + " - " + messages("summary.tcsp")) {
+
+    @errorSummary(form)
+
+    @subtitle("summary.tcsp")
+
+    @heading("tcsp.servicesOfAnotherTcsp.title")
+
+    <p class="govuk-body">
+        @messages("tcsp.servicesOfAnotherTcsp.hint.1")
+        @hmrcNewTabLink(
+            NewTabLink(
+                classList = Some("govuk-link"),
+                href = Some(appConfig.tcspWhoNeedsToRegisterLink),
+                text = messages("tcsp.servicesOfAnotherTcsp.hint.1.link.text")
+            )
+        )
+        @messages("tcsp.servicesOfAnotherTcsp.hint.2")
+    </p>
+
+    @formHelper(action = controllers.tcsp.routes.ServicesOfAnotherTCSPController.post(edit)) {
+
+        @inputYesNo(
+            Radios(
+                name = "servicesOfAnotherTCSP",
+                items = HmrcYesNoRadioItems(),
+                classes = "govuk-radios govuk-radios--inline"
+            ).withFormField(form("servicesOfAnotherTCSP"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

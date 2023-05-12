@@ -24,6 +24,7 @@ import play.api.data.Forms.{mapping, seq}
 import uk.gov.voa.play.form.ConditionalMappings._
 
 import javax.inject.Inject
+import scala.collection.convert.ImplicitConversions.`collection asJava`
 
 class TransactionTypesFormProvider @Inject()() extends Mappings {
 
@@ -35,7 +36,7 @@ class TransactionTypesFormProvider @Inject()() extends Mappings {
         .verifying(
           nonEmptySeq("error.required.ba.atleast.one.transaction.record")
         ),
-      "software" -> mandatoryIf(_.get("types[3]").contains(DigitalOther.toString),
+      "software" -> mandatoryIf(_.values.contains(DigitalOther.toString),
         text("error.required.ba.software.package.name").verifying(
           firstError(
             maxLength(length, "error.max.length.ba.software.package.name"),

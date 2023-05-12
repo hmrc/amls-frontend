@@ -33,10 +33,20 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
   val agentPremisesRowIndex = 0
   val index = 1
 
-  val tp: TradingPremises = fullTradingPremisesGen.sample
-    .getOrElse(TradingPremises()).copy(
-    whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(activities = BusinessActivities.all)),
-    msbServices = Some(TradingPremisesMsbServices(TradingPremisesMsbService.all.toSet))
+  val ytp = YourTradingPremises(
+    "foo",
+    Address("123 Test Road", "Some Village", Some("A Town"), Some("Big City"), "AA1 1BB", None),
+    Some(true),
+    Some(new LocalDate(2010, 10, 10)),
+    None
+  )
+
+  val tp: TradingPremises = TradingPremises(
+    yourTradingPremises = Some(ytp),
+    whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(BusinessActivities.all)),
+    msbServices = Some(TradingPremisesMsbServices(TradingPremisesMsbService.all.toSet)),
+    hasAccepted = true,
+    hasChanged = true
   )
 
   val agentName = "John Doe"

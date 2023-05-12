@@ -62,7 +62,6 @@ class SummaryViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks
 
         summary(testdata)
       }
-      println(doc)
 
       doc.getElementsByClass("govuk-summary-list__key").toSeq.zip(
         doc.getElementsByClass("govuk-summary-list__value").toSeq

@@ -138,11 +138,14 @@
 
 
     @formHelper(action = controllers.routes.RegistrationProgressController.get) {
-        @if(inCompleteModel.isEmpty) {
-            @button("button.bankdetails.yourbankaccount.acceptandcomplete", "accept-and-complete")
-            @returnLink(true)
-        } else {
-            @button("link.return.registration.progress", "return-to-application")
+        @(inCompleteModel.isEmpty, completedModel.isEmpty) match {
+            case (true, false) => {
+                @button("button.bankdetails.yourbankaccount.acceptandcomplete", "accept-and-complete")
+                @returnLink(true)
+            }
+            case _ => {
+                @button("link.return.registration.progress", "return-to-application")
+            }
         }
     }
 

@@ -17,6 +17,8 @@
 package models.tcsp
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.tcsp.TcspTypes._
+import models.tcsp.ProvidedServices._
 import org.mockito.Mockito._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap

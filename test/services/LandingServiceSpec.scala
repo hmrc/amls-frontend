@@ -17,7 +17,6 @@
 package services
 
 import java.time.LocalDate
-
 import connectors._
 import models._
 import models.amp.Amp
@@ -38,6 +37,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
 import models.tcsp._
+import models.tcsp.TcspTypes._
 import models.tradingpremises.TradingPremises
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._

@@ -113,4 +113,5 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   val tradingPremisesVirtualOfficeLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register"
 
+  val tcspWhoNeedsToRegisterLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register"
 }

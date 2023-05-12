@@ -18,40 +18,42 @@ package controllers.tcsp
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.tcsp.{CompanyFormationAgent, RegisteredOfficeEtc, Tcsp, TcspTypes}
-import play.api.mvc.MessagesControllerComponents
+import forms.tcsp.ServiceProviderTypesFormProvider
+import models.tcsp.Tcsp
+import models.tcsp.TcspTypes.{CompanyFormationAgent, RegisteredOfficeEtc}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import views.html.tcsp.service_provider_types
+import views.html.tcsp.ServiceProviderTypesView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class TcspTypesController @Inject()(val dataCacheConnector: DataCacheConnector,
                                     val authAction: AuthAction,
                                     val ds: CommonPlayDependencies,
                                     val cc: MessagesControllerComponents,
-                                    service_provider_types: service_provider_types) extends AmlsBaseController(ds, cc) {
+                                    formProvider: ServiceProviderTypesFormProvider,
+                                    view: ServiceProviderTypesView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
 
       dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key) map {
         response =>
-          val form: Form2[TcspTypes] = (for {
+          val form = (for {
             tcsp <- response
             tcspTypes <- tcsp.tcspTypes
-          } yield Form2[TcspTypes](tcspTypes)).getOrElse(EmptyForm)
-          Ok(service_provider_types(form, edit))
+          } yield formProvider().fill(tcspTypes)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
   def post(edit: Boolean = false) = authAction.async {
     implicit request =>
-      Form2[TcspTypes](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(service_provider_types(f, edit)))
-        case ValidForm(_, data) => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => {
           val companyFormOrRegisteredOffice = (data.serviceProviders.contains(CompanyFormationAgent), data.serviceProviders.contains(RegisteredOfficeEtc))
 
           val result = for {
@@ -78,7 +80,7 @@ class TcspTypesController @Inject()(val dataCacheConnector: DataCacheConnector,
             }
           }
         }
-      }
+      )
   }
 
 }

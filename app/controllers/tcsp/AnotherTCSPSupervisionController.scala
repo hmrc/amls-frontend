@@ -18,47 +18,46 @@ package controllers.tcsp
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.tcsp.{ServicesOfAnotherTCSP, Tcsp}
-import play.api.mvc.MessagesControllerComponents
+import forms.tcsp.AnotherTCSPSupervisionFormProvider
+import models.tcsp.Tcsp
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import views.html.tcsp.another_tcsp_supervision
+import views.html.tcsp.AnotherTCSPSupervisionView
 
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class AnotherTCSPSupervisionController @Inject()(val authAction: AuthAction,
                                                  val ds: CommonPlayDependencies,
                                                  val dataCacheConnector: DataCacheConnector,
                                                  val cc: MessagesControllerComponents,
-                                                 another_tcsp_supervision: another_tcsp_supervision,
+                                                 formProvider: AnotherTCSPSupervisionFormProvider,
+                                                 view: AnotherTCSPSupervisionView,
                                                  implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key) map {
         response =>
-          val form: Form2[ServicesOfAnotherTCSP] = (for {
+          val form = (for {
             tcsp <- response
             model <- tcsp.servicesOfAnotherTCSP
-          } yield Form2[ServicesOfAnotherTCSP](model)) getOrElse EmptyForm
-          Ok(another_tcsp_supervision(form, edit))
+          } yield formProvider().fill(model)) getOrElse formProvider()
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[ServicesOfAnotherTCSP](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(another_tcsp_supervision(f, edit)))
-        case ValidForm(_, data) =>
-
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             tcsp <- dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key)
             _ <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key, tcsp.servicesOfAnotherTCSP(data))
           } yield Redirect(routes.SummaryController.get)
-      }
+      )
     }
   }
 }

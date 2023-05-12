@@ -18,13 +18,15 @@ package controllers.tcsp
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.tcsp.OnlyOffTheShelfCompsSoldFormProvider
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.tcsp.TcspTypes.CompanyFormationAgent
+
 import javax.inject.Inject
 import models.tcsp._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-
-import views.html.tcsp._
+import views.html.tcsp.OnlyOffTheShelfCompsSoldView
 
 import scala.concurrent.Future
 
@@ -32,40 +34,33 @@ class OnlyOffTheShelfCompsSoldController @Inject()(val authAction: AuthAction,
                                                    val ds: CommonPlayDependencies,
                                                    val dataCacheConnector: DataCacheConnector,
                                                    val cc: MessagesControllerComponents,
-                                                   only_off_the_shelf_comps_sold: only_off_the_shelf_comps_sold) extends AmlsBaseController(ds, cc) {
+                                                   formProvider: OnlyOffTheShelfCompsSoldFormProvider,
+                                                   view: OnlyOffTheShelfCompsSoldView) extends AmlsBaseController(ds, cc) {
 
-  val NAME = "onlyOffTheShelfCompsSold"
-  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
-  implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.tcsp.off.the.shelf.companies")
-
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key) map {
         response =>
-          val form: Form2[OnlyOffTheShelfCompsSold] = (for {
+          val form = (for {
             tcsp <- response
             model <- tcsp.onlyOffTheShelfCompsSold
-          } yield Form2[OnlyOffTheShelfCompsSold](model)) getOrElse EmptyForm
-          Ok(only_off_the_shelf_comps_sold(form, edit))
+          } yield formProvider().fill(model)) getOrElse formProvider()
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[Boolean](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(only_off_the_shelf_comps_sold(f, edit)))
-        case ValidForm(_, data) =>
-          val res = data match {
-            case true => OnlyOffTheShelfCompsSoldYes
-            case false => OnlyOffTheShelfCompsSoldNo
-          }
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => {
           for {
             tcsp <- dataCacheConnector.fetch[Tcsp](request.credId, Tcsp.key)
-            _ <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key, tcsp.onlyOffTheShelfCompsSold(res))
-
+            _ <- dataCacheConnector.save[Tcsp](request.credId, Tcsp.key, tcsp.onlyOffTheShelfCompsSold(data))
           } yield redirectTo(edit, tcsp)
-      }
+        }
+      )
   }
 
   def redirectTo(edit: Boolean, tcsp: Tcsp) = {

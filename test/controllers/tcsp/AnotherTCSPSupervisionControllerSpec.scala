@@ -17,23 +17,26 @@
 package controllers.tcsp
 
 import controllers.actions.SuccessfulAuthAction
+import forms.tcsp.AnotherTCSPSupervisionFormProvider
 import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
 import org.jsoup.Jsoup
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.tcsp.another_tcsp_supervision
+import views.html.tcsp.AnotherTCSPSupervisionView
 
-class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
+class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[another_tcsp_supervision]
+    lazy val view = inject[AnotherTCSPSupervisionView]
     val controller = new AnotherTCSPSupervisionController(
       SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       cc = mockMcc,
-      another_tcsp_supervision = view,
+      formProvider = inject[AnotherTCSPSupervisionFormProvider],
+      view = view,
       error = errorView
     )
   }
@@ -76,7 +79,8 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
             mockCacheFetch[Tcsp](None)
             mockCacheSave[Tcsp]
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.AnotherTCSPSupervisionController.post().url)
+              .withFormUrlEncodedBody(
               "servicesOfAnotherTCSP" -> "true",
               "mlrRefNumber" -> "12345678"
             )
@@ -92,7 +96,8 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
             mockCacheFetch[Tcsp](None)
             mockCacheSave[Tcsp]
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.AnotherTCSPSupervisionController.post(true).url)
+              .withFormUrlEncodedBody(
               "servicesOfAnotherTCSP" -> "true",
               "mlrRefNumber" -> "12345678"
             )
@@ -110,9 +115,10 @@ class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "invalid data" in new Fixture {
 
-          val newRequestInvalid = requestWithUrlEncodedBody(
+          val newRequestInvalid = FakeRequest(POST, routes.AnotherTCSPSupervisionController.post().url)
+              .withFormUrlEncodedBody(
             "servicesOfAnotherTCSP" -> "true",
-            "mlrRefNumber" -> "adbg1233"
+            "mlrRefNumber" -> ""
           )
 
           val result = controller.post()(newRequestInvalid)
