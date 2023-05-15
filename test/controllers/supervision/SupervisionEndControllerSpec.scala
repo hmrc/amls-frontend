@@ -17,28 +17,30 @@
 package controllers.supervision
 
 import controllers.actions.SuccessfulAuthAction
+import forms.supervision.SupervisionEndFormProvider
 import models.supervision._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.supervision.supervision_end
+import views.html.supervision.SupervisionEndView
 
-class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[supervision_end]
+    lazy val view = inject[SupervisionEndView]
     val controller = new SupervisionEndController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      supervision_end = view)
+      formProvider = inject[SupervisionEndFormProvider],
+      view = view)
   }
 
   "SupervisionEndController" must {
@@ -49,12 +51,12 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("supervision.supervision_end.title"))
+      contentAsString(result) must include(messages("supervision.supervision_end.title"))
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=endDate.day]").`val` must be("")
-      document.select("input[name=endDate.month]").`val` must be("")
-      document.select("input[name=endDate.year]").`val` must be("")
+      document.getElementById("endDate.day").`val` must be("")
+      document.getElementById("endDate.month").`val` must be("")
+      document.getElementById("endDate.year").`val` must be("")
     }
 
 
@@ -73,9 +75,9 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=endDate.day]").`val` must be("24")
-      document.select("input[name=endDate.month]").`val` must be("2")
-      document.select("input[name=endDate.year]").`val` must be("1998")
+      document.getElementById("endDate.day").`val` must be("24")
+      document.getElementById("endDate.month").`val` must be("2")
+      document.getElementById("endDate.year").`val` must be("1998")
     }
 
     "on get display the SupervisionEnd page with empty form when there is no data" in new Fixture {
@@ -91,16 +93,17 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=endDate.day]").`val` must be("")
-      document.select("input[name=endDate.month]").`val` must be("")
-      document.select("input[name=endDate.year]").`val` must be("")
+      document.getElementById("endDate.day").`val` must be("")
+      document.getElementById("endDate.month").`val` must be("")
+      document.getElementById("endDate.year").`val` must be("")
     }
 
     "on post with valid data" in new Fixture {
       val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
       val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.SupervisionEndController.post().url)
+      .withFormUrlEncodedBody(
         "anotherBody" -> "true",
         "endDate.day" -> "24",
         "endDate.month" -> "2",
@@ -122,7 +125,8 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
       val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
       val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.SupervisionEndController.post().url)
+      .withFormUrlEncodedBody(
         "anotherBody" -> "true",
         "endDate.day" -> "24",
         "endDate.month" -> "2",
@@ -149,7 +153,8 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
         Some(ProfessionalBodyYes("details"))
       )))
 
-      val newRequest = requestWithUrlEncodedBody("invalid" -> "data")
+      val newRequest = FakeRequest(POST, routes.SupervisionEndController.post().url)
+      .withFormUrlEncodedBody("invalid" -> "data")
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

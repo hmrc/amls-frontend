@@ -34,6 +34,7 @@ import models.eab.Eab
 import models.hvd._
 import models.moneyservicebusiness._
 import models.responsiblepeople.ResponsiblePerson
+import models.supervision.ProfessionalBodies._
 import models.supervision.{ProfessionalBodyYes => SupervisionProfessionalBodyYes, _}
 import models.tcsp._
 import models.tcsp.TcspTypes._

@@ -17,6 +17,7 @@
 package models.supervision
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.supervision.ProfessionalBodies._
 import org.joda.time.LocalDate
 import org.mockito.Mockito._
 import play.api.libs.json.Json

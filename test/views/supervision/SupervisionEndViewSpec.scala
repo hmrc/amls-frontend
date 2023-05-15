@@ -16,38 +16,41 @@
 
 package views.supervision
 
-import forms.EmptyForm
+import forms.supervision.SupervisionEndFormProvider
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.supervision.supervision_end
+import views.html.supervision.SupervisionEndView
 
+class SupervisionEndViewSpec extends AmlsViewSpec with MustMatchers  {
 
-class supervision_endSpec extends AmlsViewSpec with MustMatchers  {
+  lazy val supervision_end = app.injector.instanceOf[SupervisionEndView]
+  lazy val fp = app.injector.instanceOf[SupervisionEndFormProvider]
+
+  implicit val request = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    lazy val supervision_end = app.injector.instanceOf[supervision_end]
     implicit val requestWithToken = addTokenForView()
   }
 
   "supervision_end view" must {
 
     "have correct title, headings and form fields" in new ViewFixture {
-      val form2 = EmptyForm
 
-      def view = supervision_end(EmptyForm, edit = false)
+      def view = supervision_end(fp(), edit = false)
 
-      doc.title must startWith(Messages("supervision.supervision_end.title"))
-      heading.html must be(Messages("supervision.supervision_end.title"))
-      subHeading.html must include(Messages("summary.supervision"))
+      doc.title must startWith(messages("supervision.supervision_end.title"))
+      heading.html must be(messages("supervision.supervision_end.title"))
+      subHeading.html must include(messages("summary.supervision"))
     }
 
-    "have a back link" in new ViewFixture {
+    behave like pageWithErrors(
+      supervision_end(fp().withError("endDate", "error.supervision.end.required.date.all"), true),
+      "endDate",
+      "error.supervision.end.required.date.all"
+    )
 
-      def view = supervision_end(EmptyForm, edit = false)
-
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
-    }
+    behave like pageWithBackLink(supervision_end(fp(), false))
   }
 }

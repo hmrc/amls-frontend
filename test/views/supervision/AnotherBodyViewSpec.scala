@@ -17,26 +17,31 @@
 package views.supervision
 
 import forms.EmptyForm
+import forms.supervision.AnotherBodyFormProvider
+import models.supervision.AnotherBodyYes
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.supervision.another_body
+import views.html.supervision.AnotherBodyView
 
+class AnotherBodyViewSpec extends AmlsViewSpec with MustMatchers  {
 
-class another_bodySpec extends AmlsViewSpec with MustMatchers  {
+  lazy val another_body = inject[AnotherBodyView]
+  lazy val fp = inject[AnotherBodyFormProvider]
+
+  implicit val request = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    lazy val another_body = app.injector.instanceOf[another_body]
     implicit val requestWithToken = addTokenForView()
   }
 
-  "another_body view" must {
+  "AnotherBodyView" must {
 
     "have correct title, headings and form fields" in new ViewFixture {
-      val form2 = EmptyForm
 
-      def view = another_body(EmptyForm, edit = false)
+      def view = another_body(fp().fill(AnotherBodyYes("A Name")), edit = false)
 
       doc.title must startWith(Messages("supervision.another_body.title"))
       heading.html must be(Messages("supervision.another_body.title"))
@@ -45,11 +50,24 @@ class another_bodySpec extends AmlsViewSpec with MustMatchers  {
       doc.getElementsByAttributeValue("name", "anotherBody") must not be empty
     }
 
-    "have a back link" in new ViewFixture {
+    behave like pageWithErrors(
+      another_body(
+        fp().withError("anotherBody", "error.required.supervision.anotherbody"),
+        true
+      ),
+      "anotherBody",
+      "error.required.supervision.anotherbody"
+    )
 
-      def view = another_body(EmptyForm, edit = false)
+    behave like pageWithErrors(
+      another_body(
+        fp().withError("supervisorName", "error.required.supervision.supervisor"),
+        true
+      ),
+      "supervisorName",
+      "error.required.supervision.supervisor"
+    )
 
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
-    }
+    behave like pageWithBackLink(another_body(fp(), false))
   }
 }

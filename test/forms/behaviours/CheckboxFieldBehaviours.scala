@@ -18,7 +18,7 @@ package forms.behaviours
 
 import play.api.data.{Form, FormError}
 
-trait CheckboxFieldBehaviours extends FormSpec {
+trait CheckboxFieldBehaviours extends FieldBehaviours {
 
   def checkboxField[T](form: Form[_],
                        fieldName: String,

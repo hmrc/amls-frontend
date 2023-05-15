@@ -17,29 +17,29 @@
 package controllers.supervision
 
 import controllers.actions.SuccessfulAuthAction
+import forms.supervision.PenalisedByProfessionalFormProvider
 import models.supervision.{ProfessionalBodyYes, Supervision}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.supervision.penalised_by_professional
+import views.html.supervision.PenalisedByProfessionalView
 
-
-class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[penalised_by_professional]
+    lazy val view = inject[PenalisedByProfessionalView]
     val controller = new PenalisedByProfessionalController (
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      penalised_by_professional = view)
+      formProvider = inject[PenalisedByProfessionalFormProvider],
+      view = view)
 
     mockCacheSave[Supervision]
-
   }
 
   "PenalisedByProfessionalController" must {
@@ -50,7 +50,7 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("supervision.penalisedbyprofessional.title"))
+      contentAsString(result) must include(messages("supervision.penalisedbyprofessional.title"))
     }
 
 
@@ -71,7 +71,8 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
   "on post with valid data" in new Fixture {
 
-    val newRequest = requestWithUrlEncodedBody(
+    val newRequest = FakeRequest(POST, routes.PenalisedByProfessionalController.post().url)
+    .withFormUrlEncodedBody(
       "penalised" -> "true",
       "professionalBody" -> "details"
     )
@@ -85,7 +86,8 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
   "on post with invalid data" in new Fixture {
 
-    val newRequest = requestWithUrlEncodedBody(
+    val newRequest = FakeRequest(POST, routes.PenalisedByProfessionalController.post().url)
+    .withFormUrlEncodedBody(
       "penalisedYes" -> "details"
     )
 
@@ -96,7 +98,8 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
 
    "on post with valid data in edit mode" in new Fixture {
 
-     val newRequest = requestWithUrlEncodedBody(
+     val newRequest = FakeRequest(POST, routes.PenalisedByProfessionalController.post(true).url)
+     .withFormUrlEncodedBody(
        "penalised" -> "true",
        "professionalBody" -> "details"
      )

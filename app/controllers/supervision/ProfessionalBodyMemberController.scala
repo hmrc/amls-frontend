@@ -18,14 +18,13 @@ package controllers.supervision
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.supervision.MemberOfProfessionalBodyFormProvider
 import models.supervision.{ProfessionalBodyMember, ProfessionalBodyMemberNo, ProfessionalBodyMemberYes, Supervision}
-import play.api.mvc.{MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import utils.AuthAction
+import views.html.supervision.MemberOfProfessionalBodyView
 
-import views.html.supervision.member_of_professional_body
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class ProfessionalBodyMemberController @Inject()(
@@ -33,36 +32,37 @@ class ProfessionalBodyMemberController @Inject()(
                                                   val authAction: AuthAction,
                                                   val ds: CommonPlayDependencies,
                                                   val cc: MessagesControllerComponents,
-                                                  member_of_professional_body: member_of_professional_body) extends AmlsBaseController(ds, cc) {
+                                                  formProvider: MemberOfProfessionalBodyFormProvider,
+                                                  view: MemberOfProfessionalBodyView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
         response =>
-          val form: Form2[ProfessionalBodyMember] = (for {
+          val form = (for {
             supervision <- response
             members <- supervision.professionalBodyMember
-          } yield Form2[ProfessionalBodyMember](members)).getOrElse(EmptyForm)
-          Ok(member_of_professional_body(form, edit))
+          } yield formProvider().fill(members)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit : Boolean = false) = authAction.async {
+  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[ProfessionalBodyMember](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(member_of_professional_body(f, edit)))
-        case ValidForm(_, data) => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => {
           for {
             supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
             updatedSupervision <- updateSupervisionFromIncomingData(data, supervision)
             _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key, updatedSupervision)
           } yield redirectTo(updatedSupervision, edit)
         }
-      }
+      )
   }
 
-  def updateSupervisionFromIncomingData(data: ProfessionalBodyMember, supervision: Option[Supervision]) = {
+  def updateSupervisionFromIncomingData(data: ProfessionalBodyMember, supervision: Option[Supervision]): Future[Supervision] = {
     Future[Supervision](data match {
       case ProfessionalBodyMemberNo => supervision.professionalBodyMember(data).copy(professionalBodies = None)
       case _ => supervision.professionalBodyMember(data)

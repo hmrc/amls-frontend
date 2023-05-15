@@ -21,83 +21,123 @@ import jto.validation.forms.Rules.{maxLength, notEmpty, minLength => _, _}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Path, Rule, ValidationError, Write}
 import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
+import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import play.api.libs.json.Reads.StringReads
 import play.api.libs.json._
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import utils.TraversableValidators.minLengthR
 
 sealed trait BusinessType {
-  val value: String =
-    this match {
-      case AccountingTechnicians => "01"
-      case CharteredCertifiedAccountants => "02"
-      case InternationalAccountants => "03"
-      case TaxationTechnicians => "04"
-      case ManagementAccountants => "05"
-      case InstituteOfTaxation => "06"
-      case Bookkeepers => "07"
-      case AccountantsIreland => "08"
-      case AccountantsScotland => "09"
-      case AccountantsEnglandandWales => "10"
-      case FinancialAccountants => "11"
-      case AssociationOfBookkeepers => "12"
-      case LawSociety => "13"
-      case Other(_) => "14"
-    }
+  val value: String
+
+  import models.supervision.ProfessionalBodies._
 
   def getMessage()(implicit messages: Messages): String = {
     val message = s"supervision.memberofprofessionalbody.lbl."
     this match {
-      case AccountingTechnicians => Messages(s"${message}01")
-      case CharteredCertifiedAccountants => Messages(s"${message}02")
-      case InternationalAccountants => Messages(s"${message}03")
-      case TaxationTechnicians => Messages(s"${message}04")
-      case ManagementAccountants => Messages(s"${message}05")
-      case InstituteOfTaxation => Messages(s"${message}06")
-      case Bookkeepers => Messages(s"${message}07")
-      case AccountantsIreland => Messages(s"${message}08")
-      case AccountantsScotland => Messages(s"${message}09")
-      case AccountantsEnglandandWales => Messages(s"${message}10")
+      case AccountantsEnglandandWales => messages(s"$message${this.value}")
         .replace("Accountants of England", "Accountants in England")
-      case FinancialAccountants => Messages(s"${message}11")
-      case AssociationOfBookkeepers => Messages(s"${message}12")
-      case LawSociety => Messages(s"${message}13")
-      case Other(_) => Messages(s"${message}14")
+      case Other("") => messages(s"${message}14")
+      case Other(details) => details
+      case _ => messages(s"$message${this.value}")
     }
   }
 }
 
-case object AccountingTechnicians extends BusinessType
-
-case object CharteredCertifiedAccountants extends BusinessType
-
-case object InternationalAccountants extends BusinessType
-
-case object TaxationTechnicians extends BusinessType
-
-case object ManagementAccountants extends BusinessType
-
-case object InstituteOfTaxation extends BusinessType
-
-case object Bookkeepers extends BusinessType
-
-case object AccountantsIreland extends BusinessType
-
-case object AccountantsScotland extends BusinessType
-
-case object AccountantsEnglandandWales extends BusinessType
-
-case object FinancialAccountants extends BusinessType
-
-case object AssociationOfBookkeepers extends BusinessType
-
-case object LawSociety extends BusinessType
-
-case class Other(businessDetails: String) extends BusinessType
-
 case class ProfessionalBodies(businessTypes: Set[BusinessType])
 
-object ProfessionalBodies {
+object ProfessionalBodies extends Enumerable.Implicits {
+
+  case object AccountingTechnicians extends WithName("accountingTechnicians") with BusinessType {
+    override val value: String = "01"
+  }
+
+  case object CharteredCertifiedAccountants extends WithName("charteredCertifiedAccountants") with BusinessType {
+    override val value: String = "02"
+  }
+
+  case object InternationalAccountants extends WithName("internationalAccountants") with BusinessType {
+    override val value: String = "03"
+  }
+
+  case object TaxationTechnicians extends WithName("taxationTechnicians") with BusinessType {
+    override val value: String = "04"
+  }
+
+  case object ManagementAccountants extends WithName("managementAccountants") with BusinessType {
+    override val value: String = "05"
+  }
+
+  case object InstituteOfTaxation extends WithName("instituteOfTaxation") with BusinessType {
+    override val value: String = "06"
+  }
+
+  case object Bookkeepers extends WithName("bookkeepers") with BusinessType {
+    override val value: String = "07"
+  }
+
+  case object AccountantsIreland extends WithName("accountantsIreland") with BusinessType {
+    override val value: String = "08"
+  }
+
+  case object AccountantsScotland extends WithName("accountantsScotland") with BusinessType {
+    override val value: String = "09"
+  }
+
+  case object AccountantsEnglandandWales extends WithName("accountantsEnglandandWales") with BusinessType {
+    override val value: String = "10"
+  }
+
+  case object FinancialAccountants extends WithName("financialAccountants") with BusinessType {
+    override val value: String = "11"
+  }
+
+  case object AssociationOfBookkeepers extends WithName("associationOfBookkeepers") with BusinessType {
+    override val value: String = "12"
+  }
+
+  case object LawSociety extends WithName("lawSociety") with BusinessType {
+    override val value: String = "13"
+  }
+
+  case class Other(businessDetails: String) extends WithName("other") with BusinessType {
+    override val value: String = "14"
+  }
+
+  val all: Seq[BusinessType] = Seq(
+    AccountingTechnicians,
+    CharteredCertifiedAccountants,
+    InternationalAccountants,
+    TaxationTechnicians,
+    ManagementAccountants,
+    InstituteOfTaxation,
+    Bookkeepers,
+    AccountantsEnglandandWales,
+    AccountantsIreland,
+    AccountantsScotland,
+    FinancialAccountants,
+    AssociationOfBookkeepers,
+    LawSociety,
+    Other("")
+  )
+
+  def formValues(html: Html)(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex.map { case (businessType, index) =>
+
+    val conditional = if(businessType.value == Other("").value) Some(html) else None
+
+    CheckboxItem(
+      content = Text(businessType.getMessage()),
+      value = businessType.toString,
+      id = Some(s"businessType_$index"),
+      name = Some(s"businessType[$index]"),
+      conditionalHtml = conditional
+    )
+  }
+
+  implicit val enumerable: Enumerable[BusinessType] = Enumerable(all.map(v => v.toString -> v): _*)
 
   import utils.MappingUtils.Implicits._
 

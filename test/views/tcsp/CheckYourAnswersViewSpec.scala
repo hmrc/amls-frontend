@@ -88,12 +88,6 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
         valueText must include(value.text())
       }
-
-//      doc.select("span.bold").toList.find(e => e.text() ==  Messages("tcsp.off-the-shelf.companies.lbl"))
-//        .get.parents().select("div").first().getElementsByClass("cya-summary-list__value").html() must be("Yes")
-//
-//      doc.select("span.bold").toList.find(e => e.text() ==  Messages("tcsp.create.complex.corporate.structures.lbl"))
-//        .get.parents().select("div").first().getElementsByClass("cya-summary-list__value").html() must be("No")
     }
 
   }

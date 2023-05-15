@@ -18,14 +18,15 @@ package controllers.supervision
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.supervision.SupervisionEndFormProvider
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+
 import javax.inject.Inject
 import models.supervision._
 import org.joda.time.LocalDate
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-
-import views.html.supervision.supervision_end
+import views.html.supervision.SupervisionEndView
 
 import scala.concurrent.Future
 
@@ -33,14 +34,15 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
                                          val authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
                                          val cc: MessagesControllerComponents,
-                                         supervision_end: supervision_end) extends AmlsBaseController(ds, cc) {
+                                         formProvider: SupervisionEndFormProvider,
+                                         view: SupervisionEndView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
         case Some(Supervision(anotherBody, _, _, _, _, _)) if getEndDate(anotherBody).isDefined
-        => Ok(supervision_end(Form2[SupervisionEnd](SupervisionEnd(getEndDate(anotherBody).get)), edit))
-        case _ => Ok(supervision_end(EmptyForm, edit))
+        => Ok(view(formProvider().fill(SupervisionEnd(getEndDate(anotherBody).get)), edit))
+        case _ => Ok(view(formProvider(), edit))
       }
   }
 
@@ -54,43 +56,40 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
     }
   }
 
-  def post(edit : Boolean = false) = authAction.async {
+  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
 
-      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) flatMap { supervision =>
-        def extraFields: Map[String, Seq[String]] = supervision match {
-          case Some(s) => getExtraFields(s)
-          case _ => Map()
-        }
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
+          dataCacheConnector.fetchAll(request.credId) flatMap {
+            optMap =>
+              val result = for {
+                cache <- optMap
+                supervision <- cache.getEntry[Supervision](Supervision.key)
+                anotherBody <- supervision.anotherBody
+              } yield {
 
-        def getExtraFields(s: Supervision): Map[String, Seq[String]] = {
-          s.anotherBody match {
-            case Some(data) if data.isInstanceOf[AnotherBodyYes] =>
-              Map("extraStartDate" -> Seq(data.asInstanceOf[AnotherBodyYes].startDate.get.startDate.toString("yyyy-MM-dd")))
-            case None => Map()
-          }
-        }
-
-        Form2[SupervisionEnd](request.body.asFormUrlEncoded.get ++ extraFields) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(supervision_end(f, edit)))
-          case ValidForm(_, data) =>
-            dataCacheConnector.fetchAll(request.credId) flatMap {
-              optMap =>
-                val result = for {
-                  cache <- optMap
-                  supervision <- cache.getEntry[Supervision](Supervision.key)
-                  anotherBody <- supervision.anotherBody
-                } yield {
-                  dataCacheConnector.save[Supervision](request.credId, Supervision.key,
-                    supervision.copy(anotherBody = Some(updateData(anotherBody, data)))) map {
-                    _ => redirect(edit)
-                  }
+                anotherBody match {
+                  case AnotherBodyYes(_, Some(supervisionStartDate), _, _) if data.endDate.isBefore(supervisionStartDate.startDate) =>
+                    Future.successful(BadRequest(view(
+                      formProvider().withError(
+                        "endDate.day",
+                        "error.expected.supervision.enddate.after.startdate"
+                      ),
+                      edit
+                    )))
+                  case _ =>
+                    dataCacheConnector.save[Supervision](request.credId, Supervision.key,
+                      supervision.copy(anotherBody = Some(updateData(anotherBody, data)))) map {
+                      _ => redirect(edit)
+                    }
                 }
-                result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
-            }
-        }
-      }
+              }
+              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+          }
+      )
   }
 
   private def updateData(anotherBody: AnotherBody, data: SupervisionEnd): AnotherBody = {

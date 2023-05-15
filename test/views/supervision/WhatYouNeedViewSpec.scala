@@ -18,31 +18,27 @@ package views.supervision
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.supervision.what_you_need
+import views.html.supervision.WhatYouNeedView
 
+class WhatYouNeedViewSpec extends AmlsViewSpec with MustMatchers  {
 
-class what_you_needSpec extends AmlsViewSpec with MustMatchers  {
+  lazy val what_you_need = inject[WhatYouNeedView]
+
+  implicit val request = FakeRequest()
+
+  val call = controllers.supervision.routes.AnotherBodyController.get()
 
   trait ViewFixture extends Fixture {
-    lazy val what_you_need = app.injector.instanceOf[what_you_need]
     implicit val requestWithToken = addTokenForView()
   }
 
-  "what_you_need view" must {
-
-    "have a back link" in new Fixture {
-      lazy val what_you_need = app.injector.instanceOf[what_you_need]
-      implicit val requestWithToken = addTokenForView()
-
-      def view = what_you_need()
-
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
-    }
+  "WhatYouNeedView view" must {
 
     "contain the expected content elements" in new ViewFixture {
-      def view = what_you_need()
+      def view = what_you_need(call)
 
       html must include(Messages("if your business has been registered with another supervisory body under the Money Laundering Regulations"))
       html must include(Messages("which professional bodies you’re a member of, if any"))
@@ -51,7 +47,9 @@ class what_you_needSpec extends AmlsViewSpec with MustMatchers  {
       html must include(Messages("name of your previous supervisory body"))
       html must include(Messages("dates your supervision started and ended"))
       html must include(Messages("reason why your supervision ended"))
+      html must include(s"""href="${call.url}""")
     }
 
+    behave like pageWithBackLink(what_you_need(call))
   }
 }

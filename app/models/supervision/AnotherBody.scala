@@ -22,6 +22,10 @@ import jto.validation.forms.Rules._
 import jto.validation.forms._
 import models.FormTypes._
 import org.joda.time.LocalDate
+import play.api.i18n.Messages
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 import utils.MappingUtils.constant
 
 sealed trait AnotherBody
@@ -52,6 +56,20 @@ case class AnotherBodyYes(supervisorName: String,
 case object AnotherBodyNo extends AnotherBody
 
 object AnotherBody {
+
+  def formValues(html: Html)(implicit messages: Messages): Seq[RadioItem] = HmrcYesNoRadioItems().map { radioItem =>
+
+    if (radioItem.value.contains("true")) {
+      radioItem.copy(
+        id = Some("anotherBody-true"),
+        conditionalHtml = Some(html)
+      )
+    } else {
+      radioItem.copy(
+        id = Some("anotherBody-false")
+      )
+    }
+  }
 
   import utils.MappingUtils.Implicits._
   import play.api.libs.json.JodaReads._

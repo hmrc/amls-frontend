@@ -20,33 +20,33 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.EmptyForm
-import javax.inject.Inject
 import models.supervision.Supervision
-import play.api.mvc.MessagesControllerComponents
-import utils.AuthAction
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.{AuthAction, ControllerHelper}
+import utils.supervision.CheckYourAnswersHelper
+import views.html.supervision.CheckYourAnswersView
 
-import utils.ControllerHelper
-import views.html.supervision.summary
+import javax.inject.Inject
 
-class SummaryController  @Inject() (val dataCacheConnector: DataCacheConnector,
-                                    val authAction: AuthAction,
-                                    val ds: CommonPlayDependencies,
-                                    val cc: MessagesControllerComponents,
-                                    val summary: summary,
-                                    implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                  val authAction: AuthAction,
+                                  val ds: CommonPlayDependencies,
+                                  val cc: MessagesControllerComponents,
+                                  cyaHelper: CheckYourAnswersHelper,
+                                  val view: CheckYourAnswersView,
+                                  implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
-  def get() = authAction.async {
+  def get(): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
         case Some(data@Supervision(Some(anotherBody), Some(_), _, Some(_), _, _)) if ControllerHelper.isAbComplete(anotherBody) =>
-          Ok(summary(EmptyForm, data))
+          Ok(view(cyaHelper.getSummaryList(data)))
         case _ =>
           Redirect(controllers.routes.RegistrationProgressController.get)
       }
   }
 
-  def post = authAction.async {
+  def post: Action[AnyContent] = authAction.async {
     implicit request => (for {
       supervision <- OptionT(dataCacheConnector.fetch[Supervision](request.credId, Supervision.key))
       _ <- OptionT.liftF(dataCacheConnector.save[Supervision](request.credId, Supervision.key, supervision.copy(hasAccepted = true)))

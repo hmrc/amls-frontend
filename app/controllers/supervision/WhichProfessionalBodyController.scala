@@ -18,54 +18,54 @@ package controllers.supervision
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.supervision.{ProfessionalBodies, Supervision}
-import play.api.mvc.MessagesControllerComponents
+import forms.supervision.WhichProfessionalBodyFormProvider
+import models.supervision.Supervision
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
+import views.html.supervision.WhichProfessionalBodyView
 
-import views.html.supervision.which_professional_body
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class WhichProfessionalBodyController @Inject()(
-                                               val dataCacheConnector: DataCacheConnector,
-                                               val authAction: AuthAction,
-                                               val ds: CommonPlayDependencies,
-                                               val cc: MessagesControllerComponents,
-                                               which_professional_body: which_professional_body) extends AmlsBaseController(ds, cc) {
+                                                 val dataCacheConnector: DataCacheConnector,
+                                                 val authAction: AuthAction,
+                                                 val ds: CommonPlayDependencies,
+                                                 val cc: MessagesControllerComponents,
+                                                 formProvider: WhichProfessionalBodyFormProvider,
+                                                 view: WhichProfessionalBodyView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map { response =>
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map { response =>
 
-          val form = (for {
-            supervision <- response
-            businessTypes <- supervision.professionalBodies
-          } yield {
-            Form2[ProfessionalBodies](businessTypes)
-          }) getOrElse EmptyForm
+        val form = (for {
+          supervision <- response
+          businessTypes <- supervision.professionalBodies
+        } yield {
+          formProvider().fill(businessTypes)
+        }) getOrElse formProvider()
 
-          Ok(which_professional_body(form, edit))
-        }
+        Ok(view(form, edit))
+      }
   }
 
-  def post(edit: Boolean = false) = authAction.async{
-      implicit request =>
-        Form2[ProfessionalBodies](request.body) match {
-          case ValidForm(_, data) =>
-            for {
-              supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
-              _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key,supervision.professionalBodies(Some(data)))
-            } yield {
-              if(edit){
-                Redirect(routes.SummaryController.post())
-              } else {
-                Redirect(routes.PenalisedByProfessionalController.post(edit))
-              }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
+          for {
+            supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
+            _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key,supervision.professionalBodies(Some(data)))
+          } yield {
+            if(edit){
+              Redirect(routes.SummaryController.post())
+            } else {
+              Redirect(routes.PenalisedByProfessionalController.post(edit))
             }
-          case f:InvalidForm => Future.successful(BadRequest(which_professional_body(f, edit)))
-        }
+          }
+      )
   }
 
 }
