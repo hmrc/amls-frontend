@@ -17,6 +17,7 @@
 package models.hvd
 
 import models.DateOfChange
+import models.hvd.Products.{Alcohol, Tobacco}
 import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
 import play.api.Logging
 import play.api.i18n.Messages

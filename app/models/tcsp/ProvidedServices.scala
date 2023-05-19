@@ -107,7 +107,7 @@ object ProvidedServices extends Enumerable.Implicits {
       CheckboxItem(
         content = Text(messages(s"tcsp.provided_services.service.lbl.${service.value}")),
         value = service.toString,
-        id = Some(s"services$index"),
+        id = Some(s"services_$index"),
         name = Some(s"services[$index]"),
         conditionalHtml = conditional
       )

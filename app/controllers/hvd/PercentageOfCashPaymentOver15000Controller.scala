@@ -18,16 +18,15 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
-import javax.inject.Inject
-import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
-import play.api.mvc.MessagesControllerComponents
+import forms.hvd.PercentagePaymentFormProvider
+import models.hvd.Hvd
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
+import views.html.hvd.PercentageView
 
-import views.html.hvd.percentage
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class PercentageOfCashPaymentOver15000Controller @Inject() (val authAction: AuthAction,
@@ -36,32 +35,33 @@ class PercentageOfCashPaymentOver15000Controller @Inject() (val authAction: Auth
                                                             implicit val serviceFlow: ServiceFlow,
                                                             implicit val statusService: StatusService,
                                                             val cc: MessagesControllerComponents,
-                                                            percentage: percentage) extends AmlsBaseController(ds, cc) {
+                                                            formProvider: PercentagePaymentFormProvider,
+                                                            view: PercentageView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
       response =>
-        val form: Form2[PercentageOfCashPaymentOver15000] = (for {
+        val form = (for {
           hvd <- response
           percentageOfCashPaymentOver15000 <- hvd.percentageOfCashPaymentOver15000
-        } yield Form2[PercentageOfCashPaymentOver15000](percentageOfCashPaymentOver15000)).getOrElse(EmptyForm)
-        Ok(percentage(form, edit))
+        } yield formProvider().fill(percentageOfCashPaymentOver15000)).getOrElse(formProvider())
+        Ok(view(form, edit))
     }
   }
 
-    def post(edit: Boolean = false) = authAction.async {
+    def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[PercentageOfCashPaymentOver15000](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(percentage(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
             _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key,
               hvd.percentageOfCashPaymentOver15000(data)
             )
           } yield Redirect(routes.SummaryController.get)
-      }
+      )
     }
   }
 }

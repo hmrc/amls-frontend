@@ -69,8 +69,7 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-
-        document.select("input[id=services7]").hasAttr("checked") mustBe true
+        document.select("input[id=services_7]").hasAttr("checked") mustBe true
         document.select("input[name=details]").`val` must be ("some other service")
       }
     }

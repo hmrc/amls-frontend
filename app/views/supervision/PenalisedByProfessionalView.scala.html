@@ -38,11 +38,11 @@
 @conditionalHtml = {
     @inputTextArea(
         CharacterCount(
-            hint = Some(Hint(
-                content = Text(messages("hint.255.chars"))
-            )),
             id = "professionalBody",
             name = "professionalBody",
+            label = Label(
+                content = Text(messages("supervision.penalisedbyprofessional.details.lbl"))
+            ),
             rows = 8,
             errorMessage = form("professionalBody").error.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*)))),
             maxLength = Some(255)

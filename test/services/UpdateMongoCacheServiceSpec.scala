@@ -31,6 +31,8 @@ import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7.{BeneficialShareholder, RoleWithinBusinessRelease7}
 import models.eab.Eab
+import models.hvd.Products.Cars
+import models.hvd.SalesChannel.Retail
 import models.hvd._
 import models.moneyservicebusiness._
 import models.responsiblepeople.ResponsiblePerson

@@ -17,6 +17,7 @@
 package controllers.hvd
 
 import controllers.actions.SuccessfulAuthAction
+import forms.hvd.ReceiveCashPaymentsFormProvider
 import models.businessmatching.BusinessActivity.HighValueDealing
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd.{Hvd, PaymentMethods}
@@ -25,22 +26,24 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.hvd.receiving
+import views.html.hvd.ReceiveCashView
 
-class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
+class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[receiving]
+    lazy val view = inject[ReceiveCashView]
     val controller = new ReceiveCashPaymentsController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockServiceFlow,
       mockStatusService,
       cc = mockMcc,
-      receiving = view
+      formProvider = inject[ReceiveCashPaymentsFormProvider],
+      view = view
     )
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))
@@ -77,7 +80,8 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to summary on edit" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.ReceiveCashPaymentsController.post().url)
+      .withFormUrlEncodedBody(
         "receivePayments" -> "false"
       )
 
@@ -89,7 +93,8 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to PercentageOfCashPaymentOver15000Controller on form equals no" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.ReceiveCashPaymentsController.post().url)
+      .withFormUrlEncodedBody(
         "receivePayments" -> "false"
       )
 
@@ -103,7 +108,8 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
     "redirect to ExpectToReceiveCashPaymentsController on form equals yes" when {
       "edit is true and hvd cashPaymentMethods is not defined" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.ReceiveCashPaymentsController.post().url)
+        .withFormUrlEncodedBody(
           "receivePayments" -> "true"
         )
 
@@ -115,7 +121,8 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
       }
       "edit is false" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.ReceiveCashPaymentsController.post().url)
+        .withFormUrlEncodedBody(
           "receivePayments" -> "true"
         )
 
@@ -137,7 +144,8 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
           cashPaymentMethods = Some(PaymentMethods(true, true, Some("")))
         )), Some(Hvd.key))
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.ReceiveCashPaymentsController.post().url)
+        .withFormUrlEncodedBody(
           "receivePayments" -> "false"
         )
 

@@ -18,57 +18,57 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.hvd.SalesChannelFormProvider
 import models.businessmatching.BusinessActivity.HighValueDealing
 import models.hvd.{HowWillYouSellGoods, Hvd}
-import play.api.mvc.{Call, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import utils.AuthAction
+import utils.{AuthAction, DateOfChangeHelper}
+import views.html.hvd.HowWillYouSellGoodsView
 
-import utils.DateOfChangeHelper
-import views.html.hvd.how_will_you_sell_goods
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
-class HowWillYouSellGoodsController @Inject()( val dataCacheConnector: DataCacheConnector,
-                                               val statusService: StatusService,
-                                               val authAction: AuthAction,
-                                               val ds: CommonPlayDependencies,
-                                               val serviceFlow: ServiceFlow,
-                                               val cc: MessagesControllerComponents,
-                                               how_will_you_sell_goods: how_will_you_sell_goods) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+class HowWillYouSellGoodsController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                              val statusService: StatusService,
+                                              val authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
+                                              val serviceFlow: ServiceFlow,
+                                              val cc: MessagesControllerComponents,
+                                              formProvider: SalesChannelFormProvider,
+                                              view: HowWillYouSellGoodsView
+                                             ) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
-          response =>
-            val form: Form2[HowWillYouSellGoods] = (for {
-              hvd <- response
-              channels <- hvd.howWillYouSellGoods
-            } yield Form2[HowWillYouSellGoods](channels)).getOrElse(EmptyForm)
-            Ok(how_will_you_sell_goods(form, edit))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
+        response =>
+          val form = (for {
+            hvd <- response
+            channels <- hvd.howWillYouSellGoods
+          } yield formProvider().fill(channels)).getOrElse(formProvider())
+          Ok(view(form, edit))
+      }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request => {
-        Form2[HowWillYouSellGoods](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(how_will_you_sell_goods(f, edit)))
-          case ValidForm(_, model) =>
-            for {
-              hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
-              status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-              _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.howWillYouSellGoods(model))
-              isNewActivity <- serviceFlow.isNewActivity(request.credId, HighValueDealing)
-            } yield {
-              val redirect = !isNewActivity && redirectToDateOfChange[HowWillYouSellGoods](status, hvd.howWillYouSellGoods, model)
-              Redirect(getNextPage(redirect, edit))
-            }
-        }
-      }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        model =>
+          for {
+            hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
+            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+            _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.howWillYouSellGoods(model))
+            isNewActivity <- serviceFlow.isNewActivity(request.credId, HighValueDealing)
+          } yield {
+            val redirect = !isNewActivity && redirectToDateOfChange[HowWillYouSellGoods](status, hvd.howWillYouSellGoods, model)
+            Redirect(getNextPage(redirect, edit))
+          }
+      )
+    }
   }
 
   private def getNextPage(redirect: Boolean, edit:Boolean): Call = {

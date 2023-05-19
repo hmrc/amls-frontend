@@ -17,18 +17,21 @@
 package controllers.hvd
 
 import controllers.actions.SuccessfulAuthAction
+import forms.hvd.ProductsFormProvider
 import models.businessmatching.BusinessActivity.HighValueDealing
+import models.hvd.Products.{Alcohol, Antiques, Cars, Other, Tobacco}
 import models.hvd._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DateOfChangeHelper, DependencyMocks}
-import views.html.hvd.products
+import views.html.hvd.ProductsView
 
-class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
+class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   val emptyCache = CacheMap("", Map.empty)
 
@@ -46,8 +49,8 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[value=01]").hasAttr("checked") must be(true)
-      document.select("input[value=02]").hasAttr("checked") must be(true)
+      document.select(s"input[value=${Alcohol.toString}]").hasAttr("checked") must be(true)
+      document.select(s"input[value=${Tobacco.toString}]").hasAttr("checked") must be(true)
     }
 
     "redirect successfully" when  {
@@ -195,10 +198,10 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
     "the submission is approved" when {
       "the sector has just been added" must {
         "redirect to the next page" when {
-          "the user selectes 'alcohol' or 'tobacco" in new Fixture {
-            val newRequest = requestWithUrlEncodedBody(
-              "products[0]" -> "01",
-              "products[1]" -> "02"
+          "the user selects 'alcohol' or 'tobacco" in new Fixture {
+            val newRequest = FakeRequest(POST, routes.ProductsController.post().url).withFormUrlEncodedBody(
+              "products[0]" -> Alcohol.toString,
+              "products[1]" -> Tobacco.toString
             )
 
             mockIsNewActivityNewAuth(true, Some(HighValueDealing))
@@ -211,9 +214,9 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
           }
 
           "the user selects something other than alcohol or tobacco" in new Fixture {
-            val newRequest = requestWithUrlEncodedBody(
-              "products[0]" -> "03",
-              "products[1]" -> "04"
+            val newRequest = FakeRequest(POST, routes.ProductsController.post().url).withFormUrlEncodedBody(
+              "products[0]" -> Antiques.toString,
+              "products[1]" -> Cars.toString
             )
 
             mockIsNewActivityNewAuth(true, Some(HighValueDealing))
@@ -232,14 +235,15 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
 
-    lazy val view = app.injector.instanceOf[products]
+    lazy val view = inject[ProductsView]
     val controller = new ProductsController(mockCacheConnector,
       mockStatusService,
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockServiceFlow,
       cc = mockMcc,
-      products = view
+      formProvider = inject[ProductsFormProvider],
+      view = view
     )
 
     mockIsNewActivityNewAuth(false)
@@ -248,34 +252,34 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait RequestModifiers {
     def requestWithAlcohol() = {
-      requestWithUrlEncodedBody(
-        "products[0]" -> "01",
-        "products[1]" -> "02",
-        "products[2]" -> "12",
+      FakeRequest(POST, routes.ProductsController.post().url).withFormUrlEncodedBody(
+        "products[0]" -> Alcohol.toString,
+        "products[1]" -> Tobacco.toString,
+        "products[2]" -> Other("").toString,
         "otherDetails" -> "test"
       )
     }
 
     def requestWithoutAlcohol() = {
-      requestWithUrlEncodedBody(
-        "products[0]" -> "03",
-        "products[1]" -> "04"
+      FakeRequest(POST, routes.ProductsController.post().url).withFormUrlEncodedBody(
+        "products[0]" -> Antiques.toString,
+        "products[1]" -> Cars.toString
       )
     }
 
     def invalidRequestWithTooLongOther() = {
-      requestWithUrlEncodedBody(
-        "products[0]" -> "01",
-        "products[1]" -> "02",
-        "products[2]" -> "12",
+      FakeRequest(POST, routes.ProductsController.post().url).withFormUrlEncodedBody(
+        "products[0]" -> Alcohol.toString,
+        "products[1]" -> Tobacco.toString,
+        "products[2]" -> Other("").toString,
         "otherDetails" -> "g" * 256
       )
     }
 
     def invalidRequestWithEmptyOther() = {
-      requestWithUrlEncodedBody(
-        "products[0]" -> "01",
-        "products[1]" -> "12",
+      FakeRequest(POST, routes.ProductsController.post().url).withFormUrlEncodedBody(
+        "products[0]" -> Alcohol.toString,
+        "products[1]" -> Other("").toString,
         "otherDetails" -> ""
       )
     }

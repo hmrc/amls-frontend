@@ -17,6 +17,8 @@
 package models.hvd
 
 import models.DateOfChange
+import models.hvd.Products.Cars
+import models.hvd.SalesChannel._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.joda.time.LocalDate
 import org.mockito.Mockito._

@@ -30,6 +30,7 @@ import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.eab.Eab
+import models.hvd.Products.{Alcohol, Tobacco}
 import models.hvd._
 import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions, SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
 import models.renewal.{CashPayments => RCashPayments, MoneySources => RMoneySources, PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, WhichCurrencies => RenWhichCurrencies, _}

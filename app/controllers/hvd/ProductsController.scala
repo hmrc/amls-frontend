@@ -18,18 +18,17 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.hvd.ProductsFormProvider
 import models.businessmatching.BusinessActivity.HighValueDealing
-import models.hvd.{Alcohol, Hvd, Products, Tobacco}
-import play.api.mvc.{Call, MessagesControllerComponents}
+import models.hvd.Products.{Alcohol, Tobacco}
+import models.hvd.{Hvd, Products}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import utils.AuthAction
+import utils.{AuthAction, DateOfChangeHelper}
+import views.html.hvd.ProductsView
 
-import utils.DateOfChangeHelper
-import views.html.hvd.products
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class ProductsController @Inject() (val dataCacheConnector: DataCacheConnector,
@@ -38,39 +37,40 @@ class ProductsController @Inject() (val dataCacheConnector: DataCacheConnector,
                                     val ds: CommonPlayDependencies,
                                     val serviceFlow: ServiceFlow,
                                     val cc: MessagesControllerComponents,
-                                    products: products) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                                    formProvider: ProductsFormProvider,
+                                    view: ProductsView) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
-          response =>
-            val form: Form2[Products] = (for {
-              hvd <- response
-              products <- hvd.products
-            } yield Form2[Products](products)).getOrElse(EmptyForm)
-            Ok(products(form, edit))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
+        response =>
+          val form = (for {
+            hvd <- response
+            products <- hvd.products
+          } yield formProvider().fill(products)).getOrElse(formProvider())
+          Ok(view(form, edit))
+      }
   }
 
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request =>
-          Form2[Products](request.body) match {
-            case f: InvalidForm =>
-              Future.successful(BadRequest(products(f, edit)))
-            case ValidForm(_, data) => {
-              for {
-                hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
-                status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-                _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.products(data))
-                isNewActivity <- serviceFlow.isNewActivity(request.credId, HighValueDealing)
-              } yield {
-                val redirect = !isNewActivity && redirectToDateOfChange[Products](status, hvd.products, data)
-                val exciseGoods = data.items.contains(Alcohol) | data.items.contains(Tobacco)
-                Redirect(getNextPage(redirect, exciseGoods, edit))
-              }
-            }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => {
+          for {
+            hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
+            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+            _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.products(data))
+            isNewActivity <- serviceFlow.isNewActivity(request.credId, HighValueDealing)
+          } yield {
+            val redirect = !isNewActivity && redirectToDateOfChange[Products](status, hvd.products, data)
+            val exciseGoods = data.items.contains(Alcohol) | data.items.contains(Tobacco)
+            Redirect(getNextPage(redirect, exciseGoods, edit))
           }
+        }
+      )
     }
 
   private def getNextPage(redirect: Boolean, exciseGoods: Boolean, edit:Boolean): Call = {

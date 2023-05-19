@@ -590,13 +590,9 @@ error.required.hvd.choose.option = Select how you expect to receive cash payment
 error.required.hvd.excise.goods = Select yes if you will buy or sell duty-suspended excise goods
 error.required.hvd.percentage = Select what percentage of your turnover you expect to come from cash payments of €10,000 or more
 
-error.date.hvd.day = Date of the first payment must include a day
-error.date.hvd.month = Date of the first payment must include a month
-error.date.hvd.year = Date of the first payment must include a year
-error.date.hvd.month.day = Date of the first payment must include a day and month
-error.date.hvd.year.month = Date of the first payment must include a month and year
-error.date.hvd.year.day = Date of the first payment must include a day and year
-error.date.hvd.year.month.day = Enter the date of the first payment
+error.date.hvd.one = Date of the first payment must include a {0}
+error.date.hvd.two = Date of the first payment must include a {0} and {1}
+error.date.hvd.all = Enter the date of the first payment
 error.date.hvd.future = Date of the first payment must be today or in the past
 error.date.hvd.real = Enter a real date for the date of the first payment
 error.date.hvd.past = Date of the first payment must be after 1900

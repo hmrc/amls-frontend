@@ -74,7 +74,7 @@ object Service extends Enumerable.Implicits {
       id = Some(s"services_$index"),
       name = Some(s"services[$index]")
     )
-  }
+  }.sortBy(_.content.asHtml.body)
 
   val all: Seq[Service] = Seq(
     Accountancy,
