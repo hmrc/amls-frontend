@@ -48,7 +48,7 @@ trait AddressMappings extends Mappings {
       "postCode" -> text("error.required.postcode")
         .verifying(regexp(postcodeRegex, "error.invalid.postcode"))
     } else {
-      "country" -> text("error.required.country").verifying(countryConstraint)
+      "country" -> text("error.required.country").verifying(countryConstraintExcludeUK)
     }
   }
 
@@ -58,7 +58,13 @@ trait AddressMappings extends Mappings {
     }.getOrElse(throw new IllegalArgumentException(s"Invalid country code submitted: $input"))
   }
 
-  private def countryConstraint: Constraint[String] =
+  protected def parseCountryOpt(input: String): Option[Country] = {
+    models.countries.collectFirst {
+      case e@Country(_, c) if c == input => e
+    }
+  }
+
+  protected def countryConstraintExcludeUK: Constraint[String] =
     Constraint {
       case str if ukOpt.contains(str) =>
         Invalid(countryErrorKey)
@@ -68,7 +74,15 @@ trait AddressMappings extends Mappings {
         Invalid("error.invalid.country")
     }
 
+  protected def countryConstraint: Constraint[String] =
+    Constraint {
+      case str if parseCountryOpt(str).isDefined =>
+        Valid
+      case _ =>
+        Invalid("error.invalid.country")
+    }
+
   private val ukOpt = models.countries.collectFirst {
-    case Country(value, code) if code == "GB" => code
+    case Country(_, code) if code == "GB" => code
   }
 }

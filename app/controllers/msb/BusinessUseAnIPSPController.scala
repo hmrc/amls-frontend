@@ -16,42 +16,41 @@
 
 package controllers.msb
 
-
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.msb.BusinessUseAnIPSPFormProvider
 import models.moneyservicebusiness._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
+import views.html.msb.BusinessUseAnIPSPView
 
-import views.html.msb.business_use_an_ipsp
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class BusinessUseAnIPSPController @Inject() (val dataCacheConnector: DataCacheConnector,
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val cc: MessagesControllerComponents,
-                                             business_use_an_ipsp: business_use_an_ipsp) extends AmlsBaseController(ds, cc) {
+                                             formProvider: BusinessUseAnIPSPFormProvider,
+                                             view: BusinessUseAnIPSPView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
         response =>
-          val form: Form2[BusinessUseAnIPSP] = (for {
+          val form = (for {
             msb <- response
             businessUseAnIPSP <- msb.businessUseAnIPSP
-          } yield Form2[BusinessUseAnIPSP](businessUseAnIPSP)).getOrElse(EmptyForm)
-          Ok(business_use_an_ipsp(form, edit))
+          } yield formProvider().fill(businessUseAnIPSP)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[BusinessUseAnIPSP](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(business_use_an_ipsp(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
             _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
@@ -63,7 +62,7 @@ class BusinessUseAnIPSPController @Inject() (val dataCacheConnector: DataCacheCo
             case _ =>
               Redirect(routes.FundsTransferController.get(edit))
           }
-      }
+      )
     }
   }
 }

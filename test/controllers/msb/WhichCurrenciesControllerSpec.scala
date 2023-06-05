@@ -17,6 +17,7 @@
 package controllers.msb
 
 import controllers.actions.SuccessfulAuthAction
+import forms.msb.WhichCurrenciesFormProvider
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessActivity.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
@@ -30,9 +31,11 @@ import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, Sca
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
+import services.CurrencyAutocompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.msb.which_currencies
+import views.html.msb.WhichCurrenciesView
 
 import scala.concurrent.Future
 
@@ -41,7 +44,8 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
                                     with MustMatchers
                                     with PatienceConfiguration
                                     with IntegrationPatience
-                                    with ScalaFutures {
+                                    with ScalaFutures
+                                    with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
@@ -52,13 +56,15 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
 
     when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any(), any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
-    lazy val view = app.injector.instanceOf[which_currencies]
+    lazy val view = inject[WhichCurrenciesView]
     val controller = new WhichCurrenciesController(dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow,
       cc = mockMcc,
-      which_currencies = view)
+      autocompleteService = inject[CurrencyAutocompleteService],
+      formProvider = inject[WhichCurrenciesFormProvider],
+      view = view)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
@@ -75,7 +81,8 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
   }
 
   trait DealsInForeignCurrencyFixture extends Fixture {
-    val newRequest = requestWithUrlEncodedBody(
+    val newRequest = FakeRequest(POST, routes.WhichCurrenciesController.post().url)
+      .withFormUrlEncodedBody(
       "currencies[0]" -> "USD",
       "currencies[1]" -> "GBP",
       "currencies[2]" -> "BOB"
@@ -104,8 +111,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
       }
 
       "show a pre-populated form when model contains data" in new Fixture {
-        val currentModel = WhichCurrencies(
-          Seq("USD"))
+        val currentModel = WhichCurrencies(Seq("USD"))
 
         mockApplicationStatus(NotCompleted)
 
@@ -118,8 +124,6 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
         status(result) mustEqual OK
 
         document.select("select[name=currencies[0]] > option[value=USD]").hasAttr("selected") must be(true)
-        document.select("input[name=bankMoneySource][checked]").`val` mustEqual ""
-        document.select("input[name=wholesalerMoneySource][checked]").`val` mustEqual ""
       }
     }
 
@@ -140,7 +144,8 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
       }
       "data is invalid" should {
         "return bad request" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhichCurrenciesController.post().url)
+            .withFormUrlEncodedBody(
             ("IncorrectData1", "IncorrectData2")
           )
 

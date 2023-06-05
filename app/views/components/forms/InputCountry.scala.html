@@ -18,18 +18,24 @@
 
 @this(govukSelect: GovukSelect)
 
-@(form: Form[_], countries: Seq[SelectItem])(implicit messages: Messages)
+@(
+    form: Form[_],
+    countries: Seq[SelectItem],
+    id: String = "location-autocomplete",
+    name: String = "country",
+    labelMsg: String = "businessdetails.registeredoffice.country.lbl"
+)(implicit messages: Messages)
 
 @govukSelect(
     Select(
-        id = "location-autocomplete",
-        name = "country",
+        id = id,
+        name = name,
         label = Label(
-            content = Text(messages("businessdetails.registeredoffice.country.lbl"))
+            content = Text(messages(labelMsg))
         ),
         classes = "govuk-!-width-two-thirds",
         items = countries,
         attributes = Map("data-gov-autocomplete" -> "true")
     )
-    .withFormField(form("country"))
+    .withFormField(form(name))
 )

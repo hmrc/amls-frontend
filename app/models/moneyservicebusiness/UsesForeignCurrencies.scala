@@ -21,13 +21,22 @@ import jto.validation.forms.Rules.{minLength => _, _}
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
-sealed trait UsesForeignCurrencies
+sealed trait UsesForeignCurrencies {
+  val value: Boolean
+}
 
-case object UsesForeignCurrenciesYes extends UsesForeignCurrencies
+case object UsesForeignCurrenciesYes extends UsesForeignCurrencies {
+  override val value: Boolean = true
+}
 
-case object UsesForeignCurrenciesNo extends UsesForeignCurrencies
+case object UsesForeignCurrenciesNo extends UsesForeignCurrencies {
+  override val value: Boolean = false
+}
 
 object UsesForeignCurrencies {
+
+  def fromBoolean(boolean: Boolean): UsesForeignCurrencies =
+    if(boolean) UsesForeignCurrenciesYes else UsesForeignCurrenciesNo
 
   import utils.MappingUtils.Implicits._
 

@@ -18,17 +18,16 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.moneyservicebusiness.{MoneyServiceBusiness, SendTheLargestAmountsOfMoney}
-import play.api.mvc.MessagesControllerComponents
+import forms.msb.SendLargestAmountsFormProvider
+import models.moneyservicebusiness.MoneyServiceBusiness
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.businessmatching.ServiceFlow
 import services.{AutoCompleteService, StatusService}
-import utils.{AuthAction, ControllerHelper}
-import views.html.msb.send_largest_amounts_of_money
+import utils.AuthAction
+import views.html.msb.SendLargestAmountsOfMoneyView
 
+import javax.inject.Inject
 import scala.concurrent.Future
-
 
 class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction,
                                                        val ds: CommonPlayDependencies,
@@ -37,26 +36,27 @@ class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction,
                                                        implicit val serviceFlow: ServiceFlow,
                                                        val autoCompleteService: AutoCompleteService,
                                                        val cc: MessagesControllerComponents,
-                                                       send_largest_amounts_of_money: send_largest_amounts_of_money) extends AmlsBaseController(ds, cc) {
+                                                       formProvider: SendLargestAmountsFormProvider,
+                                                       view: SendLargestAmountsOfMoneyView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       cacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
         response =>
-          val form: Form2[SendTheLargestAmountsOfMoney] = (for {
+          val form = (for {
             msb <- response
             amount <- msb.sendTheLargestAmountsOfMoney
-          } yield Form2[SendTheLargestAmountsOfMoney](amount)).getOrElse(EmptyForm)
-          Ok(send_largest_amounts_of_money(form, edit, autoCompleteService.getCountries))
+          } yield amount).fold(formProvider())(formProvider().fill)
+          Ok(view(form, edit, autoCompleteService.formOptions))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[SendTheLargestAmountsOfMoney](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(send_largest_amounts_of_money(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
+        data =>
           for {
             msb <-
             cacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
@@ -66,10 +66,6 @@ class SendTheLargestAmountsOfMoneyController @Inject()(authAction: AuthAction,
           } yield {
            Redirect(routes.MostTransactionsController.get(edit))
           }
-      }
+      )
   }
-
-  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
-    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "largestAmountsOfMoney", index => index / 2)
-
 }

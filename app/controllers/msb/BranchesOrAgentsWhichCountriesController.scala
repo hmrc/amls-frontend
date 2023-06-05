@@ -18,16 +18,14 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountries, BranchesOrAgentsWhichCountries, MoneyServiceBusiness}
-import play.api.mvc.MessagesControllerComponents
+import forms.msb.BranchesOrAgentsWhichCountriesFormProvider
+import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountries, MoneyServiceBusiness}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AutoCompleteService
-import utils.ControllerHelper
 import utils.AuthAction
-import views.html.msb.branches_or_agents_which_countries
+import views.html.msb.BranchesOrAgentsWhichCountriesView
 
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -35,9 +33,10 @@ class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector:
                                                          val ds: CommonPlayDependencies,
                                                          val autoCompleteService: AutoCompleteService,
                                                          val cc: MessagesControllerComponents,
-                                                         branches_or_agents_which_countries: branches_or_agents_which_countries) extends AmlsBaseController(ds, cc) {
+                                                         formProvider: BranchesOrAgentsWhichCountriesFormProvider,
+                                                         view: BranchesOrAgentsWhichCountriesView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
         response =>
@@ -45,32 +44,26 @@ class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector:
             msb <- response
             boa <- msb.branchesOrAgents
             branches <- boa.branches
-          } yield Form2[BranchesOrAgentsWhichCountries](branches)).getOrElse(EmptyForm)
-
-          Ok(branches_or_agents_which_countries(form, edit, autoCompleteService.getCountries))
+          } yield formProvider().fill(branches)).getOrElse(formProvider())
+          Ok(view(form, edit, autoCompleteService.formOptions))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[BranchesOrAgentsWhichCountries](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(branches_or_agents_which_countries(
-            alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
+        data =>
           for {
             msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
             _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
               msb.branchesOrAgents(BranchesOrAgents.update(msb.branchesOrAgents.getOrElse(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)), data)))
-          } yield edit match {
-            case false =>
-              Redirect(routes.IdentifyLinkedTransactionsController.get())
-            case true =>
-              Redirect(routes.SummaryController.get)
+          } yield if (edit) {
+            Redirect(routes.SummaryController.get)
+          } else {
+            Redirect(routes.IdentifyLinkedTransactionsController.get())
           }
-      }
+      )
   }
-
-  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
-    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "countries", index => index / 2)
 }

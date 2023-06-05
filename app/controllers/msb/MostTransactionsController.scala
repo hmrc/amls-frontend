@@ -18,18 +18,18 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
+import forms.msb.MostTransactionsFormProvider
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService}
-import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange}
-import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
-import play.api.mvc.MessagesControllerComponents
+import models.moneyservicebusiness.MoneyServiceBusiness
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.businessmatching.ServiceFlow
 import services.{AutoCompleteService, StatusService}
-import utils.{AuthAction, ControllerHelper}
-import views.html.msb.most_transactions
+import utils.AuthAction
+import views.html.msb.MostTransactionsView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -40,49 +40,46 @@ class MostTransactionsController @Inject()(authAction: AuthAction,
                                            implicit val serviceFlow: ServiceFlow,
                                            val autoCompleteService: AutoCompleteService,
                                            val cc: MessagesControllerComponents,
-                                           most_transactions: most_transactions) extends AmlsBaseController(ds, cc) {
+                                           formProvider: MostTransactionsFormProvider,
+                                           view: MostTransactionsView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        cacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
-          response =>
-            val form = (for {
-              msb <- response
-              transactions <- msb.mostTransactions
-            } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
-            Ok(most_transactions(form, edit, autoCompleteService.getCountries))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      cacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
+        response =>
+          val form = (for {
+            msb <- response
+            transactions <- msb.mostTransactions
+          } yield transactions).fold(formProvider())(formProvider().fill)
+          Ok(view(form, edit, autoCompleteService.formOptions))
+      }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        Form2[MostTransactions](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(most_transactions(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
-          case ValidForm(_, data) =>
-            cacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
-              val result = for {
-                cacheMap <- maybeCache
-                msb <- cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
-                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-                services <- bm.msbServices
-                register <- cacheMap.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
-              } yield {
-                cacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
-                  msb.mostTransactions(Some(data))
-                ) map {
-                  _ => routing(services.msbServices, register, msb, edit)
-                }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
+        data =>
+          cacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
+            val result = for {
+              cacheMap <- maybeCache
+              msb <- cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+              bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+              services <- bm.msbServices
+              register <- cacheMap.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
+            } yield {
+              cacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
+                msb.mostTransactions(Some(data))
+              ) map {
+                _ => routing(services.msbServices, register, msb, edit)
               }
-
-              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
-        }
+
+            result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+          }
+      )
   }
-
-  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
-    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "mostTransactionsCountries", index => index / 2)
-
 
   private def shouldAnswerCurrencyExchangeQuestions(msbServices: Set[BusinessMatchingMsbService],
                                                      register: ServiceChangeRegister,
@@ -103,7 +100,7 @@ class MostTransactionsController @Inject()(authAction: AuthAction,
 
   private def routing(msbServices: Set[BusinessMatchingMsbService], register: ServiceChangeRegister, msb: MoneyServiceBusiness, edit: Boolean) = {
     if (shouldAnswerCurrencyExchangeQuestions(msbServices, register, msb, edit)) {
-      Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
+      Redirect(routes.CurrencyExchangesInNext12MonthsController.get(edit))
     } else if (shouldAnswerForeignExchangeQuestions(msbServices, register, msb, edit)) {
       Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
     } else {

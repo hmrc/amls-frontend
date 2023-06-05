@@ -17,34 +17,36 @@
 package controllers.msb
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.updateservice.ServiceChangeRegister
+import forms.msb.TransactionsInNext12MonthsFormProvider
 import models.businessmatching.BusinessActivity.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry, TransactionsInNext12Months}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.msb.transactions_in_next_12_months
+import views.html.msb.TransactionsInNext12MonthsView
 
 import scala.concurrent.Future
 
-class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar {
+class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[transactions_in_next_12_months]
+    lazy val view = inject[TransactionsInNext12MonthsView]
     val controller = new TransactionsInNext12MonthsController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       mockStatusService,
       mockServiceFlow,
       cc = mockMcc,
-      transactions_in_next_12_months = view
+      formProvider = inject[TransactionsInNext12MonthsFormProvider],
+      view = view
     )
 
     mockIsNewActivityNewAuth(false)
@@ -64,7 +66,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("msb.transactions.expected.title"))
+      contentAsString(result) must include(messages("msb.transactions.expected.title"))
     }
 
     "load the page 'How many transactions do you expect in the next 12 months?' with pre populated data" in new Fixture {
@@ -92,13 +94,14 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("msb.transactions.expected.title"))
+        contentAsString(result) must include(messages("msb.transactions.expected.title"))
       }
     }
 
     "Show error message when user has not filled the mandatory fields" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.TransactionsInNext12MonthsController.post().url)
+      .withFormUrlEncodedBody(
         "txnAmount" -> ""
       )
 
@@ -110,13 +113,14 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.msb.transactions.in.12months"))
+      contentAsString(result) must include(messages("error.required.msb.transactions.in.12months"))
 
     }
 
     "on valid post" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.TransactionsInNext12MonthsController.post().url)
+      .withFormUrlEncodedBody(
         "txnAmount" -> "12345678963"
       )
 
@@ -133,7 +137,8 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
     "on valid post in edit mode with the next page's data in the store" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.TransactionsInNext12MonthsController.post().url)
+      .withFormUrlEncodedBody(
         "txnAmount" -> "12345678963"
       )
 
@@ -160,7 +165,8 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
     "on valid post in edit mode without the next page's data in the store" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.TransactionsInNext12MonthsController.post().url)
+      .withFormUrlEncodedBody(
         "txnAmount" -> "12345678963"
       )
 

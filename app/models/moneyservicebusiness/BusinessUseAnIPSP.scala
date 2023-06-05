@@ -21,14 +21,28 @@ import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 import cats.data.Validated.Valid
+import play.api.i18n.Messages
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 
 sealed trait BusinessUseAnIPSP
 
-case class BusinessUseAnIPSPYes(name: String , reference: String) extends BusinessUseAnIPSP
+case class BusinessUseAnIPSPYes(name: String, reference: String) extends BusinessUseAnIPSP
 
 case object BusinessUseAnIPSPNo extends BusinessUseAnIPSP
 
 object BusinessUseAnIPSP {
+
+  def formValues(conditionalHtml: Html*)(implicit messages: Messages): Seq[RadioItem] = {
+    HmrcYesNoRadioItems().map { input =>
+      if(input.value.contains("true")) {
+        input.copy(conditionalHtml = Some(Html(conditionalHtml.mkString)))
+      } else {
+        input
+      }
+    }
+  }
 
   import models.FormTypes._
   import utils.MappingUtils.Implicits._

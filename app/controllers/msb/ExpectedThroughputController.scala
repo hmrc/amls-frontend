@@ -18,16 +18,15 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness}
-import play.api.mvc.MessagesControllerComponents
+import forms.msb.ExpectedThroughputFormProvider
+import models.moneyservicebusiness.MoneyServiceBusiness
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
+import views.html.msb.ExpectedThroughputView
 
-import views.html.msb.expected_throughput
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class ExpectedThroughputController @Inject() (authAction: AuthAction,
@@ -36,36 +35,38 @@ class ExpectedThroughputController @Inject() (authAction: AuthAction,
                                               implicit val statusService: StatusService,
                                               implicit val serviceFlow: ServiceFlow,
                                               val cc: MessagesControllerComponents,
-                                              expected_throughput: expected_throughput) extends AmlsBaseController(ds, cc) {
+                                              formProvider: ExpectedThroughputFormProvider,
+                                              view: ExpectedThroughputView) extends AmlsBaseController(ds, cc) {
 
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
         response =>
-          val form: Form2[ExpectedThroughput] = (for {
+          val form = (for {
             msb <- response
             expectedThroughput <- msb.throughput
-          } yield Form2[ExpectedThroughput](expectedThroughput)).getOrElse(EmptyForm)
-          Ok(expected_throughput(form, edit))
+          } yield formProvider().fill(expectedThroughput)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[ExpectedThroughput](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(expected_throughput(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
             _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
               msb.throughput(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get)
-            case false => Redirect(routes.BranchesOrAgentsController.get())
+          } yield if (edit) {
+            Redirect(routes.SummaryController.get)
+          } else {
+            Redirect(routes.BranchesOrAgentsController.get())
           }
-      }
+      )
     }
   }
 }

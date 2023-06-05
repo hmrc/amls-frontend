@@ -24,26 +24,26 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.msb.what_you_need
+import views.html.msb.WhatYouNeedView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[what_you_need]
-    implicit val ec = app.injector.instanceOf[ExecutionContext]
+    lazy val view = inject[WhatYouNeedView]
+    implicit val ec = inject[ExecutionContext]
     val controller = new WhatYouNeedController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockStatusService,
       mockCacheConnector,
       cc = mockMcc,
-      what_you_need = view)
+      view = view)
 
     mockCacheFetch[ServiceChangeRegister](None)
     mockCacheFetchAll
@@ -58,9 +58,9 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        val pageTitle = Messages("title.wyn") + " - " +
-          Messages("summary.msb") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
+        val pageTitle = messages("title.wyn") + " - " +
+          messages("summary.msb") + " - " +
+          messages("title.amls") + " - " + messages("title.gov")
 
         contentAsString(result) must include(pageTitle)
       }

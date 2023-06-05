@@ -1,0 +1,74 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import models.moneyservicebusiness.ExpectedThroughput
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import views.html.components.forms.{ErrorSummary, InputYesNo}
+@import views.html.components.{Button, ReturnLink, SectionSubtitle, Heading}
+
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    formHelper: FormWithCSRF,
+    inputYesNo: InputYesNo,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@formItems = @{
+    ExpectedThroughput.all.map { throughput =>
+      RadioItem(
+          content = Text(messages(s"msb.throughput.lbl.${throughput.value}")),
+          id = Some(throughput.toString),
+          value = Some(throughput.toString)
+      )
+    }
+}
+
+@layout(pageTitle = messages("msb.throughput.title") + " - " + messages("summary.msb")) {
+
+    @errorSummary(form, Some(Map("throughput" -> ExpectedThroughput.First.toString)))
+
+    @subtitle("summary.msb")
+
+    @heading("msb.throughput.title")
+
+    @Html(s"""<p class="govuk-body">""")
+    @Html(s"${messages("msb.throughput.sub.p1")} ")
+    @Html(s"${messages("msb.throughput.sub.p2.prefix")} ")
+    @Html(s"<strong>${messages("msb.throughput.sub.p2.strong")} </strong>")
+    @Html(s"${messages("msb.throughput.sub.p2.suffix")}")
+
+    @formHelper(action = controllers.msb.routes.ExpectedThroughputController.post(edit)) {
+
+        @inputYesNo(
+            Radios(
+                name = "throughput",
+                items = formItems,
+                classes = "govuk-radios"
+            ).withFormField(form("throughput"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

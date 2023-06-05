@@ -42,7 +42,8 @@
     timeoutEnabled: Boolean = true,
     canSignOut: Boolean = true,
     showBackLink: Boolean = true,
-    fullWidthLayout: Boolean = false
+    fullWidthLayout: Boolean = false,
+    additionalScript: Content = Empty
 )(mainContent: Html)(implicit request: Request[_], messages: Messages)
 
 @headScripts = {
@@ -74,6 +75,7 @@
 @scripts = {
     <script src='@controllers.routes.Assets.versioned("lib/govuk-frontend/govuk/all.js")'></script>
     <script src='@controllers.routes.Assets.versioned("lib/hmrc-frontend/hmrc/all.js")'></script>
+    <script src="@routes.Assets.versioned("autocomplete/accessible-autocomplete.min.js")"></script>
     <script src="@routes.Assets.versioned("autocomplete/location-autocomplete.min.js")"></script>
     <script>window.GOVUKFrontend.initAll();window.HMRCFrontend.initAll()</script>
     <script type="text/javascript">
@@ -82,6 +84,7 @@
                 url: '@routes.Assets.versioned("autocomplete/location-autocomplete-graph.json")'
             })
     </script>
+    @additionalScript.asHtml
 }
 
 @mainContentWithGetHelp = {

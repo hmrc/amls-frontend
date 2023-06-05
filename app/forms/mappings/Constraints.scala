@@ -153,4 +153,12 @@ trait Constraints {
       case _ =>
         Invalid(errorKey)
     }
+
+  protected def nonEmptyOptionalSeq[A](errorKey: String): Constraint[Seq[Option[A]]] =
+    Constraint {
+      case seq if seq.flatten.isEmpty =>
+        Invalid(errorKey)
+      case seq if seq.exists(_.isDefined) =>
+        Valid
+    }
 }

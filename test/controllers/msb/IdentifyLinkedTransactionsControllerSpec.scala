@@ -17,33 +17,35 @@
 package controllers.msb
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching._
+import forms.msb.IdentifyLinkedTransactionsFormProvider
 import models.businessmatching.BusinessMatchingMsbService._
-import models.moneyservicebusiness.{MoneyServiceBusiness, _}
+import models.businessmatching._
+import models.moneyservicebusiness._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.msb.identify_linked_transactions
+import views.html.msb.IdentifyLinkedTransactionsView
 
 import scala.concurrent.Future
 
-class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSugar  {
+class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     trait Fixture extends DependencyMocks {
       self => val request = addToken(authRequest)
-      lazy val view = app.injector.instanceOf[identify_linked_transactions]
+      lazy val view = inject[IdentifyLinkedTransactionsView]
       val controller = new IdentifyLinkedTransactionsController(
         mockCacheConnector,
         authAction = SuccessfulAuthAction,
         ds = commonDependencies,
         cc = mockMcc,
-        identify_linked_transactions = view)
+        formProvider = inject[IdentifyLinkedTransactionsFormProvider],
+        view = view)
     }
 
   val cacheMap = mock[CacheMap]
@@ -63,7 +65,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("msb.linked.txn.title"))
+      contentAsString(result) must include(messages("msb.linked.txn.title"))
     }
 
     "load the page systems identify linked transactions with pre populated data" in new Fixture  {
@@ -76,7 +78,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("msb.linked.txn.title"))
+      contentAsString(result) must include(messages("msb.linked.txn.title"))
 
       document.select("input[name=linkedTxn][checked]").`val` mustEqual "true"
 
@@ -84,7 +86,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Show error message when user has not filled the mandatory fields" in new Fixture  {
 
-      val newRequest = requestWithUrlEncodedBody()
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody()
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
@@ -94,13 +97,14 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include (Messages("error.required.msb.linked.txn"))
+      contentAsString(result) must include (messages("error.required.msb.linked.txn"))
 
     }
 
     "Navigate to next page if they have selected MT as a service" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -140,7 +144,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "user selects Yes and nvigate to next page if they have selected CE as a service" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -175,12 +180,13 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.CurrencyExchangesInNext12MonthsController.get().url))
     }
 
     "user selects No and navigates to CE section if they have selected CE as a service" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody(
         "linkedTxn" -> "false"
       )
       val msbServices = Some(
@@ -215,11 +221,12 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.CurrencyExchangesInNext12MonthsController.get().url))
     }
 
     "navigates to FX section if they have selected FX as a service" in new Fixture {
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody(
         "linkedTxn" -> "false"
       )
       val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
@@ -240,7 +247,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to next page if they have selected cheque cashing as a service" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody(
         "linkedTxn" -> "true"
       )
 
@@ -280,7 +288,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to next page if they have selected cheque cashing as a servicein edit mode" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody(
         "linkedTxn" -> "true"
       )
 
@@ -320,7 +329,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to Summary page in edit mode when all services are included and have data filled" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -357,7 +367,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to Summary page in edit mode when CE pages are included and have data filled" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -392,7 +403,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to Summary page in edit mode when FX pages are included and have data filled" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -427,7 +439,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to MT section in edit mode when MT data is not in the store" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -461,7 +474,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "Navigate to CE section in edit mode when CE data is not in the store" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -490,12 +504,13 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.CurrencyExchangesInNext12MonthsController.get(true).url))
     }
 
     "Navigate to FX section in edit mode when FX data is not in the store" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody(
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
@@ -529,7 +544,8 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
 
     "throw exception when msb services in Business Matching returns none" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.IdentifyLinkedTransactionsController.post().url)
+      .withFormUrlEncodedBody(
         "linkedTxn" -> "true"
       )
 

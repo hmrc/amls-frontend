@@ -18,6 +18,7 @@ package models.moneyservicebusiness
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import models.CharacterSets
+import models.moneyservicebusiness.MoneySources.{Banks, Customers, Wholesalers}
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 import utils.AmlsSpec
 
@@ -286,6 +287,52 @@ class MoneySourcesSpec extends AmlsSpec {
         "customerMoneySource" -> "Yes")
       val expected = JsSuccess(completeModel, JsPath)
       Json.fromJson[MoneySources](json) must be(expected)
+    }
+  }
+
+  "toFormValues" must {
+
+    "yield the correct sequence" when {
+
+      "model is empty" in {
+
+        MoneySources().toFormValues.isEmpty mustBe true
+      }
+
+      val list = Seq(
+        (Banks),
+        (Wholesalers),
+        (Customers)
+      )
+
+      list.foreach { source =>
+
+        s"$source is present" in {
+
+          val result = MoneySources(
+            Some(BankMoneySource("A Bank")), Some(WholesalerMoneySource("A Wholesaler")), Some(true)
+          ).toFormValues
+
+          result.isEmpty mustBe false
+          result(list.indexOf(source)) mustBe source
+        }
+      }
+    }
+  }
+
+  "toMessages" must {
+
+    "yield the correct messages" in {
+
+      val result = MoneySources(
+        Some(BankMoneySource("A Bank")), Some(WholesalerMoneySource("A Wholesaler")), Some(true)
+      ).toMessages
+
+      result.head mustBe messages("msb.which_currencies.source.banks")
+      result(1) mustBe messages("msb.which_currencies.source.wholesalers")
+      result(2) mustBe messages("msb.which_currencies.source.customers")
+
+      MoneySources().toMessages.isEmpty mustBe true
     }
   }
 }

@@ -17,6 +17,7 @@
 package controllers.msb
 
 import controllers.actions.SuccessfulAuthAction
+import forms.msb.MoneySourcesFormProvider
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching._
 import models.businessmatching.BusinessMatchingMsbService._
@@ -31,11 +32,12 @@ import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, Sca
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status.SEE_OTHER
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils._
-import views.html.msb.money_sources
+import views.html.msb.MoneySourcesView
 
 import scala.concurrent.Future
 
@@ -44,7 +46,8 @@ class MoneySourcesControllerSpec extends AmlsSpec
   with MustMatchers
   with PatienceConfiguration
   with IntegrationPatience
-  with ScalaFutures {
+  with ScalaFutures
+  with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
@@ -55,13 +58,14 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
     when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any(), any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
-    lazy val view = app.injector.instanceOf[money_sources]
+    lazy val view = inject[MoneySourcesView]
     val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow,
       cc = mockMcc,
-      money_sources = view,
+      formProvider = inject[MoneySourcesFormProvider],
+      view = view,
       error = errorView)
 
     mockIsNewActivityNewAuth(false)
@@ -83,15 +87,15 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
     val request = addToken(authRequest)
 
-    val newRequest = requestWithUrlEncodedBody(
-      "bankMoneySource" -> "Yes",
+    val newRequest = FakeRequest(POST, routes.MoneySourcesController.post().url).withFormUrlEncodedBody(
+      "moneySources[1]" -> "banks",
       "bankNames" -> "Bank names",
-      "wholesalerMoneySource" -> "Yes",
+      "moneySources[2]" -> "wholesalers",
       "wholesalerNames" -> "wholesaler names",
-      "customerMoneySource" -> "Yes")
+      "moneySources[3]" -> "customers")
 
     val cacheMap = mock[CacheMap]
-    lazy val view = app.injector.instanceOf[money_sources]
+    lazy val view = inject[MoneySourcesView]
     when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
       .thenReturn(Future.successful(Some(completeMsb.copy(whichCurrencies = Some(WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, None))))))))
 
@@ -103,7 +107,8 @@ class MoneySourcesControllerSpec extends AmlsSpec
       statusService = mock[StatusService],
       serviceFlow = mock[ServiceFlow],
       cc = mockMcc,
-      money_sources = view,
+      formProvider = inject[MoneySourcesFormProvider],
+      view = view,
       error = errorView)
 
     val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
@@ -149,9 +154,9 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
         status(result) mustEqual OK
 
-        document.select("select[name=currencies[0]] > option[value=USD]").hasAttr("selected")
-        document.select("input[name=bankMoneySource][checked]").`val` mustEqual ""
-        document.select("input[name=wholesalerMoneySource][checked]").`val` mustEqual ""
+        document.getElementById("moneySources_1").hasAttr("checked") mustBe false
+        document.getElementById("moneySources_2").hasAttr("checked") mustBe false
+        document.getElementById("moneySources_3").hasAttr("checked") mustBe true
       }
     }
 
@@ -181,7 +186,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
       "data is invalid" should {
         "return bad request" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.MoneySourcesController.post().url).withFormUrlEncodedBody(
             ("IncorrectData1", "IncorrectData2")
           )
 

@@ -22,7 +22,7 @@ import jto.validation.{Write, From, Rule}
 import jto.validation.forms._
 import play.api.libs.json.Json
 
-case class TransactionsInNext12Months (txnAmount: String)
+case class TransactionsInNext12Months(txnAmount: String)
 
 object TransactionsInNext12Months {
 

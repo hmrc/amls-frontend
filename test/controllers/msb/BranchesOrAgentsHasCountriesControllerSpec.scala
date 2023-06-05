@@ -17,6 +17,7 @@
 package controllers.msb
 
 import controllers.actions.SuccessfulAuthAction
+import forms.msb.BranchesOrAgentsFormProvider
 import models.Country
 import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountries, BranchesOrAgentsWhichCountries, MoneyServiceBusiness}
 import org.jsoup.Jsoup
@@ -24,24 +25,26 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.msb.branches_or_agents
+import views.html.msb.BranchesOrAgentsView
 
 import scala.concurrent.Future
 
-class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSugar {
+class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[branches_or_agents]
+    lazy val view = inject[BranchesOrAgentsView]
     val controller = new BranchesOrAgentsController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       mockAutoComplete,
       mockMcc,
-      branches_or_agents = view)
+      formProvider = inject[BranchesOrAgentsFormProvider],
+      view = view)
   }
 
   "BranchesOrAgentsHasCountriesController" must {
@@ -57,7 +60,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
       status(result) mustEqual OK
 
       document.select("input[name=hasCountries]").size mustEqual 2
-      document.select("input[name=hasCountries][checked]").size mustEqual 0
+      document.select("input[checked]").size mustEqual 0
     }
 
     "show a prefilled form when store contains data" in new Fixture {
@@ -88,7 +91,8 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         hasChanged = true
       )
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.BranchesOrAgentsController.post().url)
+      .withFormUrlEncodedBody(
         "hasCountries" -> "false"
       )
 
@@ -106,7 +110,8 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
 
     "return a redirect to the 'Which Countries' page when the user has selected 'yes' from options" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.BranchesOrAgentsController.post().url)
+      .withFormUrlEncodedBody(
         "hasCountries" -> "true"
       )
 
@@ -129,7 +134,8 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         hasChanged = true
       )
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.BranchesOrAgentsController.post().url)
+      .withFormUrlEncodedBody(
         "hasCountries" -> "false"
       )
 
@@ -152,7 +158,8 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         hasChanged = true
       )
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.BranchesOrAgentsController.post().url)
+      .withFormUrlEncodedBody(
         "hasCountries" -> "true"
       )
 
