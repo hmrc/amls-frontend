@@ -24,7 +24,7 @@ private object AppDependencies {
     "uk.gov.hmrc"       %% "play-ui"                    % "9.11.0-play-28",
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "5.24.0",
     "uk.gov.hmrc"       %% "govuk-template"             % "5.78.0-play-28",
-    "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "3.34.0-play-28",
+    "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "6.6.0-play-28",
 
 
     "io.github.jto" %% "validation-core"      % validationVersion,
