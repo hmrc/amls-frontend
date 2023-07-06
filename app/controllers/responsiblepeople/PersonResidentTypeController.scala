@@ -20,15 +20,15 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.responsiblepeople.PersonResidentTypeFormProvider
 import models.Country
 import models.responsiblepeople._
 import play.api.i18n.MessagesApi
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.person_residence_type
+import views.html.responsiblepeople.PersonResidenceTypeView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class PersonResidentTypeController @Inject()(override val messagesApi: MessagesApi,
@@ -36,47 +36,48 @@ class PersonResidentTypeController @Inject()(override val messagesApi: MessagesA
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val cc: MessagesControllerComponents,
-                                             person_residence_type: person_residence_type,
+                                             formProvider: PersonResidentTypeFormProvider,
+                                             view: PersonResidenceTypeView,
                                              implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-      implicit request =>
-        getData[ResponsiblePerson](request.credId, index) map {
-          case Some(ResponsiblePerson(Some(personName),_,_,_,Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(person_residence_type(Form2[PersonResidenceType](residencyType), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(person_residence_type(EmptyForm, edit, index, flow, personName.titleName))
-          case _ => NotFound(notFoundView)
-        }
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      getData[ResponsiblePerson](request.credId, index) map {
+        case Some(ResponsiblePerson(Some(personName),_,_,_,Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+        => Ok(view(formProvider().fill(residencyType), edit, index, flow, personName.titleName))
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+        => Ok(view(formProvider(), edit, index, flow, personName.titleName))
+        case _ => NotFound(notFoundView)
+      }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-      implicit request =>
-        Form2[PersonResidenceType](request.body) match {
-          case f: InvalidForm =>
-            getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(person_residence_type(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-            }
-          case ValidForm(_, data) => {
-            val residency = data.isUKResidence
-            (for {
-              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
-                val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
-                val countryOfBirth = rp.personResidenceType.fold[Option[Country]](None)(x => x.countryOfBirth)
-                val updatedData = data.copy(countryOfBirth = countryOfBirth, nationality = nationality)
-                residency match {
-                  case UKResidence(_) => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None)
-                  case NonUKResidence => rp.personResidenceType(updatedData)
-                }
-              })
-              rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
-            } yield {
-              redirectGivenResidency(residency, rp, index, edit, flow)
-            }) getOrElse NotFound(notFoundView)
-          }.recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-          }
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithError =>
+          getData[ResponsiblePerson](request.credId, index) map { rp =>
+            BadRequest(view(formWithError, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+          },
+        data => {
+          val residency = data.isUKResidence
+          (for {
+            cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
+              val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
+              val countryOfBirth = rp.personResidenceType.fold[Option[Country]](None)(x => x.countryOfBirth)
+              val updatedData = data.copy(countryOfBirth = countryOfBirth, nationality = nationality)
+              residency match {
+                case UKResidence(_) => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None)
+                case NonUKResidence => rp.personResidenceType(updatedData)
+              }
+            })
+            rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
+          } yield {
+            redirectGivenResidency(residency, rp, index, edit, flow)
+          }) getOrElse NotFound(notFoundView)
+        }.recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
+      )
   }
 
   private def redirectGivenResidency(

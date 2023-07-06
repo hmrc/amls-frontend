@@ -17,35 +17,27 @@
 package controllers.responsiblepeople
 
 import config.ApplicationConfig
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthAction, DependencyMocks}
+import play.api.test.Injecting
+import utils.{AmlsSpec, DependencyMocks}
+import views.html.responsiblepeople.FitAndProperNoticeView
 
-class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   val recordId = 1
 
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
     lazy val mockApplicationConfig = mock[ApplicationConfig]
-    lazy val defaultBuilder = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[ApplicationConfig].to(mockApplicationConfig))
 
-    val builder = defaultBuilder
-    lazy val app = builder.build()
-    lazy val controller = app.injector.instanceOf[FitAndProperNoticeController]
-
+    lazy val controller = new FitAndProperNoticeController(
+      mockCacheConnector, SuccessfulAuthAction, commonDependencies, mockMcc, inject[FitAndProperNoticeView]
+    )
   }
 
   "FitAndProperNoticeController" when {
@@ -55,12 +47,12 @@ class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with S
         status(result) must be(OK)
         val page: Document = Jsoup.parse(contentAsString(result))
         page.getElementsByClass("button")
-        page.body().html() must include(Messages("responsiblepeople.fit_and_proper.notice.title"))
-        page.body().html() must include(Messages("responsiblepeople.fit_and_proper.notice.text1"))
-        page.body().html() must include(Messages("responsiblepeople.fit_and_proper.notice.heading1"))
-        page.body().html() must include(Messages("responsiblepeople.fit_and_proper.notice.text2"))
-        page.body().html() must include(Messages("responsiblepeople.fit_and_proper.notice.heading2"))
-        page.body().html() must include(Messages("responsiblepeople.fit_and_proper.notice.text3"))
+        page.body().html() must include(messages("responsiblepeople.fit_and_proper.notice.title"))
+        page.body().html() must include(messages("responsiblepeople.fit_and_proper.notice.text1"))
+        page.body().html() must include(messages("responsiblepeople.fit_and_proper.notice.heading1"))
+        page.body().html() must include(messages("responsiblepeople.fit_and_proper.notice.text2"))
+        page.body().html() must include(messages("responsiblepeople.fit_and_proper.notice.heading2"))
+        page.body().html() must include(messages("responsiblepeople.fit_and_proper.notice.text3"))
       }
     }
 
@@ -69,7 +61,7 @@ class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with S
         val result = controller.get(recordId)(request)
         status(result) must be(OK)
         val page: Document = Jsoup.parse(contentAsString(result))
-        page.getElementsMatchingOwnText(Messages("button.continue"))
+        page.getElementsMatchingOwnText(messages("button.continue"))
           .attr("href") mustBe routes.FitAndProperController.get(recordId).url
       }
     }

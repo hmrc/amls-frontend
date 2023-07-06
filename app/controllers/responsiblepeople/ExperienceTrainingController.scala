@@ -19,50 +19,51 @@ package controllers.responsiblepeople
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
+import forms.responsiblepeople.ExperienceTrainingFormProvider
 import models.businessmatching.BusinessMatching
-import models.responsiblepeople.{ExperienceTraining, ResponsiblePerson}
+import models.responsiblepeople.ResponsiblePerson
 import play.api.Logging
-import play.api.mvc.MessagesControllerComponents
-import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.experience_training
-import scala.concurrent.Future
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.{AuthAction, ControllerHelper, RepeatingSection}
+import views.html.responsiblepeople.ExperienceTrainingView
 
+import scala.concurrent.Future
 
-class ExperienceTrainingController @Inject () (val dataCacheConnector: DataCacheConnector,
-                                               authAction: AuthAction,
-                                               val ds: CommonPlayDependencies,
-                                               val cc: MessagesControllerComponents,
-                                               experience_training: experience_training,
-                                               implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with Logging {
+class ExperienceTrainingController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                             authAction: AuthAction,
+                                             val ds: CommonPlayDependencies,
+                                             val cc: MessagesControllerComponents,
+                                             formProvider: ExperienceTrainingFormProvider,
+                                             view: ExperienceTrainingView,
+                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with Logging {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-      implicit request =>
-        businessMatchingData(request.credId) flatMap {
-          bm =>
-            getData[ResponsiblePerson](request.credId, index) map {
-              case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_, Some(experienceTraining),_,_,_,_,_,_,_,_))
-              => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), bm, edit, index, flow, personName.titleName))
-              case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-              => Ok(experience_training(EmptyForm, bm, edit, index, flow, personName.titleName))
-              case _
-              => NotFound(notFoundView)
-            }
-        }
-    }
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      businessMatchingData(request.credId) flatMap {
+        bm =>
+          getData[ResponsiblePerson](request.credId, index) map {
+            case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_, Some(experienceTraining),_,_,_,_,_,_,_,_))
+            => Ok(view(formProvider().fill(experienceTraining), bm, edit, index, flow, personName.titleName))
+            case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+            => Ok(view(formProvider(), bm, edit, index, flow, personName.titleName))
+            case _
+            => NotFound(notFoundView)
+          }
+      }
+  }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
     authAction.async {
       implicit request => {
         businessMatchingData(request.credId) flatMap {
           bm =>
-            Form2[ExperienceTraining](request.body) match {
-              case f: InvalidForm =>
+            formProvider().bindFromRequest().fold(
+              formWithErrors =>
                 getData[ResponsiblePerson](request.credId, index) map { rp =>
-                  BadRequest(experience_training(f, bm, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-                }
-              case ValidForm(_, data) => {
+                  BadRequest(view(formWithErrors, bm, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+                },
+              data => {
                 for {
                   result <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp => rp.experienceTraining(data) }
                 } yield if (edit) {
@@ -73,7 +74,7 @@ class ExperienceTrainingController @Inject () (val dataCacheConnector: DataCache
               }.recoverWith {
                 case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
               }
-            }
+            )
         }
       }
     }

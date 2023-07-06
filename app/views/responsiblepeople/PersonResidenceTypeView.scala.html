@@ -1,0 +1,89 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.components.{Button, Heading, SectionSubtitle, ReturnLink}
+@import views.html.components.forms.{ErrorSummary, InputYesNo, InputText}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    inputYesNo: InputYesNo,
+    inputText: InputText,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit messages: Messages, request: Request[_])
+
+@conditionalHtml = {
+    @inputText(
+        Input(
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("responsiblepeople.detailed_answers.uk_resident.nino", personName)),
+                classes = "govuk-label"
+            ),
+            hint = Some(Hint(content = Text(messages("lbl.nino.hint")))),
+            id = "nino",
+            name = "nino"
+        ),
+        form("nino")
+    )
+}
+
+@radioItems = @{
+    HmrcYesNoRadioItems().map { radioItem =>
+        if (radioItem.value.contains("true")) {
+            radioItem.copy(
+                id = Some("isUKResidence-true"),
+                conditionalHtml = Some(conditionalHtml)
+            )
+        } else {
+            radioItem.copy(
+                id = Some("isUKResidence-false")
+            )
+        }
+    }
+}
+
+@layout(pageTitle = messages("responsiblepeople.person.a.resident.title") + " - " + messages("summary.responsiblepeople")) {
+
+    @errorSummary(form, Some(Map("isUKResidence" -> "isUKResidence-true")))
+
+    @subtitle("summary.responsiblepeople")
+
+    @heading("responsiblepeople.person.a.resident.heading", personName)
+
+    @formHelper(action = controllers.responsiblepeople.routes.PersonResidentTypeController.post(index, edit, flow)) {
+
+        @inputYesNo(
+            Radios(
+                name = "isUKResidence",
+                items = radioItems,
+                classes = "govuk-radios"
+            ).withFormField(form("isUKResidence"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

@@ -23,7 +23,8 @@
     countries: Seq[SelectItem],
     id: String = "location-autocomplete",
     name: String = "country",
-    labelMsg: String = "businessdetails.registeredoffice.country.lbl"
+    labelMsg: String = "businessdetails.registeredoffice.country.lbl",
+    labelMsgArgs: String = ""
 )(implicit messages: Messages)
 
 @govukSelect(
@@ -31,7 +32,7 @@
         id = id,
         name = name,
         label = Label(
-            content = Text(messages(labelMsg))
+            content = Text(messages(labelMsg, labelMsgArgs))
         ),
         classes = "govuk-!-width-two-thirds",
         items = countries,

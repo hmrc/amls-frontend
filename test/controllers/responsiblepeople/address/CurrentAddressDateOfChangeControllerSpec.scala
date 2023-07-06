@@ -19,6 +19,7 @@ package controllers.responsiblepeople.address
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import controllers.responsiblepeople.address
+import forms.DateOfChangeFormProvider
 import models.responsiblepeople.TimeAtAddress.{ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import org.joda.time.LocalDate
@@ -26,27 +27,29 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.date_of_change
+import views.html.DateOfChangeView
 
 import scala.concurrent.Future
 
-class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
+class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
 
     val statusService = mock[StatusService]
-    lazy val view = app.injector.instanceOf[date_of_change]
+    lazy val view = inject[DateOfChangeView]
     val controller = new CurrentAddressDateOfChangeController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       statusService = statusService,
       cc = mockMcc,
-      date_of_change = view
+      formProvider = inject[DateOfChangeFormProvider],
+      view = view
     )
   }
 
@@ -69,7 +72,8 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
     "when post is called" when {
       "RP is incomplete" must {
         "redirect to the how long at current address page" in new Fixture {
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.CurrentAddressDateOfChangeController.post(1).url)
+          .withFormUrlEncodedBody(
             "dateOfChange.year" -> "2010",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"
@@ -97,7 +101,8 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
 
       "RP is incomplete and date entered before RP start date" must {
         "redirect to the how long at current address page" in new Fixture {
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.CurrentAddressDateOfChangeController.post(1).url)
+          .withFormUrlEncodedBody(
             "dateOfChange.year" -> "2010",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"
@@ -125,7 +130,8 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
 
       "when RP is complete" must {
         "redirect to the detailed answers page" in new Fixture with ResponsiblePeopleValues {
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.CurrentAddressDateOfChangeController.post(1).url)
+          .withFormUrlEncodedBody(
             "dateOfChange.year" -> "2010",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"
@@ -148,7 +154,8 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
     "respond with BAD_REQUEST" when {
       "given invalid data" in new Fixture {
 
-        val invalidPostRequest = requestWithUrlEncodedBody("invalid" -> "data")
+        val invalidPostRequest = FakeRequest(POST, routes.CurrentAddressDateOfChangeController.post(1).url)
+        .withFormUrlEncodedBody("invalid" -> "data")
 
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
         val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus))

@@ -18,57 +18,52 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
+import forms.responsiblepeople.address.NewHomeAddressFormProvider
 import models.responsiblepeople._
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc._
 import utils.{AuthAction, ControllerHelper}
-import views.html.responsiblepeople.address.new_home_address
+import views.html.responsiblepeople.address.NewHomeAddressView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
-
 
 @Singleton
 class NewHomeAddressController @Inject()(authAction: AuthAction,
                                          val dataCacheConnector: DataCacheConnector,
                                          val ds: CommonPlayDependencies,
                                          val cc: MessagesControllerComponents,
-                                         new_home_address: new_home_address,
+                                         formProvider: NewHomeAddressFormProvider,
+                                         view: NewHomeAddressView,
                                          implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with AddressHelper {
 
-  def get(index: Int) = authAction.async {
+  def get(index: Int): Action[AnyContent] = authAction.async {
     implicit request =>
       for {
         rp <- getData[ResponsiblePerson](request.credId, index)
         newAddress <- dataCacheConnector.fetch[NewHomeAddress](request.credId, NewHomeAddress.key)
       } yield (rp, newAddress) match {
         case (Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)), Some(newHomeAddress))
-        => Ok(new_home_address(Form2[NewHomeAddress](newHomeAddress), index, personName.titleName))
+        => Ok(view(formProvider().fill(newHomeAddress), index, personName.titleName))
         case (Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)), None)
-        => Ok(new_home_address(EmptyForm, index, personName.titleName))
+        => Ok(view(formProvider(), index, personName.titleName))
         case _
         => NotFound(notFoundView)
       }
   }
 
-  def post(index: Int) =
-    authAction.async {
-      implicit request =>
-        (Form2[NewHomeAddress](request.body)(NewHomeAddress.addressFormRule(PersonAddress.formRule(AddressType.NewHome))) match {
-          case f: InvalidForm if f.data.get("isUK").isDefined
-          => processFormAndRedirect(NewHomeAddress(modelFromForm(f)), index, request.credId)
-          case f: InvalidForm
-          => getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(new_home_address(f, index, ControllerHelper.rpTitleName(rp)))
-          }
-          case ValidForm(_, data)
-          => processFormAndRedirect(data, index, request.credId)
-        }).recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
-    }
+  def post(index: Int): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => getData[ResponsiblePerson](request.credId, index) map { rp =>
+          BadRequest(view(formWithErrors, index, ControllerHelper.rpTitleName(rp)))
+        },
+        data => processFormAndRedirect(data, index, request.credId)
+      ).recoverWith {
+        case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+      }
+  }
 
-  def processFormAndRedirect(data: NewHomeAddress, index: Int, credId: String)(implicit request: Request[AnyContent]) = {
+  private def processFormAndRedirect(data: NewHomeAddress, index: Int, credId: String)(implicit request: Request[AnyContent]): Future[Result] = {
     for {
       redirect <- dataCacheConnector.save[NewHomeAddress](credId, NewHomeAddress.key, data) map { _ =>
         data.personAddress match {

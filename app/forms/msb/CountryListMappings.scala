@@ -27,7 +27,7 @@ trait CountryListMappings extends AddressMappings {
     seq(
       optional(
         text(errorKey)
-          .verifying(countryConstraint)
+          .verifying(countryConstraint())
           .transform[Country](parseCountry, _.code)
       )
     ).verifying(nonEmptyOptionalSeq(errorKey))

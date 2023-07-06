@@ -19,54 +19,54 @@ package controllers.responsiblepeople.address
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.responsiblepeople.address.AdditionalExtraAddressFormProvider
 import models.responsiblepeople._
-import play.api.mvc.MessagesControllerComponents
-import services.AutoCompleteService
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.address.additional_extra_address
+import views.html.responsiblepeople.address.AdditionalExtraAddressView
 
 import scala.concurrent.Future
 
 class AdditionalExtraAddressController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                  authAction: AuthAction,
-                                                 autoCompleteService: AutoCompleteService,
                                                  val ds: CommonPlayDependencies,
                                                  val cc: MessagesControllerComponents,
-                                                 additional_extra_address: additional_extra_address,
+                                                 formProvider: AdditionalExtraAddressFormProvider,
+                                                 view: AdditionalExtraAddressView,
                                                  implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map {
         case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, Some(ResponsiblePersonAddressHistory(_, _, Some(additionalExtraAddress))), _, _, _, _, _, _, _, _, _, _, _, _)) =>
-          Ok(additional_extra_address(Form2[ResponsiblePersonAddress](additionalExtraAddress), edit, index, flow, personName.titleName))
+          Ok(view(formProvider().fill(additionalExtraAddress), edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
-          Ok(additional_extra_address(EmptyForm, edit, index, flow, personName.titleName))
+          Ok(view(formProvider(), edit, index, flow, personName.titleName))
         case _ => NotFound(notFoundView)
       }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
     authAction.async {
       implicit request =>
-        (Form2[ResponsiblePersonAddress](request.body)(ResponsiblePersonAddress.addressFormRule(PersonAddress.formRule(AddressType.OtherPrevious))) match {
-          case f: InvalidForm if f.data.get("isUK").isDefined
-          => processForm(ResponsiblePersonAddress(modelFromForm(f), None), request.credId, index, edit, flow)
-          case f: InvalidForm
-          => getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(additional_extra_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          }
-          case ValidForm(_, data)
-          => processForm(data, request.credId, index, edit, flow)
-        }).recoverWith {
+        formProvider().bindFromRequest().fold(
+          formWithErrors => if(formWithErrors.data.contains("isUK")) {
+            processForm(ResponsiblePersonAddress(modelFromPlayForm(formWithErrors), None), request.credId, index, edit, flow)
+          } else {
+            getData[ResponsiblePerson](request.credId, index) map { rp =>
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            }
+          },
+          data => processForm(data, request.credId, index, edit, flow)
+        ).recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }
 
+  //TODO This needs to be changed, current model creation is not fit for purpose
   private def processForm(data: ResponsiblePersonAddress, credId: String, index: Int, edit: Boolean, flow: Option[String])
-                         (implicit hc: HeaderCarrier) = {
+                         (implicit hc: HeaderCarrier): Future[Result] = {
 
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       (res.addressHistory, data.personAddress) match {

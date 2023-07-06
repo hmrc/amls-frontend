@@ -19,56 +19,57 @@ package controllers.responsiblepeople
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{ContactDetails, ResponsiblePerson}
-import play.api.mvc.MessagesControllerComponents
+import forms.responsiblepeople.ContactDetailsFormProvider
+import models.responsiblepeople.ResponsiblePerson
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.contact_details
+import views.html.responsiblepeople.ContactDetailsView
 
 import scala.concurrent.Future
 
-
 class ContactDetailsController @Inject () (
-                                           val dataCacheConnector: DataCacheConnector,
-                                           authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           val cc: MessagesControllerComponents,
-                                           contact_details: contact_details,
-                                           implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                            val dataCacheConnector: DataCacheConnector,
+                                            authAction: AuthAction,
+                                            val ds: CommonPlayDependencies,
+                                            val cc: MessagesControllerComponents,
+                                            formProvider: ContactDetailsFormProvider,
+                                            view: ContactDetailsView,
+                                            implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-      implicit request =>
-        getData[ResponsiblePerson](request.credId, index) map {
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_, Some(name),_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(contact_details(Form2[ContactDetails](name), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(contact_details(EmptyForm, edit, index, flow, personName.titleName))
-          case _ => NotFound(notFoundView)
-        }
-    }
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      getData[ResponsiblePerson](request.credId, index) map {
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_, Some(name),_,_,_,_,_,_,_,_,_,_,_,_,_))
+        => Ok(view(formProvider().fill(name), edit, index, flow, personName.titleName))
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+        => Ok(view(formProvider(), edit, index, flow, personName.titleName))
+        case _ => NotFound(notFoundView)
+      }
+  }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
     authAction.async {
       implicit request => {
-        Form2[ContactDetails](request.body) match {
-          case f: InvalidForm =>
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(contact_details(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-            }
-          case ValidForm(_, data) => {
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            },
+          data => {
             for {
               _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                 rp.contactDetails(data)
               }
-            } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-              case false => Redirect(controllers.responsiblepeople.address.routes.CurrentAddressController.get(index, edit, flow))
+            } yield if (edit) {
+              Redirect(routes.DetailedAnswersController.get(index, flow))
+            } else {
+              Redirect(controllers.responsiblepeople.address.routes.CurrentAddressController.get(index, edit, flow))
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
-        }
+        )
       }
     }
 }

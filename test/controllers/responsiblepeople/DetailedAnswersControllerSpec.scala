@@ -35,25 +35,28 @@ import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.responsiblepeople.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.responsiblepeople.detailed_answers
+import views.html.responsiblepeople.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePeopleValues with BusinessMatchingGenerator with OptionValues{
+class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePeopleValues with BusinessMatchingGenerator with OptionValues with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[detailed_answers]
+    lazy val view = inject[CheckYourAnswersView]
     val controller = new DetailedAnswersController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       config = mock[ApplicationConfig],
       cc = mockMcc,
-      detailed_answers = view,
+      cyaHelper = inject[CheckYourAnswersHelper],
+      view = view,
       error = errorView
       )
 
@@ -97,7 +100,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("title.cya"))
+        contentAsString(result) must include(messages("title.cya"))
         contentAsString(result) must include("/anti-money-laundering/responsible-people/check-your-answers")
       }
     }
@@ -111,7 +114,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      val element = document.getElementsMatchingOwnText(messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
       element.hasAttr("href") must be(true)
     }
 
@@ -124,7 +127,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      val element = document.getElementsMatchingOwnText(messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
       element.hasAttr("href") must be(true)
     }
 
@@ -137,7 +140,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      val element = document.getElementsMatchingOwnText(messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
       element.hasAttr("href") must be(false)
     }
 
@@ -150,7 +153,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      val element = document.getElementsMatchingOwnText(messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
       element.hasAttr("href") must be(true)
     }
 
@@ -163,7 +166,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("title.cya"))
+        contentAsString(result) must include(messages("title.cya"))
         contentAsString(result) must not include "/anti-money-laundering/responsible-people/your-answers"
       }
     }
@@ -178,7 +181,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           val result = controller.get(1)(request)
           status(result) must be(OK)
 
-          contentAsString(result) must include(Messages("title.cya"))
+          contentAsString(result) must include(messages("title.cya"))
         }
 
         "respond with OK and show the detailed answers page with a correctly formatted responsiblePerson startDate" in new Fixture {

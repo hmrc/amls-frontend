@@ -26,6 +26,14 @@ trait AutoCompleteServiceMocks extends MockitoSugar {
 
   implicit val mockAutoComplete:AutoCompleteService = mock[AutoCompleteService]
 
+  val nonUKCountries: Seq[SelectItem] = Seq(
+    SelectItem(Some("AF"), "Afghanistan"),
+    SelectItem(Some("AX"), "Åland Islands"),
+    SelectItem(Some("AL"), "Albania"),
+    SelectItem(Some("DZ"), "Algeria"),
+    SelectItem(Some("AS"), "American Samoa")
+  )
+
   when {
     mockAutoComplete.getCountries
   } thenReturn Some(Seq(
@@ -39,12 +47,9 @@ trait AutoCompleteServiceMocks extends MockitoSugar {
 
   when {
     mockAutoComplete.formOptions
-  } thenReturn Seq(
-    SelectItem(Some("GB"), "United Kingdom"),
-    SelectItem(Some("AF"), "Afghanistan"),
-    SelectItem(Some("AX"), "Åland Islands"),
-    SelectItem(Some("AL"), "Albania"),
-    SelectItem(Some("DZ"), "Algeria"),
-    SelectItem(Some("AS"), "American Samoa")
-  )
+  } thenReturn SelectItem(Some("GB"), "United Kingdom") +: nonUKCountries
+
+  when {
+    mockAutoComplete.formOptionsExcludeUK
+  } thenReturn nonUKCountries
 }

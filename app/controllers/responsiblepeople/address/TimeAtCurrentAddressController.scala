@@ -19,14 +19,14 @@ package controllers.responsiblepeople.address
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.responsiblepeople.address.TimeAtAddressFormProvider
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
-import models.responsiblepeople.{ResponsiblePerson, _}
+import models.responsiblepeople._
 import models.status.SubmissionStatus
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import services.StatusService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.address.time_at_address
+import views.html.responsiblepeople.address.TimeAtAddressView
 
 import scala.concurrent.Future
 
@@ -35,30 +35,31 @@ class TimeAtCurrentAddressController @Inject() (val dataCacheConnector: DataCach
                                                 val statusService: StatusService,
                                                 val ds: CommonPlayDependencies,
                                                 val cc: MessagesControllerComponents,
-                                                time_at_address: time_at_address,
+                                                formProvider: TimeAtAddressFormProvider,
+                                                view: TimeAtAddressView,
                                                 implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map {
         case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_, Some(timeAtAddress), _)), _, _)), _, _, _, _, _, _, _, _, _, _, _, _)) =>
-          Ok(time_at_address(Form2[TimeAtAddress](timeAtAddress), edit, index, flow, personName.titleName))
+          Ok(view(formProvider().fill(timeAtAddress), edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
-          Ok(time_at_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
+          Ok(view(formProvider(), edit, index, flow, personName.titleName))
         case _ => NotFound(notFoundView)
       }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      (Form2[TimeAtAddress](request.body) match {
-        case f: InvalidForm =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
           getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(time_at_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          }
-        case ValidForm(_, data) => {
+            BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+          },
+        data => {
           getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
             (for {
               rp <- responsiblePerson
@@ -72,13 +73,13 @@ class TimeAtCurrentAddressController @Inject() (val dataCacheConnector: DataCach
                 for {
                   status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
                 } yield {
-                  redirectTo(index, data, rp, status, edit, flow)
+                  redirectTo(index, data, edit, flow)
                 }
               }
             }) getOrElse Future.successful(NotFound(notFoundView))
           }
         }
-      }).recoverWith {
+      ).recoverWith {
         case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
       }
   }
@@ -97,8 +98,6 @@ class TimeAtCurrentAddressController @Inject() (val dataCacheConnector: DataCach
   }
 
   private def redirectTo(index: Int, timeAtAddress: TimeAtAddress,
-                         rp: ResponsiblePerson,
-                         status: SubmissionStatus,
                          edit: Boolean,
                          flow: Option[String]) = {
     timeAtAddress match {

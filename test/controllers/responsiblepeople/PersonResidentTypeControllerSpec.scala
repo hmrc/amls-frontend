@@ -19,26 +19,29 @@ package controllers.responsiblepeople
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.PersonResidentTypeFormProvider
+import generators.NinoGen
 import models.Country
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
-import org.scalatestplus.mockito.MockitoSugar
-import utils.{AmlsSpec, AuthAction}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.http.cache.client.CacheMap
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.AmlsSpec
+import views.html.responsiblepeople.PersonResidenceTypeView
 
 import scala.concurrent.Future
 
-class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil {
+class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with NinoGen with Injecting {
 
+  def nextNino = ninoGen.sample.value.value
   trait Fixture {
     self =>
     val request = addToken(authRequest)
@@ -47,14 +50,16 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
     val mockApplicationConfig = mock[ApplicationConfig]
 
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[ApplicationConfig].to(mockApplicationConfig))
-      .build()
-
-    val controller = app.injector.instanceOf[PersonResidentTypeController]
+    val controller = new PersonResidentTypeController(
+      messagesApi,
+      dataCacheConnector,
+      SuccessfulAuthAction,
+      commonDependencies,
+      stubMessagesControllerComponents(),
+      inject[PersonResidentTypeFormProvider],
+      inject[PersonResidenceTypeView],
+      errorView
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -152,7 +157,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
         "goes to CountryOfBirthController" when {
           "uk residence" in new Fixture   {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+              .withFormUrlEncodedBody(
               "isUKResidence" -> "true",
               "nino" -> nextNino,
               "countryOfBirth" -> "GB",
@@ -187,7 +193,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
         "goes to PersonUKPassportController" when {
           "non uk residence" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+              .withFormUrlEncodedBody(
               "isUKResidence" -> "false",
               "nino" -> nextNino,
               "countryOfBirth" -> "GB",
@@ -221,7 +228,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
           "in edit mode" when {
             "residence type is changed from uk residence to non uk residence" in new Fixture {
 
-              val newRequest = requestWithUrlEncodedBody(
+              val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+                .withFormUrlEncodedBody(
                 "isUKResidence" -> "false"
               )
 
@@ -255,7 +263,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
           "in edit mode" when {
             "uk residence" in new Fixture {
 
-              val newRequest = requestWithUrlEncodedBody(
+              val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+                .withFormUrlEncodedBody(
                 "isUKResidence" -> "true",
                 "nino" -> nextNino,
                 "countryOfBirth" -> "GB",
@@ -292,7 +301,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
           val testNino = nextNino
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+            .withFormUrlEncodedBody(
             "isUKResidence" -> "true",
             "nino" -> testNino,
             "countryOfBirth" -> "GB",
@@ -337,7 +347,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
           val spacedNino = testNino.grouped(2).mkString(" ")
           val withDashes = spacedNino.substring(0, 8) + "-" + spacedNino.substring(8, spacedNino.length) // ## ## ##- ## #
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+            .withFormUrlEncodedBody(
             "isUKResidence" -> "true",
             "nino" -> withDashes,
             "countryOfBirth" -> "GB",
@@ -370,7 +381,7 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               case UKResidence(n) => Some(n)
               case _ => None
             }
-          } yield nino.toString) foreach {
+          } yield nino.value) foreach {
             _ mustBe testNino
           }
 
@@ -398,7 +409,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               dateOfBirth = Some(dateOfBirth)
             )
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+              .withFormUrlEncodedBody(
               "isUKResidence" -> "true",
               "nino" -> nino,
               "countryOfBirth" -> countryCode,
@@ -441,7 +453,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
       "respond with BAD_REQUEST" when {
         "invalid form is submitted" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+            .withFormUrlEncodedBody(
             "ukPassportNumber" -> "12346464688"
           )
           val responsiblePeople = ResponsiblePerson(Some(PersonName("firstname", None, "lastname")))
@@ -461,7 +474,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
       "return NOT_FOUND" when {
         "index is out of bounds" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+            .withFormUrlEncodedBody(
             "isUKResidence" -> "true",
             "nino" -> nextNino,
             "countryOfBirth" -> "GB",

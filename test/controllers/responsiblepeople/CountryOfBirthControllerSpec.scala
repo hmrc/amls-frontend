@@ -18,24 +18,25 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.CountryOfBirthFormProvider
 import models.Country
-import models.autocomplete.{CountryDataProvider, NameValuePair}
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
+import services.AutoCompleteService
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction}
+import utils.AmlsSpec
+import views.html.responsiblepeople.CountryOfBirthView
 
 import scala.concurrent.Future
 
-class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil {
+class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil with Injecting {
 
   val RecordId = 1
 
@@ -44,18 +45,16 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
 
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[CountryDataProvider].to(new CountryDataProvider {
-        override def fetch: Option[Seq[NameValuePair]] = Some(Seq(
-          NameValuePair("Spain", "ES")
-        ))
-      }))
-      .build()
-
-    val controllers = app.injector.instanceOf[CountryOfBirthController]
+    val controllers = new CountryOfBirthController(
+      SuccessfulAuthAction,
+      commonDependencies,
+      dataCacheConnector,
+      inject[AutoCompleteService],
+      stubMessagesControllerComponents(),
+      inject[CountryOfBirthFormProvider],
+      inject[CountryOfBirthView],
+      errorView
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -122,7 +121,8 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
       "redirect to Nationality Controller" when {
 
         "all the mandatory inoput parameters are supplied" in new Fixture {
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.CountryOfBirthController.post(1).url)
+            .withFormUrlEncodedBody(
             "bornInUk" -> "false",
             "country" -> "FR"
           )
@@ -144,7 +144,8 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
       "redirect to Detailed Answer Controller" when {
 
         "all the mandatory input parameters are supplied and in edit mode" in new Fixture {
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.CountryOfBirthController.post(1).url)
+            .withFormUrlEncodedBody(
             "bornInUk" -> "true"
           )
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any(), any()))
@@ -168,7 +169,8 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          val line1MissingRequest = requestWithUrlEncodedBody("" -> "")
+          val line1MissingRequest = FakeRequest(POST, routes.CountryOfBirthController.post(1).url)
+            .withFormUrlEncodedBody("" -> "")
 
           val result = controllers.post(RecordId)(line1MissingRequest)
           status(result) must be(BAD_REQUEST)

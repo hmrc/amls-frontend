@@ -19,33 +19,32 @@ package controllers.responsiblepeople.address
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import controllers.responsiblepeople.address
+import forms.responsiblepeople.address.MovedAddressFormProvider
 import models.responsiblepeople._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.responsiblepeople.address.moved_address
+import views.html.responsiblepeople.address.MovedAddressView
 
 import scala.concurrent.Future
 
-class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
+class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self =>
     val request = addToken(authRequest)
     val dataCache: DataCacheConnector = mock[DataCacheConnector]
-    lazy val view = app.injector.instanceOf[moved_address]
+    lazy val view = inject[MovedAddressView]
     val controller = new MovedAddressController(messagesApi, self.dataCache, SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
-      moved_address = view)
-
+      view = view, formProvider = inject[MovedAddressFormProvider])
   }
 
   "MovedAddress" when {
-
 
     val personName = PersonName("firstName", Some("middleName"), "lastName")
     val UKAddress = PersonAddressUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
@@ -73,7 +72,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("responsiblepeople.movedaddress.heading", personName.titleName))
+        contentAsString(result) must include(messages("responsiblepeople.movedaddress.heading", personName.titleName))
       }
 
       "Load registration progress page successfully when no ResponsiblePeople model is supplied" in new Fixture {
@@ -123,7 +122,8 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         "option is 'Yes' is selected confirming the mentioned has moved from the shown address" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.MovedAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "movedAddress" -> "true"
           )
 
@@ -142,7 +142,8 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "option is 'No' is selected confirming the mentioned has not moved from the shown address" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.MovedAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "movedAddress" -> "false"
           )
 
@@ -154,7 +155,8 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
       "redirect to current address controller when no address is supplied" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.MovedAddressController.post(1).url)
+        .withFormUrlEncodedBody(
         )
 
         val personName = PersonName("firstName", Some("middleName"), "lastName")
@@ -181,7 +183,8 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
       "redirect to registration progress when no responsible person model is supplied" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.MovedAddressController.post(1).url)
+        .withFormUrlEncodedBody(
         )
 
         val mockCacheMap = mock[CacheMap]
@@ -199,7 +202,9 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
       "throw error message on not selecting the option" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.MovedAddressController.post(1).url)
+        .withFormUrlEncodedBody(
+          "movedAddress" -> ""
         )
 
         val mockCacheMap = mock[CacheMap]
@@ -212,9 +217,8 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post(1)(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.required.rp.moved.address", personName.titleName))
+        contentAsString(result) must include(messages("error.required.rp.moved.address"))
       }
-
     }
   }
 }

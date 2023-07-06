@@ -31,4 +31,13 @@ class AutoCompleteService @Inject()(data: CountryDataProvider) {
       value.map(pair => SelectItem(value = Some(pair.value), text = pair.name))
     case None => throw new RuntimeException()
   }
+
+  lazy val formOptionsExcludeUK: Seq[SelectItem] = getCountries match {
+    case Some(value) =>
+      Seq(SelectItem()) ++
+        value
+          .filterNot(_.value == "GB")
+          .map(pair => SelectItem(value = Some(pair.value), text = pair.name))
+    case None => throw new RuntimeException()
+  }
 }

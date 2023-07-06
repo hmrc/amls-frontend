@@ -27,12 +27,13 @@ import models.businessmatching.BusinessType.Partnership
 import models.responsiblepeople.ResponsiblePerson
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved}
-import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.responsiblepeople.CheckYourAnswersHelper
 import utils.{AuthAction, ControllerHelper, DeclarationHelper, RepeatingSection}
-import views.html.responsiblepeople.detailed_answers
+import views.html.responsiblepeople.CheckYourAnswersView
 
 import scala.concurrent.Future
 
@@ -43,7 +44,8 @@ class DetailedAnswersController @Inject () (
                                              val statusService: StatusService,
                                              val config: ApplicationConfig,
                                              val cc: MessagesControllerComponents,
-                                             detailed_answers: detailed_answers,
+                                             cyaHelper: CheckYourAnswersHelper,
+                                             view: CheckYourAnswersView,
                                              implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])
@@ -54,37 +56,38 @@ class DetailedAnswersController @Inject () (
     }
   }
 
-  def get(index: Int, flow: Option[String] = None) = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetchAll(request.credId) flatMap {
-          optionalCache =>
-            (for {
-              cache: CacheMap <- optionalCache
-              businessMatching: BusinessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-            } yield {
-              redirect(request.amlsRefNumber, request.accountTypeId, request.credId, cache, index, flow, businessMatching)
-            }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get))
-        }
+  def get(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetchAll(request.credId) flatMap {
+        optionalCache =>
+          (for {
+            cache: CacheMap <- optionalCache
+            businessMatching: BusinessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          } yield {
+            redirect(request.amlsRefNumber, request.accountTypeId, request.credId, cache, index, flow, businessMatching)
+          }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get))
+      }
   }
 
   private def redirect(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, cache: CacheMap, index: Int, flow: Option[String], businessMatching: BusinessMatching)
-                      (implicit request: Request[_]) =
+                      (implicit request: Request[_]): Future[Result] =
     (for {
       responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
     } yield responsiblePeople.lift(index - 1) match {
       case Some(x) if x.copy(hasAccepted = true).isComplete => showHideAddressMove(amlsRegistrationNo, accountTypeId, credId, x.lineId) flatMap { showHide =>
         isMsbOrTcsp(credId).map {
           msbOrTcsp: Option[Boolean] =>
-
             val shouldShowApprovalSection = !(msbOrTcsp.contains(true)) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
-            Ok(detailed_answers(Some(x), index, showHide, ControllerHelper.rpTitleName(Some(x)), flow, shouldShowApprovalSection, businessMatching))
+            val personName = ControllerHelper.rpTitleName(Some(x))
+            val summaryList = cyaHelper.getSummaryList(x, businessMatching, personName, index, flow, showHide, shouldShowApprovalSection)
+            Ok(view(summaryList, index, showHide, personName, flow))
         }
       }
       case Some(_) => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get))
       case _ => Future.successful(NotFound(notFoundView))
     }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get))
 
-  def post(index: Int, flow: Option[String] = None) = authAction.async{
+  def post(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async{
     implicit request =>
       updateDataStrict[ResponsiblePerson](request.credId, index){ rp =>
         rp.copy(hasAccepted = true)

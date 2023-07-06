@@ -16,18 +16,18 @@
 
 package controllers.responsiblepeople
 
-import javax.inject.Inject
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.responsiblepeople.PersonUKPassportFormProvider
 import models.responsiblepeople.{ResponsiblePerson, UKPassport, UKPassportNo, UKPassportYes}
 import play.api.i18n.MessagesApi
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.person_uk_passport
+import views.html.responsiblepeople.PersonUKPassportView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class PersonUKPassportController @Inject()(
@@ -36,43 +36,44 @@ class PersonUKPassportController @Inject()(
                                             authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
                                             val cc: MessagesControllerComponents,
-                                            person_uk_passport: person_uk_passport,
+                                            formProvider: PersonUKPassportFormProvider,
+                                            view: PersonUKPassportView,
                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-      implicit request =>
-        getData[ResponsiblePerson](request.credId, index) map {
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,Some(ukPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-            Ok(person_uk_passport(Form2[UKPassport](ukPassport), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-            Ok(person_uk_passport(EmptyForm, edit, index, flow, personName.titleName))
-          case _ => NotFound(notFoundView)
-        }
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      getData[ResponsiblePerson](request.credId, index) map {
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,Some(ukPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          Ok(view(formProvider().fill(ukPassport), edit, index, flow, personName.titleName))
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          Ok(view(formProvider(), edit, index, flow, personName.titleName))
+        case _ => NotFound(notFoundView)
+      }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-      implicit request =>
-        Form2[UKPassport](request.body) match {
-          case f: InvalidForm => getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(person_uk_passport(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          }
-          case ValidForm(_, data) => {
-            (for {
-              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
-                data match {
-                  case UKPassportYes(_) => rp.ukPassport(data).copy(nonUKPassport = None)
-                  case _ => rp.ukPassport(data)
-                }
-              })
-              rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
-            } yield {
-              redirectTo(rp, data, index, edit, flow)
-            }) getOrElse NotFound(notFoundView)
-          } recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-          }
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => getData[ResponsiblePerson](request.credId, index) map { rp =>
+          BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+        },
+        data => {
+          (for {
+            cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
+              data match {
+                case UKPassportYes(_) => rp.ukPassport(data).copy(nonUKPassport = None)
+                case _ => rp.ukPassport(data)
+              }
+            })
+            rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
+          } yield {
+            redirectTo(rp, data, index, edit, flow)
+          }) getOrElse NotFound(notFoundView)
+        } recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
+      )
   }
 
   private def redirectTo(rp: Seq[ResponsiblePerson], data: UKPassport, index: Int, edit: Boolean, flow: Option[String]) = {

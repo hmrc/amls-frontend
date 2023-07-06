@@ -19,46 +19,44 @@ package controllers.responsiblepeople.address
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.responsiblepeople.address.AdditionalAddressUKFormProvider
 import models.responsiblepeople._
-import play.api.mvc.MessagesControllerComponents
-import services.AutoCompleteService
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.address.additional_extra_address_UK
-
+import views.html.responsiblepeople.address.AdditionalExtraAddressUKView
 
 import scala.concurrent.Future
 
 class AdditionalExtraAddressUKController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                    authAction: AuthAction,
                                                    implicit val auditConnector: AuditConnector,
-                                                   autoCompleteService: AutoCompleteService,
                                                    val ds: CommonPlayDependencies,
                                                    val cc: MessagesControllerComponents,
-                                                   additional_extra_address_UK: additional_extra_address_UK,
+                                                   formProvider: AdditionalAddressUKFormProvider,
+                                                   view: AdditionalExtraAddressUKView,
                                                    implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map {
         case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, Some(ResponsiblePersonAddressHistory(_, _, Some(additionalExtraAddress))), _, _, _, _, _, _, _, _, _, _, _, _)) =>
-          Ok(additional_extra_address_UK(Form2[ResponsiblePersonAddress](additionalExtraAddress), edit, index, flow, personName.titleName))
+          Ok(view(formProvider().fill(additionalExtraAddress), edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
-          Ok(additional_extra_address_UK(EmptyForm, edit, index, flow, personName.titleName))
+          Ok(view(formProvider(), edit, index, flow, personName.titleName))
         case _ => NotFound(notFoundView)
       }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
     authAction.async {
       implicit request =>
-        (Form2[ResponsiblePersonAddress](request.body) match {
-          case f: InvalidForm =>
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(additional_extra_address_UK(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-            }
-          case ValidForm(_, data) => {
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            },
+          data => {
             getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
               (for {
                 rp <- responsiblePerson
@@ -70,7 +68,7 @@ class AdditionalExtraAddressUKController @Inject()(val dataCacheConnector: DataC
               }) getOrElse updateAdditionalExtraAddressAndRedirect(request.credId, data, index, edit, flow)
             }
           }
-        }).recoverWith {
+        ).recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }

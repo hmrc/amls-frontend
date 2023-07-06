@@ -27,6 +27,7 @@ import models.responsiblepeople._
 import models.status.SubmissionStatus
 import models.{Country, DateOfChange, ViewResponse}
 import org.joda.time.{LocalDate, Months}
+import play.api.data.Form
 import play.api.i18n.{Lang, Messages}
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -152,6 +153,14 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
 
   def modelFromForm(f: InvalidForm): PersonAddress = {
     if (f.data.get("isUK").contains(Seq("true"))) {
+      PersonAddressUK("", "", None, None, "")
+    } else {
+      PersonAddressNonUK("", "", None, None, Country("", ""))
+    }
+  }
+
+  def modelFromPlayForm(f: Form[_]): PersonAddress = {
+    if (f.data.contains("isUK")) {
       PersonAddressUK("", "", None, None, "")
     } else {
       PersonAddressNonUK("", "", None, None, Country("", ""))

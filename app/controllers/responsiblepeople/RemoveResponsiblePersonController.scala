@@ -19,27 +19,27 @@ package controllers.responsiblepeople
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonEndDate}
+import forms.responsiblepeople.RemoveResponsiblePersonFormProvider
+import models.responsiblepeople.ResponsiblePerson
 import models.status._
-import play.api.mvc.MessagesControllerComponents
+import org.joda.time.LocalDate
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.StatusService
 import utils.{AuthAction, RepeatingSection, StatusConstants}
-import views.html.responsiblepeople.remove_responsible_person
+import views.html.responsiblepeople.RemoveResponsiblePersonView
 
 import scala.concurrent.Future
 
+class RemoveResponsiblePersonController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                  authAction: AuthAction,
+                                                  val ds: CommonPlayDependencies,
+                                                  val statusService: StatusService,
+                                                  val cc: MessagesControllerComponents,
+                                                  formProvider: RemoveResponsiblePersonFormProvider,
+                                                  view: RemoveResponsiblePersonView,
+                                                  implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-class RemoveResponsiblePersonController @Inject () (
-                                                   val dataCacheConnector: DataCacheConnector,
-                                                   authAction: AuthAction,
-                                                   val ds: CommonPlayDependencies,
-                                                   val statusService: StatusService,
-                                                   val cc: MessagesControllerComponents,
-                                                   remove_responsible_person: remove_responsible_person,
-                                                   implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
-
-  def get(index: Int, flow: Option[String] = None) = authAction.async {
+  def get(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       for {
         rp <- getData[ResponsiblePerson](request.credId, index)
@@ -47,9 +47,9 @@ class RemoveResponsiblePersonController @Inject () (
       } yield rp match {
         case Some(person) if (person.lineId.isDefined && !person.isComplete) =>
           Redirect(routes.WhatYouNeedController.get(index, flow))
-        case (Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))) =>
-          Ok(remove_responsible_person(
-            f = EmptyForm,
+        case (Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))) =>
+          Ok(view(
+            formProvider(),
             index = index,
             personName = personName.fullName,
             showDateField = showRemovalDateField(status, rp.get.lineId.isDefined),
@@ -59,51 +59,47 @@ class RemoveResponsiblePersonController @Inject () (
       }
   }
 
-  def remove(index: Int, flow: Option[String] = None) = authAction.async {
+  def remove(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-        def removeWithoutDate = removeDataStrict[ResponsiblePerson](request.credId, index) map { _ =>
-          Redirect(routes.YourResponsiblePeopleController.get)
-        }
 
-        statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap {
-          case NotCompleted | SubmissionReady => removeWithoutDate
-          case SubmissionReadyForReview =>
-              getData[ResponsiblePerson](request.credId, index) flatMap {
-                  case Some(person) if person.lineId.isDefined => for {
-                      _ <- updateDataStrict[ResponsiblePerson](request.credId, index)(_.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
-                  } yield Redirect(routes.YourResponsiblePeopleController.get)
-                  case _ => removeWithoutDate
+      def removeWithoutDate(): Future[Result] = removeDataStrict[ResponsiblePerson](request.credId, index) map { _ =>
+        Redirect(routes.YourResponsiblePeopleController.get)
+      }
+
+      statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { status =>
+        getData[ResponsiblePerson](request.credId, index) flatMap { personData =>
+          (status, personData) match {
+            case (NotCompleted, _) => removeWithoutDate()
+            case (SubmissionReady, _) => removeWithoutDate()
+            case (SubmissionReadyForReview, None) => removeWithoutDate()
+            case (SubmissionReadyForReview, Some(person)) if person.lineId.isDefined =>
+              updateDataStrict[ResponsiblePerson](request.credId, index)(_.copy(status = Some(StatusConstants.Deleted), hasChanged = true)).map { _ =>
+                Redirect(routes.YourResponsiblePeopleController.get)
               }
-          case _ =>
-            getData[ResponsiblePerson](request.credId, index) flatMap { _ match {
-                case Some(person) if person.lineId.isEmpty => removeWithoutDate
-                case Some(person) =>
-                  val name = person.personName.fold("")(_.fullName)
-                  val startDate = person.positions
-                    .flatMap(p => p.startDate)
-                    .map(d => Seq(d.startDate.toString("yyyy-MM-dd")))
-                    .getOrElse(Seq())
-                  val extraFields = Map(
-                    "positionStartDate" -> startDate,
-                    "userName" -> Seq(name)
-                  )
-
-                  Form2[ResponsiblePersonEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
-                    case f: InvalidForm =>
-                      Future.successful(BadRequest(remove_responsible_person(f, index, name, true, flow)))
-
-                    case ValidForm(_, data) => {
-                      for {
-                        _ <- updateDataStrict[ResponsiblePerson](request.credId, index) {
-                          _.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
-                        }
-                      } yield Redirect(routes.YourResponsiblePeopleController.get)
-                    }
-                    case _ => removeWithoutDate
+            case (_, Some(person)) if person.lineId.isEmpty => removeWithoutDate()
+            case (_, Some(person)) =>
+              val name = person.personName.fold("")(_.titleName)
+              formProvider().bindFromRequest().fold(
+                formWithErrors => Future.successful(BadRequest(view(formWithErrors, index, name, true, flow))),
+                data => {
+                  val startDate = person.positions.flatMap(_.startDate.map(_.startDate))
+                  data match {
+                    case Left(_) => removeWithoutDate()
+                    case Right(value) if startDate.exists(_.isAfter(value.endDate)) =>
+                      val formWithFutureError =
+                        formProvider().withError(
+                          "endDate", messages("error.expected.rp.date.after.start", name, startDate.fold("")(_.toString("dd-MM-yyyy")))
+                        )
+                      Future.successful(BadRequest(view(formWithFutureError, index, name, true, flow)))
+                    case Right(value) => updateDataStrict[ResponsiblePerson](request.credId, index) {
+                      _.copy(status = Some(StatusConstants.Deleted), endDate = Some(value), hasChanged = true)
+                    }.map(_ => Redirect(routes.YourResponsiblePeopleController.get))
                   }
-              }
-            }
+                }
+              )
+          }
         }
+      }
   }
 
   private def showRemovalDateField(status: SubmissionStatus, lineIdExists: Boolean): Boolean = {

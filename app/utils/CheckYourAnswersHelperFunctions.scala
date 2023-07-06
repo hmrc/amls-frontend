@@ -42,6 +42,18 @@ trait CheckYourAnswersHelperFunctions {
     )
   )
 
+  def addressToLines(addressLines: Seq[String]): Value = Value(
+    HtmlContent(
+      Html(
+        "<ul class=\"govuk-list\">" +
+          addressLines.map { line =>
+            s"""<li>$line<li>"""
+          }.mkString
+          + "</ul>"
+      )
+    )
+  )
+
   def row(title: String, label: String, actions: Option[Actions])(implicit messages: Messages): SummaryListRow = {
     SummaryListRow(
       Key(Text(messages(title))),

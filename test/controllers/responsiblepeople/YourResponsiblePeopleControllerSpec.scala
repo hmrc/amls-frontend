@@ -24,9 +24,8 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import utils.AmlsSpec
-import play.api.i18n.Messages
 import play.api.test.Helpers._
-import views.html.responsiblepeople.your_responsible_people
+import views.html.responsiblepeople.YourResponsiblePeopleView
 
 import scala.concurrent.Future
 
@@ -34,11 +33,11 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
 
     trait Fixture {
       self => val request = addToken(authRequest)
-      lazy val view = app.injector.instanceOf[your_responsible_people]
+      lazy val view = app.injector.instanceOf[YourResponsiblePeopleView]
       val controller = new YourResponsiblePeopleController (
         dataCacheConnector = mock[DataCacheConnector],
         authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
-        your_responsible_people = view)
+        view = view)
     }
 
     "Get" must {
@@ -49,7 +48,7 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
           (any(), any())).thenReturn(Future.successful(Some(Seq(model))))
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include (s"${Messages("responsiblepeople.whomustregister.title")} - ${Messages("summary.responsiblepeople")}")
+        contentAsString(result) must include (s"${messages("responsiblepeople.whomustregister.title")} - ${messages("summary.responsiblepeople")}")
       }
 
       "show the 'Add a responsible person' link" in new Fixture {
@@ -63,7 +62,7 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include (Messages("responsiblepeople.check_your_answers.add"))
+        contentAsString(result) must include (messages("responsiblepeople.check_your_answers.add"))
 
         val document = Jsoup.parse(contentAsString(result))
         document.getElementById("addResponsiblePerson").attr("href") must be (routes.ResponsiblePeopleAddController.get(false).url)

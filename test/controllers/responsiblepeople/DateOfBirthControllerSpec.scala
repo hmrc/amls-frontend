@@ -19,6 +19,7 @@ package controllers.responsiblepeople
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.DateOfBirthFormProvider
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
 import org.joda.time.LocalDate
@@ -28,13 +29,15 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.{FakeRequest, Injecting}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction}
+import views.html.responsiblepeople.DateOfBirthView
 
 import scala.concurrent.Future
 
-class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
+class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self =>
@@ -43,14 +46,16 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
 
     val mockApplicationConfig = mock[ApplicationConfig]
 
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[ApplicationConfig].to(mockApplicationConfig))
-      .build()
-
-    val controller = app.injector.instanceOf[DateOfBirthController]
+    val controller = new DateOfBirthController(
+      messagesApi,
+      dataCacheConnector,
+      SuccessfulAuthAction,
+      commonDependencies,
+      mockMcc,
+      inject[DateOfBirthFormProvider],
+      inject[DateOfBirthView],
+      errorView
+    )
 
     val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]
@@ -114,7 +119,7 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
       "edit is false" must {
         "go to PersonResidencyTypeController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.DateOfBirthController.post(1).url).withFormUrlEncodedBody(
             "dateOfBirth.day" -> "1",
             "dateOfBirth.month" -> "12",
             "dateOfBirth.year" -> "1990"
@@ -136,7 +141,7 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
       "edit is true" must {
         "go to DetailedAnswersController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.DateOfBirthController.post(1).url).withFormUrlEncodedBody(
             "dateOfBirth.day" -> "1",
             "dateOfBirth.month" -> "12",
             "dateOfBirth.year" -> "1990"
@@ -158,8 +163,10 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "nonUKPassport" -> "true"
+          val newRequest = FakeRequest(POST, routes.DateOfBirthController.post(1).url).withFormUrlEncodedBody(
+            "dateOfBirth.day" -> "sdfsadgadg",
+            "dateOfBirth.month" -> "12",
+            "dateOfBirth.year" -> "1990"
           )
 
           val responsiblePeople = ResponsiblePerson()
@@ -185,7 +192,7 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
       "Responsible Person cannot be found with given index" must {
         "respond with NOT_FOUND" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.DateOfBirthController.post(1).url).withFormUrlEncodedBody(
             "dateOfBirth.day" -> "1",
             "dateOfBirth.month" -> "12",
             "dateOfBirth.year" -> "1990"

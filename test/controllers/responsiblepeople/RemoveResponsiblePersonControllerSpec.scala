@@ -18,6 +18,7 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.RemoveResponsiblePersonFormProvider
 import generators.ResponsiblePersonGenerator
 import models.Country
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
@@ -32,27 +33,28 @@ import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.i18n.Messages
 import play.api.test.Helpers.{status, _}
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, StatusConstants}
-import views.html.responsiblepeople.remove_responsible_person
+import views.html.responsiblepeople.RemoveResponsiblePersonView
 
 import scala.concurrent.Future
 
 class RemoveResponsiblePersonControllerSpec extends AmlsSpec
-  with MustMatchers with MockitoSugar with ScalaFutures with ScalaCheckPropertyChecks with NinoUtil with ResponsiblePersonGenerator {
+  with MustMatchers with MockitoSugar with ScalaFutures with ScalaCheckPropertyChecks with NinoUtil with ResponsiblePersonGenerator with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[remove_responsible_person]
+    lazy val view = inject[RemoveResponsiblePersonView]
     val controller = new RemoveResponsiblePersonController (
       dataCacheConnector = mock[DataCacheConnector],
       statusService =  mock[StatusService],
       authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
-      remove_responsible_person = view,
+      formProvider = inject[RemoveResponsiblePersonFormProvider],
+      view = view,
       error = errorView)
   }
 
@@ -104,7 +106,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           status(result) must be(OK)
           val contentString = contentAsString(result)
           val doc =  Jsoup.parse(contentString)
-          doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
+          doc.getElementsMatchingOwnText(messages("lbl.day")).hasText must be(true)
 
         }
       }
@@ -127,7 +129,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           status(result) must be(OK)
           val contentString = contentAsString(result)
           val doc =  Jsoup.parse(contentString)
-          doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
+          doc.getElementsMatchingOwnText(messages("lbl.day")).hasText must be(true)
 
         }
       }
@@ -149,7 +151,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           status(result) must be(OK)
           val contentString = contentAsString(result)
           val doc =  Jsoup.parse(contentString)
-          doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
+          doc.getElementsMatchingOwnText(messages("lbl.day")).hasText must be(true)
 
         }
         "respond with NOT_FOUND when the index is out of bounds" in new Fixture {
@@ -180,7 +182,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           status(result) must be(OK)
 
-          contentAsString(result) must not include Messages("responsiblepeople.remove.responsible.person.enddate.lbl")
+          contentAsString(result) must not include messages("responsiblepeople.remove.responsible.person.enddate.lbl")
         }
       }
       "the submission status is SubmissionReadyForReview" must {
@@ -200,7 +202,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           status(result) must be(OK)
 
-          contentAsString(result) must not include Messages("responsiblepeople.remove.responsible.person.enddate.lbl")
+          contentAsString(result) must not include messages("responsiblepeople.remove.responsible.person.enddate.lbl")
 
         }
 
@@ -221,7 +223,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           status(result) must be(OK)
 
-          contentAsString(result) must not include Messages("responsiblepeople.remove.responsible.person.enddate.lbl")
+          contentAsString(result) must not include messages("responsiblepeople.remove.responsible.person.enddate.lbl")
 
         }
 
@@ -358,7 +360,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         "removing a responsible person from an application with status SubmissionDecisionApproved" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.RemoveResponsiblePersonController.remove(1).url)
+          .withFormUrlEncodedBody(
+            "dateRequired" -> "true",
             "endDate.day" -> "1",
             "endDate.month" -> "1",
             "endDate.year" -> "2006"
@@ -386,7 +390,8 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         "removing a new incomplete responsible person from an application with status SubmissionDecisionApproved" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
-          val newRequest = requestWithUrlEncodedBody("" -> "")
+          val newRequest = FakeRequest(POST, routes.RemoveResponsiblePersonController.remove(1).url)
+          .withFormUrlEncodedBody("dateRequired" -> "false")
 
           val people = Seq(
             responsiblePersonGen.sample.get.copy(lineId = None, positions = Some(positionsGen.sample.get.copy(startDate = None)))
@@ -415,10 +420,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         "removing a responsible person from an application with no date" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = requestWithUrlEncodedBody(
-            "endDate.day" -> "",
-            "endDate.month" -> "",
-            "endDate.year" -> ""
+          val newRequest = FakeRequest(POST, routes.RemoveResponsiblePersonController.remove(1).url)
+          .withFormUrlEncodedBody(
+            "dateRequired" -> "false"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
@@ -439,7 +443,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         "removing a responsible person from an application with no date" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.RemoveResponsiblePersonController.remove(1).url)
+          .withFormUrlEncodedBody(
+            "dateRequired" -> "true",
             "endDate.day" -> "",
             "endDate.month" -> "",
             "endDate.year" -> ""
@@ -454,17 +460,21 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+          contentAsString(result) must include(messages("error.required.tp.all"))
 
         }
 
-        "removing a responsible person from an application given a year which is too short" in new Fixture {
+        s"removing a responsible person from an application given a year which is below ${RemoveResponsiblePersonFormProvider.minDate.toString("dd-MM-yyyy")}" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = requestWithUrlEncodedBody(
-            "endDate.day" -> "24",
-            "endDate.month" -> "2",
-            "endDate.year" -> "16"
+          val belowMinDate = RemoveResponsiblePersonFormProvider.minDate.minusDays(1)
+
+          val newRequest = FakeRequest(POST, routes.RemoveResponsiblePersonController.remove(1).url)
+          .withFormUrlEncodedBody(
+            "dateRequired" -> "true",
+            "endDate.day" -> belowMinDate.getDayOfMonth.toString,
+            "endDate.month" -> belowMinDate.getMonthOfYear.toString,
+            "endDate.year" -> belowMinDate.getYear.toString
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
@@ -476,39 +486,20 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
-
-        }
-
-        "removing a responsible person from an application given a year which is too long" in new Fixture {
-          val emptyCache = CacheMap("", Map.empty)
-
-          val newRequest = requestWithUrlEncodedBody(
-            "endDate.day" -> "24",
-            "endDate.month" -> "2",
-            "endDate.year" -> "10166"
-          )
-
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
-            .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-          val result = controller.remove(1)(newRequest)
-          status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.expected.jodadate.format"))
-
+          contentAsString(result) must include(messages("error.allowed.start.date"))
         }
 
         "removing a rp from an application with future date" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
-          val newRequest = requestWithUrlEncodedBody(
-            "endDate.day" -> "15",
-            "endDate.month" -> "1",
-            "endDate.year" -> "2030"
+          val futureDate = LocalDate.now().plusDays(1)
+
+          val newRequest = FakeRequest(POST, routes.RemoveResponsiblePersonController.remove(1).url)
+          .withFormUrlEncodedBody(
+            "dateRequired" -> "true",
+            "endDate.day" -> futureDate.getDayOfMonth.toString,
+            "endDate.month" -> futureDate.getMonthOfYear.toString,
+            "endDate.year" -> futureDate.getYear.toString
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
@@ -520,7 +511,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.future.date"))
+          contentAsString(result) must include(messages("error.future.date"))
 
         }
 
@@ -528,10 +519,14 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val emptyCache = CacheMap("", Map.empty)
 
-          val position = Positions(Set(InternalAccountant), Some(PositionStartDate(new LocalDate(1999, 5, 1))))
+          val startDate = new LocalDate(1999, 5, 1)
+
+          val position = Positions(Set(InternalAccountant), Some(PositionStartDate(startDate)))
           val peopleList = Seq(CompleteResponsiblePeople1.copy(positions = Some(position)))
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.RemoveResponsiblePersonController.remove(1).url)
+          .withFormUrlEncodedBody(
+            "dateRequired" -> "true",
             "endDate.day" -> "15",
             "endDate.month" -> "1",
             "endDate.year" -> "1998"
@@ -546,11 +541,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          //contentAsString(result) must include(Messages("error.expected.future.date.after.start"))
-
+          contentAsString(result) must include(messages("error.expected.rp.date.after.start", personName.titleName, startDate.toString("dd-MM-yyyy")))
         }
       }
-
     }
   }
 

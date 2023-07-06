@@ -18,8 +18,8 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.address.AdditionalAddressFormProvider
 import models.Country
-import models.autocomplete.NameValuePair
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.jsoup.Jsoup
@@ -27,19 +27,18 @@ import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfter, OptionValues}
-import play.api.i18n.Messages
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
-import services.AutoCompleteService
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AmlsSpec, AuthorisedFixture}
-import views.html.responsiblepeople.address.additional_address
+import views.html.responsiblepeople.address.AdditionalAddressView
 
 import scala.concurrent.Future
 
-class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with OptionValues {
+class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with OptionValues with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
@@ -52,24 +51,16 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
     self => val request = addToken(authRequest)
 
     val auditConnector = mock[AuditConnector]
-    val autoCompleteService = mock[AutoCompleteService]
-    lazy val view = app.injector.instanceOf[additional_address]
+    lazy val view = inject[AdditionalAddressView]
     val additionalAddressController = new AdditionalAddressController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
-      autoCompleteService = autoCompleteService,
       ds = commonDependencies,
       cc = mockMcc,
-      additional_address = view,
+      formProvider = inject[AdditionalAddressFormProvider],
+      view = view,
       error = errorView
     )
-
-    when {
-      autoCompleteService.getCountries
-    } thenReturn Some(Seq(
-      NameValuePair("United Kingdom", "UK"),
-      NameValuePair("Spain", "ES")
-    ))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -77,9 +68,9 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
 
   "AdditionalAddressController" when {
 
-    val pageTitle = Messages("responsiblepeople.additional_address.title", "firstname lastname") + " - " +
-      Messages("summary.responsiblepeople") + " - " +
-      Messages("title.amls") + " - " + Messages("title.gov")
+    val pageTitle = messages("responsiblepeople.additional_address.title", "firstname lastname") + " - " +
+      messages("summary.responsiblepeople") + " - " +
+      messages("title.amls") + " - " + messages("title.gov")
     val personName = Some(PersonName("firstname", None, "lastname"))
 
 
@@ -160,7 +151,8 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
     "post is called" must {
       "respond with BAD_REQUEST" when {
         "isUK field is not supplied" in new Fixture {
-          val line1MissingRequest = requestWithUrlEncodedBody()
+          val line1MissingRequest = FakeRequest(POST, routes.AdditionalAddressController.post(1).url)
+          .withFormUrlEncodedBody()
 
           val responsiblePeople = ResponsiblePerson()
 
@@ -173,13 +165,14 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#isUK]").html() must include(Messages(s"error.required.uk.or.overseas.address.previous", ""))
+          document.select("a[href=#isUK]").html() must include(messages(s"error.required.uk.or.overseas.address.previous"))
         }
       }
 
       "go to AdditionalAddressUK" when {
         "isUK is true"  in new Fixture {
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.AdditionalAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "true")
 
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -202,7 +195,8 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
       "go to AdditionalAddressNonUK page" when {
         "isUk is false" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.AdditionalAddressController.post(1).url)
+          .withFormUrlEncodedBody(
           "isUK" -> "false")
 
           val responsiblePeople = ResponsiblePerson()
@@ -222,7 +216,8 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
       "redirect to AdditionalAddressNonUK and wipe old address" when {
         "changed the answer from yes to no" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.AdditionalAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "false")
 
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
@@ -251,7 +246,8 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
       "redirect to AdditionalAddressUkController and wipe old address" when {
         "changed the answer from no to yes" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.AdditionalAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "true")
 
           val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("", ""))

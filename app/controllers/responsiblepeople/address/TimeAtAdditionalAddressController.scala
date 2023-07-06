@@ -19,13 +19,13 @@ package controllers.responsiblepeople.address
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.responsiblepeople.address.TimeAtAddressFormProvider
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.address.time_at_additional_address
-
+import views.html.responsiblepeople.address.TimeAtAdditionalAddressView
 
 import scala.concurrent.Future
 
@@ -33,7 +33,8 @@ class TimeAtAdditionalAddressController @Inject() (val dataCacheConnector: DataC
                                                    authAction: AuthAction,
                                                    val ds: CommonPlayDependencies,
                                                    val cc: MessagesControllerComponents,
-                                                   time_at_additional_address: time_at_additional_address,
+                                                   formProvider: TimeAtAddressFormProvider,
+                                                   view: TimeAtAdditionalAddressView,
                                                    implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
@@ -42,21 +43,21 @@ class TimeAtAdditionalAddressController @Inject() (val dataCacheConnector: DataC
     implicit request =>
       getData[ResponsiblePerson](request.credId, index) map {
         case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, Some(ResponsiblePersonAddressHistory(_, Some(ResponsiblePersonAddress(_, Some(additionalAddress))), _)), _, _, _, _, _, _, _, _, _, _, _, _)) =>
-          Ok(time_at_additional_address(Form2[TimeAtAddress](additionalAddress), edit, index, flow, personName.titleName))
+          Ok(view(formProvider().fill(additionalAddress), edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
-          Ok(time_at_additional_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
+          Ok(view(formProvider(), edit, index, flow, personName.titleName))
         case _ => NotFound(notFoundView)
       }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
     implicit request =>
-      (Form2[TimeAtAddress](request.body) match {
-        case f: InvalidForm =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
           getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(time_at_additional_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          }
-        case ValidForm(_, data) => {
+            BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+          },
+        data => {
           getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
             (for {
               rp <- responsiblePerson
@@ -72,7 +73,7 @@ class TimeAtAdditionalAddressController @Inject() (val dataCacheConnector: DataC
             }) getOrElse Future.successful(NotFound(notFoundView))
           }
         }
-      }).recoverWith {
+      ).recoverWith {
         case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
       }
   }

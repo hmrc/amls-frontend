@@ -17,22 +17,29 @@
 package controllers.responsiblepeople
 
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.LegalNameChangeDateFormProvider
 import models.responsiblepeople.{LegalNameChangeDate, PersonName, ResponsiblePerson}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import views.html.responsiblepeople.legal_name_change_date
+import views.html.responsiblepeople.LegalNameChangeDateView
 
-class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
+class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
 
   trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(self.authRequest)
     val RecordId = 1
-    lazy val view = app.injector.instanceOf[legal_name_change_date]
-    lazy val controller = new LegalNameChangeDateController(mockCacheConnector, SuccessfulAuthAction, commonDependencies, cc = mockMcc,
-      legal_name_change_date = view,
+    lazy val view = inject[LegalNameChangeDateView]
+    lazy val controller = new LegalNameChangeDateController(
+      mockCacheConnector,
+      SuccessfulAuthAction,
+      commonDependencies,
+      cc = mockMcc,
+      formProvider = inject[LegalNameChangeDateFormProvider],
+      view = view,
       error = errorView)
 
     val personName = PersonName("firstname", None, "lastname")
@@ -87,7 +94,8 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
         "go to KnownByController" when {
           "edit is false" in new TestFixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.LegalNameChangeDateController.post(1).url)
+            .withFormUrlEncodedBody(
               "date.day" -> "1",
               "date.month" -> "12",
               "date.year" -> "1990"
@@ -105,7 +113,8 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
         "go to DetailedAnswersController" when {
           "edit is true" in new TestFixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.LegalNameChangeDateController.post(1).url)
+            .withFormUrlEncodedBody(
               "date.day" -> "1",
               "date.month" -> "12",
               "date.year" -> "1990"
@@ -124,7 +133,8 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
       "form is invalid" must {
         "return BAD_REQUEST" in new TestFixture {
 
-          val NameMissingInRequest = requestWithUrlEncodedBody(
+          val NameMissingInRequest = FakeRequest(POST, routes.LegalNameChangeDateController.post(1).url)
+          .withFormUrlEncodedBody(
             "date.day" -> "1"
           )
 
@@ -141,7 +151,8 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
       "model cannot be found with given index" must {
         "return NOT_FOUND" in new TestFixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.LegalNameChangeDateController.post(1).url)
+          .withFormUrlEncodedBody(
             "date.day" -> "1",
             "date.month" -> "12",
             "date.year" -> "1990"

@@ -19,14 +19,16 @@ package services
 import models.autocomplete.{CountryDataProvider, NameValuePair}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 
 class AutoCompleteServiceSpec extends PlaySpec with MockitoSugar {
 
   trait Fixture {
 
     val locations = Seq(
-      NameValuePair("Location 1", "location:1"),
-      NameValuePair("Location 2", "location:2")
+      NameValuePair("United Kingdom", "GB"),
+      NameValuePair("United States", "US"),
+      NameValuePair("Spain", "ES")
     )
 
     val service = new AutoCompleteService(new CountryDataProvider {
@@ -36,8 +38,33 @@ class AutoCompleteServiceSpec extends PlaySpec with MockitoSugar {
 
   "getLocations" must {
     "return a list of locations loaded from a resource file" in new Fixture {
-      service.getCountries mustBe Some(locations)
+      service.getCountries mustBe Some(locations.sortBy(_.name))
     }
   }
 
+  "formOptions" must {
+    "transform the result of .getLocations to a list of SelectItems" in new Fixture {
+      service.formOptions mustBe Seq(
+        SelectItem(),
+        SelectItem(Some("ES"), "Spain"),
+        SelectItem(Some("GB"), "United Kingdom"),
+        SelectItem(Some("US"), "United States")
+      )
+    }
+  }
+
+  "formOptionsExcludeUK" must {
+    "product the result of .formOptions without United Kingdom" in new Fixture {
+
+      val result: Seq[SelectItem] = service.formOptionsExcludeUK
+
+      result mustBe Seq(
+        SelectItem(),
+        SelectItem(Some("ES"), "Spain"),
+        SelectItem(Some("US"), "United States")
+      )
+
+      result mustNot contain(SelectItem(Some("GB"), "United Kingdom"))
+    }
+  }
 }

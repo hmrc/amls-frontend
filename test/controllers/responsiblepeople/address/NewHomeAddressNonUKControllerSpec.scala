@@ -18,6 +18,7 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.address.NewHomeAddressNonUKFormProvider
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.{Country, DateOfChange}
@@ -25,13 +26,14 @@ import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
-import views.html.responsiblepeople.address.new_home_address_NonUK
+import views.html.responsiblepeople.address.NewHomeAddressNonUKView
 
 import scala.concurrent.Future
 
-class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServiceMocks {
+class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServiceMocks with Injecting {
 
   val RecordId = 1
 
@@ -39,14 +41,15 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
-    lazy val view = app.injector.instanceOf[new_home_address_NonUK]
+    lazy val view = inject[NewHomeAddressNonUKView]
     val controller = new NewHomeAddressNonUKController(
       SuccessfulAuthAction,
       dataCacheConnector,
       mockAutoComplete,
       commonDependencies,
       mockMcc,
-      new_home_address_NonUK = view,
+      formProvider = inject[NewHomeAddressNonUKFormProvider],
+      view = view,
       error = errorView
     )
   }
@@ -55,7 +58,7 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
   val outOfBounds = 99
   val personName = Some(PersonName("firstname", None, "lastname"))
 
-  "NewHomeAddressController" when {
+  "NewHomeAddressNonUKControllerSpec" when {
 
     "get is called" must {
       "respond with NOT_FOUND when called with an index that is out of bounds" in new Fixture {
@@ -83,10 +86,10 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
     "post is called" must {
       "redirect to DetailedAnswersController" when {
         "all the mandatory non-UK parameters are supplied" in new Fixture {
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "false",
-            "addressLineNonUK1" -> "new address line1",
-            "addressLineNonUK2" -> "new address line2",
+          val requestWithParams = FakeRequest(POST, routes.NewHomeAddressNonUKController.post(1).url)
+          .withFormUrlEncodedBody(
+            "addressLine1" -> "new address line1",
+            "addressLine2" -> "new address line2",
             "country" -> "ES"
           )
 
@@ -118,10 +121,10 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
         }
 
         "all the mandatory non-UK parameters are supplied and date of move is more then 6 months" in new Fixture {
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "false",
-            "addressLineNonUK1" -> "new address line1",
-            "addressLineNonUK2" -> "new address line2",
+          val requestWithParams = FakeRequest(POST, routes.NewHomeAddressNonUKController.post(1).url)
+          .withFormUrlEncodedBody(
+            "addressLine1" -> "new address line1",
+            "addressLine2" -> "new address line2",
             "country" -> "ES"
           )
 
@@ -170,10 +173,10 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
         }
 
         "all the mandatory non-UK parameters are supplied and date of move is more then 3 years" in new Fixture {
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "false",
-            "addressLineNonUK1" -> "new address line1",
-            "addressLineNonUK2" -> "new address line2",
+          val requestWithParams = FakeRequest(POST, routes.NewHomeAddressNonUKController.post(1).url)
+          .withFormUrlEncodedBody(
+            "addressLine1" -> "new address line1",
+            "addressLine2" -> "new address line2",
             "country" -> "ES"
           )
 
@@ -218,10 +221,10 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
 
         "given an invalid address" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "false",
-            "addressLineNonUK1" -> "Line &1",
-            "addressLineNonUK2" -> "Line *2",
+          val requestWithParams = FakeRequest(POST, routes.NewHomeAddressNonUKController.post(1).url)
+          .withFormUrlEncodedBody(
+            "addressLine1" -> "Line &1",
+            "addressLine2" -> "Line *2",
             "country" -> "ES"
           )
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
@@ -233,7 +236,8 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
 
         "isUK field is not supplied" in new Fixture {
 
-          val line1MissingRequest = requestWithUrlEncodedBody()
+          val line1MissingRequest = FakeRequest(POST, routes.NewHomeAddressNonUKController.post(1).url)
+          .withFormUrlEncodedBody()
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
@@ -246,10 +250,10 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
 
         "the default fields for overseas are not supplied" in new Fixture {
 
-          val requestWithMissingParams = requestWithUrlEncodedBody(
-            "isUK" -> "false",
-            "addressLineNonUK1" -> "",
-            "addressLineNonUK2" -> "",
+          val requestWithMissingParams = FakeRequest(POST, routes.NewHomeAddressNonUKController.post(1).url)
+          .withFormUrlEncodedBody(
+            "addressLine1" -> "",
+            "addressLine2" -> "",
             "country" -> ""
           )
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
@@ -261,10 +265,10 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
 
         "respond with NOT_FOUND" when {
           "given an out of bounds index" in new Fixture {
-            val requestWithParams = requestWithUrlEncodedBody(
-              "isUK" -> "false",
-              "addressLineNonUK1" -> "Line 1",
-              "addressLineNonUK2" -> "Line 2",
+            val requestWithParams = FakeRequest(POST, routes.NewHomeAddressNonUKController.post(1).url)
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "Line 1",
+              "addressLine2" -> "Line 2",
               "country" -> "ES"
             )
 

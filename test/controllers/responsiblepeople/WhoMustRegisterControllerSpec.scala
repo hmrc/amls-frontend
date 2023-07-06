@@ -22,23 +22,23 @@ import org.scalatestplus.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import views.html.responsiblepeople.who_must_register
+import views.html.responsiblepeople.WhoMustRegisterView
 
 class WhoMustRegisterControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[who_must_register]
+    lazy val view = app.injector.instanceOf[WhoMustRegisterView]
     val controller = new WhoMustRegisterController (
       authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
-      who_must_register = view)
+      view = view)
   }
   "WhoMustRegisterController" must {
 
       "load the page" in new Fixture {
         val result = controller.get(1)(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("responsiblepeople.whomustregister.ymr"))
+        contentAsString(result) must include(messages("responsiblepeople.whomustregister.ymr"))
       }
     }
 }

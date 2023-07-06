@@ -44,7 +44,7 @@ class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector
           } yield {
             if(!whoIsYourAccountant.isUk) formProvider().fill(whoIsYourAccountant) else formProvider()
           }).getOrElse(formProvider())
-          Ok(view(form, edit, ControllerHelper.accountantName(response), autoCompleteService.formOptions))
+          Ok(view(form, edit, ControllerHelper.accountantName(response), autoCompleteService.formOptionsExcludeUK))
       }
   }
 
@@ -54,7 +54,7 @@ class WhoIsYourAccountantNonUkAddressController @Inject()(val dataCacheConnector
         formWithErrors =>
           dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
             response => BadRequest(view(
-              formWithErrors, edit, ControllerHelper.accountantName(response), autoCompleteService.formOptions))
+              formWithErrors, edit, ControllerHelper.accountantName(response), autoCompleteService.formOptionsExcludeUK))
           },
         data =>
           for {

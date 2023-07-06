@@ -19,6 +19,7 @@ package controllers.responsiblepeople
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.PersonNonUKPassportFormProvider
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{DateOfBirth, NonUKPassportYes, PersonName, ResponsiblePerson}
 import org.joda.time.LocalDate
@@ -26,29 +27,23 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction}
-import views.html.responsiblepeople.person_non_uk_passport
+import utils.AmlsSpec
+import views.html.responsiblepeople.PersonNonUKPassportView
 
 import scala.concurrent.Future
 
-class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
+class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
 
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .build()
-    lazy val view = app.injector.instanceOf[person_non_uk_passport]
+    lazy val view = inject[PersonNonUKPassportView]
 
     val mockApplicationConfig = mock[ApplicationConfig]
     val controller = new PersonNonUKPassportController(messagesApi = messagesApi,
@@ -56,7 +51,8 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      person_non_uk_passport = view,
+      formProvider = inject[PersonNonUKPassportFormProvider],
+      view = view,
       error = errorView
     )
 
@@ -131,7 +127,8 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "edit is false and DOB is defined" must {
         "go to CountryofBirthController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PersonNonUKPassportController.post(1).url)
+          .withFormUrlEncodedBody(
             "nonUKPassport" -> "true",
             "nonUKPassportNumber" -> passportNumber
           )
@@ -157,7 +154,8 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "edit is false and DOB is not defined" must {
         "go to CountryofBirthController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PersonNonUKPassportController.post(1).url)
+          .withFormUrlEncodedBody(
             "nonUKPassport" -> "true",
             "nonUKPassportNumber" -> passportNumber
           )
@@ -183,7 +181,8 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "edit is true" must {
         "go to DetailedAnswersController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PersonNonUKPassportController.post(1).url)
+          .withFormUrlEncodedBody(
             "nonUKPassport" -> "true",
             "nonUKPassportNumber" -> passportNumber
           )
@@ -208,7 +207,8 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PersonNonUKPassportController.post(1).url)
+          .withFormUrlEncodedBody(
             "nonUKPassport" -> "true"
           )
 
@@ -224,7 +224,8 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "Responsible Person cannot be found with given index" must {
         "respond with NOT_FOUND" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PersonNonUKPassportController.post(1).url)
+          .withFormUrlEncodedBody(
             "nonUKPassport" -> "false"
           )
 

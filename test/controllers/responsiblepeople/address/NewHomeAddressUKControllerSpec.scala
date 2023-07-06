@@ -18,21 +18,22 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.{Country, DateOfChange}
+import forms.responsiblepeople.address.NewHomeAddressUKFormProvider
+import models.DateOfChange
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.responsiblepeople.address.new_home_address_UK
+import views.html.responsiblepeople.address.NewHomeAddressUKView
 
 import scala.concurrent.Future
 
-class NewHomeAddressUKControllerSpec extends AmlsSpec {
+class NewHomeAddressUKControllerSpec extends AmlsSpec with Injecting {
 
   val RecordId = 1
 
@@ -40,13 +41,14 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
-    lazy val view = app.injector.instanceOf[new_home_address_UK]
+    lazy val view = inject[NewHomeAddressUKView]
     val controller = new NewHomeAddressUKController(
       SuccessfulAuthAction,
       dataCacheConnector,
       commonDependencies,
       mockMcc,
-      new_home_address_UK = view,
+      formProvider = inject[NewHomeAddressUKFormProvider],
+      view = view,
       error = errorView
     )
   }
@@ -84,12 +86,12 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec {
       "redirect to DetailedAnswersController" when {
         "all the mandatory UK parameters are supplied" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "true",
-            "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA"
-          )
+          val requestWithParams = FakeRequest(POST, routes.NewHomeAddressUKController.post(1).url)
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "Line 1",
+              "addressLine2" -> "Line 2",
+              "postCode" -> "AA1 1AA"
+            )
 
           val ukAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(OneToThreeYears), Some(DateOfChange(LocalDate.now().minusMonths(13))))
@@ -120,12 +122,12 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec {
 
         "all the mandatory UK parameters are supplied and date of move is more then 6 months" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "true",
-            "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
-            "postCode" -> "AA1 1AA"
-          )
+          val requestWithParams = FakeRequest(POST, routes.NewHomeAddressUKController.post(1).url)
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "Line 1",
+              "addressLine2" -> "Line 2",
+              "postCode" -> "AA1 1AA"
+            )
 
           val ukAddress = PersonAddressUK("Line 111", "Line 222", None, None, "AA1 1AA")
           val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now().minusMonths(7))))
@@ -173,12 +175,12 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec {
 
         "all the mandatory UK parameters are supplied and date of move is more then 3 years" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "true",
-            "addressLine1" -> "Line 11",
-            "addressLine2" -> "Line 21",
-            "postCode" -> "AA1 1AA"
-          )
+          val requestWithParams = FakeRequest(POST, routes.NewHomeAddressUKController.post(1).url)
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "Line 11",
+              "addressLine2" -> "Line 21",
+              "postCode" -> "AA1 1AA"
+            )
 
           val ukAddress1 = PersonAddressUK("Line 11", "Line 21", None, None, "AA1 1AA")
           val currentAddress = ResponsiblePersonCurrentAddress(ukAddress1, Some(ThreeYearsPlus), Some(DateOfChange(LocalDate.now().minusMonths(37))))
@@ -213,62 +215,13 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec {
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(),
             meq(Seq(responsiblePeople1.copy(addressHistory = Some(updatedHistory), hasChanged = true))))(any(), any())
         }
-
-        "all the mandatory non-UK parameters are supplied" in new Fixture {
-
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "false",
-            "addressLineNonUK1" -> "new address line1",
-            "addressLineNonUK2" -> "new address line2",
-            "country" -> "ES"
-          )
-          val NonUKAddress = PersonAddressNonUK("push current address line1", "push current address line2", None, None, Country("Spain","ES"))
-          val currentAddress = ResponsiblePersonCurrentAddress(NonUKAddress, Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now)))
-          val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
-          val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
-          val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
-            additionalAddress = Some(additionalAddress),
-            additionalExtraAddress = Some(additionalExtraAddress))
-          val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
-
-          val pushCurrentToAdditional = ResponsiblePersonAddress(PersonAddressNonUK("push current address line1", "push current address line2", None, None, Country("Spain","ES")), Some(ZeroToFiveMonths))
-          val pushCurrentToExtraAdditional = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
-
-          val nCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressNonUK("new address line1", "new address line2", None, None, Country("Spain","ES")),
-            Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now)))
-          val upDatedHistory = ResponsiblePersonAddressHistory(currentAddress = Some(nCurrentAddress),
-            additionalAddress = Some(pushCurrentToAdditional),
-            additionalExtraAddress = Some(pushCurrentToExtraAdditional))
-          val nResponsiblePeople = ResponsiblePerson(addressHistory = Some(upDatedHistory), hasChanged = true)
-
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-          when(controller.dataCacheConnector.fetch[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key))(any(), any()))
-            .thenReturn(Future.successful(Some(NewHomeDateOfChange(Some(LocalDate.now())))))
-
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
-          when(controller.dataCacheConnector.removeByKey[NewHomeAddress](any(), meq(NewHomeAddress.key))
-            (any(), any())).thenReturn(Future.successful(emptyCache))
-
-          val result = controller.post(RecordId)(requestWithParams)
-
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
-
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(),
-            meq(Seq(nResponsiblePeople)))(any(),any())
-        }
-
       }
 
       "respond with BAD_REQUEST" when {
         "given an invalid address" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "true",
+          val requestWithParams = FakeRequest(POST, routes.NewHomeAddressUKController.post(1).url)
+          .withFormUrlEncodedBody(
             "addressLine1" -> "Line &1",
             "addressLine2" -> "Line *2",
             "postCode" -> "AA1 1AA"
@@ -297,8 +250,8 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec {
 
         "the default fields for UK are not supplied" in new Fixture {
 
-          val requestWithMissingParams = requestWithUrlEncodedBody(
-            "isUK" -> "true",
+          val requestWithMissingParams = FakeRequest(POST, routes.NewHomeAddressUKController.post(1).url)
+          .withFormUrlEncodedBody(
             "addressLine1" -> "",
             "addressLine2" -> "",
             "postCode" -> ""
@@ -313,8 +266,8 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec {
 
         "the default fields for overseas are not supplied" in new Fixture {
 
-          val requestWithMissingParams = requestWithUrlEncodedBody(
-            "isUK" -> "false",
+          val requestWithMissingParams = FakeRequest(POST, routes.NewHomeAddressUKController.post(1).url)
+          .withFormUrlEncodedBody(
             "addressLineNonUK1" -> "",
             "addressLineNonUK2" -> "",
             "country" -> ""
@@ -329,8 +282,8 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec {
         "respond with NOT_FOUND" when {
           "given an out of bounds index" in new Fixture {
 
-            val requestWithParams = requestWithUrlEncodedBody(
-              "isUK" -> "true",
+            val requestWithParams = FakeRequest(POST, routes.NewHomeAddressUKController.post(1).url)
+            .withFormUrlEncodedBody(
               "addressLine1" -> "Line 1",
               "addressLine2" -> "Line 2",
               "postCode" -> "AA1 1AA"

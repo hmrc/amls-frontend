@@ -1,0 +1,86 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import views.html.components.forms.{ErrorSummary, InputText}
+@import views.html.components.{Button, ReturnLink, SectionSubtitle, Heading}
+
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    formHelper: FormWithCSRF,
+    inputText: InputText,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean, index: Int, flow: Option[String] = None, personName: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@layout(pageTitle = messages("responsiblepeople.legalNameInput.title") + " - " + messages("summary.responsiblepeople")) {
+
+    @errorSummary(form)
+
+    @subtitle("summary.responsiblepeople")
+
+    @heading("responsiblepeople.legalNameInput.heading", personName)
+
+    <p class="govuk-hint">@messages("responsiblepeople.legalnamechangedate.hint")</p>
+
+    @formHelper(action = controllers.responsiblepeople.routes.LegalNameInputController.post(index, edit, flow)) {
+
+        @inputText(
+            Input(
+                id = "firstName",
+                name = "firstName",
+                label = Label(
+                    content = Text(messages("responsiblepeople.personName.otherfirstnames"))
+                ),
+                classes = "govuk-!-width-one-half"
+            ),
+            form("firstName")
+        )
+
+        @inputText(
+            Input(
+                id = "middleName",
+                name = "middleName",
+                label = Label(
+                    content = Text(messages("responsiblepeople.personName.othermiddlenames"))
+                ),
+                classes = "govuk-!-width-one-half"
+            ),
+            form("middleName")
+        )
+
+        @inputText(
+            Input(
+                id = "lastName",
+                name = "lastName",
+                label = Label(
+                    content = Text(messages("responsiblepeople.personName.otherlastnames"))
+                ),
+                classes = "govuk-!-width-one-half"
+            ),
+            form("lastName")
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

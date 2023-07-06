@@ -19,58 +19,59 @@ package controllers.responsiblepeople
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
-import models.responsiblepeople.{ResponsiblePerson, SaRegistered}
-import play.api.mvc.MessagesControllerComponents
+import forms.responsiblepeople.SelfAssessmentRegisteredFormProvider
+import models.responsiblepeople.ResponsiblePerson
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople._
+import views.html.responsiblepeople.SelfAssessmentRegisteredView
 
 import scala.concurrent.Future
 
-
 class RegisteredForSelfAssessmentController @Inject () (
-                                                       val dataCacheConnector: DataCacheConnector,
-                                                       authAction: AuthAction,
-                                                       val ds: CommonPlayDependencies,
-                                                       val cc: MessagesControllerComponents,
-                                                       registered_for_self_assessment: registered_for_self_assessment,
-                                                       implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                         val dataCacheConnector: DataCacheConnector,
+                                                         authAction: AuthAction,
+                                                         val ds: CommonPlayDependencies,
+                                                         val cc: MessagesControllerComponents,
+                                                         formProvider: SelfAssessmentRegisteredFormProvider,
+                                                         view: SelfAssessmentRegisteredView,
+                                                         implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
     authAction.async {
       implicit request =>
         getData[ResponsiblePerson](request.credId, index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_, Some(person),_,_,_,_,_,_,_,_,_,_))
-          => Ok(registered_for_self_assessment(Form2[SaRegistered](person), edit, index, flow, personName.titleName))
+          => Ok(view(formProvider().fill(person), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(registered_for_self_assessment(EmptyForm, edit, index, flow, personName.titleName))
+          => Ok(view(formProvider(), edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
         }
     }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
     authAction.async {
       implicit request =>
-        Form2[SaRegistered](request.body) match {
-          case f: InvalidForm =>
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(registered_for_self_assessment(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-            }
-          case ValidForm(_, data) => {
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            },
+          data => {
             for {
               _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                 rp.saRegistered(data)
               }
             } yield {
-              edit match {
-                case false => Redirect(routes.ExperienceTrainingController.get(index, edit, flow))
-                case true => Redirect(routes.DetailedAnswersController.get(index, flow))
+              if (edit) {
+                Redirect(routes.DetailedAnswersController.get(index, flow))
+              } else {
+                Redirect(routes.ExperienceTrainingController.get(index, edit, flow))
               }
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
-        }
+        )
     }
 }

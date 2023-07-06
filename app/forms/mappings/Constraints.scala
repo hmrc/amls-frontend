@@ -18,6 +18,7 @@ package forms.mappings
 
 import org.joda.time.{LocalDate => JodaLocalDate}
 import play.api.data.validation.{Constraint, Invalid, Valid}
+import uk.gov.hmrc.domain.Nino
 
 import java.time.LocalDate
 
@@ -25,6 +26,10 @@ trait Constraints {
 
   protected val basicPunctuationRegex: String = "^[a-zA-Z0-9\u00C0-\u00FF !#$%&'‘’\"“”«»()*+,./:;=?@\\[\\]|~£€¥\\u005C\u2014\u2013\u2010\u005F\u005E\u0060\u000A\u000D\u002d]+$"
   protected val alphanumericRegex: String = "^[0-9a-zA-Z_]+$"
+  protected val nameRegex: String = "^[a-zA-Z\\u00C0-\\u00FF '‘’\\u2014\\u2013\\u2010\\u002d]+$"
+  protected val emailRegex: String = "(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-zA-Z0-9-]*[a-zA-Z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
+  protected val vrnRegex: String = "^[0-9]{9}$"
+  protected val utrRegex: String = "^[0-9]{10}$"
 
   protected def firstError[A](constraints: Constraint[A]*): Constraint[A] =
     Constraint {
@@ -160,5 +165,11 @@ trait Constraints {
         Invalid(errorKey)
       case seq if seq.exists(_.isDefined) =>
         Valid
+    }
+
+  protected def validNino: Constraint[String] =
+    Constraint {
+      case str if Nino.isValid(str) => Valid
+      case _ => Invalid("error.invalid.nino")
     }
 }
