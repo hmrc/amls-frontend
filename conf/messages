@@ -651,9 +651,9 @@ error.required.ba.renewal.select.yes = Select yes if you had customers who lived
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select one of your responsible people or register someone else as the nominated officer for the business
-error.required.declaration.who.is.registering = Select who is registering this business
 error.required.declaration.who.is.declaring.this.update = Select who is declaring this update
 error.required.declaration.who.is.declaring.this.renewal = Select who is declaring this renewal
+error.required.declaration.who.is.declaring.this.registration = Select who is registering this business
 error.required.declaration.first_name = Enter your first name
 error.required.declaration.last_name = Enter your last name
 error.required.declaration.specify.role = Enter your role in the business
@@ -828,6 +828,7 @@ status.referenceno.short = Registration number
 status.incomplete = Incomplete
 status.status = Status
 status.complete = Completed
+status.updated = Updated
 status.notstarted = Not started
 status.notsubmitted = Not submitted
 status.submitted = Submitted
@@ -848,6 +849,7 @@ status.submissionready.buttontext = Continue
 status.visuallyhidden.text = This section is
 status.progress.add = Add {0}
 status.progress.edit = Edit {0}
+status.progress.manage = Manage {0}
 
 your.registration = Your registration
 your.registration.status = Registration status

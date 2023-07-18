@@ -14,10 +14,23 @@
  * limitations under the License.
  */
 
-package models.registrationprogress
+package forms.declaration
 
-sealed trait Status
-case object NotStarted extends Status
-case object Started extends Status
-case object Completed extends Status
-case object Updated extends Status
+import forms.mappings.Mappings
+import models.declaration.WhoIsRegistering
+import play.api.data.Form
+
+import javax.inject.Inject
+
+class WhoIsRegisteringFormProvider @Inject()() extends Mappings {
+
+  def apply(errorSuffix: String): Form[WhoIsRegistering] = {
+
+    val commonError = "error.required.declaration.who.is.declaring.this"
+
+    Form(
+      "person" -> text(s"$commonError.$errorSuffix")
+        .transform[WhoIsRegistering](WhoIsRegistering.apply, _.person)
+    )
+  }
+}

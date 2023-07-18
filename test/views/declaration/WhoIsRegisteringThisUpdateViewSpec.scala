@@ -16,6 +16,7 @@
 
 package views.declaration
 
+import forms.declaration.WhoIsRegisteringFormProvider
 import forms.{Form2, InvalidForm, ValidForm}
 import generators.ResponsiblePersonGenerator
 import jto.validation.{Path, ValidationError}
@@ -24,29 +25,33 @@ import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.scalacheck.Gen
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.declaration.who_is_registering_this_update
+import views.html.declaration.WhoIsRegisteringThisUpdateView
 
+class WhoIsRegisteringThisUpdateViewSpec extends AmlsViewSpec with MustMatchers with ResponsiblePersonGenerator {
 
-class who_is_registering_this_updateSpec extends AmlsViewSpec with MustMatchers with ResponsiblePersonGenerator {
+  lazy val updateView = inject[WhoIsRegisteringThisUpdateView]
+  lazy val fp = inject[WhoIsRegisteringFormProvider]
+  lazy val updateForm = fp("update")
+
+  implicit val request = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    lazy val who_is_registering_this_update = app.injector.instanceOf[who_is_registering_this_update]
     implicit val requestWithToken = addTokenForView()
   }
 
-  "who_is_registering_this_update view" must {
+  "WhoIsRegisteringThisUpdateView" must {
     "have correct title, heading and required fields" in new ViewFixture {
-      val form2: ValidForm[WhoIsRegistering] = Form2(WhoIsRegistering("PersonName"))
+
       val people = Gen.listOfN(2, responsiblePersonGen).sample.get
 
-      def view = who_is_registering_this_update(form2, people)
+      def view = updateView(updateForm.fill(WhoIsRegistering("PersonName")), people)
 
-      doc.title mustBe s"${Messages("declaration.who.is.registering.amendment.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-      heading.html must be(Messages("declaration.who.is.registering.amendment.title"))
-      subHeading.html must include(Messages("submit.amendment.application"))
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+      doc.title mustBe s"${messages("declaration.who.is.registering.amendment.title")} - ${messages("title.amls")} - ${messages("title.gov")}"
+      heading.html must be(messages("declaration.who.is.registering.amendment.title"))
+      subHeading.html must include(messages("submit.amendment.application"))
 
       people.zipWithIndex.foreach { case (p, i) =>
         val id = s"person-$i"
@@ -55,23 +60,17 @@ class who_is_registering_this_updateSpec extends AmlsViewSpec with MustMatchers 
       }
 
       doc.select("input[type=radio]").size mustBe people.size + 1
-      doc.getElementsContainingOwnText(Messages("declaration.who.is.registering.text")).hasText must be(true)
+      doc.getElementsContainingOwnText(messages("declaration.who.is.registering.text")).hasText must be(true)
     }
 
-    "show errors in the correct locations" in new ViewFixture {
+    behave like pageWithErrors(
+      updateView(
+        updateForm.withError("person", "error.required.declaration.who.is.declaring.this.update"),
+        Seq(ResponsiblePerson())
+      ),
+      "person", "error.required.declaration.who.is.declaring.this.update"
+    )
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "person") -> Seq(ValidationError("not a message Key"))
-        ))
-
-      def view = who_is_registering_this_update(form2, Seq(ResponsiblePerson()))
-
-      errorSummary.html() must include("not a message Key")
-
-      doc.getElementById("person")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
-    }
+    behave like pageWithBackLink(updateView(updateForm, Seq(ResponsiblePerson())))
   }
 }

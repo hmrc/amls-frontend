@@ -19,49 +19,50 @@ package controllers.declaration
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.InvalidForm
+import forms.declaration.AddPersonFormProvider
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.declaration.AddPerson
 import models.declaration.release7._
 import models.status._
+import play.api.data.Form
 import play.api.i18n.Messages
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.mvc._
 import services.StatusService
 import utils.{AuthAction, ControllerHelper}
-import views.html.declaration.add_person
+import views.html.declaration.AddPersonView
 
 import scala.concurrent.Future
-
 
 class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector,
                                       val statusService: StatusService,
                                       authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
                                       val cc: MessagesControllerComponents,
-                                      add_person: add_person) extends AmlsBaseController(ds, cc) {
+                                      formProvider: AddPersonFormProvider,
+                                      view: AddPersonView) extends AmlsBaseController(ds, cc) {
 
 
-  def get() = authAction.async {
+  def get(): Action[AnyContent] = authAction.async {
     implicit request => {
-          addPersonView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok,EmptyForm)
-      }
+      addPersonView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok,formProvider())
+    }
   }
 
-  def getWithAmendment() = get()
+  def getWithAmendment(): Action[AnyContent] = get() //TODO this can be removed unless there is a GTM need for it
 
   def post() = authAction.async {
     implicit request => {
-      Form2[AddPerson](request.body) match {
-        case f: InvalidForm =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
 
           dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) flatMap { bm =>
             val businessType = ControllerHelper.getBusinessType(bm)
-            val updatedForm = updateFormErrors(f, businessType)
-            addPersonView(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, updatedForm)
-          }
-
-        case ValidForm(_, data) =>
+//            val updatedForm = updateFormErrors(formWithErrors, businessType) TODO content review should negate this
+            addPersonView(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, formWithErrors)
+          },
+        data =>
           dataCacheConnector.save[AddPerson](request.credId, AddPerson.key, data) flatMap { _ =>
             statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
               case _ if isResponsiblePerson(data) => {
@@ -71,13 +72,14 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
               case _ => Redirect(routes.DeclarationController.get)
             }
           }
-      }
+      )
     }
   }
 
+  //TODO this needs to be removed and error messages checked by Thomas - raise on Tuesday
   def updateFormErrors(f: InvalidForm, businessType: Option[BusinessType])(implicit messages: Messages): InvalidForm = {
     val message = businessType match {
-      case Some(bt) => BusinessType.errorMessageFor(bt)
+      case Some(bt) => BusinessType.errorMessageFor(bt) //TODO will need content review
       case _ => throw new IllegalArgumentException("[Controllers][AddPersonController] business type is not known")
     }
 
@@ -99,7 +101,7 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
     roleList.contains(NominatedOfficer)
   }
 
-  private def addPersonView(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String, status: Status, form: Form2[AddPerson])
+  private def addPersonView(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String, status: Status, form: Form[AddPerson])
                            (implicit request: Request[AnyContent]): Future[Result] = {
 
     dataCacheConnector.fetch[BusinessMatching](cacheId, BusinessMatching.key) flatMap { bm =>
@@ -107,11 +109,11 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
 
       statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
         case SubmissionReady =>
-          status(add_person("declaration.addperson.title", "submit.registration", businessType, form))
+          status(view("declaration.addperson.title", "submit.registration", businessType, form))
         case SubmissionReadyForReview | SubmissionDecisionApproved =>
-          status(add_person("declaration.addperson.amendment.title", "submit.amendment.application", businessType, form))
-        case RenewalSubmitted(_) => status(add_person("declaration.addperson.title", "submit.amendment.application", businessType, form))
-        case ReadyForRenewal(_) => status(add_person("declaration.addperson.title", "submit.renewal.application", businessType, form))
+          status(view("declaration.addperson.amendment.title", "submit.amendment.application", businessType, form))
+        case RenewalSubmitted(_) => status(view("declaration.addperson.title", "submit.amendment.application", businessType, form))
+        case ReadyForRenewal(_) => status(view("declaration.addperson.title", "submit.renewal.application", businessType, form))
         case _ => throw new Exception("Incorrect status - Page not permitted for this status")
 
       }

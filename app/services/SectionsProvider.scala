@@ -43,10 +43,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector,
                                  val config: ApplicationConfig) {
 
-  def getSummaryList(cache: CacheMap) = {
-
-  }
-
   def sections(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[Section]] =
 
     cacheConnector.fetchAll(cacheId) map {
@@ -60,6 +56,15 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
   def sections(cache: CacheMap) : Seq[Section] = {
     mandatorySections(cache) ++ dependentSections(cache)
   }
+
+  def taskRows(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Seq[TaskRow]] =
+    cacheConnector.fetchAll(cacheId) map {
+      optionCache =>
+        optionCache map {
+          cache =>
+            taskRows(cache)
+        } getOrElse Seq.empty
+    }
 
   def taskRows(cache: CacheMap)(implicit messages: Messages): Seq[TaskRow] = {
     mandatoryTaskRows(cache, messages) ++ dependentTaskRows(cache, messages)

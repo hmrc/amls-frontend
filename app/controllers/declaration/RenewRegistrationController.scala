@@ -19,14 +19,13 @@ package controllers.declaration
 import javax.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
+import forms.declaration.RenewRegistrationFormProvider
 import models.declaration.{RenewRegistration, RenewRegistrationNo, RenewRegistrationYes}
 import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, DeclarationHelper}
-import play.api.mvc.MessagesControllerComponents
-import views.html.declaration.renew_registration
-
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import views.html.declaration.RenewRegistrationView
 
 import scala.concurrent.Future
 
@@ -37,33 +36,32 @@ class RenewRegistrationController @Inject()(val dataCacheConnector: DataCacheCon
                                             implicit val renewalService: RenewalService,
                                             val ds: CommonPlayDependencies,
                                             val cc: MessagesControllerComponents,
-                                            renew_registration: renew_registration) extends AmlsBaseController(ds, cc) {
+                                            formProvider: RenewRegistrationFormProvider,
+                                            view: RenewRegistrationView) extends AmlsBaseController(ds, cc) {
 
-  def get() = authAction.async {
+  def get(): Action[AnyContent] = authAction.async {
     implicit request =>
       DeclarationHelper.statusEndDate(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { maybeEndDate =>
-        dataCacheConnector.fetch[RenewRegistration](request.credId, RenewRegistration.key) map {
-          renewRegistration =>
-            val form = (for {
-              renew <- renewRegistration
-            } yield Form2[RenewRegistration](renew)).getOrElse(EmptyForm)
-            Ok(renew_registration(form, maybeEndDate))
+        dataCacheConnector.fetch[RenewRegistration](request.credId, RenewRegistration.key) map { renewOpt =>
+          val form = renewOpt.fold(formProvider())(formProvider().fill)
+          Ok(view(form, maybeEndDate))
         }
 
       }
   }
 
-  def post() = authAction.async {
+  def post(): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[RenewRegistration](request.body) match {
-        case f: InvalidForm =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
           DeclarationHelper.statusEndDate(request.amlsRefNumber, request.accountTypeId, request.credId) flatMap { maybeEndDate =>
-            Future.successful(BadRequest(renew_registration(f, maybeEndDate)))
+            Future.successful(BadRequest(view(formWithErrors, maybeEndDate)))
+          },
+        data =>
+          dataCacheConnector.save[RenewRegistration](request.credId, RenewRegistration.key, data).flatMap { _ =>
+            redirectDependingOnResponse(data, request.amlsRefNumber, request.accountTypeId, request.credId)
           }
-        case ValidForm(_, data) =>
-          dataCacheConnector.save[RenewRegistration](request.credId, RenewRegistration.key, data)
-          redirectDependingOnResponse(data, request.amlsRefNumber, request.accountTypeId, request.credId)
-      }
+      )
     }
   }
 

@@ -19,10 +19,12 @@ package utils
 import cats.data.OptionT
 import cats.implicits._
 import controllers.declaration
-import models.registrationprogress.{Completed, Section}
+import models.registrationprogress.{Completed, Section, TaskRow}
 import models.responsiblepeople.{Partner, ResponsiblePerson}
 import models.status._
 import org.joda.time.LocalDate
+import play.api.i18n.Messages
+import play.api.mvc.Call
 import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -55,10 +57,11 @@ object DeclarationHelper {
     }
   }
 
-  def routeDependingOnNominatedOfficer(hasNominatedOfficer: Boolean, status: SubmissionStatus) = {
-    hasNominatedOfficer match {
-      case true => declaration.routes.WhoIsRegisteringController.get
-      case false => routeWithoutNominatedOfficer(status)
+  def routeDependingOnNominatedOfficer(hasNominatedOfficer: Boolean, status: SubmissionStatus): Call = {
+    if (hasNominatedOfficer) {
+      declaration.routes.WhoIsRegisteringController.get
+    } else {
+      routeWithoutNominatedOfficer(status)
     }
   }
 
@@ -121,18 +124,14 @@ object DeclarationHelper {
   }
 
   def sectionsComplete(cacheId: String, sectionsProvider: SectionsProvider)
-                      (implicit hc: HeaderCarrier ,ec: ExecutionContext) = {
+                      (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Boolean] = {
 
-    sectionsProvider.sections(cacheId) map {
-      sections =>
-        isSectionComplete(sections)
+    sectionsProvider.taskRows(cacheId) map {
+      _ forall {
+        _.status == Completed
+      }
     }
   }
-
-  private def isSectionComplete(seq: Seq[Section]): Boolean =
-    seq forall {
-      _.status == Completed
-    }
 
   def getSubheadingBasedOnStatus(credId: String, amlsRefNumber: Option[String], accountTypeId: (String, String), statusService: StatusService, renewalService: RenewalService)
                                 (implicit hc: HeaderCarrier ,ec: ExecutionContext)= {

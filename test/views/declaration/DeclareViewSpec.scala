@@ -17,16 +17,18 @@
 package views.declaration
 
 import org.scalatest.MustMatchers
+import play.api.test.FakeRequest
 import utils.AmlsViewSpec
-import play.api.i18n.Messages
 import views.Fixture
-import views.html.declaration.declare
+import views.html.declaration.DeclareView
 
+class DeclareViewSpec extends AmlsViewSpec with MustMatchers  {
 
-class declaration_Spec extends AmlsViewSpec with MustMatchers  {
+  lazy val declare = app.injector.instanceOf[DeclareView]
+
+  implicit val request = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    lazy val declare = app.injector.instanceOf[declare]
     implicit val requestWithToken = addTokenForView()
   }
 
@@ -34,51 +36,45 @@ class declaration_Spec extends AmlsViewSpec with MustMatchers  {
     "have correct title" in new ViewFixture {
       def view = declare("string1", "string2", "Name", isAmendment = false)
 
-      doc.title mustBe s"string1 - ${Messages("title.amls")} - ${Messages("title.gov")}"
+      doc.title mustBe s"string1 - ${messages("title.amls")} - ${messages("title.gov")}"
     }
 
     "have correct headings" in new ViewFixture {
 
       def view = declare("string1", "string2", "Name", isAmendment = false)
 
-      heading.html must be(Messages("declaration.declaration.title"))
-      subHeading.html must include(Messages("string2"))
-    }
-
-    "have a back link" in new ViewFixture {
-
-      def view = declare("string1", "string2", "Name", isAmendment = false)
-
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+      heading.html must be(messages("declaration.declaration.title"))
+      subHeading.html must include(messages("string2"))
     }
 
     "have correct content" in new ViewFixture {
       def view = declare("string1", "string2", "Name", isAmendment = false)
 
-      doc.text() must include(Messages("declaration.declaration.declare"))
+      doc.text() must include(messages("declaration.declaration.declare"))
 
       Seq(
-        Messages("declaration.declaration.tellhmrc"),
-        Messages("declaration.declaration.noncompliance"),
-        Messages("declaration.declaration.confirm"),
-        Messages("declaration.declaration.correctinformation")
+        messages("declaration.declaration.tellhmrc"),
+        messages("declaration.declaration.noncompliance"),
+        messages("declaration.declaration.confirm"),
+        messages("declaration.declaration.correctinformation")
       ) foreach { msg =>
-        doc.select(".list.list-bullet").text() must include(msg)
+        doc.select(".govuk-list.govuk-list--bullet").text() must include(msg)
       }
     }
 
     "have correct preamble when an 'amendment' message is passed in" in new ViewFixture {
       def view = declare("string1", "string2", "Name", isAmendment = true)
 
-      doc.text() must include(Messages("declaration.declaration.amendment.correctinformation"))
+      doc.text() must include(messages("declaration.declaration.amendment.correctinformation"))
     }
 
-    "replay the person's name in the first line of the declaration text" in new ViewFixture {
+    "display the person's name in the first line of the declaration text" in new ViewFixture {
       val name = "Some Person"
       def view = declare("string1", "string2", name, isAmendment = false)
 
-      doc.select(".notice").text() must include(Messages("declaration.declaration.fullname", name))
+      doc.select(".govuk-warning-text__text").text() must include(messages("declaration.declaration.fullname", name))
     }
 
+    behave like pageWithBackLink(declare("string1", "string2", "John Smith", isAmendment = false))
   }
 }

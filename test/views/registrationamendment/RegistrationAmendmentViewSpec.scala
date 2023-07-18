@@ -17,18 +17,28 @@
 package views.registrationprogress
 
 import generators.businesscustomer.AddressGenerator
-import models.registrationprogress.{Completed, Section, Started}
+import models.registrationprogress._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.mvc.Call
+import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.registrationamendment.registration_amendment
+import views.html.registrationamendment.RegistrationAmendmentView
 
-class registration_amendmentSpec extends AmlsViewSpec with MockitoSugar with AddressGenerator {
+class RegistrationAmendmentViewSpec extends AmlsViewSpec with MockitoSugar with AddressGenerator {
+
+  lazy val amendmentView = inject[RegistrationAmendmentView]
+
+  implicit val request = FakeRequest()
+
+  val taskList = TaskList(
+    Seq(
+      TaskRow("section1", "/foo", true, Completed, TaskRow.updatedTag),
+      TaskRow("section2", "/bar", true, Started, TaskRow.incompleteTag),
+    )
+  )
 
   trait ViewFixture extends Fixture {
-    lazy val registration_amendment = app.injector.instanceOf[registration_amendment]
     implicit val requestWithToken = addTokenForView()
 
     val sections = Seq(
@@ -40,22 +50,19 @@ class registration_amendmentSpec extends AmlsViewSpec with MockitoSugar with Add
     "display the correct visual content for incomplete sections" when {
       "making an amendment" in new ViewFixture {
         def view =
-          registration_amendment(
-            Seq(Section("section1", Completed, true, mock[Call]),
-              Section("section2", Started, true, mock[Call])),
+          amendmentView(
+            taskList,
             true,
             "businessName",
             Seq.empty,
             true
           )
 
+        val expectedFullCompletedString = s"This section is ${messages("progress.visuallyhidden.view.updated")}"
+        doc.getElementById("progress.section1.name-status").text must include(expectedFullCompletedString)
 
-        val expectedFullCompletedString = s"This section is ${Messages("progress.visuallyhidden.view.updated")}"
-        doc.getElementById("progress.section1.name-status").select(".task-status").text mustBe expectedFullCompletedString
-
-        val expectedFullIncompleteString = s"This section is ${Messages("progress.visuallyhidden.view.started")}"
-        doc.getElementById("progress.section2.name-status").select(".task-status").text mustBe expectedFullIncompleteString
-
+        val expectedFullIncompleteString = s"This section is ${messages("progress.visuallyhidden.view.started")}"
+        doc.getElementById("progress.section2.name-status").text must include(expectedFullIncompleteString)
       }
     }
 
@@ -63,9 +70,8 @@ class registration_amendmentSpec extends AmlsViewSpec with MockitoSugar with Add
 
       val officerName = "FirstName LastName"
 
-      def view = registration_amendment(
-        Seq(Section("section1", Completed, true, mock[Call]),
-          Section("section2", Started, true, mock[Call])),
+      def view = amendmentView(
+        taskList,
         true,
         "businessName",
         Seq.empty,
@@ -80,9 +86,8 @@ class registration_amendmentSpec extends AmlsViewSpec with MockitoSugar with Add
     }
 
     "do not show the Nominated officer box if NO is not defined" in new ViewFixture {
-      def view = registration_amendment(
-        Seq(Section("section1", Completed, true, mock[Call]),
-          Section("section2", Started, true, mock[Call])),
+      def view = amendmentView(
+        taskList,
         true,
         "businessName",
         Seq.empty,

@@ -17,48 +17,33 @@
 package views.declaration
 
 import cats.implicits._
-import forms.{EmptyForm, Form2, InvalidForm}
-import jto.validation.{Path, ValidationError}
-import models.declaration.BusinessNominatedOfficer
+import forms.declaration.BusinessPartnersFormProvider
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.declaration.register_partners
+import views.html.declaration.RegisterPartnersView
 
-class register_partnersSpec extends AmlsViewSpec with MustMatchers {
+class RegisterPartnersViewSpec extends AmlsViewSpec with MustMatchers {
+
+  lazy val partnersView: RegisterPartnersView = inject[RegisterPartnersView]
+  lazy val fp: BusinessPartnersFormProvider = inject[BusinessPartnersFormProvider]
+
+  implicit val request = FakeRequest()
 
   trait ViewFixture extends Fixture {
-    lazy val register_partners = app.injector.instanceOf[register_partners]
     implicit val requestWithToken = addTokenForView()
   }
 
-  "register_partners view" must {
+  "RegisterPartnersView view" must {
     "have correct title, headings and content" in new ViewFixture {
 
-      def view = register_partners("subheading", EmptyForm, Seq.empty[ResponsiblePerson], Seq("partner1"))
+      def view = partnersView("subheading", fp(), Seq.empty[ResponsiblePerson], Seq("partner1"))
 
-      doc.title mustBe s"${Messages("declaration.register.partners.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-      heading.html must include(Messages("declaration.register.partners.title"))
+      doc.title mustBe s"${messages("declaration.register.partners.title")} - ${messages("title.amls")} - ${messages("title.gov")}"
+      heading.html must include(messages("declaration.register.partners.title"))
       subHeading.html must include("subheading")
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
-    }
-
-    "show errors in the correct locations" in new ViewFixture {
-
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "value") -> Seq(ValidationError("not a message Key"))
-        ))
-
-      def view = register_partners("subheading", form2, Seq(ResponsiblePerson()), Seq("partner1"))
-
-      errorSummary.html() must include("not a message Key")
-
-      doc.getElementById("value")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
     }
 
     "have a list of responsible people" in new ViewFixture {
@@ -68,7 +53,7 @@ class register_partnersSpec extends AmlsViewSpec with MustMatchers {
         ResponsiblePerson(PersonName("Test", None, "Person2").some)
       )
 
-      def view = register_partners("subheading", EmptyForm, people, Seq("partner1"))
+      def view = partnersView("subheading", fp(), people, Seq("partner1"))
 
       people map(_.personName.get) foreach { n =>
         val id = s"value-${n.fullNameWithoutSpace}"
@@ -81,15 +66,14 @@ class register_partnersSpec extends AmlsViewSpec with MustMatchers {
         label.text() must include(n.fullName)
       }
 
-      val id = s"value--1"
+      val id = s"other"
       val e = doc.getElementById(id)
 
       Option(e) must be(defined)
       e.`val` mustBe "-1"
 
       val label = doc.select(s"label[for=$id]")
-      label.text() must include(Messages("lbl.register.some.one.else"))
-
+      label.text() must include(messages("lbl.register.some.one.else"))
     }
 
     "show the correct text when there are no current partners" in new ViewFixture {
@@ -101,9 +85,9 @@ class register_partnersSpec extends AmlsViewSpec with MustMatchers {
 
       val currentPartners = Seq.empty
 
-      def view = register_partners("subheading", EmptyForm, people, currentPartners)
+      def view = partnersView("subheading", fp(), people, currentPartners)
 
-      html must include(Messages("declaration.register.partners.none.text"))
+      html must include(messages("declaration.register.partners.none.text"))
     }
 
     "show the correct text when there is one current partner" in new ViewFixture {
@@ -115,11 +99,22 @@ class register_partnersSpec extends AmlsViewSpec with MustMatchers {
 
       val currentPartners = Seq("firstName lastName")
 
-      def view = register_partners("subheading", EmptyForm, people, currentPartners)
+      def view = partnersView("subheading", fp(), people, currentPartners)
 
-      html must include(Messages("declaration.register.partners.one.text", currentPartners.head))
+      html must include(messages("declaration.register.partners.one.text", currentPartners.head))
     }
 
+    behave like pageWithErrors(
+      partnersView(
+        "subheading",
+        fp().withError("value", "error.required.declaration.partners"),
+        Seq.empty[ResponsiblePerson],
+        Seq("partner1")
+      ),
+      "value",
+      "error.required.declaration.partners"
+    )
 
+    behave like pageWithBackLink(partnersView("subheading", fp(), Seq.empty[ResponsiblePerson], Seq("partner1")))
   }
 }

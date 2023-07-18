@@ -1,0 +1,76 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import org.joda.time.LocalDate
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
+@import views.html.components.forms.{ErrorSummary, InputYesNo}
+@import views.html.components.{Button, Heading, ReturnLink, SectionSubtitle}
+@import utils.DateHelper
+
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    formHelper: FormWithCSRF,
+    inputYesNo: InputYesNo,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], endDate: Option[LocalDate])(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@formValues = @{
+    HmrcYesNoRadioItems().map { item =>
+      if(item.value.contains("true")) {
+          item.copy(content = Text(messages("declaration.renew.now")))
+      } else {
+          item.copy(content = Text(messages("declaration.continue.update")))
+      }
+    }
+}
+
+@layout(pageTitle = messages("declaration.renew.registration.title")) {
+
+    @errorSummary(form)
+
+    @subtitle("summary.declaration")
+
+    @heading("declaration.renew.registration.title")
+
+    <p class="govuk-body">@messages("declaration.renew.registration.section1")</p>
+
+    @endDate.map { date =>
+        <p class="govuk-body">@messages("declaration.renew.registration.section2", DateHelper.formatDate(date))</p>
+    }
+
+    @formHelper(action = controllers.declaration.routes.RenewRegistrationController.post()) {
+
+        @inputYesNo(
+            Radios(
+                name = "renewRegistration",
+                items = formValues,
+                classes = "govuk-radios govuk-radios--inline"
+            ).withFormField(form("renewRegistration"))
+        )
+
+        @button("progress.link.continue")
+
+        @returnLink(true)
+    }
+}

@@ -19,20 +19,17 @@ package controllers.declaration
 import com.google.inject.Inject
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
+import forms.declaration.WhoIsRegisteringFormProvider
 import models.declaration._
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePerson}
 import models.status._
-import play.api.i18n.Messages
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.data.Form
+import play.api.mvc._
 import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, DeclarationHelper}
-
-
-import views.html.declaration.{who_is_registering_this_registration, who_is_registering_this_renewal, who_is_registering_this_update}
+import views.html.declaration.{WhoIsRegisteringThisRegistrationView, WhoIsRegisteringThisRenewalView, WhoIsRegisteringThisUpdateView}
 
 import scala.concurrent.Future
 
@@ -44,12 +41,13 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
                                              val amlsConnector: AmlsConnector,
                                              val cc: MessagesControllerComponents,
                                              val sectionsProvider: SectionsProvider,
-                                             who_is_registering_this_renewal: who_is_registering_this_renewal,
-                                             who_is_registering_this_update: who_is_registering_this_update,
-                                             who_is_registering_this_registration: who_is_registering_this_registration,
+                                             formProvider: WhoIsRegisteringFormProvider,
+                                             renewalView: WhoIsRegisteringThisRenewalView,
+                                             updateView: WhoIsRegisteringThisUpdateView,
+                                             registrationView: WhoIsRegisteringThisRegistrationView,
                                              implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
-  def get = authAction.async {
+  def get: Action[AnyContent] = authAction.async {
     implicit request =>
       DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
         case true =>  dataCacheConnector.fetchAll(request.credId) flatMap {
@@ -57,8 +55,8 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
             (for {
               cache <- optionalCache
               responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-            } yield whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
-              ) getOrElse whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, EmptyForm, Seq.empty)
+            } yield whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, ResponsiblePerson.filter(responsiblePeople))
+              ) getOrElse whoIsRegisteringView(request.amlsRefNumber, request.accountTypeId, request.credId, Ok, Seq.empty)
         }
         case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get.url))
       }
@@ -66,16 +64,16 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
 
   }
 
-  def post: Action[AnyContent] = authAction.async {
+  def post(identifier: String): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[WhoIsRegistering](request.body) match {
-        case f: InvalidForm =>
+      getFormProvider(identifier).bindFromRequest().fold(
+        formWithErrors =>
           dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key) flatMap {
             case Some(data) =>
-              whoIsRegisteringViewWithError(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, f, ResponsiblePerson.filter(data))
-            case None => whoIsRegisteringViewWithError(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, f, Seq.empty)
-          }
-        case ValidForm(_, data) =>
+              whoIsRegisteringViewWithError(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, formWithErrors, ResponsiblePerson.filter(data))
+            case None => whoIsRegisteringViewWithError(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, formWithErrors, Seq.empty)
+          },
+        data =>
           dataCacheConnector.fetchAll(request.credId) flatMap {
             optionalCache =>
               (for {
@@ -94,7 +92,7 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
                 }
               }) getOrElse redirectToDeclarationPage(request.amlsRefNumber, request.accountTypeId, request.credId)
           }
-      }
+      )
     }
   }
 
@@ -102,62 +100,50 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
                                     accountTypeId: (String, String),
                                     cacheId: String,
                                     status: Status,
-                                    form: InvalidForm,
+                                    formWithErrors: Form[WhoIsRegistering],
                                     rp: Seq[ResponsiblePerson])
-                                   (implicit request: Request[AnyContent]): Future[Result] =
+                                   (implicit request: Request[AnyContent]): Future[Result] = {
+
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) flatMap {
-      case a@(SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_)) =>
+      case (SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_)) =>
         renewalService.getRenewal(cacheId) map {
           case Some(_) =>
-            val updatedForm = updateFormErrors(form, a, renewal = true)
-            status(who_is_registering_this_renewal(updatedForm, rp))
+            status(renewalView(formWithErrors, rp))
           case _ =>
-            val updatedForm = updateFormErrors(form, a, renewal = false)
-            status(who_is_registering_this_update(updatedForm, rp))
-        }
-      case b@RenewalSubmitted(_) =>
-        val updatedForm = updateFormErrors(form, b, renewal = true)
-        Future.successful(status(who_is_registering_this_update(updatedForm, rp)))
-      case _ =>
-        Future.successful(status(who_is_registering_this_registration(form, rp)))
-    }
-
-  def updateFormErrors(f: InvalidForm, status: SubmissionStatus, renewal: Boolean)(implicit messages: Messages): InvalidForm = {
-    val common = "error.required.declaration.who.is.declaring.this"
-    status match {
-      case SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_) =>
-        if (renewal) {
-          f.copy(errors = Seq((Path("person"), Seq(ValidationError(Seq(Messages(s"$common.renewal")))))))
-        } else {
-          f.copy(errors = Seq((Path("person"), Seq(ValidationError(Seq(Messages(s"$common.update")))))))
+            status(updateView(formWithErrors, rp))
         }
       case RenewalSubmitted(_) =>
-        f.copy(errors = Seq((Path("person"), Seq(ValidationError(Seq(Messages(s"$common.update")))))))
+        Future.successful(status(updateView(formWithErrors, rp)))
       case _ =>
-        f.copy(errors = Seq((Path("person"), Seq(ValidationError(Seq(Messages("error.required.declaration.who.is.registering")))))))
+        Future.successful(status(registrationView(formWithErrors, rp)))
     }
   }
 
-  private def whoIsRegisteringView (amlsRegistrationNo: Option[String],
-                                    accountTypeId: (String, String),
-                                    cacheId: String,
-                                    status: Status,
-                                    form: Form2[WhoIsRegistering],
-                                    rp: Seq[ResponsiblePerson])
+  private def whoIsRegisteringView(amlsRegistrationNo: Option[String],
+                                   accountTypeId: (String, String),
+                                   cacheId: String,
+                                   status: Status,
+                                   rp: Seq[ResponsiblePerson])
                                   (implicit request: Request[AnyContent]): Future[Result] =
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) flatMap {
       case SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_) =>
         renewalService.getRenewal(cacheId) map {
           case Some(_) =>
-            status(who_is_registering_this_renewal(form, rp))
+            status(renewalView(getFormProvider("renewal"), rp))
           case _ =>
-            status(who_is_registering_this_update(form, rp))
+            status(updateView(getFormProvider("update"), rp))
         }
       case RenewalSubmitted(_) =>
-        Future.successful(status(who_is_registering_this_update(form, rp)))
+        Future.successful(status(updateView(getFormProvider("update"), rp)))
       case _ =>
-        Future.successful(status(who_is_registering_this_registration(form, rp)))
+        Future.successful(status(registrationView(getFormProvider("registration"), rp)))
     }
+
+  private def getFormProvider(str: String): Form[WhoIsRegistering] = str match {
+    case r @ "renewal" => formProvider(r)
+    case u @ "update" => formProvider(u)
+    case _ => formProvider("registration")
+  }
 
   private def redirectToDeclarationPage(amlsRegistrationNo: Option[String],
                                         accountTypeId: (String, String),
@@ -178,9 +164,9 @@ class WhoIsRegisteringController @Inject () (authAction: AuthAction,
   private def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePerson]): Option[AddPerson] = {
     for {
       selectedIndex <- whoIsRegistering.indexValue
-      selectedPerson <- responsiblePeople.zipWithIndex.collect {
+      selectedPerson <- responsiblePeople.zipWithIndex.collectFirst {
         case (person, i) if i == selectedIndex => person
-      }.headOption
+      }
       personName <- selectedPerson.personName
     } yield {
       AddPerson(

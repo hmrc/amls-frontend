@@ -14,40 +14,32 @@
  * limitations under the License.
  *@
 
-@import include._
 @import models.responsiblepeople._
-@import forms2._
-@import config.{ ApplicationConfig}
-@import views.html.declaration.who_is_registering_common
+@import config.ApplicationConfig
+@import views.html.declaration.WhoIsRegisteringCommonView
 
-@this(main: include.main,
-      whoIsRegisteringCommon: who_is_registering_common)
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    whoIsRegisteringCommon: WhoIsRegisteringCommonView
+)
 
-@(f: forms.Form2[_], model : Seq[ResponsiblePerson])(implicit   m: Messages, request: Request[_], lang: Lang, appConfig: ApplicationConfig)
-
-@header = {
-    @components.back_link()
-    @errorSummary(f)
-}
+@(form: Form[_], model: Seq[ResponsiblePerson])(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
 
 @supportingContent = {
-    <p>@Messages("declaration.renewal.who.is.registering.text")</p>
+    <p class="govuk-body">@messages("declaration.renewal.who.is.registering.text")</p>
 }
 
-@main(
-    title = Messages("declaration.renewal.who.is.registering.title"),
-    heading = header
-) {
+@layout(pageTitle = messages("declaration.renewal.who.is.registering.title")) {
 
-    @form(f, controllers.declaration.routes.WhoIsRegisteringController.post()) {
+    @formHelper(action = controllers.declaration.routes.WhoIsRegisteringController.post("renewal")) {
 
         @whoIsRegisteringCommon(
             "declaration.renewal.who.is.registering.title",
-            f,
+            form,
             model,
             "summary.submit.renewal",
-            supportingContent)
-
-        @submit(buttonId=Some("confirm-continue"))
+            supportingContent
+        )
     }
 }

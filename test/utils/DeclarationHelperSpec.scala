@@ -16,8 +16,8 @@
 
 package utils
 
-import models.Country
-import models.registrationprogress.{Completed, Section, Started}
+import models.{Country, registrationprogress}
+import models.registrationprogress.{Completed, Section, Started, TaskRow}
 import models.renewal._
 import models.responsiblepeople._
 import models.status._
@@ -32,6 +32,7 @@ import utils.DeclarationHelper._
 import play.api.test.Helpers._
 import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.mvc.Call
+import play.api.test.Helpers
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
@@ -70,6 +71,8 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
   private val inCompleteRenewal = completeRenewal.copy(
     businessTurnover = None
   )
+
+  implicit val messages = Helpers.stubMessages()
 
   "currentPartnersNames" must {
     "return a sequence of full names of only undeleted partners" in {
@@ -330,18 +333,18 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
   "sectionsComplete" must {
     val sectionsProvider = mock[SectionsProvider]
     val completedSections = Seq(
-      Section("s1", Completed, true,  mock[Call]),
-      Section("s2", Completed, true,  mock[Call])
+      TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
+      TaskRow("s2", "/bar", true, Completed, TaskRow.completedTag)
     )
 
     val incompleteSections = Seq(
-      Section("s1", Completed, true,  mock[Call]),
-      Section("s2", Started,   true,  mock[Call])
+      TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
+      TaskRow("s2", "/bar", true, Started, TaskRow.incompleteTag)
     )
 
-    "return false where one or more sections are imcomplete" in {
+    "return false where one or more sections are incomplete" in {
       when{
-        sectionsProvider.sections(eqTo(credId))(any(), any())
+        sectionsProvider.taskRows(eqTo(credId))(any(), any(), any())
       }.thenReturn(Future.successful(incompleteSections))
 
       await(sectionsComplete(credId, sectionsProvider)) mustBe(false)
@@ -349,7 +352,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
 
     "return true where all sections are complete" in {
       when{
-        sectionsProvider.sections(eqTo(credId))(any(), any())
+        sectionsProvider.taskRows(eqTo(credId))(any(), any(), any())
       }.thenReturn(Future.successful(completedSections))
 
       await(sectionsComplete(credId, sectionsProvider)) mustBe(true)

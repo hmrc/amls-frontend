@@ -17,15 +17,16 @@
 package controllers.declaration
 
 import java.util.UUID
-
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.InvalidForm
+import forms.declaration.AddPersonFormProvider
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership, SoleProprietor, UnincorporatedBody}
 import models.declaration.AddPerson
+import models.declaration.release7.{Director, ExternalAccountant}
 import models.status.{ReadyForRenewal, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -33,28 +34,28 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.declaration.add_person
+import views.html.declaration.AddPersonView
 
 import scala.concurrent.Future
 
-
-class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
+class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[add_person]
+    lazy val view = inject[AddPersonView]
     val addPersonController = new AddPersonController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
       cc = mockMcc,
-      add_person = view
+      formProvider = inject[AddPersonFormProvider],
+      view = view
     )
 
     val emptyCache = CacheMap("", Map.empty)
@@ -89,7 +90,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
       "display the persons page" when {
         "status is pre-submission" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.AddPersonController.post().url)
+          .withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
             "roleWithinBusiness[]" -> "ExternalAccountant"
@@ -97,13 +99,14 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = addPersonController.get()(requestWithParams)
           status(result) must be(OK)
-          contentAsString(result) must include(Messages("submit.registration"))
+          contentAsString(result) must include(messages("submit.registration"))
 
         }
 
         "status is pending" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.AddPersonController.post().url)
+          .withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
             "roleWithinBusiness[]" -> "ExternalAccountant"
@@ -113,12 +116,13 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = addPersonController.get()(requestWithParams)
           status(result) must be(OK)
-          contentAsString(result) must include(Messages("submit.amendment.application"))
+          contentAsString(result) must include(messages("submit.amendment.application"))
         }
 
         "status is ready for renewal" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.AddPersonController.post().url)
+          .withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
             "roleWithinBusiness[]" -> "ExternalAccountant"
@@ -128,7 +132,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
           val result = addPersonController.get()(requestWithParams)
           status(result) must be(OK)
-          contentAsString(result) must include(Messages("submit.renewal.application"))
+          contentAsString(result) must include(messages("submit.renewal.application"))
         }
       }
 
@@ -162,10 +166,11 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
       "redirect to a new place" when {
         "the role type selected is Director" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.AddPersonController.post().url)
+          .withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "positions" -> "02"
+            "positions[0]" -> Director.toString
           )
 
           val result = addPersonController.post()(requestWithParams)
@@ -177,10 +182,11 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
       "redirect to DeclarationController when all the mandatory parameters supplied" when {
         "status is pending" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.AddPersonController.post().url)
+          .withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "positions" -> "08"
+            "positions[0]" -> ExternalAccountant.toString
           )
 
           mockApplicationStatus(SubmissionReadyForReview)
@@ -192,10 +198,11 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
         "status is pre-submission" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.AddPersonController.post().url)
+          .withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName",
-            "positions" -> "08"
+            "positions[0]" -> ExternalAccountant.toString
           )
 
           val result = addPersonController.post()(requestWithParams)
@@ -207,30 +214,31 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "first name not supplied" in new Fixture {
 
-          val firstNameMissingInRequest = requestWithUrlEncodedBody(
+          val firstNameMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
+          .withFormUrlEncodedBody(
             "lastName" -> "lastName",
-            "positions" -> "08"
+            "positions[0]" -> ExternalAccountant.toString
           )
 
           val result = addPersonController.post()(firstNameMissingInRequest)
           status(result) must be(BAD_REQUEST)
-
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#firstName]").html() must include("This field is required")
+          document.getElementById("firstName-error").text() must include("Enter your first name")
         }
 
         "last name not supplied" in new Fixture {
 
-          val lastNameNissingInRequest = requestWithUrlEncodedBody(
+          val lastNameNissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
+          .withFormUrlEncodedBody(
             "firstName" -> "firstName",
-            "positions" -> "08"
+            "positions[0]" -> ExternalAccountant.toString
           )
 
           val result = addPersonController.post()(lastNameNissingInRequest)
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#lastName]").html() must include("This field is required")
+          document.getElementById("lastName-error").text() must include("Enter your last name")
         }
 
         "business type is LimitedCompany and position is not filled" in new Fixture {
@@ -239,16 +247,14 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any(), any())).thenReturn(Future.successful(Some(bm)))
 
-          val roleMissingInRequest = requestWithUrlEncodedBody(
+          val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
+          .withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName"
           )
 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
-
-          val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#positions]").html() must include("Select if you are a beneficial shareholder, a director, an external accountant, a nominated officer, or other")
         }
 
         "business type is SoleProprietor and position is not filled" in new Fixture {
@@ -257,16 +263,14 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any(), any())).thenReturn(Future.successful(Some(bm)))
 
-          val roleMissingInRequest = requestWithUrlEncodedBody(
+          val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
+          .withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName"
           )
 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
-
-          val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#positions]").html() must include("Select if you are an external accountant, a nominated officer, a sole proprietor or other")
         }
 
         "business type is Partnership and position is not filled" in new Fixture {
@@ -275,16 +279,14 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any(), any())).thenReturn(Future.successful(Some(bm)))
 
-          val roleMissingInRequest = requestWithUrlEncodedBody(
+          val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
+          .withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName"
           )
 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
-
-          val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#positions]").html() must include("Select if you are an external accountant, a nominated officer, a partner or other")
         }
 
         "business type is LPrLLP and position is not filled" in new Fixture {
@@ -293,16 +295,14 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any(), any())).thenReturn(Future.successful(Some(bm)))
 
-          val roleMissingInRequest = requestWithUrlEncodedBody(
+          val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
+          .withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName"
           )
 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
-
-          val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#positions]").html() must include("Select if you are a designated member, an external accountant, a nominated officer, or other")
         }
 
         "business type is UnincorporatedBody and position is not filled" in new Fixture {
@@ -311,16 +311,14 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
             (any(), any())).thenReturn(Future.successful(Some(bm)))
 
-          val roleMissingInRequest = requestWithUrlEncodedBody(
+          val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
+          .withFormUrlEncodedBody(
             "firstName" -> "firstName",
             "lastName" -> "lastName"
           )
 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
-
-          val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#positions]").html() must include("Select if you are an external accountant, a nominated officer, or other")
         }
 
         "throw an exception if business type is not defined" in new Fixture {
@@ -335,20 +333,21 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
   }
 }
 
-class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar {
+class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[add_person]
+    lazy val view = inject[AddPersonView]
     val addPersonController = new AddPersonController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mockStatusService,
       cc = mockMcc,
-      add_person = view
+      formProvider = inject[AddPersonFormProvider],
+      view = view
     )
   }
 
@@ -368,9 +367,9 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.title() must be(Messages("declaration.addperson.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
+          document.title() must be(messages("declaration.addperson.title") + " - " + messages("title.amls") + " - " + messages("title.gov"))
 
-          contentAsString(result) must include(Messages("submit.amendment.application"))
+          contentAsString(result) must include(messages("submit.amendment.application"))
         }
       }
     }

@@ -21,61 +21,113 @@ import jto.validation.{ValidationError, _}
 import jto.validation.forms.Rules.{minLength => _, _}
 import jto.validation.forms.UrlFormEncoded
 import models.FormTypes._
+import models.businessmatching.BusinessType
+import models.businessmatching.BusinessType.{SoleProprietor => BtSoleProprietor, _}
+import models.{Enumerable, WithName}
+import play.api.i18n.Messages
 import play.api.libs.json.Reads.StringReads
 import play.api.libs.json.{JsError, _}
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.{CheckboxItem, Text}
 import utils.TraversableValidators.minLengthR
 
 case class RoleWithinBusinessRelease7(items: Set[RoleType])
 
 sealed trait RoleType {
-  val value: String =
-    this match {
-      case BeneficialShareholder => "BeneficialShareholder"
-      case Director => "Director"
-      case Partner => "Partner"
-      case InternalAccountant => "InternalAccountant"
-      case ExternalAccountant => "ExternalAccountant"
-      case SoleProprietor => "SoleProprietor"
-      case NominatedOfficer => "NominatedOfficer"
-      case DesignatedMember => "DesignatedMember"
-      case Other(_) => "Other"
-    }
-  val formValue: String =
-    this match {
-      case BeneficialShareholder => "01"
-      case Director => "02"
-      case Partner => "05"
-      case InternalAccountant => "03"
-      case ExternalAccountant => "08"
-      case SoleProprietor => "06"
-      case NominatedOfficer => "04"
-      case DesignatedMember => "07"
-      case Other(_) => "other"
-    }
-
+  val value: String
+  val formValue: String
 }
 
-case object BeneficialShareholder extends RoleType
+case object BeneficialShareholder extends WithName("beneficialShareholder") with RoleType {
+  override val value: String = "BeneficialShareholder"
+  override val formValue: String = "01"
+}
 
-case object Director extends RoleType
+case object Director extends WithName("director") with RoleType {
+  override val value: String = "Director"
+  override val formValue: String = "02"
+}
 
-case object Partner extends RoleType
+case object Partner extends WithName("partner") with RoleType {
+  override val value: String = "Partner"
+  override val formValue: String = "05"
+}
 
-case object InternalAccountant extends RoleType
+case object InternalAccountant extends WithName("internalAccountant") with RoleType {
+  override val value: String = "InternalAccountant"
+  override val formValue: String = "03"
+}
 
-case object ExternalAccountant extends RoleType
+case object ExternalAccountant extends WithName("externalAccountant") with RoleType {
+  override val value: String = "ExternalAccountant"
+  override val formValue: String = "08"
+}
 
-case object SoleProprietor extends RoleType
+case object SoleProprietor extends WithName("soleProprietor") with RoleType {
+  override val value: String = "SoleProprietor"
+  override val formValue: String = "06"
+}
 
-case object NominatedOfficer extends RoleType
+case object NominatedOfficer extends WithName("nominatedOfficer") with RoleType {
+  override val value: String = "NominatedOfficer"
+  override val formValue: String = "04"
+}
 
-case object DesignatedMember extends RoleType
+case object DesignatedMember extends WithName("designatedMember") with RoleType {
+  override val value: String = "DesignatedMember"
+  override val formValue: String = "07"
+}
 
-case class Other(details: String) extends RoleType
+case class Other(details: String) extends WithName("other") with RoleType {
+  override val value: String = "Other"
+  override val formValue: String = "other"
+}
 
-object RoleWithinBusinessRelease7 {
+object RoleWithinBusinessRelease7 extends Enumerable.Implicits {
 
   import utils.MappingUtils.Implicits._
+
+  val all: Seq[RoleType] = Seq(
+    BeneficialShareholder,
+    Director,
+    Partner,
+    InternalAccountant,
+    ExternalAccountant,
+    SoleProprietor,
+    NominatedOfficer,
+    DesignatedMember,
+    Other("")
+  )
+
+  def formValues(businessType: Option[BusinessType], conditional: Html)(implicit messages: Messages): Seq[CheckboxItem] = {
+
+    val constants = Seq(ExternalAccountant, NominatedOfficer)
+
+    val rolesForBusinessType: Seq[RoleType] = businessType match {
+      case Some(BtSoleProprietor) => constants :+ SoleProprietor
+      case Some(Partnership) => constants :+ Partner
+      case Some(LimitedCompany) => Seq(BeneficialShareholder, Director) ++ constants
+      case Some(LPrLLP) => DesignatedMember +: constants
+      case Some(UnincorporatedBody) => constants
+      case None => Seq.empty[RoleType]
+    }
+
+    (rolesForBusinessType :+ Other("")).zipWithIndex.map { case (role, index) =>
+      CheckboxItem(
+        content = if(role == Other("")){
+          Text(messages(s"responsiblepeople.position_within_business.lbl.09"))
+        } else {
+          Text(messages(s"responsiblepeople.position_within_business.lbl.${role.formValue}"))
+        },
+        value = role.toString,
+        id = Some(s"positions_$index"),
+        name = Some(s"positions[$index]"),
+        conditionalHtml = if(role == Other("")) Some(conditional) else None
+      )
+    }
+  }
+
+  implicit val enumerable: Enumerable[RoleType] = Enumerable(all.map(v => v.toString -> v): _*)
 
   val maxDetailsLength = 255
 

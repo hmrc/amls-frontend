@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import components.{Heading, TaskRowComponent}
+@import components.{Heading, TaskRowComponent, Button}
 @import include.services_sidebar
 @import config.ApplicationConfig
 @import views.html.helper.CSRF
@@ -24,7 +24,7 @@
     layout: Layout,
     heading: Heading,
     taskRow: TaskRowComponent,
-    govukSummaryList: GovukSummaryList
+    button: Button
 )
 
 @(
@@ -78,9 +78,7 @@
             @if(declarationAvailable) {
                 <form class="grid-layout__column grid-layout__column--3-3 display-block" method="post" action="@controllers.routes.RegistrationProgressController.post.url">
                     @CSRF.formField
-                    <button id="progress-continue" type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>
-                        @messages("progress.submit")
-                    </button>
+                    @button("progress.submit", "progress-continue")
                 </form>
             }
         </div>

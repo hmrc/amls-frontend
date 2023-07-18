@@ -21,12 +21,13 @@ import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.declaration.AddPerson
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
-import play.api.mvc.{MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, DeclarationHelper}
+
 import scala.concurrent.Future
-import views.html.declaration.declare
+import views.html.declaration.DeclareView
 
 class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnector,
                                         val statusService: StatusService,
@@ -35,11 +36,9 @@ class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnect
                                         val cc: MessagesControllerComponents,
                                         val sectionsProvider: SectionsProvider,
                                         val renewalService: RenewalService,
-                                        declare: declare) extends AmlsBaseController(ds, cc) {
+                                        view: DeclareView) extends AmlsBaseController(ds, cc) {
 
-  lazy val defaultView = declarationView("declaration.declaration.title", "submit.registration", isAmendment = false)
-
-  def get() = authAction.async {
+  def get(): Action[AnyContent] = authAction.async {
     implicit request => {
       DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
         case true => dataCacheConnector.fetch[AddPerson](request.credId, AddPerson.key) flatMap {
@@ -50,11 +49,11 @@ class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnect
               status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
             } yield status match {
               case ReadyForRenewal(_) if renewalComplete =>
-                Ok(declare("declaration.declaration.amendment.title", "submit.renewal.application", name, false))
+                Ok(view("declaration.declaration.amendment.title", "submit.renewal.application", name, false))
               case ReadyForRenewal(_) | SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_) =>
-                Ok(declare("declaration.declaration.amendment.title", "submit.amendment.application", name, true))
+                Ok(view("declaration.declaration.amendment.title", "submit.amendment.application", name, true))
               case _ =>
-                Ok(declare("declaration.declaration.amendment.title", "submit.registration", name, false))
+                Ok(view("declaration.declaration.amendment.title", "submit.registration", name, false))
             }
           }
           case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
@@ -64,15 +63,15 @@ class DeclarationController @Inject () (val dataCacheConnector: DataCacheConnect
     }
   }
 
-  def getWithAmendment = declarationView("declaration.declaration.amendment.title", "submit.amendment.application", true)
+  def getWithAmendment: Action[AnyContent] = declarationView("declaration.declaration.amendment.title", "submit.amendment.application", true)
 
-  private def declarationView(title: String, subtitle: String, isAmendment: Boolean) = authAction.async {
+  private def declarationView(title: String, subtitle: String, isAmendment: Boolean): Action[AnyContent] = authAction.async {
     implicit request =>
       DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
         case true =>   dataCacheConnector.fetch[AddPerson](request.credId, AddPerson.key) flatMap {
           case Some(addPerson) =>
             val name = s"${addPerson.firstName} ${addPerson.middleName getOrElse ""} ${addPerson.lastName}"
-            Future.successful(Ok(declare(title, subtitle, name, isAmendment)))
+            Future.successful(Ok(view(title, subtitle, name, isAmendment)))
           case _ => redirectToAddPersonPage(request.amlsRefNumber, request.accountTypeId, request.credId)
         }
         case false => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get.url))

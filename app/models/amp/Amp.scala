@@ -17,7 +17,7 @@
 package models.amp
 
 import config.ApplicationConfig
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
 import models.renewal.AMPTurnover
 import play.api.i18n.Messages
 import play.api.libs.json._
@@ -112,6 +112,14 @@ object Amp {
             model.hasChanged,
             Completed,
             TaskRow.completedTag
+          )
+        } else if (model.hasChanged) {
+          TaskRow(
+            key,
+            generateRedirect(appConfig.ampSummaryUrl).url,
+            hasChanged = true,
+            status = Updated,
+            tag = TaskRow.updatedTag
           )
         } else {
           TaskRow(

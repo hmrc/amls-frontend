@@ -17,6 +17,7 @@
 package controllers.declaration
 
 import controllers.actions.SuccessfulAuthAction
+import forms.declaration.RenewRegistrationFormProvider
 import models.declaration.{RenewRegistration, RenewRegistrationNo, RenewRegistrationYes}
 import models.status.ReadyForRenewal
 import org.joda.time.LocalDate
@@ -27,17 +28,18 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.{ProgressService, RenewalService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import views.html.declaration.renew_registration
+import views.html.declaration.RenewRegistrationView
 
 import scala.concurrent.Future
 
-class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[renew_registration]
+    lazy val view = app.injector.instanceOf[RenewRegistrationView]
     val controller = new RenewRegistrationController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
@@ -46,7 +48,8 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
       renewalService = mock[RenewalService],
       ds = commonDependencies,
       cc = mockMcc,
-      renew_registration = view
+      formProvider = inject[RenewRegistrationFormProvider],
+      view = view
     )
   }
 
@@ -100,7 +103,8 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
             mockCacheSave[RenewRegistration](RenewRegistrationYes, Some(RenewRegistration.key))
 
-            val newRequest = requestWithUrlEncodedBody("renewRegistration" -> "true")
+            val newRequest = FakeRequest(POST, routes.RenewRegistrationController.post().url)
+            .withFormUrlEncodedBody("renewRegistration" -> "true")
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
@@ -110,7 +114,8 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
         "redirect to the url provided by progressService" in new Fixture {
           val call = controllers.routes.RegistrationProgressController.get
-          val newRequest = requestWithUrlEncodedBody("renewRegistration" -> "false")
+          val newRequest = FakeRequest(POST, routes.RenewRegistrationController.post().url)
+          .withFormUrlEncodedBody("renewRegistration" -> "false")
           val date = new LocalDate()
 
           when {
@@ -132,7 +137,8 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
       "with invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.RenewRegistrationController.post().url)
+          .withFormUrlEncodedBody(
             "renewRegistration" -> "1234567890"
           )
           val date = new LocalDate()

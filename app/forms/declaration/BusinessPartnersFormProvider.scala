@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-package models.registrationprogress
+package forms.declaration
 
-sealed trait Status
-case object NotStarted extends Status
-case object Started extends Status
-case object Completed extends Status
-case object Updated extends Status
+import forms.mappings.Mappings
+import models.declaration.BusinessPartners
+import play.api.data.Form
+
+import javax.inject.Inject
+
+class BusinessPartnersFormProvider @Inject()() extends Mappings {
+
+  def apply(): Form[BusinessPartners] = {
+    Form(
+      "value" -> text("error.required.declaration.partners")
+        .transform[BusinessPartners](BusinessPartners.apply, _.value)
+    )
+  }
+}

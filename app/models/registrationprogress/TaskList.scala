@@ -21,13 +21,18 @@ import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
 
 case class TaskList(rows: Seq[TaskRow])
-case class TaskRow(msgKey: String, href: String, hasChanged: Boolean = false, status: Status, tag: Tag)
+case class TaskRow(msgKey: String, href: String, hasChanged: Boolean = false, status: Status, tag: Tag) //TODO implement updated to everything, see Amp.scala
 
 object TaskRow {
 
   def completedTag(implicit messages: Messages): Tag = Tag(
     Text(messages("status.complete")),
     "govuk-tag registration-status-tag"
+  )
+
+  def updatedTag(implicit messages: Messages): Tag = Tag(
+    Text(messages("status.updated")),
+    "govuk-tag govuk-tag--blue registration-status-tag"
   )
 
   def incompleteTag(implicit messages: Messages): Tag = Tag(

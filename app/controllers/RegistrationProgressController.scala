@@ -31,7 +31,7 @@ import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, DeclarationHelper}
-import views.html.registrationamendment.registration_amendment
+import views.html.registrationamendment.RegistrationAmendmentView
 import views.html.registrationprogress.RegistrationProgressView
 
 import javax.inject.{Inject, Singleton}
@@ -50,7 +50,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                                                implicit val renewalService: RenewalService,
                                                val cc: MessagesControllerComponents,
                                                registration_progress: RegistrationProgressView,
-                                               registration_amendment: registration_amendment) extends AmlsBaseController(ds, cc) {
+                                               registration_amendment: RegistrationAmendmentView) extends AmlsBaseController(ds, cc) {
 
   def get(): Action[AnyContent] = authAction.async {
       implicit request =>
@@ -67,16 +67,11 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
             } yield {
               businessMatching.reviewDetails map { reviewDetails =>
 
-                //TODO Replace use of sections with TaskList/TaskRow and Tags when migrating registration_amendment
-
-                val newSections = sectionsProvider.sectionsFromBusinessActivities(newActivities, businessMatching.msbServices)(cacheMap)
                 val newTaskRows = sectionsProvider.taskRowsFromBusinessActivities(
                   newActivities, businessMatching.msbServices)(cacheMap, messages.preferred(request)
                 )
-                val sections = sectionsProvider.sections(cacheMap)
                 val taskRows = sectionsProvider.taskRows(cacheMap) //TODO taskRows is null
                 val taskListToDisplay = TaskList(taskRows.filter(tr => tr.msgKey != BusinessMatching.messageKey) diff newTaskRows)
-                val sectionsToDisplay = sections.filter(s => s.name != BusinessMatching.messageKey) diff newSections
                 val canEditPreapplication = Set(NotCompleted, SubmissionReady, SubmissionDecisionApproved).contains(status)
                 val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage()).toSeq)
                 val hasCompleteNominatedOfficer = ControllerHelper.hasCompleteNominatedOfficer(Option(responsiblePeople))
@@ -84,12 +79,12 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
 
                 if (completePreApp) {
                   Ok(registration_amendment(
-                    sectionsToDisplay,
-                    amendmentDeclarationAvailable(sections),
+                    taskListToDisplay,
+                    amendmentDeclarationAvailable(taskRows),
                     reviewDetails.businessName,
                     activities,
                     canEditPreapplication,
-                    Some(newSections),
+                    Some(newTaskRows),
                     hasCompleteNominatedOfficer,
                     nominatedOfficerName
                   ))
@@ -129,7 +124,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
     }
   }
 
-  private def amendmentDeclarationAvailable(sections: Seq[Section]) = {
+  private def amendmentDeclarationAvailable(sections: Seq[TaskRow]) = {
 
     sections.foldLeft((true, false)) { (acc, section) =>
 

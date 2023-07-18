@@ -16,7 +16,7 @@
 
 package models.asp
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
 import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -77,6 +77,14 @@ object Asp {
             model.hasChanged,
             Completed,
             TaskRow.completedTag
+          )
+        } else if (model.hasChanged) {
+          TaskRow(
+            key,
+            controllers.asp.routes.SummaryController.get.url,
+            hasChanged = true,
+            status = Updated,
+            tag = TaskRow.updatedTag
           )
         } else {
           TaskRow(

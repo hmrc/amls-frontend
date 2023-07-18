@@ -57,7 +57,7 @@ GET         /satisfaction-survey                                                
 POST        /satisfaction-survey                                                      @controllers.SatisfactionSurveyController.post()
 
 GET         /submit-application/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.get
-POST        /submit-application/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.post()
+POST        /submit-application/who-is-registering/:id                                @controllers.declaration.WhoIsRegisteringController.post(id: String)
 
 GET         /update-information/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.get
 GET         /update-information/who-is-registering-renewal                            @controllers.declaration.WhoIsRegisteringController.get

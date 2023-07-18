@@ -17,7 +17,7 @@
 package models.eab
 
 import config.ApplicationConfig
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
 import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.Call
@@ -155,6 +155,14 @@ object Eab {
             model.hasChanged,
             Completed,
             TaskRow.completedTag
+          )
+        } else if (model.hasChanged) {
+          TaskRow(
+            key,
+            generateRedirect(appConfig.eabSummaryUrl).url,
+            hasChanged = true,
+            status = Updated,
+            tag = TaskRow.updatedTag
           )
         } else {
           TaskRow(

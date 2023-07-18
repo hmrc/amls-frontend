@@ -18,7 +18,7 @@ package models.hvd
 
 import models.DateOfChange
 import models.hvd.Products.{Alcohol, Tobacco}
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
 import play.api.Logging
 import play.api.i18n.Messages
 import play.api.libs.json._
@@ -138,6 +138,14 @@ object Hvd {
             model.hasChanged,
             Completed,
             TaskRow.completedTag
+          )
+        } else if (model.hasChanged) {
+          TaskRow(
+            key,
+            controllers.hvd.routes.SummaryController.get.url,
+            hasChanged = true,
+            status = Updated,
+            tag = TaskRow.updatedTag
           )
         } else {
           TaskRow(

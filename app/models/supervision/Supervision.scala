@@ -16,7 +16,7 @@
 
 package models.supervision
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
 import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -94,6 +94,13 @@ object Supervision {
         model.hasChanged,
         Completed,
         TaskRow.completedTag
+      )
+      case m if m.hasChanged => TaskRow(
+        key,
+        controllers.supervision.routes.SummaryController.get.url,
+        hasChanged = true,
+        status = Updated,
+        tag = TaskRow.updatedTag
       )
       case m if m.isEmpty => notStarted
       case model => TaskRow(

@@ -21,18 +21,18 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.declaration.BusinessPartnersFormProvider
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration.BusinessPartners
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{Partner, Positions, ResponsiblePerson}
 import models.status.{RenewalSubmitted, _}
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.{ProgressService, SectionsProvider, StatusService}
 import utils.DeclarationHelper._
 import utils.{AuthAction, DeclarationHelper}
-
-
-import views.html.declaration.register_partners
+import views.html.declaration.RegisterPartnersView
 
 import scala.concurrent.Future
 
@@ -44,9 +44,10 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
                                            implicit val progressService: ProgressService,
                                            val cc: MessagesControllerComponents,
                                            val sectionsProvider: SectionsProvider,
-                                           register_partners: register_partners) extends AmlsBaseController(ds, cc) {
+                                           formProvider: BusinessPartnersFormProvider,
+                                           view: RegisterPartnersView) extends AmlsBaseController(ds, cc) {
 
-  def get() = authAction.async {
+  def get(): Action[AnyContent] = authAction.async {
     implicit request => {
       DeclarationHelper.sectionsComplete(request.credId, sectionsProvider) flatMap {
         case true =>
@@ -54,9 +55,9 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
           subtitle <- OptionT.liftF(statusSubtitle(request.amlsRefNumber, request.accountTypeId, request.credId))
           responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key))
         } yield {
-          Ok(register_partners(
+          Ok(view(
             subtitle,
-            EmptyForm,
+            formProvider(),
             nonPartners(responsiblePeople),
             currentPartnersNames(responsiblePeople)
           ))
@@ -67,48 +68,45 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
     }
   }
 
-  def post() = authAction.async {
+  def post(): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[BusinessPartners](request.body) match {
-        case f: InvalidForm => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
           dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key) flatMap {
-            case Some(data) => {
-              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, f, data)
-            }
+            case Some(data) =>
+              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, formWithErrors, data)
             case None =>
-              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, f, Seq.empty)
-          }
-        }
-        case ValidForm(_, data) => {
+              businessPartnersView(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, formWithErrors, Seq.empty)
+          },
+        data =>
           data.value match {
             case "-1" =>
               Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration))))
             case _ =>
               saveAndRedirect(request.amlsRefNumber, request.accountTypeId, request.credId, data)
           }
-        }
-      }
+      )
     }
   }
 
-  def getNonPartners(people: Seq[ResponsiblePerson]) = {
+  private def getNonPartners(people: Seq[ResponsiblePerson]) = {
     people.filter(_.positions.fold(false)(p => !p.positions.contains(Partner)))
   }
 
-  def businessPartnersView(amlsRegistrationNo: Option[String],
-                           accountTypeId: (String, String),
-                           cacheId: String,
-                           status: Status,
-                           form: Form2[BusinessPartners],
-                           rp: Seq[ResponsiblePerson])
-                          (implicit request: Request[AnyContent]): Future[Result] = {
+  private def businessPartnersView(amlsRegistrationNo: Option[String],
+                                   accountTypeId: (String, String),
+                                   cacheId: String,
+                                   status: Status,
+                                   form: Form[BusinessPartners],
+                                   rp: Seq[ResponsiblePerson])
+                                  (implicit request: Request[AnyContent]): Future[Result] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case SubmissionReady =>
-        status(register_partners("submit.registration", form, getNonPartners(rp), currentPartnersNames(rp)))
+        status(view("submit.registration", form, getNonPartners(rp), currentPartnersNames(rp)))
       case SubmissionReadyForReview | SubmissionDecisionApproved =>
-        status(register_partners("submit.amendment.application", form, getNonPartners(rp), currentPartnersNames(rp)))
+        status(view("submit.amendment.application", form, getNonPartners(rp), currentPartnersNames(rp)))
       case ReadyForRenewal(_) | RenewalSubmitted(_) =>
-        status(register_partners("submit.renewal.application", form, getNonPartners(rp), currentPartnersNames(rp)))
+        status(view("submit.renewal.application", form, getNonPartners(rp), currentPartnersNames(rp)))
       case _ =>
         throw new Exception("Incorrect status - Page not permitted for this status")
     }
@@ -128,8 +126,8 @@ class RegisterPartnersController @Inject()(authAction: AuthAction,
     }
   }
 
-  def updatePartners(eventualMaybePeoples: Option[Seq[ResponsiblePerson]],
-                     data: BusinessPartners): Future[Option[Seq[ResponsiblePerson]]] = {
+  private def updatePartners(eventualMaybePeoples: Option[Seq[ResponsiblePerson]],
+                             data: BusinessPartners): Future[Option[Seq[ResponsiblePerson]]] = {
     eventualMaybePeoples match {
       case Some(rpSeq) =>
         val updatedList = ResponsiblePerson.filter(rpSeq).map { responsiblePerson =>

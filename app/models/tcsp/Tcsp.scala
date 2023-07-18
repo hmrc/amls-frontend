@@ -16,7 +16,7 @@
 
 package models.tcsp
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
 import models.tcsp.TcspTypes._
 import play.api.i18n.Messages
 import typeclasses.MongoKey
@@ -120,6 +120,14 @@ object Tcsp {
             model.hasChanged,
             Completed,
             TaskRow.completedTag
+          )
+        } else if (model.hasChanged) {
+          TaskRow(
+            key,
+            controllers.tcsp.routes.SummaryController.get.url,
+            hasChanged = true,
+            status = Updated,
+            tag = TaskRow.updatedTag
           )
         } else {
           TaskRow(
