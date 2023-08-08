@@ -41,16 +41,20 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request => {
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, Some(soleProprietorOfAnotherBusiness)))
-        => Ok(view(formProvider().fill(soleProprietorOfAnotherBusiness), edit, index, flow, personName.titleName))
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, None, _, _, _))
-        => Ok(view(formProvider(), edit, index, flow, personName.titleName))
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, Some(vatRegistered), _, _, _, _, _, _, _, _, _))
-        => Redirect(routes.VATRegisteredController.get(index, edit, flow))
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, None, _, _, _, _, _, _, _, _, _))
-        =>  Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
-        case _ => NotFound(notFoundView)
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.soleProprietorOfAnotherBusiness, person.lineId, person.vatRegistered) match {
+            case (Some(name), Some(soleProprietor), _, _) =>
+              Ok(view(formProvider().fill(soleProprietor), edit, index, flow, name.titleName))
+            case (Some(name), _, None, _) =>
+              Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case (Some(_), _, _, Some(_)) =>
+              Redirect(routes.VATRegisteredController.get(index, edit, flow))
+            case (Some(_), _, _, None) =>
+              Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
+            case _ => NotFound(notFoundView)
+          }
+        }
       }
     }
   }
@@ -82,9 +86,10 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
   }
 
   def getVatRegData(rp: ResponsiblePerson, data: SoleProprietorOfAnotherBusiness): Option[VATRegistered] = {
-    data.soleProprietorOfAnotherBusiness match {
-      case true => rp.vatRegistered
-      case false => None
+    if (data.soleProprietorOfAnotherBusiness) {
+      rp.vatRegistered
+    } else {
+      None
     }
   }
 }

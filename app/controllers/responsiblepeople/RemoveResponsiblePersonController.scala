@@ -47,11 +47,11 @@ class RemoveResponsiblePersonController @Inject()(val dataCacheConnector: DataCa
       } yield rp match {
         case Some(person) if (person.lineId.isDefined && !person.isComplete) =>
           Redirect(routes.WhatYouNeedController.get(index, flow))
-        case (Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))) =>
+        case Some(person) if person.personName.isDefined =>
           Ok(view(
             formProvider(),
             index = index,
-            personName = personName.fullName,
+            personName = person.personName.get.fullName,
             showDateField = showRemovalDateField(status, rp.get.lineId.isDefined),
             flow = flow
           ))

@@ -41,13 +41,14 @@ class FitAndProperController @Inject()(
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,ApprovalFlags(Some(hasAlreadyPassedFitAndProper), _),_,_,_,_,_,_)) =>
-          Ok(view(formProvider().fill(hasAlreadyPassedFitAndProper), edit, index, flow, personName.titleName))
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) => {
-          Ok(view(formProvider(), edit, index, flow, personName.titleName))
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.approvalFlags.hasAlreadyPassedFitAndProper) match {
+            case (Some(name), Some(hasPassed)) => Ok(view(formProvider().fill(hasPassed), edit, index, flow, name.titleName))
+            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _ => NotFound(notFoundView)
+          }
         }
-        case _ => NotFound(notFoundView)
       }
   }
 

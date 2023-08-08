@@ -16,27 +16,29 @@
 
 package controllers.responsiblepeople
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import utils.AmlsSpec
 import play.api.test.Helpers._
+import play.api.test.Injecting
+import services.responsiblepeople.YourResponsiblePeopleService
+import utils.AmlsSpec
 import views.html.responsiblepeople.YourResponsiblePeopleView
 
 import scala.concurrent.Future
 
-class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
+class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     trait Fixture {
       self => val request = addToken(authRequest)
+      val mockService = mock[YourResponsiblePeopleService]
       lazy val view = app.injector.instanceOf[YourResponsiblePeopleView]
       val controller = new YourResponsiblePeopleController (
-        dataCacheConnector = mock[DataCacheConnector],
         authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
+        yourResponsiblePeopleService = mockService,
         view = view)
     }
 
@@ -44,8 +46,8 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load the your answers page when section data is available" in new Fixture {
         val model = ResponsiblePerson(None, None)
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+        when(mockService.completeAndIncompleteRP(any())(any())
+        ).thenReturn(Future.successful(Some((Seq.empty, Seq(model).zipWithIndex.reverse))))
         val result = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include (s"${messages("responsiblepeople.whomustregister.title")} - ${messages("summary.responsiblepeople")}")
@@ -56,8 +58,8 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
         val rp1 = ResponsiblePerson(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
         val rp2 = ResponsiblePerson(Some(PersonName("firstName2", None, "lastName2")))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(rp2, rp1))))
+        when(mockService.completeAndIncompleteRP(any())(any())
+        ).thenReturn(Future.successful(Some((Seq(rp1).zipWithIndex, Seq(rp2).zipWithIndex))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -74,8 +76,8 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
         val rp1 = ResponsiblePerson(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
         val rp2 = ResponsiblePerson(Some(PersonName("firstName2", None, "lastName2")))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(rp2, rp1))))
+        when(mockService.completeAndIncompleteRP(any())(any())
+        ).thenReturn(Future.successful(Some((Seq(rp1).zipWithIndex, Seq(rp2).zipWithIndex))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -87,8 +89,8 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "redirect to the main AMLS summary page when section data is unavailable" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(None))
+        when(mockService.completeAndIncompleteRP(any())(any())
+        ).thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))

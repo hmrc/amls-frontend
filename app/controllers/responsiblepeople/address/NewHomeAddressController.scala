@@ -16,6 +16,7 @@
 
 package controllers.responsiblepeople.address
 
+import cats.implicits.catsSyntaxUFunctor
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.address.NewHomeAddressFormProvider
@@ -41,15 +42,17 @@ class NewHomeAddressController @Inject()(authAction: AuthAction,
       for {
         rp <- getData[ResponsiblePerson](request.credId, index)
         newAddress <- dataCacheConnector.fetch[NewHomeAddress](request.credId, NewHomeAddress.key)
-      } yield (rp, newAddress) match {
-        case (Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)), Some(newHomeAddress))
-        => Ok(view(formProvider().fill(newHomeAddress), index, personName.titleName))
-        case (Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)), None)
-        => Ok(view(formProvider(), index, personName.titleName))
+        nameOpt <- Future.successful(rp.map(_.personName))
+      } yield (nameOpt.flatten, newAddress) match {
+        case (Some(name), Some(newHomeAddress))
+        => Ok(view(formProvider().fill(newHomeAddress), index, name.titleName))
+        case (Some(name), None)
+        => Ok(view(formProvider(), index, name.titleName))
         case _
         => NotFound(notFoundView)
       }
   }
+
 
   def post(index: Int): Action[AnyContent] = authAction.async {
     implicit request =>

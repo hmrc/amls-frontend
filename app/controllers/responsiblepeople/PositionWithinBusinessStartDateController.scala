@@ -40,24 +40,31 @@ class PositionWithinBusinessStartDateController @Inject ()(val dataCacheConnecto
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
-        (optionalCache map { cache =>
+        (optionalCache flatMap { cache =>
 
           val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
             .getOrElse(BusinessType.SoleProprietor)
 
           val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
-          ResponsiblePerson.getResponsiblePersonFromData(data,index) match {
-            case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions, Some(startDate))),_,_,_,_,_,_,_,_,_,_,_))
-              => Ok(view(formProvider().fill(startDate), edit, index, bt,  personName.titleName, positions, ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
-            case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions, None)),_,_,_,_,_,_,_,_,_,_,_))
-              => Ok(view(formProvider(), edit, index, bt, personName.titleName, positions, ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
-            case _
-              => NotFound(notFoundView)
+          ResponsiblePerson.getResponsiblePersonFromData(data, index) map { person =>
+            (person.personName, person.positions) match {
+              case (Some(name), Some(Positions(positions, Some(startDate)))) =>
+                Ok(
+                  view(formProvider().fill(startDate), edit, index, bt, name.titleName, positions,
+                    ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data)), flow)
+                )
+              case (Some(name), Some(Positions(positions, _))) =>
+                Ok(
+                  view(formProvider(), edit, index, bt, name.titleName, positions,
+                    ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data)), flow)
+                )
+              case _ => NotFound(notFoundView)
+            }
           }
         }).getOrElse(NotFound(notFoundView))
       }
-    }
+  }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>

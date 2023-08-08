@@ -35,6 +35,7 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import services.businessmatching.ServiceFlow
+import services.msb.MoneySourcesService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils._
 import views.html.msb.MoneySourcesView
@@ -64,6 +65,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow,
       cc = mockMcc,
+      service = inject[MoneySourcesService],
       formProvider = inject[MoneySourcesFormProvider],
       view = view,
       error = errorView)
@@ -107,6 +109,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
       statusService = mock[StatusService],
       serviceFlow = mock[ServiceFlow],
       cc = mockMcc,
+      service = inject[MoneySourcesService],
       formProvider = inject[MoneySourcesFormProvider],
       view = view,
       error = errorView)

@@ -21,10 +21,10 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.PersonResidentTypeFormProvider
-import models.Country
 import models.responsiblepeople._
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.responsiblepeople.PersonResidentTypeService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.PersonResidenceTypeView
 
@@ -32,22 +32,24 @@ import javax.inject.Inject
 import scala.concurrent.Future
 
 class PersonResidentTypeController @Inject()(override val messagesApi: MessagesApi,
-                                             val dataCacheConnector: DataCacheConnector,
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val cc: MessagesControllerComponents,
+                                             personResidenceTypeService: PersonResidentTypeService,
                                              formProvider: PersonResidentTypeFormProvider,
                                              view: PersonResidenceTypeView,
-                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName),_,_,_,Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-        => Ok(view(formProvider().fill(residencyType), edit, index, flow, personName.titleName))
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-        => Ok(view(formProvider(), edit, index, flow, personName.titleName))
-        case _ => NotFound(notFoundView)
+      personResidenceTypeService.getResponsiblePerson(request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.personResidenceType) match {
+            case (Some(name), Some(residenceType)) => Ok(view(formProvider().fill(residenceType), edit, index, flow, name.titleName))
+            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _ => NotFound(notFoundView)
+          }
+        }
       }
   }
 
@@ -55,21 +57,13 @@ class PersonResidentTypeController @Inject()(override val messagesApi: MessagesA
     implicit request =>
       formProvider().bindFromRequest().fold(
         formWithError =>
-          getData[ResponsiblePerson](request.credId, index) map { rp =>
+          personResidenceTypeService.getResponsiblePerson(request.credId, index) map { rp =>
             BadRequest(view(formWithError, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           },
         data => {
           val residency = data.isUKResidence
           (for {
-            cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
-              val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
-              val countryOfBirth = rp.personResidenceType.fold[Option[Country]](None)(x => x.countryOfBirth)
-              val updatedData = data.copy(countryOfBirth = countryOfBirth, nationality = nationality)
-              residency match {
-                case UKResidence(_) => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None)
-                case NonUKResidence => rp.personResidenceType(updatedData)
-              }
-            })
+            cache <- personResidenceTypeService.getCache(data, request.credId, index)
             rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
           } yield {
             redirectGivenResidency(residency, rp, index, edit, flow)

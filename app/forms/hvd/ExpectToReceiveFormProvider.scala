@@ -48,14 +48,14 @@ class ExpectToReceiveFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  // TODO probably a better way to handle this, come back and see
-  private def apply(itemTypes: Seq[PaymentMethod], maybeDetails: Option[String]): PaymentMethods = (itemTypes, maybeDetails) match {
-    case (methods, Some(detail)) if methods.contains(Other("")) =>
-      val modifiedTransactions = methods.map(method => if (method == Other("")) Other(detail) else method)
-      PaymentMethods(modifiedTransactions, Some(detail))
-    case (methods, Some(_)) if !methods.contains(Other("")) => throw new IllegalArgumentException("Cannot have method details without Other payment method")
-    case (items, None) if items.contains(Other("")) => throw new IllegalArgumentException("Cannot have Other payment method without method details")
-    case (items, None) if !items.contains(Other("")) => PaymentMethods(items, None)
+  private def apply(paymentMethods: Seq[PaymentMethod], maybeDetails: Option[String]): PaymentMethods =
+    (paymentMethods.contains(Other("")), maybeDetails) match {
+      case (true, Some(detail)) =>
+        val modifiedTransactions = paymentMethods.map(method => if (method == Other("")) Other(detail) else method)
+        PaymentMethods(modifiedTransactions, Some(detail))
+      case (false, Some(_)) => throw new IllegalArgumentException("Cannot have method details without Other payment method")
+      case (true, None) => throw new IllegalArgumentException("Cannot have Other payment method without method details")
+      case (false, None) => PaymentMethods(paymentMethods, None)
   }
 
   private def unapply(obj: PaymentMethods): Option[(Seq[PaymentMethod], Option[String])] = {

@@ -17,26 +17,23 @@
 package controllers.responsiblepeople
 
 import com.google.inject.Inject
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import utils.{AuthAction, RepeatingSection}
+import services.responsiblepeople.YourResponsiblePeopleService
+import utils.AuthAction
 import views.html.responsiblepeople.YourResponsiblePeopleView
 
-class YourResponsiblePeopleController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                authAction: AuthAction,
+class YourResponsiblePeopleController @Inject()(authAction: AuthAction,
                                                 val ds: CommonPlayDependencies,
                                                 val cc: MessagesControllerComponents,
-                                                view: YourResponsiblePeopleView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                yourResponsiblePeopleService: YourResponsiblePeopleService,
+                                                view: YourResponsiblePeopleView) extends AmlsBaseController(ds, cc) {
 
   def get(): Action[AnyContent] = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[Seq[ResponsiblePerson]](request.credId, ResponsiblePerson.key) map {
-        case Some(data) =>
-          val (completeRP, incompleteRP) = ResponsiblePerson.filterWithIndex(data).partition(_._1.isComplete)
-          Ok(view(completeRP, incompleteRP))
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get)
-    }
+      yourResponsiblePeopleService.completeAndIncompleteRP(request.credId) map {
+        case Some((completeRP, incompleteRP)) => Ok(view(completeRP, incompleteRP))
+        case None => Redirect(controllers.routes.RegistrationProgressController.get)
+      }
   }
 }

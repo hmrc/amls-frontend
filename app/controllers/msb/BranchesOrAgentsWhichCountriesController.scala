@@ -19,33 +19,27 @@ package controllers.msb
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.msb.BranchesOrAgentsWhichCountriesFormProvider
-import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountries, MoneyServiceBusiness}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AutoCompleteService
+import services.msb.BranchesOrAgentsWhichCountriesService
 import utils.AuthAction
 import views.html.msb.BranchesOrAgentsWhichCountriesView
 
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                         authAction: AuthAction,
+class BranchesOrAgentsWhichCountriesController @Inject()(authAction: AuthAction,
                                                          val ds: CommonPlayDependencies,
                                                          val autoCompleteService: AutoCompleteService,
                                                          val cc: MessagesControllerComponents,
+                                                         branchesOrAgentsWhichCountriesService: BranchesOrAgentsWhichCountriesService,
                                                          formProvider: BranchesOrAgentsWhichCountriesFormProvider,
                                                          view: BranchesOrAgentsWhichCountriesView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
-        response =>
-          val form = (for {
-            msb <- response
-            boa <- msb.branchesOrAgents
-            branches <- boa.branches
-          } yield formProvider().fill(branches)).getOrElse(formProvider())
-          Ok(view(form, edit, autoCompleteService.formOptions))
+      branchesOrAgentsWhichCountriesService.fetchBranchesOrAgents(request.credId) map { branchesOrAgents =>
+        Ok(view(branchesOrAgents.fold(formProvider())(formProvider().fill), edit, autoCompleteService.formOptions))
       }
   }
 
@@ -54,16 +48,14 @@ class BranchesOrAgentsWhichCountriesController @Inject()(val dataCacheConnector:
       formProvider().bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
-        data =>
-          for {
-            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
-              msb.branchesOrAgents(BranchesOrAgents.update(msb.branchesOrAgents.getOrElse(BranchesOrAgents(BranchesOrAgentsHasCountries(false), None)), data)))
-          } yield if (edit) {
+        data => {
+          val redirect = if (edit) {
             Redirect(routes.SummaryController.get)
           } else {
             Redirect(routes.IdentifyLinkedTransactionsController.get())
           }
+          branchesOrAgentsWhichCountriesService.fetchAndSaveBranchesOrAgents(request.credId, data, redirect)
+        }
       )
   }
 }

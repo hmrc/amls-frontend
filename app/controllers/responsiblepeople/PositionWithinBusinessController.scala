@@ -43,21 +43,21 @@ class PositionWithinBusinessController @Inject () (
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
-        (optionalCache map { cache =>
+        (optionalCache flatMap { cache =>
 
           val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
             .getOrElse(BusinessType.SoleProprietor)
 
           val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
-          ResponsiblePerson.getResponsiblePersonFromData(data,index) match {
-            case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(Positions(positions, _)),_,_,_,_,_,_,_,_,_,_,_))
-            => Ok(view(formProvider().fill(positions), edit, index, bt, personName.titleName,
-              ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
-            case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-            => Ok(view(formProvider(), edit, index, bt, personName.titleName,
-              ResponsiblePerson.displayNominatedOfficer(rp, ResponsiblePerson.hasNominatedOfficer(data)), flow))
-            case _ => NotFound(notFoundView)
+          ResponsiblePerson.getResponsiblePersonFromData(data,index) map { person =>
+            (person.personName, person.positions) match {
+              case (Some(name), Some(p)) => Ok(view(formProvider().fill(p.positions), edit, index, bt, name.titleName,
+                ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data)), flow))
+              case (Some(name), _) => Ok(view(formProvider(), edit, index, bt, name.titleName,
+                ResponsiblePerson.displayNominatedOfficer(person, ResponsiblePerson.hasNominatedOfficer(data)), flow))
+              case _ => NotFound(notFoundView)
+            }
           }
         }).getOrElse(NotFound(notFoundView))
       }

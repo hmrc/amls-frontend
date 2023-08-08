@@ -42,13 +42,14 @@ class ExperienceTrainingController @Inject()(val dataCacheConnector: DataCacheCo
     implicit request =>
       businessMatchingData(request.credId) flatMap {
         bm =>
-          getData[ResponsiblePerson](request.credId, index) map {
-            case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_, Some(experienceTraining),_,_,_,_,_,_,_,_))
-            => Ok(view(formProvider().fill(experienceTraining), bm, edit, index, flow, personName.titleName))
-            case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-            => Ok(view(formProvider(), bm, edit, index, flow, personName.titleName))
-            case _
-            => NotFound(notFoundView)
+          getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+            responsiblePerson.fold(NotFound(notFoundView)) { person =>
+              (person.personName, person.experienceTraining) match {
+                case (Some(name), Some(training)) => Ok(view(formProvider().fill(training), bm, edit, index, flow, name.titleName))
+                case (Some(name), _) => Ok(view(formProvider(), bm, edit, index, flow, name.titleName))
+                case _ => NotFound(notFoundView)
+              }
+            }
           }
       }
   }

@@ -74,13 +74,16 @@ object FeeResponse {
   implicit val dateTimeRead: Reads[DateTime] =
     (__ \ "$date").read[Long].map { dateTime =>
       new DateTime(dateTime, DateTimeZone.UTC)
-    }
+    }.orElse(MongoJodaFormats.dateTimeReads)
 
 
-  implicit val dateTimeWrite: Writes[DateTime] = new Writes[DateTime] {
-    def writes(dateTime: DateTime): JsValue = Json.obj(
-      "$date" -> dateTime.getMillis
-    )
-  }
+//  implicit val dateTimeWrite: Writes[DateTime] = new Writes[DateTime] {
+//    def writes(dateTime: DateTime): JsValue = Json.obj(
+//      "$date" -> dateTime.getMillis
+//    )
+//  }
+
+  implicit val dateTimeWrites = MongoJodaFormats.dateTimeWrites
+
   implicit val format = Json.format[FeeResponse]
 }

@@ -42,24 +42,15 @@ class CountryOfBirthController @Inject()(authAction: AuthAction,
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName),_,_,_,Some(personResidenceType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          personResidenceType.countryOfBirth match {
-            case Some(country) =>
-              Ok(view(
-                formProvider().fill(getCountryOfBirth(country)),
-                edit,
-                index,
-                flow,
-                personName.titleName,
-                autoCompleteService.formOptions))
-
-            case _ =>
-              Ok(view(formProvider(), edit, index, flow, personName.titleName, autoCompleteService.formOptions))
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.personResidenceType) match {
+            case (Some(name), Some(PersonResidenceType(_, Some(countryOfBirth), _))) =>
+              Ok(view(formProvider().fill(getCountryOfBirth(countryOfBirth)), edit, index, flow, name.titleName, autoCompleteService.formOptions))
+            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName, autoCompleteService.formOptions))
+            case _ => NotFound(notFoundView)
           }
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(view(formProvider(), edit, index, flow, personName.titleName, autoCompleteService.formOptions))
-        case _ => NotFound(notFoundView)
+        }
       }
   }
 

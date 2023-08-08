@@ -41,11 +41,14 @@ class NewHomeAddressNonUKController @Inject()(authAction: AuthAction,
 
   def get(index: Int): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
-        => Ok(view(formProvider(), index, personName.titleName, autoCompleteService.formOptionsExcludeUK))
-        case _
-        => NotFound(notFoundView)
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          person.personName match {
+            case Some(name) =>
+              Ok(view(formProvider(), index, name.titleName, autoCompleteService.formOptionsExcludeUK))
+            case _ => NotFound(notFoundView)
+          }
+        }
       }
   }
 

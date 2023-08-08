@@ -39,20 +39,14 @@ case class MoneySources(bankMoneySource: Option[BankMoneySource] = None,
     Seq(
       if(bankMoneySource.isDefined) Some(Banks) else None,
       if(wholesalerMoneySource.isDefined) Some(Wholesalers) else None,
-      customerMoneySource match {
-        case Some(true) => Some(Customers)
-        case _ => None
-      }
+      customerMoneySource.flatMap(b => if(b) Some(Customers) else None)
     ).flatten
   }
 
   def toMessages(implicit messages: Messages): Seq[String] = Seq(
     this.bankMoneySource.map(_ => messages("msb.which_currencies.source.banks")),
     this.wholesalerMoneySource.map(_ => messages("msb.which_currencies.source.wholesalers")),
-    this.customerMoneySource match {
-      case Some(value) if value => Some(messages("msb.which_currencies.source.customers"))
-      case _ => None
-    }
+    this.customerMoneySource.flatMap(b => if (b) Some(messages("msb.which_currencies.source.customers")) else None)
   ).flatten
 }
 

@@ -40,13 +40,14 @@ class ApprovalCheckController @Inject()(
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,ApprovalFlags(_, Some(hasAlreadyPaidApprovalCheck)),_,_,_,_,_,_))  =>
-          Ok(view(formProvider().fill(hasAlreadyPaidApprovalCheck), edit, index, flow, personName.titleName))
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) => {
-          Ok(view(formProvider(), edit, index, flow, personName.titleName))
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.approvalFlags.hasAlreadyPaidApprovalCheck) match {
+            case (Some(name), Some(hasPaid)) => Ok(view(formProvider().fill(hasPaid), edit, index, flow, name.titleName))
+            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _ => NotFound(notFoundView)
+          }
         }
-        case _ => NotFound(notFoundView)
       }
   }
 

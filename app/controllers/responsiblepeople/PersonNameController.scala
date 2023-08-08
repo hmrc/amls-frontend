@@ -37,13 +37,13 @@ class PersonNameController @Inject () (val dataCacheConnector: DataCacheConnecto
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(name),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-        => Ok(view(formProvider().fill(name), edit, index, flow))
-        case Some(ResponsiblePerson(_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-        => Ok(view(formProvider(), edit, index, flow))
-        case _
-        => NotFound(notFoundView)
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          person.personName match {
+            case Some(name) => Ok(view(formProvider().fill(name), edit, index, flow))
+            case None => Ok(view(formProvider(), edit, index, flow))
+          }
+        }
       }
   }
 

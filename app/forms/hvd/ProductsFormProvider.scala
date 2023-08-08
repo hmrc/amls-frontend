@@ -47,19 +47,18 @@ class ProductsFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  // TODO probably a better way to handle this, come back and see
-  private def apply(itemTypes: Seq[ItemType], maybeDetails: Option[String]): Products = (itemTypes, maybeDetails) match {
-    case (items, Some(detail)) if items.contains(Other("")) =>
-      val modifiedTransactions = items.map(service => if (service == Other("")) Other(detail) else service)
-      Products(modifiedTransactions.toSet)
-    case (items, Some(_)) if !items.contains(Other("")) => throw new IllegalArgumentException("Cannot have product details without Other HVD product")
-    case (items, None) if items.contains(Other("")) => throw new IllegalArgumentException("Cannot have Other HVD product without product details")
-    case (items, None) if !items.contains(Other("")) => Products(items.toSet)
+  private def apply(products: Seq[ItemType], maybeDetails: Option[String]): Products = (products.contains(Other("")), maybeDetails) match {
+    case (true, Some(detail)) =>
+      val modifiedItemTypes = products.map(itemType => if (itemType == Other("")) Other(detail) else itemType)
+      Products(modifiedItemTypes.toSet)
+    case (false, Some(_)) => throw new IllegalArgumentException("Cannot have product details without Other HVD product")
+    case (true, None) => throw new IllegalArgumentException("Cannot have Other HVD product without product details")
+    case (false, None) => Products(products.toSet)
   }
 
   private def unapply(obj: Products): Option[(Seq[ItemType], Option[String])] = {
-    val objTypes = obj.items.toSeq.map { x =>
-      if (x.isInstanceOf[Other]) Other("") else x
+    val objTypes = obj.items.toSeq.map { item =>
+      if (item.isInstanceOf[Other]) Other("") else item
     }
 
     val maybeName = obj.items.find(_.isInstanceOf[Other]).flatMap {

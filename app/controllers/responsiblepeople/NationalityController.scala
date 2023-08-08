@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.NationalityFormProvider
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{PersonResidenceType, ResponsiblePerson}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
@@ -41,16 +41,16 @@ class NationalityController @Inject () (
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName),_,_,_,Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-        => residencyType.nationality match {
-            case Some(country) => Ok(view(formProvider().fill(country), edit, index, flow, personName.titleName, autoCompleteService.formOptionsExcludeUK))
-            case _ => Ok(view(formProvider(), edit, index, flow, personName.titleName, autoCompleteService.formOptionsExcludeUK))
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.personResidenceType) match {
+            case (Some(name), Some(PersonResidenceType(_, _, Some(nationality)))) =>
+              Ok(view(formProvider().fill(nationality), edit, index, flow, name.titleName, autoCompleteService.formOptionsExcludeUK))
+            case (Some(name), _) =>
+              Ok(view(formProvider(), edit, index, flow, name.titleName, autoCompleteService.formOptionsExcludeUK))
+            case _ => NotFound(notFoundView)
           }
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-        => Ok(view(formProvider(), edit, index, flow, personName.titleName, autoCompleteService.formOptionsExcludeUK))
-        case _
-        => NotFound(notFoundView)
+        }
       }
   }
 

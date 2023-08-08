@@ -16,6 +16,8 @@
 
 package controllers.responsiblepeople.address
 
+import cats.data.OptionT
+import cats.implicits.catsStdInstancesForFuture
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
@@ -41,13 +43,18 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
 
   def get(index: Int, edit: Boolean): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _,
-        Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_, _, Some(doc))), _, _)), _, _, _, _, _, _, _, _, _, _, _, _))
-        => Ok(view(formProvider().fill(DateOfChange(doc.dateOfChange)), "summary.responsiblepeople",
-          controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
-        ))
-        case _ => Ok(view(formProvider(), "summary.responsiblepeople",
+      OptionT(getData[ResponsiblePerson](request.credId, index) map {
+        case Some(person) =>
+          for {
+            addressHistory <- person.addressHistory
+            currentAddress <- addressHistory.currentAddress
+            doc <- currentAddress.dateOfChange
+          } yield {
+            formProvider().fill(doc)
+          }
+        case _ => Some(formProvider())
+      }).getOrElse(formProvider()) map { form =>
+        Ok(view(form, "summary.responsiblepeople",
           controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
         ))
       }

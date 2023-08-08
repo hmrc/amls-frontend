@@ -19,6 +19,7 @@ package controllers.msb
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.msb.MoneySourcesFormProvider
+
 import javax.inject.Inject
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessMatchingMsbService.ForeignExchange
@@ -26,6 +27,7 @@ import models.moneyservicebusiness._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
+import services.msb.MoneySourcesService
 import utils.AuthAction
 import views.html.msb.MoneySourcesView
 
@@ -37,6 +39,7 @@ class MoneySourcesController @Inject()(authAction: AuthAction,
                                        implicit val statusService: StatusService,
                                        implicit val serviceFlow: ServiceFlow,
                                        val cc: MessagesControllerComponents,
+                                       service: MoneySourcesService,
                                        formProvider: MoneySourcesFormProvider,
                                        view: MoneySourcesView,
                                        implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
@@ -66,27 +69,13 @@ class MoneySourcesController @Inject()(authAction: AuthAction,
             _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key, updateMoneySources(msb, data))
             updatedMsb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
             bm <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-          } yield redirectToNextPage(updatedMsb, bm, edit).getOrElse(NotFound(notFoundView))
+          } yield service.redirectToNextPage(updatedMsb, bm, edit).getOrElse(NotFound(notFoundView))
         }
       )
     }
   }
 
-  def redirectToNextPage(maybeMsb: Option[MoneyServiceBusiness], maybeBm: Option[BusinessMatching], edit: Boolean) = {
-    for {
-      msb <- maybeMsb
-      bm <- maybeBm
-      services <- bm.msbServices
-    } yield {
-      services.msbServices.contains(ForeignExchange) match {
-        case true if msb.fxTransactionsInNext12Months.isEmpty || !edit =>
-          Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
-        case _ => Redirect(routes.SummaryController.get)
-      }
-    }
-  }
-
-  def updateMoneySources(oldMsb: Option[MoneyServiceBusiness], moneySources: MoneySources): Option[MoneyServiceBusiness] = {
+  private def updateMoneySources(oldMsb: Option[MoneyServiceBusiness], moneySources: MoneySources): Option[MoneyServiceBusiness] = {
     oldMsb match {
       case Some(msb) => {
         msb.whichCurrencies match {
