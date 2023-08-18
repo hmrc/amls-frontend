@@ -16,31 +16,27 @@
 
 package models.payments
 
-import enumeratum._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
-import models.EnumFormatForm
+import models.{Enumerable, WithName}
+import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
-sealed abstract class WaysToPay extends EnumEntry
+sealed trait WaysToPay
 
-object WaysToPay extends PlayEnum[WaysToPay] {
+object WaysToPay extends Enumerable.Implicits {
 
-  import utils.MappingUtils.Implicits._
+  case object Card extends WithName("card") with WaysToPay
+  case object Bacs extends WithName("bacs") with WaysToPay
 
-  case object Card extends WaysToPay
-  case object Bacs extends WaysToPay
+  val all: Seq[WaysToPay] = Seq(Bacs, Card)
 
-  override def values = findValues
-
-  val pathName = "waysToPay"
-
-  implicit val formRule: Rule[UrlFormEncoded, WaysToPay] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ pathName).read(EnumFormatForm.reader(WaysToPay)).withMessage("payments.waystopay.error")
+  def formValues(implicit messages: Messages): Seq[RadioItem] = all.zipWithIndex.map { case (wayToPay, index) =>
+    RadioItem(
+      content = Text(messages(s"payments.waystopay.${wayToPay.toString}")),
+      value = Some(wayToPay.toString),
+      id = Some(s"waysToPay_$index")
+    )
   }
 
-  implicit val formWrites: Write[WaysToPay, UrlFormEncoded] = Write { __ =>
-    Map(pathName -> Seq(__.entryName))
-  }
-
+  implicit val enumerable: Enumerable[WaysToPay] = Enumerable(all.map(v => v.toString -> v): _*)
 }

@@ -20,21 +20,20 @@ import audit.PaymentConfirmationEvent
 import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import javax.inject.{Inject, Singleton}
+import models.ReadStatusResponse
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredYes}
 import models.confirmation.Currency
 import models.payments._
 import models.renewal.Renewal
 import models.status._
-import models.ReadStatusResponse
-import play.api.mvc.MessagesControllerComponents
-import models.ReadStatusResponse
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AuthAction, BusinessName, FeeHelper}
 import views.html.confirmation._
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -48,16 +47,16 @@ class PaymentConfirmationController @Inject()(authAction: AuthAction,
                                               private[controllers] val auditConnector: AuditConnector,
                                               val cc: MessagesControllerComponents,
                                               val feeHelper: FeeHelper,
-                                              payment_confirmation_renewal: payment_confirmation_renewal,
-                                              payment_confirmation_amendvariation: payment_confirmation_amendvariation,
-                                              payment_confirmation_transitional_renewal: payment_confirmation_transitional_renewal,
-                                              payment_confirmation: payment_confirmation,
-                                              payment_failure: payment_failure
+                                              paymentConfirmationRenewalView: PaymentConfirmationRenewalView,
+                                              paymentConfirmationAmendVariationView: PaymentConfirmationAmendVariationView,
+                                              paymentConfirmationTransitionalRenewalView: PaymentConfirmationTransitionalRenewalView,
+                                              paymentConfirmationView: PaymentConfirmationView,
+                                              paymentFailureView: PaymentFailureView
                                              ) extends AmlsBaseController(ds, cc) {
 
   val prefix = "[PaymentConfirmationController]"
 
-  def paymentConfirmation(reference: String) = authAction.async {
+  def paymentConfirmation(reference: String): Action[AnyContent] = authAction.async {
       implicit request =>
 
         def companyName(maybeStatus: Option[ReadStatusResponse]): OptionT[Future, String] =
@@ -83,15 +82,15 @@ class PaymentConfirmationController @Inject()(authAction: AuthAction,
         } yield if (isPaymentSuccessful) {
           (status, businessDetails.previouslyRegistered) match {
             case (ReadyForRenewal(_), _) if renewalData.isDefined =>
-              Ok(payment_confirmation_renewal(businessName, reference))
+              Ok(paymentConfirmationRenewalView(businessName, reference))
             case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_) | ReadyForRenewal(_), _) =>
-              Ok(payment_confirmation_amendvariation(businessName, reference))
+              Ok(paymentConfirmationAmendVariationView(businessName, reference))
             case (_, Some(PreviouslyRegisteredYes(_))) =>
-              Ok(payment_confirmation_transitional_renewal(businessName, reference))
-            case _ => Ok(payment_confirmation(businessName, reference))
+              Ok(paymentConfirmationTransitionalRenewalView(businessName, reference))
+            case _ => Ok(paymentConfirmationView(businessName, reference))
           }
         } else {
-          Ok(payment_failure(
+          Ok(paymentFailureView(
             msgFromPaymentStatus(paymentStatusFromQueryString.getOrElse(paymentStatus.currentStatus.toString)),
             Currency(payment.amountInPence.toDouble / 100), reference))
         }
@@ -101,7 +100,7 @@ class PaymentConfirmationController @Inject()(authAction: AuthAction,
 
 
   private def doAudit(paymentStatus: PaymentStatus, amlsRegistrationNumber: Option[String], accountTypeId: (String, String), groupIdentifier: Option[String])
-                     (implicit hc: HeaderCarrier) = {
+                     (implicit hc: HeaderCarrier): OptionT[Future, AuditResult] = {
     for {
       fees <- OptionT(feeHelper.retrieveFeeResponse(amlsRegistrationNumber, accountTypeId, groupIdentifier, prefix))
       payRef <- OptionT.fromOption[Future](fees.paymentReference)

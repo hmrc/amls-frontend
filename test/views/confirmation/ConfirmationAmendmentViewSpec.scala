@@ -19,22 +19,20 @@ package views.confirmation
 import generators.PaymentGenerator
 import models.confirmation.Currency
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.confirmation.confirm_amendvariation
+import views.html.confirmation.ConfirmationAmendmentView
 
-class AmendmentConfirmationViewSpec extends AmlsViewSpec with MustMatchers  with PaymentGenerator {
+class ConfirmationAmendmentViewSpec extends AmlsViewSpec with MustMatchers  with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
-    lazy val confirm_amendvariation = app.injector.instanceOf[confirm_amendvariation]
+    lazy val amendmentView = app.injector.instanceOf[ConfirmationAmendmentView]
     implicit val requestWithToken = addTokenForView()
 
     val continueHref = "http://google.co.uk"
 
-    override def view = confirm_amendvariation(
+    override def view = amendmentView(
       Some(paymentReferenceNumber),
-      Currency(100),
       Currency(150),
       continueHref
     )
@@ -43,45 +41,52 @@ class AmendmentConfirmationViewSpec extends AmlsViewSpec with MustMatchers  with
   "The amendment confirmation view" must {
 
     "show the correct title" in new ViewFixture {
-      doc.title must startWith(Messages("confirmation.amendment.header"))
+      doc.title must startWith(messages("confirmation.amendment.header"))
     }
 
     "show the correct header" in new ViewFixture {
-      doc.select(".heading-xlarge").text mustBe Messages("confirmation.amendment.header")
+      heading.text mustBe messages("confirmation.amendment.header")
     }
 
     "show the correct secondary header" in new ViewFixture {
-      doc.select(".heading-secondary").text must include(Messages("confirmation.amendment.header.secondary"))
+      subHeading.text must include(messages("confirmation.amendment.header.secondary"))
     }
 
     "show the correct informational paragraph" in new ViewFixture {
-      doc.select(".info").text mustBe Messages("confirmation.amendment.info")
+      doc.getElementById("pay-for-update").text mustBe messages("confirmation.amendment.info")
     }
 
     "show the advice to print out the page" in new ViewFixture {
-      doc.select(".make-note").text mustBe Messages("confirmation.amendment.makenote")
+      doc.getElementById("take-note").text mustBe messages("confirmation.amendment.makenote")
     }
 
     "show the correct time limit" in new ViewFixture {
-      doc.select("#timelimit").text mustBe Messages("confirmation.timelimit")
-    }
-
-    "show the link to print the page" in new ViewFixture {
-      doc.select(".print-link").text mustBe Messages("link.print")
+      doc.getElementById("timelimit").text mustBe messages("confirmation.timelimit")
     }
 
     "show the correct fee" in new ViewFixture {
-      doc.select(".reg-online--pay-fee .heading-large").first.text mustBe "£150.00"
+      doc.getElementById("total").text mustBe "£150.00"
     }
 
     "show the correct reference" in new ViewFixture {
-      doc.select(".reg-online--pay-fee .heading-large").get(1).text mustBe paymentReferenceNumber
+      doc.getElementById("reference").text mustBe paymentReferenceNumber
     }
 
-    "continue button has the right text" in new ViewFixture {
-      doc.select(s".button[href=$continueHref]").text mustBe Messages("button.continuetopayment")
+    "display the print link" in new ViewFixture {
+
+      val button = doc.getElementById("confirmation-print")
+
+      button.text() mustBe messages("link.print")
+      button.attr("data-journey-click") mustBe "fee-reference:click:print"
+      button.attr("href") mustBe "javascript:window.print()"
     }
 
+    "display the continue button" in new ViewFixture {
+
+      val button = doc.getElementById("payfee")
+
+      button.text() mustBe messages("button.continuetopayment")
+      button.attr("href") mustBe continueHref
+    }
   }
-
 }

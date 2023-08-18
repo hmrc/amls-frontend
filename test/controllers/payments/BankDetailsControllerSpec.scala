@@ -31,7 +31,7 @@ import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, FeeResponseService, RenewalService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.payments.bank_details
+import views.html.payments.BankDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,7 +43,7 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
 
     implicit val hc: HeaderCarrier = new HeaderCarrier()
     implicit val ec: ExecutionContext = mock[ExecutionContext]
-    lazy val view = app.injector.instanceOf[bank_details]
+    lazy val view = app.injector.instanceOf[BankDetailsView]
     val controller = new BankDetailsController(
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
@@ -52,7 +52,7 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
       statusService = mockStatusService,
       cc = mockMcc,
       renewalService = mock[RenewalService],
-      bank_details = view
+      view = view
     )
 
     val submissionStatus = SubmissionReadyForReview

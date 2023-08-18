@@ -18,26 +18,28 @@ package controllers.payments
 
 import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
+import forms.payments.WaysToPayFormProvider
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.ResponseType.SubscriptionResponseType
 import models.confirmation.Currency
+import models.payments.WaysToPay.{Bacs, Card}
 import models.payments._
-import models.renewal.{AMLSTurnover, AMPTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
+import models.renewal._
 import models.status.{SubmissionReady, SubmissionReadyForReview}
 import models.{Country, FeeResponse, ReadStatusResponse, ReturnLocation}
 import org.joda.time.DateTime
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import utils.AmlsSpec
-import views.html.payments.ways_to_pay
+import views.html.payments.WaysToPayView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator with PaymentGenerator {
+class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator with PaymentGenerator with Injecting {
 
   trait Fixture {
     self =>
@@ -47,7 +49,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
     implicit val hc: HeaderCarrier = new HeaderCarrier()
     implicit val ec: ExecutionContext = mock[ExecutionContext]
-    lazy val view = app.injector.instanceOf[ways_to_pay]
+    lazy val view = inject[WaysToPayView]
     val controller = new WaysToPayController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
@@ -56,16 +58,15 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
       feeResponseService = mock[FeeResponseService],
       cc = mockMcc,
       renewalService = mock[RenewalService],
-      ways_to_pay = view
+      formProvider = inject[WaysToPayFormProvider],
+      view = view
     )
 
-    val applicationConfig = app.injector.instanceOf[ApplicationConfig]
+    val applicationConfig = inject[ApplicationConfig]
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
 
     val fees = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber, 100, None, None, 0, 100, Some(paymentReferenceNumber), None, DateTime.now())
-
-
 
     val submissionStatus = SubmissionReadyForReview
     val readStatusResponse = mock[ReadStatusResponse]
@@ -138,8 +139,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
         val result = controller.get()(request)
 
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("payments.waystopay.title"))
-
+        contentAsString(result) must include(messages("payments.waystopay.title"))
       }
     }
 
@@ -147,8 +147,8 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
       "bacs" must {
         "redirect to TypeOfBankController" in new Fixture {
-          val postRequest = requestWithUrlEncodedBody(
-            "waysToPay" -> WaysToPay.Bacs.entryName
+          val postRequest = FakeRequest(POST, routes.WaysToPayController.post().url).withFormUrlEncodedBody(
+            "waysToPay" -> Bacs.toString
           )
 
           val result = controller.post()(postRequest)
@@ -158,14 +158,13 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
           val bacsModel: CreateBacsPaymentRequest = CreateBacsPaymentRequest(amlsRegistrationNumber, paymentReferenceNumber, safeId, 10000)
           verify(controller.paymentsService).createBacsPayment(eqTo(bacsModel), any())(any(), any())
-
         }
       }
 
       "card" must {
         "go to the payments url" in new Fixture {
-          val postRequest = requestWithUrlEncodedBody(
-            "waysToPay" -> WaysToPay.Card.entryName
+          val postRequest = FakeRequest(POST, routes.WaysToPayController.post().url).withFormUrlEncodedBody(
+            "waysToPay" -> Card.toString
           )
 
           when {
@@ -189,8 +188,8 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
         "return 500" when {
           "payment info cannot be retrieved" in new Fixture {
 
-            val postRequest = requestWithUrlEncodedBody(
-              "waysToPay" -> WaysToPay.Card.entryName
+            val postRequest = FakeRequest(POST, routes.WaysToPayController.post().url).withFormUrlEncodedBody(
+              "waysToPay" -> Card.toString
             )
 
             when {
@@ -211,17 +210,14 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
       "request is invalid" must {
         "return BAD_REQUEST" in new Fixture {
 
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.WaysToPayController.post().url).withFormUrlEncodedBody(
             "waysToPay" -> "01"
           )
 
           val result = controller.post()(postRequest)
           status(result) mustBe BAD_REQUEST
-
         }
       }
     }
-
   }
-
 }

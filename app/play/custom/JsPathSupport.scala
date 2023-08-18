@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@(linkId: String,
- linkMessageKey: String = "link.print",
- gaTag: Option[String] = None
- )(implicit m: Messages)
- <p class="govuk-body">
-  @if(gaTag.isDefined) {
-      <a id="@linkId" href="javascript:window.print()" class="print-link print-hidden js-visible govuk-link" data-journey-click="@gaTag.get">@Messages(linkMessageKey)</a>
-  } else {
-      <a id="@linkId" href="javascript:window.print()" class="print-link print-hidden js-visible govuk-link">@Messages(linkMessageKey)</a>
+package play.custom
+
+import play.api.libs.json.{JsPath, Reads}
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+
+object JsPathSupport {
+  implicit class RichJsPath(path: JsPath) {
+    val readLocalDateTime: Reads[LocalDateTime] = {
+      Reads.at[LocalDateTime](path)(MongoJavatimeFormats.localDateTimeReads)
+        .orElse(Reads.at[String](path).map(dateTimeStr => LocalDateTime.parse(dateTimeStr, ISO_LOCAL_DATE_TIME)))
+    }
   }
- </p>
+}

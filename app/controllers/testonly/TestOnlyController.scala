@@ -48,11 +48,11 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
                                    duplicate_enrolment: duplicate_enrolment,
                                    duplicate_submission: duplicate_submission,
                                    wrong_credential_type: wrong_credential_type,
-                                   payment_failure: payment_failure,
-                                   payment_confirmation: payment_confirmation,
-                                   payment_confirmation_transitional_renewal: payment_confirmation_transitional_renewal,
-                                   confirmation_bacs: confirmation_bacs,
-                                   confirmation_bacs_transitional_renewal: confirmation_bacs_transitional_renewal) extends AmlsBaseController(ds, cc) {
+                                   paymentFailureView: PaymentFailureView,
+                                   paymentConfirmationView: PaymentConfirmationView,
+                                   paymentConfirmationTransitionalRenewalView: PaymentConfirmationTransitionalRenewalView,
+                                   confirmationBacsView: ConfirmationBacsView
+                                  ) extends AmlsBaseController(ds, cc) {
 
 
   def dropMongoCache = authAction.async {
@@ -116,28 +116,25 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
 
   def paymentFailure = authAction.async {
     implicit request =>
-      Future.successful(Ok(payment_failure("confirmation.payment.failed.reason.failure", 100, "X123456789")))
+      Future.successful(Ok(paymentFailureView("confirmation.payment.failed.reason.failure", 100, "X123456789")))
   }
 
   def paymentSuccessful = authAction.async {
     implicit request =>
-      Future.successful(Ok(payment_confirmation("Company Name", "X123456789")))
+      Future.successful(Ok(paymentConfirmationView("Company Name", "X123456789")))
   }
 
   def paymentSuccessfulTransitionalRenewal = authAction.async {
     implicit request =>
-      Future.successful(Ok(payment_confirmation_transitional_renewal("Company Name", "X123456789")))
+      Future.successful(Ok(paymentConfirmationTransitionalRenewalView("Company Name", "X123456789")))
   }
 
   def confirmationBacs = authAction.async {
     implicit request =>
-      Future.successful(Ok(confirmation_bacs("Company Name")))
+      Future.successful(Ok(confirmationBacsView("Company Name")))
   }
 
-  def confirmationBacsTransitionalRenewal = authAction.async {
-    implicit request =>
-      Future.successful(Ok(confirmation_bacs_transitional_renewal("Company Name")))
-  }
+  def confirmationBacsTransitionalRenewal = confirmationBacs
 
   def populateTP = authAction.async {
     implicit request =>

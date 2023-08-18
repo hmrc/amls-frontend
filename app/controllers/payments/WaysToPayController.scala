@@ -19,18 +19,17 @@ package controllers.payments
 import cats.data.OptionT
 import cats.implicits._
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
+import forms.payments.WaysToPayFormProvider
 import models.FeeResponse
+import models.payments.CreateBacsPaymentRequest
 import models.payments.WaysToPay._
-import models.payments.{CreateBacsPaymentRequest, WaysToPay}
-import play.api.mvc.{MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, AuthorisedRequest, DeclarationHelper}
-import views.html.payments.ways_to_pay
+import views.html.payments.WaysToPayView
 
-
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -42,51 +41,51 @@ class WaysToPayController @Inject()(val authAction: AuthAction,
                                     val feeResponseService: FeeResponseService,
                                     val cc: MessagesControllerComponents,
                                     val renewalService: RenewalService,
-                                    ways_to_pay: ways_to_pay) extends AmlsBaseController(ds, cc) {
+                                    formProvider: WaysToPayFormProvider,
+                                    view: WaysToPayView) extends AmlsBaseController(ds, cc) {
 
-  def get() = authAction.async {
+  def get(): Action[AnyContent] = authAction.async {
     implicit request =>
       (for {
         subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
-      } yield Ok(ways_to_pay(EmptyForm, subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
+      } yield Ok(view(formProvider(), subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
   }
 
-  def post() = authAction.async {
+  def post(): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[WaysToPay](request.body) match {
-        case ValidForm(_, data) =>
-          data match {
-            case Card =>
-              progressToPayment { (fees, paymentReference, safeId) =>
-                paymentsService.requestPaymentsUrl(
-                  fees,
-                  controllers.routes.PaymentConfirmationController.paymentConfirmation(paymentReference).url,
-                  fees.amlsReferenceNumber,
-                  safeId,
-                  request.accountTypeId
-                ).map { nextUrl =>
-                  Redirect(nextUrl.value)
-                }
-              }("Cannot retrieve payment information")
-            case Bacs =>
-              progressToPayment { (fees, paymentReference, safeId) =>
-                paymentsService.createBacsPayment(
-                  CreateBacsPaymentRequest(
-                    fees.amlsReferenceNumber,
-                    paymentReference,
-                    safeId,
-                    paymentsService.amountFromSubmissionData(fees).fold(0)(_.map(_ * 100).value.toInt)),
-                  request.accountTypeId
-                ).map { _ =>
-                  Redirect(controllers.payments.routes.TypeOfBankController.get)
-                }
-              }("Unable to save BACS info")
-          }
-        case f: InvalidForm =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
           (for {
             subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
-          } yield BadRequest(ways_to_pay(f, subHeading))) getOrElse InternalServerError("Failed to retrieve data.")
-      }
+          } yield BadRequest(view(formWithErrors, subHeading))) getOrElse InternalServerError("Failed to retrieve data."),
+        {
+          case Card =>
+            progressToPayment { (fees, paymentReference, safeId) =>
+              paymentsService.requestPaymentsUrl(
+                fees,
+                controllers.routes.PaymentConfirmationController.paymentConfirmation(paymentReference).url,
+                fees.amlsReferenceNumber,
+                safeId,
+                request.accountTypeId
+              ).map { nextUrl =>
+                Redirect(nextUrl.value)
+              }
+            }("Cannot retrieve payment information")
+          case Bacs =>
+            progressToPayment { (fees, paymentReference, safeId) =>
+              paymentsService.createBacsPayment(
+                CreateBacsPaymentRequest(
+                  fees.amlsReferenceNumber,
+                  paymentReference,
+                  safeId,
+                  paymentsService.amountFromSubmissionData(fees).fold(0)(_.map(_ * 100).value.toInt)),
+                request.accountTypeId
+              ).map { _ =>
+                Redirect(controllers.payments.routes.TypeOfBankController.get)
+              }
+            }("Unable to save BACS info")
+        }
+      )
   }
 
   def progressToPayment(fn: (FeeResponse, String, String) => Future[Result])

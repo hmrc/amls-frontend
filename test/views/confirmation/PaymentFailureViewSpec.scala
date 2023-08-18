@@ -18,15 +18,14 @@ package views.confirmation
 
 import models.confirmation.Currency
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.confirmation.payment_failure
+import views.html.confirmation.PaymentFailureView
 
 class PaymentFailureViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    lazy val payment_failure = app.injector.instanceOf[payment_failure]
+    lazy val payment_failure = inject[PaymentFailureView]
     implicit val requestWithToken = addTokenForView()
 
     //noinspection ScalaStyle
@@ -36,7 +35,7 @@ class PaymentFailureViewSpec extends AmlsViewSpec with MustMatchers {
   "The Payment Failure view" must {
     "show the correct headings and content" in new ViewFixture {
       validateTitle("confirmation.payment.failed.title")
-      doc.body.select(".page-header h1").text() mustBe Messages("confirmation.payment.failed.header")
+      heading.text() mustBe messages("confirmation.payment.failed.header")
       validateParagraphizedContent("confirmation.payment.failed.reason.failure")
       validateParagraphizedContent("confirmation.payment.failed.info")
     }
@@ -47,5 +46,4 @@ class PaymentFailureViewSpec extends AmlsViewSpec with MustMatchers {
       doc.body.select(".payment-ref").text() mustBe "X123456789"
     }
   }
-
 }

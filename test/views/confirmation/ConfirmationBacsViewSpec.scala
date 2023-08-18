@@ -19,44 +19,35 @@ package views.confirmation
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.confirmation.PaymentConfirmationView
+import views.html.confirmation.ConfirmationBacsView
 
-class PaymentConfirmedViewSpec extends AmlsViewSpec with MustMatchers {
+class ConfirmationBacsViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    lazy val payment_confirmation = app.injector.instanceOf[PaymentConfirmationView]
+    lazy val confirmationBacsView = inject[ConfirmationBacsView]
     implicit val requestWithToken = addTokenForView()
 
-    val businessName = "Test Business Ltd"
-    val paymentReference = "XMHSG000000000"
-
-    override def view = payment_confirmation(businessName, paymentReference)
+    override def view = confirmationBacsView("businessName")
   }
 
-  "The payment confirmation view" must {
+  "The bacs confirmation view" must {
 
     "show the correct title" in new ViewFixture {
-
-      doc.title must startWith(messages("confirmation.payment.title"))
+      doc.title must startWith(messages("confirmation.payment.bacs.title"))
     }
 
-    "show the correct heading" in new ViewFixture {
-
-      heading.text must be(messages("confirmation.payment.lede"))
+    "show the correct header" in new ViewFixture {
+      heading.text must include(messages("confirmation.payment.bacs.header"))
     }
 
-    "show the company name and reference in the heading" in new ViewFixture {
-
-      val headingContainer = doc.select(".govuk-panel__body")
-
-      headingContainer.text must include(businessName)
-      headingContainer.text must include(messages("confirmation.payment.reference_header", paymentReference))
+    "show the correct secondary header" in new ViewFixture {
+      doc.select(".govuk-panel__body").text must include("businessName")
     }
 
     "contain the correct content" in new ViewFixture {
-      doc.html() must include(messages("confirmation.payment.info.hmrc.review.1"))
-      doc.html() must include(messages("confirmation.payment.info.hmrc.review.2"))
-      doc.html() must include(messages("confirmation.payment.info.hmrc.review.3"))
+      doc.html() must include(messages("confirmation.payment.renewal.info.hmrc_review"))
+      doc.html() must include(messages("confirmation.payment.renewal.info.hmrc_review3"))
+      doc.html() must include(messages("confirmation.payment.renewal.info.hmrc_review4"))
     }
 
     "have a footer with the correct information" in new ViewFixture {

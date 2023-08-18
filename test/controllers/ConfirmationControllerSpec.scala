@@ -34,13 +34,13 @@ import org.joda.time.DateTime
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, FeeHelper}
-import views.html.confirmation.{confirm_amendvariation, confirm_renewal, confirmation_new, confirmation_no_fee}
+import views.html.confirmation.{ConfirmationAmendmentView, ConfirmationNewView, ConfirmationRenewalView, ConfirmationNoFeeView}
 
 import scala.concurrent.Future
 
@@ -48,16 +48,13 @@ import scala.concurrent.Future
 class ConfirmationControllerSpec extends AmlsSpec
   with AmlsReferenceNumberGenerator
   with PaymentGenerator
-  with SubscriptionResponseGenerator {
+  with SubscriptionResponseGenerator
+  with Injecting {
 
   trait Fixture {
     self =>
     val baseUrl = "http://localhost"
     val request = addToken(authRequest(uri = baseUrl))
-    lazy val view1 = app.injector.instanceOf[confirm_renewal]
-    lazy val view2 = app.injector.instanceOf[confirm_amendvariation]
-    lazy val view3 = app.injector.instanceOf[confirmation_new]
-    lazy val view4 = app.injector.instanceOf[confirmation_no_fee]
     val controller = new ConfirmationController(
       keystoreConnector = mock[KeystoreConnector],
       authAction = SuccessfulAuthAction,
@@ -65,15 +62,14 @@ class ConfirmationControllerSpec extends AmlsSpec
       dataCacheConnector = mock[DataCacheConnector],
       amlsConnector = mock[AmlsConnector],
       ds = commonDependencies,
-      enrolmentService = mock[AuthEnrolmentsService],
       authenticator = mock[AuthenticatorConnector],
       confirmationService = mock[ConfirmationService],
       cc = mockMcc,
       feeHelper = mock[FeeHelper],
-      confirm_renewal = view1,
-      confirm_amendvariation = view2,
-      confirmation_new = view3,
-      confirmation_no_fee = view4)
+      confirmationRenewal = inject[ConfirmationRenewalView],
+      confirmationAmendment = inject[ConfirmationAmendmentView],
+      confirmationNew = inject[ConfirmationNewView],
+      confirmationNoFee = inject[ConfirmationNoFeeView])
 
     val amlsRegistrationNumber = "amlsRefNumber"
 
@@ -136,7 +132,7 @@ class ConfirmationControllerSpec extends AmlsSpec
       controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
     } thenReturn Future.successful(Some(businessDetails))
 
-    val applicationConfig = app.injector.instanceOf[ApplicationConfig]
+    val applicationConfig = inject[ApplicationConfig]
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
 
@@ -212,8 +208,8 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.title must include(Messages("confirmation.header"))
-          contentAsString(result) must include(Messages("confirmation.submission.info"))
+          doc.title must include(messages("confirmation.header"))
+          contentAsString(result) must include(messages("confirmation.submission.info"))
         }
 
         "does not have response data" in new Fixture {
@@ -230,8 +226,8 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.title must include(Messages("confirmation.header"))
-          contentAsString(result) must include(Messages("confirmation.submission.info"))
+          doc.title must include(messages("confirmation.header"))
+          contentAsString(result) must include(messages("confirmation.submission.info"))
         }
       }
 
@@ -251,8 +247,8 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.title must include(Messages("confirmation.amendment.header"))
-          contentAsString(result) must include(Messages("confirmation.amendment.info"))
+          doc.title must include(messages("confirmation.amendment.header"))
+          contentAsString(result) must include(messages("confirmation.amendment.info"))
         }
 
         "does not have response data" in new Fixture {
@@ -269,8 +265,8 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.title must include(Messages("confirmation.amendment.header"))
-          contentAsString(result) must include(Messages("confirmation.amendment.info"))
+          doc.title must include(messages("confirmation.amendment.header"))
+          contentAsString(result) must include(messages("confirmation.amendment.info"))
         }
       }
 
@@ -287,8 +283,8 @@ class ConfirmationControllerSpec extends AmlsSpec
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.title must include(Messages("confirmation.amendment.header"))
-          contentAsString(result) must include(Messages("confirmation.amendment.info"))
+          doc.title must include(messages("confirmation.amendment.header"))
+          contentAsString(result) must include(messages("confirmation.amendment.info"))
         }
       }
 
@@ -308,9 +304,9 @@ class ConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.title must include(Messages("confirmation.renewal.title"))
-        contentAsString(result) must include(Messages("confirmation.renewal.header"))
-        doc.select("#fee").text must include(Currency(200d).toString)
+        doc.title must include(messages("confirmation.renewal.title"))
+        contentAsString(result) must include(messages("confirmation.renewal.header"))
+        doc.getElementById("total").text must include(Currency(200d).toString)
       }
     }
 
@@ -327,8 +323,8 @@ class ConfirmationControllerSpec extends AmlsSpec
         val result = controller.get()(request)
         status(result) mustBe OK
 
-        Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.variation.title"))
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
+        Jsoup.parse(contentAsString(result)).title must include(messages("confirmation.variation.title"))
+        contentAsString(result) must include(messages("confirmation.no.fee"))
         contentAsString(result) must include(companyNameFromRegistration)
       }
 
@@ -343,8 +339,8 @@ class ConfirmationControllerSpec extends AmlsSpec
         val result = controller.get()(request)
         status(result) mustBe OK
 
-        Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.variation.title"))
-        contentAsString(result) must include(Messages("confirmation.no.fee"))
+        Jsoup.parse(contentAsString(result)).title must include(messages("confirmation.variation.title"))
+        contentAsString(result) must include(messages("confirmation.no.fee"))
         contentAsString(result) must include(companyNameFromRegistration)
       }
     }

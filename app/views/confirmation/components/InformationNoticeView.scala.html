@@ -14,27 +14,24 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
-@import config.{ ApplicationConfig}
+@import views.html.include.printLink
+@import views.html.components.Button
 
-@this(main: include.main)
+@this(button: Button)
 
 @(infoText: String = "confirmation.payment.info.keep_up_to_date")(implicit messages: Messages, request: Request[_])
 
-<h2>@messages("confirmation.payment.info.heading.keep_up_to_date")</h2>
+<h2 class="govuk-heading-m">@messages("confirmation.payment.info.heading.keep_up_to_date")</h2>
 
-<p>@messages(Messages(infoText))</p>
+<p class="govuk-body">@messages(infoText)</p>
 
-<ul class="list list-bullet">
+<ul class="govuk-list govuk-list--bullet">
     <li>@messages("confirmation.payment.info.keep_up_to_date.item1")</li>
     <li>@messages("confirmation.payment.info.keep_up_to_date.item2")</li>
     <li>@messages("confirmation.payment.info.keep_up_to_date.item3")</li>
 </ul>
 
-@printLink(linkId="confirmation-print",
-           gaTag=Some("confirmation:click:print")
-          )
-
-
-<a id="payment-continue" class="button" href="@controllers.routes.LandingController.get" role="button" draggable="false">@Messages("confirmation.payment.continue_button.text")</a>
+@printLink(
+    linkId="confirmation-print",
+    gaTag=Some("confirmation:click:print")
+)

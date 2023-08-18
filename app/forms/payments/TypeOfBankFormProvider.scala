@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@(linkId: String,
- linkMessageKey: String = "link.print",
- gaTag: Option[String] = None
- )(implicit m: Messages)
- <p class="govuk-body">
-  @if(gaTag.isDefined) {
-      <a id="@linkId" href="javascript:window.print()" class="print-link print-hidden js-visible govuk-link" data-journey-click="@gaTag.get">@Messages(linkMessageKey)</a>
-  } else {
-      <a id="@linkId" href="javascript:window.print()" class="print-link print-hidden js-visible govuk-link">@Messages(linkMessageKey)</a>
-  }
- </p>
+package forms.payments
+
+import forms.generic.BooleanFormProvider
+import models.payments.TypeOfBank
+import play.api.data.Form
+
+import javax.inject.Inject
+
+class TypeOfBankFormProvider @Inject()() extends BooleanFormProvider {
+
+  def apply(): Form[TypeOfBank] = createForm[TypeOfBank](
+    "typeOfBank", "payments.typeofbank.error"
+  )(TypeOfBank.apply, _.isUK)
+}

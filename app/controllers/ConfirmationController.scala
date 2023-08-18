@@ -16,19 +16,18 @@
 
 package controllers
 
-import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, _}
-import javax.inject.{Inject, Singleton}
+import connectors._
 import models.ResponseType.AmendOrVariationResponseType
-import models.confirmation.Currency
 import models.status._
 import models.{FeeResponse, SubmissionRequestStatus}
 import play.api.Logging
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
-import services.{AuthEnrolmentsService, StatusService, _}
+import play.api.mvc._
+import services.{StatusService, ConfirmationService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName, FeeHelper}
-import views.html.confirmation._
+import views.html.confirmation.{ConfirmationAmendmentView, ConfirmationNewView, ConfirmationRenewalView, ConfirmationNoFeeView}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -39,19 +38,18 @@ class ConfirmationController @Inject()(authAction: AuthAction,
                                        private[controllers] implicit val amlsConnector: AmlsConnector,
                                        private[controllers] implicit val statusService: StatusService,
                                        private[controllers] val authenticator: AuthenticatorConnector,
-                                       private[controllers] val enrolmentService: AuthEnrolmentsService,
                                        private[controllers] val confirmationService: ConfirmationService,
                                        val cc: MessagesControllerComponents,
                                        val feeHelper: FeeHelper,
-                                       confirm_renewal: confirm_renewal,
-                                       confirm_amendvariation: confirm_amendvariation,
-                                       confirmation_new: confirmation_new,
-                                       confirmation_no_fee: confirmation_no_fee
+                                       confirmationRenewal: ConfirmationRenewalView,
+                                       confirmationAmendment: ConfirmationAmendmentView,
+                                       confirmationNew: ConfirmationNewView,
+                                       confirmationNoFee: ConfirmationNoFeeView
                                       ) extends AmlsBaseController(ds, cc) with Logging {
 
   val prefix = "[ConfirmationController]"
 
-  def get() = authAction.async {
+  def get(): Action[AnyContent] = authAction.async {
     implicit request =>
       // $COVERAGE-OFF$
       logger.debug(s"[$prefix] - begin get()...")
@@ -70,14 +68,12 @@ class ConfirmationController @Inject()(authAction: AuthAction,
 
     confirmationService.isRenewalDefined(credId) map { isRenewalDefined =>
       if (isRenewalDefined) {
-        Ok(confirm_renewal(fees.paymentReference,
-          fees.totalFees,
+        Ok(confirmationRenewal(fees.paymentReference,
           fees.toPay(status, submissionRequestStatus),
           controllers.payments.routes.WaysToPayController.get.url,
           submissionRequestStatus.fold[Boolean](false)(_.isRenewalAmendment.getOrElse(false))))
       } else {
-        Ok(confirm_amendvariation(fees.paymentReference,
-          fees.totalFees,
+        Ok(confirmationAmendment(fees.paymentReference,
           fees.toPay(status, submissionRequestStatus),
           controllers.payments.routes.WaysToPayController.get.url))
       }
@@ -89,8 +85,7 @@ class ConfirmationController @Inject()(authAction: AuthAction,
 
     val amount = fees.toPay(status, submissionRequestStatus)
 
-    Future.successful(Ok(confirm_amendvariation(fees.paymentReference,
-      Currency(fees.totalFees),
+    Future.successful(Ok(confirmationAmendment(fees.paymentReference,
       amount,
       controllers.payments.routes.WaysToPayController.get.url)))
   }
@@ -118,19 +113,16 @@ class ConfirmationController @Inject()(authAction: AuthAction,
             showAmendmentVariationConfirmation(fees, status, submissionRequestStatus)
           case ReadyForRenewal(_) | RenewalSubmitted(_) =>
             showRenewalConfirmation(fees, status, submissionRequestStatus, credId)
-          case _ => {
-            Future.successful(Ok(confirmation_new(fees.paymentReference, fees.totalFees, controllers.payments.routes.WaysToPayController.get.url)))
-          }
+          case _ =>
+            Future.successful(Ok(confirmationNew(fees.paymentReference, fees.totalFees, controllers.payments.routes.WaysToPayController.get.url)))
         }
 
       case _ =>
         // $COVERAGE-OFF$
         logger.debug(s"[$prefix][resultFromStatus] - No fee found)")
         // $COVERAGE-ON$
-        for {
-          name <- BusinessName.getBusinessNameFromAmls(amlsRegistrationNumber, accountTypeId, credId).value
-        } yield {
-          Ok(confirmation_no_fee(name.get))
+        BusinessName.getBusinessNameFromAmls(amlsRegistrationNumber, accountTypeId, credId).value.map { name =>
+          Ok(confirmationNoFee(name))
         }
     }
   }
