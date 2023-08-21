@@ -67,7 +67,7 @@ class PaymentConfirmationController @Inject()(authAction: AuthAction,
           "Cancelled" -> "confirmation.payment.failed.reason.cancelled"
         )
 
-        val paymentStatusFromQueryString = request.queryString.get("paymentStatus").map(_.head)
+        val paymentStatusFromQueryString = request.getQueryString("paymentStatus")
 
         val isPaymentSuccessful = !request.queryString.contains("paymentStatus")
 
