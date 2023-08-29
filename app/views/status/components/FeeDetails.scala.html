@@ -14,18 +14,19 @@
  * limitations under the License.
  *@
 
-@import include._
 @import models.ResponseType.{SubscriptionResponseType,AmendOrVariationResponseType}
 @import models.confirmation.Currency
-@import config.ApplicationConfig
+@import views.html.components.Button
 
-@(feeResponse: FeeResponse)(implicit request: Request[_],m:Messages, lang: Lang)
+@this(button: Button)
 
-<p>@Messages("fee.details.heading")</p>
+@(feeResponse: FeeResponse)(implicit request: Request[_], messages: Messages)
+
+<p class="govuk-body">@messages("fee.details.heading")</p>
 
 <div class="list panel-indent reg-online--pay-fee">
     <div class="form-field-group">
-        @Messages("fee.details.registration.fee.lbl")
+        @messages("fee.details.registration.fee.lbl")
         <p class="heading-large numeric">
         @feeResponse.responseType match {
             case SubscriptionResponseType => {@Currency.fromBD(feeResponse.totalFees)}
@@ -34,11 +35,11 @@
         </p>
     </div>
     <div class="form-field-group">
-        @Messages("fee.reference.number.lbl")
-        <p class="heading-large numeric">@feeResponse.paymentReference </p>
+        @messages("fee.reference.number.lbl")
+        <p class="heading-large numeric">@feeResponse.paymentReference</p>
     </div>
-    <p>@Messages("fee.details.note")</p>
+    <p class="govuk-body">@messages("fee.details.note")</p>
 
 </div>
 
-<p><a id="payfee" class="button" href="@controllers.routes.ConfirmationController.get">@Messages("button.payfee")</a></p>
+@button("button.payfee", "payfee", Some(controllers.routes.ConfirmationController.get.url))

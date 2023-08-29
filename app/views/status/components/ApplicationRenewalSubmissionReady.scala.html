@@ -14,10 +14,14 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
-@import config.{ ApplicationConfig}
+@import views.html.components.Button
 
-@()(implicit messages: Messages, request: Request[_])
+@this(button: Button)
 
-@Messages("status.submissionreadyforreview.description.4.no.msb.or.tcsp")
+@(businessName: Option[String])(implicit request: Request[_], messages: Messages)
+
+<p class="govuk-body">@messages("status.renewalnotsubmitted.description")</p>
+@button("your.registration.status.renewal.not.submitted.button", "go-to-about-your-business", Some(controllers.routes.RegistrationProgressController.get.url))
+@if(businessName.isDefined){
+    <span hidden> for @businessName.get</span>
+}

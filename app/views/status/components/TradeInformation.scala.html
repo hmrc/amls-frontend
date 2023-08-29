@@ -14,12 +14,18 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
-@import config.{ ApplicationConfig}
+@import config.ApplicationConfig
+@import views.html.components.Anchor
 
-@()(implicit messages: Messages, request: Request[_])
+@this(anchor: Anchor)
 
-<div class="no-print">
-  <p><a id="satisfaction-survey" href="@controllers.routes.SatisfactionSurveyController.get">@Messages("survey.satisfaction.beforeyougo")</a></p>
-</div>
+@()(implicit messages: Messages, appConfig: ApplicationConfig)
+
+<p class="govuk-body">@messages("status.submissionreadyforreview.description.4")</p>
+<p class="govuk-body">
+    @anchor(
+        "status.submissionreadyforreview.description.4.link",
+        appConfig.tradeInformationLink,
+        "ready-for-review-link"
+    )
+</p>

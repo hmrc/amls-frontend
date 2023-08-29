@@ -14,8 +14,20 @@
  * limitations under the License.
  *@
 
-@(businessName: Option[String])(implicit request: Request[_], m: Messages, lang: Lang)
+@import views.html.components.Button
 
-<p id="incomplete-description">@Messages("status.incomplete.description")</p>
-<a id="return-to-saved-application" href="@controllers.routes.RegistrationProgressController.get" class="button" draggable="false">@Messages("status.incomplete.buttontext")
- @if(businessName.isDefined){<span class="visually-hidden"> for @businessName.get</span>}</a>
+@this(button: Button)
+
+@(businessName: Option[String])(implicit request: Request[_], messages: Messages)
+
+<p class="govuk-body">@messages("status.renewalincomplete.description")</p>
+
+@button(
+    "your.registration.status.renewal.incomplete.button",
+    "continue-renewal",
+    Some(controllers.renewal.routes.WhatYouNeedController.get.url)
+)
+
+@if(businessName.isDefined) {
+    <span hidden> for @businessName.get</span>
+}

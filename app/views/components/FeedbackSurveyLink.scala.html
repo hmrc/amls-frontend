@@ -14,13 +14,18 @@
  * limitations under the License.
  *@
 
-@import utils.DateHelper
-@import org.joda.time.LocalDate
+@import config.ApplicationConfig
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 
-@(businessName: Option[String], endDate: Option[LocalDate] = None)(implicit request: Request[_], m: Messages, lang: Lang)
+@this(hmrcNewTabLinkHelper: HmrcNewTabLinkHelper)
 
-@endDate.map { date =>
- <p>@Messages("status.renewal.due", DateHelper.formatDate(date))</p>
-}
-<a href="@controllers.renewal.routes.WhatYouNeedController.get" id="start-renewal" class="button" type="submit" draggable="false">@Messages("status.renewal.due.start")
- @if(businessName.isDefined){<span class="visually-hidden"> for @businessName.get</span>}</a>
+@(linkText: String)(implicit messages: Messages, appConfig: ApplicationConfig)
+
+@hmrcNewTabLinkHelper(
+    NewTabLinkHelper(
+        classList = Some("feedback-link"),
+        href = Some(appConfig.feedbackFrontendUrl),
+        text = messages(linkText)
+    )
+)

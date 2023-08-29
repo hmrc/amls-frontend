@@ -36,6 +36,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   lazy val contactHost = baseUrl("contact-frontend")
   lazy val authHost = baseUrl("auth")
+  lazy val feedbackFrontendUrl = baseUrl("feedback-frontend") + "/feedback/AMLS"
   lazy val assetsPrefix = getConfigString(s"assets.url") + getConfigString(s"assets.version")
 
   val reportAProblemPartialUrl = getConfigString("contact-frontend.report-problem-url.with-js")
@@ -114,4 +115,10 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
   val tradingPremisesVirtualOfficeLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register"
 
   val tcspWhoNeedsToRegisterLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register"
+
+  val contactHmrcLink = "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/money-laundering"
+
+  val applicationWhoNeedsToRegisterLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#businesses-already-supervised-for-money-laundering-purposes"
+
+  val tradeInformationLink = "https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019"
 }

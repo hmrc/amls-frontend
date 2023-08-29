@@ -14,15 +14,20 @@
  * limitations under the License.
  *@
 
-@import models.FeeResponse
-@import config.ApplicationConfig
+@import views.html.components.Button
 
-@()(implicit request: Request[_], m: Messages, lang: Lang)
+@this(button: Button)
 
-<p id="submission-ready-for-review-description">@Messages("status.submissionreadyforreview.description.2")</p>
-<ul class="list list-bullet">
-    <li>@Messages("status.submissionreadyforreview.description.2.listline1")</li>
-    <li>@Messages("status.submissionreadyforreview.description.2.listline2")</li>
-    <li>@Messages("status.submissionreadyforreview.description.2.listline3")</li>
-</ul>
-<p>@Messages("status.submissionreadyforreview.description.3")</p>
+@(businessName: Option[String])(implicit request: Request[_], messages: Messages)
+
+<p class="govuk-body" id="incomplete-description">@messages("status.incomplete.description")</p>
+
+@button(
+    "status.incomplete.buttontext",
+    "return-to-saved-application",
+    Some(controllers.routes.RegistrationProgressController.get.url)
+)
+
+@if(businessName.isDefined) {
+    <span hidden> for @businessName.get</span>
+}

@@ -16,11 +16,17 @@
 
 @this(govukButton: GovukButton)
 
-@(msg: String = "button.saveandcontinue", id: String = "button", hrefOpt: Option[String] = None, startButton: Boolean = false)(implicit messages: Messages)
+@(
+    msg: String = "button.saveandcontinue",
+    id: String = "button",
+    hrefOpt: Option[String] = None,
+    startButton: Boolean = false,
+    attributes: Map[String, String] = Map.empty
+)(implicit messages: Messages)
 
 @govukButton(Button(
-href = hrefOpt,
-content = Text(messages(msg)),
-isStartButton = startButton,
-attributes = Map("id" -> id)
+    href = hrefOpt,
+    content = Text(messages(msg)),
+    isStartButton = startButton,
+    attributes = attributes + ("id" -> id)
 ))

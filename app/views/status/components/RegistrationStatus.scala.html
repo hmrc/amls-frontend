@@ -30,63 +30,67 @@
 @import models.status.SubmissionDecisionRevoked
 @import models.status.SubmissionDecisionExpired
 @import models.status.DeRegistered
+
+@this()
+
 @(amlsRegNo: Option[String] = None, status: SubmissionStatus, canOrCannotTradeInformation: Html = HtmlFormat.empty, endDate: Option[LocalDate] = None)(implicit messages: Messages, request: Request[_])
 
 @status match {
     case SubmissionReadyForReview => {
-        <p>@Messages("your.registration.status.pending")
-            @canOrCannotTradeInformation
-        </p>
+        <p class="govuk-body">@messages("your.registration.status.pending")</p>
+        @canOrCannotTradeInformation
     }
     case SubmissionDecisionApproved | ReadyForRenewal(_) => {
-        <p>
-            @endDate match {
-                case Some(date) => {
-                    @Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date))@Messages("full.stop")
-                    <br/>
-                }
-                case _ => {
-                    @Messages("status.submissiondecisionsupervised.enddate.text.nodate")@Messages("full.stop")
-                    <br/>
-                }
+        @endDate match {
+            case Some(date) => {
+                <p class="govuk-body">
+                    @messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date))@messages("full.stop")
+                </p>
             }
+            case _ => {
+                <p class="govuk-body">
+                    @messages("status.submissiondecisionsupervised.enddate.text.nodate")@messages("full.stop")
+                </p>
+            }
+        }
+        <p class="govuk-body">
             @amlsRegNo.map { number =>
-                @Messages("your.registration.number", number)@Messages("full.stop")
+                @messages("your.registration.number", number)@messages("full.stop")
             }
         </p>
     }
     case NotCompleted => {
-        <p>@Messages("your.registration.status.incomplete")</p>
+        <p class="govuk-body">@messages("your.registration.status.incomplete")</p>
     }
     case SubmissionReady => {
-        <p>@Messages("your.registration.status.not.submitted")</p>
+        <p class="govuk-body">@messages("your.registration.status.not.submitted")</p>
     }
     case RenewalSubmitted(_) => {
-        <p>
-            @Messages("your.registration.status.renewal.submitted")
-            <br/>
+        <p class="govuk-body">
+            @messages("your.registration.status.renewal.submitted")
+        </p>
+        <p class="govuk-body">
             @amlsRegNo.map { number =>
-                @Messages("your.registration.number", number)@Messages("full.stop")
+                @messages("your.registration.number", number)@messages("full.stop")
             }
         </p>
     }
     case SubmissionWithdrawn => {
-        <p>@Messages("your.registration.status.withdrawn")</p>
+        <p class="govuk-body">@messages("your.registration.status.withdrawn")</p>
     }
     case SubmissionDecisionRejected => {
-        <p>@Messages("your.registration.status.rejected")</p>
+        <p class="govuk-body">@messages("your.registration.status.rejected")</p>
     }
     case SubmissionDecisionRevoked => {
-        <p>@Messages("your.registration.status.revoked")</p>
+        <p class="govuk-body">@messages("your.registration.status.revoked")</p>
     }
     case SubmissionDecisionExpired => {
-        <p>@Messages("your.registration.status.expired")</p>
+        <p class="govuk-body">@messages("your.registration.status.expired")</p>
     }
     case DeRegistered => {
-        <p>@Messages("your.registration.status.deregistered")
+        <p class="govuk-body">@messages("your.registration.status.deregistered")
         @endDate.map { date =>
-            @Messages("your.registration.status.deregistered.date", DateHelper.formatDate(date))
-
+            @messages("your.registration.status.deregistered.date", DateHelper.formatDate(date))
         }
         </p>
     }

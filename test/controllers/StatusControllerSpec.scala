@@ -40,23 +40,25 @@ import org.scalatest.PrivateMethodTester
 import play.api.http.Status.OK
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import play.twirl.api.Html
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
-import views.html.status.your_registration
+import views.html.status.YourRegistrationView
+import views.html.status.components._
 
 import scala.concurrent.Future
 
-class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMethodTester {
+class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMethodTester with Injecting {
 
   val cacheMap = mock[CacheMap]
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[your_registration]
+    lazy val view = inject[YourRegistrationView]
     val controller = new StatusController(
       mock[LandingService],
       mock[StatusService],
@@ -72,7 +74,26 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       mock[FeeResponseService],
       mockMcc,
       mock[AmlsNotificationConnector],
-      your_registration = view)
+      inject[FeeInformation],
+      inject[RegistrationStatus],
+      inject[ApplicationIncomplete],
+      inject[ApplicationDeregistered],
+      inject[ApplicationRenewalSubmissionReady],
+      inject[ApplicationRenewalDue],
+      inject[ApplicationSubmissionReady],
+      inject[ApplicationPending],
+      inject[ApplicationRejected],
+      inject[ApplicationRevoked],
+      inject[ApplicationExpired],
+      inject[ApplicationWithdrawn],
+      inject[ApplicationRenewalSubmitted],
+      inject[ApplicationRenewalIncomplete],
+      inject[WithdrawOrDeregisterInformation],
+      inject[TradeInformationNoActivities],
+      inject[TradeInformationOneActivity],
+      inject[TradeInformation],
+      inject[TradeInformationFindOut],
+      view = view)
 
     val controllerNoAmlsNumber = new StatusController(
       mock[LandingService],
@@ -89,7 +110,26 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       mock[FeeResponseService],
       mockMcc,
       mock[AmlsNotificationConnector],
-      your_registration = view)
+      inject[FeeInformation],
+      inject[RegistrationStatus],
+      inject[ApplicationIncomplete],
+      inject[ApplicationDeregistered],
+      inject[ApplicationRenewalSubmissionReady],
+      inject[ApplicationRenewalDue],
+      inject[ApplicationSubmissionReady],
+      inject[ApplicationPending],
+      inject[ApplicationRejected],
+      inject[ApplicationRevoked],
+      inject[ApplicationExpired],
+      inject[ApplicationWithdrawn],
+      inject[ApplicationRenewalSubmitted],
+      inject[ApplicationRenewalIncomplete],
+      inject[WithdrawOrDeregisterInformation],
+      inject[TradeInformationNoActivities],
+      inject[TradeInformationOneActivity],
+      inject[TradeInformation],
+      inject[TradeInformationFindOut],
+      view = view)
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
     val rp1 = ResponsiblePerson(
@@ -635,7 +675,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         val result = controllerNoAmlsNumber.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get.url}]").text mustBe Messages("status.withdraw.link-text")
+        doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get.url}]").text mustBe s"${messages("status.withdraw.link-text")}."
       }
     }
 
@@ -662,7 +702,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         val result = controller.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get.url}]").text mustBe Messages("your.registration.deregister.link")
+        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get.url}]").text mustBe s"${messages("your.registration.deregister.link")}."
       }
     }
 

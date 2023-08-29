@@ -14,10 +14,8 @@
  * limitations under the License.
  *@
 
-@import models.FeeResponse
-@import config.ApplicationConfig
+@this()
 
-@()(implicit request: Request[_], m: Messages, lang: Lang)
+@()(implicit messages: Messages)
 
-<p id="renewal-pending-description-1">@Messages("your.registration.status.renewal.pending.description.line1")</p>
-<p id="renewal-pending-description-2">@Messages("your.registration.status.renewal.pending.description.line2")</p>
+<p class="govuk-body">@messages("status.submissionreadyforreview.description.4.msb.or.tcsp")</p>

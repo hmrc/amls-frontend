@@ -14,12 +14,18 @@
  * limitations under the License.
  *@
 
-@(call: Call, businessName: Option[String])(implicit request: Request[_], m: Messages, lang: Lang)
+@import utils.DateHelper
+@import org.joda.time.LocalDate
+@import views.html.components.Button
 
-<p>@Messages("status.submissionready.description")</p>
-<a href="@call.url" id="status-submit" class="button" type="submit" draggable="false">@Messages("your.registration.status.not.submitted.button")
- @if(businessName.isDefined){<span class="visually-hidden"> for @businessName.get</span>}</a>
+@this(button: Button)
 
+@(businessName: Option[String], endDate: Option[LocalDate] = None)(implicit request: Request[_], messages: Messages)
 
-
-
+@endDate.map { date =>
+    <p class="govuk-body">@messages("status.renewal.due", DateHelper.formatDate(date))</p>
+}
+@button("status.renewal.due.start", "start-renewal", Some(controllers.renewal.routes.WhatYouNeedController.get.url))
+@if(businessName.isDefined) {
+    <span class=hidden> for @businessName.get</span>
+}

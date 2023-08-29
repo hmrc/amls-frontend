@@ -18,24 +18,28 @@
 @import models.status.SubmissionReadyForReview
 @import models.status.SubmissionDecisionApproved
 @import models.status.ReadyForRenewal
+@import models.status.RenewalSubmitted
+@import views.html.components.Anchor
+
+@this(anchor: Anchor)
 
 @(status: SubmissionStatus)(implicit messages: Messages, request: Request[_])
 
 @status match {
     case SubmissionReadyForReview => {
-        <div>
-            <p class="no-print">
-                @Messages("your.registration.withdraw")
-                <a id="withdraw-application" href="@controllers.withdrawal.routes.WithdrawApplicationController.get">@Messages("status.withdraw.link-text")</a>@Messages("full.stop")
-            </p>
-        </div>
+        <h2 class="govuk-heading-s">@messages("status.fees")</h2>
+        <p class="govuk-body">@messages("your.registration.fees")</p>
+        <p class="govuk-body">@anchor("status.howtopay", "how-to-pay", "how-to-pay")</p>
     }
     case SubmissionDecisionApproved | ReadyForRenewal(_) => {
-        <div>
-            <p class="no-print">
-                @Messages("your.registration.deregister")
-                <a class="no-print" id="deregister-link" href="@controllers.deregister.routes.DeRegisterApplicationController.get">@Messages("your.registration.deregister.link")</a>@Messages("full.stop")
-            </p>
-        </div>
+        <h2 class="govuk-heading-s">@messages("status.fees")</h2>
+        <p class="govuk-body">
+            @anchor("your.registration.how.to.pay", "how-to-pay", "how-to-pay")
+        </p>
+    }
+    case RenewalSubmitted(_) => {
+        <h2 class="govuk-heading-s">@messages("status.fees")</h2>
+        <p class="govuk-body">@messages("your.registration.renewal.fees")</p>
+        <p class="govuk-body">@anchor("status.howtopay", "how-to-pay", "how-to-pay")</p>
     }
 }

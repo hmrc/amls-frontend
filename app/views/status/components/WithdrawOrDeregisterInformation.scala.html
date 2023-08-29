@@ -17,28 +17,36 @@
 @import models.status.SubmissionStatus
 @import models.status.SubmissionReadyForReview
 @import models.status.SubmissionDecisionApproved
-
 @import models.status.ReadyForRenewal
-@import models.status.RenewalSubmitted
+@import views.html.components.Anchor
+
+@this(anchor: Anchor)
+
 @(status: SubmissionStatus)(implicit messages: Messages, request: Request[_])
 
 @status match {
     case SubmissionReadyForReview => {
-        <h2 class="heading-small">@Messages("status.fees")</h2>
-            <p>@Messages("your.registration.fees")
-        <br />
-            <a id="how-to-pay" href="how-to-pay">@Messages("status.howtopay")</a>
-        </p>
+        <div>
+            <p class="govuk-body no-print">
+                @messages("your.registration.withdraw")
+                @anchor(
+                    s"${messages("status.withdraw.link-text")}.",
+                    controllers.withdrawal.routes.WithdrawApplicationController.get.url,
+                    "withdraw-application"
+                )
+            </p>
+        </div>
     }
     case SubmissionDecisionApproved | ReadyForRenewal(_) => {
-        <h2 class="heading-small">@Messages("status.fees")</h2>
-            <p><a id="how-to-pay" href="how-to-pay">@Messages("your.registration.how.to.pay")</a></p>
-    }
-    case RenewalSubmitted(_) => {
-        <h2 class="heading-small">@Messages("status.fees")</h2>
-        <p>@Messages("your.registration.renewal.fees")
-        <br />
-        <a id="how-to-pay" href="how-to-pay">@Messages("status.howtopay")</a>
-        </p>
+        <div>
+            <p class="govuk-body no-print">
+                @messages("your.registration.deregister")
+                @anchor(
+                    s"${messages("your.registration.deregister.link")}.",
+                    controllers.deregister.routes.DeRegisterApplicationController.get.url,
+                    "deregister-link"
+                )
+            </p>
+        </div>
     }
 }

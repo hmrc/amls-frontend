@@ -14,11 +14,11 @@
  * limitations under the License.
  *@
 
-@import include._
-@import forms2._
-@import config.{ ApplicationConfig}
+@this()
 
-@()(implicit messages: Messages, request: Request[_])
+@()(implicit request: Request[_], messages: Messages)
 
-<br />
-<a href="https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019">@Messages("status.submissionreadyforreview.description.4.link")</a>
+<div class="govuk-!-margin-bottom-8">
+    <p class="govuk-body" id="renewal-pending-description-1">@messages("your.registration.status.renewal.pending.description.line1")</p>
+    <p class="govuk-body" id="renewal-pending-description-2">@messages("your.registration.status.renewal.pending.description.line2")</p>
+</div>
