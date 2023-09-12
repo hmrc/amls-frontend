@@ -20,17 +20,17 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.businessmatching._
+import forms.renewal.MoneySourcesFormProvider
 import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing}
 import models.businessmatching.BusinessMatchingMsbService.ForeignExchange
+import models.businessmatching._
 import models.renewal.{MoneySources, Renewal}
-import play.api.mvc.{MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.RenewalService
 import utils.AuthAction
-import views.html.renewal.money_sources
+import views.html.renewal.MoneySourcesView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class MoneySourcesController @Inject()(val authAction: AuthAction,
@@ -38,43 +38,43 @@ class MoneySourcesController @Inject()(val authAction: AuthAction,
                                        renewalService: RenewalService,
                                        dataCacheConnector: DataCacheConnector,
                                        val cc: MessagesControllerComponents,
-                                       money_sources: money_sources) extends AmlsBaseController(ds, cc) {
+                                       formProvider: MoneySourcesFormProvider,
+                                       view: MoneySourcesView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        val block = for {
-          renewal <- OptionT(renewalService.getRenewal(request.credId))
-          whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
-          ms <- OptionT.fromOption[Future](whichCurrencies.moneySources)
-        } yield {
-          Ok(money_sources(Form2[MoneySources](ms), edit))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      val block = for {
+        renewal <- OptionT(renewalService.getRenewal(request.credId))
+        whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
+        ms <- OptionT.fromOption[Future](whichCurrencies.moneySources)
+      } yield {
+        Ok(view(formProvider().fill(ms), edit))
+      }
 
-        block getOrElse Ok(money_sources(EmptyForm, edit))
-
+      block getOrElse Ok(view(formProvider(), edit))
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        Form2[MoneySources](request.body) match {
-          case f: InvalidForm => Future.successful(BadRequest(money_sources(f, edit)))
-          case ValidForm(_, model) =>
-            dataCacheConnector.fetchAll(request.credId) flatMap {
-              optMap =>
-                val result = for {
-                  cacheMap <- optMap
-                  renewal <- cacheMap.getEntry[Renewal](Renewal.key)
-                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-                  services <- bm.msbServices
-                  activities <- bm.activities
-                } yield {
-                  renewalService.updateRenewal(request.credId, updateMoneySources(renewal, model)) map { _ =>
-                    standardRouting(services.msbServices, activities.businessActivities, edit)
-                  }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithError => Future.successful(BadRequest(view(formWithError, edit))),
+        data =>
+          dataCacheConnector.fetchAll(request.credId) flatMap {
+            optMap =>
+              val result = for {
+                cacheMap <- optMap
+                renewal <- cacheMap.getEntry[Renewal](Renewal.key)
+                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                services <- bm.msbServices
+                activities <- bm.activities
+              } yield {
+                renewalService.updateRenewal(request.credId, updateMoneySources(renewal, data)) map { _ =>
+                  standardRouting(services.msbServices, activities.businessActivities, edit)
                 }
-                result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
-            }
-        }
+              }
+              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+          }
+      )
   }
 
   def updateMoneySources(oldRenewal: Renewal, moneySources: MoneySources): Renewal = {

@@ -18,19 +18,21 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, HowCashPaymentsReceived, PaymentMethods, Renewal}
+import forms.renewal.CashPaymentsCustomersNotMetFormProvider
+import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.renewal.cash_payments_customers_not_met
+import views.html.renewal.CashPaymentsCustomersNotMetView
 
 import scala.concurrent.Future
 
-class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
+class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec with Injecting {
 
   lazy val mockDataCacheConnector = mock[DataCacheConnector]
   lazy val mockRenewalService = mock[RenewalService]
@@ -41,12 +43,13 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[cash_payments_customers_not_met]
+    lazy val view = inject[CashPaymentsCustomersNotMetView]
     val controller = new CashPaymentsCustomersNotMetController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService, cc = mockMcc,
-      cash_payments_customers_not_met = view
+      formProvider = inject[CashPaymentsCustomersNotMetFormProvider],
+      view = view
     )
 
     when(mockRenewalService.getRenewal(any())(any()))
@@ -103,7 +106,8 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
 
       "a valid request is made" must {
         "redirect to summary page if false is passed in the form" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.CashPaymentsCustomersNotMetController.post().url)
+          .withFormUrlEncodedBody(
             "receiveCashPayments" -> "false"
           )
 
@@ -116,7 +120,8 @@ class CashPaymentsCustomersNotMetControllerSpec extends AmlsSpec {
 
       "a valid request is made" must {
         "redirect to HowCashPaymentsReceivedController if true is passed in the form" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.CashPaymentsCustomersNotMetController.post().url)
+          .withFormUrlEncodedBody(
             "receiveCashPayments" -> "true"
           )
 

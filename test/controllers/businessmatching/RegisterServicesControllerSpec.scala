@@ -86,7 +86,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
     lazy val controller = app.injector.instanceOf[RegisterServicesController]
 
     when {
-      controller.statusService.isPreSubmission(Some(any()), any(), any())(any(), any())
+      controller.statusService.isPreSubmission(Some(any()), any(), any())(any(), any(), any())
     } thenReturn Future.successful(true)
 
     when {
@@ -828,7 +828,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
 
         when {
-          controller.statusService.isPreSubmission(Some(any()), any(), any())(any(),any())
+          controller.statusService.isPreSubmission(Some(any()), any(), any())(any(), any(), any())
         } thenReturn Future.successful(false)
 
         val postRequest = FakeRequest(POST, routes.RegisterServicesController.post().url)
@@ -855,7 +855,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
 
         when {
-          controller.statusService.isPreSubmission(Some(any()), any(), any())(any(),any())
+          controller.statusService.isPreSubmission(Some(any()), any(), any())(any(), any(), any())
         } thenReturn Future.successful(true)
 
         val postRequest = FakeRequest(POST, routes.RegisterServicesController.post().url)

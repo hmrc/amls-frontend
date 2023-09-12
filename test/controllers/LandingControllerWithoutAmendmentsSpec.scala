@@ -135,7 +135,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
 
         when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
-        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
           .thenReturn(Future.successful((rejectedStatusGen.sample.get, None)))
 
         val result: Future[Result] = controllerNoAmlsNumber.get()(request)
@@ -149,7 +149,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
       "the landing service has a saved form and " when {
         "the form has not been submitted" in new Fixture {
-          when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+          when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
             .thenReturn(Future.successful((NotCompleted, None)))
 
           val complete = mock[BusinessMatching]
@@ -178,7 +178,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
             .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
-          when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+          when(controllerNoAmlsNumber.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
             .thenReturn(Future.successful((SubmissionReady, None)))
 
           val result = controllerNoAmlsNumber.get()(request)

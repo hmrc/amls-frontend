@@ -84,7 +84,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
     when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
       .thenReturn(Future.successful(Some(mockCacheMap)))
 
-    when(whatDoesYourBusinessDoController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).
+    when(whatDoesYourBusinessDoController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())).
       thenReturn(Future.successful(SubmissionReady))
   }
 
@@ -331,7 +331,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
           "redirect to the dateOfChange page when no money services have been added" in new Fixture {
 
-            when(whatDoesYourBusinessDoController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).
+            when(whatDoesYourBusinessDoController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())).
               thenReturn(Future.successful(SubmissionDecisionApproved))
 
             val model = WhatDoesYourBusinessDo(Set(AccountancyServices))
@@ -362,7 +362,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
           "redirect to the dateOfChange page when no money services have been added" in new Fixture {
 
-            when(whatDoesYourBusinessDoController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).
+            when(whatDoesYourBusinessDoController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())).
               thenReturn(Future.successful(ReadyForRenewal(None)))
 
             val model = WhatDoesYourBusinessDo(Set(AccountancyServices))

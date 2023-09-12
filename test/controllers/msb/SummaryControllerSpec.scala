@@ -68,7 +68,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
     )
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(true)
 
     mockCacheFetch[ServiceChangeRegister](None, None)

@@ -57,7 +57,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
     mockCacheGetEntry[ServiceChangeRegister](None, ServiceChangeRegister.key)
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(true)
 
     val emptyCache = CacheMap("", Map.empty)
@@ -278,7 +278,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
         mockCacheSave[MoneyServiceBusiness]
 
         when {
-          controller.statusService.isPreSubmission(any(), any(), any())(any(), any())
+          controller.statusService.isPreSubmission(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(false)
       }
 
@@ -331,7 +331,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
         mockCacheSave[MoneyServiceBusiness]
 
         when {
-          controller.statusService.isPreSubmission(any(), any(), any())(any(), any())
+          controller.statusService.isPreSubmission(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(false)
       }
 
@@ -367,7 +367,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar w
         val incomingModel = MoneyServiceBusiness()
 
         when {
-          controller.statusService.isPreSubmission(any(), any(), any())(any(), any())
+          controller.statusService.isPreSubmission(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)

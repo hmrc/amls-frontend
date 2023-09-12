@@ -84,7 +84,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
     "load the summary page when section data is available" in new Fixture {
 
       val model = BusinessActivities(None)
-      when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+      when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCache.fetchAll(any())(any()))
@@ -102,7 +102,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+      when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCache.fetchAll(any())(any()))
@@ -130,7 +130,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
           .thenReturn(Some(completeModel))
 
 
-        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get()(request)
@@ -154,7 +154,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
         when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
           .thenReturn(Some(completeModel))
 
-        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get()(request)

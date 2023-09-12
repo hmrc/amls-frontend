@@ -18,34 +18,36 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching._
+import forms.renewal.FXTransactionsInLast12MonthsFormProvider
 import models.businessmatching.BusinessActivity._
+import models.businessmatching._
 import models.renewal.{FXTransactionsInLast12Months, Renewal}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.renewal.fx_transaction_in_last_12_months
+import views.html.renewal.FXTransactionsInLast12MonthsView
 
 import scala.concurrent.Future
 
-class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar  {
+class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = app.injector.instanceOf[fx_transaction_in_last_12_months]
+    lazy val view = inject[FXTransactionsInLast12MonthsView]
     val controller = new FXTransactionsInLast12MonthsController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService, cc = mockMcc,
-      fx_transaction_in_last_12_months = view
+      formProvider = inject[FXTransactionsInLast12MonthsFormProvider],
+      view = view
     )
 
     val cacheMap = mock[CacheMap]
@@ -68,7 +70,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("renewal.msb.fx.transactions.expected.title"))
+      contentAsString(result) must include(messages("renewal.msb.fx.transactions.expected.title"))
     }
 
     "load the page 'How many foreign exchange transactions' with pre populated data" in new Fixture  {
@@ -85,7 +87,8 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "Show error message when user has not filled the mandatory fields" in new Fixture  {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.FXTransactionsInLast12MonthsController.post().url)
+      .withFormUrlEncodedBody(
         "fxTransaction" -> ""
       )
 
@@ -98,12 +101,13 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include (Messages("error.required.renewal.fx.transactions.in.12months"))
+      contentAsString(result) must include (messages("error.required.renewal.fx.transactions.in.12months"))
 
     }
 
     trait FlowFixture extends Fixture {
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.FXTransactionsInLast12MonthsController.post().url)
+      .withFormUrlEncodedBody(
         "fxTransaction" -> "12345678963"
       )
 

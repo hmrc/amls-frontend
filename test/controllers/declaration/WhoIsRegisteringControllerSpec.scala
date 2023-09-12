@@ -88,7 +88,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
       when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(cacheMap)))
 
-      when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+      when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(status))
 
       when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))

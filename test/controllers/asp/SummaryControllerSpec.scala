@@ -41,7 +41,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     mockCacheSave[Asp]
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(true)
   }
 

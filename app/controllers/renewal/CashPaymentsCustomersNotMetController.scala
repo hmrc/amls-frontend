@@ -19,14 +19,15 @@ package controllers.renewal
 import com.google.inject.Singleton
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.renewal.CashPaymentsCustomersNotMetFormProvider
 import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, Renewal}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RenewalService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-import views.html.renewal.cash_payments_customers_not_met
+import views.html.renewal.CashPaymentsCustomersNotMetView
+
+import javax.inject.Inject
 import scala.concurrent.Future
 
 @Singleton
@@ -35,28 +36,29 @@ class CashPaymentsCustomersNotMetController @Inject()(val dataCacheConnector: Da
                                                       val ds: CommonPlayDependencies,
                                                       val renewalService: RenewalService,
                                                       val cc: MessagesControllerComponents,
-                                                      cash_payments_customers_not_met: cash_payments_customers_not_met) extends AmlsBaseController(ds, cc) {
+                                                      formProvider: CashPaymentsCustomersNotMetFormProvider,
+                                                      view: CashPaymentsCustomersNotMetView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       renewalService.getRenewal(request.credId).map {
         response =>
-          val form: Form2[CashPaymentsCustomerNotMet] = (for {
+          val form = (for {
             renewal <- response
             payments <- renewal.receiveCashPayments map { c => c.cashPaymentsCustomerNotMet }
-          } yield Form2[CashPaymentsCustomerNotMet](payments)).getOrElse(EmptyForm)
-          Ok(cash_payments_customers_not_met(form, edit))
+          } yield formProvider().fill(payments)).getOrElse(formProvider())
+          Ok(view(form, edit))
       } recoverWith {
-        case _ => Future.successful(Ok(cash_payments_customers_not_met(EmptyForm, edit)))
+        case _ => Future.successful(Ok(view(formProvider(), edit)))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[CashPaymentsCustomerNotMet](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(cash_payments_customers_not_met(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             renewal <- renewalService.getRenewal(request.credId)
             _ <- updateCashPayments(request.credId, data, renewal)
@@ -64,7 +66,7 @@ class CashPaymentsCustomersNotMetController @Inject()(val dataCacheConnector: Da
             case CashPaymentsCustomerNotMet(true) => Redirect(routes.HowCashPaymentsReceivedController.get(edit))
             case CashPaymentsCustomerNotMet(false) => Redirect(routes.SummaryController.get)
           }
-      }
+      )
     }
   }
 

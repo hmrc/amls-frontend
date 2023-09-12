@@ -19,6 +19,7 @@ package controllers.renewal
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.renewal.MoneySourcesFormProvider
 import models.businessmatching._
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService._
@@ -28,16 +29,16 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.renewal.money_sources
+import views.html.renewal.MoneySourcesView
 
 import scala.concurrent.Future
 
-class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar {
+class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self =>
@@ -45,14 +46,15 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
     val cacheMap = mock[CacheMap]
-    lazy val view = app.injector.instanceOf[money_sources]
+    lazy val view = inject[MoneySourcesView]
     lazy val controller = new MoneySourcesController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       renewalService,
       dataCacheConnector,
       cc = mockMcc,
-      money_sources = view)
+      formProvider = inject[MoneySourcesFormProvider],
+      view = view)
 
     when {
       renewalService.getRenewal(any())(any())
@@ -63,16 +65,12 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   trait FormSubmissionFixture extends Fixture {
-    val validFormRequest = requestWithUrlEncodedBody(
-      "currencies[0]" -> "USD",
-      "currencies[1]" -> "GBP",
-      "currencies[2]" -> "BOB",
-      "bankMoneySource" -> "Yes",
+    val validFormRequest = FakeRequest(POST, routes.MoneySourcesController.post().url).withFormUrlEncodedBody(
+      "moneySources[1]" -> "banks",
       "bankNames" -> "Bank names",
-      "wholesalerMoneySource" -> "Yes",
+      "moneySources[2]" -> "wholesalers",
       "wholesalerNames" -> "wholesaler names",
-      "customerMoneySource" -> "Yes",
-      "usesForeignCurrencies" -> "Yes"
+      "moneySources[3]" -> "customers"
     )
 
     when {
@@ -131,7 +129,7 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
-        doc.select(".heading-xlarge").text mustBe Messages("renewal.msb.money_sources.header")
+        doc.getElementsByTag("h1").text mustBe messages("renewal.msb.money_sources.header")
       }
     }
   }
@@ -181,7 +179,7 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "save the model data into the renewal object" in new RoutingFixture {
-        val result = await(controller.post()(validFormRequest))
+        await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
         verify(renewalService).updateRenewal(any(), captor.capture())(any())

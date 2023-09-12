@@ -58,7 +58,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with
       error = errorView
     )
 
-    when(timeAtCurrentAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+    when(timeAtCurrentAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(SubmissionReadyForReview))
   }
 

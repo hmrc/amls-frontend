@@ -140,14 +140,14 @@ class BacsConfirmationControllerSpec extends AmlsSpec
     def setupStatus(status: SubmissionStatus): Unit = {
 
       when {
-        controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any())
+        controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any(), any())
       } thenReturn Future.successful(status)
 
       val statusResponse = mock[ReadStatusResponse]
       when(statusResponse.safeId) thenReturn safeIdGen.sample
 
       when {
-        controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any())
+        controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any())
       } thenReturn Future.successful((status, Some(statusResponse)))
     }
   }

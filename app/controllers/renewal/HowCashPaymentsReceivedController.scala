@@ -19,46 +19,46 @@ package controllers.renewal
 import com.google.inject.Singleton
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, HowCashPaymentsReceived}
-import play.api.mvc.MessagesControllerComponents
+import forms.renewal.HowCashPaymentsReceivedFormProvider
+import models.renewal.{CashPayments, CashPaymentsCustomerNotMet}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RenewalService
 import utils.AuthAction
+import views.html.renewal.HowCashPaymentsReceivedView
 
-import views.html.renewal.how_cash_payments_received
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 @Singleton
 class HowCashPaymentsReceivedController @Inject()(
-                                                 val dataCacheConnector: DataCacheConnector,
-                                                 val authAction: AuthAction,
-                                                 val ds: CommonPlayDependencies,
-                                                 val renewalService: RenewalService,
-                                                 val cc: MessagesControllerComponents,
-                                                 how_cash_payments_received: how_cash_payments_received) extends AmlsBaseController(ds, cc) {
+                                                   val dataCacheConnector: DataCacheConnector,
+                                                   val authAction: AuthAction,
+                                                   val ds: CommonPlayDependencies,
+                                                   val renewalService: RenewalService,
+                                                   val cc: MessagesControllerComponents,
+                                                   formProvider: HowCashPaymentsReceivedFormProvider,
+                                                   view: HowCashPaymentsReceivedView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       renewalService.getRenewal(request.credId) map {
         response =>
-          val form: Form2[HowCashPaymentsReceived] = (for {
+          val form = (for {
             renewal <- response
-            payments <- renewal.receiveCashPayments flatMap {c => c.howCashPaymentsReceived}
-          } yield Form2[HowCashPaymentsReceived](payments)).getOrElse(EmptyForm)
-          Ok(how_cash_payments_received(form, edit))
+            payments <- renewal.receiveCashPayments.flatMap(_.howCashPaymentsReceived)
+          } yield formProvider().fill(payments)).getOrElse(formProvider())
+          Ok(view(form, edit))
       } recoverWith {
-        case _ => Future.successful(Ok(how_cash_payments_received(EmptyForm, edit)))
+        case _ => Future.successful(Ok(view(formProvider(), edit)))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[HowCashPaymentsReceived](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(how_cash_payments_received(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             renewal <- renewalService.getRenewal(request.credId)
             _ <- renewalService.updateRenewal(request.credId,
@@ -68,7 +68,7 @@ class HowCashPaymentsReceivedController @Inject()(
                 case _ => CashPayments(CashPaymentsCustomerNotMet(false), None)
             }))
           } yield Redirect(routes.SummaryController.get)
-      }
+      )
     }
   }
 

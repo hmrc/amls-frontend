@@ -18,22 +18,27 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.renewal.BusinessTurnoverFormProvider
 import models.renewal.{BusinessTurnover, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.renewal.business_turnover
+import views.html.renewal.BusinessTurnoverView
 
 import scala.concurrent.Future
 
-class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach with Injecting {
+
+  lazy val mockDataCacheConnector = mock[DataCacheConnector]
+  lazy val mockRenewalService = mock[RenewalService]
 
   trait Fixture {
     self =>
@@ -43,20 +48,23 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
     val emptyCache = CacheMap("", Map.empty)
 
-    lazy val mockDataCacheConnector = mock[DataCacheConnector]
-    lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = app.injector.instanceOf[business_turnover]
+    lazy val view = inject[BusinessTurnoverView]
     val controller = new BusinessTurnoverController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService, cc = mockMcc,
-      business_turnover = view
+      formProvider = inject[BusinessTurnoverFormProvider],
+      view = view
     )
 
     when(mockRenewalService.getRenewal(any())(any()))
       .thenReturn(Future.successful(Some(Renewal(businessTurnover = Some(BusinessTurnover.First)))))
   }
 
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(mockRenewalService, mockDataCacheConnector)
+  }
 
   val emptyCache = CacheMap("", Map.empty)
 
@@ -67,7 +75,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("renewal.business-turnover.title"))
+        contentAsString(result) must include(messages("renewal.business-turnover.title"))
       }
 
       "on get display the  Business Turnover page with pre populated data" in new Fixture {
@@ -77,17 +85,42 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.select("input[value=01]").hasAttr("checked") must be(true)
+        document.select("input[value=zeroPlus]").hasAttr("checked") must be(true)
       }
 
     }
 
     "when post is called" must {
 
+      "return 400" when {
+
+        "given no data" in new Fixture {
+
+          val newRequest = FakeRequest(POST, routes.BusinessTurnoverController.post().url).withFormUrlEncodedBody(
+            "businessTurnover" -> ""
+          )
+
+          verifyZeroInteractions(mockDataCacheConnector, mockRenewalService)
+
+          status(controller.post()(newRequest)) must be(BAD_REQUEST)
+        }
+
+        "given bad data" in new Fixture {
+
+          val newRequest = FakeRequest(POST, routes.BusinessTurnoverController.post().url).withFormUrlEncodedBody(
+            "businessTurnover" -> "foo"
+          )
+
+          verifyZeroInteractions(mockDataCacheConnector, mockRenewalService)
+
+          status(controller.post()(newRequest)) must be(BAD_REQUEST)
+        }
+      }
+
       "on post with valid data" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "businessTurnover" -> "01"
+        val newRequest = FakeRequest(POST, routes.BusinessTurnoverController.post().url).withFormUrlEncodedBody(
+          "businessTurnover" -> "zeroPlus"
         )
 
         when(controller.dataCacheConnector.fetch[BusinessTurnover](any(), any())(any(), any()))
@@ -103,8 +136,8 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "on post with valid data in edit mode" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "businessTurnover" -> "01"
+        val newRequest = FakeRequest(POST, routes.BusinessTurnoverController.post().url).withFormUrlEncodedBody(
+          "businessTurnover" -> "tenMillionPlus"
         )
 
         when(controller.dataCacheConnector.fetch[BusinessTurnover](any(), any())(any(), any()))
@@ -117,7 +150,6 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
       }
-
     }
   }
 }

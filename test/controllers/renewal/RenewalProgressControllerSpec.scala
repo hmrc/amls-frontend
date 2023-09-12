@@ -22,8 +22,8 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import generators.businessmatching.BusinessMatchingGenerator
 import models.ReadStatusResponse
-import models.businessmatching._
 import models.businessmatching.BusinessActivity._
+import models.businessmatching._
 import models.registrationprogress._
 import models.responsiblepeople.{ResponsiblePeopleValues, ResponsiblePerson}
 import models.status.{ReadyForRenewal, RenewalSubmitted}
@@ -31,17 +31,15 @@ import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.Call
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction}
-
 
 import scala.concurrent.Future
 
@@ -76,21 +74,21 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
     val cacheMap = mock[CacheMap]
 
-    val defaultSection = Section("A new section", NotStarted, hasChanged = false, mock[Call])
+    val defaultTaskRow = TaskRow("A new section", "/foo", false, NotStarted, TaskRow.notStartedTag)
 
-    val renewalSection = Section("renewal", NotStarted, hasChanged = false, mock[Call])
+    val renewalTaskRow = defaultTaskRow.copy(msgKey = "renewal")
 
     when {
       dataCacheConnector.fetchAll(any())(any())
     } thenReturn Future.successful(Some(cacheMap))
 
     when {
-      sectionsProvider.sections(eqTo(cacheMap))
-    } thenReturn Seq(defaultSection)
+      sectionsProvider.taskRows(eqTo(cacheMap))(any())
+    } thenReturn Seq(defaultTaskRow)
 
     when {
-      renewalService.getSection(any())(any(), any())
-    } thenReturn Future.successful(renewalSection)
+      renewalService.getTaskRow(any())(any(), any(), any())
+    } thenReturn Future.successful(renewalTaskRow)
 
     val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
     val bm = Some(businessMatchingGen.sample.get.copy(activities = Some(businessActivitiesModel)))
@@ -108,8 +106,8 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
       .thenReturn(OptionT.none[Future, Set[BusinessActivity]])
 
     when {
-      sectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
-    } thenReturn Seq(defaultSection)
+      sectionsProvider.taskRowsFromBusinessActivities(any(), any())(any(), any())
+    } thenReturn Seq(defaultTaskRow)
 
     when(cacheMap.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any()))
       .thenReturn(Some(Seq(completeResponsiblePerson)))
@@ -119,7 +117,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
     "load the page when status is ReadyForRenewal" in new Fixture {
 
-      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
       val bmWithoutTCSPOrMSB = Some(BusinessMatching(activities = Some(businessActivitiesModel)))
@@ -133,13 +131,12 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
       val html = Jsoup.parse(contentAsString(result))
 
-      html.select(".page-header").text() must include(Messages("renewal.progress.title"))
-
+      html.getElementsByTag("h1").text() must include(messages("renewal.progress.title"))
     }
 
     "redirect to the registration progress controller when status is renewal submitted" in new Fixture {
 
-      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful((RenewalSubmitted(Some(renewalDate)), Some(readStatusResponse))))
 
       val bmWithoutTCSPOrMSB = Some(bm.get.copy(activities = Some(businessActivitiesModel)))
@@ -157,7 +154,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
     "load the page when status is ReadyForRenewal and one of the section is modified" in new Fixture  {
 
-      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
       val bmWithoutTCSPOrMSB = Some(bm.get.copy(activities = Some(businessActivitiesModel)))
@@ -166,11 +163,11 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
         .thenReturn(bmWithoutTCSPOrMSB)
 
       val sections = Seq(
-        Section("supervision", Completed, true,  controllers.supervision.routes.SummaryController.get),
-        Section("businessmatching", Completed, true,  controllers.businessmatching.routes.SummaryController.get)
+        TaskRow("supervision", controllers.supervision.routes.SummaryController.get.url, false, Completed, TaskRow.completedTag),
+        TaskRow("asp", controllers.asp.routes.SummaryController.get.url, true, Completed, TaskRow.updatedTag)
       )
 
-      when(controller.sectionsProvider.sections(cacheMap))
+      when(controller.sectionsProvider.taskRows(eqTo(cacheMap))(any()))
         .thenReturn(sections)
 
       when(controller.renewals.canSubmit(any(),any()))
@@ -181,23 +178,23 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
       status(result) mustBe OK
 
       val html = Jsoup.parse(contentAsString(result))
-      html.select(".page-header").text() must include(Messages("renewal.progress.title"))
+      html.getElementsByTag("h1").text() must include(messages("renewal.progress.title"))
       html.select("button[name=submit]").hasAttr("disabled") must be(false)
 
-      val elements = html.getElementsMatchingOwnText(Messages("progress.visuallyhidden.view.updated"))
+      val elements = html.getElementsMatchingOwnText(messages("progress.visuallyhidden.view.updated"))
       elements.size() must be(1)
 
     }
 
     "display all the available sections from a normal variation progress page" in new Fixture {
-      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
       val result = controller.get()(request)
     }
 
     "respond with InternalServerError when no sections are returned" in new Fixture {
-      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+      when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
       when {
@@ -214,9 +211,9 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
   "POST" must {
     "redirect to correct page" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody("" -> "")
+      val newRequest = FakeRequest(POST, routes.RenewalProgressController.post().url).withFormUrlEncodedBody("" -> "")
 
-      when(controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any()))
+      when(controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get)))
 
       val result = controller.post()(newRequest)

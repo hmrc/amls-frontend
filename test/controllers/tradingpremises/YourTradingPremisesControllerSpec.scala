@@ -59,7 +59,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
       view = view,
       error = errorView)
 
-    when(ytpController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+    when(ytpController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
     val model = TradingPremises()
     val models = Seq(TradingPremises())

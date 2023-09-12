@@ -20,9 +20,7 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.Json
 import utils.AmlsSpec
 
-import java.time.LocalDateTime
-
-class PaymentSpec extends AmlsSpec with ScalaFutures {
+class PaymentSpec extends AmlsSpec with ScalaFutures { //TODO come back and sort this
 
   val paymentJson =
     """

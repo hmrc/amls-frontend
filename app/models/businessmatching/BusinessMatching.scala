@@ -115,33 +115,33 @@ case class BusinessMatching(
     case _ => false
   }
 
-  def alphabeticalBusinessTypes()(implicit message: Messages): Option[List[String]] = {
+  def alphabeticalBusinessTypes()(implicit messages: Messages): Option[List[String]] = {
     activities map { a =>
       a.businessActivities.map {
-        case AccountancyServices => Messages("businessmatching.registerservices.servicename.lbl.01")
-        case ArtMarketParticipant => Messages("businessmatching.registerservices.servicename.lbl.02")
-        case BillPaymentServices => Messages("businessmatching.registerservices.servicename.lbl.03")
-        case EstateAgentBusinessService => Messages("businessmatching.registerservices.servicename.lbl.04")
-        case HighValueDealing => Messages("businessmatching.registerservices.servicename.lbl.05")
-        case MoneyServiceBusiness => Messages("businessmatching.registerservices.servicename.lbl.06")
-        case TrustAndCompanyServices => Messages("businessmatching.registerservices.servicename.lbl.07")
-        case TelephonePaymentService => Messages("businessmatching.registerservices.servicename.lbl.08")
+        case AccountancyServices => messages("businessmatching.registerservices.servicename.lbl.01")
+        case ArtMarketParticipant => messages("businessmatching.registerservices.servicename.lbl.02")
+        case BillPaymentServices => messages("businessmatching.registerservices.servicename.lbl.03")
+        case EstateAgentBusinessService => messages("businessmatching.registerservices.servicename.lbl.04")
+        case HighValueDealing => messages("businessmatching.registerservices.servicename.lbl.05")
+        case MoneyServiceBusiness => messages("businessmatching.registerservices.servicename.lbl.06")
+        case TrustAndCompanyServices => messages("businessmatching.registerservices.servicename.lbl.07")
+        case TelephonePaymentService => messages("businessmatching.registerservices.servicename.lbl.08")
       }.toList.sorted
     }
   }
 
-  def alphabeticalBusinessActivitiesLowerCase(estateAgent: Boolean = false)(implicit message: Messages): Option[List[String]] = {
+  def alphabeticalBusinessActivitiesLowerCase(estateAgent: Boolean = false)(implicit messages: Messages): Option[List[String]] = {
     activities map { a =>
       a.businessActivities.map {
-        case AccountancyServices => Messages("businessactivities.registerservices.servicename.lbl.01")
-        case ArtMarketParticipant => Messages("businessactivities.registerservices.servicename.lbl.02")
-        case BillPaymentServices => Messages("businessactivities.registerservices.servicename.lbl.03")
-        case EstateAgentBusinessService if estateAgent => Messages("businessactivities.registerservices.servicename.lbl.04.agent")
-        case EstateAgentBusinessService => Messages("businessactivities.registerservices.servicename.lbl.04")
-        case HighValueDealing => Messages("businessactivities.registerservices.servicename.lbl.05")
-        case MoneyServiceBusiness => Messages("businessactivities.registerservices.servicename.lbl.06")
-        case TrustAndCompanyServices => Messages("businessactivities.registerservices.servicename.lbl.07")
-        case TelephonePaymentService => Messages("businessactivities.registerservices.servicename.lbl.08")
+        case AccountancyServices => messages("businessactivities.registerservices.servicename.lbl.01")
+        case ArtMarketParticipant => messages("businessactivities.registerservices.servicename.lbl.02")
+        case BillPaymentServices => messages("businessactivities.registerservices.servicename.lbl.03")
+        case EstateAgentBusinessService if estateAgent => messages("businessactivities.registerservices.servicename.lbl.04.agent")
+        case EstateAgentBusinessService => messages("businessactivities.registerservices.servicename.lbl.04")
+        case HighValueDealing => messages("businessactivities.registerservices.servicename.lbl.05")
+        case MoneyServiceBusiness => messages("businessactivities.registerservices.servicename.lbl.06")
+        case TrustAndCompanyServices => messages("businessactivities.registerservices.servicename.lbl.07")
+        case TelephonePaymentService => messages("businessactivities.registerservices.servicename.lbl.08")
       }.toList.sorted
     }
   }
@@ -170,18 +170,6 @@ object BusinessMatching {
 
   val messageKey = "businessmatching"
 
-  def section(implicit cache: CacheMap): Section = {
-    val incomplete = Section(messageKey, NotStarted, false, controllers.businessmatching.routes.RegisterServicesController.get())
-    cache.getEntry[BusinessMatching](key).fold(incomplete) {
-      model =>
-        if (model.isComplete) {
-          Section(messageKey, Completed, model.hasChanged, controllers.businessmatching.routes.SummaryController.get)
-        } else {
-          Section(messageKey, Started, model.hasChanged, controllers.businessmatching.routes.RegisterServicesController.get())
-        }
-    }
-  }
-
   def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
     val incomplete = TaskRow(
       messageKey,
@@ -203,7 +191,7 @@ object BusinessMatching {
         } else {
           TaskRow(
             messageKey,
-            controllers.businessmatching.routes.SummaryController.get.url,
+            controllers.businessmatching.routes.RegisterServicesController.get().url,
             model.hasChanged,
             Started,
             TaskRow.incompleteTag

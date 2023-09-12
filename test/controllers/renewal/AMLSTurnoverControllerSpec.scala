@@ -17,41 +17,42 @@
 package controllers.renewal
 
 import controllers.actions.SuccessfulAuthAction
+import forms.renewal.AMLSTurnoverFormProvider
 import models.businessactivities._
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessActivities => Activities, _}
 import models.renewal.AMLSTurnover.First
-import models.renewal.Renewal
+import models.renewal.{AMLSTurnover, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.renewal.amls_turnover
+import views.html.renewal.AMLSTurnoverView
 
 import scala.concurrent.Future
 
-class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
     lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = app.injector.instanceOf[amls_turnover]
+    lazy val view = inject[AMLSTurnoverView]
     val controller = new AMLSTurnoverController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       renewalService = mockRenewalService,
       cc = mockMcc,
-      amls_turnover = view
+      formProvider = inject[AMLSTurnoverFormProvider],
+      view = view
     )
 
     val businessMatching = BusinessMatching(
@@ -80,7 +81,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("renewal.turnover.title"))
+        contentAsString(result) must include(messages("renewal.turnover.title"))
       }
 
       "display the Role Within Business page with pre populated data" in new Fixture {
@@ -91,7 +92,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[value=01]").hasAttr("checked") must be(true)
+        document.select("input[value=zeroPlus]").hasAttr("checked") must be(true)
       }
 
       "display the business type is AccountancyServices" in new Fixture {
@@ -111,7 +112,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.01"))
+        contentAsString(result) must include(messages("businessactivities.registerservices.servicename.lbl.01"))
 
       }
 
@@ -132,7 +133,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.03"))
+        contentAsString(result) must include(messages("businessactivities.registerservices.servicename.lbl.03"))
 
       }
 
@@ -153,7 +154,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.04"))
+        contentAsString(result) must include(messages("businessactivities.registerservices.servicename.lbl.04"))
 
       }
 
@@ -174,7 +175,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.05"))
+        contentAsString(result) must include(messages("businessactivities.registerservices.servicename.lbl.05"))
 
       }
 
@@ -195,7 +196,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.06"))
+        contentAsString(result) must include(messages("businessactivities.registerservices.servicename.lbl.06"))
 
       }
 
@@ -216,7 +217,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.07"))
+        contentAsString(result) must include(messages("businessactivities.registerservices.servicename.lbl.07"))
 
       }
 
@@ -237,7 +238,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessactivities.registerservices.servicename.lbl.08"))
+        contentAsString(result) must include(messages("businessactivities.registerservices.servicename.lbl.08"))
 
       }
 
@@ -251,8 +252,8 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
           "in edit mode" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
-              "turnover" -> "01"
+            val newRequest = FakeRequest(POST, routes.AMLSTurnoverController.post().url).withFormUrlEncodedBody(
+              "turnover" -> AMLSTurnover.First.toString
             )
 
             val bMatching = BusinessMatching(
@@ -273,8 +274,8 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           }
 
           "it does not have business type of ASP, HVD or MSB" in new Fixture {
-            val newRequest = requestWithUrlEncodedBody(
-              "turnover" -> "01"
+            val newRequest = FakeRequest(POST, routes.AMLSTurnoverController.post().url).withFormUrlEncodedBody(
+              "turnover" -> AMLSTurnover.First.toString
             )
 
             val bMatching = BusinessMatching(
@@ -296,8 +297,8 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         "go to renewal CustomerOutsideIsUKController" when {
           "it has business type of HVD and not (ASP or MSB)" in new Fixture {
-            val newRequest = requestWithUrlEncodedBody(
-              "turnover" -> "01"
+            val newRequest = FakeRequest(POST, routes.AMLSTurnoverController.post().url).withFormUrlEncodedBody(
+              "turnover" -> AMLSTurnover.First.toString
             )
 
             val bMatching = BusinessMatching(
@@ -320,8 +321,8 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "go to the renewal TotalThroughput page" when {
 
           "it has a business type of MSB but not ASP" in new Fixture {
-            val newRequest = requestWithUrlEncodedBody(
-              "turnover" -> "01"
+            val newRequest = FakeRequest(POST, routes.AMLSTurnoverController.post().url).withFormUrlEncodedBody(
+              "turnover" -> AMLSTurnover.First.toString
             )
 
             val bMatching = BusinessMatching(
@@ -355,11 +356,9 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
           status(result) mustBe BAD_REQUEST
         }
-      }
 
-      "getErrorMessage" must {
         "return error message for multiple services" when {
-          "there's more than one business activity" in new Fixture with PrivateMethodTester {
+          "there's more than one business activity" in new Fixture {
             override val businessMatching = BusinessMatching(
               activities = Some(Activities(Set(AccountancyServices, MoneyServiceBusiness)))
             )
@@ -367,32 +366,43 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
               .thenReturn(Future.successful(Some(businessMatching)))
 
-            val getErrorMessage = PrivateMethod[Future[String]]('getErrorMessage)
-            val result = controller invokePrivate getErrorMessage("credId", headerCarrier)
+            val newRequest = FakeRequest(POST, routes.AMLSTurnoverController.post().url).withFormUrlEncodedBody(
+              "turnover" -> ""
+            )
 
-            whenReady(result) { res =>
-              res mustBe "error.required.renewal.ba.turnover.from.mlr"
-            }
+            val result = controller.post(true)(newRequest)
+
+            status(result) mustBe BAD_REQUEST
+
+            contentAsString(result) must include(
+              messages("error.required.renewal.ba.turnover.from.mlr")
+            )
           }
         }
 
         "return error message for single service" when {
-          "there's one business activity" in new Fixture with PrivateMethodTester {
-
+          "there's one business activity" in new Fixture {
             when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
               .thenReturn(Future.successful(Some(businessMatching)))
 
-            val getErrorMessage = PrivateMethod[Future[String]]('getErrorMessage)
-            val result = controller invokePrivate getErrorMessage("credId", headerCarrier)
+            val newRequest = FakeRequest(POST, routes.AMLSTurnoverController.post().url).withFormUrlEncodedBody(
+              "turnover" -> ""
+            )
 
-            whenReady(result) { res =>
-              res mustBe "error.required.renewal.ba.turnover.from.mlr.single.service"
-            }
+            val result = controller.post(true)(newRequest)
+
+            status(result) mustBe BAD_REQUEST
+
+            contentAsString(result) must include(
+              messages("error.required.renewal.ba.turnover.from.mlr.single.service",
+                messages("businessactivities.registerservices.servicename.lbl.01")
+              )
+            )
           }
         }
 
         "return default error message" when {
-          "no business activities are returned" in new Fixture with PrivateMethodTester {
+          "no business activities are returned" in new Fixture {
             override val businessMatching = BusinessMatching(
               activities = Some(Activities(Set()))
             )
@@ -400,12 +410,17 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
               .thenReturn(Future.successful(Some(businessMatching)))
 
-            val getErrorMessage = PrivateMethod[Future[String]]('getErrorMessage)
-            val result = controller invokePrivate getErrorMessage("credId", headerCarrier)
+            val newRequest = FakeRequest(POST, routes.AMLSTurnoverController.post().url).withFormUrlEncodedBody(
+              "turnover" -> ""
+            )
 
-            whenReady(result) { res =>
-              res mustBe "error.required.renewal.ba.turnover.from.mlr"
-            }
+            val result = controller.post(true)(newRequest)
+
+            status(result) mustBe BAD_REQUEST
+
+            contentAsString(result) must include(
+              messages("error.required.renewal.ba.turnover.from.mlr")
+            )
           }
         }
       }

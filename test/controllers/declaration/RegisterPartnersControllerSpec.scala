@@ -149,7 +149,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
           when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePerson]]](any(), any(), meq(Some(updatedList)))(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(controller.progressService.getSubmitRedirect(Some(any()), any(), any())(any(), any()))
+          when(controller.progressService.getSubmitRedirect(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(controllers.declaration.routes.WhoIsRegisteringController.get)))
 
           val result = controller.post()(newRequest)

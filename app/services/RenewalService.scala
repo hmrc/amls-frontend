@@ -20,36 +20,58 @@ import cats.data.OptionT
 import cats.data.Validated.Valid
 import cats.implicits._
 import connectors.DataCacheConnector
-
-import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.businessmatching._
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress.{Completed, NotStarted, Started, TaskRow}
 import models.renewal.Renewal.ValidationRules._
 import models.renewal._
+import play.api.i18n.Messages
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.MappingUtils._
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
-  def getSection(credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
+  def getTaskRow(credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, messages: Messages) = {
 
-    val notStarted = Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get)
+    val notStarted = TaskRow(
+      Renewal.sectionKey,
+      controllers.renewal.routes.WhatYouNeedController.get.url,
+      hasChanged = false,
+      NotStarted,
+      TaskRow.notStartedTag
+    )
 
     this.getRenewal(credId).flatMap {
       case Some(model) =>
         isRenewalComplete(model, credId) flatMap { x =>
           if (x) {
-            Future.successful(Section(Renewal.sectionKey, Completed, model.hasChanged, controllers.renewal.routes.SummaryController.get))
+            Future.successful(
+              TaskRow(
+                Renewal.sectionKey,
+                controllers.renewal.routes.SummaryController.get.url,
+                model.hasChanged,
+                Completed,
+                TaskRow.completedTag
+              )
+            )
           } else {
             model match {
               case Renewal(None, None, None, None, None, _, _, _, _, _, _, _, _, _, _, _, _, _) => Future.successful(notStarted)
-              case _ => Future.successful(Section(Renewal.sectionKey, Started, model.hasChanged, controllers.renewal.routes.WhatYouNeedController.get))
+              case _ => Future.successful(
+                TaskRow(
+                  Renewal.sectionKey,
+                  controllers.renewal.routes.WhatYouNeedController.get.url,
+                  model.hasChanged,
+                  Started,
+                  TaskRow.incompleteTag
+                )
+              )
             }
           }
         }
@@ -167,7 +189,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     }
   }
 
-  def canSubmit(renewalSection: Section, variationSections: Seq[Section]) = {
+  def canSubmit(renewalSection: TaskRow, variationSections: Seq[TaskRow]) = {
     variationSections.forall(_.status == Completed) &&
             !renewalSection.status.equals(Started) &&
             (variationSections :+ renewalSection).exists(_.hasChanged)

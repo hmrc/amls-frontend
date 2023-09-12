@@ -19,7 +19,7 @@ package utils
 import cats.data.OptionT
 import cats.implicits._
 import controllers.declaration
-import models.registrationprogress.{Completed, Section, TaskRow}
+import models.registrationprogress.Completed
 import models.responsiblepeople.{Partner, ResponsiblePerson}
 import models.status._
 import org.joda.time.LocalDate
@@ -74,7 +74,7 @@ object DeclarationHelper {
   }
 
   def statusSubtitle(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
-                    (implicit statusService: StatusService, hc: HeaderCarrier ,ec: ExecutionContext): Future[String] = {
+                    (implicit statusService: StatusService, hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[String] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case SubmissionReady => "submit.registration"
       case SubmissionReadyForReview | SubmissionDecisionApproved => "submit.amendment.application"
@@ -84,7 +84,7 @@ object DeclarationHelper {
   }
 
   def statusEndDate(amlsRegistrationNo: Option[String], accountTypeId: (String, String), cacheId: String)
-                    (implicit statusService: StatusService, hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[LocalDate]] = {
+                    (implicit statusService: StatusService, hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Option[LocalDate]] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId) map {
       case ReadyForRenewal(endDate) => endDate
       case _ => None
@@ -95,7 +95,8 @@ object DeclarationHelper {
                    (implicit statusService: StatusService,
                     renewalService: RenewalService,
                     hc: HeaderCarrier ,
-                    ec: ExecutionContext
+                    ec: ExecutionContext,
+                    messages: Messages
                    ): Future[Boolean] = {
     for{
       status <- statusService.getStatus(amlsRegistrationNo, accountTypeId, cacheId)
@@ -134,7 +135,7 @@ object DeclarationHelper {
   }
 
   def getSubheadingBasedOnStatus(credId: String, amlsRefNumber: Option[String], accountTypeId: (String, String), statusService: StatusService, renewalService: RenewalService)
-                                (implicit hc: HeaderCarrier ,ec: ExecutionContext)= {
+                                (implicit hc: HeaderCarrier ,ec: ExecutionContext, messages: Messages)= {
     for {
       renewalComplete <- OptionT.liftF(DeclarationHelper.renewalComplete(renewalService, credId))
       status <- OptionT.liftF(statusService.getStatus(amlsRefNumber, accountTypeId, credId))

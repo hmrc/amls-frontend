@@ -2690,7 +2690,9 @@ renewal.whatyouneed.line_13 = which countries your customers lived or worked in,
 renewal.whatyouneed.line_14 = the percentage of your turnover that came from cash payments of €10,000 or more
 renewal.whatyouneed.line_15 = how you received cash payments of €10,000 or more from customers you had not met in person, if you received any
 renewal.progress.title = About your business
-renewal.progress.intro = If something has changed in your business that is relevant to Money Laundering Regulations you must update your information.\nYou’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for any additional responsible people.
+renewal.progress.intro.1 = If something has changed in your business that is relevant to Money Laundering Regulations you must update your information.
+renewal.progress.intro.2 = You’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for any additional responsible people.
+renewal.progress.section = Sections
 renewal.progress.submit.header = Submit renewal
 renewal.progress.submit = Continue
 renewal.progress.edit = Edit your renewal
@@ -2748,7 +2750,9 @@ renewal.cash.payments.received.lbl3 = Another way
 renewal.cash.payments.received.lbl3.hint = Add how you received cash payments from customers you have not met in person
 
 renewal.msb.throughput.header = What was your total value of transactions in the last 12 months?
-renewal.msb.throughput.info = <p>This is also known as your total throughput. It is <strong class="bold">not</strong> your total net profit or turnover.</p>
+renewal.msb.throughput.info.prefix = This is also known as your total throughput. It is
+renewal.msb.throughput.info.bold = not
+renewal.msb.throughput.info.suffix = your total net profit or turnover.
 renewal.msb.throughput.selection.required = Select your total throughput in the last 12 months
 renewal.msb.throughput.selection.invalid = Select one option to show your total throughput in the last 12 months
 renewal.msb.throughput.selection.1 = £0 to £99,999

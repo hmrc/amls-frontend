@@ -78,7 +78,7 @@ class BusinessNameSpec extends AmlsSpec with ScalaFutures {
         when(statusResponse.safeId) thenReturn Some(safeId)
 
         when {
-          statusService.getDetailedStatus(any(), any(), any())(any(), any())
+          statusService.getDetailedStatus(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful((SubmissionReady, Some(statusResponse)))
 
         when {

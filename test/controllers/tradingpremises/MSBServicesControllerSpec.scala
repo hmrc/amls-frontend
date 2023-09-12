@@ -75,7 +75,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
       ))
     )
 
-    when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
+    when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
 
   }
 
@@ -283,7 +283,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           "value[2]" -> TPCurrencyExchange.toString
         )
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
         when(cache.fetch[Seq[TradingPremises]](any(), any())
           (any(), any())).thenReturn(Future.successful(Some(Seq(tp))))
@@ -305,7 +305,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           "value[2]" -> TPCurrencyExchange.toString
         )
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(ReadyForRenewal(None))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())) thenReturn Future.successful(ReadyForRenewal(None))
 
         when(cache.fetch[Seq[TradingPremises]](any(), any())
           (any(), any())).thenReturn(Future.successful(Some(Seq(tp))))
@@ -326,7 +326,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           "value[1]" -> TPTransmittingMoney.toString
         )
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
         when(cache.fetch[Seq[TradingPremises]](any(), any())
           (any(), any())).thenReturn(Future.successful(Some(Seq(tp))))
@@ -358,7 +358,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
           "value[2]" -> TPCurrencyExchange.toString
         )
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
         when(cache.fetch[Seq[TradingPremises]](any(), any())
           (any(),  any())).thenReturn(Future.successful(Some(Seq(tpNone))))

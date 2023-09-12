@@ -68,7 +68,7 @@ class SummaryControllerSpec extends AmlsSpec with Injecting {
     )
 
     when {
-      controller.statusService.isPreSubmission(any(), any(), any())(any(), any())
+      controller.statusService.isPreSubmission(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(false)
   }
 

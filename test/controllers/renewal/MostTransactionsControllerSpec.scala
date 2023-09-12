@@ -19,6 +19,7 @@ package controllers.renewal
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.renewal.MostTransactionsFormProvider
 import models.Country
 import models.businessmatching._
 import models.businessmatching.BusinessActivity._
@@ -31,14 +32,15 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Result
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
-import views.html.renewal.most_transactions
+import views.html.renewal.MostTransactionsView
 
 import scala.concurrent.Future
 
-class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
+class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends AutoCompleteServiceMocks {
     self =>
@@ -48,7 +50,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
     val cacheMap = mock[CacheMap]
     val emptyCache = CacheMap("", Map.empty)
     val mockRenewalService = mock[RenewalService]
-    lazy val view = app.injector.instanceOf[most_transactions]
+    lazy val view = inject[MostTransactionsView]
     val controller = new MostTransactionsController(
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -56,12 +58,14 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       self.mockRenewalService,
       mockAutoComplete,
       cc = mockMcc,
-      most_transactions = view)
+      formProvider = inject[MostTransactionsFormProvider],
+      view = view)
   }
 
   trait FormSubmissionFixture extends Fixture {
     def formData(valid: Boolean) = if (valid) "mostTransactionsCountries[0]" -> "GB" else "mostTransactionsCountries[0]" -> ""
-    def formRequest(valid: Boolean) = requestWithUrlEncodedBody(formData(valid))
+    def formRequest(valid: Boolean) =
+      FakeRequest(POST, routes.MostTransactionsController.post().url).withFormUrlEncodedBody(formData(valid))
 
     when(mockRenewalService.getRenewal(any())(any()))
       .thenReturn(Future.successful(None))
@@ -69,8 +73,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
     when(mockRenewalService.updateRenewal(any(), any())(any()))
       .thenReturn(Future.successful(emptyCache))
 
-    def post(edit: Boolean = false, valid: Boolean = true)(block: Result => Unit) =
-      block(await(controller.post(edit)(formRequest(valid))))
+    def post(edit: Boolean = false, valid: Boolean = true)(block: Future[Result] => Unit) =
+      block(controller.post(edit)(formRequest(valid)))
   }
 
   trait RenewalModelFormSubmissionFixture extends FormSubmissionFixture {
@@ -84,7 +88,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       ), hasChanged = true
     )
 
-    val newRequest = requestWithUrlEncodedBody(
+    val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url).withFormUrlEncodedBody(
       "mostTransactionsCountries[]" -> "GB"
     )
 
@@ -116,7 +120,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
       document.select("select").size mustEqual 3
       document.select("option[selected]").size mustEqual 0
-      document.select(".amls-error-summary").size mustEqual 0
+      document.select(".govuk-error-summary").size mustEqual 0
     }
 
     "show a prefilled form when there is data in the store" in new Fixture {
@@ -143,12 +147,12 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
       document.select("select").size mustEqual 3
       document.select("option[selected]").size mustEqual 3
-      document.select(".amls-error-summary").size mustEqual 0
+      document.select(".govuk-error-summary").size mustEqual 0
     }
 
     "return a Bad request with errors on invalid submission" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url).withFormUrlEncodedBody(
         "mostTransactionsCountries[0]" -> "GBasdadsdas"
       )
 
@@ -159,7 +163,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
       document.select("select").size mustEqual 3
       document.select("option[selected]").size mustEqual 0
-      document.select(".amls-error-summary").size mustEqual 1
+      document.select(".govuk-error-summary").size mustEqual 1
     }
 
     "on valid submission" when {
@@ -169,18 +173,17 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
             setupBusinessMatching(msbServices = Set(CurrencyExchange))
 
             post() { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustEqual routes.CETransactionsInLast12MonthsController.get().url.some
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustEqual routes.CETransactionsInLast12MonthsController.get().url.some
             }
-
           }
 
           "msb includes CE and FX" in new RenewalModelFormSubmissionFixture {
             setupBusinessMatching(msbServices = Set(CurrencyExchange, ForeignExchange))
 
             post() { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustEqual routes.CETransactionsInLast12MonthsController.get().url.some
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustEqual routes.CETransactionsInLast12MonthsController.get().url.some
             }
 
           }
@@ -191,8 +194,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
             setupBusinessMatching(msbServices = Set(ForeignExchange))
 
             post() { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustEqual routes.FXTransactionsInLast12MonthsController.get().url.some
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustEqual routes.FXTransactionsInLast12MonthsController.get().url.some
             }
 
           }
@@ -203,8 +206,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
             setupBusinessMatching(Set(HighValueDealing, AccountancyServices))
 
             post() { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustEqual routes.PercentageOfCashPaymentOver15000Controller.get().url.some
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustEqual routes.PercentageOfCashPaymentOver15000Controller.get().url.some
             }
           }
         }
@@ -213,8 +216,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
             setupBusinessMatching(Set(HighValueDealing))
 
             post() { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustEqual routes.CustomersOutsideIsUKController.get().url.some
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustEqual routes.CustomersOutsideIsUKController.get().url.some
             }
           }
 
@@ -222,8 +225,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
             setupBusinessMatching(Set(AccountancyServices))
 
             post() { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustEqual routes.CustomersOutsideIsUKController.get().url.some
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustEqual routes.CustomersOutsideIsUKController.get().url.some
             }
           }
 
@@ -233,8 +236,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
             setupBusinessMatching(msbServices = Set(ChequeCashingScrapMetal))
 
             post() { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustEqual routes.SummaryController.get.url.some
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustEqual routes.SummaryController.get.url.some
             }
           }
         }
@@ -246,15 +249,15 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
           setupBusinessMatching(msbServices = Set(CurrencyExchange, ForeignExchange, TransmittingMoney, ChequeCashingScrapMetal))
 
           post(edit = true) { result =>
-            result.header.status mustBe SEE_OTHER
-            result.header.headers.get("Location") mustEqual routes.SummaryController.get.url.some
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustEqual routes.SummaryController.get.url.some
           }
         }
       }
     }
 
     "throw exception when Msb services in Business Matching returns none" in new FormSubmissionFixture {
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.MostTransactionsController.post().url).withFormUrlEncodedBody(
         "mostTransactionsCountries[]" -> "GB"
       )
 
@@ -277,6 +280,5 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         ScalaFutures.whenReady(controller.post(true)(newRequest)) { x => x }
       }
     }
-
   }
 }

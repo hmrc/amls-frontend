@@ -61,7 +61,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
     mockApplicationStatus(NotCompleted)
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(true)
   }
 
@@ -203,7 +203,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
         )
 
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheFetchAll
@@ -236,7 +236,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
         )
 
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheFetchAll
@@ -299,7 +299,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
         )
 
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheFetchAll
@@ -340,7 +340,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
       mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
       
       when {
-        mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+        mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
       } thenReturn Future.successful(false)
 
       val result = controller.post()(newRequest)

@@ -29,6 +29,7 @@ import play.api.i18n.Messages
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContentAsFormUrlEncoded, Request, Result}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -67,7 +68,8 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
     def formData(data: Option[Request[AnyContentAsFormUrlEncoded]]) = data match {
       case Some(d) => d
-      case None => requestWithUrlEncodedBody("countries" -> "GB")
+      case None => FakeRequest(POST, routes.CustomersOutsideUKController.post().url)
+        .withFormUrlEncodedBody("countries[0]" -> "GB")
     }
 
     def formRequest(data: Option[Request[AnyContentAsFormUrlEncoded]]) = formData(data)
@@ -200,7 +202,11 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
       "given invalid data" must {
         "respond with BAD_REQUEST" in new FormSubmissionFixture {
-          post(data = Some(addToken(authRequest.withFormUrlEncodedBody("countries" -> "abc")))) { result: Result =>
+          post(data = Some(addToken(
+            FakeRequest(POST, routes.CustomersOutsideUKController.post().url)
+              .withFormUrlEncodedBody("countries" -> "abc")
+          ))
+          ) { result: Result =>
             result.header.status mustBe BAD_REQUEST
           }
         }

@@ -79,7 +79,7 @@ class WithdrawApplicationControllerSpec extends AmlsSpec {
     } thenReturn Future.successful(BusinessMatching(reviewDetails.some).some)
 
     when {
-      statusService.getDetailedStatus(Some(any()), any(), any())(any(), any())
+      statusService.getDetailedStatus(Some(any()), any(), any())(any(), any(), any())
     } thenReturn Future.successful((SubmissionReadyForReview, statusResponse.some))
 
     when {

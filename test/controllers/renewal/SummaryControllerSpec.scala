@@ -19,24 +19,25 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.Country
-import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.businessmatching.BusinessActivity._
-import models.registrationprogress.{Completed, Section}
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.registrationprogress.{Completed, TaskRow}
 import models.renewal._
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.{ProgressService, RenewalService, SectionsProvider}
+import play.api.test.Injecting
+import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.renewal.summary
+import utils.renewal.CheckYourAnswersHelper
+import views.html.renewal.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
+class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self =>
@@ -49,24 +50,19 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
     lazy val mockProgressService = mock[ProgressService]
-    lazy val mockSectionsProvider = mock[SectionsProvider]
-    lazy val view = app.injector.instanceOf[summary]
+    lazy val view = inject[CheckYourAnswersView]
     val controller = new SummaryController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService, cc = mockMcc,
       progressService = mockProgressService,
-      sectionsProvider = mockSectionsProvider,
-      summary = view
+      cyaHelper = inject[CheckYourAnswersHelper],
+      view = view
     )
 
     when {
-      mockSectionsProvider.sections(any[CacheMap])
-    } thenReturn Seq.empty[Section]
-
-    when {
-      mockRenewalService.getSection(any())(any(),any())
-    } thenReturn Future.successful(Section("", Completed, false, mock[Call]))
+      mockRenewalService.getTaskRow(any())(any(), any(), any())
+    } thenReturn Future.successful(TaskRow("", "/foo", false, Completed, TaskRow.completedTag))
 
     val renewalModel = Renewal(
       Some(models.renewal.InvolvedInOtherYes("test")),
@@ -126,7 +122,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       } thenReturn Future.successful(Some(renewalModel.copy(hasAccepted = false)))
 
       when {
-        controller.dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), any())(any(), any())
+        controller.dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), eqTo(renewalModel))(any(), any())
       } thenReturn Future.successful(cache)
 
       val result = controller.post()(request)
@@ -136,6 +132,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val captor = ArgumentCaptor.forClass(classOf[Renewal])
       verify(controller.dataCacheConnector).save[Renewal](any(), eqTo(Renewal.key), captor.capture())(any(), any())
+      captor.getValue mustBe renewalModel
       captor.getValue.hasAccepted mustBe true
     }
   }

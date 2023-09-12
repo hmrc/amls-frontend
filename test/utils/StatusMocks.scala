@@ -29,7 +29,7 @@ trait StatusMocks extends MockitoSugar {
   implicit val mockStatusService = mock[StatusService]
 
   def mockApplicationStatus(status: SubmissionStatus)(implicit service: StatusService) = when {
-    service.getStatus(any[Option[String]], any(), any())(any(), any())
+    service.getStatus(any[Option[String]], any(), any())(any(), any(), any())
   } thenReturn Future.successful(status)
 
 }

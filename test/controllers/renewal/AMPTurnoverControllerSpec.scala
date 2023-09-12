@@ -18,6 +18,7 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.renewal.AMPTurnoverFormProvider
 import models.businessmatching.{BusinessActivities => Activities, _}
 import models.businessmatching.BusinessActivity._
 import models.renewal.{AMPTurnover, Renewal}
@@ -26,16 +27,16 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.renewal.amp_turnover
+import views.html.renewal.AMPTurnoverView
 
 import scala.concurrent.Future
 
-class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
@@ -45,12 +46,13 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = app.injector.instanceOf[amp_turnover]
+    lazy val view = app.injector.instanceOf[AMPTurnoverView]
     val controller = new AMPTurnoverController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService, cc = mockMcc,
-      amp_turnover = view
+      formProvider = inject[AMPTurnoverFormProvider],
+      view = view
     )
 
     val businessMatching = BusinessMatching(
@@ -91,7 +93,7 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[value=01]").hasAttr("checked") must be(true)
+        document.select("input[value=zeroToTwenty]").hasAttr("checked") must be(true)
       }
     }
 
@@ -99,18 +101,18 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.AMPTurnoverController.post().url).withFormUrlEncodedBody(
         )
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.required.renewal.amp.percentage"))
+        contentAsString(result) must include(messages("error.required.renewal.amp.percentage"))
       }
 
       "when edit is true" must {
         "Redirect to the summary page" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
-            "percentageExpectedTurnover" -> "01"
+          val newRequest = FakeRequest(POST, routes.AMPTurnoverController.post().url).withFormUrlEncodedBody(
+            "percentageExpectedTurnover" -> AMPTurnover.First.toString
           )
 
           val bMatching = BusinessMatching(
@@ -135,8 +137,8 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       }
       "When edit is false" must {
         "go to summary page if business type is not ASP, HVD or MSB" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
-            "percentageExpectedTurnover" -> "01"
+          val newRequest = FakeRequest(POST, routes.AMPTurnoverController.post().url).withFormUrlEncodedBody(
+            "percentageExpectedTurnover" -> AMPTurnover.First.toString
           )
 
           val bMatching = BusinessMatching(
@@ -156,8 +158,8 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
         }
         "go to CustomerOutsideIsUKController when HVD (and not ASP or MSB) is selected" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
-            "percentageExpectedTurnover" -> "01"
+          val newRequest = FakeRequest(POST, routes.AMPTurnoverController.post().url).withFormUrlEncodedBody(
+            "percentageExpectedTurnover" -> AMPTurnover.First.toString
           )
 
           val bMatching = BusinessMatching(
@@ -177,8 +179,8 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url))
         }
         "go to the TotalThroughput page when MSB (and not ASP) is selected" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
-            "percentageExpectedTurnover" -> "01"
+          val newRequest = FakeRequest(POST, routes.AMPTurnoverController.post().url).withFormUrlEncodedBody(
+            "percentageExpectedTurnover" -> AMPTurnover.First.toString
           )
 
           val bMatching = BusinessMatching(

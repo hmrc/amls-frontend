@@ -21,6 +21,7 @@ import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
 import play.api.Logging
+import play.api.i18n.Messages
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -58,7 +59,7 @@ object BusinessName extends Logging {
 
   def getBusinessNameFromAmls(amlsRegistrationNumber: Option[String], accountTypeId: (String, String), cacheId: String)
                              (implicit hc: HeaderCarrier, amls: AmlsConnector, ec: ExecutionContext,
-                              dc: DataCacheConnector, statusService: StatusService) = {
+                              dc: DataCacheConnector, statusService: StatusService, messages: Messages) = {
     for {
       (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRegistrationNumber, accountTypeId, cacheId))
       businessName <- detailedStatus.fold[OptionT[Future, String]](OptionT.some("")) { r =>

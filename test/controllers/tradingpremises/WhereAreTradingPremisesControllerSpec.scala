@@ -64,7 +64,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       error = errorView
       )
 
-    when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
+    when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())
@@ -380,7 +380,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
       val result = controller.post(1, edit = true)(initRequest)
@@ -410,7 +410,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(ReadyForRenewal(None)))
 
       val result = controller.post(1, edit = true)(initRequest)
@@ -442,7 +442,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         .thenReturn(Future.successful(emptyCache))
 
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
 
@@ -471,7 +471,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
       val result = controller.post(1, edit = true)(initRequest)

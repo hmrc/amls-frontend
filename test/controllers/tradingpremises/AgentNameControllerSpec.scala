@@ -143,7 +143,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       "respond with SEE_OTHER" when {
         "edit is false and given valid data" in new Fixture {
 
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
           val newRequest = FakeRequest(POST, routes.AgentNameController.post(1).url)
           .withFormUrlEncodedBody(
@@ -160,7 +160,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
         "edit is true and given valid data" in new Fixture {
 
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
 
           val newRequest = FakeRequest(POST, routes.AgentNameController.post(1, true).url)
@@ -201,7 +201,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           "agentDateOfBirth.month" -> "2",
           "agentDateOfBirth.year" -> "1956")
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
@@ -228,7 +228,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse.copy(lineId = Some(1)))))
 
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
           val newRequest = FakeRequest(POST, routes.AgentNameController.post(1, true).url)
           .withFormUrlEncodedBody(
@@ -250,7 +250,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse.copy(lineId = Some(1)))))
 
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
           val newRequest = FakeRequest(POST, routes.AgentNameController.post(1, true).url)
           .withFormUrlEncodedBody(
@@ -272,7 +272,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse.copy(lineId = None))))
 
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
           val newRequest = FakeRequest(POST, routes.AgentNameController.post(1).url)
           .withFormUrlEncodedBody(

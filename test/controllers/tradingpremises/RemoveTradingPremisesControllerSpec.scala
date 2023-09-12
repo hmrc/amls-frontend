@@ -71,7 +71,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp), lineId = Some(1234))))))
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get(1, false)(request)
@@ -85,7 +85,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp), lineId = Some(1234))))))
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(ReadyForRenewal(None)))
 
         val result = controller.get(1, false)(request)
@@ -100,7 +100,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp), lineId = Some(1234))))))
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(RenewalSubmitted(None)))
 
         val result = controller.get(1, false)(request)
@@ -115,7 +115,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(None, Some(ytp))))))
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get(1, false)(request)
@@ -131,7 +131,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremises(None, None)))))
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
       val result = controller.get(1, false)(request)
@@ -142,7 +142,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
       "there is no data at all at that index" in new Fixture {
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get(1, false)(request)
@@ -158,7 +158,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any())).
         thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())).
         thenReturn(Future.successful(SubmissionDecisionApproved))
 
       val result = controller.get(1)(request)
@@ -178,7 +178,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
             .thenReturn(Future.successful(Some(tradingPremisesList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
           val result = controller.remove(1, false)(request)
@@ -198,7 +198,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
             .thenReturn(Future.successful(Some(tradingPremisesList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.remove(1, false)(request)
@@ -225,7 +225,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
             .thenReturn(Future.successful(Some(tradingPremisesList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
 
@@ -249,7 +249,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(lineId = None)))))
 
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           when(controller.dataCacheConnector.save(any(), any(), any())(any(),  any()))
@@ -275,7 +275,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
             .thenReturn(Future.successful(Some(tradingPremisesList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
 
@@ -299,7 +299,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(lineId = None)))))
 
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           when(controller.dataCacheConnector.save(any(), any(), any())(any(),  any()))
@@ -327,7 +327,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
             .thenReturn(Future.successful(Some(tradingPremisesList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.remove(1, true)(newRequest)
@@ -348,7 +348,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
             .thenReturn(Future.successful(Some(tradingPremisesList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.remove(1, true)(newRequest)
@@ -370,7 +370,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
             .thenReturn(Future.successful(Some(tradingPremisesList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.remove(1, true)(newRequest)
@@ -395,7 +395,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
             .thenReturn(Future.successful(Some(tradingPremisesEndDateList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.remove(1, true)(newRequest)

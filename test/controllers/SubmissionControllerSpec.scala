@@ -118,7 +118,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
           controller.subscriptionService.subscribe(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(response)
 
-        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReady))
 
         val result = controller.post()(request)
@@ -136,7 +136,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
           controller.subscriptionService.subscribe(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(response)
 
-        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReady))
 
         val result = controller.post()(request)
@@ -158,7 +158,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
           controller.authenticator.refreshProfile(any(), any())
         } thenReturn Future.successful(HttpResponse(OK, ""))
 
-        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionReady))
 
         val result = controller.post()(request)
@@ -178,7 +178,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         controller.subscriptionService.update(any[String](), any(), any())(any(), any())
       } thenReturn Future.successful(amendmentResponse)
 
-      when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
       val result = controller.post()(request)
@@ -198,7 +198,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       } thenReturn Future.failed(DuplicateEnrolmentException(msg, UpstreamErrorResponse(msg, BAD_GATEWAY, BAD_GATEWAY)))
 
       when {
-        controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
+        controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
       val result = controller.post()(request)
@@ -220,7 +220,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       } thenReturn Future.failed(DuplicateSubscriptionException(msg))
 
       when {
-        controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
+        controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
       val result = controller.post()(request)
@@ -238,7 +238,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       }.thenReturn(Future.successful(completedSections))
 
       when {
-        controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
+        controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
       when {
@@ -263,7 +263,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
 
       when {
-        controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
+        controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
       val result = controller.post()(request)
@@ -286,7 +286,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
           controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
         } thenReturn Future.successful(mock[AmendVariationRenewalResponse])
 
-        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.post()(request)
@@ -306,7 +306,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
           controller.subscriptionService.variation(any[String](), any(), any())(any(), any())
         } thenReturn Future.successful(amendmentResponse)
 
-        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.post()(request)
@@ -325,7 +325,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
 
         when {
-          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
+          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())
         } thenReturn Future.successful(SubmissionDecisionApproved)
 
         val result = controller.post()(request)
@@ -348,7 +348,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         } thenReturn Future.successful(mock[SubmissionResponse])
 
         when {
-          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
+          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())
         } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now.plusDays(15))))
 
         when {
@@ -373,7 +373,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         } thenReturn Future.successful(mock[AmendVariationRenewalResponse])
 
         when {
-          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
+          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())
         } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now.plusDays(15))))
 
         when {
@@ -395,7 +395,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
 
         when {
-          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
+          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())
         } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now.plusDays(15))))
 
         when {
@@ -422,7 +422,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         } thenReturn Future.successful(mock[SubmissionResponse])
 
         when {
-          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
+          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())
         } thenReturn Future.successful(RenewalSubmitted(Some(LocalDate.now.plusDays(15))))
 
         when {
@@ -445,7 +445,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
 
         when {
-          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any())
+          controller.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())
         } thenReturn Future.successful(RenewalSubmitted(Some(LocalDate.now.plusDays(15))))
 
         when {

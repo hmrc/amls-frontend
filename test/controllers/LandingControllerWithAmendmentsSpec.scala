@@ -109,7 +109,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       start = view,
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter)
 
-    when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
+    when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
 
     when {
@@ -275,7 +275,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       start = view,
       headerCarrierForPartialsConverter = headerCarrierForPartialsConverter)
 
-    when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any()))
+    when(controller.landingService.refreshCache(any(), any[String](), any())(any(), any(), any()))
       .thenReturn(Future.successful(mock[CacheMap]))
 
     when {
@@ -427,7 +427,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
 
         when(controller.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
-        when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+        when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
           .thenReturn(Future.successful((rejectedStatusGen.sample.get, None)))
 
         val result = controller.get()(request)
@@ -460,7 +460,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
 
         when(controller.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(Some(cacheMap))
-        when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+        when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
           .thenReturn(Future.successful((activeStatusGen.sample.get, None)))
 
         val result = controller.get()(request)
@@ -480,14 +480,14 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
               when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
                 .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
-              when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+              when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
                 .thenReturn(Future.successful((NotCompleted, None)))
 
               val result = controller.get()(request)
 
               status(result) must be(SEE_OTHER)
               redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
-              verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
+              verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
             }
           }
         }
@@ -506,14 +506,14 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(List()))
             when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
-            when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+            when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
               .thenReturn(Future.successful((NotCompleted, None)))
 
             val result = controller.get()(request)
 
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
-            verify(controller.landingService, never).refreshCache(any[String](), any(), any())(any(), any())
+            verify(controller.landingService, never).refreshCache(any[String](), any(), any())(any(), any(), any())
           }
 
           "redirect to the status page without refreshing the cache" when {
@@ -541,7 +541,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
-                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
                   .thenReturn(Future.successful((NotCompleted, None)))
 
                 when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
@@ -552,7 +552,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 status(result) must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
 
-                verify(controller.landingService).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
+                verify(controller.landingService).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
               }
             }
 
@@ -574,7 +574,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
-                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
                   .thenReturn(Future.successful((NotCompleted, None)))
 
                 when(testCacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(Some(eabOther))
@@ -584,7 +584,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 status(result) must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get.url))
 
-                verify(controller.landingService).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
+                verify(controller.landingService).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
               }
             }
           }
@@ -605,7 +605,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
-                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
                   .thenReturn(Future.successful((NotCompleted, None)))
 
                 when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
@@ -616,7 +616,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 status(result) must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
 
-                verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
+                verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
               }
             }
 
@@ -645,7 +645,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
-                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+                when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
                   .thenReturn(Future.successful((NotCompleted, None)))
 
                 when(testCacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(Some(eabOmbudsmanServices))
@@ -655,7 +655,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 status(result) must be(SEE_OTHER)
                 redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get.url))
 
-                verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
+                verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
               }
             }
           }
@@ -668,14 +668,14 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
-            when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+            when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
               .thenReturn(Future.successful((NotCompleted, None)))
 
             val result = controller.get()(request)
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
-            verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
+            verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
           }
 
           "refresh from API5 and redirect to status controller with duplicate submission flag set" in new Fixture {
@@ -685,14 +685,14 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             val testCacheMap = buildTestCacheMap(hasChanged = false, includesResponse = false)
             setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
             when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
-            when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+            when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
               .thenReturn(Future.successful((NotCompleted, None)))
 
             val result = controller.get()(request)
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.routes.StatusController.get(true).url))
-            verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
+            verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
           }
 
           "refresh from API5 and redirect to status controller when there is no TP or RP data" in new Fixture {
@@ -705,7 +705,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", None))))
 
-            when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+            when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
               .thenReturn(Future.successful((NotCompleted, None)))
 
             when(fixedCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None)))
@@ -723,7 +723,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
-            verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
+            verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
           }
         }
       }
@@ -736,14 +736,14 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(SubscriptionResponse("", "", None))))
 
-          when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+          when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
             .thenReturn(Future.successful((NotCompleted, None)))
 
           val result = controller.get()(request)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
-          verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
+          verify(controller.landingService, atLeastOnce()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
         }
       }
     }
@@ -760,12 +760,12 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(businessMatching))
           when(cacheMap.getEntry[BusinessDetails](BusinessDetails.key)).thenReturn(Some(completeATB))
           when(cacheMap.getEntry[Eab](meq(Eab.key))(any())).thenReturn(None)
-          when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any()))
+          when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
             .thenReturn(Future.successful((NotCompleted, None)))
 
           val result = controller.get()(request)
 
-          verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext])
+          verify(controller.landingService, never()).refreshCache(any[String](), any(), any())(any[HeaderCarrier], any[ExecutionContext], any())
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
         }

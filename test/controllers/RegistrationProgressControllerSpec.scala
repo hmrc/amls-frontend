@@ -30,7 +30,7 @@ import models.responsiblepeople.{ResponsiblePeopleValues, ResponsiblePerson}
 import models.status._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.Matchers.any
+import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
 import play.api.http.Status.OK
 import play.api.test.Helpers._
@@ -105,8 +105,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-          when(mockSectionsProvider.sections(mockCacheMap))
-            .thenReturn(Seq.empty[Section])
+          when(mockSectionsProvider.taskRows(meq(mockCacheMap))(any()))
+            .thenReturn(Seq.empty[TaskRow])
 
           val responseF = controller.get()(request)
           status(responseF) must be(OK)
@@ -168,8 +168,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
               .thenReturn(Seq.empty[TaskRow])
 
-            when(controller.sectionsProvider.sections(mockCacheMap))
-              .thenReturn(Seq.empty[Section])
+            when(controller.sectionsProvider.taskRows(meq(mockCacheMap))(any()))
+              .thenReturn(Seq.empty[TaskRow])
 
             val responseF = controller.get()(request)
             status(responseF) must be(OK)
@@ -409,8 +409,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
       "the user is not enrolled into the AMLS Account" must {
         "show the registration progress page" in new Fixture {
-          when(mockSectionsProvider.sections(mockCacheMap))
-            .thenReturn(Seq.empty[Section])
+          when(mockSectionsProvider.taskRows(meq(mockCacheMap))(any()))
+            .thenReturn(Seq.empty[TaskRow])
 
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
@@ -430,8 +430,8 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-          val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get)
-          when(mockSectionsProvider.sections(mockCacheMap)) thenReturn Seq(completeSection)
+          val completeTaskRow = TaskRow(BusinessMatching.messageKey, controllers.routes.LandingController.get.url, true, Started, TaskRow.incompleteTag)
+          when(mockSectionsProvider.taskRows(meq(mockCacheMap))(any())) thenReturn Seq(completeTaskRow)
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -522,7 +522,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           val call = controllers.routes.RegistrationProgressController.get
 
           when {
-            controller.statusService.getStatus(any(), any(), any())(any(), any())
+            controller.statusService.getStatus(any(), any(), any())(any(), any(), any())
           } thenReturn Future.successful(RenewalSubmitted(None))
 
           when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
@@ -532,7 +532,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             .thenReturn(Future.successful(Some(completeRenewal)))
 
           when {
-            controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any())
+            controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any(), any())
           } thenReturn Future.successful(Some(call))
 
           val result = controller.post()(request)
@@ -548,7 +548,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
         "redirect to the renew registration controller" in new Fixture {
           when {
-            controller.statusService.getStatus(any(), any(), any())(any(), any())
+            controller.statusService.getStatus(any(), any(), any())(any(), any(), any())
           } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
 
           when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
@@ -568,7 +568,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
       "return INTERNAL_SERVER_ERROR if no call is returned" in new Fixture {
         when {
-          controller.statusService.getStatus(any(), any(), any())(any(), any())
+          controller.statusService.getStatus(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(RenewalSubmitted(None))
 
         when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
@@ -578,7 +578,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           .thenReturn(Future.successful(Some(completeRenewal)))
 
         when {
-          controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any())
+          controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any(), any())
         } thenReturn Future.successful(None)
 
         val result = controller.post()(request)

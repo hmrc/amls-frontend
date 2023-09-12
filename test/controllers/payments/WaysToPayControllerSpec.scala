@@ -94,7 +94,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
     } thenReturn Future.successful(HttpResponse(OK, ""))
 
     when {
-      controller.statusService.getDetailedStatus(any[Option[String]], any(), any())( any(), any())
+      controller.statusService.getDetailedStatus(any[Option[String]], any(), any())( any(), any(), any())
     } thenReturn Future.successful((submissionStatus, Some(readStatusResponse)))
 
     when {
@@ -102,7 +102,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
     } thenReturn Future.successful(Some(fees))
 
     when {
-      controller.statusService.getStatus(any(), any(), any())(any(), any())
+      controller.statusService.getStatus(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(SubmissionReady)
 
     val completeRenewal = Renewal(

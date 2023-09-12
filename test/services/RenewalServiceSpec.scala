@@ -18,15 +18,14 @@ package services
 
 import connectors.DataCacheConnector
 import models.Country
-import models.businessmatching._
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService._
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.businessmatching._
+import models.registrationprogress._
 import models.renewal._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.mvc.Call
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -82,9 +81,14 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           dataCache.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
         } thenReturn Future.successful(None)
 
-        val section = await(service.getSection(credId))
-        section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get)
-
+        val section = await(service.getTaskRow(credId))
+        section mustBe TaskRow(
+          Renewal.sectionKey,
+          controllers.renewal.routes.WhatYouNeedController.get.url,
+          false,
+          NotStarted,
+          TaskRow.notStartedTag
+        )
       }
 
       "the renewal is complete and has been started" in new Fixture {
@@ -112,9 +116,15 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
         setUpRenewal(completeModel)
 
-        val section = await(service.getSection(credId))
+        val taskRow = await(service.getTaskRow(credId))
         await(service.isRenewalComplete(completeModel, credId)) mustBe true
-        section mustBe Section(Renewal.sectionKey, Completed, hasChanged = true, controllers.renewal.routes.SummaryController.get)
+        taskRow mustBe TaskRow(
+          Renewal.sectionKey,
+          controllers.renewal.routes.SummaryController.get.url,
+          true,
+          Completed,
+          TaskRow.completedTag
+        )
       }
 
       "the renewal model is not complete" in new Fixture {
@@ -123,16 +133,28 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
         setUpRenewal(renewal)
 
-        val section = await(service.getSection(credId))
-        section mustBe Section(Renewal.sectionKey, Started, hasChanged = true, controllers.renewal.routes.WhatYouNeedController.get)
+        val taskRow = await(service.getTaskRow(credId))
+        taskRow mustBe TaskRow(
+          Renewal.sectionKey,
+          controllers.renewal.routes.WhatYouNeedController.get.url,
+          true,
+          Started,
+          TaskRow.incompleteTag
+        )
       }
 
       "the renewal model is not complete and not started" in new Fixture {
         val renewal = Renewal(None)
         setUpRenewal(renewal)
 
-        val section = await(service.getSection(credId))
-        section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get)
+        val taskRow = await(service.getTaskRow(credId))
+        taskRow mustBe TaskRow(
+          Renewal.sectionKey,
+          controllers.renewal.routes.WhatYouNeedController.get.url,
+          false,
+          NotStarted,
+          TaskRow.notStartedTag
+        )
       }
     }
   }
@@ -720,34 +742,34 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
   }
 
   trait CanSubmitFixture extends Fixture {
-      val notStartedRenewal = Section("renewal", NotStarted, false, mock[Call])
-      val startedRenewal = Section("renewal", Started, true, mock[Call])
-      val completedUnchangedRenewal = Section("renewal", Completed, false, mock[Call])
-      val completedChangedRenewal = Section("renewal", Completed, true, mock[Call])
+      val notStartedRenewal = TaskRow("renewal", "/foo", false, NotStarted, TaskRow.notStartedTag)
+      val startedRenewal = TaskRow("renewal", "/foo", true, Started, TaskRow.incompleteTag)
+      val completedUnchangedRenewal = TaskRow("renewal", "/foo", false, Completed, TaskRow.completedTag)
+      val completedChangedRenewal = TaskRow("renewal", "/foo", true, Completed, TaskRow.completedTag)
 
       val sectionsCompletedAndChanged = Seq(
-          Section("", Completed, false, mock[Call]),
-          Section("", Completed, true, mock[Call])
+          TaskRow("", "/foo", false, Completed, TaskRow.completedTag),
+          TaskRow("", "/foo", true, Completed, TaskRow.completedTag)
       )
 
       val sectionCompletedAndNotChanged = Seq(
-          Section("", Completed, false, mock[Call]),
-          Section("", Completed, false, mock[Call])
+          TaskRow("", "/foo", false, Completed, TaskRow.completedTag),
+          TaskRow("", "/foo", false, Completed, TaskRow.completedTag)
       )
 
       val sectionsMutuallyIncompleteAndChanged = Seq(
-          Section("", Started, false, mock[Call]),
-          Section("", Completed, true, mock[Call])
+          TaskRow("", "/foo", false, Started, TaskRow.incompleteTag),
+          TaskRow("", "/foo", true, Completed, TaskRow.completedTag)
       )
 
       val sectionIncompleteAndChanged = Seq(
-          Section("", Started, true, mock[Call]),
-          Section("", Completed, false, mock[Call])
+          TaskRow("", "/foo", true, Started, TaskRow.incompleteTag),
+          TaskRow("", "/foo", false, Completed, TaskRow.completedTag)
       )
 
       val sectionsIncompleteAndNotChanged = Seq(
-          Section("", Completed, false, mock[Call]),
-          Section("", Started, false, mock[Call])
+          TaskRow("", "/foo", false, Completed, TaskRow.completedTag),
+          TaskRow("", "/foo", false, Started, TaskRow.incompleteTag)
       )
   }
 

@@ -68,7 +68,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Priv
             HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService)))
         )
 
-        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
@@ -102,7 +102,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Priv
 
       "display the is your involved in other page when there is no cache data" in new Fixture {
 
-        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
@@ -118,7 +118,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Priv
         when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
           .thenReturn(Some(BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))))
 
-        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))

@@ -78,7 +78,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
 
     when {
-      controller.statusService.isPreSubmission(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())
+      controller.statusService.isPreSubmission(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
     } thenReturn Future.successful(true)
   }
 
@@ -88,7 +88,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
 
       val model = Hvd(None)
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
       when(controller.dataCache.fetch[Hvd](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(model)))
@@ -100,7 +100,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCache.fetch[Hvd](any(), any())( any(), any()))
@@ -116,7 +116,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         when(controller.dataCache.fetch[Hvd](any(), eqTo(Hvd.key))
           (any(), any())).thenReturn(Future.successful(Some(completeModel)))
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get()(request)
@@ -136,7 +136,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         when(controller.dataCache.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(completeModel)))
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get()(request)
@@ -152,7 +152,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         when(controller.dataCache.fetch[Hvd]( any(), eqTo(Hvd.key))
           (any(), any())).thenReturn(Future.successful(Some(completeModel)))
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         mockIsNewActivityNewAuth(true, Some(HighValueDealing))

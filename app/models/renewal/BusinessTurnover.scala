@@ -18,20 +18,37 @@ package models.renewal
 
 import jto.validation.{ValidationError, _}
 import jto.validation.forms.UrlFormEncoded
+import models.{Enumerable, WithName}
 import models.businessactivities.ExpectedBusinessTurnover
 import play.api.libs.json._
 
-sealed trait BusinessTurnover
+sealed trait BusinessTurnover {
+  val value: String
+}
 
-object BusinessTurnover {
+object BusinessTurnover extends Enumerable.Implicits {
 
-  case object First extends BusinessTurnover
-  case object Second extends BusinessTurnover
-  case object Third extends BusinessTurnover
-  case object Fourth extends BusinessTurnover
-  case object Fifth extends BusinessTurnover
-  case object Sixth extends BusinessTurnover
-  case object Seventh extends BusinessTurnover
+  case object First extends WithName("zeroPlus") with BusinessTurnover {
+    override val value: String = "01"
+  }
+  case object Second extends WithName("fifteenThousandPlus") with BusinessTurnover {
+    override val value: String = "02"
+  }
+  case object Third extends WithName("fiftyThousandPlus") with BusinessTurnover {
+    override val value: String = "03"
+  }
+  case object Fourth extends WithName("oneHundredThousandPlus") with BusinessTurnover {
+    override val value: String = "04"
+  }
+  case object Fifth extends WithName("twoHundredFiftyThousandPlus") with BusinessTurnover {
+    override val value: String = "05"
+  }
+  case object Sixth extends WithName("oneMillionPlus") with BusinessTurnover {
+    override val value: String = "06"
+  }
+  case object Seventh extends WithName("tenMillionPlus") with BusinessTurnover {
+    override val value: String = "07"
+  }
 
   import utils.MappingUtils.Implicits._
 
@@ -97,4 +114,16 @@ object BusinessTurnover {
     case BusinessTurnover.Seventh => ExpectedBusinessTurnover.Seventh
     case _ => throw new Exception("Invalid business turnover value")
   }
+
+  val all: Seq[BusinessTurnover] = Seq(
+    First,
+    Second,
+    Third,
+    Fourth,
+    Fifth,
+    Sixth,
+    Seventh
+  )
+
+  implicit val enumerable: Enumerable[BusinessTurnover] = Enumerable(all.map(v => v.toString -> v): _*)
 }

@@ -16,6 +16,7 @@
 
 package forms.msb
 
+import forms.mappings.CountryListMappings
 import models.moneyservicebusiness.SendTheLargestAmountsOfMoney
 import play.api.data.Form
 

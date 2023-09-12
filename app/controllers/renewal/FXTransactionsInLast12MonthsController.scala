@@ -18,17 +18,16 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.businessmatching._
+import forms.renewal.FXTransactionsInLast12MonthsFormProvider
 import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing}
-import models.renewal.{FXTransactionsInLast12Months, Renewal}
-import play.api.mvc.{MessagesControllerComponents, Result}
+import models.businessmatching._
+import models.renewal.Renewal
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.RenewalService
 import utils.AuthAction
+import views.html.renewal.FXTransactionsInLast12MonthsView
 
-import views.html.renewal.fx_transaction_in_last_12_months
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class FXTransactionsInLast12MonthsController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -36,42 +35,43 @@ class FXTransactionsInLast12MonthsController @Inject()(val dataCacheConnector: D
                                                        val ds: CommonPlayDependencies,
                                                        val renewalService: RenewalService,
                                                        val cc: MessagesControllerComponents,
-                                                       fx_transaction_in_last_12_months: fx_transaction_in_last_12_months) extends AmlsBaseController(ds, cc) {
+                                                       formProvider: FXTransactionsInLast12MonthsFormProvider,
+                                                       view: FXTransactionsInLast12MonthsView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetch[Renewal](request.credId, Renewal.key) map {
-          response =>
-            val form: Form2[FXTransactionsInLast12Months] = (for {
-              renewal <- response
-              transactions <- renewal.fxTransactionsInLast12Months
-            } yield Form2[FXTransactionsInLast12Months](transactions)).getOrElse(EmptyForm)
-            Ok(fx_transaction_in_last_12_months(form, edit))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Renewal](request.credId, Renewal.key) map {
+        response =>
+          val form = (for {
+            renewal <- response
+            transactions <- renewal.fxTransactionsInLast12Months
+          } yield formProvider().fill(transactions)).getOrElse(formProvider())
+          Ok(view(form, edit))
+      }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request => {
-        Form2[FXTransactionsInLast12Months](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(fx_transaction_in_last_12_months(f, edit)))
-          case ValidForm(_, data) =>
-            dataCacheConnector.fetchAll(request.credId) flatMap {
-              optMap =>
-                val result = for {
-                  cacheMap <- optMap
-                  renewal <- cacheMap.getEntry[Renewal](Renewal.key)
-                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-                  activities <- bm.activities
-                } yield {
-                  renewalService.updateRenewal(request.credId, renewal.fxTransactionsInLast12Months(data)) map { _ =>
-                    standardRouting(activities.businessActivities, edit)
-                  }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
+          dataCacheConnector.fetchAll(request.credId) flatMap {
+            optMap =>
+              val result = for {
+                cacheMap <- optMap
+                renewal <- cacheMap.getEntry[Renewal](Renewal.key)
+                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                activities <- bm.activities
+              } yield {
+                renewalService.updateRenewal(request.credId, renewal.fxTransactionsInLast12Months(data)) map { _ =>
+                  standardRouting(activities.businessActivities, edit)
                 }
-                result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
-            }
-        }
-      }
+              }
+              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+          }
+      )
+    }
   }
 
   private def standardRouting(businessActivities: Set[BusinessActivity], edit: Boolean): Result =

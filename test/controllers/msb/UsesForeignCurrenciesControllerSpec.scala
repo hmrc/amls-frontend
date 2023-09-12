@@ -98,7 +98,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
     implicit val ec = inject[ExecutionContext]
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(true)
 
     val emptyCache = CacheMap("", Map.empty)

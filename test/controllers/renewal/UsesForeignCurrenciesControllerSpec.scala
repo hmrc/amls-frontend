@@ -19,6 +19,7 @@ package controllers.renewal
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.renewal.UsesForeignCurrenciesFormProvider
 import models.businessmatching._
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
@@ -28,16 +29,16 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.renewal.uses_foreign_currencies
+import views.html.renewal.UsesForeignCurrenciesView
 
 import scala.concurrent.Future
 
-class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
+class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self =>
@@ -45,14 +46,15 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
     val cacheMap = mock[CacheMap]
-    lazy val view = app.injector.instanceOf[uses_foreign_currencies]
+    lazy val view = inject[UsesForeignCurrenciesView]
     lazy val controller = new UsesForeignCurrenciesController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       renewalService,
       dataCacheConnector,
       cc = mockMcc,
-      uses_foreign_currencies = view)
+      formProvider = inject[UsesForeignCurrenciesFormProvider],
+      view = view)
 
     when {
       renewalService.getRenewal(any())(any())
@@ -63,17 +65,8 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   trait FormSubmissionFixture extends Fixture {
-    val validFormRequest = requestWithUrlEncodedBody(
-      "currencies[0]" -> "USD",
-      "currencies[1]" -> "GBP",
-      "currencies[2]" -> "BOB",
-      "usesForeignCurrencies" -> "true",
-      "bankMoneySource" -> "Yes",
-      "bankNames" -> "Bank names",
-      "wholesalerMoneySource" -> "Yes",
-      "wholesalerNames" -> "wholesaler names",
-      "customerMoneySource" -> "Yes"
-    )
+    val validFormRequest = FakeRequest(POST, routes.UsesForeignCurrenciesController.post().url)
+    .withFormUrlEncodedBody("usesForeignCurrencies" -> "true")
 
     when {
       renewalService.updateRenewal(any(),any())(any())
@@ -129,7 +122,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
-        doc.select(".heading-xlarge").text mustBe Messages("renewal.msb.foreign_currencies.header")
+        doc.getElementsByTag("h1").text mustBe messages("renewal.msb.foreign_currencies.header")
       }
     }
   }
@@ -140,17 +133,8 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
         "editing and answer is no" in new RoutingFixture {
           setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
 
-          val validFormRequest2 = requestWithUrlEncodedBody(
-            "currencies[0]" -> "USD",
-            "currencies[1]" -> "GBP",
-            "currencies[2]" -> "BOB",
-            "usesForeignCurrencies" -> "false",
-            "bankMoneySource" -> "Yes",
-            "bankNames" -> "Bank names",
-            "wholesalerMoneySource" -> "Yes",
-            "wholesalerNames" -> "wholesaler names",
-            "customerMoneySource" -> "Yes"
-          )
+          val validFormRequest2 = FakeRequest(POST, routes.UsesForeignCurrenciesController.post().url)
+          .withFormUrlEncodedBody("usesForeignCurrencies" -> "false")
 
           val result = controller.post(edit = true)(validFormRequest2)
 

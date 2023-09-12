@@ -76,7 +76,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       when(controller.dataCache.fetch[BusinessDetails](any(), meq(BusinessDetails.key))
         (any(), any())).thenReturn(Future.successful(Some(model)))
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReady))
 
       val result = controller.get()(request)
@@ -91,7 +91,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       when(controller.dataCache.fetch[BusinessMatching](any(), meq(BusinessMatching.key))
         (any(), any())).thenReturn(Future.successful(Some(testBusinessMatch)))
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReady))
 
       val result = controller.get()(request)

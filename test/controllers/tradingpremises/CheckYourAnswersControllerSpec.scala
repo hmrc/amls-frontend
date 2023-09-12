@@ -61,7 +61,7 @@ class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Inj
       view = view,
       error = errorView)
 
-    when(statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+    when(statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
     val model = TradingPremises()
   }

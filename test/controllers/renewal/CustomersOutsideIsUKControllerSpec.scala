@@ -25,10 +25,10 @@ import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import play.api.i18n.Messages
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContentAsFormUrlEncoded, Request, Result}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -64,7 +64,8 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
     def formData(data: Option[Request[AnyContentAsFormUrlEncoded]]) = data match {
       case Some(d) => d
-      case None => requestWithUrlEncodedBody("isOutside" -> "true")
+      case None => FakeRequest(POST, routes.CustomersOutsideUKController.post().url)
+        .withFormUrlEncodedBody("isOutside" -> "true")
     }
 
     def formRequest(data: Option[Request[AnyContentAsFormUrlEncoded]]) = formData(data)
@@ -134,9 +135,9 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        val pageTitle = Messages("renewal.customer.outside.uk.title") + " - " +
-          Messages("summary.renewal") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
+        val pageTitle = messages("renewal.customer.outside.uk.title") + " - " +
+          messages("summary.renewal") + " - " +
+          messages("title.amls") + " - " + messages("title.gov")
 
         document.title() mustBe pageTitle
       }
@@ -183,7 +184,10 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
           "user answers no, not in edit mode and business is an hvd" in new FormSubmissionFixture {
             post(
               businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing)))),
-              data = Some(addToken(authRequest.withFormUrlEncodedBody("isOutside" -> "false")))
+              data = Some(addToken(
+                FakeRequest(POST, routes.CustomersOutsideIsUKController.post().url)
+                  .withFormUrlEncodedBody("isOutside" -> "false")
+              ))
             ) { result =>
               result.header.status mustBe SEE_OTHER
               result.header.headers.get("Location") mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)

@@ -271,7 +271,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     "update all saved sections" in {
       reset(service.cacheConnector)
 
-      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
       when {
@@ -361,7 +361,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       reset(service.cacheConnector)
 
-      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
       when {
         service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
@@ -497,7 +497,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     "update all saved sections" in {
       reset(service.cacheConnector)
 
-      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
+      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
 
       when {
         service.cacheConnector.fetchAllWithDefault(any())(any())

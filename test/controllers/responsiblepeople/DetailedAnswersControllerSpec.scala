@@ -23,17 +23,15 @@ import controllers.declaration
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LimitedCompany, Partnership}
+import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import services.StatusService
@@ -84,7 +82,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
         .thenReturn(Future.successful(Some(BusinessMatching())))
 
-      when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+      when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(status))
     }
 
@@ -296,7 +294,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
             .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(Partnership)))))))
 
-          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.post(1, flow)(request)
@@ -326,7 +324,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
             .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
 
-          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.post(1, flow)(request)
@@ -356,7 +354,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
             .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
 
-          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.post(1, flow)(request)
@@ -386,7 +384,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
             .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
 
-          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.post(1, flow)(request)

@@ -83,7 +83,7 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
             )))
           )
 
-          when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
           when(mockCache.getEntry[BusinessActivities](BusinessActivities.key))
@@ -125,7 +125,7 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
             )))
           )
 
-          when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
           when(controller.dataCacheConnector.fetchAll(any())(any()))
@@ -148,7 +148,7 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
 
           override def model = Some(BusinessActivities(expectedAMLSTurnover = Some(First)))
 
-          when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
           when(controller.dataCacheConnector.fetchAll(any())(any()))

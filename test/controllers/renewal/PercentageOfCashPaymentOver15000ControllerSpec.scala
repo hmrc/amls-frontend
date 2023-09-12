@@ -18,22 +18,23 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.renewal.PercentageFormProvider
 import models.renewal.{PercentageOfCashPaymentOver15000, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.renewal.percentage
+import views.html.renewal.PercentageView
 
 import scala.concurrent.Future
 
-class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
     self =>
@@ -45,12 +46,13 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = app.injector.instanceOf[percentage]
+    lazy val view = inject[PercentageView]
     val controller = new PercentageOfCashPaymentOver15000Controller(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService, cc = mockMcc,
-      percentage = view
+      formProvider = inject[PercentageFormProvider],
+      view = view
     )
   }
 
@@ -79,7 +81,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("input[value=01]").hasAttr("checked") must be(true)
+        document.select("input[value=zeroToTwenty]").hasAttr("checked") must be(true)
       }
     }
 
@@ -87,19 +89,21 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.PercentageOfCashPaymentOver15000Controller.post().url)
+        .withFormUrlEncodedBody(
         )
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.required.renewal.hvd.percentage"))
+        contentAsString(result) must include(messages("error.required.renewal.hvd.percentage"))
       }
 
       "when edit is false" must {
         "redirect to the CashPaymentController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "percentage" -> "01"
+          val newRequest = FakeRequest(POST, routes.PercentageOfCashPaymentOver15000Controller.post().url)
+          .withFormUrlEncodedBody(
+            "percentage" -> PercentageOfCashPaymentOver15000.First.toString
           )
 
           when(mockRenewalService.getRenewal(any())(any()))
@@ -117,8 +121,9 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
       "when edit is true" must {
         "redirect to the SummaryController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "percentage" -> "01"
+          val newRequest = FakeRequest(POST, routes.PercentageOfCashPaymentOver15000Controller.post().url)
+          .withFormUrlEncodedBody(
+            "percentage" -> PercentageOfCashPaymentOver15000.First.toString
           )
 
           when(mockRenewalService.getRenewal(any())(any()))

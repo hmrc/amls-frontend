@@ -193,7 +193,7 @@ class CurrentAddressNonUKControllerSpec extends AmlsSpec with Injecting {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           when {
@@ -234,7 +234,7 @@ class CurrentAddressNonUKControllerSpec extends AmlsSpec with Injecting {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           when {
@@ -278,7 +278,7 @@ class CurrentAddressNonUKControllerSpec extends AmlsSpec with Injecting {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(ReadyForRenewal(None)))
 
           when {
@@ -310,7 +310,7 @@ class CurrentAddressNonUKControllerSpec extends AmlsSpec with Injecting {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           when {
@@ -341,7 +341,7 @@ class CurrentAddressNonUKControllerSpec extends AmlsSpec with Injecting {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           when {
@@ -372,7 +372,7 @@ class CurrentAddressNonUKControllerSpec extends AmlsSpec with Injecting {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           when {
@@ -404,7 +404,7 @@ class CurrentAddressNonUKControllerSpec extends AmlsSpec with Injecting {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           when {
@@ -437,7 +437,7 @@ class CurrentAddressNonUKControllerSpec extends AmlsSpec with Injecting {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
@@ -467,7 +467,7 @@ class CurrentAddressNonUKControllerSpec extends AmlsSpec with Injecting {
 
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = currentAddressController.post(RecordId)(requestWithMissingParams)
@@ -498,7 +498,7 @@ class CurrentAddressNonUKControllerSpec extends AmlsSpec with Injecting {
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = currentAddressController.post(outOfBounds, true)(requestWithParams)

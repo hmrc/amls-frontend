@@ -196,7 +196,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             currentAddressController.dataCacheConnector.fetch[ViewResponse](any(), eqTo(ViewResponse.key))(any(), any())
           } thenReturn Future.successful(Some(viewResponse))
 
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
@@ -233,7 +233,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           when {
@@ -277,7 +277,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(ReadyForRenewal(None)))
 
           when {
@@ -309,7 +309,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           when {
@@ -340,7 +340,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           when {
@@ -371,7 +371,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           when {
@@ -403,7 +403,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           when {
@@ -437,7 +437,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
@@ -464,7 +464,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = currentAddressController.post(RecordId)(requestWithMissingParams)
@@ -495,7 +495,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
-          when(statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
           val result = currentAddressController.post(outOfBounds, true)(requestWithParams)

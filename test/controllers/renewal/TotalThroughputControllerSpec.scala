@@ -18,9 +18,11 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{BusinessActivities, _}
+import forms.renewal.TotalThroughputFormProvider
 import models.businessmatching.BusinessActivity._
-import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney, ChequeCashingScrapMetal}
+import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingScrapMetal, CurrencyExchange, ForeignExchange, TransmittingMoney}
+import models.businessmatching._
+import models.moneyservicebusiness.ExpectedThroughput
 import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
@@ -30,15 +32,15 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.renewal.total_throughput
+import views.html.renewal.TotalThroughputView
 
 import scala.concurrent.Future
 
-
-class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
+class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self =>
@@ -47,21 +49,22 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
     val dataCacheConnector = mock[DataCacheConnector]
     val renewal = Renewal()
     val cacheMap = mock[CacheMap]
-    lazy val view = app.injector.instanceOf[total_throughput]
+    lazy val view = inject[TotalThroughputView]
     lazy val controller = new TotalThroughputController(
       SuccessfulAuthAction, ds = commonDependencies,
       renewalService,
       dataCacheConnector,
       cc = mockMcc,
-      total_throughput = view
+      formProvider = inject[TotalThroughputFormProvider],
+      view = view
     )
   }
 
   trait FormSubmissionFixture extends Fixture {
     self =>
 
-    val formData = "throughput" -> "01"
-    val formRequest = requestWithUrlEncodedBody(formData)
+    val formData = "throughput" -> ExpectedThroughput.First.toString
+    val formRequest = FakeRequest(POST, routes.TotalThroughputController.post().url).withFormUrlEncodedBody(formData)
     val cache = mock[CacheMap]
 
     when {
@@ -74,8 +77,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
 
     setupBusinessMatching(Set(HighValueDealing, MoneyServiceBusiness))
 
-    def post(edit: Boolean = false)(block: Result => Unit) =
-      block(await(controller.post(edit)(formRequest)))
+    def post(edit: Boolean = false)(block: Future[Result] => Unit) =
+      block(controller.post(edit)(formRequest))
 
     def setupBusinessMatching(activities: Set[BusinessActivity], msbServices: Set[BusinessMatchingMsbService] = Set()) = when {
         cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
@@ -97,13 +100,9 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
 
       val page = Jsoup.parse(html)
 
-      page.select("input[type=radio][name=throughput][id=throughput-01]").hasAttr("checked") must be(false)
-      page.select("input[type=radio][name=throughput][id=throughput-02]").hasAttr("checked") must be(false)
-      page.select("input[type=radio][name=throughput][id=throughput-03]").hasAttr("checked") must be(false)
-      page.select("input[type=radio][name=throughput][id=throughput-04]").hasAttr("checked") must be(false)
-      page.select("input[type=radio][name=throughput][id=throughput-05]").hasAttr("checked") must be(false)
-      page.select("input[type=radio][name=throughput][id=throughput-06]").hasAttr("checked") must be(false)
-      page.select("input[type=radio][name=throughput][id=throughput-07]").hasAttr("checked") must be(false)
+      ExpectedThroughput.all.map(_.toString) foreach { id =>
+        page.getElementById(id).hasAttr("checked") must be(false)
+      }
     }
 
     "return the view with prepopulated data" in new Fixture {
@@ -115,7 +114,11 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) mustBe OK
 
       val page = Jsoup.parse(contentAsString(result))
-      page.select("input[type=radio][name=throughput][id=throughput-01]").hasAttr("checked") must be(true)
+
+      ExpectedThroughput.all.map(_.toString) foreach { id =>
+        val result = if(id == "first") true else false
+        page.getElementById(id).hasAttr("checked") must be(result)
+      }
     }
 
     "return a bad request result when an invalid form is posted" in new Fixture {
@@ -133,8 +136,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
               )
           ), hasChanged = true
       )
-      val newRequest = requestWithUrlEncodedBody(
-          "throughput" -> "01"
+      val newRequest = FakeRequest(POST, routes.TotalThroughputController.post().url).withFormUrlEncodedBody(
+          "throughput" -> ExpectedThroughput.First.toString
       )
 
       when(dataCacheConnector.fetchAll(any())(any()))
@@ -154,8 +157,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
         setupBusinessMatching(Set(HighValueDealing, MoneyServiceBusiness), Set(TransmittingMoney))
 
         post() { result =>
-          result.header.status mustBe SEE_OTHER
-          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.TransactionsInLast12MonthsController.get().url)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.renewal.routes.TransactionsInLast12MonthsController.get().url)
         }
       }
 
@@ -163,8 +166,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
         setupBusinessMatching(Set(HighValueDealing), Set(CurrencyExchange))
 
         post() { result =>
-          result.header.status mustBe SEE_OTHER
-          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.CETransactionsInLast12MonthsController.get().url)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.renewal.routes.CETransactionsInLast12MonthsController.get().url)
         }
       }
 
@@ -172,8 +175,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
         setupBusinessMatching(Set(HighValueDealing), Set(ForeignExchange))
 
         post() { result =>
-          result.header.status mustBe SEE_OTHER
-          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.FXTransactionsInLast12MonthsController.get().url)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.renewal.routes.FXTransactionsInLast12MonthsController.get().url)
         }
       }
 
@@ -181,8 +184,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
         setupBusinessMatching(Set(HighValueDealing, AccountancyServices), Set(ChequeCashingScrapMetal))
 
         post() { result =>
-          result.header.status mustBe SEE_OTHER
-          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url)
         }
       }
 
@@ -190,8 +193,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
         setupBusinessMatching(Set(HighValueDealing), Set(ChequeCashingScrapMetal))
 
         post() { result =>
-          result.header.status mustBe SEE_OTHER
-          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url)
         }
       }
     }
@@ -201,8 +204,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
         setupBusinessMatching(Set(HighValueDealing), Set(ChequeCashingScrapMetal))
 
         post(edit = true) { result =>
-          result.header.status mustBe SEE_OTHER
-          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.SummaryController.get.url)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.renewal.routes.SummaryController.get.url)
         }
       }
     }
@@ -211,7 +214,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
       setupBusinessMatching(Set(HighValueDealing), Set(ChequeCashingScrapMetal))
 
       post() { result =>
-        result.header.status mustBe SEE_OTHER
+        status(result) mustBe SEE_OTHER
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
         verify(renewalService).updateRenewal(any(), captor.capture())(any())
         captor.getValue.totalThroughput mustBe Some(TotalThroughput("01"))

@@ -70,7 +70,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "redirect to the expected throughput controller if in pre-submission status" in new Fixture {
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(true)
 
         val result = controller.post(request)
@@ -79,7 +79,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "redirect to the expected throughput page if MSB has just been added to the application" in new Fixture {
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(false)
 
         mockCacheFetch(
@@ -93,7 +93,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       "redirect to the expected throughput page if not in pre-submission status" in new Fixture {
 
         when {
-          mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+          mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
         } thenReturn Future.successful(false)
 
 

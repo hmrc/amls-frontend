@@ -16,22 +16,19 @@
 
 package controllers.renewal
 
-import cats.data.OptionT
-import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
-import javax.inject.{Inject, Singleton}
+import forms.renewal.AMLSTurnoverFormProvider
 import models.businessmatching.BusinessActivity._
 import models.businessmatching._
 import models.renewal.{AMLSTurnover, Renewal}
-import play.api.mvc.MessagesControllerComponents
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RenewalService
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper}
-import views.html.renewal.amls_turnover
+import views.html.renewal.AMLSTurnoverView
 
-
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -40,34 +37,37 @@ class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnecto
                                        val ds: CommonPlayDependencies,
                                        val renewalService: RenewalService,
                                        val cc: MessagesControllerComponents,
-                                       amls_turnover: amls_turnover) extends AmlsBaseController(ds, cc) {
+                                       formProvider: AMLSTurnoverFormProvider,
+                                       view: AMLSTurnoverView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      dataCacheConnector.fetchAll(request.credId) map {
-        optionalCache =>
-          (for {
-            cache <- optionalCache
-            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-          } yield {
-            val form = (for {
-              renewal <- cache.getEntry[Renewal](Renewal.key)
-              turnover <- renewal.turnover
-            } yield Form2[AMLSTurnover](turnover)) getOrElse EmptyForm
-            Ok(amls_turnover(form, edit, businessMatching.alphabeticalBusinessActivitiesLowerCase(false)))
-          }) getOrElse Ok(amls_turnover(EmptyForm, edit, None))
+      dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
+        (for {
+          cache <- optionalCache
+          businessMatchingOpt = cache.getEntry[BusinessMatching](BusinessMatching.key)
+          businessMatching <- businessMatchingOpt
+          form = getForm(businessMatchingOpt)
+          activities = businessMatching.alphabeticalBusinessActivitiesLowerCase(false)
+        } yield {
+          val filledForm = (for {
+            renewal <- cache.getEntry[Renewal](Renewal.key)
+            turnover <- renewal.turnover
+          } yield form.fill(turnover)) getOrElse form
+          Ok(view(filledForm, edit, activities))
+        }) getOrElse Ok(view(formProvider(), edit, None))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      getErrorMessage(request.credId) flatMap { errorMsg =>
-        Form2[AMLSTurnover](request.body)(AMLSTurnover.formRuleWithErrorMsg(errorMsg)) match {
-          case f: InvalidForm =>
-            for {
-              businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-            } yield BadRequest(amls_turnover(f, edit, businessMatching.alphabeticalBusinessActivitiesLowerCase(false)))
-          case ValidForm(_, data) =>
+      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) flatMap { bm =>
+        getForm(bm).bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(
+              BadRequest(view(formWithErrors, edit, bm.flatMap(_.alphabeticalBusinessActivitiesLowerCase(false))))
+            ),
+          data =>
             for {
               renewal <- renewalService.getRenewal(request.credId)
               _ <- renewalService.updateRenewal(request.credId, renewal.turnover(data))
@@ -79,7 +79,7 @@ class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnecto
                 getRouting(ControllerHelper.getBusinessActivity(businessMatching))
               }
             }
-        }
+        )
       }
     }
   }
@@ -97,16 +97,12 @@ class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnecto
     }
   }
 
-  private def getErrorMessage(credId: String)(implicit hc: HeaderCarrier) = {
+  private def getForm(bm: Option[BusinessMatching]): Form[AMLSTurnover] = {
     (for {
-      businessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
-      activities <- OptionT.fromOption[Future](businessMatching.activities)
+      activities <- bm.alphabeticalBusinessActivitiesLowerCase()
+      isSingleActivity = if (activities.length == 1) activities.headOption else None
     } yield {
-      if (activities.businessActivities.size == 1) {
-        "error.required.renewal.ba.turnover.from.mlr.single.service"
-      } else {
-        "error.required.renewal.ba.turnover.from.mlr"
-      }
-    }) getOrElse "error.required.renewal.ba.turnover.from.mlr"
+      formProvider(isSingleActivity)
+    }) getOrElse formProvider()
   }
 }

@@ -84,7 +84,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar {
 
     "pre populate where is your registered office or main place of business page with saved data" in new Fixture {
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionRejected))
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None, None, None, None, None, None, Some(nonukAddress), None))))
@@ -95,7 +95,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar {
     }
 
     "successfully submit form and navigate to target page" in new Fixture {
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionRejected))
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(nonukAddress), None))))
@@ -129,7 +129,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar {
 
     "successfully submit form and navigate to summary page after edit" in new Fixture {
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionRejected))
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(nonukAddress), None))))
@@ -165,7 +165,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar {
     }
 
     "fail submission on invalid address" in new Fixture {
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionRejected))
 
       when(controller.dataCacheConnector.fetch(any(), any())(any(), any()))
@@ -220,7 +220,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar {
           .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(nonukAddress), None))))
         when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val newRequest = FakeRequest(POST, routes.RegisteredOfficeNonUKController.post().url).withFormUrlEncodedBody(
@@ -243,7 +243,7 @@ class RegisteredOfficeNonUKControllerSpec extends AmlsSpec with  MockitoSugar {
           .thenReturn(Future.successful(Some(BusinessDetails(None,None, None, None, None, None, Some(nonukAddress), None))))
         when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(emptyCache))
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(ReadyForRenewal(None)))
 
         val newRequest = FakeRequest(POST, routes.RegisteredOfficeNonUKController.post().url).withFormUrlEncodedBody(

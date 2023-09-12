@@ -17,20 +17,20 @@
 package controllers.renewal
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
-import models.registrationprogress.{Completed, NotStarted, Section}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.registrationprogress.{Completed, NotStarted, TaskRow}
 import models.renewal.Renewal
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.when
+import org.scalatest.concurrent.ScalaFutures
 import play.api.i18n._
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AmlsSpec, DependencyMocks}
-import org.scalatest.concurrent.ScalaFutures
-import views.html.renewal.what_you_need
+import views.html.renewal.WhatYouNeedView
 
 import scala.concurrent.Future
 
@@ -40,14 +40,14 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
     self =>
 
     val renewalService = mock[RenewalService]
-    lazy val view = app.injector.instanceOf[what_you_need]
+    lazy val view = app.injector.instanceOf[WhatYouNeedView]
     val controller = new WhatYouNeedController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       renewalService = renewalService,
       cc = mock[MessagesControllerComponents],
-      what_you_need = view)
+      view = view)
   }
 
   "WhatYouNeedController" must {
@@ -61,15 +61,16 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
         when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(bm))
 
         when {
-          renewalService.getSection(any())(any[HeaderCarrier], any())
-        } thenReturn Future.successful(Section("renewal", NotStarted, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get))
+          renewalService.getTaskRow(any())(any[HeaderCarrier], any(), any())
+        } thenReturn Future.successful(
+          TaskRow("renewal", controllers.renewal.routes.SummaryController.get.url, Renewal().hasChanged, NotStarted, TaskRow.notStartedTag))
 
         val result = controller.get(requestWithToken)
         status(result) must be(OK)
 
-        val pageTitle = Messages("title.wyn") + " - " +
-          Messages("summary.renewal") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
+        val pageTitle = messages("title.wyn") + " - " +
+          messages("summary.renewal") + " - " +
+          messages("title.amls") + " - " + messages("title.gov")
 
         contentAsString(result) must include(pageTitle)
       }
@@ -81,8 +82,9 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
         when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(bm))
 
         when {
-          renewalService.getSection(meq("internalId"))(any(), any())
-        } thenReturn Future.successful(Section("renewal", Completed, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get))
+          renewalService.getTaskRow(meq("internalId"))(any(), any(), any())
+        } thenReturn Future.successful(
+          TaskRow("renewal", controllers.renewal.routes.SummaryController.get.url, Renewal().hasChanged, Completed, TaskRow.completedTag))
 
         val result = controller.get(requestWithToken)
         status(result) must be(SEE_OTHER)
@@ -93,8 +95,9 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any())) thenReturn (Future.successful(None))
 
           when {
-            renewalService.getSection(meq("internalId"))(any(), any())
-          } thenReturn Future.successful(Section("renewal", Completed, Renewal().hasChanged, controllers.renewal.routes.SummaryController.get))
+            renewalService.getTaskRow(meq("internalId"))(any(), any(), any())
+          } thenReturn Future.successful(
+            TaskRow("renewal", controllers.renewal.routes.SummaryController.get.url, Renewal().hasChanged, Completed, TaskRow.completedTag))
 
           a[Exception] must be thrownBy {
             ScalaFutures.whenReady(controller.get(requestWithToken)) { x => x }

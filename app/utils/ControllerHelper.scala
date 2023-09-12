@@ -109,7 +109,7 @@ object ControllerHelper {
 
   //For repeating section
   def allowedToEdit(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
-                   (implicit statusService: StatusService, hc: HeaderCarrier ,ec: ExecutionContext): Future[Boolean] = {
+                   (implicit statusService: StatusService, hc: HeaderCarrier ,ec: ExecutionContext, messages: Messages): Future[Boolean] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, credId) map {
       case SubmissionReady | NotCompleted | SubmissionReadyForReview  => true
       case _ => false
@@ -118,7 +118,7 @@ object ControllerHelper {
 
   def allowedToEdit(activity: BusinessActivity, msbSubSector: Option[BusinessMatchingMsbService] = None,
                     amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
-                   (implicit statusService: StatusService, cacheConnector: DataCacheConnector, hc: HeaderCarrier, serviceFlow: ServiceFlow ,ec: ExecutionContext): Future[Boolean] = for {
+                   (implicit statusService: StatusService, cacheConnector: DataCacheConnector, hc: HeaderCarrier, serviceFlow: ServiceFlow ,ec: ExecutionContext, messages: Messages): Future[Boolean] = for {
     status <- statusService.getStatus(amlsRegistrationNo, accountTypeId, credId)
     isNewActivity <- serviceFlow.isNewActivity(credId, activity)
     changeRegister <- cacheConnector.fetch[ServiceChangeRegister](credId, ServiceChangeRegister.key)

@@ -74,7 +74,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Injecti
           when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = timeAtAddressController.post(recordId, true)(requestWithParams)
@@ -101,7 +101,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Injecti
           when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = timeAtAddressController.post(recordId, true)(requestWithParams)

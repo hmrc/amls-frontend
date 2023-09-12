@@ -20,17 +20,17 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.businessmatching._
+import forms.renewal.SendMoneyToOtherCountryFormProvider
 import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing}
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange}
-import models.renewal.{Renewal, SendMoneyToOtherCountry}
-import play.api.mvc.MessagesControllerComponents
+import models.businessmatching._
+import models.renewal.Renewal
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RenewalService
 import utils.AuthAction
-import views.html.renewal.send_money_to_other_country
+import views.html.renewal.SendMoneyToOtherCountryView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class SendMoneyToOtherCountryController @Inject()(val authAction: AuthAction,
@@ -38,51 +38,53 @@ class SendMoneyToOtherCountryController @Inject()(val authAction: AuthAction,
                                                   val dataCacheConnector: DataCacheConnector,
                                                   renewalService: RenewalService,
                                                   val cc: MessagesControllerComponents,
-                                                  send_money_to_other_country: send_money_to_other_country) extends AmlsBaseController(ds, cc) {
+                                                  formProvider: SendMoneyToOtherCountryFormProvider,
+                                                  view: SendMoneyToOtherCountryView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        (for {
-          renewal <- OptionT(renewalService.getRenewal(request.credId))
-          otherCountry <- OptionT.fromOption[Future](renewal.sendMoneyToOtherCountry)
-        } yield {
-          Ok(send_money_to_other_country(Form2[SendMoneyToOtherCountry](otherCountry), edit))
-        }) getOrElse Ok(send_money_to_other_country(EmptyForm, edit))
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      (for {
+        renewal <- OptionT(renewalService.getRenewal(request.credId))
+        otherCountry <- OptionT.fromOption[Future](renewal.sendMoneyToOtherCountry)
+      } yield {
+        Ok(view(formProvider().fill(otherCountry), edit))
+      }) getOrElse Ok(view(formProvider(), edit))
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        Form2[SendMoneyToOtherCountry](request.body) match {
-          case f: InvalidForm => Future.successful(BadRequest(send_money_to_other_country(f, edit)))
-          case ValidForm(_, model) =>
-            dataCacheConnector.fetchAll(request.credId) flatMap {
-              optMap =>
-                (for {
-                  cacheMap <- optMap
-                  renewal <- cacheMap.getEntry[Renewal](Renewal.key)
-                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-                  services <- bm.msbServices
-                  activities <- bm.activities
-                } yield {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        value =>
+          dataCacheConnector.fetchAll(request.credId) flatMap {
+            optMap =>
+              (for {
+                cacheMap <- optMap
+                renewal <- cacheMap.getEntry[Renewal](Renewal.key)
+                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                services <- bm.msbServices
+                activities <- bm.activities
+              } yield {
 
-                  renewalService.updateRenewal(request.credId, model.money match {
-                    case false => renewal.sendMoneyToOtherCountry(model).copy(
-                      mostTransactions = None, sendTheLargestAmountsOfMoney = None)
-                    case true => renewal.sendMoneyToOtherCountry(model)
-                  }) map { _ =>
-                    if (model.money) {
-                      Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
-                    } else {
-                      redirect(
-                        services.msbServices,
-                        activities.businessActivities,
-                        edit
-                      )
-                    }
+                renewalService.updateRenewal(request.credId, if (value.money) {
+                  renewal.sendMoneyToOtherCountry(value)
+                } else {
+                  renewal.sendMoneyToOtherCountry(value).copy(
+                    mostTransactions = None, sendTheLargestAmountsOfMoney = None)
+                }) map { _ =>
+                  if (value.money) {
+                    Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
+                  } else {
+                    redirect(
+                      services.msbServices,
+                      activities.businessActivities,
+                      edit
+                    )
                   }
-                }) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
-            }
-        }
+                }
+              }) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+          }
+      )
   }
 
   private def redirect(services: Set[BusinessMatchingMsbService], activities: Set[BusinessActivity], edit: Boolean) = {

@@ -66,7 +66,7 @@ class PSRNumberControllerSpec extends AmlsSpec
     )
 
     when {
-      mockStatusService.isPreSubmission(Some(any()), any(), any())(any(), any())
+      mockStatusService.isPreSubmission(Some(any()), any(), any())(any(), any(), any())
     } thenReturn Future.successful(true)
 
     when {

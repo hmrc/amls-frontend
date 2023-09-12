@@ -43,7 +43,7 @@
     preparedForm.errors match {
         case errors => Some(
             errors.zipWithIndex.toMap.map { case (error, index) =>
-                error.key -> s"location-autocomplete-$index"
+                error.key -> s"currency-autocomplete-$index"
             }
         )
         case Nil => None
@@ -79,7 +79,7 @@
 
     @formHelper(action = controllers.msb.routes.WhichCurrenciesController.post(edit)) {
 
-        <div class="govuk-!-width-one-quarter">
+        <div class="currencies-autocomplete-wrapper">
             @for(i <- 0 until 3) {
                 @govukSelect(
                     Select(
@@ -88,11 +88,10 @@
                         label = Label(
                             content = Text(messages(s"lbl.currency.line${i+1}"))
                         ),
-                        classes = "govuk-!-width-one-quarter",
                         items = currencyData,
                         attributes = Map("data-gov-autocomplete" -> "true")
                     )
-                    .withFormField(form(s"currencies[$i]"))
+                    .withFormField(preparedForm(s"currencies[$i]"))
                 )
             }
         </div>

@@ -90,7 +90,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
     } thenReturn Some(Currency.fromInt(100))
 
     when {
-      controller.statusService.getStatus(any(), any(), any())(any(), any())
+      controller.statusService.getStatus(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(SubmissionReady)
 
     val completeRenewal = Renewal(

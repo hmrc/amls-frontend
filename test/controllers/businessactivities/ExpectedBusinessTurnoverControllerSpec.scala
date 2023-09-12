@@ -62,7 +62,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
         when(controller.dataCacheConnector.fetch[ExpectedBusinessTurnover](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get()(request)
@@ -78,7 +78,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
 
       "display the Expected Business Turnover page with pre populated data" in new Fixture {
 
-        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))

@@ -21,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import utils.AuthAction
 
-import views.html.login_event
+import views.html.LoginEventView
 
 import scala.concurrent.Future
 
@@ -30,12 +30,12 @@ class LoginEventController @Inject()(authAction: AuthAction,
                                      val ds: CommonPlayDependencies,
                                      val cc: MessagesControllerComponents,
                                      applicationConfig: ApplicationConfig,
-                                     login_event: login_event) extends AmlsBaseController(ds, cc) {
+                                     view: LoginEventView) extends AmlsBaseController(ds, cc) {
 
   val redirectCallType = "GET"
 
   def get: Action[AnyContent] = authAction.async {
-    implicit request => Future(Ok(login_event(generateRedirect(applicationConfig.eabRedressUrl))))
+    implicit request => Future(Ok(view(generateRedirect(applicationConfig.eabRedressUrl))))
   }
 
   private def generateRedirect(destinationUrl: String) = {

@@ -59,7 +59,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
         val date = new LocalDate()
 
         when {
-          controller.statusService.getStatus(any(),any(), any())(any(),any())
+          controller.statusService.getStatus(any(),any(), any())(any(),any(),any())
         } thenReturn Future.successful(ReadyForRenewal(Some(date)))
 
         when{
@@ -76,7 +76,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
         val date = new LocalDate()
 
         when {
-          controller.statusService.getStatus(any(),any(), any())(any(),any())
+          controller.statusService.getStatus(any(),any(), any())(any(),any(),any())
         } thenReturn Future.successful(ReadyForRenewal(Some(date)))
 
         when {
@@ -98,7 +98,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
             val date = new LocalDate()
 
             when {
-              controller.statusService.getStatus(any(),any(), any())(any(),any())
+              controller.statusService.getStatus(any(),any(), any())(any(),any(),any())
             } thenReturn Future.successful(ReadyForRenewal(Some(date)))
 
             mockCacheSave[RenewRegistration](RenewRegistrationYes, Some(RenewRegistration.key))
@@ -119,13 +119,13 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
           val date = new LocalDate()
 
           when {
-            controller.statusService.getStatus(any(),any(), any())(any(),any())
+            controller.statusService.getStatus(any(),any(), any())(any(),any(),any())
           } thenReturn Future.successful(ReadyForRenewal(Some(date)))
 
           mockCacheSave[RenewRegistration](RenewRegistrationNo, Some(RenewRegistration.key))
 
           when {
-            controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any())
+            controller.progressService.getSubmitRedirect(any[Option[String]](), any(), any())(any(), any(), any())
           } thenReturn Future.successful(Some(call))
 
           val result = controller.post()(newRequest)
@@ -144,7 +144,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
           val date = new LocalDate()
 
           when {
-            controller.statusService.getStatus(any(),any(), any())(any(),any())
+            controller.statusService.getStatus(any(),any(), any())(any(),any(),any())
           } thenReturn Future.successful(ReadyForRenewal(Some(date)))
 
           mockCacheSave[RenewRegistration](RenewRegistrationNo, Some(RenewRegistration.key))
