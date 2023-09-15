@@ -16,12 +16,11 @@
 
 package controllers.renewal
 
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.renewal.AMLSTurnoverFormProvider
 import models.businessmatching.BusinessActivity._
 import models.businessmatching._
-import models.renewal.{AMLSTurnover, Renewal}
+import models.renewal.AMLSTurnover
 import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RenewalService
@@ -32,8 +31,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                       val authAction: AuthAction,
+class AMLSTurnoverController @Inject()(val authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
                                        val renewalService: RenewalService,
                                        val cc: MessagesControllerComponents,
@@ -42,36 +40,32 @@ class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnecto
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      dataCacheConnector.fetchAll(request.credId) map { optionalCache =>
-        (for {
-          cache <- optionalCache
-          businessMatchingOpt = cache.getEntry[BusinessMatching](BusinessMatching.key)
-          businessMatching <- businessMatchingOpt
-          form = getForm(businessMatchingOpt)
-          activities = businessMatching.alphabeticalBusinessActivitiesLowerCase(false)
-        } yield {
-          val filledForm = (for {
-            renewal <- cache.getEntry[Renewal](Renewal.key)
-            turnover <- renewal.turnover
-          } yield form.fill(turnover)) getOrElse form
-          Ok(view(filledForm, edit, activities))
-        }) getOrElse Ok(view(formProvider(), edit, None))
+      val futureFormFillBusinessActivities: Future[Form[AMLSTurnover]] = renewalService.getFirstBusinessActivityInLowercase(request.credId).map(formProvider(_))
+      val futureAMLSTurnover: Future[Option[AMLSTurnover]] = renewalService.getRenewal(request.credId).map(_.turnover)
+
+      for {
+        optBm <- renewalService.getBusinessMatching(request.credId)
+        form <- futureFormFillBusinessActivities
+        optTurnover <- futureAMLSTurnover
+      } yield {
+        val filledFormOrEmpty = optTurnover.map(turnover => form.fill(turnover)).getOrElse(form)
+        Ok(view(filledFormOrEmpty, edit, optBm.flatMap(_.alphabeticalBusinessActivitiesLowerCase())))
       }
   }
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) flatMap { bm =>
-        getForm(bm).bindFromRequest().fold(
+      renewalService.getFirstBusinessActivityInLowercase(request.credId) flatMap {
+        formProvider(_).bindFromRequest().fold(
           formWithErrors =>
-            Future.successful(
-              BadRequest(view(formWithErrors, edit, bm.flatMap(_.alphabeticalBusinessActivitiesLowerCase(false))))
-            ),
+            renewalService.getBusinessMatching(request.credId) map { bm =>
+              BadRequest(view(formWithErrors, edit, bm.alphabeticalBusinessActivitiesLowerCase()))
+            },
           data =>
             for {
               renewal <- renewalService.getRenewal(request.credId)
               _ <- renewalService.updateRenewal(request.credId, renewal.turnover(data))
-              businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+              businessMatching <- renewalService.getBusinessMatching(request.credId)
             } yield {
               if (edit) {
                 Redirect(routes.SummaryController.get)
@@ -97,12 +91,4 @@ class AMLSTurnoverController @Inject()(val dataCacheConnector: DataCacheConnecto
     }
   }
 
-  private def getForm(bm: Option[BusinessMatching]): Form[AMLSTurnover] = {
-    (for {
-      activities <- bm.alphabeticalBusinessActivitiesLowerCase()
-      isSingleActivity = if (activities.length == 1) activities.headOption else None
-    } yield {
-      formProvider(isSingleActivity)
-    }) getOrElse formProvider()
-  }
 }

@@ -319,7 +319,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         SummaryListRow(
           Key(Text(messages("renewal.customer.outside.uk.countries.title"))),
           boa.countries match {
-            case Some(country :: Nil) => Value(Text(country.name))
+            case Some(countries) if countries.length == 1 => Value(Text(countries.head.name))
             case Some(countries) => toBulletList(countries.map(_.name))
             case None => throw new Exception("Countries are required for Summary List Row")
           },

@@ -82,6 +82,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
   def getRenewal(cacheId: String)(implicit headerCarrier: HeaderCarrier): Future[Option[Renewal]] =
     dataCache.fetch[Renewal](cacheId, Renewal.key)
 
+  // TODO make private and update usages to new update function
   def updateRenewal(credId: String, renewal: Renewal)(implicit headerCarrier: HeaderCarrier): Future[CacheMap] =
     dataCache.save[Renewal](credId, Renewal.key, renewal)
 
@@ -195,4 +196,28 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
             (variationSections :+ renewalSection).exists(_.hasChanged)
   }
 
+  def getFirstBusinessActivityInLowercase(cacheId: String)
+                                         (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Option[String]] = {
+    getBusinessMatching(cacheId)
+      .map(optBm => optBm.flatMap(bm => bm.alphabeticalBusinessActivitiesLowerCase())
+        .flatMap(activities => if (activities.length == 1) activities.headOption else None))
+  }
+
+  def getBusinessMatching(cacheId: String)(implicit headerCarrier: HeaderCarrier): Future[Option[BusinessMatching]] =
+    dataCache.fetch[BusinessMatching](cacheId, BusinessMatching.key)
+
+  /*
+   TODO:
+    - Update controllers usages of updateRenewal with this
+    - Make old method private
+   */
+  def fetchAndUpdateRenewal(credId: String, updateAction: Renewal => Renewal)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, CacheMap]] = {
+
+    dataCache.fetchAll(credId).flatMap {
+      _.flatMap(_.getEntry[Renewal](Renewal.sectionKey))
+        .map(renewal => updateRenewal(credId, updateAction(renewal)))
+        .toRight("Unable to get data from the cache")
+        .sequence
+    }
+  }
 }

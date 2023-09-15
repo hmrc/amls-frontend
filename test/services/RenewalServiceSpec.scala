@@ -23,6 +23,7 @@ import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching._
 import models.registrationprogress._
 import models.renewal._
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
@@ -874,6 +875,159 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         "sections are incomplete and not changed" in new CanSubmitFixture {
           service.canSubmit(completedChangedRenewal, sectionsIncompleteAndNotChanged) must be(false)
         }
+      }
+    }
+  }
+
+  "getFirstBusinessActivityInLowercase" must {
+
+    "return an activity" when {
+
+      "the length of the activities list is exactly 1" in new Fixture {
+
+        BusinessActivities.all foreach { activity =>
+          when {
+            dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+          } thenReturn Future.successful(
+            Some(BusinessMatching(activities = Some(BusinessActivities(Set(activity)))))
+          )
+
+          service.getFirstBusinessActivityInLowercase(credId).futureValue mustBe Some(
+            messages(s"businessactivities.registerservices.servicename.lbl.${activity.value}")
+          )
+        }
+      }
+    }
+
+    "return none" when {
+
+      "the length of the activities is zero" in new Fixture {
+
+        when {
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+        } thenReturn Future.successful(
+          Some(BusinessMatching(activities = Some(BusinessActivities(Set.empty))))
+        )
+
+        service.getFirstBusinessActivityInLowercase(credId).futureValue mustBe None
+      }
+
+      "the length of the activities is longer than 1" in new Fixture {
+
+        when {
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+        } thenReturn Future.successful(
+          Some(BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices, ArtMarketParticipant)))))
+        )
+
+        service.getFirstBusinessActivityInLowercase(credId).futureValue mustBe None
+      }
+
+      "no activities are returned" in new Fixture {
+
+        when {
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+        } thenReturn Future.successful(None)
+
+        service.getFirstBusinessActivityInLowercase(credId).futureValue mustBe None
+      }
+    }
+  }
+
+  "getBusinessMatching" must {
+
+    "return business matching instance" when {
+
+      "cache connector retrieves an instance successfully" in new Fixture {
+
+        val bm: BusinessMatching = BusinessMatching()
+
+        when {
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+        } thenReturn Future.successful(Some(bm))
+
+        service.getBusinessMatching(credId).futureValue mustBe Some(bm)
+      }
+    }
+
+    "return none" when {
+
+      "cache connector cannot retrieve business matching" in new Fixture {
+
+        when {
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+        } thenReturn Future.successful(None)
+
+        service.getBusinessMatching(credId).futureValue mustBe None
+      }
+    }
+  }
+
+  "fetchAndUpdateRenewal" must {
+
+    "return a right with the cachemap" when {
+
+      "renewal is updated correctly" in new Fixture {
+
+        val model = standardCompleteInvolvedInOtherActivities()
+
+        when {
+          dataCache.fetchAll(eqTo(credId))(any())
+        } thenReturn Future.successful(Some(mockCacheMap))
+
+        when {
+          dataCache.save(eqTo(credId), eqTo(Renewal.sectionKey), any())(any(), any())
+        } thenReturn Future.successful(mockCacheMap)
+
+        when {
+          mockCacheMap.getEntry[Renewal](eqTo(Renewal.sectionKey))(any())
+        } thenReturn Some(model)
+
+        val result = service.fetchAndUpdateRenewal(
+          credId,
+          renewal => renewal.copy(hasAccepted = false)
+        ).futureValue
+
+        val captor = ArgumentCaptor.forClass(classOf[Renewal])
+        verify(dataCache).save(eqTo(credId), eqTo(Renewal.sectionKey), captor.capture())(any(), any())
+
+        result mustBe Right(mockCacheMap)
+        captor.getValue mustBe model.copy(hasAccepted = false)
+      }
+    }
+
+    "return left with an error message" when {
+
+      "renewal is not present in cache" in new Fixture {
+
+        when {
+          dataCache.fetchAll(eqTo(credId))(any())
+        } thenReturn Future.successful(Some(mockCacheMap))
+
+        when {
+          mockCacheMap.getEntry[Renewal](eqTo(Renewal.sectionKey))(any())
+        } thenReturn None
+
+        val result = service.fetchAndUpdateRenewal(
+          credId,
+          renewal => renewal.copy(hasAccepted = false)
+        ).futureValue
+
+        result mustBe Left("Unable to get data from the cache")
+      }
+
+      "fetching the cache fails" in new Fixture {
+
+        when {
+          dataCache.fetchAll(eqTo(credId))(any())
+        } thenReturn Future.successful(None)
+
+        val result = service.fetchAndUpdateRenewal(
+          credId,
+          renewal => renewal.copy(hasAccepted = false)
+        ).futureValue
+
+        result mustBe Left("Unable to get data from the cache")
       }
     }
   }

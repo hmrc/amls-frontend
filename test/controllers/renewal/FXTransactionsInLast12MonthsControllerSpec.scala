@@ -16,7 +16,6 @@
 
 package controllers.renewal
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.renewal.FXTransactionsInLast12MonthsFormProvider
 import models.businessmatching.BusinessActivity._
@@ -39,11 +38,9 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
   trait Fixture {
     self => val request = addToken(authRequest)
 
-    lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
     lazy val view = inject[FXTransactionsInLast12MonthsView]
     val controller = new FXTransactionsInLast12MonthsController (
-      dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService, cc = mockMcc,
       formProvider = inject[FXTransactionsInLast12MonthsFormProvider],
@@ -51,8 +48,12 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
     )
 
     val cacheMap = mock[CacheMap]
-    when(mockDataCacheConnector.fetchAll(any())(any()))
-            .thenReturn(Future.successful(Some(cacheMap)))
+
+    when(mockRenewalService.fetchAndUpdateRenewal(any(), any())(any(), any()))
+      .thenReturn(Future.successful(Right(cacheMap)))
+
+    when(mockRenewalService.getRenewal(any())(any()))
+      .thenReturn(Future.successful(None))
 
     def setupBusinessMatching(activities: Set[BusinessActivity]) = when {
       cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
@@ -65,9 +66,6 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "load the page 'How many foreign exchange transactions'" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Renewal](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
-
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(messages("renewal.msb.fx.transactions.expected.title"))
@@ -75,14 +73,14 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "load the page 'How many foreign exchange transactions' with pre populated data" in new Fixture  {
 
-      when(controller.dataCacheConnector.fetch[Renewal](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(Renewal(
-        fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("12345678963"))))))
+      when(mockRenewalService.getRenewal(any())(any()))
+        .thenReturn(Future.successful(
+          Some(Renewal(fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("12345678963")))))
+        )
 
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include("12345678963")
-
     }
 
     "Show error message when user has not filled the mandatory fields" in new Fixture  {
@@ -92,17 +90,9 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         "fxTransaction" -> ""
       )
 
-      when {
-        cacheMap.getEntry[Renewal](Renewal.key)
-      } thenReturn Some(Renewal())
-
-      when(mockRenewalService.updateRenewal(any(), any())(any()))
-        .thenReturn(Future.successful(emptyCache))
-
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include (messages("error.required.renewal.fx.transactions.in.12months"))
-
     }
 
     trait FlowFixture extends Fixture {
@@ -110,13 +100,6 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       .withFormUrlEncodedBody(
         "fxTransaction" -> "12345678963"
       )
-
-      when {
-        cacheMap.getEntry[Renewal](Renewal.key)
-      } thenReturn Some(Renewal())
-
-      when(mockRenewalService.updateRenewal(any(), any())(any()))
-              .thenReturn(Future.successful(mock[CacheMap]))
     }
 
     "Successfully save data in mongoCache and navigate to Next page" when {
@@ -179,6 +162,5 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
       }
     }
-
   }
 }

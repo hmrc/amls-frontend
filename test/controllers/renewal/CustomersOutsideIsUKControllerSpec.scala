@@ -16,11 +16,10 @@
 
 package controllers.renewal
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.Country
-import models.businessmatching._
 import models.businessmatching.BusinessActivity._
+import models.businessmatching._
 import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -42,7 +41,6 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     self =>
     val request = addToken(authRequest)
 
-    val dataCacheConnector = mock[DataCacheConnector]
     val renewalService = mock[RenewalService]
     val authAction = SuccessfulAuthAction
 
@@ -51,7 +49,6 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[RenewalService].to(renewalService))
       .overrides(bind[AuthAction].to(authAction))
       .build()
@@ -78,12 +75,8 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     val customersOutsideIsUK = CustomersOutsideIsUK(true)
 
     when {
-      renewalService.updateRenewal(any(),any())(any())
-    } thenReturn Future.successful(cache)
-
-    when {
-      dataCacheConnector.fetchAll(any())(any())
-    } thenReturn Future.successful(Some(cache))
+      renewalService.fetchAndUpdateRenewal(any(), any())(any(), any())
+    } thenReturn Future.successful(Right(cache))
 
     when {
       cache.getEntry[Renewal](Renewal.key)

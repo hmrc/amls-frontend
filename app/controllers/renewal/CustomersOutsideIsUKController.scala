@@ -16,12 +16,11 @@
 
 package controllers.renewal
 
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.renewal.CustomersOutsideIsUKFormProvider
 import models.businessmatching.BusinessActivity.HighValueDealing
 import models.businessmatching.{BusinessActivity, BusinessMatching}
-import models.renewal.{CustomersOutsideIsUK, Renewal}
+import models.renewal.CustomersOutsideIsUK
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{AutoCompleteService, RenewalService}
 import utils.AuthAction
@@ -31,8 +30,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                               val authAction: AuthAction,
+class CustomersOutsideIsUKController @Inject()(val authAction: AuthAction,
                                                val ds: CommonPlayDependencies,
                                                val renewalService: RenewalService,
                                                val autoCompleteService: AutoCompleteService,
@@ -58,29 +56,30 @@ class CustomersOutsideIsUKController @Inject()(val dataCacheConnector: DataCache
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
-          dataCacheConnector.fetchAll(request.credId) flatMap { optionalCache =>
-            (for {
-              cache <- optionalCache
-              renewal <- cache.getEntry[Renewal](Renewal.key)
-              businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-              ba <- businessMatching.activities.map { a => a.businessActivities}
-            } yield {
-              renewalService.updateRenewal(request.credId, data.isOutside match {
-                case false => renewal.customersOutsideIsUK(data).copy(customersOutsideUK = None)
-                case true => renewal.customersOutsideIsUK(data)
-              }) map { _ =>
-                redirectTo(data, edit, ba)
-              }
-            }) getOrElse Future.successful(InternalServerError("Unable to get data from the cache"))
+          renewalService.fetchAndUpdateRenewal(
+            request.credId,
+            renewal => if (data.isOutside) {
+              renewal.customersOutsideIsUK(data)
+            } else {
+              renewal.customersOutsideIsUK(data).copy(customersOutsideUK = None)
+            }
+          ) map {
+            case Left(error) => InternalServerError(error)
+            case Right(cacheMap) => redirectTo(
+              data,
+              edit,
+              cacheMap.getEntry[BusinessMatching](BusinessMatching.key).flatMap(_.activities.map(_.businessActivities))
+            )
           }
       )
   }
-  def redirectTo(outsideUK: CustomersOutsideIsUK, edit: Boolean, ba: Set[BusinessActivity]) = {
+  private def redirectTo(outsideUK: CustomersOutsideIsUK, edit: Boolean, ba: Option[Set[BusinessActivity]]) = {
     (outsideUK, edit) match {
       case (CustomersOutsideIsUK(true), false) => Redirect(routes.CustomersOutsideUKController.get())
       case (CustomersOutsideIsUK(true), true) => Redirect(routes.CustomersOutsideUKController.get(true))
       case (CustomersOutsideIsUK(false), _) => (ba, edit) match {
-        case (x, false) if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+        case (x, false) if x.fold(false)(_.contains(HighValueDealing)) =>
+          Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
         case _ => Redirect(routes.SummaryController.get)
       }
     }
