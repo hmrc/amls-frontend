@@ -20,26 +20,24 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import javax.inject.Inject
-import models.businessmatching.BusinessMatching
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName}
-import views.html.withdrawal.withdraw_application
+import views.html.withdrawal.WithdrawApplicationView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
-class WithdrawApplicationController @Inject()(
-                                               authAction: AuthAction,
-                                               val ds: CommonPlayDependencies,
-                                               implicit val amls: AmlsConnector,
-                                               implicit val dc: DataCacheConnector,
-                                               enrolments: AuthEnrolmentsService,
-                                               implicit val statusService: StatusService,
-                                               val cc: MessagesControllerComponents,
-                                               withdraw_application: withdraw_application) extends AmlsBaseController(ds, cc) {
+class WithdrawApplicationController @Inject()(authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
+                                              implicit val amls: AmlsConnector,
+                                              implicit val dc: DataCacheConnector,
+                                              enrolments: AuthEnrolmentsService,
+                                              implicit val statusService: StatusService,
+                                              val cc: MessagesControllerComponents,
+                                              view: WithdrawApplicationView) extends AmlsBaseController(ds, cc) {
 
-  def get = authAction.async {
+  def get: Action[AnyContent] = authAction.async {
       implicit request =>
         val maybeProcessingDate = for {
           status <- OptionT.liftF(statusService.getDetailedStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
@@ -47,17 +45,15 @@ class WithdrawApplicationController @Inject()(
         } yield response.processingDate
 
         (for {
-          cache <- OptionT(dc.fetch[BusinessMatching](request.credId, BusinessMatching.key))
-          details <- OptionT.fromOption[Future](cache.reviewDetails)
           processingDate <- maybeProcessingDate
           amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
           id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId))
           name <- BusinessName.getName(request.credId, Some(id), request.accountTypeId)
-        } yield Ok(withdraw_application(name, processingDate))) getOrElse InternalServerError("Unable to show the withdrawal page")
+        } yield Ok(view(name, processingDate))) getOrElse InternalServerError("Unable to show the withdrawal page")
   }
 
-  def post = authAction.async {
-    Future.successful(Redirect(routes.WithdrawalReasonController.get))
+  def post: Action[AnyContent] = authAction {
+    Redirect(routes.WithdrawalReasonController.get)
   }
 
 }

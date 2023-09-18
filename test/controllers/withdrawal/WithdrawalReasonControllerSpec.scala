@@ -19,20 +19,22 @@ package controllers.withdrawal
 import cats.implicits._
 import connectors.AmlsConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.withdrawal.WithdrawalReasonFormProvider
+import models.withdrawal.WithdrawalReason.{Other, OutOfScope}
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse, WithdrawalReason}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, StatusService}
+import play.api.test.{FakeRequest, Injecting}
+import services.AuthEnrolmentsService
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import views.html.withdrawal.withdrawal_reason
+import views.html.withdrawal.WithdrawalReasonView
 
 import scala.concurrent.Future
 
-class WithdrawalReasonControllerSpec extends AmlsSpec {
+class WithdrawalReasonControllerSpec extends AmlsSpec with Injecting {
 
   trait TestFixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -40,17 +42,16 @@ class WithdrawalReasonControllerSpec extends AmlsSpec {
     val request = addToken(authRequest)
     val amlsConnector = mock[AmlsConnector]
     val authService = mock[AuthEnrolmentsService]
-    val statusService = mock[StatusService]
-    lazy val view = app.injector.instanceOf[withdrawal_reason]
+    lazy val view = inject[WithdrawalReasonView]
     lazy val controller = new WithdrawalReasonController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       amlsConnector,
       authService,
-      statusService,
-      mockCacheConnector,
       cc = mockMcc,
-      withdrawal_reason = view)
+      formProvider = inject[WithdrawalReasonFormProvider],
+      view = view
+    )
 
     val amlsRegistrationNumber = "XA1234567890L"
 
@@ -67,20 +68,20 @@ class WithdrawalReasonControllerSpec extends AmlsSpec {
 
     "get is called" must {
 
-      "display withdrawal_reasons view without data" in new TestFixture {
+      "display the view without data" in new TestFixture {
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("withdrawal.reason.heading"))
+        contentAsString(result) must include(messages("withdrawal.reason.heading"))
 
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("withdrawalReason-01").hasAttr("checked") must be(false)
-        document.getElementById("withdrawalReason-02").hasAttr("checked") must be(false)
-        document.getElementById("withdrawalReason-03").hasAttr("checked") must be(false)
-        document.getElementById("withdrawalReason-04").hasAttr("checked") must be(false)
+
+        WithdrawalReason.all.foreach { reason =>
+          document.getElementById(reason.toString).hasAttr("checked") must be(false)
+        }
+
         document.getElementById("specifyOtherReason").`val`() must be("")
       }
-
     }
 
     "post is called" when {
@@ -90,10 +91,10 @@ class WithdrawalReasonControllerSpec extends AmlsSpec {
         "go to landing controller" which {
           "follows sending a withdrawal to amls" when {
             "withdrawalReason is selection without other reason" in new TestFixture {
-              val newRequest = requestWithUrlEncodedBody(
-                "withdrawalReason" -> "01"
+              val newRequest = FakeRequest(POST, routes.WithdrawalReasonController.post().url).withFormUrlEncodedBody(
+                "withdrawalReason" -> OutOfScope.toString
               )
-
+FakeRequest
               val result = controller.post()(newRequest)
               status(result) must be(SEE_OTHER)
 
@@ -107,8 +108,8 @@ class WithdrawalReasonControllerSpec extends AmlsSpec {
 
             "withdrawalReason is selection with other reason" in new TestFixture {
 
-              val newRequest = requestWithUrlEncodedBody(
-                "withdrawalReason" -> "04",
+              val newRequest = FakeRequest(POST, routes.WithdrawalReasonController.post().url).withFormUrlEncodedBody(
+                "withdrawalReason" -> Other("").toString,
                 "specifyOtherReason" -> "reason"
               )
 
@@ -118,11 +119,10 @@ class WithdrawalReasonControllerSpec extends AmlsSpec {
               val captor = ArgumentCaptor.forClass(classOf[WithdrawSubscriptionRequest])
               verify(amlsConnector).withdraw(eqTo(amlsRegistrationNumber), captor.capture(), any())(any(), any())
 
-              captor.getValue.withdrawalReason mustBe WithdrawalReason.Other("reason")
+              captor.getValue.withdrawalReason mustBe Other("reason")
               captor.getValue.withdrawalReasonOthers mustBe "reason".some
 
               redirectLocation(result) must be(Some(controllers.routes.LandingController.get.url))
-
             }
           }
         }
@@ -131,8 +131,8 @@ class WithdrawalReasonControllerSpec extends AmlsSpec {
       "given invalid data" must {
         "return with BAD_REQUEST" in new TestFixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "withdrawalReason" -> "20"
+          val newRequest = FakeRequest(POST, routes.WithdrawalReasonController.post().url).withFormUrlEncodedBody(
+            "withdrawalReason" -> "foo"
           )
 
           val result = controller.post()(newRequest)
@@ -148,8 +148,8 @@ class WithdrawalReasonControllerSpec extends AmlsSpec {
             authService.amlsRegistrationNumber(Some(any()), Some(any()))(any(), any())
           } thenReturn Future.successful(None)
 
-          val newRequest = requestWithUrlEncodedBody(
-            "withdrawalReason" -> "01"
+          val newRequest = FakeRequest(POST, routes.WithdrawalReasonController.post().url).withFormUrlEncodedBody(
+            "withdrawalReason" -> OutOfScope.toString
           )
 
           val result = controller.post()(newRequest)
@@ -157,9 +157,6 @@ class WithdrawalReasonControllerSpec extends AmlsSpec {
 
         }
       }
-
     }
-
   }
-
 }

@@ -17,38 +17,34 @@
 package views.deregister
 
 import generators.AmlsReferenceNumberGenerator
-import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.deregister.deregister_application
+import views.html.deregister.DeregisterApplicationView
 
-class deregister_applicationSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator {
+class DeregisterApplicationViewSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator {
 
   trait ViewFixture extends Fixture {
-    lazy val deregister_application = app.injector.instanceOf[deregister_application]
+    lazy val deregisterView = inject[DeregisterApplicationView]
     implicit val requestWithToken = addTokenForView()
 
     val businessName = "Test Business"
-    val currentRegYearEndDate = LocalDate.now()
 
-    def view = deregister_application(businessName, Set.empty, amlsRegistrationNumber)
+    def view = deregisterView(businessName)
   }
 
-  "deregister_application view" must {
+  "DeregisterApplicationView" must {
     "have correct title and headings" in new ViewFixture {
 
-      val title = s"${Messages("status.deregister.empty.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+      val title = s"${messages("status.deregister.empty.title")} - ${messages("title.amls")} - ${messages("title.gov")}"
 
       doc.title mustBe title
-      heading.html must be(Messages("Deregister Test Business under the Money Laundering Regulations"))
-      subHeading.html must include(Messages("summary.status"))
-
+      heading.html must be(messages("status.deregister.title", businessName))
+      subHeading.html must include(messages("summary.status"))
     }
 
     "have correct body content" in new ViewFixture {
-      validateParagraphizedContent("status.deregister.body-content")
+      doc.text() must include(messages("status.deregister.body-content"))
     }
   }
 }

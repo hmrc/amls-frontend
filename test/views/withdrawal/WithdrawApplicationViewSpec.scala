@@ -18,15 +18,14 @@ package views.withdrawal
 
 import org.joda.time.LocalDateTime
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
-import utils.{AmlsViewSpec, DateHelper}
+import utils.AmlsViewSpec
 import views.Fixture
-import views.html.withdrawal.withdraw_application
+import views.html.withdrawal.WithdrawApplicationView
 
-class withdraw_applicationSpec extends AmlsViewSpec with MockitoSugar {
+class WithdrawApplicationViewSpec extends AmlsViewSpec with MockitoSugar {
 
   trait ViewFixture extends Fixture {
-    lazy val withdraw_application = app.injector.instanceOf[withdraw_application]
+    lazy val withdraw_application = inject[WithdrawApplicationView]
     implicit val requestWithToken = addTokenForView()
 
     //noinspection ScalaStyle
@@ -37,13 +36,13 @@ class withdraw_applicationSpec extends AmlsViewSpec with MockitoSugar {
 
   "The withdraw application view" must {
     "show the correct titles and headings" in new ViewFixture {
-      doc.title must be(s"${Messages("status.withdraw.empty.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}")
-      heading.html must be(Messages("Withdraw your application for The Business"))
-      subHeading.html must include(Messages("summary.status"))
+      doc.title must be(s"${messages("status.withdraw.empty.title")} - ${messages("title.amls")} - ${messages("title.gov")}")
+      heading.html must be(messages("Withdraw your application for The Business"))
+      subHeading.html must include(messages("summary.status"))
     }
 
     "show the correct informational content" in new ViewFixture {
-      validateParagraphizedContent("status.withdraw.body-content")
+      doc.text() must include(messages("status.withdraw.body-content"))
       doc.text() must include("If you carry out activities covered by the Money Laundering Regulations, you need to be registered with an appropriate supervisory body.")
     }
   }

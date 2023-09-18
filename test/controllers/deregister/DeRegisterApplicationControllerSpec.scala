@@ -27,11 +27,10 @@ import models.registrationdetails.RegistrationDetails
 import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture}
-import views.html.deregister.deregister_application
+import views.html.deregister.DeregisterApplicationView
 
 import scala.concurrent.Future
 
@@ -50,7 +49,7 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec {
     val dataCache = mock[DataCacheConnector]
     val enrolments = mock[AuthEnrolmentsService]
     val amlsConnector = mock[AmlsConnector]
-    lazy val view = app.injector.instanceOf[deregister_application]
+    lazy val view = app.injector.instanceOf[DeregisterApplicationView]
     val controller = new DeRegisterApplicationController(
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -59,7 +58,8 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec {
       enrolments,
       amlsConnector,
       mockMcc,
-      deregister_application = view)
+      view = view
+    )
 
     when {
       dataCache.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())
@@ -91,7 +91,7 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec {
       "show the correct page" in new TestFixture {
         val result = controller.get()(request)
         status(result) mustBe OK
-        contentAsString(result) must include(Messages("Deregister Business Name from registration details under the Money Laundering Regulations"))
+        contentAsString(result) must include(messages("Deregister Business Name from registration details under the Money Laundering Regulations"))
       }
 
       "show the name of the business" in new TestFixture {
