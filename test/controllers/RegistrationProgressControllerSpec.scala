@@ -271,7 +271,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               val statusLink = Jsoup.parse(contentAsString(responseF)).getElementById("progress-continue")
 
-              statusLink.siblingElements().text() must include(messages("progress.view.status"))
+              statusLink.parent().siblingElements().text() must include(messages("progress.view.status"))
               statusLink.attr("href") must be(controllers.routes.StatusController.get().url)
               statusLink.text() must include("Check your status and messages")
             }
@@ -319,7 +319,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               val statusLink = Jsoup.parse(contentAsString(responseF)).getElementById("progress-continue")
 
-              statusLink.siblingElements().text() must include(messages("progress.view.status"))
+              statusLink.parent().siblingElements().text() must include(messages("progress.view.status"))
               statusLink.attr("href") must be(controllers.routes.StatusController.get().url)
               statusLink.text() must include("Check your status and messages")
             }

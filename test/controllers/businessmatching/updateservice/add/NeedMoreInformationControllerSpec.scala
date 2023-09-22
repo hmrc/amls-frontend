@@ -24,11 +24,10 @@ import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageI
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import utils._
-import views.html.businessmatching.updateservice.add.new_service_information
+import views.html.businessmatching.updateservice.add.NewServiceInformationView
 
 class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with FutureAssertions with ScalaFutures {
 
@@ -38,14 +37,14 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
     val request = requestWithToken
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-    lazy val view = app.injector.instanceOf[new_service_information]
+    lazy val view = app.injector.instanceOf[NewServiceInformationView]
     val controller = new NeedMoreInformationController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel],
       cc = mockMcc,
-      new_service_information = view
+      view = view
     )
 
     val flowModel = AddBusinessTypeFlowModel(Some(AccountancyServices), Some(true))
@@ -60,7 +59,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
         mockCacheFetch(Some(ServiceChangeRegister(Some(Set(HighValueDealing)))), Some(ServiceChangeRegister.key))
         val result = controller.get()(request)
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.newserviceinformation.title"))
+        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.newserviceinformation.title"))
       }
     }
   }

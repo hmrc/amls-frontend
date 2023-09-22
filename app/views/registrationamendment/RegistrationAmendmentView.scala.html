@@ -89,9 +89,11 @@
                 } else {
                     @messages("progress.updates.not.made")
                 }</p>
-                <a id="progress-continue" class="govuk-link" href="@controllers.routes.StatusController.get().url">
-                    @messages("progress.updates.continue")
-                </a>
+                <p class="govuk-body">
+                    <a id="progress-continue" class="govuk-link" href="@controllers.routes.StatusController.get().url">
+                        @messages("progress.updates.continue")
+                    </a>
+                </p>
             }
         </div>
     </div>

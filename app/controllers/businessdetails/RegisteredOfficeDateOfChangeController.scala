@@ -19,58 +19,69 @@ package controllers.businessdetails
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.DateOfChangeFormProvider
 import models.DateOfChange
 import models.businessdetails.{BusinessDetails, RegisteredOfficeNonUK, RegisteredOfficeUK}
-import play.api.mvc.MessagesControllerComponents
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.twirl.api.Html
 import services.StatusService
-import utils.{AuthAction, DateOfChangeHelper}
-import views.html.date_of_change
+import utils.{AuthAction, DateHelper, DateOfChangeHelper}
+import views.html.DateOfChangeView
 
 import scala.concurrent.Future
 
-class RegisteredOfficeDateOfChangeController @Inject () (
-                                                          val dataCacheConnector: DataCacheConnector,
-                                                          val statusService: StatusService,
-                                                          val authAction: AuthAction,
-                                                          val ds: CommonPlayDependencies,
-                                                          val cc: MessagesControllerComponents,
-                                                          date_of_change: date_of_change) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+class RegisteredOfficeDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                       val statusService: StatusService,
+                                                       val authAction: AuthAction,
+                                                       val ds: CommonPlayDependencies,
+                                                       val cc: MessagesControllerComponents,
+                                                       formProvider: DateOfChangeFormProvider,
+                                                       view: DateOfChangeView) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
 
 
-  def get = authAction.async {
-      implicit request =>
-        Future(Ok(date_of_change(
-          EmptyForm,
-          "summary.businessdetails",
-          controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
-        )))
-    }
+  def get: Action[AnyContent] = authAction {
+    implicit request => Ok(getView(formProvider()))
+  }
 
-  def post = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) flatMap { businessDetails =>
-          val extraFields: Map[String, Seq[String]] = businessDetails.get.activityStartDate match {
-            case Some(date) => Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
-            case None => Map()
-          }
-          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
-            case form: InvalidForm =>
-              Future.successful(BadRequest(date_of_change(
-                form, "summary.businessdetails",
-                controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post())
-              ))
-            case ValidForm(_, dateOfChange) =>
-              for {
-                _ <- dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
-                  businessDetails.registeredOffice(businessDetails.registeredOffice match {
-                    case Some(office: RegisteredOfficeUK) => office.copy(dateOfChange = Some(dateOfChange))
-                    case Some(office: RegisteredOfficeNonUK) => office.copy(dateOfChange = Some(dateOfChange))
+  def post: Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(getView(formWithErrors))),
+        doc => {
+          dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key).flatMap { details =>
+            details.activityStartDate match {
+              case Some(date) if !doc.dateOfChange.isBefore(date.startDate) =>
+                dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
+                  details.registeredOffice(details.registeredOffice match {
+                    case Some(office: RegisteredOfficeUK) => office.copy(dateOfChange = Some(doc))
+                    case Some(office: RegisteredOfficeNonUK) => office.copy(dateOfChange = Some(doc))
                     case _ => throw new Exception("An exception has occurred")
-                  }))
-              } yield Redirect(routes.SummaryController.get)
+                  })) map { _ =>
+                  Redirect(routes.SummaryController.get)
+                }
+              case Some(date) =>
+                Future.successful(BadRequest(getView(
+                  formProvider().withError(
+                    "dateOfChange",
+                    messages(
+                      "error.expected.dateofchange.date.after.activitystartdate",
+                      DateHelper.formatDate(date.startDate)
+                    )
+                  )
+                )))
+              case None =>
+                Future.failed(new Exception("Could not retrieve start date"))
+            }
           }
         }
+      )
   }
+
+  private def getView(form: Form[DateOfChange])(implicit request: Request[_]): Html = view(
+    form,
+    "summary.businessdetails",
+    controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
+  )
 }

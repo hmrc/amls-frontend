@@ -37,7 +37,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.updateservice.add.msb_subservices
+import views.html.businessmatching.updateservice.add.MsbSubSectorsView
 
 import scala.concurrent.Future
 
@@ -52,7 +52,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-    lazy val view = app.injector.instanceOf[msb_subservices]
+    lazy val view = app.injector.instanceOf[MsbSubSectorsView]
     val controller = new SubSectorsController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
@@ -61,7 +61,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       config = config,
       cc = mockMcc,
       formProvider = app.injector.instanceOf[MsbSubSectorsFormProvider],
-      msb_subservices = view
+      view = view
     )
 
 
@@ -95,8 +95,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[type=checkbox]").size mustBe 5
         document.select("input[type=checkbox][checked]").size mustBe 2
-        document.select(".amls-error-summary").size mustBe 0
-
+        document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
       }
 
       "return OK with 'msb_subservices' populated view and FXtoggle is not enabled" in new Fixture {
@@ -112,8 +111,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[type=checkbox]").size mustBe 4
         document.select("input[type=checkbox][checked]").size mustBe 2
-        document.select(".amls-error-summary").size mustBe 0
-
+        document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
       }
     }
 
@@ -129,7 +127,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[type=checkbox]").size mustBe 4
       document.select("input[type=checkbox][checked]").size mustBe 0
-      document.select(".amls-error-summary").size mustBe 0
+      document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
     }
 
     "return OK with a 'msb_subservices' not populated view and FXtoggle is enabled" in new Fixture {
@@ -143,7 +141,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[type=checkbox]").size mustBe 5
       document.select("input[type=checkbox][checked]").size mustBe 0
-      document.select(".amls-error-summary").size mustBe 0
+      document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
     }
 
 
@@ -151,7 +149,9 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
       "return a bad request when no data has been posted" in new Fixture {
 
-        val result = controller.post()(requestWithUrlEncodedBody("" -> ""))
+        val result = controller.post()(FakeRequest(POST, routes.SubSectorsController.post().url)
+          .withFormUrlEncodedBody("" -> "")
+        )
 
         status(result) mustBe BAD_REQUEST
       }

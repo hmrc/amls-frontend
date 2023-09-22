@@ -28,11 +28,10 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import utils.AuthAction
-import views.html.businessmatching.updateservice.add.msb_subservices
+import views.html.businessmatching.updateservice.add.MsbSubSectorsView
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
-
 
 @Singleton
 class SubSectorsController @Inject()(authAction: AuthAction,
@@ -43,7 +42,7 @@ class SubSectorsController @Inject()(authAction: AuthAction,
                                      val config:ApplicationConfig,
                                      val cc: MessagesControllerComponents,
                                      formProvider: MsbSubSectorsFormProvider,
-                                     msb_subservices: msb_subservices) extends AmlsBaseController(ds, cc) {
+                                     view: MsbSubSectorsView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
@@ -53,16 +52,15 @@ class SubSectorsController @Inject()(authAction: AuthAction,
           val flowSubServices: Set[BusinessMatchingMsbService] = model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices
           val form = formProvider().fill(flowSubServices.toSeq)
 
-          Ok(msb_subservices(form, edit, config.fxEnabledToggle))
+          Ok(view(form, edit, config.fxEnabledToggle))
         }) getOrElse InternalServerError("Get: Unable to show Sub-Services page. Failed to retrieve data")
   }
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
-
         formProvider().bindFromRequest().fold(
           formWithErrors =>
-            Future.successful(BadRequest(msb_subservices(formWithErrors, edit, config.fxEnabledToggle))),
+            Future.successful(BadRequest(view(formWithErrors, edit, config.fxEnabledToggle))),
           data =>
             dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
               case Some(model) =>

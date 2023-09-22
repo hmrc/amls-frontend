@@ -18,6 +18,7 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.DateOfChangeFormProvider
 import models.businessdetails._
 import models.{Country, DateOfChange}
 import org.joda.time.LocalDate
@@ -26,25 +27,27 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.date_of_change
+import views.html.DateOfChangeView
 
 import scala.concurrent.Future
 
-class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoSugar{
+class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[date_of_change]
+    lazy val view = inject[DateOfChangeView]
     val controller = new RegisteredOfficeDateOfChangeController (
       dataCacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      date_of_change = view)
+      formProvider = inject[DateOfChangeFormProvider],
+      view = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -57,16 +60,18 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
   "handle the date of change form post" when {
     "given valid data for a UK address" in new Fixture {
 
-      val postRequest = requestWithUrlEncodedBody(
+      val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post.url)
+        .withFormUrlEncodedBody(
         "dateOfChange.year" -> "2010",
         "dateOfChange.month" -> "10",
         "dateOfChange.day" -> "01"
       )
 
+      val date = new LocalDate(2010, 10, 1)
       val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
-      val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2010, 10, 1))))
+      val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(date)))
 
-      val business = BusinessDetails(registeredOffice = Some(office))
+      val business = BusinessDetails(registeredOffice = Some(office), activityStartDate = Some(ActivityStartDate(date)))
 
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())).
         thenReturn(Future.successful(Some(business)))
@@ -90,16 +95,19 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
 
     "given valid data for a Non-UK address" in new Fixture {
 
-      val postRequest = requestWithUrlEncodedBody(
+      val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post.url)
+        .withFormUrlEncodedBody(
         "dateOfChange.year" -> "2005",
         "dateOfChange.month" -> "04",
         "dateOfChange.day" -> "26"
       )
 
-      val office = RegisteredOfficeNonUK("305", "address line", Some("address line2"), Some("address line3"), Country("Finland", "FIN"))
-      val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(new LocalDate(2005, 4, 26))))
+      val date = new LocalDate(2005, 4, 26)
 
-      val business = BusinessDetails(registeredOffice = Some(office))
+      val office = RegisteredOfficeNonUK("305", "address line", Some("address line2"), Some("address line3"), Country("Finland", "FIN"))
+      val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(date)))
+
+      val business = BusinessDetails(registeredOffice = Some(office), activityStartDate = Some(ActivityStartDate(date)))
 
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())).
         thenReturn(Future.successful(Some(business)))
@@ -127,7 +135,8 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
       when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())).
         thenReturn(Future.successful(Some(BusinessDetails())))
 
-      val postRequest = requestWithUrlEncodedBody("invalid" -> "data")
+      val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post.url)
+        .withFormUrlEncodedBody("invalid" -> "data")
 
       val result = controller.post(postRequest)
 
@@ -136,7 +145,8 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
 
     }
     "dateOfChange is earlier than Business Activities Start Date" in new Fixture {
-      val postRequest = requestWithUrlEncodedBody(
+      val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post.url)
+        .withFormUrlEncodedBody(
         "dateOfChange.year" -> "2010",
         "dateOfChange.month" -> "10",
         "dateOfChange.day" -> "01"

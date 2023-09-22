@@ -24,16 +24,18 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.tradingpremises.TradingAddressFormProvider
-import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
+import forms.{DateOfChangeFormProvider, FormHelpers}
 import models.DateOfChange
 import models.status.SubmissionStatus
 import models.tradingpremises._
+import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.twirl.api.Html
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
-import views.html.date_of_change
+import utils.{AuthAction, DateHelper, DateOfChangeHelper, RepeatingSection}
+import views.html.DateOfChangeView
 import views.html.tradingpremises.WhereAreTradingPremisesView
 
 import scala.concurrent.Future
@@ -46,8 +48,9 @@ class WhereAreTradingPremisesController @Inject () (
                                                      val ds: CommonPlayDependencies,
                                                      val cc: MessagesControllerComponents,
                                                      formProvider: TradingAddressFormProvider,
+                                                     dateChangeFormProvider: DateOfChangeFormProvider,
                                                      view: WhereAreTradingPremisesView,
-                                                     date_of_change: date_of_change,
+                                                     dateChangeView: DateOfChangeView,
                                                      implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
@@ -117,35 +120,50 @@ class WhereAreTradingPremisesController @Inject () (
     }
   }
 
-  def dateOfChange(index: Int) = authAction.async {
-    implicit request =>
-        Future(Ok(date_of_change(EmptyForm,
-          "summary.tradingpremises", controllers.tradingpremises.routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
+  def dateOfChange(index: Int): Action[AnyContent] = authAction {
+    implicit request => Ok(dateChangeView(
+      dateChangeFormProvider(),
+      "summary.tradingpremises",
+      controllers.tradingpremises.routes.WhereAreTradingPremisesController.saveDateOfChange(index)
+    ))
   }
 
-  def saveDateOfChange(index: Int) = authAction.async {
+  def saveDateOfChange(index: Int): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[TradingPremises](request.credId, index) flatMap { tradingPremises =>
-        Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
-          case form: InvalidForm =>
-            Future.successful(BadRequest(
-              date_of_change(
-                form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
-                "summary.tradingpremises", routes.WhereAreTradingPremisesController.saveDateOfChange(index))))
-          case ValidForm(_, dateOfChange) =>
-            updateDataStrict[TradingPremises](request.credId, index) { tp =>
-              tp.yourTradingPremises.fold(tp) { ytp =>
-                tp.copy(
-                  yourTradingPremises = Some(ytp.copy(
-                    tradingNameChangeDate = Some(dateOfChange),
-                    tradingPremisesAddress = ytp.tradingPremisesAddress.copy(dateOfChange = Some(dateOfChange))
-                  )))
-              }
-            } map { _ =>
-              Redirect(routes.CheckYourAnswersController.get(1))
+      dateChangeFormProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(getDateView(formWithErrors, index))),
+        dateOfChange => {
+          getData[TradingPremises](request.credId, index).flatMap { tradingPremises =>
+            tradingPremises.startDate match {
+              case Some(date) if dateOfChange.dateOfChange.isAfter(date) =>
+                updateDataStrict[TradingPremises](request.credId, index) { tp =>
+                  tp.yourTradingPremises.fold(tp) { ytp =>
+                    tp.copy(
+                      yourTradingPremises = Some(ytp.copy(
+                        tradingNameChangeDate = Some(dateOfChange),
+                        tradingPremisesAddress = ytp.tradingPremisesAddress.copy(dateOfChange = Some(dateOfChange))
+                      )))
+                  }
+                } map { _ =>
+                  Redirect(routes.CheckYourAnswersController.get(1))
+                }
+              case Some(date) =>
+                Future.successful(BadRequest(getDateView(
+                  dateChangeFormProvider().withError(
+                    "dateOfChange",
+                    messages(
+                      "error.expected.tp.dateofchange.after.startdate",
+                      DateHelper.formatDate(date)
+                    )
+                  ),
+                  index
+                )))
+              case None =>
+                Future.failed(new Exception("Could not retrieve start date"))
             }
+          }
         }
-      }
+      )
   }
 
   private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], premises: YourTradingPremises) =
@@ -155,4 +173,10 @@ class WhereAreTradingPremisesController @Inject () (
         ytp <- tp.yourTradingPremises
       } yield (ytp.tradingName != premises.tradingName || ytp.tradingPremisesAddress != premises.tradingPremisesAddress) && tp.lineId.isDefined
     ).getOrElse(false)
+
+  private def getDateView(form: Form[DateOfChange], index: Int)(implicit request: Request[_]): Html = dateChangeView(
+    form,
+    "summary.tradingpremises",
+    routes.WhereAreTradingPremisesController.saveDateOfChange(index)
+  )
 }

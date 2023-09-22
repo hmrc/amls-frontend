@@ -18,55 +18,69 @@ package controllers.asp
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.DateOfChangeFormProvider
 import models.DateOfChange
-import models.businessdetails.BusinessDetails
 import models.asp.Asp
-import play.api.mvc.MessagesControllerComponents
+import models.businessdetails.{ActivityStartDate, BusinessDetails}
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.twirl.api.Html
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.AuthAction
-import views.html.date_of_change
+import utils.{AuthAction, DateHelper}
+import views.html.DateOfChangeView
+
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                          val authAction: AuthAction,
                                                          val ds: CommonPlayDependencies,
                                                          val cc: MessagesControllerComponents,
-                                                         date_of_change: date_of_change) extends AmlsBaseController(ds, cc) {
+                                                         formProvider: DateOfChangeFormProvider,
+                                                         view: DateOfChangeView) extends AmlsBaseController(ds, cc) {
 
-  def get = authAction.async {
-      implicit request =>
-        Future.successful(Ok(date_of_change(EmptyForm, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post)))
+  def get: Action[AnyContent] = authAction {
+    implicit request => Ok(getView(formProvider()))
   }
 
 
   def post = authAction.async {
-      implicit request =>
-        getModelWithDateMap(request.credId) flatMap {
-          case (asp, startDate) =>
-            Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDate) match {
-              case f: InvalidForm =>
-                Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post)))
-              case ValidForm(_, data) => {
-                for {
-                  _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
-                    asp.services match {
-                      case Some(service) => {
-                        val a = asp.copy(services = Some(service.copy(dateOfChange = Some(data))))
-                        a
-                      }
-                      case None => asp
-                    })
-                } yield {
-                  Redirect(routes.SummaryController.get)
-                }
+    implicit request =>
+
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(getView(formWithErrors))),
+        dateOfChange => {
+          getModelWithDate(request.credId).flatMap {
+            case (asp, Some(activityStartDate)) if !dateOfChange.dateOfChange.isBefore(activityStartDate.startDate) =>
+              for {
+                _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
+                  asp.services match {
+                    case Some(service) => {
+                      val a = asp.copy(services = Some(service.copy(dateOfChange = Some(dateOfChange))))
+                      a
+                    }
+                    case None => asp
+                  })
+              } yield {
+                Redirect(routes.SummaryController.get)
               }
-            }
+            case (_, Some(activityStartDate)) =>
+              Future.successful(BadRequest(getView(
+                formProvider().withError(
+                  "dateOfChange",
+                  messages(
+                    "error.expected.dateofchange.date.after.activitystartdate",
+                    DateHelper.formatDate(activityStartDate.startDate)
+                  )
+                )
+              )))
+            case (_, None) => Future.failed(new Exception("Could not retrieve start date"))
+          }
         }
+      )
   }
 
-  private def getModelWithDateMap(cacheId: String)(implicit hc: HeaderCarrier): Future[(Asp, Map[_ <: String, Seq[String]])] = {
+  private def getModelWithDate(cacheId: String)(implicit hc: HeaderCarrier): Future[(Asp, Option[ActivityStartDate])] = {
     dataCacheConnector.fetchAll(cacheId) map {
       optionalCache =>
         (for {
@@ -74,11 +88,17 @@ class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector:
           businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
           asp <- cache.getEntry[Asp](Asp.key)
         } yield (asp, businessDetails.activityStartDate)) match {
-          case Some((asp, Some(activityStartDate))) => (asp, Map("activityStartDate" -> Seq(activityStartDate.startDate.toString("yyyy-MM-dd"))))
-          case Some((asp, _)) => (asp, Map())
-          case _ => (Asp(), Map())
+          case Some((asp, Some(activityStartDate))) => (asp, Some(activityStartDate))
+          case Some((asp, _)) => (asp, None)
+          case _ => (Asp(), None)
         }
     }
   }
+
+  private def getView(form: Form[DateOfChange])(implicit request: Request[_]): Html = view(
+    form,
+    "summary.asp",
+    routes.ServicesOfBusinessDateOfChangeController.post
+  )
 }
 

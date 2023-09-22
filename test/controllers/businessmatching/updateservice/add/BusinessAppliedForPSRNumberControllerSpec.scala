@@ -29,18 +29,18 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
-import play.api.test.FakeRequest
+import play.api.test.{FakeRequest, Injecting}
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
+import views.html.businessmatching.updateservice.add.BusinessAppliedForPSRNumberView
 
 class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
   with MockitoSugar
   with ScalaFutures
-  with BusinessMatchingGenerator {
+  with BusinessMatchingGenerator
+  with Injecting {
 
   val emptyCache = CacheMap("", Map.empty)
 
@@ -52,14 +52,14 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
-    lazy val view = app.injector.instanceOf[business_applied_for_psr_number]
+    lazy val view = inject[BusinessAppliedForPSRNumberView]
     val controller = new BusinessAppliedForPSRNumberController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel],
       cc = mockMcc,
-      formProvider = app.injector.instanceOf[PSRNumberFormProvider],
-      business_applied_for_psr_number = view
+      formProvider = inject[PSRNumberFormProvider],
+      view = view
     )
 
     mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
@@ -79,7 +79,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
         val result = controller.get()(request)
 
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.psr.number.title"))
+        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.psr.number.title"))
       }
 
       "return OK and display psr_number view with pre populated data if there is MSB and TM defined" in new Fixture {
@@ -217,16 +217,10 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.text() must include(Messages("error.invalid.msb.psr.number"))
+          document.text() must include(messages("error.invalid.msb.psr.number"))
         }
       }
     }
   }
 }
-
-
-
-
-
-
 

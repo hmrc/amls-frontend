@@ -17,22 +17,23 @@
 package controllers.asp
 
 import controllers.actions.SuccessfulAuthAction
+import forms.DateOfChangeFormProvider
 import models.asp._
 import models.businessdetails.{ActivityStartDate, BusinessDetails}
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, DependencyMocks}
-import views.html.date_of_change
+import utils.{AmlsSpec, DateHelper, DependencyMocks}
+import views.html.DateOfChangeView
 
 import scala.concurrent.Future
 
-class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
+class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   val emptyCache = CacheMap("", Map.empty)
 
@@ -40,9 +41,16 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
     self =>
     val request = addToken(authRequest)
 
-    lazy val dateOfChange = app.injector.instanceOf[date_of_change]
+    lazy val dateOfChange = inject[DateOfChangeView]
 
-    val controller = new ServicesOfBusinessDateOfChangeController(mockCacheConnector, SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc, dateOfChange)
+    val controller = new ServicesOfBusinessDateOfChangeController(
+      mockCacheConnector,
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      inject[DateOfChangeFormProvider],
+      dateOfChange
+    )
   }
 
   "ServicesDateOfChangeController" must {
@@ -50,65 +58,16 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
     "on get display date of change view" in new Fixture {
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("summary.asp"))
+      contentAsString(result) must include(messages("summary.asp"))
     }
 
     "submit with valid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.ServicesOfBusinessDateOfChangeController.post.url)
+      .withFormUrlEncodedBody(
         "dateOfChange.day" -> "24",
         "dateOfChange.month" -> "2",
         "dateOfChange.year" -> "1990"
-      )
-
-      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
-
-      when(mockCacheMap.getEntry[Asp](Asp.key))
-        .thenReturn(None)
-
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(controller.dataCacheConnector.save[Asp](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get.url))
-    }
-
-    "fail submission when invalid date is supplied" in new Fixture {
-
-      val newRequest = requestWithUrlEncodedBody(
-        "dateOfChange.day" -> "24",
-        "dateOfChange.month" -> "2",
-        "dateOfChange.year" -> "199000"
-      )
-
-      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
-
-      when(mockCacheMap.getEntry[Asp](Asp.key))
-        .thenReturn(None)
-
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(controller.dataCacheConnector.save[Asp](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
-    }
-
-    "fail submission when input date is before activity start date" in new Fixture {
-
-      val newRequest = requestWithUrlEncodedBody(
-        "dateOfChange.day" -> "24",
-        "dateOfChange.month" -> "2",
-        "dateOfChange.year" -> "1980"
       )
 
       when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
@@ -124,9 +83,62 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
         (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.expected.dateofchange.date.after.activitystartdate", "24-02-1990"))
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.asp.routes.SummaryController.get.url))
     }
 
+    "fail submission when invalid date is supplied" in new Fixture {
+
+      val newRequest = FakeRequest(POST, routes.ServicesOfBusinessDateOfChangeController.post.url)
+      .withFormUrlEncodedBody(
+        "dateOfChange.day" -> "24",
+        "dateOfChange.month" -> "2",
+        "dateOfChange.year" -> "foo"
+      )
+
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+
+      when(mockCacheMap.getEntry[Asp](Asp.key))
+        .thenReturn(None)
+
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.save[Asp](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(messages("error.invalid.year"))
+    }
+
+    "fail submission when input date is before activity start date" in new Fixture {
+
+      val newRequest = FakeRequest(POST, routes.ServicesOfBusinessDateOfChangeController.post.url)
+      .withFormUrlEncodedBody(
+        "dateOfChange.day" -> "24",
+        "dateOfChange.month" -> "2",
+        "dateOfChange.year" -> "1980"
+      )
+
+      val startDate = new LocalDate(1990, 2, 24)
+
+      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(startDate)))))
+
+      when(mockCacheMap.getEntry[Asp](Asp.key))
+        .thenReturn(Some(Asp()))
+
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.save[Asp](any(), any(), any())
+        (any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+      contentAsString(result) must include(messages("error.expected.dateofchange.date.after.activitystartdate", DateHelper.formatDate(startDate)))
+    }
   }
 }

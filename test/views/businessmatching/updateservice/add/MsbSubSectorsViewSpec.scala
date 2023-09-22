@@ -17,28 +17,25 @@
 package views.businessmatching.updateservice.add
 
 import forms.businessmatching.MsbSubSectorsFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
-import models.businessmatching.{BusinessMatchingMsbService, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
-import org.jsoup.nodes.Element
-import play.api.data.{Form, FormError}
+import models.businessmatching.{BusinessMatchingMsbService, BusinessMatchingMsbServices}
+import play.api.data.Form
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.businessmatching.updateservice.add._
+import views.html.businessmatching.updateservice.add.MsbSubSectorsView
 
-class msb_subservicesSpec extends AmlsViewSpec {
+class MsbSubSectorsViewSpec extends AmlsViewSpec {
+
+  lazy val msb_subservices = inject[MsbSubSectorsView]
+  lazy val formProvider = inject[MsbSubSectorsFormProvider]
+  implicit val requestWithToken = addTokenForView()
 
   trait ViewFixture extends Fixture {
-    lazy val msb_subservices = app.injector.instanceOf[msb_subservices]
-    lazy val formProvider = app.injector.instanceOf[MsbSubSectorsFormProvider]
-    implicit val requestWithToken = addTokenForView()
-
     def view = msb_subservices(formProvider(), edit = false)
   }
 
-  "The msb_subservices view" must {
+  "MsbSubSectorsView" must {
 
     "have correct title" in new ViewFixture {
 
@@ -49,22 +46,6 @@ class msb_subservicesSpec extends AmlsViewSpec {
       doc.title must startWith(Messages("businessmatching.updateservice.msb.services.title") + " - " + Messages("summary.updateservice"))
       heading.html must be(Messages("businessmatching.updateservice.msb.services.title"))
       subHeading.html must include(Messages("summary.updateservice"))
-      doc.getElementById("back-link").isInstanceOf[Element] mustBe true
-
-    }
-
-    "show errors in the correct locations" in new ViewFixture {
-
-      val messageKey = "error.required.msb.services"
-
-      val filledForm: Form[Seq[BusinessMatchingMsbService]] = formProvider().withError(FormError("value", messageKey))
-
-      override def view = msb_subservices(filledForm, edit = false)
-
-      doc.getElementsByClass("govuk-list govuk-error-summary__list")
-        .first.text() mustBe messages(messageKey)
-
-      doc.getElementById("value-error").text() mustBe(s"Error: ${messages(messageKey)}")
     }
 
     "hide the return to progress link" in new ViewFixture {
@@ -85,8 +66,15 @@ class msb_subservicesSpec extends AmlsViewSpec {
 
       val checkboxes = doc.body().getElementsByAttributeValue("type", "checkbox")
       (0 until checkboxes.size()) foreach { i =>
-        checkboxes.get(i).attr("value") mustEqual BusinessMatchingMsbServices.all(i).toString
+        BusinessMatchingMsbServices.all.map(_.toString) must contain(checkboxes.get(i).attr("value"))
       }
     }
+
+    behave like pageWithErrors(
+      msb_subservices(formProvider().withError("value", "error.required.msb.services"), false),
+      "value", "error.required.msb.services"
+    )
+
+    behave like pageWithBackLink(msb_subservices(formProvider(), false))
   }
 }

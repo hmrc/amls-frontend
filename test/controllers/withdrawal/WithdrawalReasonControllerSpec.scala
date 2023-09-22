@@ -94,7 +94,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with Injecting {
               val newRequest = FakeRequest(POST, routes.WithdrawalReasonController.post().url).withFormUrlEncodedBody(
                 "withdrawalReason" -> OutOfScope.toString
               )
-FakeRequest
+
               val result = controller.post()(newRequest)
               status(result) must be(SEE_OTHER)
 

@@ -20,25 +20,33 @@ import forms.mappings.Mappings
 import models.businessmatching.BusinessActivity
 import play.api.data.Form
 import play.api.data.Forms.seq
+import play.api.data.validation.{Constraint, Invalid, Valid}
 
 import javax.inject.Inject
 
 class RemoveBusinessActivitiesFormProvider @Inject()() extends Mappings {
 
-  def apply(maybeBusinessActivities: Seq[BusinessActivity]): Form[Seq[BusinessActivity]] = {
+  def apply(noOfActivities: Int): Form[Seq[BusinessActivity]] = {
+
+    def notAllActivitiesRemoved: Constraint[Seq[_]] = {
+      Constraint {
+        case seq if seq.size == 2 && seq.size == noOfActivities =>
+          Invalid("error.required.bm.remove.leave.twobusinesses")
+        case seq if seq.size == noOfActivities =>
+          Invalid("error.required.bm.remove.leave.one")
+        case _ =>
+          Valid
+      }
+    }
+
+    val error = if (noOfActivities > 2) {
+      "error.required.bm.remove.service.multiple"
+    } else {
+      "error.required.bm.remove.service"
+    }
 
     Form[Seq[BusinessActivity]](
-      "value" -> seq(enumerable[BusinessActivity]("error.required.bm.remove.service")).verifying(
-          nonEmptySeq("error.required.bm.remove.service")
-          /*TODO Add other constraints
-            def maxLengthValidator(count: Int): Rule[Set[BusinessActivity], Set[BusinessActivity]] =
-              Rule.fromMapping[Set[BusinessActivity], Set[BusinessActivity]] {
-                case s if s.size == 2 && s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.twobusinesses")))
-                case s if s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.one")))
-                case s => Valid(s)
-              }
-           */
-        )
-      )
+      "value" -> seq(enumerable[BusinessActivity](error)).verifying(nonEmptySeq(error), notAllActivitiesRemoved)
+    )
   }
 }

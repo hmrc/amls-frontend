@@ -19,11 +19,10 @@ package controllers.businessmatching.updateservice.remove
 import controllers.actions.SuccessfulAuthAction
 import models.businessmatching.BusinessActivity.AccountancyServices
 import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
-import play.api.i18n.Messages
 import org.jsoup.Jsoup
 import play.api.test.Helpers.{OK, contentAsString, status, _}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.updateservice.remove.need_more_information
+import views.html.businessmatching.updateservice.remove.NeedMoreInformationView
 
 class NeedMoreInformationControllerSpec extends AmlsSpec {
 
@@ -31,13 +30,13 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
     self =>
 
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[need_more_information]
+    lazy val view = app.injector.instanceOf[NeedMoreInformationView]
     val controller = new NeedMoreInformationController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[RemoveBusinessTypeFlowModel],
       cc = mockMcc,
-      need_more_information = view
+      view = view
     )
   }
 
@@ -46,12 +45,12 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
 
     "get is called" must {
 
-      "return OK with need_to_update view" in new Fixture {
+      "return OK with NeedMoreInformationView" in new Fixture {
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel(Some(Set(AccountancyServices)))), Some(RemoveBusinessTypeFlowModel.key))
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.updateotherinformation.title"))
+        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.updateotherinformation.title"))
       }
     }
 
@@ -66,5 +65,4 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
       }
     }
   }
-
 }

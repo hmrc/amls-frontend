@@ -17,28 +17,25 @@
 package views.businessmatching.updateservice.remove
 
 import forms.businessmatching.RemoveBusinessActivitiesFormProvider
-import forms.{EmptyForm, InvalidForm}
-import jto.validation.{Path, ValidationError}
 import models.businessmatching.BusinessActivities
-import models.businessmatching.BusinessActivity.{AccountancyServices, BillPaymentServices, MoneyServiceBusiness}
-import org.scalatest.MustMatchers
-import play.api.data.FormError
-import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.businessmatching.updateservice.remove._
+import views.html.businessmatching.updateservice.remove.RemoveActivitiesView
 
-class remove_activitiesSpec extends AmlsViewSpec with MustMatchers {
+class RemoveActivitiesViewSpec extends AmlsViewSpec {
+
+  lazy val formProvider = inject[RemoveBusinessActivitiesFormProvider]
+  lazy val remove_activities = inject[RemoveActivitiesView]
+  implicit val requestWithToken = addTokenForView()
+
+  def createView = remove_activities(formProvider(2),
+    edit = true,
+    Seq.empty
+  )
 
   trait ViewFixture extends Fixture {
-    lazy val formProvider = app.injector.instanceOf[RemoveBusinessActivitiesFormProvider]
-    lazy val remove_activities = app.injector.instanceOf[remove_activities]
-    implicit val requestWithToken = addTokenForView()
-
-    override def view = remove_activities(formProvider(Seq.empty),
-      edit = true,
-      Seq.empty[String]
-    )
+    override def view: HtmlFormat.Appendable = createView
   }
 
   "The select activities to remove view" must {
@@ -55,41 +52,30 @@ class remove_activitiesSpec extends AmlsViewSpec with MustMatchers {
       subHeading.html must include(messages("summary.updateservice"))
     }
 
-    "have the back link button" in new ViewFixture {
-      doc.getElementById("back-link").text() mustBe "Back"
-    }
+    behave like pageWithBackLink(createView)
 
     "show the correct content" in new ViewFixture {
 
-      val submittedActivities = Seq(MoneyServiceBusiness)
-
-
-      override def view = remove_activities(formProvider(Nil),
+      override def view = remove_activities(
+        formProvider(2),
         edit = true,
-        submittedActivities map BusinessActivities.getValue)
+        Seq.empty
+      )
 
-      submittedActivities foreach { a =>
+      BusinessActivities.all foreach { a =>
         doc.body().text must include(messages(a.getMessage()))
-        doc.body().html() must include(BusinessActivities.getValue(a))
+        doc.body().html() must include(a.toString)
       }
 
       doc.body().text() must include (messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
       doc.getElementById("button").text() must include (messages("businessmatching.updateservice.removeactivities.button"))
-
     }
 
-    "show errors in the correct locations" in new ViewFixture {
-
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq((Path \ "businessmatching.updateservice.removeactivities") -> Seq(ValidationError("not a message Key"))))
-
-      override def view = remove_activities(
-        formProvider(Nil).withError(FormError("businessmatching.updateservice.removeactivities", "not a message Key")),
-        edit = true,
-        Seq.empty[String]
-      )
-
-      doc.getElementsByClass("govuk-error-summary").html() must include("not a message Key")
-    }
+    behave like pageWithErrors(
+      remove_activities(
+        formProvider(2).withError("value", "error.required.bm.remove.service.multiple"), false, Seq.empty
+      ),
+      "value", "error.required.bm.remove.service.multiple"
+    )
   }
 }

@@ -18,13 +18,14 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 @import config.ApplicationConfig
 @import models.businessmatching.BusinessAppliedForPSRNumber
-@import components.Button
+@import components.{SectionSubtitle, Button}
 @import components.forms.{InputText, InputYesNo, ErrorSummary}
 @import views.ViewUtils._
 @import utils.HtmlElementHelpers._
 
 @this(
     formHelper: FormWithCSRF,
+    subtitle: SectionSubtitle,
     layout: Layout,
     inputText: InputText,
     inputYesNo: InputYesNo,
@@ -60,6 +61,8 @@
 
         @errorSummary(form)
 
+        @subtitle("summary.updateservice")
+
         @inputYesNo(
             Radios(
                 fieldset = Some(Fieldset(
@@ -70,7 +73,7 @@
                   ))
                 )),
                 hint = Some(Hint(content = Text(messages("businessmatching.psr.number.hint")))),
-                name = "value",
+                name = "appliedFor",
                 items = BusinessAppliedForPSRNumber.formValues(conditionalInput)
               )
             .withFormField(form("appliedFor"))

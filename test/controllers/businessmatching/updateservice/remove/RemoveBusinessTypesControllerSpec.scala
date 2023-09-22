@@ -22,20 +22,19 @@ import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import forms.businessmatching.RemoveBusinessActivitiesFormProvider
 import models.DateOfChange
-import models.businessmatching._
 import models.businessmatching.BusinessActivity._
+import models.businessmatching._
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.updateservice.remove.remove_activities
+import views.html.businessmatching.updateservice.remove.RemoveActivitiesView
 
 import scala.concurrent.Future
 
@@ -49,7 +48,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val mockRemoveBusinessTypeHelper = mock[RemoveBusinessTypeHelper]
-    lazy val view = app.injector.instanceOf[remove_activities]
+    lazy val view = app.injector.instanceOf[RemoveActivitiesView]
 
     val controller = new RemoveBusinessTypesController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
@@ -59,7 +58,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       router = createRouter[RemoveBusinessTypeFlowModel],
       cc = mockMcc,
       formProvider = new RemoveBusinessActivitiesFormProvider,
-      remove_activities = view
+      view = view
     )
 
     when {
@@ -82,7 +81,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
+        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
       }
     }
 
@@ -260,7 +259,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
         status(result) must be(BAD_REQUEST)
 
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.getElementsByClass("validation-summary-message").text() must include(messages("error.required.bm.remove.leave.one"))
+        document.text() must include(messages("error.required.bm.remove.leave.one"))
       }
     }
   }

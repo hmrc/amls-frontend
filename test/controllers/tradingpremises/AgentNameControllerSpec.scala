@@ -17,6 +17,7 @@
 package controllers.tradingpremises
 
 import controllers.actions.SuccessfulAuthAction
+import forms.DateOfChangeFormProvider
 import forms.tradingpremises.AgentNameFormProvider
 import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
@@ -35,7 +36,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.date_of_change
+import views.html.DateOfChangeView
 import views.html.tradingpremises.AgentNameView
 
 import scala.concurrent.Future
@@ -46,7 +47,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
     val request = addToken(authRequest)
     lazy val view1 = inject[AgentNameView]
-    lazy val view2 = inject[date_of_change]
+    lazy val view2 = inject[DateOfChangeView]
     val controller = new AgentNameController(
       mockCacheConnector,
       SuccessfulAuthAction,
@@ -54,8 +55,9 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       mockStatusService,
       cc = mockMcc,
       formProvider = inject[AgentNameFormProvider],
-      agent_name = view1,
-      date_of_change = view2,
+      dateFormProvider = inject[DateOfChangeFormProvider],
+      agentView = view1,
+      dateView = view2,
       error = errorView
     )
 
@@ -296,7 +298,8 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       "handle the date of change form post" when {
         "given valid data for a agent name" in new Fixture {
 
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.AgentNameController.post(1).url)
+            .withFormUrlEncodedBody(
             "dateOfChange.year" -> "2010",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"
@@ -328,7 +331,8 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
         }
 
         "given a date of change which is before the activity start date" in new Fixture {
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.AgentNameController.post(1).url)
+            .withFormUrlEncodedBody(
             "dateOfChange.year" -> "2003",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"

@@ -132,7 +132,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
         "go to landing controller" which {
           "follows sending a deregistration to amls" when {
             "deregistrationReason is selection without other reason" in new TestFixture {
-FakeRequest
+
               val newRequest = FakeRequest(POST, routes.DeregistrationReasonController.post().url)
               .withFormUrlEncodedBody(
                 "deregistrationReason" -> OutOfScope.toString

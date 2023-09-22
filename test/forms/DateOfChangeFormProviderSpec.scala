@@ -37,7 +37,7 @@ class DateOfChangeFormProviderSpec extends JodaDateBehaviours {
   val minDate: LocalDate = DateOfChangeFormProvider.minDate
   val maxDate: LocalDate = DateOfChangeFormProvider.maxDate
 
-  "Supervision Start Date form" must {
+  "Date Of Change form" must {
 
     "bind valid data" in {
 

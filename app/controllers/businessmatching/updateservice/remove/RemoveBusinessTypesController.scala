@@ -29,7 +29,7 @@ import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, AuthorisedRequest}
-import views.html.businessmatching.updateservice.remove.remove_activities
+import views.html.businessmatching.updateservice.remove.RemoveActivitiesView
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
@@ -44,7 +44,7 @@ class RemoveBusinessTypesController @Inject()(
                                                val router: Router[RemoveBusinessTypeFlowModel],
                                                val cc: MessagesControllerComponents,
                                                formProvider: RemoveBusinessActivitiesFormProvider,
-                                               remove_activities: remove_activities) extends AmlsBaseController(ds, cc) {
+                                               view: RemoveActivitiesView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
@@ -52,35 +52,30 @@ class RemoveBusinessTypesController @Inject()(
           model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key))
             .orElse(OptionT.some(RemoveBusinessTypeFlowModel()))
           (_, values) <- getFormData(request.credId)
+          valuesAsActivities = BusinessActivities.all.toSeq diff values.map(BusinessActivities.getBusinessActivity)
+          form = formProvider(valuesAsActivities.length)
         } yield {
-          model.activitiesToRemove.map { x =>
-            val form = formProvider(x.toSeq).fill(x.toSeq)
-            Ok(remove_activities(form, edit, values))
-          }.getOrElse(InternalServerError("Get: Unable to show remove Activities page. Failed to retrieve data"))
+          val formForView = model.activitiesToRemove.fold(form) { x =>
+            form.fill(x.toSeq)
+          }
+          Ok(view(formForView, edit, valuesAsActivities))
         }) getOrElse InternalServerError("Get: Unable to show remove Activities page. Failed to retrieve data")
   }
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
-
-        // TODO move this to validation
-//        val errorMessage = (for {
-//          submittedActivities <- businessMatchingService.getSubmittedBusinessActivities(request.credId)
-//        } yield {if(submittedActivities.size > 2) {
-//          "error.required.bm.remove.service.multiple"
-//        } else {
-//          "error.required.bm.remove.service"
-//        }}).value
-
         (for {
           data <- getFormData(request.credId)
-          form = formProvider(
-            data._2.map(BusinessActivities.getBusinessActivity)
-          )
+          form = formProvider(data._2.size)
         } yield {
           form.bindFromRequest().fold(
-            formWithErrors => Future.successful(BadRequest(remove_activities(formWithErrors, edit, data._2))),
-            formValue => saveAndRedirect(formValue, data, edit)
+            formWithErrors => Future.successful(
+              BadRequest(view(
+                formWithErrors,
+                edit,
+                BusinessActivities.all.toSeq diff data._2.map(BusinessActivities.getBusinessActivity)
+            ))),
+            formValue => saveAndRedirect(formValue, edit)
           )
         }).value flatMap {
           case Some(value) => value
@@ -103,11 +98,11 @@ class RemoveBusinessTypesController @Inject()(
     (existingActivityNames, activityValues)
   }
 
-  private def saveAndRedirect(formValue: Seq[BusinessActivity], data: Tuple2[Seq[String], Seq[String]], edit: Boolean)(implicit request: AuthorisedRequest[AnyContent]): Future[Result] = {
+  private def saveAndRedirect(formValue: Seq[BusinessActivity], edit: Boolean)(implicit request: AuthorisedRequest[AnyContent]): Future[Result] = {
     (for {
       model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key)) orElse OptionT.some(RemoveBusinessTypeFlowModel())
       dateApplicable <- removeBusinessTypeHelper.dateOfChangeApplicable(request.credId, formValue.toSet)
-      servicesChanged <- OptionT.some[Future, Boolean](model.activitiesToRemove.getOrElse(Set.empty) != data)
+      servicesChanged <- OptionT.some[Future, Boolean](model.activitiesToRemove.getOrElse(Set.empty) != formValue.toSet)
       newModel <- OptionT.some[Future, RemoveBusinessTypeFlowModel](
         model.copy(activitiesToRemove = Some(formValue.toSet), dateOfChange = if (!dateApplicable || servicesChanged) None else model.dateOfChange)
       )

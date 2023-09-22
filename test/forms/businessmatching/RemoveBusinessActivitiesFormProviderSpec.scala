@@ -17,29 +17,77 @@
 package forms.businessmatching
 
 import forms.behaviours.CheckboxFieldBehaviours
+import models.businessmatching.BusinessActivity.{AccountancyServices, ArtMarketParticipant, HighValueDealing}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import play.api.data.FormError
 
 class RemoveBusinessActivitiesFormProviderSpec extends CheckboxFieldBehaviours {
 
-  val form = new RemoveBusinessActivitiesFormProvider()(Seq.empty)
+  val fp = new RemoveBusinessActivitiesFormProvider()
 
-  ".value" must {
+  val fieldName = "value"
 
-    val fieldName = "value"
-    val requiredKey = "error.required.bm.remove.service"
+  ".value" when {
 
-    behave like checkboxField[BusinessActivity](
-      form,
-      fieldName,
-      validValues  = BusinessActivities.all.toSeq,
-      invalidError = FormError(s"$fieldName[0]", "error.invalid")
-    )
+    "number of activities is 2" must {
 
-    behave like mandatoryCheckboxField(
-      form,
-      fieldName,
-      requiredKey
-    )
+      val form = fp(2)
+
+      val requiredKey = "error.required.bm.remove.service"
+
+      behave like checkboxField[BusinessActivity](
+        form,
+        fieldName,
+        validValues = BusinessActivities.all.toSeq,
+        invalidError = FormError(s"$fieldName[0]", "error.invalid")
+      )
+
+      behave like mandatoryCheckboxField(
+        form,
+        fieldName,
+        requiredKey
+      )
+
+      "give error when all checkboxes are selected" in {
+
+        val result = form.bind(Map(
+          s"$fieldName[0]" -> AccountancyServices.toString,
+          s"$fieldName[1]" -> ArtMarketParticipant.toString,
+        ))
+
+        result.errors shouldBe Seq(FormError(fieldName, "error.required.bm.remove.leave.twobusinesses"))
+      }
+    }
+
+    "number of activities is larger than 2" must {
+
+      val form = fp(3)
+
+      val requiredKey = "error.required.bm.remove.service.multiple"
+
+      behave like checkboxField[BusinessActivity](
+        form,
+        fieldName,
+        validValues = BusinessActivities.all.toSeq,
+        invalidError = FormError(s"$fieldName[0]", "error.invalid")
+      )
+
+      behave like mandatoryCheckboxField(
+        form,
+        fieldName,
+        requiredKey
+      )
+
+      "give error when all checkboxes are selected and number of services is not 2" in {
+
+        val result = form.bind(Map(
+          s"$fieldName[0]" -> AccountancyServices.toString,
+          s"$fieldName[1]" -> ArtMarketParticipant.toString,
+          s"$fieldName[2]" -> HighValueDealing.toString,
+        ))
+
+        result.errors shouldBe Seq(FormError(fieldName, "error.required.bm.remove.leave.one"))
+      }
+    }
   }
 }

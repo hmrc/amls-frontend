@@ -19,6 +19,7 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.DateOfChangeFormProvider
 import forms.tradingpremises.WhatDoesYourBusinessDoFormProvider
 import models.businessactivities.{BusinessActivities, ExpectedBusinessTurnover, InvolvedInOtherYes}
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
@@ -41,8 +42,8 @@ import uk.gov.hmrc.auth.core.AffinityGroup.Individual
 import uk.gov.hmrc.auth.core.{Enrolments, User}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedRequest}
-import views.html.date_of_change
+import utils.{AmlsSpec, AuthorisedRequest, DateHelper}
+import views.html.DateOfChangeView
 import views.html.tradingpremises.WhatDoesYourBusinessDoView
 
 import scala.concurrent.Future
@@ -61,7 +62,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
   trait Fixture {
     self => val request = addToken(authRequest)
     lazy val view1 = inject[WhatDoesYourBusinessDoView]
-    lazy val view2 = inject[date_of_change]
+    lazy val view2 = inject[DateOfChangeView]
 
     val whatDoesYourBusinessDoController = new WhatDoesYourBusinessDoController (
       dataCacheConnector = mockDataCacheConnector,
@@ -69,8 +70,9 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
       statusService = mock[StatusService],
       cc = mockMcc,
       formProvider = inject[WhatDoesYourBusinessDoFormProvider],
+      dateChangeFormProvider = inject[DateOfChangeFormProvider],
       activitiesView = view1,
-      date_of_change = view2,
+      dateChangeView = view2,
       error = errorView
     )
 
@@ -460,11 +462,42 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
     "the dateOfChange action is posted to" must {
 
+      "return 400 when given date is before start date" in new Fixture {
+
+        val postRequest = FakeRequest(POST, routes.WhatDoesYourBusinessDoController.saveDateOfChange(1).url)
+          .withFormUrlEncodedBody(
+            "dateOfChange.year" -> "2010",
+            "dateOfChange.month" -> "10",
+            "dateOfChange.day" -> "01"
+          )
+
+        val date = new LocalDate(2011, 10, 1)
+
+        val authorisedRequest = AuthorisedRequest(postRequest, Some("REF"), "CREDID", Individual, Enrolments(Set()), ("TYPE", "ID"), Some("GROUPID"), Some(User))
+
+        val data = WhatDoesYourBusinessDo(Set(AccountancyServices))
+
+        val yourPremises = mock[YourTradingPremises]
+        when(yourPremises.startDate) thenReturn Some(date)
+
+        val premises = TradingPremises(yourTradingPremises = Some(yourPremises), whatDoesYourBusinessDoAtThisAddress = Some(data))
+
+        when(whatDoesYourBusinessDoController.dataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any(), any()))
+          .thenReturn(Future.successful(Some(Seq(premises))))
+
+        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(premises))))
+
+        val result = whatDoesYourBusinessDoController.saveDateOfChange(1)(authorisedRequest)
+
+        status(result) must be(BAD_REQUEST)
+        contentAsString(result) must include(messages("error.expected.tp.dateofchange.after.startdate", DateHelper.formatDate(date)))
+      }
+
       "update the dateOfChange field in the data" in new Fixture {
 
-
-
-        val postRequest = requestWithUrlEncodedBody(
+        val postRequest = FakeRequest(POST, routes.WhatDoesYourBusinessDoController.saveDateOfChange(1).url)
+          .withFormUrlEncodedBody(
           "dateOfChange.year" -> "2010",
           "dateOfChange.month" -> "10",
           "dateOfChange.day" -> "01"

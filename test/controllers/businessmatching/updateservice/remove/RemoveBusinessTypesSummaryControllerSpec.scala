@@ -30,12 +30,11 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Mockito.when
 import org.mockito.Matchers.{any, eq => eqTo}
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils._
 import views.TitleValidator
-import views.html.businessmatching.updateservice.remove.remove_activities_summary
+import views.html.businessmatching.updateservice.remove.RemoveActivitiesSummaryView
 
 
 import scala.concurrent.Future
@@ -49,14 +48,14 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
 
     val removeServiceHelper = mock[RemoveBusinessTypeHelper]
     val router = createRouter[RemoveBusinessTypeFlowModel]
-    lazy val view = app.injector.instanceOf[remove_activities_summary]
+    lazy val view = app.injector.instanceOf[RemoveActivitiesSummaryView]
     val controller = new RemoveBusinessTypesSummaryController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       removeServiceHelper,
       router,
       cc = mockMcc,
-      remove_activities_summary = view
+      view = view
     )
   }
 
@@ -73,10 +72,10 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        validateTitle(s"${Messages("title.cya")} - ${Messages("summary.updateinformation")}")(implicitly, doc)
-        doc.getElementsByTag("h1").text must include(Messages("title.cya"))
-        doc.getElementsByClass("cya-summary-list").text must include(MoneyServiceBusiness.getMessage())
-        doc.getElementsByClass("cya-summary-list").text must include(DateHelper.formatDate(now))
+        validateTitle(s"${messages("title.cya")} - ${messages("summary.updateinformation")}")(implicitly, doc)
+        doc.getElementsByTag("h1").text must include(messages("title.cya"))
+        doc.getElementsByClass("govuk-summary-list__value").text must include(MoneyServiceBusiness.getMessage())
+        doc.getElementsByClass("govuk-summary-list__value").text must include(DateHelper.formatDate(now))
       }
     }
 
