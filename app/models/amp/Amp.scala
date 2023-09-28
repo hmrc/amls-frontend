@@ -113,7 +113,7 @@ object Amp {
             Completed,
             TaskRow.completedTag
           )
-        } else if (model.hasChanged) {
+        } else if (model.isComplete && model.hasChanged) {
           TaskRow(
             key,
             generateRedirect(appConfig.ampSummaryUrl).url,

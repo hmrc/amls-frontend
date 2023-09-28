@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessmatching.{BusinessActivity, BusinessMatching}
-import models.registrationprogress.{Completed, Section, TaskList, TaskRow}
+import models.registrationprogress.{Completed, TaskList, TaskRow, Updated}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePerson
 import models.status._
@@ -130,7 +130,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
 
       val (hasPreviousCompleted, hasPreviousChanged) = acc
 
-      (hasPreviousCompleted && section.status == Completed, hasPreviousChanged || section.hasChanged)
+      (hasPreviousCompleted && (section.status == Completed || section.status == Updated), hasPreviousChanged || section.hasChanged)
 
     } match {
       case (true, true) => true

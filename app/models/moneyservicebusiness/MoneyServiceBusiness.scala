@@ -18,7 +18,7 @@ package models.moneyservicebusiness
 
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
+import models.registrationprogress._
 import play.api.i18n.Messages
 import play.api.libs.json._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -129,21 +129,6 @@ object MoneyServiceBusiness {
 
   val key = "msb"
 
-  def section(implicit cache: CacheMap): Section = {
-    val messageKey = key
-    val notStarted = Section(messageKey, NotStarted, false, controllers.msb.routes.WhatYouNeedController.get)
-
-    cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {
-      model =>
-        val msbService = ControllerHelper.getMsbServices(cache.getEntry[BusinessMatching](BusinessMatching.key)).getOrElse(Set.empty)
-        if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange))) {
-          Section(messageKey, Completed, model.hasChanged, controllers.msb.routes.SummaryController.get)
-        } else {
-          Section(messageKey, Started, model.hasChanged, controllers.msb.routes.WhatYouNeedController.get)
-        }
-    }
-  }
-
   def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
     val notStarted = TaskRow(
       key,
@@ -156,21 +141,21 @@ object MoneyServiceBusiness {
     cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {
       model =>
         val msbService = ControllerHelper.getMsbServices(cache.getEntry[BusinessMatching](BusinessMatching.key)).getOrElse(Set.empty)
-        if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange))) {
-          TaskRow(
-            key,
-            controllers.msb.routes.SummaryController.get.url,
-            model.hasChanged,
-            Completed,
-            TaskRow.completedTag
-          )
-        } else if (model.hasChanged) {
+        if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange)) && model.hasChanged) {
           TaskRow(
             key,
             controllers.msb.routes.SummaryController.get.url,
             hasChanged = true,
             status = Updated,
             tag = TaskRow.updatedTag
+          )
+        } else if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange))) {
+          TaskRow(
+            key,
+            controllers.msb.routes.SummaryController.get.url,
+            model.hasChanged,
+            Completed,
+            TaskRow.completedTag
           )
         } else {
           TaskRow(

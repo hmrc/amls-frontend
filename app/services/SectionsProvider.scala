@@ -56,7 +56,7 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
     mandatoryTaskRows(cache, messages) ++ dependentTaskRows(cache, messages)
   }
 
-  def taskRowsFromBusinessActivities(activities: Set[BusinessActivity],
+  def taskRowsFromBusinessActivities(activities: Set[BusinessActivity], //TODO remove all .section methods from below where .taskRow is used
                                      msbServices: Option[BusinessMatchingMsbServices])
                                     (implicit cache: CacheMap, messages: Messages): Seq[TaskRow] = {
 
@@ -77,6 +77,7 @@ class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnecto
       ba <- bm.activities
     } yield taskRowsFromBusinessActivities(ba.businessActivities, bm.msbServices)) getOrElse Seq.empty
 
+  // TODO - as above
   private def mandatoryTaskRows(implicit cache: CacheMap, messages: Messages): Seq[TaskRow] =
     Seq(
       BusinessMatching.taskRow,

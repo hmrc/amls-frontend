@@ -82,7 +82,7 @@ object BankDetails {
     }
   }
 
-  def section(implicit cache: CacheMap): Section = {
+  def section(implicit cache: CacheMap): Section = { //TODO remove this
     val msgKey = "bankdetails"
     val defaultSection = Section(msgKey, NotStarted, false, controllers.bankdetails.routes.WhatYouNeedController.get)
 

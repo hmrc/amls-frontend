@@ -16,15 +16,13 @@
 
 package models.responsiblepeople
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.registrationprogress._
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
-
-import scala.collection.Seq
 
 case class ResponsiblePerson(personName: Option[PersonName] = None,
                              legalName: Option[PreviousName] = None,
@@ -240,7 +238,7 @@ object ResponsiblePerson {
   def filterWithIndex(rp: Seq[ResponsiblePerson]): Seq[(ResponsiblePerson, Int)] =
     rp.zipWithIndex.reverse.filterNot(_._1.status.contains(StatusConstants.Deleted)).filterNot(_._1 == ResponsiblePerson())
 
-  def section(implicit cache: CacheMap): Section = {
+  def section(implicit cache: CacheMap): Section = { //TODO remove this
 
     val messageKey = "responsiblepeople"
     val notStarted = Section(messageKey, NotStarted, false, controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get())
@@ -347,10 +345,10 @@ object ResponsiblePerson {
   }
 
   import play.api.libs.functional.syntax._
+  import play.api.libs.json.JodaReads._
+  import play.api.libs.json.JodaWrites._
   import play.api.libs.json._
   import utils.MappingUtils._
-  import play.api.libs.json.JodaWrites._
-  import play.api.libs.json.JodaReads._
 
   val flowFromDeclaration = "fromDeclaration"
 

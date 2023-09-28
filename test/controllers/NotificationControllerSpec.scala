@@ -40,7 +40,7 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.notifications.your_messages
+import views.html.notifications.YourMessagesView
 import views.notifications.{V1M0, V2M0, V3M0, V4M0, V5M0}
 
 import scala.concurrent.Future
@@ -99,7 +99,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     lazy val third: V3M0 = app.injector.instanceOf[V3M0]
     lazy val fourth: V4M0 = app.injector.instanceOf[V4M0]
     lazy val fifth: V5M0 = app.injector.instanceOf[V5M0]
-    lazy val view: your_messages = app.injector.instanceOf[your_messages]
+    lazy val view: YourMessagesView = app.injector.instanceOf[YourMessagesView]
     val controller = new NotificationController(
       authEnrolmentsService = mockAuthEnrolmentsService,
       statusService = mockStatusService,
@@ -110,7 +110,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       amlsConnector = mockAmlsConnector,
       dataCacheConnector = mockCacheConnector,
       cc = mockMcc,
-      your_messages = view,
+      view = view,
       error = errorView,
       v1m0 = first,
       v2m0 = second,
@@ -128,7 +128,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       dataCacheConnector = mockCacheConnector,
       ds = commonDependencies,
       cc = mockMcc,
-      your_messages = view,
+      view = view,
       error = errorView,
       v1m0 = first,
       v2m0 = second,
@@ -174,7 +174,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
   "getMessages" must {
 
-    "respond with OK and show the your_messages page when there is a valid safeId" in new Fixture {
+    "respond with OK and show the YourMessagesView page when there is a valid safeId" in new Fixture {
 
       when(mockNotificationService.getNotifications(any(), any())(any(), any()))
         .thenReturn(Future.successful(testList))
@@ -200,7 +200,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       }.getMessage must be("Unable to retrieve SafeID")
     }
 
-    "respond with OK and show the your_messages page when there is an invalid safeId and businessMatching is used" in new Fixture {
+    "respond with OK and show the your messages page when there is an invalid safeId and businessMatching is used" in new Fixture {
 
       when(mockNotificationService.getNotifications(any(), any())(any(), any()))
         .thenReturn(Future.successful(testList))

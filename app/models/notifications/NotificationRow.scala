@@ -18,10 +18,14 @@ package models.notifications
 
 import models.notifications.ContactType._
 import models.notifications.RejectedReason._
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import org.joda.time.DateTime
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
+import play.api.i18n.Messages
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsValue, Writes, _}
+import play.api.libs.json._
+import uk.gov.hmrc.govukfrontend.views.Aliases.HtmlContent
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
 import utils.ContactTypeHelper
 
@@ -83,6 +87,43 @@ case class NotificationRow (
     case _ => "notifications.type.communication"
   }
 
+  def asTableRows(id: String, index: Int)(implicit messages: Messages): Seq[TableRow] = {
+
+    val link =
+      s"""
+         |<a id="hyper-link-$id-$index"
+         |href="${controllers.routes.NotificationController.messageDetails(
+            _id.id,
+            utils.ContactTypeHelper.getContactType(
+              status,
+              contactType,
+              variation
+            ),
+            amlsRegistrationNumber,
+            templatePackageVersion
+          )}
+         |">
+         |${messages(this.subject)}
+         |</a>
+         |""".stripMargin
+
+    val boldClass = "govuk-!-font-weight-bold"
+
+    Seq(
+      TableRow(
+        HtmlContent(link),
+        classes = boldClass
+      ),
+      TableRow(
+        Text(messages(notificationType)),
+        classes = boldClass
+      ),
+      TableRow(
+        Text(messages(dateReceived)),
+        classes = boldClass
+      )
+    )
+  }
 }
 
 object NotificationRow {

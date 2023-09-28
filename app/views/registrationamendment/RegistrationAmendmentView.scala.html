@@ -17,8 +17,7 @@
 @import components.{Heading, TaskRowComponent, Button}
 @import include._
 @import config.ApplicationConfig
-@import models.registrationprogress.{TaskList, TaskRow, Completed}
-@import views.html.helper.CSRF
+@import models.registrationprogress.{TaskList, TaskRow, Started}
 
 @this(
     layout: Layout,
@@ -84,7 +83,7 @@
                 }
             } else {
                 <h2 class="govuk-heading-m override-heading-medium">@messages("progress.view.status")</h2>
-                <p class="govuk-body">@if(taskList.rows.exists(_.status != Completed) || taskList.rows.exists(_.hasChanged)) {
+                <p class="govuk-body">@if(taskList.rows.exists(row => row.status == Started)) {
                     @messages("progress.updates.incomplete")
                 } else {
                     @messages("progress.updates.not.made")

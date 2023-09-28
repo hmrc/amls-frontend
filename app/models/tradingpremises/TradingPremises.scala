@@ -17,14 +17,12 @@
 package models.tradingpremises
 
 import models.businessmatching.BusinessActivity.MoneyServiceBusiness
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.registrationprogress._
 import models.tradingpremises.BusinessStructure._
 import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
-
-import scala.collection.Seq
 
 case class TradingPremises(
                             registeringAgentPremises: Option[RegisteringAgentPremises] = None,
@@ -191,6 +189,15 @@ object TradingPremises {
         )
       } else {
         filter(tp) match {
+          case premises if premises.nonEmpty && anyChanged(premises) && premises.forall {
+            _.isComplete
+          } => TaskRow(
+            messageKey,
+            controllers.tradingpremises.routes.YourTradingPremisesController.get().url,
+            true,
+            Updated,
+            TaskRow.updatedTag
+          )
           case premises if premises.nonEmpty && premises.forall {
             _.isComplete
           } => TaskRow(
