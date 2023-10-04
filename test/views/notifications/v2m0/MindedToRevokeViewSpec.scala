@@ -64,7 +64,7 @@ class MindedToRevokeViewSpec extends AmlsViewSpec with MustMatchers {
 
       def view = minded_to_revoke(notificationParams)
 
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
+      doc.getElementById("return-to-messages").attr("href") mustBe controllers.routes.NotificationController.getMessages().url
     }
   }
 }

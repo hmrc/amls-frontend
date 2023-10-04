@@ -17,40 +17,30 @@
 package controllers.businessactivities
 
 import com.google.inject.Inject
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.businessactivities.EmployeeCountFormProvider
-import models.businessactivities.{BusinessActivities, EmployeeCount, HowManyEmployees}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import models.businessactivities.EmployeeCount
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.businessactivities.HowManyEmployeesService
 import utils.AuthAction
 import views.html.businessactivities.BusinessEmployeesCountView
 
 import scala.concurrent.Future
 
-class HowManyEmployeesController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction,
-                                            val ds: CommonPlayDependencies,
-                                            val cc: MessagesControllerComponents,
-                                            formProvider: EmployeeCountFormProvider,
-                                            view: BusinessEmployeesCountView) extends AmlsBaseController(ds, cc) {
-
-  def updateData(howManyEmployees: Option[HowManyEmployees], data: EmployeeCount): HowManyEmployees = {
-    howManyEmployees.fold[HowManyEmployees](HowManyEmployees(employeeCount = Some(data.employeeCount)))(x =>
-      x.copy(employeeCount = Some(data.employeeCount)))
-  }
+class HowManyEmployeesController @Inject()(val authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
+                                           val cc: MessagesControllerComponents,
+                                           service: HowManyEmployeesService,
+                                           formProvider: EmployeeCountFormProvider,
+                                           view: BusinessEmployeesCountView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-      implicit request => {
-        dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-          response =>
-            val form = (for {
-              businessActivities <- response
-              employees <- businessActivities.howManyEmployees
-              formData <- employees.employeeCount
-            } yield formProvider().fill(EmployeeCount(formData))).getOrElse(formProvider())
-            Ok(view(form, edit))
-        }
+    implicit request => {
+      service.getEmployeeCount(request.credId) map { countOpt =>
+        val form = countOpt.fold(formProvider())(count => formProvider().fill(EmployeeCount(count)))
+        Ok(view(form, edit))
       }
+    }
   }
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
@@ -59,16 +49,16 @@ class HowManyEmployeesController @Inject() (val dataCacheConnector: DataCacheCon
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
-          for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivities.howManyEmployees(updateData(businessActivities.howManyEmployees, data)))
-          } yield if (edit) {
-            Redirect(routes.SummaryController.get)
-          } else {
-            Redirect(routes.TransactionRecordController.get())
+          service.updateEmployeeCount(request.credId, data) map { _ =>
+            redirect(edit)
           }
       )
     }
+  }
+
+  private def redirect(edit: Boolean): Result = if (edit) {
+    Redirect(routes.SummaryController.get)
+  } else {
+    Redirect(routes.TransactionRecordController.get())
   }
 }

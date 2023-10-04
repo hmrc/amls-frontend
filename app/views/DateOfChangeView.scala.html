@@ -33,7 +33,7 @@
 @(form: Form[_], subheadingMessage: String, controllerAction: Call, hasReturnLink: Boolean = true, buttonMsgKey: String = "button.saveandcontinue")(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
 @layout(
-    pageTitle = s"${messages("dateofchange.title")} - ${messages("summary.responsiblepeople")}",
+    pageTitle = s"${messages("dateofchange.title")} - ${messages(subheadingMessage)}",
 ) {
 
     @errorSummary(form, Some(Map("dateOfChange" -> "dateOfChange.day")))

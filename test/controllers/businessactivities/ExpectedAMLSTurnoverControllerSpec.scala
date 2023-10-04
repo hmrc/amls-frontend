@@ -17,7 +17,6 @@
 package controllers.businessactivities
 
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.businessactivities.ExpectedAMLSTurnoverFormProvider
 import models.businessactivities.ExpectedAMLSTurnover.First
@@ -28,19 +27,23 @@ import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
+import services.businessactivities.ExpectedAMLSTurnoverService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import views.html.businessactivities.ExpectedAMLSTurnoverView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
+class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting with BeforeAndAfterEach {
+
+  val mockService = mock[ExpectedAMLSTurnoverService]
 
   trait Fixture {
     self =>
@@ -49,10 +52,10 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
 
     lazy val view = inject[ExpectedAMLSTurnoverView]
     val controller = new ExpectedAMLSTurnoverController (
-      dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       cc = mockMcc,
+      service = mockService,
       formProvider = inject[ExpectedAMLSTurnoverFormProvider],
       view = view
     )
@@ -63,6 +66,8 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
   }
 
   val emptyCache = CacheMap("", Map.empty)
+
+  override def beforeEach(): Unit = reset(mockService)
 
   "ExpectedAMLSTurnoverController" when {
 
@@ -86,14 +91,8 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
-          when(mockCache.getEntry[BusinessActivities](BusinessActivities.key))
-            .thenReturn(None)
-
-          when(mockCache.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(businessMatching))
-
-          when(controller.dataCacheConnector.fetchAll(any())(any()))
-            .thenReturn(Future.successful(Some(mockCache)))
+          when(mockService.getBusinessMatchingExpectedTurnover(any())(any()))
+            .thenReturn(Future.successful(Some((businessMatching, None))))
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -128,14 +127,8 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
-          when(controller.dataCacheConnector.fetchAll(any())(any()))
-            .thenReturn(Future.successful(Some(mockCache)))
-
-          when(mockCache.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(businessMatching))
-
-          when(mockCache.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
-            .thenReturn(model)
+          when(mockService.getBusinessMatchingExpectedTurnover(any())(any()))
+            .thenReturn(Future.successful(Some((businessMatching, Some(First)))))
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -151,7 +144,7 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
-          when(controller.dataCacheConnector.fetchAll(any())(any()))
+          when(mockService.getBusinessMatchingExpectedTurnover(any())(any()))
             .thenReturn(Future.successful(None))
 
           val result = controller.get()(request)
@@ -168,15 +161,17 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           "expectedAMLSTurnover" -> "zeroPlus"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
+        when(mockService.getBusinessMatching(any())(any()))
+          .thenReturn(Future.successful(Some(BusinessMatching())))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        when(mockService.updateBusinessActivities(any(), eqTo(First))(any()))
+          .thenReturn(Future.successful(Some(mockCache)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessactivities.routes.BusinessFranchiseController.get().url))
+
+        verify(mockService).updateBusinessActivities(any(), eqTo(First))(any())
       }
 
       "on post with valid data in edit mode" in new Fixture {
@@ -185,15 +180,17 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           "expectedAMLSTurnover" -> "zeroPlus"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
+        when(mockService.getBusinessMatching(any())(any()))
+          .thenReturn(Future.successful(Some(BusinessMatching())))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        when(mockService.updateBusinessActivities(any(), eqTo(First))(any()))
+          .thenReturn(Future.successful(Some(mockCache)))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get.url))
+
+        verify(mockService).updateBusinessActivities(any(), eqTo(First))(any())
       }
 
       "on post with invalid data" in new Fixture {
@@ -210,12 +207,14 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           )))
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
-          .thenReturn(Future.successful(Some(businessMatching)))
+        when(mockService.getBusinessMatching(any())(any()))
+          .thenReturn(Future.successful(Some(BusinessMatching())))
 
         val result = controller.post(true)(request)
 
         status(result) mustBe BAD_REQUEST
+
+        verify(mockService, times(0)).updateBusinessActivities(any(), any())(any())
       }
     }
   }

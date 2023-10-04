@@ -2672,6 +2672,8 @@ notifications.revr.title = Your supervision has been revoked
 notifications.nmrj.title = No longer considering refusal
 notifications.nmrv.title = No longer considering revocation
 
+notifications.back.link = Return to your messages
+
 ############################### Renewal ###############################
 renewal.whatyouneed.requiredinfo.heading = You’ll need to tell us:
 renewal.whatyouneed.line_1 = about any other activities your business was involved in over the last 12 months

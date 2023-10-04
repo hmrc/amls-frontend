@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 class ExpectedAMLSTurnoverFormProvider @Inject()() extends Mappings {
 
-  def apply(): Form[ExpectedAMLSTurnover] = Form(
-    "expectedAMLSTurnover" -> enumerable[ExpectedAMLSTurnover]("error.required.ba.turnover.from.mlr")
+  def apply(errorMsg: String = "error.required.ba.turnover.from.mlr"): Form[ExpectedAMLSTurnover] = Form(
+    "expectedAMLSTurnover" -> enumerable[ExpectedAMLSTurnover](errorMsg)
   )
 }

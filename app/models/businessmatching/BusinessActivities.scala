@@ -35,6 +35,9 @@ case class BusinessActivities(businessActivities: Set[BusinessActivity],
     businessActivities.union(additionalActivities.getOrElse(Set.empty)) contains activity
   }
 
+  def hasOnlyOneBusinessActivity: Boolean = {
+    businessActivities.size == 1
+  }
 }
 
 sealed trait BusinessActivity extends CheckYourAnswersField {

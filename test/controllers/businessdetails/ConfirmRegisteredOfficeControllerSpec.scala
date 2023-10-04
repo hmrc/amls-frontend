@@ -16,7 +16,6 @@
 
 package controllers.businessdetails
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.businessdetails.ConfirmRegisteredOfficeFormProvider
 import models.Country
@@ -25,75 +24,94 @@ import models.businessdetails._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HeaderCarrier
+import services.businessdetails.ConfirmRegisteredOfficeService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import views.html.businessdetails.ConfirmRegisteredOfficeOrMainPlaceView
 
 import scala.concurrent.Future
 
-class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
+class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfterEach {
+
+  val mockService = mock[ConfirmRegisteredOfficeService]
 
   trait Fixture {
     self => val request = addToken(authRequest)
     lazy val view = app.injector.instanceOf[ConfirmRegisteredOfficeOrMainPlaceView]
     val controller = new ConfirmRegisteredOfficeController (
-      dataCache = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
+      service = mockService,
       formProvider = app.injector.instanceOf[ConfirmRegisteredOfficeFormProvider],
       view = view)
   }
 
+  val address = Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB"))
   private val ukAddress = RegisteredOfficeUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
   private val nonUkAddress = RegisteredOfficeNonUK("line1", "line2", Some("line3"), Some("line4"), Country("United States of America", "US"))
   private val businessDetails = BusinessDetails(None, None, None, None, None, None, Some(ukAddress), None)
   val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
     Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "ghghg")
   val reviewDtlsNonUk = reviewDtls.copy(
-    businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), None, Country("United States of America", "US")))
+    businessAddress = address)
   val bm = BusinessMatching(Some(reviewDtls))
   val emptyCache = CacheMap("", Map.empty)
 
+  override def beforeEach(): Unit = reset(mockService)
 
   "ConfirmRegisteredOfficeController" must {
     "Get Option:" must {
       "load register Office" in new Fixture {
 
-        when(controller.dataCache.fetch[BusinessMatching](any(), meq(BusinessMatching.key))
-          (any(), any())).thenReturn(Future.successful(Some(bm)))
+        when(mockService.hasRegisteredAddress(any())(any()))
+          .thenReturn(Future.successful(Some(false)))
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), meq(BusinessDetails.key))
-          (any(), any())).thenReturn(Future.successful(None))
+        when(mockService.getAddress(any())(any()))
+          .thenReturn(Future.successful(Some(address)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessdetails.confirmingyouraddress.title"))
+        contentAsString(result) must include(messages("businessdetails.confirmingyouraddress.title"))
+      }
+
+      "load Registered office or main place of business when has registered address returns None" in new Fixture {
+
+        when(mockService.hasRegisteredAddress(any())(any()))
+          .thenReturn(Future.successful(None))
+
+        when(mockService.getAddress(any())(any()))
+          .thenReturn(Future.successful(Some(address)))
+
+        val result = controller.get()(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
       }
 
       "load Registered office or main place of business when Business Address from mongoCache returns None" in new Fixture {
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))
+        when(mockService.hasRegisteredAddress(any())(any()))
+          .thenReturn(Future.successful(Some(false)))
+
+        when(mockService.getAddress(any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
-
       }
 
       "load Registered office or main place of business when there is already a registered address in BusinessDetails" in new Fixture {
 
-        when(controller.dataCache.fetch[BusinessMatching](any(), meq(BusinessMatching.key))
-          (any(), any())).thenReturn(Future.successful(Some(bm)))
+        when(mockService.hasRegisteredAddress(any())(any()))
+          .thenReturn(Future.successful(Some(true)))
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), meq(BusinessDetails.key))
-          (any(), any())).thenReturn(Future.successful(Some(businessDetails)))
+        when(mockService.getAddress(any())(any()))
+          .thenReturn(Future.successful(Some(address)))
 
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
@@ -102,50 +120,19 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "Post" must {
-      "successfully redirect to the page on selection of 'Yes' [this is registered address] for UK address" in new Fixture {
+      "successfully redirect to the page on selection of 'Yes' [this is registered address]" in new Fixture {
         val newRequest = FakeRequest(POST, routes.ConfirmRegisteredOfficeController.post().url).withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
 
-        val mockCacheMap = mock[CacheMap]
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
-        when(controller.dataCache.save[BusinessMatching](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-          .thenReturn(Some(businessDetails))
-        when(controller.dataCache.fetchAll(any[String])(any[HeaderCarrier]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockService.updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true)))(any()))
+          .thenReturn(Future.successful(Some(ukAddress)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.BusinessEmailAddressController.get().url))
-        verify(
-          controller.dataCache).save[BusinessDetails](any(), any(),
-          meq(businessDetails.copy(registeredOffice = Some(ukAddress))))(any(), any())
-      }
 
-      "successfully redirect to the page on selection of 'Yes' [this is registered address] for non-UK address" in new Fixture {
-        val newRequest = FakeRequest(POST, routes.ConfirmRegisteredOfficeController.post().url).withFormUrlEncodedBody(
-          "isRegOfficeOrMainPlaceOfBusiness" -> "true"
-        )
-
-        val mockCacheMap = mock[CacheMap]
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(Some(reviewDtlsNonUk))))
-        when(controller.dataCache.save[BusinessMatching](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-          .thenReturn(Some(businessDetails))
-        when(controller.dataCache.fetchAll(any[String])(any[HeaderCarrier]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.businessdetails.routes.BusinessEmailAddressController.get().url))
-        verify(
-          controller.dataCache).save[BusinessDetails](any(), any(),
-          meq(businessDetails.copy(registeredOffice = Some(nonUkAddress))))(any(), any())
+        verify(mockService).updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true)))(any())
       }
 
       "successfully redirect to the page on selection of Option 'No' [this is not registered address]" in new Fixture {
@@ -154,50 +141,30 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
           "isRegOfficeOrMainPlaceOfBusiness" -> "false"
         )
 
-        val mockCacheMap = mock[CacheMap]
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
-        when(controller.dataCache.save[BusinessMatching](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-          .thenReturn(Some(businessDetails))
-        when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockService.updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(false)))(any()))
+          .thenReturn(Future.successful(Some(ukAddress)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
-        verify(
-          controller.dataCache).save[BusinessDetails](any(), any(),
-          meq(businessDetails.copy(registeredOffice = None)))(any(), any()
-        )
 
+        verify(mockService).updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(false)))(any())
       }
 
-      "successfully redirect to the page on selection of Option 'Yes' [this is registered address] and review details is None" in new Fixture {
+      "successfully redirect to the page on selection of Option 'Yes' [this is registered address] update returns None" in new Fixture {
 
         val newRequest = FakeRequest(POST, routes.ConfirmRegisteredOfficeController.post().url).withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "true"
         )
 
-        val mockCacheMap = mock[CacheMap]
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(None)))
-        when(controller.dataCache.save[BusinessMatching](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-          .thenReturn(Some(businessDetails))
-        when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(mockService.updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true)))(any()))
+          .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeIsUKController.get().url))
-        verify(
-          controller.dataCache).save[BusinessDetails](any(), any(),
-          meq(businessDetails.copy(registeredOffice = None)))(any(), any()
-        )
 
+        verify(mockService).updateRegisteredOfficeAddress(any(), meq(ConfirmRegisteredOffice(true)))(any())
       }
 
 
@@ -206,25 +173,44 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
         val newRequest = FakeRequest(POST, routes.ConfirmRegisteredOfficeController.post().url).withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> "foo"
         )
-        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(),any()))
-          .thenReturn(Future.successful(Some(bm)))
+
+        when(mockService.getAddress(any())(any()))
+          .thenReturn(Future.successful(Some(address)))
+
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.required.atb.confirm.office"))
+        contentAsString(result) must include(messages("error.required.atb.confirm.office"))
 
+        verify(mockService, times(0)).updateRegisteredOfficeAddress(any(), any())(any())
       }
 
       "on post with invalid data show error" in new Fixture {
         val newRequest = FakeRequest(POST, routes.ConfirmRegisteredOfficeController.post().url).withFormUrlEncodedBody(
           "isRegOfficeOrMainPlaceOfBusiness" -> ""
         )
-        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(),any()))
-          .thenReturn(Future.successful(Some(bm)))
+
+        when(mockService.getAddress(any())(any()))
+          .thenReturn(Future.successful(Some(address)))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("err.summary"))
+        contentAsString(result) must include(messages("err.summary"))
 
+        verify(mockService, times(0)).updateRegisteredOfficeAddress(any(), any())(any())
+      }
+
+      "on post with invalid data must redirect if no address is found" in new Fixture {
+        val newRequest = FakeRequest(POST, routes.ConfirmRegisteredOfficeController.post().url).withFormUrlEncodedBody(
+          "isRegOfficeOrMainPlaceOfBusiness" -> ""
+        )
+
+        when(mockService.getAddress(any())(any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.post()(newRequest)
+        redirectLocation(result) mustBe Some(routes.RegisteredOfficeIsUKController.get().url)
+
+        verify(mockService, times(0)).updateRegisteredOfficeAddress(any(), any())(any())
       }
     }
   }

@@ -63,7 +63,7 @@ class RevocationReasonsViewSpec extends AmlsViewSpec with MustMatchers {
 
       def view = revocation_reasons(notificationParams)
 
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
+      doc.getElementById("return-to-messages").attr("href") mustBe controllers.routes.NotificationController.getMessages().url
     }
   }
 }

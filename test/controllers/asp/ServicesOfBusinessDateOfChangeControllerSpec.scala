@@ -19,14 +19,14 @@ package controllers.asp
 import controllers.actions.SuccessfulAuthAction
 import forms.DateOfChangeFormProvider
 import models.asp._
-import models.businessdetails.{ActivityStartDate, BusinessDetails}
+import models.businessdetails.ActivityStartDate
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.HeaderCarrier
+import services.asp.ServicesOfBusinessDateOfChangeService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DateHelper, DependencyMocks}
 import views.html.DateOfChangeView
@@ -37,6 +37,8 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
 
   val emptyCache = CacheMap("", Map.empty)
 
+  val mockService = mock[ServicesOfBusinessDateOfChangeService]
+
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
@@ -44,10 +46,10 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
     lazy val dateOfChange = inject[DateOfChangeView]
 
     val controller = new ServicesOfBusinessDateOfChangeController(
-      mockCacheConnector,
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
+      mockService,
       inject[DateOfChangeFormProvider],
       dateOfChange
     )
@@ -70,17 +72,11 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
         "dateOfChange.year" -> "1990"
       )
 
-      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+      when(mockService.getModelWithDate(any())(any()))
+        .thenReturn(Future.successful((Asp(), Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
-      when(mockCacheMap.getEntry[Asp](Asp.key))
-        .thenReturn(Some(Asp()))
-
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(controller.dataCacheConnector.save[Asp](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+      when(mockService.updateAsp(any(), any(), any())(any()))
+        .thenReturn(Future.successful(Some(Asp())))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -95,18 +91,6 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
         "dateOfChange.month" -> "2",
         "dateOfChange.year" -> "foo"
       )
-
-      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
-
-      when(mockCacheMap.getEntry[Asp](Asp.key))
-        .thenReturn(None)
-
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(controller.dataCacheConnector.save[Asp](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -123,18 +107,6 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
       )
 
       val startDate = new LocalDate(1990, 2, 24)
-
-      when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-        .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(startDate)))))
-
-      when(mockCacheMap.getEntry[Asp](Asp.key))
-        .thenReturn(Some(Asp()))
-
-      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(controller.dataCacheConnector.save[Asp](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

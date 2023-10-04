@@ -16,7 +16,6 @@
 
 package controllers.businessactivities
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.businessactivities.DocumentRiskAssessmentPolicyFormProvider
 import models.businessactivities._
@@ -25,27 +24,30 @@ import models.businessmatching.{BusinessMatching, BusinessActivities => BMBusine
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.http.HeaderCarrier
+import services.businessactivities.DocumentRiskAssessmentService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import views.html.businessactivities.DocumentRiskAssessmentPolicyView
 
 import scala.concurrent.Future
 
-class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with Injecting with BeforeAndAfterEach {
+
+  val mockService = mock[DocumentRiskAssessmentService]
 
   trait Fixture {
     self => val request = addToken(authRequest)
     lazy val view = inject[DocumentRiskAssessmentPolicyView]
 
-    val controller = new DocumentRiskAssessmentController (
-      dataCacheConnector = mock[DataCacheConnector],
+    val controller = new DocumentRiskAssessmentController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
+      service = mockService,
       formProvider = inject[DocumentRiskAssessmentPolicyFormProvider],
       view = view,
       error = errorView)
@@ -53,13 +55,14 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
   val emptyCache = CacheMap("", Map.empty)
 
+  override def beforeEach(): Unit = reset(mockService)
+
   "DocumentRiskAssessmentController" when {
 
     "get is called" must {
       "load the Document Risk assessment Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
+        when(mockService.getRiskAssessmentPolicy(any())(any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -71,9 +74,9 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
       "pre-populate the Document Risk assessment Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(BusinessActivities(
-            riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased, Digital)))))
+        when(mockService.getRiskAssessmentPolicy(any())(any()))
+          .thenReturn(Future.successful(Some(
+            RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased, Digital)))
           )))
 
         val result = controller.get()(request)
@@ -97,17 +100,10 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
           val mockCacheMap = mock[CacheMap]
 
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(AccountancyServices, MoneyServiceBusiness))))))
-
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
-
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
-
-          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
+          when(mockService.updateRiskAssessmentType(any(), any())(any()))
+            .thenReturn(Future.successful(
+              Some(BusinessMatching(None, Some(BMBusinessActivities(Set(AccountancyServices, MoneyServiceBusiness)))))
+            ))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
@@ -122,19 +118,10 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             "riskassessments[2]" -> "digital"
           )
 
-          val mockCacheMap = mock[CacheMap]
-
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
-
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
-
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
-
-          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
+          when(mockService.updateRiskAssessmentType(any(), any())(any()))
+            .thenReturn(Future.successful(
+              Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness)))))
+            ))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
@@ -148,14 +135,10 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             .withFormUrlEncodedBody(
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-              .thenReturn(Future.successful(None))
-
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
-              .thenReturn(Future.successful(emptyCache))
-
             val result = controller.post()(newRequest)
             status(result) must be(BAD_REQUEST)
+
+            verifyZeroInteractions(mockService)
           }
 
           "riskassessments fields are missing, represented by an empty string" in new Fixture {
@@ -166,14 +149,10 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
               "riskassessments[2]" -> ""
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-              .thenReturn(Future.successful(None))
-
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
-              .thenReturn(Future.successful(emptyCache))
-
             val result = controller.post()(newRequest)
             status(result) must be(BAD_REQUEST)
+
+            verifyZeroInteractions(mockService)
           }
         }
       }
@@ -189,17 +168,10 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
 
           val mockCacheMap = mock[CacheMap]
 
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
-
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
-
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
-
-          when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
+          when(mockService.updateRiskAssessmentType(any(), any())(any()))
+            .thenReturn(Future.successful(
+              Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness)))))
+            ))
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)

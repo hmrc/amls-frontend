@@ -17,7 +17,6 @@
 package views.notifications.v1m0
 
 import models.notifications._
-import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import views.Fixture
@@ -63,7 +62,7 @@ class MindedToRejectViewSpec extends AmlsViewSpec with MustMatchers {
 
       def view = minded_to_reject(notificationParams)
 
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
+      doc.getElementById("return-to-messages").attr("href") mustBe controllers.routes.NotificationController.getMessages().url
     }
   }
 }

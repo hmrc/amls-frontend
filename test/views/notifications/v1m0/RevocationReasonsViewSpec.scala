@@ -17,7 +17,6 @@
 package views.notifications.v1m0
 
 import models.notifications.NotificationParams
-import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import views.Fixture
@@ -63,7 +62,7 @@ class RevocationReasonsViewSpec extends AmlsViewSpec with MustMatchers {
 
       def view = revocation_reasons(notificationParams)
 
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
+      doc.getElementById("return-to-messages").attr("href") mustBe controllers.routes.NotificationController.getMessages().url
     }
   }
 }

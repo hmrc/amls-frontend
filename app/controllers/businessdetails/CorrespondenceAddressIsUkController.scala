@@ -57,9 +57,14 @@ class CorrespondenceAddressIsUkController @Inject ()(val dataConnector: DataCach
         isUk =>
           for {
             businessDetails <- dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key)
-            _ <- dataConnector.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.correspondenceAddressIsUk(isUk))
-            _ <- if (isUkHasChanged(businessDetails.correspondenceAddress, isUk = isUk)) { dataConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
-              businessDetails.correspondenceAddress(CorrespondenceAddress(None, None))) } else { Future.successful(None) }
+            detailsToSave = if (isUkHasChanged(businessDetails.correspondenceAddress, isUk = isUk)) {
+                              businessDetails
+                                .correspondenceAddressIsUk(isUk)
+                                .correspondenceAddress(CorrespondenceAddress(None, None))
+                            } else {
+                              businessDetails.correspondenceAddressIsUk(isUk)
+                            }
+            _ <- dataConnector.save[BusinessDetails](request.credId, BusinessDetails.key, detailsToSave)
           } yield isUk match {
             case CorrespondenceAddressIsUk(true) => Redirect(routes.CorrespondenceAddressUkController.get(edit))
             case CorrespondenceAddressIsUk(false) => Redirect(routes.CorrespondenceAddressNonUkController.get(edit))

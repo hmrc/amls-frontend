@@ -17,52 +17,40 @@
 package controllers.businessactivities
 
 import com.google.inject.Inject
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.businessactivities.BusinessFranchiseFormProvider
-import models.businessactivities.BusinessActivities
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.businessactivities.BusinessFranchiseService
 import utils.AuthAction
 import views.html.businessactivities.BusinessFranchiseNameView
 
 import scala.concurrent.Future
 
-class BusinessFranchiseController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                             val authAction: AuthAction,
+class BusinessFranchiseController @Inject() (val authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val cc: MessagesControllerComponents,
+                                             service: BusinessFranchiseService,
                                              formProvider: BusinessFranchiseFormProvider,
                                              view: BusinessFranchiseNameView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
    implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-        response =>
-          val form = (for {
-            businessActivities <- response
-            businessFranchise <- businessActivities.businessFranchise
-          } yield formProvider().fill(businessFranchise)).getOrElse(formProvider())
-          Ok(view(form, edit))
-      }
+     service.getBusinessFranchise(request.credId) map { franchiseOpt =>
+       Ok(view(franchiseOpt.fold(formProvider())(formProvider().fill), edit))
+     }
   }
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
-    implicit request => {
+    implicit request =>
       formProvider().bindFromRequest.fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
-        data =>
-          for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivities.businessFranchise(data)
-            )
-          } yield if (edit) {
-            Redirect(routes.SummaryController.get)
-          } else {
-            Redirect(routes.EmployeeCountAMLSSupervisionController.get())
-          }
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => service.updateBusinessFranchise(request.credId, data).map(_ => redirectTo(edit))
       )
-    }
+  }
+
+  private def redirectTo(edit: Boolean): Result = if (edit) {
+    Redirect(routes.SummaryController.get)
+  } else {
+    Redirect(routes.EmployeeCountAMLSSupervisionController.get())
   }
 }

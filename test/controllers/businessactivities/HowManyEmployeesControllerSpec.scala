@@ -16,10 +16,8 @@
 
 package controllers.businessactivities
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.businessactivities.EmployeeCountFormProvider
-import models.businessactivities.{BusinessActivities, HowManyEmployees}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -28,6 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
+import services.businessactivities.HowManyEmployeesService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import views.html.businessactivities.BusinessEmployeesCountView
@@ -36,15 +35,17 @@ import scala.concurrent.Future
 
 class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
+  val mockService = mock[HowManyEmployeesService]
+
   trait Fixture {
     self => val request = addToken(authRequest)
 
     lazy val view = inject[BusinessEmployeesCountView]
     val controller = new HowManyEmployeesController (
-      dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
+      service = mockService,
       formProvider = inject[EmployeeCountFormProvider],
       view = view)
   }
@@ -56,7 +57,7 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
     "get is called" must {
       "display the how many employees page with an empty form" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(mockService.getEmployeeCount(any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -69,8 +70,8 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "display the how many employees page with pre populated data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(BusinessActivities(howManyEmployees = Some(HowManyEmployees(Some("163"), Some("17")))))))
+        when(mockService.getEmployeeCount(any())(any()))
+          .thenReturn(Future.successful(Some("163")))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -99,11 +100,8 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "employeeCount" -> "456"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        when(mockService.updateEmployeeCount(any(), any())(any()))
+          .thenReturn(Future.successful(Some(emptyCache)))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -117,16 +115,12 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "employeeCount" -> "54321"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        when(mockService.updateEmployeeCount(any(), any())(any()))
+          .thenReturn(Future.successful(Some(emptyCache)))
 
         val resultTrue = controller.post(true)(newRequest)
         status(resultTrue) must be(SEE_OTHER)
         redirectLocation(resultTrue) must be(Some(routes.SummaryController.get.url))
-
       }
     }
   }

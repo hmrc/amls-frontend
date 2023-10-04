@@ -63,7 +63,7 @@ class NoLongerMindedToRejectViewSpec extends AmlsViewSpec with MustMatchers {
 
       def view = no_longer_minded_to_reject(notificationParams)
 
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
+      doc.getElementById("return-to-messages").attr("href") mustBe controllers.routes.NotificationController.getMessages().url
     }
   }
 }

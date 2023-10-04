@@ -16,26 +16,23 @@
 
 package controllers.asp
 
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.DateOfChangeFormProvider
 import models.DateOfChange
-import models.asp.Asp
-import models.businessdetails.{ActivityStartDate, BusinessDetails}
 import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.Html
-import uk.gov.hmrc.http.HeaderCarrier
+import services.asp.ServicesOfBusinessDateOfChangeService
 import utils.{AuthAction, DateHelper}
 import views.html.DateOfChangeView
 
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                         val authAction: AuthAction,
+class ServicesOfBusinessDateOfChangeController @Inject()(val authAction: AuthAction,
                                                          val ds: CommonPlayDependencies,
                                                          val cc: MessagesControllerComponents,
+                                                         service: ServicesOfBusinessDateOfChangeService,
                                                          formProvider: DateOfChangeFormProvider,
                                                          view: DateOfChangeView) extends AmlsBaseController(ds, cc) {
 
@@ -44,24 +41,15 @@ class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector:
   }
 
 
-  def post = authAction.async {
+  def post: Action[AnyContent] = authAction.async {
     implicit request =>
 
       formProvider().bindFromRequest().fold(
         formWithErrors => Future.successful(BadRequest(getView(formWithErrors))),
         dateOfChange => {
-          getModelWithDate(request.credId).flatMap {
+          service.getModelWithDate(request.credId).flatMap {
             case (asp, Some(activityStartDate)) if !dateOfChange.dateOfChange.isBefore(activityStartDate.startDate) =>
-              for {
-                _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
-                  asp.services match {
-                    case Some(service) => {
-                      val a = asp.copy(services = Some(service.copy(dateOfChange = Some(dateOfChange))))
-                      a
-                    }
-                    case None => asp
-                  })
-              } yield {
+              service.updateAsp(asp, dateOfChange, request.credId) map { _ =>
                 Redirect(routes.SummaryController.get)
               }
             case (_, Some(activityStartDate)) =>
@@ -78,21 +66,6 @@ class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector:
           }
         }
       )
-  }
-
-  private def getModelWithDate(cacheId: String)(implicit hc: HeaderCarrier): Future[(Asp, Option[ActivityStartDate])] = {
-    dataCacheConnector.fetchAll(cacheId) map {
-      optionalCache =>
-        (for {
-          cache <- optionalCache
-          businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
-          asp <- cache.getEntry[Asp](Asp.key)
-        } yield (asp, businessDetails.activityStartDate)) match {
-          case Some((asp, Some(activityStartDate))) => (asp, Some(activityStartDate))
-          case Some((asp, _)) => (asp, None)
-          case _ => (Asp(), None)
-        }
-    }
   }
 
   private def getView(form: Form[DateOfChange])(implicit request: Request[_]): Html = view(

@@ -17,58 +17,46 @@
 package controllers.businessactivities
 
 import com.google.inject.Inject
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.businessactivities.EmployeeCountAMLSSupervisionFormProvider
-import models.businessactivities.{BusinessActivities, EmployeeCountAMLSSupervision, HowManyEmployees}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import models.businessactivities.EmployeeCountAMLSSupervision
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.businessactivities.EmployeeCountAMLSSupervisionService
 import utils.AuthAction
 import views.html.businessactivities.BusinessEmployeesAMLSSupervisionView
 
 import scala.concurrent.Future
 
-class EmployeeCountAMLSSupervisionController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                        val authAction: AuthAction,
-                                                        val ds: CommonPlayDependencies,
-                                                        val cc: MessagesControllerComponents,
-                                                        formProvider: EmployeeCountAMLSSupervisionFormProvider,
-                                                        view: BusinessEmployeesAMLSSupervisionView) extends AmlsBaseController(ds, cc) {
-
-  def updateData(howManyEmployees: Option[HowManyEmployees], data: EmployeeCountAMLSSupervision): HowManyEmployees = {
-    howManyEmployees.fold[HowManyEmployees](HowManyEmployees(employeeCountAMLSSupervision = Some(data.employeeCountAMLSSupervision)))(x =>
-      x.copy(employeeCountAMLSSupervision = Some(data.employeeCountAMLSSupervision)))
-  }
+class EmployeeCountAMLSSupervisionController @Inject()(val authAction: AuthAction,
+                                                       val ds: CommonPlayDependencies,
+                                                       val cc: MessagesControllerComponents,
+                                                       service: EmployeeCountAMLSSupervisionService,
+                                                       formProvider: EmployeeCountAMLSSupervisionFormProvider,
+                                                       view: BusinessEmployeesAMLSSupervisionView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
-      implicit request => {
-        dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-          response =>
-            val form = (for {
-              businessActivities <- response
-              employees <- businessActivities.howManyEmployees
-              formValue <- employees.employeeCountAMLSSupervision
-            } yield formProvider().fill(EmployeeCountAMLSSupervision(formValue))).getOrElse(formProvider())
-            Ok(view(form, edit))
-        }
+    implicit request => {
+      service.getEmployeeCountAMLSSupervision(request.credId) map { value =>
+        val form = value.fold(formProvider())(formValue => formProvider().fill(EmployeeCountAMLSSupervision(formValue)))
+        Ok(view(form, edit))
       }
+    }
   }
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
       formProvider().bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, edit))),
-        data =>
-          for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivities.howManyEmployees(updateData(businessActivities.howManyEmployees, data)))
-          } yield if (edit) {
-            Redirect(routes.SummaryController.get)
-          } else {
-            Redirect(routes.HowManyEmployeesController.get())
-          }
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => service.updateHowManyEmployees(request.credId, data).map(_ => redirectLogic(edit))
       )
+    }
+  }
+
+  private def redirectLogic(edit: Boolean): Result = {
+    if (edit) {
+      Redirect(routes.SummaryController.get)
+    } else {
+      Redirect(routes.HowManyEmployeesController.get())
     }
   }
 }

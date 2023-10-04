@@ -16,24 +16,27 @@
 
 package controllers.businessactivities
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.businessactivities.BusinessFranchiseFormProvider
-import models.businessactivities.{BusinessActivities, BusinessFranchiseYes}
+import models.businessactivities.BusinessFranchiseYes
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
+import services.businessactivities.BusinessFranchiseService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import views.html.businessactivities.BusinessFranchiseNameView
 
 import scala.concurrent.Future
 
-class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
+class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting with BeforeAndAfterEach {
+
+  val mockService = mock[BusinessFranchiseService]
 
   trait Fixture {
     self => val request = addToken(authRequest)
@@ -41,21 +44,23 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
     lazy val view = inject[BusinessFranchiseNameView]
 
     val controller = new BusinessFranchiseController (
-      dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
+      service = mockService,
       formProvider = inject[BusinessFranchiseFormProvider],
       view = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)
 
+  override protected def beforeEach(): Unit = reset(mockService)
+
   "BusinessFranchiseController" when {
 
     "get is called" must {
       "on get display the is your business a franchise page" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(mockService.getBusinessFranchise(any())(any()))
           .thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -69,8 +74,8 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
       }
 
       "on get display the is your business a franchise page with pre populated data" in new Fixture {
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(BusinessActivities(businessFranchise = Some(BusinessFranchiseYes("test test"))))))
+        when(mockService.getBusinessFranchise(any())(any()))
+          .thenReturn(Future.successful(Some(BusinessFranchiseYes("test test"))))
         val result = controller.get()(request)
         status(result) must be(OK)
 
@@ -84,18 +89,18 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
     }
 
     "post is called" must {
+
+      val franchiseName = "Company Inc."
+
       "respond with SEE_OTHER" when {
         "edit is false and given valid data" in new Fixture {
 
           val newRequest = FakeRequest(POST, routes.BusinessFranchiseController.post().url).withFormUrlEncodedBody(
             "businessFranchise" -> "true",
-            "franchiseName" -> "test test"
+            "franchiseName" -> franchiseName
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-            .thenReturn(Future.successful(None))
-
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          when(mockService.updateBusinessFranchise(any(), eqTo(BusinessFranchiseYes(franchiseName)))(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(false)(newRequest)
@@ -106,13 +111,10 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
         "edit is true and given valid data" in new Fixture {
           val newRequest = FakeRequest(POST, routes.BusinessFranchiseController.post(true).url).withFormUrlEncodedBody(
             "businessFranchise" -> "true",
-            "franchiseName" -> "test"
+            "franchiseName" -> franchiseName
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-            .thenReturn(Future.successful(None))
-
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          when(mockService.updateBusinessFranchise(any(), eqTo(BusinessFranchiseYes(franchiseName)))(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(true)(newRequest)
@@ -129,6 +131,8 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
+
+          verifyZeroInteractions(mockService)
         }
       }
     }

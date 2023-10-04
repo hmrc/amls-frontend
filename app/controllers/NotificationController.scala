@@ -160,55 +160,6 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
     (for {
       businessName <- BusinessName.getName(credId, Some(safeId), accountTypeId)
       records: Seq[NotificationRow] <- OptionT.liftF(amlsNotificationService.getNotifications(safeId, accountTypeId))
-//      records: Seq[NotificationRow] <- OptionT.liftF(Future.successful(
-//        Seq(
-//          NotificationRow(
-//            Some(
-//              NStatus(
-//                Some(StatusType.Revoked),
-//                Some(RevokedReason.RevokedCeasedTrading)
-//              )),
-//            Some(ContactType.MindedToRevoke),
-//            None,
-//            false,
-//            new DateTime(1479730062573L, DateTimeZone.UTC),
-//            false,
-//            "XJML00000200000",
-//            "v5m0",
-//            new IDType("5832e38e01000001005ca3ff")
-//          ),
-//          NotificationRow(
-//            Some(
-//              NStatus(
-//                Some(StatusType.Revoked),
-//                Some(RevokedReason.RevokedCeasedTrading)
-//              )),
-//            Some(ContactType.MindedToRevoke),
-//            None,
-//            false,
-//            new DateTime(1479730062573L, DateTimeZone.UTC),
-//            false,
-//            "XJML00000200000",
-//            "v5m0",
-//            new IDType("5832e38e01000001005ca3ff")
-//          ),
-//          NotificationRow(
-//            Some(
-//              NStatus(
-//                Some(StatusType.Revoked),
-//                Some(RevokedReason.RevokedCeasedTrading)
-//              )),
-//            Some(ContactType.MindedToRevoke),
-//            None,
-//            false,
-//            new DateTime(1479730062573L, DateTimeZone.UTC),
-//            false,
-//            "XJML00000200000",
-//            "v5m0",
-//            new IDType("5832e38e01000001005ca3ff")
-//          )
-//        )
-//      ))
     } yield {
       val currentRecordsWithIndexes = (for {
         amls <- refNumber

@@ -36,12 +36,18 @@ class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
+
+      def accountantNames(businessActivities: BusinessActivities): Option[String] = {
+        businessActivities.whoIsYourAccountant.head.names.map(name => name.accountantsName)
+      }
+
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-          case Some(BusinessActivities(_,_,_,_,_,_,_,_,_,_,_,Some(whoIsYourAccountant), Some(taxMatters),_,_,_))
-          => Ok(view(formProvider().fill(taxMatters), edit, whoIsYourAccountant.names.map(name => name.accountantsName)))
-          case Some(BusinessActivities(_,_,_,_,_,_,_,_,_,_,_,Some(whoIsYourAccountant), _,_,_,_))
-          => Ok(view(formProvider(), edit, whoIsYourAccountant.names.map(name => name.accountantsName)))
-          case _ => NotFound(notFoundView)
+        case Some(x) if x.taxMattersAndHasAccountant =>
+          Ok(view(formProvider().fill(x.taxMatters.head), edit, accountantNames(x)))
+        case Some(y) if y.hasAccountant =>
+          Ok(view(formProvider(), edit, accountantNames(y)))
+        case None =>
+          NotFound(notFoundView)
       }
   }
 

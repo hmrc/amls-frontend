@@ -107,20 +107,20 @@ case class NotificationRow (
          |</a>
          |""".stripMargin
 
-    val boldClass = "govuk-!-font-weight-bold"
+    val rowClass = "govuk-!-font-weight-bold govuk-!-width-one-third"
 
     Seq(
       TableRow(
         HtmlContent(link),
-        classes = boldClass
+        classes = rowClass
       ),
       TableRow(
         Text(messages(notificationType)),
-        classes = boldClass
+        classes = rowClass
       ),
       TableRow(
         Text(messages(dateReceived)),
-        classes = boldClass
+        classes = rowClass
       )
     )
   }

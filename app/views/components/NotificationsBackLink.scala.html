@@ -14,25 +14,16 @@
  * limitations under the License.
  *@
 
-@this(govukBackLink: GovukBackLink)
+@import views.html.components.Anchor
+
+@this(anchor: Anchor)
 
 @()(implicit messages: Messages)
 
-@govukBackLink(
-    BackLink(
-        attributes = Map("id" -> "back-link"),
-        classes="js-enabled",
-        href="javascript:history.back()",
-        content = HtmlContent(messages("site.back"))
+<p class="govuk-body">
+    @anchor(
+        "notifications.back.link",
+        controllers.routes.NotificationController.getMessages().url,
+        "return-to-messages"
     )
-)
-
-<noscript>
-    @govukBackLink(
-        BackLink(
-            attributes = Map("id" -> "back-link"),
-            href= controllers.routes.NotificationController.getMessages().url,
-            content = HtmlContent(messages("site.back"))
-        )
-    )
-</noscript>
+</p>

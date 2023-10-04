@@ -152,6 +152,12 @@ case class BusinessActivities(
       case _ => false
     }
   }
+
+  def taxMattersHere: Boolean = taxMatters.isDefined
+
+  def hasAccountant: Boolean = whoIsYourAccountant.isDefined
+
+  def taxMattersAndHasAccountant: Boolean = taxMattersHere && hasAccountant
 }
 
 object BusinessActivities extends Logging {
