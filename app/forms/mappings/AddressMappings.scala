@@ -26,7 +26,6 @@ trait AddressMappings extends Mappings {
 
   val length: Int = 35
   val addressTypeRegex: String = "^[A-Za-z0-9 !'‘’\"“”(),./\u2014\u2013\u2010\u002d]{1,35}$"
-  val postcodeRegex: String = "^[A-Za-z]{1,2}[0-9][0-9A-Za-z]?\\s?[0-9][A-Za-z]{2}$"
   private def requiredError(line: String) = s"error.required.address.$line"
 
   private def maxLengthError(line: String) = s"error.max.length.address.$line"

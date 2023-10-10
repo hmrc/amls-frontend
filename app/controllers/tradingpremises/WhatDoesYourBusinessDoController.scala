@@ -50,7 +50,7 @@ class WhatDoesYourBusinessDoController @Inject () (
                                                     activitiesView: WhatDoesYourBusinessDoView,
                                                     dateChangeFormProvider: DateOfChangeFormProvider,
                                                     dateChangeView: DateOfChangeView,
-                                                    implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with FormHelpers with DateOfChangeHelper with Logging {
+                                                    implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with FormHelpers with DateOfChangeHelper with Logging {
 
   private def data(credId: String, index: Int, edit: Boolean)(implicit hc: HeaderCarrier)
   : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {

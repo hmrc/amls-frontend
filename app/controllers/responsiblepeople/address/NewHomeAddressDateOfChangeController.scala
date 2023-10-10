@@ -34,7 +34,7 @@ class NewHomeAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
                                                      val cc: MessagesControllerComponents,
                                                      formProvider: NewHomeAddressDateOfChangeFormProvider,
                                                      view: NewHomeDateOfChangeView,
-                                                     implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                     implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int): Action[AnyContent] = authAction.async {
     implicit request =>

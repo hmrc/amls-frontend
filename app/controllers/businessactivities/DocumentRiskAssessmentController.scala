@@ -34,7 +34,7 @@ DocumentRiskAssessmentController @Inject()(val authAction: AuthAction,
                                            service: DocumentRiskAssessmentService,
                                            formProvider: DocumentRiskAssessmentPolicyFormProvider,
                                            view: DocumentRiskAssessmentPolicyView,
-                                           implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+                                           implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>

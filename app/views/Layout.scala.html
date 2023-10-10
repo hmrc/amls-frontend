@@ -43,6 +43,7 @@
     canSignOut: Boolean = true,
     showBackLink: Boolean = true,
     fullWidthLayout: Boolean = false,
+    showDeskproLink: Boolean = true,
     additionalScript: Content = Empty
 )(mainContent: Html)(implicit request: Request[_], messages: Messages)
 
@@ -91,9 +92,11 @@
     <div class="govuk-!-margin-bottom-6">
         @mainContent
     </div>
-    <p class="govuk-!-display-none-print govuk-!-padding-top-6">
+    @if(showDeskproLink) {
+        <p class="govuk-!-display-none-print govuk-!-padding-top-6">
         @hmrcReportTechnicalIssueHelper()
-    </p>
+        </p>
+    }
 }
 
 

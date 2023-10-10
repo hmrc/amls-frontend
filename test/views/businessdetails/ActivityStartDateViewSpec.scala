@@ -22,7 +22,6 @@ import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import play.api.data.Form
-import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.ActivityStartDateView
@@ -30,11 +29,12 @@ import views.html.businessdetails.ActivityStartDateView
 
 class ActivityStartDateViewSpec extends AmlsViewSpec with MustMatchers {
   trait ViewFixture extends Fixture {
-    lazy val date = app.injector.instanceOf[ActivityStartDateView]
-    lazy val formProvider = app.injector.instanceOf[ActivityStartDateFormProvider]
+    lazy val date = inject[ActivityStartDateView]
+    lazy val formProvider = inject[ActivityStartDateFormProvider]
     implicit val requestWithToken = addTokenForView()
   }
-  "activity_start_date view" must {
+
+  "ActivityStartDateView" must {
     "have correct title" in new ViewFixture {
 
       val formWithData: Form[ActivityStartDate] = formProvider().fill(ActivityStartDate(LocalDate.now))

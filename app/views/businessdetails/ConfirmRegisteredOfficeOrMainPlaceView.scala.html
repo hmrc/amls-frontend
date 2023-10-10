@@ -15,11 +15,10 @@
  *@
 
 @import config.ApplicationConfig
-@import include.registered_office_helper
 @import models.businessdetails._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
-@import views.html.components.{SectionSubtitle, Button, Heading, ReturnLink}
+@import views.html.components.{SectionSubtitle, Button, Heading, ReturnLink, RegisteredOfficeHelper}
 @import views.html.components.forms.{InputYesNo, ErrorSummary}
 
 
@@ -29,6 +28,7 @@
     formHelper: FormWithCSRF,
     errorSummary: ErrorSummary,
     heading: Heading,
+    officeHelper: RegisteredOfficeHelper,
     subtitle: SectionSubtitle,
     inputYesNo: InputYesNo,
     button: Button,
@@ -47,7 +47,7 @@
 
     @heading("businessdetails.confirmingyouraddress.title")
 
-    @registered_office_helper(model)
+    @officeHelper(model)
 
     @formHelper(action = controllers.businessdetails.routes.ConfirmRegisteredOfficeController.post(edit)) {
 

@@ -37,7 +37,7 @@ class RemoveTradingPremisesController @Inject () (
                                                    val cc: MessagesControllerComponents,
                                                    formProvider: RemoveTradingPremisesFormProvider,
                                                    view: RemoveTradingPremisesView,
-                                                   implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                   implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, complete: Boolean = false) = authAction.async {
     implicit request =>

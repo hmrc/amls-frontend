@@ -47,7 +47,7 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
                                                           messages: Messages,
                                                           lang: Lang,
                                                           appConfig: ApplicationConfig,
-                                                          error: views.html.error) = {
+                                                          error: views.html.ErrorView) = {
 
     import play.api.mvc.Results._
 
@@ -75,7 +75,7 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
 
   private[address] def updateAdditionalExtraAddressAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
                                                               (implicit request: Request[AnyContent], hc: HeaderCarrier, ec: ExecutionContext,
-                                                               auditConnector: AuditConnector, messages: Messages, lang: Lang, appConfig: ApplicationConfig, error: views.html.error) = {
+                                                               auditConnector: AuditConnector, messages: Messages, lang: Lang, appConfig: ApplicationConfig, error: views.html.ErrorView) = {
 
     import play.api.mvc.Results._
 

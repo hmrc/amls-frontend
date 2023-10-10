@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import include._
 @import config.{ ApplicationConfig}
 @import models.tradingpremises._
 @import utils.StatusConstants
@@ -30,7 +29,7 @@
     button: Button
 )
 
-@(add: Boolean, status: SubmissionStatus, completeTp: Seq[(TradingPremises, Int)], incompleteTp: Seq[(TradingPremises, Int)])(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
+@(add: Boolean, status: SubmissionStatus, completeTp: Seq[(TradingPremises, Int)], incompleteTp: Seq[(TradingPremises, Int)])(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
 @tpDetail(tp: TradingPremises) = {
     @{tp.yourTradingPremises match {

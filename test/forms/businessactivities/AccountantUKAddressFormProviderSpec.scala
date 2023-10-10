@@ -38,7 +38,7 @@ class AccountantUKAddressFormProviderSpec extends AddressFieldBehaviours {
       "error.text.validation.address"
     )
 
-    behave like postcodeField(formProvider.postcodeRegex)
+    behave like postcodeField(postcodeRegex)
   }
 
 }

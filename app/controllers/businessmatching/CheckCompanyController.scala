@@ -16,34 +16,26 @@
 
 package controllers.businessmatching
 
-
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.EmptyForm
-import play.api.mvc.MessagesControllerComponents
-import services.StatusService
-import services.businessmatching.BusinessMatchingService
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import views.html.businessmatching.check_company_is_not_registered
+import views.html.businessmatching.CheckCompanyIsNotRegisteredView
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class CheckCompanyController @Inject()(
-                                   authAction: AuthAction,
-                                   val ds: CommonPlayDependencies,
-                                   val statusService: StatusService,
-                                   val businessMatchingService: BusinessMatchingService,
-                                   val cc: MessagesControllerComponents,
-                                   checkCompany: check_company_is_not_registered) extends AmlsBaseController(ds, cc) {
+class CheckCompanyController @Inject()(authAction: AuthAction,
+                                       val ds: CommonPlayDependencies,
+                                       val cc: MessagesControllerComponents,
+                                       view: CheckCompanyIsNotRegisteredView) extends AmlsBaseController(ds, cc) {
 
-  def get() = authAction {
+  def get(): Action[AnyContent] = authAction {
     implicit request =>
-      Ok(checkCompany(EmptyForm))
+      Ok(view())
   }
 
 
-  def post() = authAction {
-    implicit request =>
-      Redirect(routes.SummaryController.get)
+  def post(): Action[AnyContent] = authAction { _ =>
+    Redirect(routes.SummaryController.get)
   }
 }

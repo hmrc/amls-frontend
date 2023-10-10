@@ -38,7 +38,7 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
                                             val cc: MessagesControllerComponents,
                                             formProvider: ActivityStartDateFormProvider,
                                             view: ActivityStartDateView,
-                                            implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                            implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>

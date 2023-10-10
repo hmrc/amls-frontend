@@ -35,7 +35,7 @@ class RemoveAgentPremisesReasonsController @Inject () (
                                                         val cc: MessagesControllerComponents,
                                                         formProvider: RemoveAgentPremisesReasonsFormProvider,
                                                         view: RemoveAgentPremisesReasonsView,
-                                                        implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                        implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, complete: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>

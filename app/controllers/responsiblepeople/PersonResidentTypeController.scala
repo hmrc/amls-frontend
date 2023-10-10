@@ -38,7 +38,7 @@ class PersonResidentTypeController @Inject()(override val messagesApi: MessagesA
                                              personResidenceTypeService: PersonResidentTypeService,
                                              formProvider: PersonResidentTypeFormProvider,
                                              view: PersonResidenceTypeView,
-                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+                                             implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>

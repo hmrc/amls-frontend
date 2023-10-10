@@ -35,7 +35,7 @@ class NewHomeAddressUKController @Inject()(authAction: AuthAction,
                                            val cc: MessagesControllerComponents,
                                            formProvider: NewHomeAddressUKFormProvider,
                                            view: NewHomeAddressUKView,
-                                           implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with AddressHelper {
+                                           implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with AddressHelper {
 
   def get(index: Int): Action[AnyContent] = authAction.async {
     implicit request =>

@@ -30,10 +30,6 @@
 
 @(form: Form[_], edit: Boolean, showReturnLink: Boolean = true,  isPreSubmission: Boolean = true)(implicit request: Request[_], messages:Messages, lang: Lang, appConfig: ApplicationConfig)
 
-@header = {
-    @components.back_link()
-}
-
 @section = @{
     if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation"
 }

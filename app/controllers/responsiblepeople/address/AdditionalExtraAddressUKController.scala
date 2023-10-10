@@ -35,7 +35,7 @@ class AdditionalExtraAddressUKController @Inject()(val dataCacheConnector: DataC
                                                    val cc: MessagesControllerComponents,
                                                    formProvider: AdditionalAddressUKFormProvider,
                                                    view: AdditionalExtraAddressUKView,
-                                                   implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper {
+                                                   implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>

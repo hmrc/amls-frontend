@@ -32,7 +32,7 @@ class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector
                                       val cc: MessagesControllerComponents,
                                       view: TaxMattersView,
                                       formProvider: TaxMattersFormProvider,
-                                      implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+                                      implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>

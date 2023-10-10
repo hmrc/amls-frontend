@@ -38,7 +38,7 @@ class BankAccountNameController @Inject()(
                                            val mcc: MessagesControllerComponents,
                                            formProvider: BankAccountNameFormProvider,
                                            view: BankAccountNameView,
-                                           implicit val error: views.html.error) extends BankDetailsController(ds, mcc) {
+                                           implicit val error: views.html.ErrorView) extends BankDetailsController(ds, mcc) {
 
   def getNoIndex: Action[AnyContent] = authAction.async {
     implicit request =>

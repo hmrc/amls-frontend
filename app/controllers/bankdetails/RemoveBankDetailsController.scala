@@ -30,7 +30,7 @@ class RemoveBankDetailsController @Inject()(val authAction: AuthAction,
                                             val dataCacheConnector: DataCacheConnector,
                                             val mcc: MessagesControllerComponents,
                                             view: RemoveBankDetailsView,
-                                            implicit val error: views.html.error) extends BankDetailsController(ds, mcc) {
+                                            implicit val error: views.html.ErrorView) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int): Action[AnyContent] = authAction.async {
       implicit request =>

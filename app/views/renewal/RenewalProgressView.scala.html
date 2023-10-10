@@ -15,15 +15,15 @@
  *@
 
 @import models.status.{Renewal, ReadyForRenewal, RenewalSubmitted}
-@import config.{ ApplicationConfig}
-@import views.html.components.{Heading, TaskRowComponent}
+@import config.ApplicationConfig
+@import views.html.components.{Heading, TaskRowComponent, ServicesSidebar}
 @import views.html.renewal.components.ApplicationSubmitView
-@import include.services_sidebar
 @import models.registrationprogress.TaskList
 
 @this(
     layout: Layout,
     heading: Heading,
+    servicesSidebar: ServicesSidebar,
     taskRow: TaskRowComponent,
     applicationSubmit: ApplicationSubmitView
 )
@@ -69,7 +69,7 @@
         </div>
     </div>
 
-    @services_sidebar(canEditPreApplication = false, displayLink = false, businessName, serviceNames.toList.sorted, hasCompleteNominatedOfficer, nominatedOfficerName)
+    @servicesSidebar(canEditPreApplication = false, displayLink = false, businessName, serviceNames.toList.sorted, hasCompleteNominatedOfficer, nominatedOfficerName)
 
     <div class="govuk-grid-row govuk-!-margin-top-6">
         <div class="govuk-grid-column-full">

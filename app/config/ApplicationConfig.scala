@@ -41,6 +41,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   val reportAProblemPartialUrl = getConfigString("contact-frontend.report-problem-url.with-js")
   val reportAProblemNonJSUrl = getConfigString("contact-frontend.report-problem-url.non-js")
+  lazy val contactFrontendReportUrl = baseUrl("contact-frontend") + getConfigString("contact-frontend.report-url")
   val betaFeedbackUrl = getConfigString("contact-frontend.beta-feedback-url.authenticated")
   val betaFeedbackUnauthenticatedUrl = getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 
@@ -125,4 +126,12 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
   val legislationLink = "http://www.legislation.gov.uk/search"
 
   val tribunalLink = "https://www.gov.uk/tax-tribunal"
+
+  val howToPayLink = "https://www.gov.uk/guidance/money-laundering-regulations-registration-fees#how-to-pay"
+
+  val cardPaymentLink = "https://www.gov.uk/pay-tax-debit-credit-card"
+
+  val waysToPayLink = "https://www.gov.uk/guidance/pay-money-laundering-regulations-fees-and-penalty-charges#ways-to-pay"
+
+  val registerNewOrgLink = "/coafe/government-gateway/register?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend"
 }

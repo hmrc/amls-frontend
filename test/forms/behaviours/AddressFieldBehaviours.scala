@@ -16,6 +16,7 @@
 
 package forms.behaviours
 
+import forms.mappings.Constraints
 import models.Country
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
@@ -23,7 +24,7 @@ import play.api.data.{Form, FormError}
 import collection.mutable.{Map => MutableMap}
 
 
-trait AddressFieldBehaviours extends FieldBehaviours {
+trait AddressFieldBehaviours extends FieldBehaviours with Constraints {
 
   val form: Form[_]
   val maxLength: Int

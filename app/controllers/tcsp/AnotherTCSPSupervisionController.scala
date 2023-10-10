@@ -33,7 +33,7 @@ class AnotherTCSPSupervisionController @Inject()(val authAction: AuthAction,
                                                  val cc: MessagesControllerComponents,
                                                  formProvider: AnotherTCSPSupervisionFormProvider,
                                                  view: AnotherTCSPSupervisionView,
-                                                 implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+                                                 implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>

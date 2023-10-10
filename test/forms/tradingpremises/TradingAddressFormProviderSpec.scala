@@ -94,7 +94,7 @@ class TradingAddressFormProviderSpec extends AddressFieldBehaviours with Constra
       "error.text.validation.address"
     )
 
-    behave like postcodeField(formProvider.postcodeRegex)
+    behave like postcodeField(postcodeRegex)
   }
 
 }

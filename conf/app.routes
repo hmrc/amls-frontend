@@ -27,6 +27,10 @@ GET         /start/bta                                                          
 GET         /start                                                                    @controllers.LandingController.get
 
 POST        /subscribe                                                                @controllers.SubmissionController.post()
+GET         /subscribe/duplicate-enrolment                                            @controllers.SubmissionErrorController.duplicateEnrolment()
+GET         /subscribe/duplicate-submission                                           @controllers.SubmissionErrorController.duplicateSubmission()
+GET         /subscribe/wrong-credential-type                                          @controllers.SubmissionErrorController.wrongCredentialType()
+GET         /subscribe/bad-request                                                    @controllers.SubmissionErrorController.badRequest()
 
 GET         /unauthorised                                                             @controllers.AmlsController.unauthorised
 GET         /unauthorised-role                                                        @controllers.AmlsController.unauthorised_role
@@ -52,9 +56,6 @@ POST        /your-registration/deregister                                       
 
 GET         /your-registration/deregister-reason                                      @controllers.deregister.DeregistrationReasonController.get
 POST        /your-registration/deregister-reason                                      @controllers.deregister.DeregistrationReasonController.post()
-
-GET         /satisfaction-survey                                                      @controllers.SatisfactionSurveyController.get()
-POST        /satisfaction-survey                                                      @controllers.SatisfactionSurveyController.post()
 
 GET         /submit-application/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.get
 POST        /submit-application/who-is-registering/:id                                @controllers.declaration.WhoIsRegisteringController.post(id: String)

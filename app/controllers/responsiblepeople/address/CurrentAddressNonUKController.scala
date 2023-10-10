@@ -38,7 +38,7 @@ class CurrentAddressNonUKController @Inject()(val dataCacheConnector: DataCacheC
                                               val cc: MessagesControllerComponents,
                                               formProvider: CurrentAddressNonUKFormProvider,
                                               view: CurrentAddressNonUKView,
-                                              implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper with DateOfChangeHelper {
+                                              implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>

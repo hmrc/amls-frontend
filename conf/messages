@@ -115,8 +115,6 @@ error.invalid.maxlength.255 = You can’t enter more than 255 characters
 error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
 error.invalid.role.in.business.maxlength.255 = Role in the business must be 255 characters or less
 
-error.survey.satisfaction.required = Select one option to show how you feel about using the service
-
 error.required.phone.number = Enter your business telephone number
 err.invalid.phone.number = Enter a telephone number, like 01632 960 001, 07700900982 or +44 808 157 0192
 error.max.length.phone = You can’t enter more than 24 characters for the phone number
@@ -132,22 +130,26 @@ error.submission.problem.title = There’s a problem with your application
 error.submission.duplicate.title = There is a problem
 error.submission.badrequest.title = Sorry, there is a problem
 
-error.submission.badrequest.content = We cannot update your information.\n\
-  We have saved your information. Do not try and send it again.\n\
-  Send us your name and email address and we will find out and fix what caused the problem. We will reply within 2 working days.
+error.submission.badrequest.content.line1 = We cannot update your information.
+error.submission.badrequest.content.line2 = We have saved your information. Do not try and send it again.
+error.submission.badrequest.content.line3 = Please report the problem using the link below and we’ll get back to you within 2 working days.
 
-error.submission.duplicate.content = We’re sorry that there’s a problem. Please give us some details and an adviser will contact you to fix it.\n\
-  Please don’t try to resubmit your application, as this won’t work.
+error.submission.duplicate.content.line1 = We’re sorry that there’s a problem. Please give us some details and an adviser will contact you to fix it.
+error.submission.duplicate.content.line2 = Please don’t try to resubmit your application, as this won’t work.
 
-error.submission.duplicate_enrolment.content = You’ve already registered for Anti-Money Laundering Supervision using a different account and you must log in using that account.\n\
-  If you’re unable to use that account or need further help, please leave your contact details below and we’ll get back to you within 2 days.
+error.submission.duplicate_enrolment.content.line1 = You’ve already registered for Anti-Money Laundering Supervision using a different account and you must log in using that account.
+error.submission.duplicate_enrolment.content.line2 = If you’re unable to use that account or need further help, please report it using the link below and we’ll get back to you within 2 working days.
 
-error.submission.duplicate_submission.content = You registered for anti-money laundering supervision using a different account. You must sign in using that account.\n\
-  If you cannot use that account or need any other help, send us your name and email address. We will reply within 2 working days.
+error.submission.duplicate_enrolment.link.text = Report a problem with your application
 
-error.submission.wrong_credentials.content = Your account doesn’t have enough access rights to register.\n\
-  You need to speak to your account administrator to change your access rights or you can create a new organisation Government Gateway account.\n\
-  If you are unable to change your access rights, can’t create a new organisation account or need further help, please leave your contact details below and we’ll get back to you within 2 days.
+error.submission.duplicate_submission.content.line1 = You registered for anti-money laundering supervision using a different account. You must sign in using that account.
+error.submission.duplicate_submission.content.line2 = If you cannot use that account or need any other help, please report it using the link below and we’ll get back to you within 2 working days.
+
+error.submission.duplicate_submission.link.text = Report a problem
+
+error.submission.wrong_credentials.content.line1 = Your account doesn’t have enough access rights to register.
+error.submission.wrong_credentials.content.line2 = You need to speak to your account administrator to change your access rights or you can create a new organisation Government Gateway account.
+error.submission.wrong_credentials.content.line3 = If you are unable to change your access rights, can’t create a new organisation account or need further help, please report it using the link below and we’ll get back to you within 2 working days.
 
 ########################################################################################################################
 ############################        Custom Error Messages for Different Sections         ###############################
@@ -799,8 +801,8 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.text1 = To use this service you should sign in with an ’organisation’ account, but it looks like you’ve tried to use either an ’individual’ or ’agent’ account.
 unauthorised.text2 = If you don’t have an organisation account you can
 unauthorised.register.link.text = register for a new one.
-unauthorised.role.content = Your account doesn’t have enough access rights to register.\n\
-  You need to speak to your account administrator to change your access rights or you can create a new organisation Government Gateway account.
+unauthorised.role.content.line1 = Your account doesn’t have enough access rights to register.
+unauthorised.role.content.line2 = You need to speak to your account administrator to change your access rights or you can create a new organisation Government Gateway account.
 
 ############################### Start Page ###############################
 start.title = Manage your anti-money laundering supervision
@@ -1550,6 +1552,7 @@ businessmatching.businessType.lbl.01 = Limited company
 businessmatching.businessType.lbl.03 = Partnership
 businessmatching.businessType.lbl.04 = Limited partnership or limited liability partnership
 businessmatching.businessType.lbl.05 = Unincorporated association or trust
+businessmatching.businessType.error = Select your business structure
 businessmatching.registerservices.title = Which services do you need to register?
 businessmatching.registerservices.other.title = What other service do you need to register?
 businessmatching.registerservices.details = What these services mean
@@ -1630,10 +1633,8 @@ businessmatching.cannotcontinuewiththeapplication.requiredinfo.second = You can 
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.third = The information you have given so far in this application has been saved. You have 28 days to return and complete your application.
 
 businessmatching.cannotchangeservices.title = You cannot continue with your change
-businessmatching.cannotchangeservices.requiredinfo = Your business must have a Payment Services Regulations (PSR) reference number in order\
-  to register for Money Service Business as part of your anti-money laundering supervision from HM Revenue and Customs.\n\
-  You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
-
+businessmatching.cannotchangeservices.requiredinfo.line1 = Your business must have a Payment Services Regulations (PSR) reference number in order to register for Money Service Business as part of your anti-money laundering supervision from HM Revenue and Customs.
+businessmatching.cannotchangeservices.requiredinfo.line2 = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
 businessmatching.cannotchangeservices.button.text = Return to about your business
 
 
@@ -2786,25 +2787,8 @@ renewal.msb.largest.amounts.title = Which countries did you send the largest amo
 error.required.renewal.largest.amounts.country = Enter the countries you sent the largest amounts of money to in the last 12 months
 
 renewal.customers.outside.uk.hint.lbl = Where did these customers live or work?
-############################### Survey ###############################
-
-survey.satisfaction.heading = Give feedback
-survey.satisfaction.title = Satisfaction survey
-
-survey.satisfaction.text.1 = Overall, how did you feel about using the service?
-survey.satisfaction.text.2 = How could we improve this service?
-survey.satisfaction.hint = Please do not include any personal or financial information. We are unable to provide a response to your comments.
-
-survey.satisfaction.lbl.01 = Very satisfied
-survey.satisfaction.lbl.02 = Satisfied
-survey.satisfaction.lbl.03 = Neither satisfied or dissatisfied
-survey.satisfaction.lbl.04 = Dissatisfied
-survey.satisfaction.lbl.05 = Very dissatisfied
 
 survey.satisfaction.beforeyougo = Give feedback on the service
-survey.satisfaction.please = We use your feedback to make our services better. Please take the 
-survey.satisfaction.answer = feedback survey
-survey.satisfaction.helpus = now.
 
 ############################### Banners ###############################
 urr.title = Help improve GOV.UK

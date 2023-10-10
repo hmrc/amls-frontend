@@ -14,8 +14,7 @@
  * limitations under the License.
  *@
 
-@import components.{Heading, TaskRowComponent, Button}
-@import include.services_sidebar
+@import components.{Heading, TaskRowComponent, Button, ServicesSidebar}
 @import config.ApplicationConfig
 @import views.html.helper.CSRF
 @import models.registrationprogress.TaskList
@@ -23,6 +22,7 @@
 @this(
     layout: Layout,
     heading: Heading,
+    servicesSidebar: ServicesSidebar,
     taskRow: TaskRowComponent,
     button: Button
 )
@@ -52,7 +52,7 @@
     </div>
 
     @* registration progress *@
-    @services_sidebar(canEditPreApplication, displayLink = true, businessName, serviceNames.toList.sorted, hasCompleteNominatedOfficer, nominatedOfficerName)
+    @servicesSidebar(canEditPreApplication, displayLink = true, businessName, serviceNames.toList.sorted, hasCompleteNominatedOfficer, nominatedOfficerName)
 
     <div class="govuk-grid-row govuk-!-margin-top-6">
         <div class="govuk-grid-column-full">

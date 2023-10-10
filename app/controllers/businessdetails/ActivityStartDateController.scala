@@ -36,7 +36,7 @@ class ActivityStartDateController @Inject ()(val dataCache: DataCacheConnector,
                                              val cc: MessagesControllerComponents,
                                              formProvider: ActivityStartDateFormProvider,
                                              activity_start_date: ActivityStartDateView,
-                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+                                             implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>

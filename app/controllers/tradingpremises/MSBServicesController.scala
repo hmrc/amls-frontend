@@ -40,7 +40,7 @@ class MSBServicesController @Inject ()(val dataCacheConnector: DataCacheConnecto
                                        val cc: MessagesControllerComponents,
                                        formProvider: MSBServicesFormProvider,
                                        view: MSBServicesView,
-                                       implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                       implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean = false, changed: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>

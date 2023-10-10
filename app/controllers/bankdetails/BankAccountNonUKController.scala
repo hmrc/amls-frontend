@@ -40,7 +40,7 @@ class BankAccountNonUKController @Inject()(val dataCacheConnector: DataCacheConn
                                            val mcc: MessagesControllerComponents,
                                            formProvider: BankAccountNonUKFormProvider,
                                            view: BankAccountNonUKView,
-                                           implicit val error: views.html.error) extends BankDetailsController(ds, mcc) {
+                                           implicit val error: views.html.ErrorView) extends BankDetailsController(ds, mcc) {
 
   def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>

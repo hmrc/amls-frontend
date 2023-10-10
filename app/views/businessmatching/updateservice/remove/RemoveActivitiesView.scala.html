@@ -32,10 +32,6 @@
 
 @(form: Form[_], edit: Boolean, activityValues: Seq[BusinessActivity])(implicit request: Request[_], messages: Messages)
 
-@header = {
-    @components.back_link()
-}
-
 @messageSuffix = @{
     if(activityValues.size == 2) {
         "twobusinesses"

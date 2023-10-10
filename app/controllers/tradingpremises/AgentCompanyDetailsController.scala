@@ -37,7 +37,7 @@ class AgentCompanyDetailsController @Inject()(val dataCacheConnector: DataCacheC
                                               val cc: MessagesControllerComponents,
                                               formProvider: AgentCompanyDetailsFormProvider,
                                               view: AgentCompanyDetailsView,
-                                              implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                              implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false): Action[AnyContent] = {
     authAction.async {

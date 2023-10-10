@@ -30,7 +30,7 @@ object TPControllerHelper {
                          messages: Messages,
                          lang: Lang,
                          appConfig: ApplicationConfig,
-                         error: views.html.error) = {
+                         error: views.html.ErrorView) = {
     maybeCache map { cache =>
 
       val maybeTradingPremises = for {

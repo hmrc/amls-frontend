@@ -36,7 +36,7 @@ class DateOfBirthController @Inject()(
                                        val cc: MessagesControllerComponents,
                                        formProvider: DateOfBirthFormProvider,
                                        view: DateOfBirthView,
-                                       implicit val error: views.html.error
+                                       implicit val error: views.html.ErrorView
                                      ) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {

@@ -17,26 +17,26 @@
 package controllers.businessmatching
 
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-
-import javax.inject.Inject
 import models.status.{NotCompleted, SubmissionReady}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import utils.AuthAction
-import views.html.businessmatching.{CannotContinueWithApplicationView, cannot_add_services}
+import views.html.businessmatching.{CannotAddServicesView, CannotContinueWithApplicationView}
+
+import javax.inject.Inject
 
 class NoPsrController @Inject()(val authAction: AuthAction,
                                 val ds: CommonPlayDependencies,
                                 statusService: StatusService,
                                 val cc: MessagesControllerComponents,
-                                cannot_add_services: cannot_add_services,
+                                cannotAddServicesView: CannotAddServicesView,
                                 cannotContinueView: CannotContinueWithApplicationView) extends AmlsBaseController(ds, cc) {
 
   def get: Action[AnyContent] = authAction.async {
     implicit request =>
       statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
         case NotCompleted | SubmissionReady => Ok(cannotContinueView())
-        case _ => Ok(cannot_add_services())
+        case _ => Ok(cannotAddServicesView())
       }
   }
 }

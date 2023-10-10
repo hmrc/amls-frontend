@@ -16,20 +16,20 @@
 
 @import config.ApplicationConfig
 @import models.bankdetails._
-@import include.forms2._
-@import views.html.components.{SectionSubtitle, Heading, Button, Anchor, ReturnLink}
+@import views.html.components.{SectionSubtitle, Heading, Button, Anchor, ReturnLink, Panel => PanelComponent}
 
 @this(
     layout: Layout,
     subtitle: SectionSubtitle,
     heading: Heading,
+    panel: PanelComponent,
     formHelper: FormWithCSRF,
     anchor: Anchor,
     button: Button,
     returnLink: ReturnLink
 )
 
-@(inCompleteModel: Seq[(BankDetails, Int)], completedModel: Seq[(BankDetails, Int)])(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
+@(inCompleteModel: Seq[(BankDetails, Int)], completedModel: Seq[(BankDetails, Int)])(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
 @ukAccount(details: BankDetails, account: UKAccount) = {
     <div>@BankDetails.getBankAccountDescription(details)<br/>

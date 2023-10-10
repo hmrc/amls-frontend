@@ -46,7 +46,7 @@ class DetailedAnswersController @Inject () (
                                              val cc: MessagesControllerComponents,
                                              cyaHelper: CheckYourAnswersHelper,
                                              view: CheckYourAnswersView,
-                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                             implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])
                                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {

@@ -35,7 +35,7 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
                                           val cc: MessagesControllerComponents,
                                           formProvider: RiskAssessmentFormProvider,
                                           view: RiskAssessmentPolicyView,
-                                          implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+                                          implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>

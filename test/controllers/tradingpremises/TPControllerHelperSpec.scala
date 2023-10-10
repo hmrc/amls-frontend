@@ -28,7 +28,7 @@ import play.api.i18n.{Lang, Messages}
 import play.api.mvc.Results._
 import play.api.test.FakeRequest
 import utils.StatusConstants
-import views.html.error
+import views.html.ErrorView
 
 class TPControllerHelperSpec extends PlaySpec with MockitoSugar {
 
@@ -38,7 +38,7 @@ class TPControllerHelperSpec extends PlaySpec with MockitoSugar {
     implicit val lang = mock[Lang]
     implicit val messages = mock[Messages]
     implicit val appConfig = mock[ApplicationConfig]
-    implicit val errorView = mock[error]
+    implicit val errorView = mock[ErrorView]
 
     def setUpTradingPremise(model: Option[TradingPremises]) = when {
       cache.getEntry[Seq[TradingPremises]](any())(any())

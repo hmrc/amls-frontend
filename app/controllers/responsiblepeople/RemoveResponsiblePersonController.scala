@@ -37,7 +37,7 @@ class RemoveResponsiblePersonController @Inject()(val dataCacheConnector: DataCa
                                                   val cc: MessagesControllerComponents,
                                                   formProvider: RemoveResponsiblePersonFormProvider,
                                                   view: RemoveResponsiblePersonView,
-                                                  implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                  implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>

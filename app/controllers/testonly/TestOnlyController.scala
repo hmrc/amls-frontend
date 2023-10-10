@@ -21,17 +21,19 @@ import config.BusinessCustomerSessionCache
 import connectors.cache.MongoCacheConnector
 import connectors.{AmlsConnector, DataCacheConnector, TestOnlyStubConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessActivity.HighValueDealing
 import models.tradingpremises.BusinessStructure.LimitedLiabilityPartnership
 import models.tradingpremises._
 import play.api.libs.json.Json
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.UpdateMongoCacheService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
 import views.html.confirmation._
-import views.html.submission.{duplicate_enrolment, duplicate_submission, wrong_credential_type}
+import views.html.ErrorView
+import views.html.submission.{DuplicateEnrolmentView, DuplicateSubmissionView, WrongCredentialTypeView}
 
 import scala.concurrent.Future
 
@@ -45,13 +47,14 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
                                    val ds: CommonPlayDependencies,
                                    val customerCache: BusinessCustomerSessionCache,
                                    val cc: MessagesControllerComponents,
-                                   duplicate_enrolment: duplicate_enrolment,
-                                   duplicate_submission: duplicate_submission,
-                                   wrong_credential_type: wrong_credential_type,
+                                   duplicateEnrolment: DuplicateEnrolmentView,
+                                   duplicateSubmission: DuplicateSubmissionView,
+                                   wrongCredentialType: WrongCredentialTypeView,
                                    paymentFailureView: PaymentFailureView,
                                    paymentConfirmationView: PaymentConfirmationView,
                                    paymentConfirmationTransitionalRenewalView: PaymentConfirmationTransitionalRenewalView,
-                                   confirmationBacsView: ConfirmationBacsView
+                                   confirmationBacsView: ConfirmationBacsView,
+                                   errorView: ErrorView
                                   ) extends AmlsBaseController(ds, cc) {
 
 
@@ -82,19 +85,19 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
   }
 
 
-  def duplicateEnrolment = authAction.async {
+  def duplicateEnrolment: Action[AnyContent] = authAction {
     implicit request =>
-      Future.successful(Ok(duplicate_enrolment()))
+      Ok(duplicateEnrolment(appConfig.contactFrontendReportUrl))
   }
 
-  def duplicateSubmission = authAction.async {
+  def duplicateSubmission: Action[AnyContent] = authAction {
     implicit request =>
-      Future.successful(Ok(duplicate_submission("There's an error")))
+      Ok(duplicateSubmission(appConfig.contactFrontendReportUrl))
   }
 
-  def wrongCredentials = authAction.async {
+  def wrongCredentials: Action[AnyContent] = authAction {
     implicit request =>
-      Future.successful(Ok(wrong_credential_type()))
+      Ok(wrongCredentialType(appConfig.contactFrontendReportUrl))
   }
 
   def getPayment(ref: String) = authAction.async {
@@ -152,4 +155,7 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
       dataCacheConnector.save(request.credId, TradingPremises.key, c) map { _ => Redirect(controllers.routes.StatusController.get())}
   }
 
+  def error: Action[AnyContent] = authAction { implicit request =>
+    Ok(errorView("Error title", "Error heading", "This is the main body of the error"))
+  }
 }

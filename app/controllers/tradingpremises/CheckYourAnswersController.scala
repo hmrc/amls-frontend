@@ -38,7 +38,7 @@ class CheckYourAnswersController @Inject()(val authAction: AuthAction,
                                            val cc: MessagesControllerComponents,
                                            cyaHelper: CheckYourAnswersHelper,
                                            view: CheckYourAnswersView,
-                                           implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                           implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int): Action[AnyContent] = authAction.async {
     implicit request =>

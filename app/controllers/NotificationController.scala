@@ -48,7 +48,7 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
                                        implicit val dataCacheConnector: DataCacheConnector,
                                        val cc: MessagesControllerComponents,
                                        view: YourMessagesView,
-                                       implicit val error: views.html.error,
+                                       implicit val error: views.html.ErrorView,
                                        v1m0: V1M0,
                                        v2m0: V2M0,
                                        v3m0: V3M0,

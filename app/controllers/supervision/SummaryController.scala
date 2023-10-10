@@ -34,7 +34,7 @@ class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
                                   val cc: MessagesControllerComponents,
                                   cyaHelper: CheckYourAnswersHelper,
                                   val view: CheckYourAnswersView,
-                                  implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+                                  implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
   def get(): Action[AnyContent] = authAction.async {
     implicit request =>

@@ -51,7 +51,7 @@ class WhereAreTradingPremisesController @Inject () (
                                                      dateChangeFormProvider: DateOfChangeFormProvider,
                                                      view: WhereAreTradingPremisesView,
                                                      dateChangeView: DateOfChangeView,
-                                                     implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                                     implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>

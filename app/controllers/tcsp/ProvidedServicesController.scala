@@ -33,7 +33,7 @@ class ProvidedServicesController @Inject() (val dataCacheConnector: DataCacheCon
                                             val cc: MessagesControllerComponents,
                                             formProvider: ProvidedServicesFormProvider,
                                             view: ProvidedServicesView,
-                                            implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+                                            implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>

@@ -34,7 +34,6 @@ import services.{RenewalService, SectionsProvider, StatusService, SubmissionServ
 import uk.gov.hmrc.http.{BadRequestException, HttpResponse, UpstreamErrorResponse}
 import utils.AmlsSpec
 import views.ParagraphHelpers
-import views.html.submission.{bad_request, duplicate_enrolment, duplicate_submission, wrong_credential_type}
 
 import scala.concurrent.Future
 
@@ -45,10 +44,6 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
     val request = addToken(authRequest)
 
     val mockSectionsProvider = mock[SectionsProvider]
-    lazy val view1 = app.injector.instanceOf[duplicate_enrolment]
-    lazy val view2 = app.injector.instanceOf[duplicate_submission]
-    lazy val view3 = app.injector.instanceOf[wrong_credential_type]
-    lazy val view4 = app.injector.instanceOf[bad_request]
 
     val controller = new SubmissionController(
       mock[SubmissionService],
@@ -58,11 +53,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       SuccessfulAuthAction,
       commonDependencies,
       mockMcc,
-      mockSectionsProvider,
-      duplicate_enrolment = view1,
-      duplicate_submission = view2,
-      wrong_credential_type = view3,
-      bad_request = view4
+      mockSectionsProvider
     )
   }
 
@@ -187,7 +178,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
     }
 
-    "show the correct help page when a duplicate enrolment error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
+    "redirect to the correct help page when a duplicate enrolment error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
       val msg = "HMRC-MLR-ORG duplicate enrolment"
       when {
         mockSectionsProvider.taskRows(any[String])(any(), any(), any())
@@ -203,13 +194,11 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       val result = controller.post()(request)
 
-      status(result) mustBe OK
-
-      implicit val doc = Jsoup.parse(contentAsString(result))
-      validateParagraphizedContent("error.submission.duplicate_enrolment.content")
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.SubmissionErrorController.duplicateEnrolment().url)
     }
 
-    "show the correct help page when a duplicate subscription error is encountered" in new Fixture with ParagraphHelpers {
+    "redirect to the correct help page when a duplicate subscription error is encountered" in new Fixture with ParagraphHelpers {
       val msg = "HMRC-MLR-ORG duplicate subscription"
       when {
         mockSectionsProvider.taskRows(any[String])(any(), any(), any())
@@ -225,13 +214,11 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       val result = controller.post()(request)
 
-      status(result) mustBe OK
-
-      implicit val doc = Jsoup.parse(contentAsString(result))
-      validateParagraphizedContent("error.submission.duplicate_submission.content")
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.SubmissionErrorController.duplicateSubmission().url)
     }
 
-    "show the correct help page when an error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
+    "redirect to the correct help page when an error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
       val msg = "invalid credentials"
       when {
         mockSectionsProvider.taskRows(any[String])(any(), any(), any())
@@ -247,13 +234,11 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       val result = controller.post()(request)
 
-      status(result) mustBe OK
-
-      implicit val doc = Jsoup.parse(contentAsString(result))
-      validateParagraphizedContent("error.submission.wrong_credentials.content")
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.SubmissionErrorController.wrongCredentialType().url)
     }
 
-    "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
+    "redirect to the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
       when {
         mockSectionsProvider.taskRows(any[String])(any(), any(), any())
       }.thenReturn(Future.successful(completedSections))
@@ -268,10 +253,8 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
       val result = controller.post()(request)
 
-      status(result) mustBe OK
-
-      implicit val doc = Jsoup.parse(contentAsString(result))
-      validateParagraphizedContent("error.submission.badrequest.content")
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.SubmissionErrorController.badRequest().url)
     }
   }
 
@@ -315,7 +298,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
       }
 
-      "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
+      "redirect to the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
         when {
           mockSectionsProvider.taskRows(any[String])(any(), any(), any())
         }.thenReturn(Future.successful(completedSections))
@@ -330,10 +313,8 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
         val result = controller.post()(request)
 
-        status(result) mustBe OK
-
-        implicit val doc = Jsoup.parse(contentAsString(result))
-        validateParagraphizedContent("error.submission.badrequest.content")
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.SubmissionErrorController.badRequest().url)
       }
     }
 
@@ -385,7 +366,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         verify(controller.subscriptionService, never()).renewal(any(), any(), any(), any())(any(), any())
       }
 
-      "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
+      "redirect to the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
         when {
           mockSectionsProvider.taskRows(any[String])(any(), any(), any())
         }.thenReturn(Future.successful(completedSections))
@@ -404,10 +385,8 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
         val result = controller.post()(request)
 
-        status(result) mustBe OK
-
-        implicit val doc = Jsoup.parse(contentAsString(result))
-        validateParagraphizedContent("error.submission.badrequest.content")
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.SubmissionErrorController.badRequest().url)
       }
     }
 
@@ -435,7 +414,7 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
       }
 
-      "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
+      "redirect to the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
         when {
           mockSectionsProvider.taskRows(any[String])(any(), any(), any())
         }.thenReturn(Future.successful(completedSections))
@@ -454,10 +433,8 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
         val result = controller.post()(request)
 
-        status(result) mustBe OK
-
-        implicit val doc = Jsoup.parse(contentAsString(result))
-        validateParagraphizedContent("error.submission.badrequest.content")
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.SubmissionErrorController.badRequest().url)
       }
     }
   }

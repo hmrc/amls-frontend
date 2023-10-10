@@ -35,7 +35,7 @@ class TimeAtAdditionalAddressController @Inject() (val dataCacheConnector: DataC
                                                    val cc: MessagesControllerComponents,
                                                    formProvider: TimeAtAddressFormProvider,
                                                    view: TimeAtAdditionalAddressView,
-                                                   implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                   implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 

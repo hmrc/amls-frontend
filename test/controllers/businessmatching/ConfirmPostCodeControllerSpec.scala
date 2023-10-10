@@ -27,6 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction}
@@ -69,7 +70,8 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
     }
 
     "update ReviewDetails with valid input post code" in new Fixture {
-      val postRequest = requestWithUrlEncodedBody(
+      val postRequest = FakeRequest(POST, routes.ConfirmPostCodeController.post().url)
+      .withFormUrlEncodedBody(
         "postCode" -> "BB1 1BB"
       )
 
@@ -88,7 +90,8 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
     }
 
     "update ReviewDetails with valid input post code and UK as country" in new Fixture {
-      val postRequest = requestWithUrlEncodedBody(
+      val postRequest = FakeRequest(POST, routes.ConfirmPostCodeController.post().url)
+      .withFormUrlEncodedBody(
         "postCode" -> "BB1 1BB"
       )
 
@@ -112,7 +115,8 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
     }
 
     "update ReviewDetails as none when business matching -> reviewDetails is empty" in new Fixture {
-      val postRequest = requestWithUrlEncodedBody(
+      val postRequest = FakeRequest(POST, routes.ConfirmPostCodeController.post().url)
+      .withFormUrlEncodedBody(
         "postCode" -> "BB1 1BB"
       )
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
@@ -129,12 +133,12 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
     "throw validation error on invalid field" in new Fixture {
 
-      val postRequest = requestWithUrlEncodedBody(
+      val postRequest = FakeRequest(POST, routes.ConfirmPostCodeController.post().url)
+      .withFormUrlEncodedBody(
         "postCode" -> "AA1111AA"
       )
       val result = controller.post()(postRequest)
       status(result) must be(BAD_REQUEST)
     }
   }
-
 }

@@ -17,7 +17,7 @@
 package forms.responsiblepeople.address
 
 import forms.behaviours.AddressFieldBehaviours
-import models.responsiblepeople.{ResponsiblePersonAddress, ResponsiblePersonCurrentAddress}
+import models.responsiblepeople.ResponsiblePersonAddress
 import play.api.data.Form
 
 class AdditionalAddressUKFormProviderSpec extends AddressFieldBehaviours {
@@ -38,6 +38,6 @@ class AdditionalAddressUKFormProviderSpec extends AddressFieldBehaviours {
       "error.text.validation.address"
     )
 
-    behave like postcodeField(formProvider.postcodeRegex)
+    behave like postcodeField(postcodeRegex)
   }
 }

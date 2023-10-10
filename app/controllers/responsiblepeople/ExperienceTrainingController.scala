@@ -36,7 +36,7 @@ class ExperienceTrainingController @Inject()(val dataCacheConnector: DataCacheCo
                                              val cc: MessagesControllerComponents,
                                              formProvider: ExperienceTrainingFormProvider,
                                              view: ExperienceTrainingView,
-                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with Logging {
+                                             implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with Logging {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>

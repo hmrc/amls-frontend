@@ -42,7 +42,7 @@ class SummaryController @Inject()(
                                    val cc: MessagesControllerComponents,
                                    cyaHelper: CheckYourAnswersHelper,
                                    val view: CheckYourAnswersView,
-                                   implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with Logging {
+                                   implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with Logging {
 
   def get: Action[AnyContent] = authAction.async {
       implicit request =>

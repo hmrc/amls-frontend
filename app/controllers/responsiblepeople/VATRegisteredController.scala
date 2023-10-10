@@ -34,7 +34,7 @@ class VATRegisteredController @Inject () (
                                            val cc: MessagesControllerComponents,
                                            formProvider: VATRegisteredFormProvider,
                                            view: VATRegisteredView,
-                                           implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                           implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>

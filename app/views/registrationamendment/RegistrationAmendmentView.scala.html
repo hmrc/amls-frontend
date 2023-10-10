@@ -14,14 +14,14 @@
  * limitations under the License.
  *@
 
-@import components.{Heading, TaskRowComponent, Button}
-@import include._
+@import components.{Heading, TaskRowComponent, Button, ServicesSidebar}
 @import config.ApplicationConfig
 @import models.registrationprogress.{TaskList, TaskRow, Started}
 
 @this(
     layout: Layout,
     heading: Heading,
+    servicesSidebar: ServicesSidebar,
     formHelper: FormWithCSRF,
     taskRow: TaskRowComponent,
     button: Button
@@ -60,7 +60,7 @@
     </div>
 
     @* Sidebar *@
-    @services_sidebar(canEditPreApplication, displayLink = true, businessName, serviceNames.toList.sorted, hasCompleteNominatedOfficer, nominatedOfficerName)
+    @servicesSidebar(canEditPreApplication, displayLink = true, businessName, serviceNames.toList.sorted, hasCompleteNominatedOfficer, nominatedOfficerName)
 
     <div class="grid-layout grid-layout--stacked">
         <h2 class="govuk-heading-m">@messages("amendment.sections.subheading")</h2>

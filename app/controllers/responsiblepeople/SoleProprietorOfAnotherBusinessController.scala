@@ -37,7 +37,7 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
                                                           val cc: MessagesControllerComponents,
                                                           formProvider: SoleProprietorFormProvider,
                                                           view: SoleProprietorView,
-                                                          implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                          implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request => {

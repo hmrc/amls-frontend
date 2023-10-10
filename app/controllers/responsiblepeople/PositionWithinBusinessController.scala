@@ -36,7 +36,7 @@ class PositionWithinBusinessController @Inject () (
                                                     val cc: MessagesControllerComponents,
                                                     formProvider: PositionWithinBusinessFormProvider,
                                                     view: PositionWithinBusinessView,
-                                                    implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                    implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
 

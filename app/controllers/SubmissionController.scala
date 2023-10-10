@@ -18,17 +18,15 @@ package controllers
 
 import connectors.AuthenticatorConnector
 import exceptions.{DuplicateEnrolmentException, DuplicateSubscriptionException, InvalidEnrolmentCredentialsException}
-import javax.inject.{Inject, Singleton}
 import models.status._
 import models.{SubmissionResponse, SubscriptionResponse}
 import play.api.Logging
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{MessagesControllerComponents, Request}
 import services.{RenewalService, SectionsProvider, StatusService, SubmissionService}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import utils.{AuthAction, DeclarationHelper}
-import views.html.submission.{bad_request, duplicate_enrolment, duplicate_submission, wrong_credential_type}
-import play.api.mvc.Request
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -39,11 +37,7 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
                                      authAction: AuthAction,
                                      val ds: CommonPlayDependencies,
                                      val cc: MessagesControllerComponents,
-                                     val sectionsProvider: SectionsProvider,
-                                     duplicate_enrolment: duplicate_enrolment,
-                                     duplicate_submission: duplicate_submission,
-                                     wrong_credential_type: wrong_credential_type,
-                                     bad_request: bad_request) extends AmlsBaseController(ds, cc) with Logging {
+                                     val sectionsProvider: SectionsProvider) extends AmlsBaseController(ds, cc) with Logging {
 
   private def handleRenewalAmendment(credId: String, amlsRegistrationNumber: Option[String], accountTypeId: (String, String))
                                     (implicit headerCarrier: HeaderCarrier) = {
@@ -79,16 +73,16 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
         } recoverWith {
           case _: DuplicateEnrolmentException =>
             logger.info("[SubmissionController][post] handling DuplicateEnrolmentException")
-            Future.successful(Ok(duplicate_enrolment()))
+            Future.successful(Redirect(routes.SubmissionErrorController.duplicateEnrolment()))
           case e: DuplicateSubscriptionException =>
             logger.info("[SubmissionController][post] handling DuplicateSubscriptionException")
-            Future.successful(Ok(duplicate_submission(e.message)))
+            Future.successful(Redirect(routes.SubmissionErrorController.duplicateSubmission()))
           case _: InvalidEnrolmentCredentialsException =>
             logger.info("[SubmissionController][post] handling InvalidEnrolmentCredentialsException")
-            Future.successful(Ok(wrong_credential_type()))
+            Future.successful(Redirect(routes.SubmissionErrorController.wrongCredentialType()))
           case _: BadRequestException =>
             logger.info("[SubmissionController][post] handling BadRequestException")
-            Future.successful(Ok(bad_request()))
+            Future.successful(Redirect(routes.SubmissionErrorController.badRequest()))
           case e: Exception =>
             logger.info("[SubmissionController][post] handling Exception")
             throw e

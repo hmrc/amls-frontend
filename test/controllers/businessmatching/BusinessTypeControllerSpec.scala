@@ -16,54 +16,55 @@
 
 package controllers.businessmatching
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.Country
-import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.{BusinessMatching, BusinessType}
+import forms.businessmatching.BusinessTypeFormProvider
+import models.businessmatching.BusinessType
+import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
-import play.api.i18n.Messages
+import play.api.test
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
+import play.api.test.{FakeRequest, Injecting}
+import services.businessmatching.BusinessTypeService
 import utils.AmlsSpec
-import views.html.businessmatching.business_type
+import views.html.businessmatching.BusinessTypeView
 
 import scala.concurrent.Future
 
-class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures {
+class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures with Injecting with BeforeAndAfterEach {
+
+  val mockService = mock[BusinessTypeService]
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[business_type]
+    lazy val view = inject[BusinessTypeView]
     val controller = new BusinessTypeController (
-      dataCache = mock[DataCacheConnector],
-      authAction = SuccessfulAuthAction,
-      ds = commonDependencies,
-      cc = mockMcc,
-      business_type = view)
+      SuccessfulAuthAction,
+      commonDependencies,
+      mockMcc,
+      mockService,
+      inject[BusinessTypeFormProvider],
+      view)
   }
+
+  override def beforeEach(): Unit = reset(mockService)
 
   "BusinessTypeController" must {
 
-    val emptyCache = CacheMap("", Map.empty)
-
     "display business Types Page" in new Fixture {
 
-      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(Future.successful(None))
+      when(mockService.getBusinessType(any())(any(), any())).thenReturn(Future.successful(None))
+
       val result = controller.get()(request)
       status(result) must be(OK)
-
     }
 
     "display Registration Number page for CORPORATE_BODY" in new Fixture {
 
-     val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-       Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
-
-      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
-        Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
+      when(mockService.getBusinessType(any())(any(), any()))
+        .thenReturn(Future.successful(Some(BusinessType.LimitedCompany)))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -72,11 +73,8 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures {
 
     "display Registration Number page for LLP" in new Fixture {
 
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
-
-      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
-        Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
+      when(mockService.getBusinessType(any())(any(), any()))
+        .thenReturn(Future.successful(Some(BusinessType.LPrLLP)))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -85,11 +83,8 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures {
 
     "display Type of Business Page" in new Fixture {
 
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
-
-      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
-        Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
+      when(mockService.getBusinessType(any())(any(), any()))
+        .thenReturn(Future.successful(Some(BusinessType.UnincorporatedBody)))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -98,11 +93,8 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures {
 
     "display Register Services Page" in new Fixture {
 
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
-
-      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
-        Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
+      when(mockService.getBusinessType(any())(any(), any()))
+        .thenReturn(Future.successful(Some(BusinessType.LPrLLP)))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -111,11 +103,8 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures {
 
     "redirect to register services controller when sole proprietor" in new Fixture {
 
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
-
-      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
-        Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
+      when(mockService.getBusinessType(any())(any(), any()))
+        .thenReturn(Future.successful(Some(BusinessType.SoleProprietor)))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -125,74 +114,45 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures {
 
     "post with updated business matching data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "businessType" -> "01"
-      )
+      val newRequest = FakeRequest(POST, routes.BusinessTypeController.post().url)
+        .withFormUrlEncodedBody("businessType" -> BusinessType.LimitedCompany.toString)
 
-      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
-
-      when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
-        Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
-
-      when(controller.dataCache.save[BusinessMatching](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+      when(mockService.updateBusinessType(any(), Matchers.eq(BusinessType.LimitedCompany))(any(), any()))
+        .thenReturn(Future.successful(Some(BusinessType.LimitedCompany)))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.CompanyRegistrationNumberController.get().url))
-
     }
 
     "post with valid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "businessType" -> "01"
-      )
+      val newRequest = test.FakeRequest(POST, routes.BusinessTypeController.post().url)
+        .withFormUrlEncodedBody("businessType" -> BusinessType.LimitedCompany.toString)
 
-      when(controller.dataCache.fetch[BusinessMatching](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCache.save[BusinessMatching](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+      when(mockService.updateBusinessType(any(), Matchers.eq(BusinessType.LimitedCompany))(any(), any()))
+        .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.RegisterServicesController.get().url))
-
     }
 
     "post with invalid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "businessType" -> "11"
-      )
-
-      when(controller.dataCache.fetch[BusinessMatching](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCache.save[BusinessMatching](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+      val newRequest = FakeRequest(POST, routes.BusinessTypeController.post().url)
+        .withFormUrlEncodedBody("businessType" -> "foo")
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("err.summary"))
-
     }
 
     "post with missing mandatory field" in new Fixture {
-      val newRequest = requestWithUrlEncodedBody(
-      )
-
-      when(controller.dataCache.fetch[BusinessMatching](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCache.save[BusinessMatching](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+      val newRequest = FakeRequest(POST, routes.BusinessTypeController.post().url)
+        .withFormUrlEncodedBody()
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required"))
     }
   }
 }

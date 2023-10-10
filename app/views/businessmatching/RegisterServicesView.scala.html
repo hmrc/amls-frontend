@@ -33,10 +33,6 @@
 
 @(form: Form[_], edit: Boolean, existing: Seq[BusinessActivity], isPreSubmission: Boolean, showReturnLink: Boolean = true)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
-@header = {
-    @components.back_link()
-}
-
 @title = @{
     if(isPreSubmission)  "businessmatching.registerservices.title" else "businessmatching.registerservices.other.title"
 }
