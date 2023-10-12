@@ -126,7 +126,7 @@ class CheckYourAnswersHelper @Inject()() {
         partnership.agentPartnership,
         editAction(
           controllers.tradingpremises.routes.AgentPartnershipController.get(index, true).url,
-          "tradingpremisesagentpartnershiptitle-edit",
+          "tradingpremisesagentpartnershiptitle-edit"
         )
       )
     }

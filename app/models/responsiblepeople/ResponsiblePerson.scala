@@ -238,31 +238,6 @@ object ResponsiblePerson {
   def filterWithIndex(rp: Seq[ResponsiblePerson]): Seq[(ResponsiblePerson, Int)] =
     rp.zipWithIndex.reverse.filterNot(_._1.status.contains(StatusConstants.Deleted)).filterNot(_._1 == ResponsiblePerson())
 
-  def section(implicit cache: CacheMap): Section = { //TODO remove this
-
-    val messageKey = "responsiblepeople"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get())
-
-    cache.getEntry[Seq[ResponsiblePerson]](key).fold(notStarted) { rp =>
-
-      if (filter(rp).equals(Nil)) {
-        Section(messageKey, NotStarted, anyChanged(rp), controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get())
-      } else {
-        filter(rp) match {
-          case responsiblePeople if responsiblePeople.nonEmpty && responsiblePeople.forall {
-            _.isComplete
-          } => Section(messageKey, Completed, anyChanged(rp), controllers.responsiblepeople.routes.YourResponsiblePeopleController.get)
-          case _ =>
-            rp.indexWhere {
-              case model if !model.isComplete && !model.status.contains(StatusConstants.Deleted) => true
-              case _ => false
-            }
-            Section(messageKey, Started, anyChanged(rp), controllers.responsiblepeople.routes.YourResponsiblePeopleController.get)
-        }
-      }
-    }
-  }
-
   def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
 
     val messageKey = "responsiblepeople"
@@ -286,6 +261,15 @@ object ResponsiblePerson {
         )
       } else {
         filter(rp) match {
+          case responsiblePeople if responsiblePeople.nonEmpty && anyChanged(responsiblePeople) && responsiblePeople.forall {
+            _.isComplete
+          } => TaskRow(
+            messageKey,
+            controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
+            anyChanged(rp),
+            Updated,
+            TaskRow.updatedTag
+          )
           case responsiblePeople if responsiblePeople.nonEmpty && responsiblePeople.forall {
             _.isComplete
           } => TaskRow(

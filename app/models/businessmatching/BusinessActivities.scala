@@ -162,7 +162,7 @@ object BusinessActivities extends Logging {
 
     val filteredValues = filterValues.fold(all.toSeq)(all.toSeq diff _)
 
-    filteredValues.zipWithIndex.map { case (activity, index) =>
+    filteredValues.map { activity =>
       val hintOpt = if(hasHints) {
         Some(Hint(
           id = Some(s"businessActivities-${activity.value}-hint"),
@@ -172,11 +172,13 @@ object BusinessActivities extends Logging {
         None
       }
 
+      val id = activity.value.substring(1)
+
       CheckboxItem(
         content = Text(messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}")),
         value = activity.toString,
-        id = Some(s"value_$index"),
-        name = Some(s"value[$index]"),
+        id = Some(s"value_$id"),
+        name = Some(s"value[$id]"),
         hint = hintOpt
       )
     }.sortBy(_.content.mkString)

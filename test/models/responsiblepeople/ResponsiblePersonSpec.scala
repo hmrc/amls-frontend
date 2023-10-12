@@ -23,6 +23,7 @@ import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with GuiceOneAppPerSuite {
@@ -168,43 +169,54 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
       }
     }
 
-    "have section function which" when {
+    "have taskRow function which" when {
+
+      val messages = Helpers.stubMessages()
 
       "called" must {
-        "return NotStarted Section section if model is empty" in {
+        "return NotStarted task row if model is empty" in {
           val mockCacheMap = mock[CacheMap]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(Seq(ResponsiblePerson())))
 
-          ResponsiblePerson.section(mockCacheMap).status must be(models.registrationprogress.NotStarted)
+          ResponsiblePerson.taskRow(mockCacheMap, messages).status must be(models.registrationprogress.NotStarted)
         }
 
-        "return Started Section section if model is not empty" in {
+        "return Started task row if model is not empty" in {
           val mockCacheMap = mock[CacheMap]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(Seq(incompleteResponsiblePeople)))
 
-          ResponsiblePerson.section(mockCacheMap).status must be(models.registrationprogress.Started)
+          ResponsiblePerson.taskRow(mockCacheMap, messages).status must be(models.registrationprogress.Started)
         }
 
-        "return Completed Section section if model is not empty and has complete rp" in {
+        "return Completed task row if model is not empty and has complete rp" in {
           val mockCacheMap = mock[CacheMap]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(Seq(completeResponsiblePerson)))
 
-          ResponsiblePerson.section(mockCacheMap).status must be(models.registrationprogress.Completed)
+          ResponsiblePerson.taskRow(mockCacheMap, messages).status must be(models.registrationprogress.Completed)
         }
 
-        "return Started Section section if model is not empty and has complete and incomplete rps" in {
+        "return Completed task row if model is not empty and has complete rp that has changed" in {
+          val mockCacheMap = mock[CacheMap]
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
+            .thenReturn(Some(Seq(completeResponsiblePerson.copy(hasChanged = true))))
+
+          ResponsiblePerson.taskRow(mockCacheMap, messages).status must be(models.registrationprogress.Updated)
+        }
+
+        "return Started task row if model is not empty and has complete and incomplete rps" in {
           val mockCacheMap = mock[CacheMap]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(Seq(completeResponsiblePerson, incompleteResponsiblePeople)))
 
-          ResponsiblePerson.section(mockCacheMap).status must be(models.registrationprogress.Started)
+          ResponsiblePerson.taskRow(mockCacheMap, messages).status must be(models.registrationprogress.Started)
         }
       }
     }

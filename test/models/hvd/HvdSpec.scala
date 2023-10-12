@@ -19,12 +19,13 @@ package models.hvd
 import models.DateOfChange
 import models.hvd.Products.Cars
 import models.hvd.SalesChannel._
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress._
 import org.joda.time.LocalDate
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JodaReads, JodaWrites, JsUndefined, Json}
+import play.api.test.Helpers
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 sealed trait HvdTestFixture {
@@ -152,37 +153,57 @@ class HvdSpec extends PlaySpec with MockitoSugar with JodaReads with JodaWrites 
 
     "have a section function that" must {
 
+      implicit val messages = Helpers.stubMessages()
       implicit val cache = mock[CacheMap]
 
-      "return a NotStarted Section when model is empty" in new HvdTestFixture {
+      "return a Not Started Task Row when model is empty" in new HvdTestFixture {
 
-        val notStartedSection = Section("hvd", NotStarted, false, controllers.hvd.routes.WhatYouNeedController.get)
+        val notStartedTaskRow = TaskRow(
+          "hvd", controllers.hvd.routes.WhatYouNeedController.get.url, false, NotStarted, TaskRow.notStartedTag
+        )
 
         when(cache.getEntry[Hvd]("hvd")) thenReturn None
 
-        Hvd.section must be(notStartedSection)
+        Hvd.taskRow must be(notStartedTaskRow)
       }
 
-      "return a Completed Section when model is complete" in new HvdTestFixture {
+      "return a Completed Task Row when model is complete" in new HvdTestFixture {
 
         val complete = mock[Hvd]
-        val completedSection = Section("hvd", Completed, false, controllers.hvd.routes.SummaryController.get)
+        val completedTaskRow = TaskRow(
+          "hvd", controllers.hvd.routes.SummaryController.get.url, false, Completed, TaskRow.completedTag)
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Hvd]("hvd")) thenReturn Some(complete)
 
-        Hvd.section must be(completedSection)
+        Hvd.taskRow must be(completedTaskRow)
       }
 
-      "return a Started Section when model is incomplete" in new HvdTestFixture {
+      "return a Updated Task Row when model is complete and has changed" in new HvdTestFixture {
+
+        val updated = mock[Hvd]
+        val updatedTaskRow = TaskRow(
+          "hvd", controllers.hvd.routes.SummaryController.get.url, true, Updated, TaskRow.updatedTag
+        )
+
+        when(updated.isComplete) thenReturn true
+        when(updated.hasChanged) thenReturn true
+        when(cache.getEntry[Hvd]("hvd")) thenReturn Some(updated)
+
+        Hvd.taskRow must be(updatedTaskRow)
+      }
+
+      "return a Started Task Row when model is incomplete" in new HvdTestFixture {
 
         val incompleteTcsp = mock[Hvd]
-        val startedSection = Section("hvd", Started, false, controllers.hvd.routes.WhatYouNeedController.get)
+        val startedTaskRow = TaskRow(
+          "hvd", controllers.hvd.routes.WhatYouNeedController.get.url, false, Started, TaskRow.incompleteTag
+        )
 
         when(incompleteTcsp.isComplete) thenReturn false
         when(cache.getEntry[Hvd]("hvd")) thenReturn Some(incompleteTcsp)
 
-        Hvd.section must be(startedSection)
+        Hvd.taskRow must be(startedTaskRow)
       }
     }
   }

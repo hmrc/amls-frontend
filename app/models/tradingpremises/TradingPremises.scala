@@ -141,31 +141,6 @@ object TradingPremises {
   def filterWithIndex(rp: Seq[TradingPremises]): Seq[(TradingPremises, Int)] =
     rp.zipWithIndex.reverse.filterNot(_._1.status.contains(StatusConstants.Deleted)).filterNot(_._1 == TradingPremises())
 
-  def section(implicit cache: CacheMap): Section = {
-
-    val messageKey = "tradingpremises"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.tradingpremises.routes.TradingPremisesAddController.get())
-
-    cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) { tp =>
-
-      if (filter(tp).equals(Nil)) {
-        Section(messageKey, NotStarted, anyChanged(tp), controllers.tradingpremises.routes.TradingPremisesAddController.get())
-      } else {
-        filter(tp) match {
-          case premises if premises.nonEmpty && premises.forall {
-            _.isComplete
-          } => Section(messageKey, Completed, anyChanged(tp), controllers.tradingpremises.routes.YourTradingPremisesController.get())
-          case _ =>
-            tp.indexWhere {
-              case model if !model.isComplete => true
-              case _ => false
-            }
-            Section(messageKey, Started, anyChanged(tp), controllers.tradingpremises.routes.YourTradingPremisesController.get())
-        }
-      }
-    }
-  }
-
   def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
 
     val messageKey = "tradingpremises"

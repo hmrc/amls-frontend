@@ -31,18 +31,15 @@ import javax.inject.Inject
 class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: ApplicationConfig) {
 
   def createSummaryList(businessMatching: BusinessMatching, isPreSubmission: Boolean, isPending: Boolean)(implicit messages: Messages): SummaryList = {
-    val rows =
+    SummaryList(
       Seq(
         businessAddress(businessMatching),
         registrationType(businessMatching, isPreSubmission),
         registeredServices(businessMatching, isPreSubmission, isPending),
-        moneyServiceBusinessActivities(businessMatching, isPending),
-      ).flatten
-
-    psrRegistrationNumber(businessMatching) match {
-      case Some(psrRows) => SummaryList(rows ++ psrRows)
-      case None => SummaryList(rows)
-    }
+        moneyServiceBusinessActivities(businessMatching, isPending)
+      ).flatten ++
+        psrRegistrationNumber(businessMatching).getOrElse(Seq.empty[SummaryListRow])
+    )
   }
 
   def getSubmitButton(

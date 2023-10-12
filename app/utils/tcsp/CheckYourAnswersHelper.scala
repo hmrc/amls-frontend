@@ -40,7 +40,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
         providedServicesRow(model),
         doesServicesOfAnotherTCSPRow(model)
       ).flatten ++
-      AnotherTCSPSupervisionRows(model).getOrElse(Seq.empty)
+      anotherTCSPSupervisionRows(model).getOrElse(Seq.empty)
     )
   }
 
@@ -168,7 +168,7 @@ class CheckYourAnswersHelper @Inject()() extends Logging {
     }
   }
 
-  private def AnotherTCSPSupervisionRows(model: Tcsp)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def anotherTCSPSupervisionRows(model: Tcsp)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
 
     def yesNoRow(boolean: Boolean) = row(
       "tcsp.anothertcspsupervision.title",

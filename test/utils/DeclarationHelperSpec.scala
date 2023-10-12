@@ -17,7 +17,7 @@
 package utils
 
 import models.Country
-import models.registrationprogress.{Completed, Started, TaskRow}
+import models.registrationprogress.{Completed, Started, TaskRow, Updated}
 import models.renewal._
 import models.responsiblepeople._
 import models.status._
@@ -339,6 +339,11 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
       TaskRow("s2", "/bar", true, Started, TaskRow.incompleteTag)
     )
 
+    val completedAndUpdatedSections = Seq(
+      TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
+      TaskRow("s2", "/bar", true, Updated, TaskRow.updatedTag)
+    )
+
     "return false where one or more sections are incomplete" in {
       when{
         sectionsProvider.taskRows(eqTo(credId))(any(), any(), any())
@@ -353,6 +358,14 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
       }.thenReturn(Future.successful(completedSections))
 
       await(sectionsComplete(credId, sectionsProvider)) mustBe(true)
+    }
+
+    "return true where sections are either complete or updated" in {
+
+      when(sectionsProvider.taskRows(eqTo(credId))(any(), any(), any()))
+        .thenReturn(Future.successful(completedAndUpdatedSections))
+
+      await(sectionsComplete(credId, sectionsProvider)) mustBe true
     }
   }
 

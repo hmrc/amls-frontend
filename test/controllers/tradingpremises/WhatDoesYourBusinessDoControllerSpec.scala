@@ -22,8 +22,8 @@ import controllers.actions.SuccessfulAuthAction
 import forms.DateOfChangeFormProvider
 import forms.tradingpremises.WhatDoesYourBusinessDoFormProvider
 import models.businessactivities.{BusinessActivities, ExpectedBusinessTurnover, InvolvedInOtherYes}
-import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady}
 import models.tradingpremises._
 import models.{DateOfChange, TradingPremisesSection}
@@ -138,7 +138,9 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           val document: Document = Jsoup.parse(contentAsString(result))
 
           status(result) must be(OK)
-          document.getElementById("value_0").hasAttr("checked") must be(true)
+
+          document.getElementById("value_1").hasAttr("checked") must be(true)
+          document.getElementById("value_3").hasAttr("checked") must be(true)
         }
       }
 

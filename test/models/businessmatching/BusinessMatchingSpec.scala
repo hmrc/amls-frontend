@@ -393,6 +393,22 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
           TaskRow.completedTag
         )
       }
+
+      "return `Updated` task row when there is a task row which is completed and has changed" in {
+        implicit val cache = mock[CacheMap]
+
+        when {
+          cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
+        } thenReturn Some(businessMatching.copy(hasChanged = true))
+
+        BusinessMatching.taskRow mustBe TaskRow(
+          "businessmatching",
+          controllers.businessmatching.routes.SummaryController.get.url,
+          true,
+          Updated,
+          TaskRow.updatedTag
+        )
+      }
     }
   }
 }

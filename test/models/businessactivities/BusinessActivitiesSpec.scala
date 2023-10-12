@@ -16,11 +16,16 @@
 
 package models.businessactivities
 
-import models.Country
 import models.businessactivities.TransactionTypes.{DigitalSoftware, Paper}
-import models.businessmatching.{BusinessActivities => ba, _}
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.{BusinessActivities => ba, _}
+import models.registrationprogress._
+import models.{Country, DateOfChange}
+import org.joda.time.LocalDate
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
 import play.api.libs.json.Json
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 
 class BusinessActivitiesSpec extends AmlsSpec {
@@ -550,6 +555,109 @@ class BusinessActivitiesSpec extends AmlsSpec {
           res.hasChanged must be(true)
           res.taxMatters must be(Some(NewTaxMatters))
         }
+      }
+    }
+  }
+
+  "taskRow is called" must {
+
+    val mockCacheMap = mock[CacheMap]
+
+    "return a not started task row" when {
+
+      "tasks have not been started" in {
+
+        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(None)
+
+        when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
+          .thenReturn(None)
+
+        BusinessActivities.taskRow(mockCacheMap, messages) mustBe TaskRow(
+          "businessactivities",
+          controllers.businessactivities.routes.WhatYouNeedController.get.url,
+          hasChanged = false,
+          NotStarted,
+          TaskRow.notStartedTag
+        )
+      }
+    }
+
+    "return an incomplete task row" when {
+
+      "activities have not been completed" in {
+
+        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching()))
+
+        when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
+          .thenReturn(Some(BusinessActivities()))
+
+        BusinessActivities.taskRow(mockCacheMap, messages) mustBe TaskRow(
+          "businessactivities",
+          controllers.businessactivities.routes.WhatYouNeedController.get.url,
+          hasChanged = false,
+          Started,
+          TaskRow.incompleteTag
+        )
+      }
+    }
+
+    "return a completed task row" when {
+
+      "mandatory sections have been completed" in {
+
+        val bmBa = ba(
+          Set(AccountancyServices),
+          None,
+          None,
+          Some(DateOfChange(LocalDate.now()))
+        )
+
+        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(
+            activities = Some(bmBa)
+          )))
+
+        when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
+          .thenReturn(Some(completeModel))
+
+        BusinessActivities.taskRow(mockCacheMap, messages) mustBe TaskRow(
+          "businessactivities",
+          controllers.businessactivities.routes.SummaryController.get.url,
+          hasChanged = false,
+          Completed,
+          TaskRow.completedTag
+        )
+      }
+    }
+
+    "return an updated task row" when {
+
+      "mandatory sections have been completed and model has changed" in {
+
+        val bmBa = ba(
+          Set(AccountancyServices),
+          None,
+          None,
+          Some(DateOfChange(LocalDate.now()))
+        )
+
+        when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(
+            activities = Some(bmBa)
+          )))
+
+        when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
+          .thenReturn(Some(completeModel.copy(hasChanged = true)))
+
+        BusinessActivities.taskRow(mockCacheMap, messages) mustBe TaskRow(
+          "businessactivities",
+          controllers.businessactivities.routes.SummaryController.get.url,
+          hasChanged = true,
+          Updated,
+          TaskRow.updatedTag
+        )
       }
     }
   }

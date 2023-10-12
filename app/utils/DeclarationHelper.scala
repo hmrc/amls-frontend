@@ -19,7 +19,7 @@ package utils
 import cats.data.OptionT
 import cats.implicits._
 import controllers.declaration
-import models.registrationprogress.Completed
+import models.registrationprogress.{Completed, Updated}
 import models.responsiblepeople.{Partner, ResponsiblePerson}
 import models.status._
 import org.joda.time.LocalDate
@@ -128,8 +128,8 @@ object DeclarationHelper {
                       (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Boolean] = {
 
     sectionsProvider.taskRows(cacheId) map {
-      _ forall {
-        _.status == Completed
+      _ forall { row =>
+        row.status == Completed || row.status == Updated
       }
     }
   }

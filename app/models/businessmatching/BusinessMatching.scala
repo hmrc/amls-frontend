@@ -171,16 +171,24 @@ object BusinessMatching {
   val messageKey = "businessmatching"
 
   def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
-    val incomplete = TaskRow(
+    val notStartedRow = TaskRow(
       messageKey,
       controllers.businessmatching.routes.RegisterServicesController.get().url,
       hasChanged = false,
       NotStarted,
       TaskRow.notStartedTag
     )
-    cache.getEntry[BusinessMatching](key).fold(incomplete) {
+    cache.getEntry[BusinessMatching](key).fold(notStartedRow) {
       model =>
-        if (model.isComplete) {
+        if (model.isComplete && model.hasChanged) {
+          TaskRow(
+            messageKey,
+            controllers.businessmatching.routes.SummaryController.get.url,
+            true,
+            Updated,
+            TaskRow.updatedTag
+          )
+        } else if (model.isComplete) {
           TaskRow(
             messageKey,
             controllers.businessmatching.routes.SummaryController.get.url,

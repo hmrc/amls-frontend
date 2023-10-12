@@ -88,19 +88,6 @@ case class BusinessDetails(
 
 object BusinessDetails {
 
-  def section(implicit cache: CacheMap): Section = {
-    val messageKey = "businessdetails"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.businessdetails.routes.WhatYouNeedController.get)
-    cache.getEntry[BusinessDetails](key).fold(notStarted) {
-      case model if model.isComplete =>
-        Section(messageKey, Completed, model.hasChanged, controllers.businessdetails.routes.SummaryController.get)
-      case BusinessDetails(None, None, None, None, None, _, None, None, None, None, _, _) =>
-        notStarted
-      case model =>
-        Section(messageKey, Started, model.hasChanged, controllers.businessdetails.routes.WhatYouNeedController.get)
-    }
-  }
-
   def taskRow(implicit cache: CacheMap, messages: Messages) = {
 
     val messageKey = "businessdetails"
@@ -113,6 +100,14 @@ object BusinessDetails {
     )
 
     cache.getEntry[BusinessDetails](key).fold(notStarted) {
+      case model if model.isComplete && model.hasChanged =>
+        TaskRow(
+          messageKey,
+          controllers.businessdetails.routes.SummaryController.get.url,
+          true,
+          Updated,
+          TaskRow.updatedTag
+        )
       case model if model.isComplete =>
         TaskRow(
           messageKey,

@@ -16,7 +16,7 @@
 
 package models.asp
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
+import models.registrationprogress._
 import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -45,20 +45,6 @@ object Asp {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
-
-  def section(implicit cache: CacheMap): Section = {
-    val messageKey = "asp"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.asp.routes.WhatYouNeedController.get)
-    cache.getEntry[Asp](key).fold(notStarted) {
-      model =>
-        if (model.isComplete) {
-          Section(messageKey, Completed, model.hasChanged, controllers.asp.routes.SummaryController.get)
-        } else {
-          Section(messageKey, Started, model.hasChanged, controllers.asp.routes.WhatYouNeedController.get)
-        }
-    }
-  }
-
   def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
     val messageKey = "asp"
     val notStarted = TaskRow(
@@ -70,21 +56,21 @@ object Asp {
     )
     cache.getEntry[Asp](key).fold(notStarted) {
       model =>
-        if (model.isComplete) {
-          TaskRow(
-            messageKey,
-            controllers.asp.routes.SummaryController.get.url,
-            model.hasChanged,
-            Completed,
-            TaskRow.completedTag
-          )
-        } else if (model.hasChanged) {
+        if (model.isComplete && model.hasChanged) {
           TaskRow(
             key,
             controllers.asp.routes.SummaryController.get.url,
             hasChanged = true,
             status = Updated,
             tag = TaskRow.updatedTag
+          )
+        } else if (model.isComplete) {
+          TaskRow(
+            messageKey,
+            controllers.asp.routes.SummaryController.get.url,
+            model.hasChanged,
+            Completed,
+            TaskRow.completedTag
           )
         } else {
           TaskRow(

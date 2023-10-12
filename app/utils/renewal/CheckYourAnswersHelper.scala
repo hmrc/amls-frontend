@@ -44,11 +44,8 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         (if (services.msbServices.contains(ForeignExchange)) getForeignExchangeRow(model) else None).getOrElse(Seq.empty)
       } ++
       getCustomersOutsideUKRows(model).getOrElse(Seq.empty) ++
-        Seq(
-          getPercentageOfCashRow(model),
-        ).flatten ++
-        getCashPaymentRows(model).getOrElse(Seq.empty)
-
+      Seq(getPercentageOfCashRow(model)).flatten ++
+      getCashPaymentRows(model).getOrElse(Seq.empty)
     )
   }
 

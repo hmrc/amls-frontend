@@ -16,7 +16,7 @@
 
 package models.businessdetails
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
@@ -24,7 +24,7 @@ import play.api.libs.json.{JsNull, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 
-class businessDetailsSpec extends AmlsSpec {
+class BusinessDetailsSpec extends AmlsSpec {
 
   val previouslyRegistered = PreviouslyRegisteredYes(Some("12345678"))
 
@@ -403,31 +403,66 @@ class businessDetailsSpec extends AmlsSpec {
 
   }
 
-  "Section" must {
-    "return a NotStarted Section when there is no data at all" in {
-      val notStartedSection = Section("businessdetails", NotStarted, false, controllers.businessdetails.routes.WhatYouNeedController.get)
+  "taskRow" must {
+    "return a Not Started Task Row when there is no data at all" in {
+      val notStartedTaskRow = TaskRow(
+        "businessdetails",
+        controllers.businessdetails.routes.WhatYouNeedController.get.url,
+        false,
+        NotStarted,
+        TaskRow.notStartedTag
+      )
 
       when(cache.getEntry[BusinessDetails](meq("about-the-business"))(any())) thenReturn None
 
-      BusinessDetails.section(cache) must be(notStartedSection)
+      BusinessDetails.taskRow(cache, messages) must be(notStartedTaskRow)
     }
 
-    "return a Completed Section when model is complete and has not changed" in {
-      val complete = completeModel
-      val completedSection = Section("businessdetails", Completed, false, controllers.businessdetails.routes.SummaryController.get)
+    "return a Completed Task Row when model is complete and has not changed" in {
 
-      when(cache.getEntry[BusinessDetails](meq("about-the-business"))(any())) thenReturn Some(complete)
+      val completedTaskRow = TaskRow(
+        "businessdetails",
+        controllers.businessdetails.routes.SummaryController.get.url,
+        false,
+        Completed,
+        TaskRow.completedTag
+      )
 
-      BusinessDetails.section(cache) must be(completedSection)
+      when(cache.getEntry[BusinessDetails](meq("about-the-business"))(any())) thenReturn Some(completeModel)
+
+      BusinessDetails.taskRow(cache, messages) must be(completedTaskRow)
     }
 
-    "return a Started Section when model is incomplete" in {
+    "return an Updated Task Row when model is complete and has changed" in {
+
+      val updatedTaskRow = TaskRow(
+        "businessdetails",
+        controllers.businessdetails.routes.SummaryController.get.url,
+        true,
+        Updated,
+        TaskRow.updatedTag
+      )
+
+      when(cache.getEntry[BusinessDetails](meq("about-the-business"))(any()))
+      .thenReturn(Some(completeModel.copy(hasChanged = true)))
+
+      BusinessDetails.taskRow(cache, messages) must be(updatedTaskRow)
+    }
+
+    "return a Started Task Row when model is incomplete" in {
+
       val incomplete = BusinessDetails(Some(previouslyRegistered), None)
-      val startedSection = Section("businessdetails", Started, false, controllers.businessdetails.routes.WhatYouNeedController.get)
+      val startedTaskRow = TaskRow(
+        "businessdetails",
+        controllers.businessdetails.routes.WhatYouNeedController.get.url,
+        false,
+        Started,
+        TaskRow.incompleteTag
+      )
 
       when(cache.getEntry[BusinessDetails](meq("about-the-business"))(any())) thenReturn Some(incomplete)
 
-      BusinessDetails.section(cache) must be(startedSection)
+      BusinessDetails.taskRow(cache, messages) must be(startedTaskRow)
     }
   }
 }

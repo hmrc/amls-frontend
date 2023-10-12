@@ -17,7 +17,7 @@
 package models.bankdetails
 
 import models.bankdetails.BankAccountType.NoBankAccountUsed
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
 import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -115,6 +115,14 @@ object BankDetails {
           hasChanged = false,
           Completed,
           TaskRow.completedTag
+        )
+      case bds@model if model.forall(_.isComplete) && anyChanged(model) =>
+        TaskRow(
+          messageKey,
+          controllers.bankdetails.routes.YourBankAccountsController.get().url,
+          true,
+          Updated,
+          TaskRow.updatedTag
         )
       case bds @ model if model forall {
         _.isComplete

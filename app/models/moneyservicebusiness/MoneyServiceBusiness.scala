@@ -141,7 +141,11 @@ object MoneyServiceBusiness {
     cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {
       model =>
         val msbService = ControllerHelper.getMsbServices(cache.getEntry[BusinessMatching](BusinessMatching.key)).getOrElse(Set.empty)
-        if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange)) && model.hasChanged) {
+        val isComplete = model.isComplete(
+          msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange)
+        )
+
+        if (isComplete && model.hasChanged) {
           TaskRow(
             key,
             controllers.msb.routes.SummaryController.get.url,
@@ -149,7 +153,7 @@ object MoneyServiceBusiness {
             status = Updated,
             tag = TaskRow.updatedTag
           )
-        } else if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange))) {
+        } else if (isComplete) {
           TaskRow(
             key,
             controllers.msb.routes.SummaryController.get.url,

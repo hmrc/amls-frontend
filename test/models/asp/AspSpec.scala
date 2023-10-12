@@ -17,7 +17,7 @@
 package models.asp
 
 import models.asp.Service._
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress._
 import org.mockito.Mockito._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -110,42 +110,62 @@ class AspSpec extends AmlsSpec with AspValues {
       }
     }
 
-    "have a section function that" must {
+    "have a task row function that" must {
 
       implicit val cache = mock[CacheMap]
 
-      "return a NotStarted Section when model is empty" in {
+      "return a NotStarted Task Row when model is empty" in {
 
-        val notStartedSection = Section("asp", NotStarted, false,  controllers.asp.routes.WhatYouNeedController.get)
+        val notStartedRow = TaskRow(
+          "asp", controllers.asp.routes.WhatYouNeedController.get.url, false, NotStarted, TaskRow.notStartedTag
+        )
 
         when(cache.getEntry[Asp]("asp")) thenReturn None
 
-        Asp.section must be(notStartedSection)
-
+        Asp.taskRow mustBe notStartedRow
       }
 
-      "return a Completed Section when model is complete" in {
+      "return a Completed Task Row when model is complete" in {
 
         val complete = mock[Asp]
-        val completedSection = Section("asp", Completed, false,  controllers.asp.routes.SummaryController.get)
+
+        val completedTaskRow = TaskRow(
+          "asp", controllers.asp.routes.SummaryController.get.url, false, Completed, TaskRow.completedTag
+        )
 
         when(complete.isComplete) thenReturn true
+        when(complete.hasChanged) thenReturn false
         when(cache.getEntry[Asp]("asp")) thenReturn Some(complete)
 
-        Asp.section must be(completedSection)
-
+        Asp.taskRow mustBe completedTaskRow
       }
 
-      "return a Started Section when model is incomplete" in {
+      "return a Updated Task Row when model is complete" in {
+
+        val complete = mock[Asp]
+
+        val updatedTaskRow = TaskRow(
+          "asp", controllers.asp.routes.SummaryController.get.url, true, Updated, TaskRow.updatedTag
+        )
+
+        when(complete.isComplete) thenReturn true
+        when(complete.hasChanged) thenReturn true
+        when(cache.getEntry[Asp]("asp")) thenReturn Some(complete)
+
+        Asp.taskRow mustBe updatedTaskRow
+      }
+
+      "return a Started Task Row when model is incomplete" in {
 
         val incompleteTcsp = mock[Asp]
-        val startedSection = Section("asp", Started, false,  controllers.asp.routes.WhatYouNeedController.get)
+        val startedSection = TaskRow(
+          "asp", controllers.asp.routes.WhatYouNeedController.get.url, false, Started, TaskRow.incompleteTag
+        )
 
         when(incompleteTcsp.isComplete) thenReturn false
         when(cache.getEntry[Asp]("asp")) thenReturn Some(incompleteTcsp)
 
-        Asp.section must be(startedSection)
-
+        Asp.taskRow mustBe startedSection
       }
     }
 

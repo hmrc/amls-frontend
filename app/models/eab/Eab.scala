@@ -148,21 +148,21 @@ object Eab {
     )
     cache.getEntry[Eab](key).fold(notStarted) {
       model =>
-        if (model.isComplete && model.hasAccepted) {
+        if (model.isComplete && model.hasChanged && model.hasAccepted) {
+          TaskRow(
+            messageKey,
+            generateRedirect(appConfig.eabSummaryUrl).url,
+            hasChanged = true,
+            status = Updated,
+            tag = TaskRow.updatedTag
+          )
+        } else if (model.isComplete && model.hasAccepted) {
           TaskRow(
             messageKey,
             generateRedirect(appConfig.eabSummaryUrl).url,
             model.hasChanged,
             Completed,
             TaskRow.completedTag
-          )
-        } else if (model.hasChanged) {
-          TaskRow(
-            key,
-            generateRedirect(appConfig.eabSummaryUrl).url,
-            hasChanged = true,
-            status = Updated,
-            tag = TaskRow.updatedTag
           )
         } else {
           TaskRow(

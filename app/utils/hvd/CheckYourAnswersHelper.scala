@@ -34,7 +34,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
       Seq(
         productRow(model),
         exciseGoodsRow(model),
-        howWillYouSellGoodsRow(model),
+        howWillYouSellGoodsRow(model)
       ).flatten ++ cashPaymentRows(model).getOrElse(Seq.empty[SummaryListRow]) ++
       Seq(
         linkedCashPaymentRow(model),

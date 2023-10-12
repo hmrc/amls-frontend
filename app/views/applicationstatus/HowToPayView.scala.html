@@ -35,18 +35,17 @@
     <h2 class="govuk-heading-s">@messages("howtopay.title2")</h2>
     <p class="govuk-body">@messages("howtopay.para.1")</p>
     <p class="govuk-body">@messages("howtopay.para.2")
-        @anchor("howtopay.para.2.link", routes.NotificationController.getMessages().url, "your-messages")
         @if(paymentReference.isDefined) {
+            @anchor("howtopay.para.2.link", routes.NotificationController.getMessages().url, "your-messages")
             @messages("howtopay.para.2.b")
         } else {
-            @messages("full.stop")
+            @anchor("howtopay.para.2.link.end", routes.NotificationController.getMessages().url, "your-messages")
         }
     </p>
     @if(paymentReference.isDefined) {
         <p class="govuk-body">
             @messages("howtopay.para.3")
-            @anchor("howtopay.para.3.link", appConfig.howToPayLink, "find-email")
-            @messages("full.stop")
+            @anchor("howtopay.para.3.link", appConfig.howToPayLink, "find-email").
         </p>
     }
 
@@ -57,8 +56,7 @@
         <p class="govuk-body">@messages("howtopay.para.4.b")</p>
         <p class="govuk-body">
             @messages("howtopay.para.4.c")
-            @anchor("howtopay.para.2.link", routes.NotificationController.getMessages().url, "your-messages-no-ref")
-            @messages("full.stop")
+            @anchor("howtopay.para.2.link", routes.NotificationController.getMessages().url, "your-messages-no-ref").
         </p>
     }
 
@@ -66,21 +64,18 @@
         <h2 class="govuk-heading-s">@messages("howtopay.title3.b")</h2>
         <p class="govuk-body">
             @messages("howtopay.para.3.b")
-            @anchor("howtopay.para.3.link", appConfig.howToPayLink, "find-email-no-reference")
-            @messages("full.stop")
+            @anchor("howtopay.para.3.link", appConfig.howToPayLink, "find-email-no-reference").
         </p>
     }
 
     <h2 class="govuk-heading-s">@messages("howtopay.title4")</h2>
     <p class="govuk-body">
         @messages("howtopay.para.5")
-        @anchor("howtopay.para.5.link", appConfig.cardPaymentLink, "card-payment")
-        @messages("full.stop")
+        @anchor("howtopay.para.5.link", appConfig.cardPaymentLink, "card-payment").
     </p>
     <p class="govuk-body">
         @messages("howtopay.para.6")
-        @anchor("howtopay.para.6.link", appConfig.waysToPayLink, "ways-to-pay")
-        @messages("full.stop")
+        @anchor("howtopay.para.6.link", appConfig.waysToPayLink, "ways-to-pay").
     </p>
 
     @if(paymentReference.isDefined) {

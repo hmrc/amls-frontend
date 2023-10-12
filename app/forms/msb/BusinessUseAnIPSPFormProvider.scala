@@ -41,7 +41,7 @@ class BusinessUseAnIPSPFormProvider @Inject()() extends Mappings {
         text("error.required.msb.ipsp.name").verifying(
           firstError(
             maxLength(length, "error.invalid.msb.ipsp.name"),
-            regexp(basicPunctuationRegex, "error.invalid.msb.ipsp.format"),
+            regexp(basicPunctuationRegex, "error.invalid.msb.ipsp.format")
           )
         )
       ),

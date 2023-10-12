@@ -16,15 +16,14 @@
 
 package models.amp
 
-import java.time.{LocalDate, LocalDateTime}
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress._
 import models.renewal.AMPTurnover
+import org.mockito.Mockito._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import org.mockito.Mockito._
-import play.api.mvc.Call
-import scala.collection.Seq
+
+import java.time.{LocalDate, LocalDateTime}
 
 trait AmpValues {
 
@@ -97,6 +96,7 @@ trait AmpValues {
   )
 
   val completeModel                             = Amp(completeData, false, true)
+  val updatedModel                              = Amp(completeData, true, true)
   val missingTypeOfParticipantModel             = Amp(missingTypeOfParticipantData)
   val missingTypeOfParticipantDetailModel       = Amp(missingTypeOfParticipantDetailData)
   val missingSoldOverTheThresholdModel          = Amp(missingSoldOverThresholdData)
@@ -127,30 +127,37 @@ class AmpSpec extends AmlsSpec with AmpValues {
       }
     }
 
-    "have a section function that" must {
+    "have a task row function that" must {
       implicit val cache         = mock[CacheMap]
       val ampWhatYouNeedUrl = "http://localhost:9223/anti-money-laundering/art-market-participant/what-you-need"
       val ampSummaryUrl     = "http://localhost:9223/anti-money-laundering/art-market-participant/check-your-answers"
 
-      "return a NotStarted Section when model is empty" in {
-        val notStartedSection = Section("amp", NotStarted, false, Call("GET", ampWhatYouNeedUrl))
+      "returns a Not Started task row when model is empty" in {
+        val notStartedTaskRow = TaskRow("amp", ampWhatYouNeedUrl, false, NotStarted, TaskRow.notStartedTag)
 
         when(cache.getEntry[Amp]("amp")) thenReturn None
-        Amp.section(appConfig) must be(notStartedSection)
+        Amp.taskRow(appConfig) mustBe notStartedTaskRow
       }
 
-      "return a Completed Section when model is complete" in {
-        val completedSection = Section("amp", Completed, false, Call("GET", ampSummaryUrl))
+      "returns a Completed task row when model is complete" in {
+        val completedTaskRow = TaskRow("amp", ampSummaryUrl, false, Completed,TaskRow.completedTag)
 
         when(cache.getEntry[Amp]("amp")) thenReturn Some(completeModel)
-        Amp.section(appConfig) must be(completedSection)
+        Amp.taskRow(appConfig) mustBe completedTaskRow
+      }
+
+      "returns a Updated task row when model is complete and has changed" in {
+        val updatedTaskRow = TaskRow("amp", ampSummaryUrl, true, Updated, TaskRow.updatedTag)
+
+        when(cache.getEntry[Amp]("amp")) thenReturn Some(updatedModel)
+        Amp.taskRow(appConfig) mustBe updatedTaskRow
       }
 
       "return a Started Section when model is incomplete" in {
-        val startedSection = Section("amp", Started, false, Call("GET", ampWhatYouNeedUrl))
+        val incompleteTaskRow = TaskRow("amp", ampWhatYouNeedUrl, false, Started,TaskRow.incompleteTag)
 
         when(cache.getEntry[Amp]("amp")) thenReturn Some(missingTypeOfParticipantDetailModel)
-        Amp.section(appConfig) must be(startedSection)
+        Amp.taskRow(appConfig) mustBe incompleteTaskRow
       }
     }
 

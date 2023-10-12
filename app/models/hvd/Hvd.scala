@@ -131,21 +131,21 @@ object Hvd {
     )
     cache.getEntry[Hvd](key).fold(notStarted) {
       model =>
-        if (model.isComplete) {
-          TaskRow(
-            key,
-            controllers.hvd.routes.SummaryController.get.url,
-            model.hasChanged,
-            Completed,
-            TaskRow.completedTag
-          )
-        } else if (model.hasChanged) {
+        if (model.isComplete && model.hasChanged) {
           TaskRow(
             key,
             controllers.hvd.routes.SummaryController.get.url,
             hasChanged = true,
             status = Updated,
             tag = TaskRow.updatedTag
+          )
+        } else if (model.isComplete) {
+          TaskRow(
+            key,
+            controllers.hvd.routes.SummaryController.get.url,
+            model.hasChanged,
+            Completed,
+            TaskRow.completedTag
           )
         } else {
           TaskRow(

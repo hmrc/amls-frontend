@@ -19,7 +19,7 @@ package models.businessactivities
 import models.businessactivities.TransactionTypes._
 import models.businessmatching.BusinessActivity.AccountancyServices
 import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities}
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow}
+import models.registrationprogress._
 import play.api.Logging
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -188,11 +188,19 @@ object BusinessActivities extends Logging {
     val bmBusinessActivities = ControllerHelper.getBusinessActivity(cache.getEntry[BusinessMatching](BusinessMatching.key))
     cache.getEntry[BusinessActivities](key).fold(notStarted) {
       model =>
-        if (model.isComplete(bmBusinessActivities)) {
+        if (model.isComplete(bmBusinessActivities) && model.hasChanged) {
           TaskRow(
             messageKey,
             controllers.businessactivities.routes.SummaryController.get.url,
-            model.hasChanged,
+            hasChanged = true,
+            Updated,
+            TaskRow.updatedTag
+          )
+        } else if (model.isComplete(bmBusinessActivities)) {
+          TaskRow(
+            messageKey,
+            controllers.businessactivities.routes.SummaryController.get.url,
+            hasChanged = false,
             Completed,
             TaskRow.completedTag
           )

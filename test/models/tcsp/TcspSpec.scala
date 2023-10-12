@@ -16,9 +16,9 @@
 
 package models.tcsp
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import models.tcsp.TcspTypes._
+import models.registrationprogress._
 import models.tcsp.ProvidedServices._
+import models.tcsp.TcspTypes._
 import org.mockito.Mockito._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -114,42 +114,59 @@ class TcspSpec extends AmlsSpec with TcspValues {
       }
     }
 
-    "have a section function that" must {
+    "have a task row function that" must {
 
       implicit val cache = mock[CacheMap]
 
-      "return a NotStarted Section when model is empty" in {
+      "returns a Not Started task row when model is empty" in {
 
-        val notStartedSection = Section("tcsp", NotStarted, false, controllers.tcsp.routes.WhatYouNeedController.get)
+        val notStartedTaskRow = TaskRow(
+          "tcsp", controllers.tcsp.routes.WhatYouNeedController.get.url, false, NotStarted, TaskRow.notStartedTag
+        )
 
         when(cache.getEntry[Tcsp]("tcsp")) thenReturn None
 
-        Tcsp.section must be(notStartedSection)
-
+        Tcsp.taskRow mustBe notStartedTaskRow
       }
 
-      "return a Completed Section when model is complete" in {
+      "returns a Completed task row when model is complete" in {
 
         val complete = mock[Tcsp]
-        val completedSection = Section("tcsp", Completed, false, controllers.tcsp.routes.SummaryController.get)
+        val completedTaskRow = TaskRow(
+          "tcsp", controllers.tcsp.routes.SummaryController.get.url, false, Completed, TaskRow.completedTag
+        )
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Tcsp]("tcsp")) thenReturn Some(complete)
 
-        Tcsp.section must be(completedSection)
-
+        Tcsp.taskRow mustBe completedTaskRow
       }
 
-      "return a Started Section when model is incomplete" in {
+      "returns an Updated task row when model is complete" in {
+
+        val complete = mock[Tcsp]
+        val completedTaskRow = TaskRow(
+          "tcsp", controllers.tcsp.routes.SummaryController.get.url, true, Updated, TaskRow.updatedTag
+        )
+
+        when(complete.isComplete) thenReturn true
+        when(complete.hasChanged) thenReturn true
+        when(cache.getEntry[Tcsp]("tcsp")) thenReturn Some(complete)
+
+        Tcsp.taskRow mustBe completedTaskRow
+      }
+
+      "returns an Incomplete task row when model is incomplete" in {
 
         val incompleteTcsp = mock[Tcsp]
-        val startedSection = Section("tcsp", Started, false, controllers.tcsp.routes.WhatYouNeedController.get)
+        val incompleteTaskRow = TaskRow(
+          "tcsp", controllers.tcsp.routes.WhatYouNeedController.get.url, false, Started, TaskRow.incompleteTag
+        )
 
         when(incompleteTcsp.isComplete) thenReturn false
         when(cache.getEntry[Tcsp]("tcsp")) thenReturn Some(incompleteTcsp)
 
-        Tcsp.section must be(startedSection)
-
+        Tcsp.taskRow mustBe incompleteTaskRow
       }
     }
 

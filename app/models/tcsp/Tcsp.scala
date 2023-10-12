@@ -90,19 +90,6 @@ object Tcsp {
   import play.api.libs.json._
   import utils.MappingUtils._
 
-  def section(implicit cache: CacheMap): Section = {
-    val messageKey = "tcsp"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.tcsp.routes.WhatYouNeedController.get)
-    cache.getEntry[Tcsp](key).fold(notStarted) {
-      model =>
-        if (model.isComplete) {
-          Section(messageKey, Completed, model.hasChanged, controllers.tcsp.routes.SummaryController.get)
-        } else {
-          Section(messageKey, Started, model.hasChanged, controllers.tcsp.routes.WhatYouNeedController.get)
-        }
-    }
-  }
-
   def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
     val notStarted = TaskRow(
       key,
@@ -113,21 +100,21 @@ object Tcsp {
     )
     cache.getEntry[Tcsp](key).fold(notStarted) {
       model =>
-        if (model.isComplete) {
-          TaskRow(
-            key,
-            controllers.tcsp.routes.SummaryController.get.url,
-            model.hasChanged,
-            Completed,
-            TaskRow.completedTag
-          )
-        } else if (model.hasChanged) {
+        if (model.isComplete && model.hasChanged) {
           TaskRow(
             key,
             controllers.tcsp.routes.SummaryController.get.url,
             hasChanged = true,
             status = Updated,
             tag = TaskRow.updatedTag
+          )
+        } else if (model.isComplete) {
+          TaskRow(
+            key,
+            controllers.tcsp.routes.SummaryController.get.url,
+            model.hasChanged,
+            Completed,
+            TaskRow.completedTag
           )
         } else {
           TaskRow(
