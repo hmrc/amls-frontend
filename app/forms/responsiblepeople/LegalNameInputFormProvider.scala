@@ -17,7 +17,7 @@
 package forms.responsiblepeople
 
 import forms.mappings.Mappings
-import models.responsiblepeople.{PersonName, PreviousName}
+import models.responsiblepeople.PreviousName
 import play.api.data.Form
 import play.api.data.Forms.{mapping, optional}
 
@@ -53,7 +53,7 @@ class LegalNameInputFormProvider @Inject()() extends Mappings {
   )
 
   private def apply(first: String, middle: Option[String], last: String): PreviousName = {
-    PreviousName(None, Some(first), middle, Some(last))
+    PreviousName(Some(true), Some(first), middle, Some(last))
   }
 
   private def unapply(obj: PreviousName): Option[(String, Option[String], String)] = (obj.firstName, obj.lastName) match {

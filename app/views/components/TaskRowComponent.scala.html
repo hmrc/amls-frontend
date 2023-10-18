@@ -15,32 +15,32 @@
  *@
 
 @import models.registrationprogress.TaskRow
-@import models.registrationprogress.{Completed, Updated}
+@import models.registrationprogress._
 
 @this(govukTag: GovukTag)
 
-@(taskRow: TaskRow, isAmend: Boolean = false)(implicit messages: Messages)
+@(taskRow: TaskRow)(implicit messages: Messages)
 
 @sectionName = @{messages(s"progress.${taskRow.msgKey}.name")}
-@message = @{
+@messageAndTag = @{
     taskRow.status match {
-        case Updated =>
-            messages("status.progress.manage", sectionName)
-        case Completed if isAmend =>
-            messages("status.progress.manage", sectionName)
         case Completed =>
-            messages("status.progress.edit", sectionName)
+            (messages("status.progress.edit", sectionName), TaskRow.completedTag)
+        case NotStarted =>
+            (messages("status.progress.add", sectionName), TaskRow.notStartedTag)
+        case Started =>
+            (messages("status.progress.add", sectionName), TaskRow.incompleteTag)
         case _ =>
-            messages("status.progress.add", sectionName)
+            (messages("status.progress.manage", sectionName), TaskRow.completedTag)
     }
 }
 
 <li id="@sectionName.replaceAll(" ", "-").toLowerCase.concat("-status")" class="app-task-list__item">
     <span class="app-task-list__task-name">
-        <a href="@taskRow.href">@message</a>
+        <a href="@taskRow.href">@messageAndTag._1</a>
     </span>
     <span hidden class="task-status">
         @messages("status.visuallyhidden.text")
     </span>
-    @govukTag(taskRow.tag)
+    @govukTag(messageAndTag._2)
 </li>

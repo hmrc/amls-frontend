@@ -14,9 +14,9 @@
  * limitations under the License.
  *@
 
-@import models.status.{Renewal, ReadyForRenewal, RenewalSubmitted}
+@import models.status.Renewal
 @import config.ApplicationConfig
-@import views.html.components.{Heading, TaskRowComponent, ServicesSidebar}
+@import views.html.components.{Heading, TaskRowWithUpdateComponent, ServicesSidebar}
 @import views.html.renewal.components.ApplicationSubmitView
 @import models.registrationprogress.TaskList
 
@@ -24,7 +24,7 @@
     layout: Layout,
     heading: Heading,
     servicesSidebar: ServicesSidebar,
-    taskRow: TaskRowComponent,
+    taskRow: TaskRowWithUpdateComponent,
     applicationSubmit: ApplicationSubmitView
 )
 @(
@@ -76,7 +76,7 @@
             <h2 class="govuk-heading-m">@messages("renewal.progress.section")</h2>
             @* Main sections *@
             <ul class="app-task-list__items govuk-!-padding-left-0">
-                @(taskList.rows.map(taskRow(_, true)))
+                @(taskList.rows.map(taskRow(_)))
             </ul>
         </div>
     </div>

@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.LegalNameInputFormProvider
-import models.responsiblepeople.{PreviousName, ResponsiblePerson}
+import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.LegalNameInputView
@@ -56,20 +56,12 @@ class LegalNameInputController @Inject()(val dataCacheConnector: DataCacheConnec
           getData[ResponsiblePerson](request.credId, index) map { rp =>
             BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           },
-        data => {
-          for {
-            _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                val name = rp.legalName.fold(data)(x =>
-                  PreviousName(x.hasPreviousName, data.firstName, data.middleName, data.lastName)
-                )
-                rp.legalName(name)
-              }
-          } yield {
+        data =>
+          updateDataStrict[ResponsiblePerson](request.credId, index)(_.legalName(data)).map { _ =>
             Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
+          }.recoverWith {
+            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
-        }.recoverWith {
-          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-        }
       )
     }
   }

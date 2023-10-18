@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import components.{Heading, TaskRowComponent, Button, ServicesSidebar}
+@import components.{Heading, TaskRowComponent, Button, ServicesSidebar, TaskRowWithUpdateComponent}
 @import config.ApplicationConfig
 @import models.registrationprogress.{TaskList, TaskRow, Started}
 
@@ -24,6 +24,7 @@
     servicesSidebar: ServicesSidebar,
     formHelper: FormWithCSRF,
     taskRow: TaskRowComponent,
+    taskRowWithUpdate: TaskRowWithUpdateComponent,
     button: Button
 )
 
@@ -68,7 +69,11 @@
 
     <div class="grid-layout">
         <ul class="app-task-list__items govuk-!-padding-left-0">
-            @(allRows.map(x => taskRow(x, true)))
+            @{
+                allRows.map { row =>
+                    if(taskList.rows.contains(row)) taskRowWithUpdate(row) else taskRow(row)
+                }
+            }
         </ul>
     </div>
 
