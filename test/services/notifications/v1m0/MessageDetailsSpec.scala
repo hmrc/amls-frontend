@@ -370,8 +370,44 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
 
       }
 
+      "static is called" must {
+
+        "throw an exception" when {
+
+          "the wrong contact type is supplied" in {
+
+            the[Exception] thrownBy {
+              MessageDetails.static(Others, "/foo")
+            } must have message("An Unknown Exception has occurred, v1m0:static():MessageDetails")
+          }
+        }
+      }
+
+      "endDate is called" must {
+
+        "throw an exception" when {
+
+          "the wrong contact type is supplied" in {
+
+            the[Exception] thrownBy {
+              MessageDetails.endDate(Others, "01-01-2023", "/foo", "123456")
+            } must have message ("An Unknown Exception has occurred, v1m0:endDate():MessageDetails")
+          }
+        }
+      }
+
+      "reminder is called" must {
+
+        "throw an exception" when {
+
+          "the wrong contact type is supplied" in {
+
+            the[Exception] thrownBy {
+              MessageDetails.reminder(Others, "123", "123456")
+            } must have message ("An Unknown Exception has occurred, v1m0:reminder():MessageDetails")
+          }
+        }
+      }
     }
-
   }
-
 }

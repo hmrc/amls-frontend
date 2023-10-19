@@ -19,7 +19,6 @@ package utils.businessdetails
 import config.ApplicationConfig
 import models.businessdetails._
 import models.businessmatching._
-import models.businessdetails.{VATRegisteredNo, VATRegisteredYes}
 import play.api.i18n.Messages
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases._
@@ -43,31 +42,6 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
       correspondenceAddressRows(businessDetails).getOrElse(Nil)
 
     SummaryList(rows)
-  }
-
-  def getSubmitButton(
-                       appliedForPSRNumberOpt: Option[BusinessAppliedForPSRNumber],
-                       isPreSubmission: Boolean,
-                       preAppCompleted: Boolean
-                     )(implicit messages: Messages): Option[Html] = {
-    if (isPreSubmission) {
-      appliedForPSRNumberOpt map {
-        case BusinessAppliedForPSRNumberYes(psrNumber) =>
-          if (preAppCompleted) {
-            button("businessmatching.summary.noedit.anchortext")
-          } else {
-            button("businessmatching.button.confirm.start")
-          }
-        case BusinessAppliedForPSRNumberNo =>
-          button(
-            "button.logout",
-            "logout",
-            Some(appConfig.logoutUrl)
-          )
-      }
-    } else {
-      Some(button("businessmatching.summary.noedit.anchortext"))
-    }
   }
 
   private def businessCurrentlyRegisteredRow(showRegisteredForMLR: Boolean, businessMatching: BusinessDetails)(implicit messages: Messages): Option[SummaryListRow] = {

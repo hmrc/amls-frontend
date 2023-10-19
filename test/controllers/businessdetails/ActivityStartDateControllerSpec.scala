@@ -28,7 +28,6 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -68,10 +67,10 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
       "load ActivityStartDate page" in new Fixture {
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(businessDetails)))
+          .thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessdetails.activity.start.date.title"))
+        contentAsString(result) must include(messages("businessdetails.activity.start.date.title"))
       }
 
       "load ActivityStartDate with pre-populated data" in new Fixture {
@@ -217,6 +216,62 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(messages("error.invalid.date.before.2100"))
+      }
+
+      "return NOT_FOUND when IndexOutOfBoundsException is thrown" in new Fixture {
+
+        val newRequest = FakeRequest(POST, routes.ActivityStartDateController.post(true).url)
+          .withFormUrlEncodedBody(
+            "value.day" -> "12",
+            "value.month" -> "5",
+            "value.year" -> "1999"
+          )
+
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+
+        override val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+          .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
+
+        when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(controller.dataCache.save(any(), any(), any())(any(), any()))
+          .thenThrow(new IndexOutOfBoundsException("error"))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(NOT_FOUND)
+      }
+
+      "redirect to Summary page when in edit mode" in new Fixture {
+
+        val newRequest = FakeRequest(POST, routes.ActivityStartDateController.post(true).url)
+          .withFormUrlEncodedBody(
+            "value.day" -> "12",
+            "value.month" -> "5",
+            "value.year" -> "1999"
+          )
+
+        val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+
+        override val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
+        when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
+          .thenReturn(Some(BusinessDetails(Some(PreviouslyRegisteredNo))))
+
+        when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+        when(controller.dataCache.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.SummaryController.get.url))
       }
     }
   }

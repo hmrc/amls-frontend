@@ -16,34 +16,13 @@
 
 package models.responsiblepeople
 
-import jto.validation.forms.Rules._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
-import models.FormTypes._
-import org.joda.time.{DateTimeFieldType, LocalDate}
-import play.api.libs.json.{Json, Writes => _}
-import play.api.libs.json.JodaWrites._
+import org.joda.time.LocalDate
 import play.api.libs.json.JodaReads._
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.{Json, Writes => _, _}
 
 case class LegalNameChangeDate(date: LocalDate)
 
 object LegalNameChangeDate {
-
   implicit val formats = Json.format[LegalNameChangeDate]
-
-  implicit val formRule: Rule[UrlFormEncoded, LegalNameChangeDate] =
-    From[UrlFormEncoded] { __ =>
-      (__ \ "date").read(newAllowedPastAndFutureDateRule("error.rp.name_change.required.date",
-        "error.rp.name_change.invalid.date.after.1900",
-        "error.rp.name_change.invalid.date.future",
-        "error.rp.name_change.invalid.date.not.real")) map LegalNameChangeDate.apply
-    }
-
-  implicit def formWrites = Write[LegalNameChangeDate, UrlFormEncoded] { data =>
-    Map(
-      "date.day" -> Seq(data.date.get(DateTimeFieldType.monthOfYear()).toString),
-      "date.month" -> Seq(data.date.get(DateTimeFieldType.monthOfYear()).toString),
-      "date.year" -> Seq(data.date.get(DateTimeFieldType.year()).toString)
-    )
-  }
 }

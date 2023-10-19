@@ -23,12 +23,13 @@ import models.businessmatching.BusinessMatching
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
+import org.scalatest.concurrent.IntegrationPatience
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 
 import scala.concurrent.Future
 
-class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach {
+class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach with IntegrationPatience {
 
   val mockCacheConnector = mock[DataCacheConnector]
   val mockCacheMap = mock[CacheMap]
@@ -161,9 +162,7 @@ class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach {
           eqTo(credId), eqTo(BusinessActivities.key), eqTo(ba.expectedAMLSTurnover(First)))(any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
-        service.updateBusinessActivities(credId, First).foreach {
-          _ mustBe Some(mockCacheMap)
-        }
+        service.updateBusinessActivities(credId, First).futureValue mustBe Some(mockCacheMap)
 
         verify(mockCacheConnector).save[BusinessActivities](
           eqTo(credId), eqTo(BusinessActivities.key), eqTo(ba.expectedAMLSTurnover(First)))(any(), any())

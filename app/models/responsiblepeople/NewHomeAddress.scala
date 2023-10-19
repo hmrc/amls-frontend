@@ -16,8 +16,6 @@
 
 package models.responsiblepeople
 
-import jto.validation.{From, Rule, To, Write}
-import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json.Json
 
 case class NewHomeAddress(personAddress: PersonAddress)
@@ -27,23 +25,4 @@ object NewHomeAddress {
   val key = "new-home-address"
 
   implicit val format = Json.format[NewHomeAddress]
-
-  implicit val formRule: Rule[UrlFormEncoded, NewHomeAddress] = From[UrlFormEncoded] { __ =>
-
-    import jto.validation.forms.Rules._
-      __.read[PersonAddress] map NewHomeAddress.apply _
-
-  }
-
-  def addressFormRule(paFormRule: Rule[UrlFormEncoded, PersonAddress]): Rule[UrlFormEncoded, NewHomeAddress] = From[UrlFormEncoded] { __ =>
-
-    import jto.validation.forms.Rules._
-    __.read(paFormRule) map NewHomeAddress.apply _
-
-  }
-
-  implicit val formWrites: Write[NewHomeAddress, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-    __.write[PersonAddress] contramap{x =>x.personAddress}
-  }
 }

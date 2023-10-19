@@ -36,7 +36,9 @@ class ContactingYouPhoneController @Inject () (val dataCache: DataCacheConnector
                                                view: BusinessTelephoneView) extends AmlsBaseController(ds, cc) {
 
   def updateData(contactingYou: Option[ContactingYou], data: ContactingYouPhone): ContactingYou = {
-    contactingYou.fold[ContactingYou](ContactingYou())(x => x.copy(phoneNumber = Some(data.phoneNumber)))
+    contactingYou.fold[ContactingYou](ContactingYou(Some(data.phoneNumber))) {
+      _.copy(phoneNumber = Some(data.phoneNumber))
+    }
   }
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
