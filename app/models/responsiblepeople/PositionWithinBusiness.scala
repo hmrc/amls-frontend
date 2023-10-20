@@ -31,6 +31,8 @@ import utils.TraversableValidators.minLengthR
 
 sealed trait PositionWithinBusiness {
   val value: String
+
+  def index: String = value.substring(1)
 }
 
 case object BeneficialOwner extends WithName("beneficialOwner") with PositionWithinBusiness {
@@ -93,29 +95,29 @@ object PositionWithinBusiness extends Enumerable.Implicits {
     val optionsList = buildOptionsList(businessType, isDeclaration, displayNominatedOfficer)
 
     optionsList.zipWithIndex.map { case (position, index) =>
-      val conditional = if (position.value == Other("").value) Some(html) else None
+      val conditional = if (position.toString == Other("").toString) Some(html) else None
 
       if(businessType == LimitedCompany && isDeclaration && index == 0) {
         CheckboxItem(
           content = Text(messages("declaration.addperson.lbl.01")),
           value = BeneficialOwner.toString,
-          id = Some(s"positions_$index"),
-          name = Some(s"positions[$index]")
+          id = Some(s"positions_${BeneficialOwner.index}"),
+          name = Some(s"positions[${BeneficialOwner.index}]")
         )
       } else if(position == Other("")) {
         CheckboxItem(
           content = Text(messages("responsiblepeople.position_within_business.lbl.09")),
           value = position.toString,
-          id = Some(s"positions_$index"),
-          name = Some(s"positions[$index]"),
+          id = Some(s"positions_9"),
+          name = Some(s"positions[9]"),
           conditionalHtml = conditional
         )
       } else {
         CheckboxItem(
           content = Text(getPrettyName(position)),
           value = position.toString,
-          id = Some(s"positions_$index"),
-          name = Some(s"positions[$index]"),
+          id = Some(s"positions_${position.index}"),
+          name = Some(s"positions[${position.index}]"),
           conditionalHtml = conditional
         )
       }
