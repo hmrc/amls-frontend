@@ -32,8 +32,4 @@ object Currency {
 
   implicit def fromInt(value: Int): Currency = Currency(value)
 
-  implicit def currencyToDouble(c: Currency): Double = c.value.toDouble
-
-  implicit def currencyToFloat(c: Currency): Float = c.value.toFloat
-
 }

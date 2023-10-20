@@ -82,6 +82,22 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
   "SubServicesController" when {
 
     "get is called" must {
+
+      "return OK with 'msb_subservices' unpopulated view when cache is empty" in new Fixture {
+
+        when(config.fxEnabledToggle) thenReturn true
+        mockCacheFetch(None)
+        val result = controller.get()(request)
+
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("businessmatching.updateservice.msb.services.heading"))
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("input[type=checkbox]").size mustBe 5
+        document.select("input[type=checkbox][checked]").size mustBe 0
+        document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
+      }
+
       "return OK with 'msb_subservices' populated view and FXtoggle is enabled" in new Fixture {
 
         when(config.fxEnabledToggle) thenReturn true
@@ -259,6 +275,22 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               hasChanged = true))
+        }
+      }
+
+      "return 500" when {
+
+        "update returns None" in new Fixture {
+
+          when(mockCacheConnector.update[AddBusinessTypeFlowModel](any(), any())(any())(any(), any()))
+            .thenReturn(Future.successful(None))
+
+          val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
+            "value[1]" -> ChequeCashingNotScrapMetal.toString,
+            "value[2]" -> ChequeCashingScrapMetal.toString
+          )
+
+          status(controller.post()(newRequest)) mustBe INTERNAL_SERVER_ERROR
         }
       }
     }

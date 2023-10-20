@@ -38,6 +38,7 @@
 @status match {
     case SubmissionReadyForReview => {
         <p class="govuk-body">@messages("your.registration.status.pending")</p>
+        <p class="govuk-body">@messages("your.registration.number", amlsRegNo.getOrElse(""))@messages("full.stop")</p>
         @canOrCannotTradeInformation
     }
     case SubmissionDecisionApproved | ReadyForRenewal(_) => {

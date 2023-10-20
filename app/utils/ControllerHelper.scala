@@ -144,17 +144,11 @@ object ControllerHelper {
   }
 
   def getNominatedOfficer(responsiblePeople: Seq[ResponsiblePerson]): Option[ResponsiblePerson] = {
-    ResponsiblePerson.filter(responsiblePeople).filter(_.isNominatedOfficer) match {
-      case rps@_::_ => Some(rps.head)
-      case _ => None
-    }
+    ResponsiblePerson.filter(responsiblePeople).find(_.isNominatedOfficer)
   }
 
   def getCompleteNominatedOfficer(responsiblePeople: Seq[ResponsiblePerson]): Option[ResponsiblePerson] = {
-    ResponsiblePerson.filter(responsiblePeople).filter(rp => rp.isComplete && rp.isNominatedOfficer) match {
-      case rps@_::_ => Some(rps.head)
-      case _ => None
-    }
+    ResponsiblePerson.filter(responsiblePeople).find(rp => rp.isComplete && rp.isNominatedOfficer)
   }
 
   def nominatedOfficerTitleName(responsiblePeople: Option[Seq[ResponsiblePerson]]): Option[String] = {

@@ -65,7 +65,7 @@ object Payment {
         (__ \ "createdAt").readLocalDateTime and
         (__ \ "isBacs").readNullable[Boolean] and
         (__ \ "updatedAt").readNullable[LocalDateTime]
-      ) (Payment.apply _)
+      ) (Payment(_, _, _, _, _, _, _, _, _, _))
 
   implicit val format = OFormat(reads,writes)
 }

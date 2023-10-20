@@ -198,12 +198,12 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
     )
 
     (businessDetails.altCorrespondenceAddress, businessDetails.correspondenceAddress) match {
-      case (Some(false), _) => Some(Seq(lettersAddressRow("lbl.no")))
+      case (Some(false), _) => Some(Seq(lettersAddressRow("lbl.yes")))
       case (Some(true), Some(address: CorrespondenceAddress)) if address.isUk.contains(true) =>
 
         address.ukAddress.map { address =>
-          Some(Seq(
-            lettersAddressRow("lbl.yes"),
+          Seq(
+            lettersAddressRow("lbl.no"),
             addressIsUKRow("businessdetails.correspondenceaddress.ukAddress"),
             SummaryListRow(
               Key(
@@ -215,17 +215,12 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
                 "businessdetailscorraddress-edit"
               )
             )
-          ))
-        }.getOrElse(
-          Some(Seq(
-            lettersAddressRow("lbl.yes"),
-            addressIsUKRow("businessdetails.correspondenceaddress.ukAddress")
-          ))
-        )
+          )
+        }
       case (Some(true), Some(address: CorrespondenceAddress)) if address.isUk.contains(false) =>
 
         address.nonUkAddress.map { address =>
-          Some(Seq(
+          Seq(
             lettersAddressRow("lbl.no"),
             addressIsUKRow("businessdetails.correspondenceaddress.nonUkAddress"),
             SummaryListRow(
@@ -238,13 +233,8 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
                 "businessdetailscorraddress-edit"
               )
             )
-          ))
-        }.getOrElse(
-          Some(Seq(
-            lettersAddressRow("lbl.no"),
-            addressIsUKRow("businessdetails.correspondenceaddress.nonUkAddress")
-          ))
-        )
+          )
+        }
       case (_, _) => None
     }
   }

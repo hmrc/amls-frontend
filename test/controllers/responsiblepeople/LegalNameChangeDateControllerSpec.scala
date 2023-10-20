@@ -71,7 +71,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures with 
 
         val responsiblePeople = ResponsiblePerson(
           personName = Some(personName),
-          legalNameChangeDate = Some(new LocalDate(2001,10,10))
+          legalNameChangeDate = Some(new LocalDate(2001,10,14))
         )
 
         mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePeople)), Some(ResponsiblePerson.key))
@@ -82,7 +82,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures with 
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.select("input[name=date.day]").`val` must be("10")
+        document.select("input[name=date.day]").`val` must be("14")
         document.select("input[name=date.month]").`val` must be("10")
         document.select("input[name=date.year]").`val` must be("2001")
       }

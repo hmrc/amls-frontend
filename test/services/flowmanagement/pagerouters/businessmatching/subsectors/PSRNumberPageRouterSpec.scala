@@ -32,7 +32,14 @@ class PSRNumberPageRouterSpec extends AmlsSpec {
       ChangeSubSectorFlowModel.apply(Some(Set(TransmittingMoney)), _)
   }
 
-  "Getting the next route" must {
+  trait NotRegisteredFixture {
+    val router = new PSRNumberPageRouterCompanyNotRegistered
+
+    val createModel: Option[BusinessAppliedForPSRNumber] => ChangeSubSectorFlowModel =
+      ChangeSubSectorFlowModel.apply(Some(Set(TransmittingMoney)), _)
+  }
+
+  "PSRNumberPageRouter" must {
     "redirect to the 'check your answers' page" when {
       "the user has entered a PSR number" in new Fixture {
         val model = createModel(Some(BusinessAppliedForPSRNumberYes("123456789")))
@@ -53,6 +60,44 @@ class PSRNumberPageRouterSpec extends AmlsSpec {
 
     "return an Internal Server Error" when {
       "there is no PSR number data" in new Fixture {
+        val model = createModel(None)
+        val result = router.getRoute("internalId", model)
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+  }
+
+  "PSRNumberPageRouterCompanyNotRegistered" must {
+    "redirect to the 'check your answers' page" when {
+      "the user has entered a PSR number and includeCompanyNotRegistered is false" in new NotRegisteredFixture {
+        val model = createModel(Some(BusinessAppliedForPSRNumberYes("123456789")))
+        val result = router.getRoute("internalId", model)
+
+        redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
+      }
+    }
+
+    "redirect to the 'check company' page" when {
+      "the user has entered a PSR number and includeCompanyNotRegistered is true" in new NotRegisteredFixture {
+        val model = createModel(Some(BusinessAppliedForPSRNumberYes("123456789")))
+        val result = router.getRoute("internalId", model, includeCompanyNotRegistered = true)
+
+        redirectLocation(result) mustBe Some(routes.CheckCompanyController.get.url)
+      }
+    }
+
+    "route to the 'you can't continue with your change' page" when {
+      "there is no PSR number" in new NotRegisteredFixture {
+        val model = createModel(Some(BusinessAppliedForPSRNumberNo))
+        val result = router.getRoute("internalId", model)
+
+        redirectLocation(result) mustBe Some(routes.NoPsrController.get.url)
+      }
+    }
+
+    "return an Internal Server Error" when {
+      "there is no PSR number data" in new NotRegisteredFixture {
         val model = createModel(None)
         val result = router.getRoute("internalId", model)
 

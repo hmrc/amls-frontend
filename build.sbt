@@ -34,6 +34,7 @@ lazy val scoverageSettings = {
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(Seq(play.sbt.PlayScala, SbtDistributablesPlugin) ++ plugins : _*)
+  .settings(libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always))
   .settings(majorVersion := 4)
   .settings(playSettings ++ scoverageSettings : _*)
   .settings(scalaSettings: _*)

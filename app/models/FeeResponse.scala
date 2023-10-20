@@ -20,7 +20,6 @@ import models.ResponseType.AmendOrVariationResponseType
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionReadyForReview, SubmissionStatus}
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
-import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
 
 sealed trait ResponseType
 
@@ -29,6 +28,7 @@ object ResponseType {
   import utils.MappingUtils.Implicits._
 
   case object SubscriptionResponseType extends ResponseType
+
   case object AmendOrVariationResponseType extends ResponseType
 
   implicit val jsonWrites = Writes[ResponseType] {
@@ -36,7 +36,7 @@ object ResponseType {
     case AmendOrVariationResponseType => JsString("AmendOrVariationResponse")
   }
 
-  implicit val jsonReads : Reads[ResponseType] = {
+  implicit val jsonReads: Reads[ResponseType] = {
     import play.api.libs.json.Reads.StringReads
     __.read[String] flatMap {
       case "SubscriptionReponse" => SubscriptionResponseType
@@ -59,7 +59,9 @@ case class FeeResponse(responseType: ResponseType,
                        createdAt: DateTime) {
 
   def toPay(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus] = None): BigDecimal = {
-    val isRenewalAmendment: Boolean = submissionRequestStatus exists { _.isRenewalAmendment.getOrElse(false) }
+    val isRenewalAmendment: Boolean = submissionRequestStatus exists {
+      _.isRenewalAmendment.getOrElse(false)
+    }
     status match {
       case (RenewalSubmitted(_) | ReadyForRenewal(_)) if isRenewalAmendment => difference.getOrElse(0)
       case SubmissionReadyForReview if responseType == AmendOrVariationResponseType => difference.getOrElse(0)
@@ -74,16 +76,15 @@ object FeeResponse {
   implicit val dateTimeRead: Reads[DateTime] =
     (__ \ "$date").read[Long].map { dateTime =>
       new DateTime(dateTime, DateTimeZone.UTC)
-    }.orElse(MongoJodaFormats.dateTimeReads)
-
-
-//  implicit val dateTimeWrite: Writes[DateTime] = new Writes[DateTime] {
-//    def writes(dateTime: DateTime): JsValue = Json.obj(
-//      "$date" -> dateTime.getMillis
-//    )
-//  }
-
-  implicit val dateTimeWrites = MongoJodaFormats.dateTimeWrites
+    }.orElse {
+      (__ \ "$date" \ "$numberLong").read[Long].map { dateTime =>
+        new DateTime(dateTime, DateTimeZone.UTC)
+      }
+    }.orElse {
+      (__ \ "$date" \ "$numberLong").read[String].map(dateTime => new DateTime(dateTime.toLong))
+    }
+  
+  implicit val dateTimeWrite: Writes[DateTime] = (dateTime: DateTime) => Json.obj("$date" -> dateTime.getMillis)
 
   implicit val format = Json.format[FeeResponse]
 }

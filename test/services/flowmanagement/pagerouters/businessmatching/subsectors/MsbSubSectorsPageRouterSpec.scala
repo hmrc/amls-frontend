@@ -29,7 +29,11 @@ class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
     val router = new MsbSubSectorsPageRouter
   }
 
-  "Getting the next route" must {
+  trait NotRegisteredFixture {
+    val router = new MsbSubSectorsPageRouterCompanyNotRegistered
+  }
+
+  "MsbSubSectorsPageRouter" must {
     "route to the 'Check your answers' page" when {
       Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal) foreach { s =>
         s"$s has been chosen" in new Fixture {
@@ -52,6 +56,47 @@ class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
 
     "return a InternalServerError" when {
       "there is no data in the flow model" in new Fixture {
+        val result = router.getRoute("internalId", ChangeSubSectorFlowModel())
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+  }
+
+  "MsbSubSectorsPageRouterCompanyNotRegistered" must {
+    "route to the 'Check your answers' page" when {
+      Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal) foreach { s =>
+        s"$s has been chosen" in new NotRegisteredFixture {
+          val model = ChangeSubSectorFlowModel(Some(Set(s)))
+          val result = router.getRoute("internalId", model)
+
+          redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
+        }
+      }
+    }
+
+    "route to the 'Check Company' page" when {
+      Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal) foreach { s =>
+        s"$s has been chosen and includeCompanyNotRegistered is true" in new NotRegisteredFixture {
+          val model = ChangeSubSectorFlowModel(Some(Set(s)))
+          val result = router.getRoute("internalId", model, includeCompanyNotRegistered = true)
+
+          redirectLocation(result) mustBe Some(routes.CheckCompanyController.get.url)
+        }
+      }
+    }
+
+    "route to the 'PSR number' page" when {
+      "TransmittingMoney has been chosen" in new NotRegisteredFixture {
+        val model = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
+        val result = router.getRoute("internalId", model)
+
+        redirectLocation(result) mustBe Some(routes.PSRNumberController.get().url)
+      }
+    }
+
+    "return a InternalServerError" when {
+      "there is no data in the flow model" in new NotRegisteredFixture {
         val result = router.getRoute("internalId", ChangeSubSectorFlowModel())
 
         status(result) mustBe INTERNAL_SERVER_ERROR
