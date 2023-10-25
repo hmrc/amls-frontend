@@ -156,7 +156,7 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
 
       "display the current home address with non-UK fields populated" in new Fixture {
 
-        val nonukAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
+        val nonukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Spain", "ES"))
         val additionalAddress = ResponsiblePersonCurrentAddress(nonukAddress, Some(SixToElevenMonths))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
@@ -186,7 +186,7 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
             "addressLineNonUK2" -> "Line 2",
             "country" -> "ES"
           )
-          val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Spain", "ES"))
+          val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("Spain", "ES"))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -227,7 +227,7 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
             "addressLineNonUK2" -> "New line 2",
             "country" -> "PL"
           )
-          val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Spain", "ES"))
+          val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("Spain", "ES"))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
@@ -271,7 +271,7 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
             "addressLineNonUK2" -> "Line 2",
             "country" -> "ES")
 
-          val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Spain", "ES"))
+          val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("Spain", "ES"))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
@@ -303,7 +303,7 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
             "addressLineNonUK2" -> "Line 2",
             "country" -> "ES")
 
-          val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Spain", "ES"))
+          val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("Spain", "ES"))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
@@ -334,7 +334,7 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
             "addressLineNonUK2" -> "Line 2",
             "country" -> "ES")
 
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
@@ -365,7 +365,7 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
             "addressLineNonUK2" -> "Line 2",
             "country" -> "ES")
 
-          val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Spain", "ES"))
+          val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("Spain", "ES"))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -397,7 +397,7 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
             "addressLineNonUK2" -> "Line 2",
             "country" -> "ES"
           )
-          val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Spain", "ES"))
+          val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("Spain", "ES"))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -430,7 +430,7 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
             "addressLineNonUK2" -> "Line *2",
             "country" -> "ES"
           )
-          val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Spain", "ES"))
+          val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("Spain", "ES"))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
@@ -539,7 +539,7 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
             "addressLineNonUK2" -> "Line 2",
             "country" -> "ES"
           )
-          val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Spain", "ES"))
+          val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("Spain", "ES"))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))

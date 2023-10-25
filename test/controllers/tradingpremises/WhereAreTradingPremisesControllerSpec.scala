@@ -85,7 +85,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
     "get is called" must {
       "respond with OK and show the form with data when there is data" in new Fixture {
 
-        val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA")
+        val address = Address("addressLine1", None, None, None, "AA1 1AA")
         val yourTradingPremises = YourTradingPremises(tradingName = "trading Name", address, Some(true), Some(LocalDate.now()))
         val tradingPremises = TradingPremises(None, Some(yourTradingPremises), None, None)
 
@@ -129,7 +129,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         "foo",
         Address(
           "1",
-          "2",
+          None,
           None,
           None,
           "AA11 1AA"
@@ -151,7 +151,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(ytp))))))
 
-          val updatedYtp = ytp.copy(tradingName = "Trading Name", tradingPremisesAddress = Address("Address 1", "Address 2", None, None, "AA1 1AA"))
+          val updatedYtp = ytp.copy(tradingName = "Trading Name", tradingPremisesAddress = Address("Address 1", None, None, None, "AA1 1AA"))
 
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(),
             meq(Seq(TradingPremises(yourTradingPremises = Some(updatedYtp), hasChanged = true))))(any(), any()))
@@ -210,7 +210,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
             "postcode" -> "AA1 1AA"
           )
           val newYtp = Some(YourTradingPremises(tradingName = "Trading Name",
-            tradingPremisesAddress = Address("Address 1", "Address 2", None, None, "AA1 1AA")))
+            tradingPremisesAddress = Address("Address 1", None, None, None, "AA1 1AA")))
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
@@ -235,7 +235,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
             "postcode" -> "AA1 1AA"
           )
 
-          val oldAddress = Address("Old address 1", "Old address 2", None, None, "Test")
+          val oldAddress = Address("Old address 1", None, None, None, "Test")
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(YourTradingPremises("Test", oldAddress)))))))
@@ -367,7 +367,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         "postcode" -> "AA1 1AA"
       )
 
-      val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA")
+      val address = Address("addressLine1", None, None, None, "AA1 1AA")
       val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = Some(true), Some(LocalDate.now()))
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -396,7 +396,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         "postcode" -> "AA1 1AA"
       )
 
-      val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA")
+      val address = Address("addressLine1", None, None, None, "AA1 1AA")
       val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = Some(true), Some(LocalDate.now()))
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -425,7 +425,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         "postcode" -> "AA1 1AA"
       )
 
-      val address = Address("Address 1", "Address 2", None, None, "AA1 1AA")
+      val address = Address("Address 1", None, None, None, "AA1 1AA")
       val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name", address, Some(true), Some(new LocalDate(2007, 2, 1)))
 
 
@@ -455,7 +455,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         "postcode" -> "AA1 1AA"
       )
 
-      val address = Address("Address 1", "Address 2", None, None, "AA1 1AA")
+      val address = Address("Address 1", None, None, None, "AA1 1AA")
       val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = Some(true), Some(new LocalDate(2007, 2, 1)))
 
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -488,7 +488,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         "dateOfChange.day" -> "01"
       )
 
-      val address = Address("addressLine1", "addressLine2", None, None, "AA1 1AA", Some(DateOfChange(new LocalDate(2010, 10, 1))))
+      val address = Address("addressLine1", None, None, None, "AA1 1AA", Some(DateOfChange(new LocalDate(2010, 10, 1))))
 
       val yourPremises = YourTradingPremises("Some name", address.copy(dateOfChange = None), isResidential = Some(true), Some(new LocalDate(2001, 1, 1)), None)
       val premises = TradingPremises(yourTradingPremises = Some(yourPremises))

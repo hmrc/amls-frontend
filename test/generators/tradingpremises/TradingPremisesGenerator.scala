@@ -32,7 +32,7 @@ trait TradingPremisesGenerator extends BaseGenerator with BusinessActivitiesGene
     line1 <- stringOfLengthGen(nameLength)
     line2 <- stringOfLengthGen(nameLength)
     postcode <- postcodeGen
-  } yield Address(line1, line2, None, None, postcode, None)
+  } yield Address(line1, Some(line2), None, None, postcode, None)
 
   val yourTradingPremisesGen: Gen[YourTradingPremises] = for {
     name <- stringOfLengthGen(nameLength)

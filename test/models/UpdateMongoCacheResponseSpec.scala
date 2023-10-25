@@ -30,7 +30,7 @@ class UpdateMongoCacheResponseSpec extends AmlsSpec {
     view = None,
     businessMatching = Some(BusinessMatching(
       Some(ReviewDetails("BusinessName", Some(SoleProprietor),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000", None)),
+        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000", None)),
       Some(BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService), None, None, None)),
       Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
       Some(TypeOfBusiness("test")),
@@ -45,11 +45,11 @@ class UpdateMongoCacheResponseSpec extends AmlsSpec {
       Some(CorporationTaxRegisteredYes("1234567890")),
       Some(ContactingYou(Some("1234567890"), Some("test@test.com"))),
       None,
-      Some(RegisteredOfficeUK("38B","line2",None,None,"AA1 1AA",None)),
+      Some(RegisteredOfficeUK("38B",None,None,None,"AA1 1AA",None)),
       Some(true),
       None,
       Some(CorrespondenceAddress(
-        Some(CorrespondenceAddressUk("Name","Business Name","address 1","address 2",
+        Some(CorrespondenceAddressUk("Name","Business Name","address 1",Some("address 2"),
           Some("address 3"),
           Some("address 4"),"AA11 1AA")),
         None)),

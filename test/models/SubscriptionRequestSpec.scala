@@ -30,7 +30,7 @@ class SubscriptionRequestSpec extends PlaySpec with MockitoSugar {
     "foo",
     Address(
       "1",
-      "2",
+      None,
       None,
       None,
       "asdfasdf"

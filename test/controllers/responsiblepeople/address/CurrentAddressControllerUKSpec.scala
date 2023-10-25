@@ -159,7 +159,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
 
       "display the home address with UK fields populated" in new Fixture {
 
-        val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+        val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
         val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePerson(personName = personName,addressHistory = Some(history))
@@ -190,7 +190,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -231,7 +231,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLineNonUK2" -> "Line 2",
             "country" -> "ES"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -272,7 +272,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "New line 2",
             "postCode" -> "TE1 1ET"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
@@ -316,7 +316,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
@@ -348,7 +348,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA")
 
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
@@ -379,7 +379,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA")
 
-          val ukAddress = PersonAddressNonUK("", "", None, None, Country("", ""))
+          val ukAddress = PersonAddressNonUK("", None, None, None, Country("", ""))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
@@ -410,7 +410,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA")
 
-          val ukAddress = PersonAddressNonUK("", "", None, None, Country("", ""))
+          val ukAddress = PersonAddressNonUK("", None, None, None, Country("", ""))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -442,7 +442,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -476,7 +476,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line *2",
             "postCode" -> "AA1 1AA"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
@@ -601,7 +601,7 @@ class CurrentAddressControllerUKSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))

@@ -88,7 +88,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
           (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         when(controller.dataCacheConnector.fetch[NewHomeAddress](any(), meq(NewHomeAddress.key))
-          (any(), any())).thenReturn(Future.successful(Some(NewHomeAddress(PersonAddressUK("", "", None, None, "")))))
+          (any(), any())).thenReturn(Future.successful(Some(NewHomeAddress(PersonAddressUK("", None, None, None, "")))))
 
         val result = controller.get(RecordId)(request)
         status(result) must be(OK)
@@ -106,7 +106,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
           (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         when(controller.dataCacheConnector.fetch[NewHomeAddress](any(), meq(NewHomeAddress.key))
-          (any(), any())).thenReturn(Future.successful(Some(NewHomeAddress(PersonAddressNonUK("", "", None, None, Country("", ""))))))
+          (any(), any())).thenReturn(Future.successful(Some(NewHomeAddress(PersonAddressNonUK("", None, None, None, Country("", ""))))))
 
         val result = controller.get(RecordId)(request)
         status(result) must be(OK)
@@ -125,7 +125,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
             "isUK" -> "true"
           )
 
-          val newHomeAddress = NewHomeAddress(PersonAddressUK("", "", None, None, ""))
+          val newHomeAddress = NewHomeAddress(PersonAddressUK("", None, None, None, ""))
 
           when(controller.dataCacheConnector.save[NewHomeAddress](any(), meq(NewHomeAddress.key), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -145,7 +145,7 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
             "isUK" -> "false"
           )
 
-          val newHomeAddress = NewHomeAddress(PersonAddressNonUK("", "", None, None, Country("", "")))
+          val newHomeAddress = NewHomeAddress(PersonAddressNonUK("", None, None, None, Country("", "")))
 
           when(controller.dataCacheConnector.save[NewHomeAddress](any(), meq(NewHomeAddress.key), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))

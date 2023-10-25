@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
 
-  val address = Address("1", "2", None, None, "AA1 1BB", None)
+  val address = Address("1", None, None, None, "AA1 1BB", None)
 
   trait Fixture  {
     self =>
@@ -119,7 +119,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
           "startDate.year" -> "2014"
         )
         val updatedYtp = Some(YourTradingPremises("foo",
-          Address("1","2",None,None,"AA1 1BB",None), None, Some(new LocalDate(2014, 5, 20)), None))
+          Address("1",None,None,None,"AA1 1BB",None), None, Some(new LocalDate(2014, 5, 20)), None))
 
         val updatedTp = TradingPremises(yourTradingPremises = updatedYtp, hasChanged = true)
 

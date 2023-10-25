@@ -29,7 +29,7 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuditHelper
 
-case class AuditAddress(addressLine1: String, addressLine2: String, addressLine3: Option[String], country: String, postCode: Option[String])
+case class AuditAddress(addressLine1: String, addressLine2: Option[String], addressLine3: Option[String], country: String, postCode: Option[String])
 
 object AuditAddress {
   implicit val format = Json.format[AuditAddress]

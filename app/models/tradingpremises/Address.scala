@@ -25,7 +25,7 @@ import models.businesscustomer.{Address => BCAddress}
 
 case class Address(
                   addressLine1: String,
-                  addressLine2: String,
+                  addressLine2: Option[String],
                   addressLine3: Option[String],
                   addressLine4: Option[String],
                   postcode: String,
@@ -34,7 +34,7 @@ case class Address(
 
   def toLines: Seq[String] = Seq(
     Some(addressLine1),
-    Some(addressLine2),
+    addressLine2,
     addressLine3,
     addressLine4,
     Some(postcode)
@@ -45,7 +45,7 @@ case class Address(
 
 object Address {
 
-  def applyWithoutDateOfChange(address1: String, address2: String, address3: Option[String], address4: Option[String], postcode: String) =
+  def applyWithoutDateOfChange(address1: String, address2: Option[String], address3: Option[String], address4: Option[String], postcode: String) =
     Address(address1, address2, address3, address4, postcode)
 
   def unapplyWithoutDateOfChange(x: Address) =
@@ -73,7 +73,7 @@ object Address {
       import jto.validation.forms.Rules._
       (
         (__ \ "addressLine1").read(addressLine1Rule) ~
-          (__ \ "addressLine2").read(addressLine2Rule) ~
+          (__ \ "addressLine2").read(optionR(addressLine2Rule)) ~
           (__ \ "addressLine3").read(optionR(addressLine3Rule)) ~
           (__ \ "addressLine4").read(optionR(addressLine4Rule)) ~
           (__ \ "postcode").read(notEmptyStrip andThen postcodeType)
@@ -86,7 +86,7 @@ object Address {
       import play.api.libs.functional.syntax.unlift
       (
         (__ \ "addressLine1").write[String] ~
-          (__ \ "addressLine2").write[String] ~
+          (__ \ "addressLine2").write[Option[String]] ~
           (__ \ "addressLine3").write[Option[String]] ~
           (__ \ "addressLine4").write[Option[String]] ~
           (__ \ "postcode").write[String]
@@ -98,7 +98,7 @@ object Address {
     import play.api.libs.json._
     (
       (__ \ "addressLine1").read[String] and
-        (__ \ "addressLine2").read[String] and
+        (__ \ "addressLine2").readNullable[String] and
         (__ \ "addressLine3").readNullable[String] and
         (__ \ "addressLine4").readNullable[String] and
         (__ \ "postcode").read[String] and
@@ -111,7 +111,7 @@ object Address {
     import play.api.libs.json._
     (
       (__ \ "addressLine1").write[String] and
-        (__ \ "addressLine2").write[String] and
+        (__ \ "addressLine2").writeNullable[String] and
         (__ \ "addressLine3").writeNullable[String] and
         (__ \ "addressLine4").writeNullable[String] and
         (__ \ "postcode").write[String] and

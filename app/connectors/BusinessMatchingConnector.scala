@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
 
 case class BusinessMatchingAddress(line_1: String,
-                                   line_2: String,
+                                   line_2: Option[String],
                                    line_3: Option[String],
                                    line_4: Option[String],
                                    postcode: Option[String] = None,

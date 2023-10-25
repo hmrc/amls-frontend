@@ -94,7 +94,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
       "redirect to YourTradingPremisesController" when {
         "all questions are complete and answers accepted" in new Fixture {
 
-          val ytpModel = YourTradingPremises("foo", Address("1","2",None,None,"AA1 1BB",None), None, Some(new LocalDate(2010, 10, 10)), None)
+          val ytpModel = YourTradingPremises("foo", Address("1",None,None,None,"AA1 1BB",None), None, Some(new LocalDate(2010, 10, 10)), None)
 
           val emptyCache = CacheMap("", Map.empty)
 
