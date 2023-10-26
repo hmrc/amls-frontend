@@ -47,15 +47,17 @@ class PreviouslyRegisteredController @Inject ()(val authAction: AuthAction,
     implicit request => {
       formProvider().bindFromRequest().fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
-        data => service.updatePreviouslyRegistered(request.credId, data).map {
-          _.fold(routingLogic(edit, true)) { cache =>
-            ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key)) match {
-              case Some(SoleProprietor) => routingLogic(edit, true)
-              case Some(_) => routingLogic(edit)
-              case None => routingLogic(edit, true)
-            }
+        data =>
+          service.updatePreviouslyRegistered(request.credId, data).map { optCache =>
+            (for {
+              cache <- optCache
+              bmOpt = cache.getEntry[BusinessMatching](BusinessMatching.key)
+              businessType <- ControllerHelper.getBusinessType(bmOpt)
+              default = businessType == SoleProprietor
+            } yield {
+              routingLogic(edit, default)
+            }).getOrElse(routingLogic(edit, true))
           }
-        }
       )
     }
   }

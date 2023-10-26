@@ -56,12 +56,12 @@ class BranchesOrAgentsWhichCountriesSpec extends PlaySpec with MustMatchers{
     "successfully validate when there are empty values in the seq" in {
 
       val form: UrlFormEncoded = Map(
-        "countries[]" -> Seq("GB", "", "US", "")
+        "countries[]" -> Seq("GB", "", "FR", "")
       )
 
       rule.validate(form) mustBe Valid(BranchesOrAgentsWhichCountries(Seq(
         Country("United Kingdom", "GB"),
-        Country("United States", "US")
+        Country("France", "FR")
       )))
     }
 

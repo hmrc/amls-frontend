@@ -104,12 +104,12 @@ class CustomersOutsideUKSpec extends PlaySpec {
 
       val form: UrlFormEncoded = Map(
         "isOutside" -> Seq("true"),
-        "countries[]" -> Seq("GB", "", "US", "")
+        "countries[]" -> Seq("GB", "", "FR", "")
       )
 
       rule.validate(form) mustBe Valid(CustomersOutsideUK(Some(Seq(
         Country("United Kingdom", "GB"),
-        Country("United States", "US")
+        Country("France", "FR")
       ))))
     }
 
