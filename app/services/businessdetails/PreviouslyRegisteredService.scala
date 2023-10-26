@@ -16,16 +16,16 @@
 
 package services.businessdetails
 
-import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessdetails.{BusinessDetails, PreviouslyRegistered}
+import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PreviouslyRegisteredService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) {
+class PreviouslyRegisteredService @Inject()(val dataCacheConnector: DataCacheConnector)(implicit ec: ExecutionContext) extends Logging {
 
   def getPreviouslyRegistered(credId: String)(implicit hc: HeaderCarrier): Future[Option[PreviouslyRegistered]] = {
     dataCacheConnector.fetch[BusinessDetails](credId, BusinessDetails.key) map { optBusinessDetails =>
@@ -34,16 +34,30 @@ class PreviouslyRegisteredService @Inject()(val dataCacheConnector: DataCacheCon
   }
 
   def updatePreviouslyRegistered(credId: String, data: PreviouslyRegistered)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
-    dataCacheConnector.fetchAll(credId) map {
+
+    val businessDetailsOptF = dataCacheConnector.fetchAll(credId) map {
       _.flatMap { cache =>
-        cache.getEntry[BusinessDetails](BusinessDetails.key) map { businessDetails =>
-          dataCacheConnector.save[BusinessDetails](
-            credId,
-            BusinessDetails.key,
-            businessDetails.copy(previouslyRegistered = Some(data), hasChanged = true)
-          )
+        cache.getEntry[BusinessDetails](BusinessDetails.key) map {
+          _.copy(previouslyRegistered = Some(data), hasChanged = true)
         }
       }
     }
-  }  flatMap(_.sequence)
+
+    val logPrefix = "[PreviouslyRegisteredService][updatePreviouslyRegistered]"
+
+    businessDetailsOptF flatMap { detailsOpt =>
+      dataCacheConnector.save[BusinessDetails](
+        credId,
+        BusinessDetails.key,
+        detailsOpt
+      ) map { cache =>
+        logger.info(s"$logPrefix: Business details updated successfully")
+        Some(cache)
+      }
+    } recover {
+      case _: Exception =>
+        logger.error(s"$logPrefix: Failed to update Business details")
+        None
+    }
+  }
 }

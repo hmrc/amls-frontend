@@ -109,8 +109,11 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
           service.updatePreviouslyRegistered(credId, PreviouslyRegisteredNo).futureValue mustBe None
 
-          verify(mockCacheConnector, times(0))
-            .save[BusinessDetails](any(), any(), any())(any(), any())
+          verify(mockCacheConnector).save[BusinessDetails](
+            eqTo(credId),
+            eqTo(BusinessDetails.key),
+            eqTo(None)
+          )(any(), any())
         }
 
         "cache is empty" in {
@@ -120,8 +123,11 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
           service.updatePreviouslyRegistered(credId, PreviouslyRegisteredNo).futureValue mustBe None
 
-          verify(mockCacheConnector, times(0))
-            .save[BusinessDetails](any(), any(), any())(any(), any())
+          verify(mockCacheConnector).save[BusinessDetails](
+            eqTo(credId),
+            eqTo(BusinessDetails.key),
+            eqTo(None)
+          )(any(), any())
         }
       }
     }

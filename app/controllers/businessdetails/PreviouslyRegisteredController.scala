@@ -53,9 +53,8 @@ class PreviouslyRegisteredController @Inject ()(val authAction: AuthAction,
               cache <- optCache
               bmOpt = cache.getEntry[BusinessMatching](BusinessMatching.key)
               businessType <- ControllerHelper.getBusinessType(bmOpt)
-              default = businessType == SoleProprietor
             } yield {
-              routingLogic(edit, default)
+              routingLogic(edit, businessType == SoleProprietor)
             }).getOrElse(routingLogic(edit, true))
           }
       )
