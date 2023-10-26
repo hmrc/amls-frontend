@@ -44,7 +44,7 @@ class activit_start_dateSpec extends AmlsViewSpec with MustMatchers {
         Messages("title.amls") + " - " + Messages("title.gov")
 
       def view = {
-        val address = Address("line 1", "Line 2", None, None, "postcode")
+        val address = Address("line 1", Some("Line 2"), None, None, "postcode")
         activity_start_date(form2, 1, false, address)
       }
 
@@ -71,7 +71,7 @@ class activit_start_dateSpec extends AmlsViewSpec with MustMatchers {
         ))
 
       def view = {
-        val address = Address("", "", None, None, "")
+        val address = Address("", None, None, None, "")
         activity_start_date(form2, 1, true, address)
       }
 

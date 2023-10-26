@@ -34,7 +34,7 @@ class your_trading_premisesSpec extends AmlsViewSpec with MustMatchers with Trad
     implicit val requestWithToken = addTokenForView()
   }
 
-  val tpAddress = Address("CPLT 1", "SecondLine", Some("ThirdLine"), Some("FourthLine"), "AQ11QA")
+  val tpAddress = Address("CPLT 1", Some("SecondLine"), Some("ThirdLine"), Some("FourthLine"), "AQ11QA")
 
   val completeTp = TradingPremises(yourTradingPremises = Some(YourTradingPremises("Complete TP 1", tpAddress)))
   val completeTp2 = TradingPremises(yourTradingPremises = Some(YourTradingPremises("Complete TP 2", tpAddress.copy(addressLine1 = "CPLT 2"))))

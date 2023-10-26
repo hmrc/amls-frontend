@@ -63,7 +63,7 @@ class RegisteredOfficeUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
   "RegisteredOfficeUKController" must {
 
-    val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
+    val ukAddress = RegisteredOfficeUK("305", Some("address line"), Some("address line2"), Some("address line3"), "AA1 1AA")
 
     "load the where is your registered office or main place of business place page" in new Fixture {
 

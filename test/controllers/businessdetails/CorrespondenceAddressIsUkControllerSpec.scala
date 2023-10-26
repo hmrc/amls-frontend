@@ -59,9 +59,9 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
     } thenReturn Future.successful(Success)
 
     val correspondenceAddressUK = CorrespondenceAddress(Some(
-      CorrespondenceAddressUk("test", "test", "line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")), None)
+      CorrespondenceAddressUk("test", "test", "line1", Some("line2"), Some("line3"), Some("line4"), "AA1 1AA")), None)
     val correspondenceAddressNonUk = CorrespondenceAddress(None, Some(
-      CorrespondenceAddressNonUk("name", "name", "line1", "line2", Some("line3"), Some("line4"), Country("Hong Kong", "HK"))))
+      CorrespondenceAddressNonUk("name", "name", "line1", Some("line2"), Some("line3"), Some("line4"), Country("Hong Kong", "HK"))))
 
     val businessDetails = BusinessDetails(None, None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(true)), Some(correspondenceAddressUK))
   }

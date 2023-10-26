@@ -557,9 +557,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
   private val residence = UKResidence(Nino(nextNino))
   private val residenceCountry = Country("United Kingdom", "GB")
   private val residenceNationality = Country("United Kingdom", "GB")
-  private val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA111AA")
+  private val currentPersonAddress = PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA111AA")
   private val currentAddress = ResponsiblePersonCurrentAddress(currentPersonAddress, Some(ZeroToFiveMonths))
-  private val additionalPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA11AA")
+  private val additionalPersonAddress = PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA11AA")
   private val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, Some(ZeroToFiveMonths))
   //scalastyle:off magic.number
   val personName = PersonName("firstName", Some("middleName"), "lastName")

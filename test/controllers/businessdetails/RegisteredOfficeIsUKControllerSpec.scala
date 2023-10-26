@@ -52,8 +52,8 @@ class RegisteredOfficeIsUKControllerSpec extends AmlsSpec with  MockitoSugar{
 
     when(controller.dataCacheConnector.fetch[BusinessDetails](any(), any())(any(), any()))
       .thenReturn(Future.successful(None))
-    val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
-    val nonUKAddress = RegisteredOfficeNonUK("305", "address line", Some("address line2"), Some("address line3"), Country("Albania", "AL"))
+    val ukAddress = RegisteredOfficeUK("305", Some("address line"), Some("address line2"), Some("address line3"), "AA1 1AA")
+    val nonUKAddress = RegisteredOfficeNonUK("305", Some("address line"), Some("address line2"), Some("address line3"), Country("Albania", "AL"))
   }
 
   "RegisteredOfficeIsUKController" must {

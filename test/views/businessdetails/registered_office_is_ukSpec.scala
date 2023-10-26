@@ -37,7 +37,7 @@ class registered_office_is_ukSpec extends AmlsViewSpec with MustMatchers  {
   "registered_office view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
+      val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1",None,None,None,"AB12CD"))
 
       def view = registered_office_is_uk(form2, true)
 
@@ -46,7 +46,7 @@ class registered_office_is_ukSpec extends AmlsViewSpec with MustMatchers  {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
+      val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1",None,None,None,"AB12CD"))
 
       def view = registered_office_is_uk(form2, true)
 

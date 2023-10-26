@@ -37,14 +37,14 @@ class additional_extra_addressSpec extends AmlsViewSpec with MustMatchers {
   "additional_extra_address view" must {
 
     "have a back link" in new ViewFixture {
-      val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None))
+      val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("",None,None,None,""), None))
       def view = additional_extra_address(form2, true, 1, None, "firstName lastName")
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None))
+      val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("",None,None,None,""), None))
 
       def view = additional_extra_address(form2, true, 1, None, "firstName lastName")
 
@@ -53,7 +53,7 @@ class additional_extra_addressSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None))
+      val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("",None,None,None,""), None))
 
       def view = additional_extra_address(form2, true, 1, None, "firstName lastName")
 

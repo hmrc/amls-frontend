@@ -101,7 +101,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       nonUKPassport = Some(NoPassport),
       dateOfBirth = Some(DateOfBirth(LocalDate.parse("2000-01-01"))),
       contactDetails = Some(ContactDetails("0912345678", "TEST@EMAIL.COM")),
-      addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", "add2", Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
+      addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", Some("add2"), Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
       positions = Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(PositionStartDate(new LocalDate(2002, 2, 2))))),
       saRegistered = Some(SaRegisteredNo),
       vatRegistered = Some(VATRegisteredNo),
@@ -203,7 +203,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val details = Some(ReviewDetails(businessName = "Test",
             businessType = None,
-            businessAddress = Address("Line 1", "Line 2", None, None, Some("AA11AA"), Country("United Kingdom", "GB")),
+            businessAddress = Address("Line 1", Some("Line 2"), None, None, Some("AA11AA"), Country("United Kingdom", "GB")),
             safeId = ""))
 
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any())) thenReturn Future.successful(None)
@@ -223,7 +223,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val details = Some(ReviewDetails(businessName = "Test",
             businessType = None,
-            businessAddress = Address("Line 1", "Line 2", None, None, Some("aa1 $ aa156"), Country("United Kingdom", "GB")),
+            businessAddress = Address("Line 1", Some("Line 2"), None, None, Some("aa1 $ aa156"), Country("United Kingdom", "GB")),
             safeId = ""))
 
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
@@ -239,7 +239,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val details = Some(ReviewDetails(businessName = "Test",
             businessType = None,
-            businessAddress = Address("Line 1", "Line 2", None, None, None, Country("United Kingdom", "GB")),
+            businessAddress = Address("Line 1", Some("Line 2"), None, None, None, Country("United Kingdom", "GB")),
             safeId = ""))
 
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
@@ -255,7 +255,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val details = Some(ReviewDetails(businessName = "Test",
             businessType = None,
-            businessAddress = Address("Line 1", "Line 2", None, None, None, Country("USA", "US")),
+            businessAddress = Address("Line 1", Some("Line 2"), None, None, None, Country("USA", "US")),
             safeId = ""))
 
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)
@@ -271,7 +271,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 
           val details = Some(ReviewDetails(businessName = "Test",
             businessType = None,
-            businessAddress = Address("Line 1", "Line 2", None, None, None, Country("", "")),
+            businessAddress = Address("Line 1", Some("Line 2"), None, None, None, Country("", "")),
             safeId = ""))
 
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String]())(any(), any())) thenReturn Future.successful(None)

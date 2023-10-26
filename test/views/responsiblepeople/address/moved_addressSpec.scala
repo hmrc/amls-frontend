@@ -32,7 +32,7 @@ class moved_addressSpec extends AmlsViewSpec with MustMatchers {
     implicit val requestWithToken = addTokenForView()
 
     val name = "firstName lastName"
-    val address = PersonAddressUK("#11", "some building", Some("Some street"), Some("city"), "AA111AA")
+    val address = PersonAddressUK("#11", Some("some building"), Some("Some street"), Some("city"), "AA111AA")
   }
 
   "moved_address view" must {

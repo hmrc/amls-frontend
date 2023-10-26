@@ -76,7 +76,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       nonUKPassport = Some(NoPassport),
       dateOfBirth = Some(DateOfBirth(LocalDate.parse("2000-01-01"))),
       contactDetails = Some(ContactDetails("0912345678", "TEST@EMAIL.COM")),
-      addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", "add2", Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
+      addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", Some("add2"), Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
       positions = Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(PositionStartDate(new LocalDate(2002, 2, 2))))),
       saRegistered = Some(SaRegisteredNo),
       vatRegistered = Some(VATRegisteredNo),
@@ -129,7 +129,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       val reviewDetails = ReviewDetails(
         "Business Name",
         None,
-        Address("Line1", "Line2", None, None, Some("AA11AA"), Country("United Kingdom", "UK")),
+        Address("Line1", Some("Line2"), None, None, Some("AA11AA"), Country("United Kingdom", "UK")),
         "testSafeId")
 
       when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext], any[Request[_]]))
@@ -242,7 +242,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       nonUKPassport = Some(NoPassport),
       dateOfBirth = Some(DateOfBirth(LocalDate.parse("2000-01-01"))),
       contactDetails = Some(ContactDetails("0912345678", "TEST@EMAIL.COM")),
-      addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", "add2", Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
+      addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", Some("add2"), Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
       positions = Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(PositionStartDate(new LocalDate(2002, 2, 2))))),
       saRegistered = Some(SaRegisteredNo),
       vatRegistered = Some(VATRegisteredNo),
@@ -295,7 +295,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       val reviewDetails = ReviewDetails(
         "Business Name",
         None,
-        Address("Line1", "Line2", None, None, Some("AA11AA"), Country("United Kingdom", "UK")),
+        Address("Line1", Some("Line2"), None, None, Some("AA11AA"), Country("United Kingdom", "UK")),
         "testSafeId")
 
       when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext], any[Request[_]]))

@@ -134,7 +134,7 @@ class detailed_answersSpec extends AmlsSummaryViewSpec with TableDrivenPropertyC
             ResponsiblePersonAddressHistory(
               currentAddress = Some(ResponsiblePersonCurrentAddress(
                 personAddress = PersonAddressNonUK(
-                  "addressLine1", "addressLine2", Some("addressLine3"), Some("addressLine4"), Country("spain", "esp")
+                  "addressLine1", Some("addressLine2"), Some("addressLine3"), Some("addressLine4"), Country("spain", "esp")
                 ),
                 timeAtAddress = Some(ZeroToFiveMonths),
                 dateOfChange = Some(DateOfChange(new LocalDate(1990, 2, 24)))
@@ -442,21 +442,21 @@ trait ResponsiblePeopleValues extends NinoUtil {
 
   val personAddress1 = PersonAddressUK(
     "addressLine1",
-    "addressLine2",
+    Some("addressLine2"),
     Some("addressLine3"),
     Some("addressLine4"),
     "postCode1"
   )
   val personAddress2 = PersonAddressUK(
     "addressLine5",
-    "addressLine6",
+    Some("addressLine6"),
     Some("addressLine7"),
     Some("addressLine8"),
     "postCode2"
   )
   val personAddress3 = PersonAddressUK(
     "addressLine9",
-    "addressLine10",
+    Some("addressLine10"),
     Some("addressLine11"),
     Some("addressLine12"),
     "postCode3"

@@ -93,7 +93,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         )
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
         override val mockCacheMap = mock[CacheMap]
 
@@ -120,7 +120,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         )
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
         when(controller.dataCache.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
 

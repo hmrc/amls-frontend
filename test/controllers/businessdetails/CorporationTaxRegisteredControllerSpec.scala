@@ -42,7 +42,7 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
     val reviewDetails = ReviewDetails(
       "BusinessName",
       Some(LimitedCompany),
-      Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+      Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
       "ghghg",
       Some("sdsw")
     )
@@ -83,7 +83,7 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
         val reviewDtlsUtr = ReviewDetails(
           "BusinessName",
           Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
           "XE0000000000000",
           Some("1111111111")
         )
@@ -111,7 +111,7 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
         val reviewDtlsUtr = ReviewDetails(
           "BusinessName",
           Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
           "XE0000000000000",
           None
         )
@@ -137,7 +137,7 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
         mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(Some(ReviewDetails(
           "BusinessName",
           Some(UnincorporatedBody),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         ))), BusinessMatching.key)
 
         val data = BusinessDetails(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
