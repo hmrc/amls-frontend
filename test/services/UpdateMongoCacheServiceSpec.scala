@@ -155,7 +155,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       whoIsYourAccountant = Some(WhoIsYourAccountant(
         Some(WhoIsYourAccountantName("Accountant's name", Some("Accountant's trading name"))),
         Some(WhoIsYourAccountantIsUk(true)),
-        Some(UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE")))),
+        Some(UkAccountantsAddress("address1", Some("address2"), Some("address3"), Some("address4"), "POSTCODE")))),
       taxMatters = Some(TaxMatters(false)),
       transactionRecordTypes = Some(TransactionTypes(Set(Paper))),
       hasChanged = false,

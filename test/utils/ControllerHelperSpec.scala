@@ -74,7 +74,7 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
     whoIsYourAccountant = Some(WhoIsYourAccountant(
       Some(WhoIsYourAccountantName("Accountant name", None)),
       Some(WhoIsYourAccountantIsUk(true)),
-      Some(UkAccountantsAddress("", "", None, None, ""))))))
+      Some(UkAccountantsAddress("", None, None, None, ""))))))
 
   val accountantNameInCompleteModel = Some(BusinessActivities(
     whoIsYourAccountant = None))
