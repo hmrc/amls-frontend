@@ -27,7 +27,7 @@ class PreviouslyRegisteredFormProvider @Inject()() extends BooleanFormProvider {
 
   def apply(): Form[PreviouslyRegistered] =
     createForm[PreviouslyRegistered]("value", "error.required.atb.previously.registered")(
-      bool => if (bool) PreviouslyRegisteredYes(Some("")) else PreviouslyRegisteredNo, //TODO check if this silly model can be changed
+      bool => if (bool) PreviouslyRegisteredYes(None) else PreviouslyRegisteredNo,
       {
         case PreviouslyRegisteredYes(_) => true
         case PreviouslyRegisteredNo => false

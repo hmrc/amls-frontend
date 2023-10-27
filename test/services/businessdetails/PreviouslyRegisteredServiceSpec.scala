@@ -17,7 +17,7 @@
 package services.businessdetails
 
 import connectors.DataCacheConnector
-import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo}
+import models.businessdetails.{BusinessDetails, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import org.mockito.Matchers.{any, anyObject, eq => eqTo}
 import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
@@ -71,35 +71,35 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
     "updatePreviouslyRegistered is called" must {
 
-      "update and save the model correctly" in {
+      "update and save the model correctly" when {
 
-        val bd = BusinessDetails()
+        "business details are returned from the cache" in {
 
-        when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
+          val bd = BusinessDetails()
 
-        when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
-          .thenReturn(Some(bd))
+          when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(mockCacheConnector.save[BusinessDetails](
-          eqTo(credId),
-          eqTo(BusinessDetails.key),
-          eqTo(bd.copy(previouslyRegistered = Some(PreviouslyRegisteredNo), hasChanged = true))
-        )(any(), any()))
-          .thenReturn(Future.successful(mockCacheMap))
+          when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
+            .thenReturn(Some(bd))
 
-        service.updatePreviouslyRegistered(credId, PreviouslyRegisteredNo).futureValue mustBe Some(mockCacheMap)
+          when(mockCacheConnector.save[BusinessDetails](
+            eqTo(credId),
+            eqTo(BusinessDetails.key),
+            eqTo(bd.copy(previouslyRegistered = Some(PreviouslyRegisteredYes(None)), hasChanged = true))
+          )(any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
-        verify(mockCacheConnector).save[BusinessDetails](
-          eqTo(credId),
-          eqTo(BusinessDetails.key),
-          eqTo(bd.copy(previouslyRegistered = Some(PreviouslyRegisteredNo), hasChanged = true))
-        )(any(), any())
-      }
+          service.updatePreviouslyRegistered(credId, PreviouslyRegisteredYes(None)).futureValue mustBe Some(mockCacheMap)
 
-      "not update or save the model" when {
+          verify(mockCacheConnector).save[BusinessDetails](
+            eqTo(credId),
+            eqTo(BusinessDetails.key),
+            eqTo(bd.copy(previouslyRegistered = Some(PreviouslyRegisteredYes(None)), hasChanged = true))
+          )(any(), any())
+        }
 
-        "business details is empty" in {
+        "business details is not yet saved in the cache" in {
 
           when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -107,14 +107,24 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
           when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
             .thenReturn(None)
 
-          service.updatePreviouslyRegistered(credId, PreviouslyRegisteredNo).futureValue mustBe None
+          when(mockCacheConnector.save[BusinessDetails](
+            eqTo(credId),
+            eqTo(BusinessDetails.key),
+            eqTo(BusinessDetails().copy(previouslyRegistered = Some(PreviouslyRegisteredNo), hasChanged = true))
+          )(any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
+
+          service.updatePreviouslyRegistered(credId, PreviouslyRegisteredNo).futureValue mustBe Some(mockCacheMap)
 
           verify(mockCacheConnector).save[BusinessDetails](
             eqTo(credId),
             eqTo(BusinessDetails.key),
-            eqTo(None)
+            eqTo(BusinessDetails().copy(previouslyRegistered = Some(PreviouslyRegisteredNo), hasChanged = true))
           )(any(), any())
         }
+      }
+
+      "not update or save the model" when {
 
         "cache is empty" in {
 
@@ -128,6 +138,26 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
             eqTo(BusinessDetails.key),
             eqTo(None)
           )(any(), any())
+        }
+
+        "save throws an exception" in {
+
+          val bd = BusinessDetails()
+
+          when(mockCacheConnector.fetchAll(eqTo(credId))(any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          when(mockCacheMap.getEntry[BusinessDetails](eqTo(BusinessDetails.key))(any()))
+            .thenReturn(Some(bd))
+
+          when(mockCacheConnector.save[BusinessDetails](
+            eqTo(credId),
+            eqTo(BusinessDetails.key),
+            eqTo(bd.copy(previouslyRegistered = Some(PreviouslyRegisteredNo), hasChanged = true))
+          )(any(), any()))
+            .thenReturn(Future.failed(new Exception("Something went wrong")))
+
+          service.updatePreviouslyRegistered(credId, PreviouslyRegisteredNo).futureValue mustBe None
         }
       }
     }

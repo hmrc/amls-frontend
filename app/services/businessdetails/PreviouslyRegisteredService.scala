@@ -36,10 +36,10 @@ class PreviouslyRegisteredService @Inject()(val dataCacheConnector: DataCacheCon
   def updatePreviouslyRegistered(credId: String, data: PreviouslyRegistered)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
 
     val businessDetailsOptF = dataCacheConnector.fetchAll(credId) map {
-      _.flatMap { cache =>
-        cache.getEntry[BusinessDetails](BusinessDetails.key) map {
-          _.copy(previouslyRegistered = Some(data), hasChanged = true)
-        }
+      _.map { cache =>
+        cache.getEntry[BusinessDetails](BusinessDetails.key)
+          .getOrElse(BusinessDetails())
+          .copy(previouslyRegistered = Some(data), hasChanged = true)
       }
     }
 

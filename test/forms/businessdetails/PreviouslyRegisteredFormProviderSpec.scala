@@ -28,6 +28,6 @@ class PreviouslyRegisteredFormProviderSpec extends BooleanFieldBehaviours[Previo
   override val errorMessage: String = "error.required.atb.previously.registered"
 
   "PreviouslyRegistered form" must {
-    behave like booleanFieldWithModel(PreviouslyRegisteredYes(Some("")), PreviouslyRegisteredNo)
+    behave like booleanFieldWithModel(PreviouslyRegisteredYes(None), PreviouslyRegisteredNo)
   }
 }

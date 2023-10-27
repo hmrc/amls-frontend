@@ -90,7 +90,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
         Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
 
-      val update = PreviouslyRegisteredYes(Some(""))
+      val update = PreviouslyRegisteredYes(None)
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
@@ -160,7 +160,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
         Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
-      val update = PreviouslyRegisteredYes(Some(""))
+      val update = PreviouslyRegisteredYes(None)
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
