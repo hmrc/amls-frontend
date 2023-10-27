@@ -118,9 +118,8 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
   }
 
   private def declarationAvailable(seq: Seq[TaskRow])(implicit messages: Messages): Boolean = {
-    val completed = TaskRow.completedTag
     seq forall {
-      _.tag == completed
+      _.status == Completed
     }
   }
 

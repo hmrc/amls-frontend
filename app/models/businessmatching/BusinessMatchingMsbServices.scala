@@ -49,6 +49,8 @@ sealed trait BusinessMatchingMsbService extends CheckYourAnswersField {
       case ForeignExchange => Messages(s"${message}05")
     }
   }
+
+  def index: String = value.substring(1)
 }
 
 object BusinessMatchingMsbService extends Enumerable.Implicits {
@@ -123,13 +125,13 @@ object BusinessMatchingMsbServices {
 
     val filteredServices = if(foreignExchangeEnabled) all else all.filterNot(_ == ForeignExchange)
 
-    filteredServices.zipWithIndex.map { case (service, index) =>
+    filteredServices.map { service =>
 
       CheckboxItem(
         content = Text(messages(s"msb.services.list.lbl.${service.value}")),
         value = service.toString,
-        id = Some(s"value_$index"),
-        name = Some(s"value[$index]")
+        id = Some(s"value_${service.index}"),
+        name = Some(s"value[${service.index}]")
       )
     }.sortBy(_.value)
   }
