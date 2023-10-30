@@ -65,7 +65,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           be(Valid(
             RegisteredOfficeNonUK(
               "38B",
-              None,
+              Some("building"),
               Some("street"),
               Some("Area"),
               Country("Albania", "AL"),
@@ -114,14 +114,12 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           val data = Map(
             "isUK" -> Seq("false"),
             "addressLineNonUK1" -> Seq(""),
-            "addressLineNonUK2" -> Seq(""),
             "country" -> Seq("")
           )
 
           RegisteredOffice.formRule.validate(data) must
             be(Invalid(Seq(
               (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
-              (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.address.line2")),
               (Path \ "country") -> Seq(ValidationError("error.required.country"))
             )))
         }
@@ -153,14 +151,12 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
           val data = Map(
             "isUK" -> Seq("true"),
             "addressLine1" -> Seq(""),
-            "addressLine2" -> Seq(""),
             "postCode" -> Seq("")
           )
 
           RegisteredOffice.formRule.validate(data) must
             be(Invalid(Seq(
               (Path \ "addressLine1") -> Seq(ValidationError("error.required.address.line1")),
-              (Path \ "addressLine2") -> Seq(ValidationError("error.required.address.line2")),
               (Path \ "postCode") -> Seq(ValidationError("error.required.postcode"))
             )))
         }
@@ -190,14 +186,14 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
 
     "validate toLines for UK address" in {
-      RegisteredOfficeUK("38B", None, None, None, "AA1 1AA").toLines must be(Seq("38B",
+      RegisteredOfficeUK("38B", Some("some street"), None, None, "AA1 1AA").toLines must be(Seq("38B",
         "some street",
         "AA1 1AA"))
 
     }
 
     "validate toLines for Non UK address" in {
-      RegisteredOfficeNonUK("38B", None, None, None, Country("United Kingdom", "GB")).toLines must be(Seq("38B",
+      RegisteredOfficeNonUK("38B", Some("some street"), None, None, Country("United Kingdom", "GB")).toLines must be(Seq("38B",
         "some street",
         "United Kingdom"))
 
@@ -205,7 +201,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
     "write correct UK address to the model" in {
 
-      val data = RegisteredOfficeUK("38B", None, Some("street"), Some("area"), "AA1 1AA")
+      val data = RegisteredOfficeUK("38B", Some("Some building"), Some("street"), Some("area"), "AA1 1AA")
 
       RegisteredOffice.formWrites.writes(data) mustBe Map("isUK" -> Seq("true"),
         "addressLine1" -> Seq("38B"),
@@ -217,7 +213,7 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
     "write correct Non UK address to the model" in {
 
-      val data = RegisteredOfficeNonUK("38B", None, None, None, Country("United Kingdom", "GB"))
+      val data = RegisteredOfficeNonUK("38B", Some("Some Street"), None, None, Country("United Kingdom", "GB"))
 
       RegisteredOffice.formWrites.writes(data) mustBe Map("isUK" -> Seq("false"),
         "addressLineNonUK1" -> Seq("38B"),

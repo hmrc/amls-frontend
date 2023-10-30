@@ -39,7 +39,7 @@ class letters_addressSpec extends AmlsViewSpec with MustMatchers {
       val form2: ValidForm[ConfirmRegisteredOffice] = Form2(ConfirmRegisteredOffice(true))
 
       def view = {
-        val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1",Some("line2"),None,None,"AB12CD")
         letters_address(form2, address, true)
       }
 
@@ -62,7 +62,7 @@ class letters_addressSpec extends AmlsViewSpec with MustMatchers {
         ))
 
       def view = {
-        val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1",Some("line2"),None,None,"AB12CD")
         letters_address(form2, address, true)
       }
 
@@ -74,7 +74,7 @@ class letters_addressSpec extends AmlsViewSpec with MustMatchers {
       val form2: Form2[_] = EmptyForm
 
       def view = {
-        val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1",Some("line2"),None,None,"AB12CD")
         letters_address(form2, address, true)
       }
 

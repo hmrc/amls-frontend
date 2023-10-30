@@ -190,7 +190,6 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
           val requestWithMissingParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "",
-            "addressLine2" -> "",
             "postCode" -> ""
           )
 
@@ -202,7 +201,6 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
 
           val document: Document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#addressLine1]").html() must include(Messages("error.required.address.line1"))
-          document.select("a[href=#addressLine2]").html() must include(Messages("error.required.address.line2"))
           document.select("a[href=#postcode]").html() must include(Messages("error.required.postcode"))
         }
 

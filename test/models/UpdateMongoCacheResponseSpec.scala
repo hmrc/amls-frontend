@@ -105,7 +105,7 @@ class UpdateMongoCacheResponseSpec extends AmlsSpec {
       "email" -> "test@test.com"),
     "registeredOffice" -> Json.obj(
       "addressLine1" -> "38B",
-      "addressLine2" -> "line2",
+      "addressLine2" -> JsNull,
       "addressLine3" -> JsNull,
       "addressLine4" -> JsNull,
       "postCode" -> "AA1 1AA",

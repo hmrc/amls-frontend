@@ -129,7 +129,7 @@ class AdditionalExtraAddressControllerUKSpec extends AmlsSpec with MockitoSugar 
 
         val doc = Jsoup.parse(contentAsString(result))
         doc.getElementById("addressLine1").`val`() mustBe address.addressLine1
-        doc.getElementById("addressLine2").`val`() mustBe address.addressLine2
+        doc.getElementById("addressLine2").`val`() mustBe address.addressLine2.get
         doc.getElementById("addressLine3").`val`() mustBe address.addressLine3.get
         doc.getElementById("addressLine4").`val`() mustBe address.addressLine4.get
         doc.getElementById("postCode").`val`() mustBe address.postCode

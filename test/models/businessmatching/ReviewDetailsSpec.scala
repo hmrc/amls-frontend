@@ -31,7 +31,7 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
     businessName = "Name",
     businessType = Some(BusinessType.SoleProprietor),
     businessAddress = Address(
-      "1 Test Street", None, None, None, None, Country("United Kingdom", "GB")
+      "1 Test Street", Some("Test Town"), None, None, None, Country("United Kingdom", "GB")
     ),
     safeId = "safeId"
   )

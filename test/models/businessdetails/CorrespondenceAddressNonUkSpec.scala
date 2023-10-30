@@ -109,7 +109,6 @@ class CorrespondenceAddressNonUkSpec extends PlaySpec with MockitoSugar {
             "yourName" -> Seq(""),
             "businessName" -> Seq(""),
             "addressLineNonUK1" -> Seq(""),
-            "addressLineNonUK2" -> Seq(""),
             "country" -> Seq("")
           )
 
@@ -118,7 +117,6 @@ class CorrespondenceAddressNonUkSpec extends PlaySpec with MockitoSugar {
               (Path \ "yourName") -> Seq(ValidationError("error.required.yourname")),
               (Path \ "businessName") -> Seq(ValidationError("error.required.name.of.business")),
               (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
-              (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.address.line2")),
               (Path \ "country") -> Seq(ValidationError("error.required.country"))
             )))
         }

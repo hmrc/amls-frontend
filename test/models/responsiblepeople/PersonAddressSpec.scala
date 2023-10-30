@@ -144,14 +144,12 @@ class PersonAddressSpec extends PlaySpec {
             val data = Map(
               "isUK" -> Seq("true"),
               "addressLine1" -> Seq(""),
-              "addressLine2" -> Seq(""),
               "postCode" -> Seq("")
             )
 
             PersonAddress.formRule.validate(data) must
               be(Invalid(Seq(
                 (Path \ "addressLine1") -> Seq(ValidationError("error.required.address.line1")),
-                (Path \ "addressLine2") -> Seq(ValidationError("error.required.address.line2")),
                 (Path \ "postCode") -> Seq(ValidationError("error.required.postcode"))
               )))
           }
@@ -159,14 +157,12 @@ class PersonAddressSpec extends PlaySpec {
             val data = Map(
               "isUK" -> Seq("false"),
               "addressLineNonUK1" -> Seq(""),
-              "addressLineNonUK2" -> Seq(""),
               "country" -> Seq("")
             )
 
             PersonAddress.formRule.validate(data) must
               be(Invalid(Seq(
                 (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
-                (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.address.line2")),
                 (Path \ "country") -> Seq(ValidationError("error.required.country"))
               )))
           }

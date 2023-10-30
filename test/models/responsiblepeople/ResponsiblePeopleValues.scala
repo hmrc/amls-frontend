@@ -35,9 +35,9 @@ trait ResponsiblePeopleValues extends NinoUtil {
     val residenceUk = UKResidence(Nino("AA111111A"))
     val residenceCountry = Country("United Kingdom", "GB")
     val residenceNationality = Country("United Kingdom", "GB")
-    val currentPersonAddress = PersonAddressUK("Line 1", None, None, None, "AA111AA")
+    val currentPersonAddress = PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA111AA")
     val currentAddress = ResponsiblePersonCurrentAddress(currentPersonAddress, Some(ZeroToFiveMonths))
-    val additionalPersonAddress = PersonAddressUK("Line 1", None, None, None, "AA11AA")
+    val additionalPersonAddress = PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA11AA")
     val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, Some(OneToThreeYears))
     val soleProprietorOfAnotherBusiness = SoleProprietorOfAnotherBusiness(true)
     //scalastyle:off magic.number
@@ -71,8 +71,8 @@ trait ResponsiblePeopleValues extends NinoUtil {
     private val residence = UKResidence(Nino(nino))
     private val residenceCountry = Country("United Kingdom", "GB")
     private val residenceNationality = Country("United Kingdom", "GB")
-    private val newPersonAddress = PersonAddressNonUK("Line 1", None, None, None, Country("Spain", "ES"))
-    private val newAdditionalPersonAddress = PersonAddressNonUK("Line 1", None, None, None, Country("France", "FR"))
+    private val newPersonAddress = PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Spain", "ES"))
+    private val newAdditionalPersonAddress = PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("France", "FR"))
     private val currentAddress = ResponsiblePersonCurrentAddress(newPersonAddress, Some(ZeroToFiveMonths))
     private val additionalAddress = ResponsiblePersonAddress(newAdditionalPersonAddress, Some(ZeroToFiveMonths))
 
