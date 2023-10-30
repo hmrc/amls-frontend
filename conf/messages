@@ -773,7 +773,7 @@ lbl.registration.status.short = Status
 
 legend.address = Address
 lbl.address.line1 = Address line 1
-lbl.address.line2 = Address line 2
+lbl.address.line2 = Address line 2 (optional)
 lbl.address.line3 = Address line 3 (optional)
 lbl.address.line4 = Address line 4 (optional)
 lbl.address.postcode = Postcode
