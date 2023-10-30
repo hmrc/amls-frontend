@@ -47,7 +47,6 @@ error.required.dateofchange.1900 = Date of the change must be after 1900
 error.required.dateofchange.future = Date of the change must be today or in the past
 
 error.required.address.line1 = Enter address line 1
-error.required.address.line2 = Enter address line 2
 error.max.length.address.line = You can’t enter more than 35 characters
 error.max.length.address.line1 = Address line 1 must be 35 characters or less
 error.max.length.address.line2 = Address line 2 must be 35 characters or less
@@ -465,7 +464,6 @@ error.required.select.non.uk.other.previous.address = this person’s other prev
 
 error.required.select.uk = Select yes if {0}’s home address is in the UK
 error.required.enter.addressline.one = Enter address line 1
-error.required.enter.addressline.two = Enter address line 2
 error.required.enter.postcode = Enter a postcode, like AA1 1AA
 error.required.enter.country = Enter a country name, like France
 error.required.enter.addresslineone.regex = Address line 1 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces, and round brackets

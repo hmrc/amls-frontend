@@ -153,7 +153,6 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
           val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "Line 1",
-            "addressLineNonUK2" -> "Line 2",
             "country" -> "ES"
           )
           val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
@@ -176,7 +175,6 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
           captor.getValue match {
             case d: DataEvent =>
               d.detail("addressLine1") mustBe "Line 1"
-              d.detail("addressLine2") mustBe "Line 2"
               d.detail("country") mustBe "Spain"
           }
         }
@@ -209,7 +207,6 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
           val requestWithMissingParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "",
-            "addressLineNonUK2" -> "",
             "country" -> "GB"
           )
 

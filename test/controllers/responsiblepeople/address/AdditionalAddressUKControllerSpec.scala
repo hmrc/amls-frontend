@@ -155,7 +155,6 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
           val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "true",
             "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA"
           )
           val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
@@ -178,7 +177,6 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
           captor.getValue match {
             case d: DataEvent =>
               d.detail("addressLine1") mustBe "Line 1"
-              d.detail("addressLine2") mustBe "Line 2"
               d.detail("postCode") mustBe "AA1 1AA"
           }
         }

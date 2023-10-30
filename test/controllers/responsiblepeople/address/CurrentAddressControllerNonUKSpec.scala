@@ -183,7 +183,6 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
           val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "Line 1",
-            "addressLineNonUK2" -> "Line 2",
             "country" -> "ES"
           )
           val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("Spain", "ES"))
@@ -213,7 +212,6 @@ class CurrentAddressControllerNonUKSpec extends AmlsSpec {
           captor.getValue match {
             case d: DataEvent =>
               d.detail("addressLine1") mustBe "Line 1"
-              d.detail("addressLine2") mustBe "Line 2"
               d.detail("country") mustBe "Spain"
           }
         }
