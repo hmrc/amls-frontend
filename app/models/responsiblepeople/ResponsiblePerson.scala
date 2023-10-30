@@ -83,6 +83,10 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
     this.copy(personName = Some(p), hasChanged = hasChanged || !this.personName.contains(p),
       hasAccepted = hasAccepted && this.personName.contains(p))
 
+  def hasPreviousName(p: Boolean): ResponsiblePerson =
+    this.copy(legalName = this.legalName.map(_.copy(hasPreviousName = Some(p))), hasChanged = hasChanged || !this.legalName.map(_.hasPreviousName).contains(p),
+      hasAccepted = hasAccepted && this.legalName.map(_.hasPreviousName).contains(p))
+
   def legalName(p: PreviousName): ResponsiblePerson =
     this.copy(legalName = Some(p), hasChanged = hasChanged || !this.legalName.contains(p),
       hasAccepted = hasAccepted && this.legalName.contains(p))

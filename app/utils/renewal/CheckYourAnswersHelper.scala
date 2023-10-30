@@ -256,10 +256,11 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         }
       ).flatten ++
         wc.moneySources.map { ms =>
-          (ms match {
-            case ms if ms.size == 1 => getMoneySourcesRow(Value(Text(ms.toMessages.mkString)))
-            case ms if ms.size > 1 => getMoneySourcesRow(toBulletList(ms.toMessages))
-          }) +: Seq(
+          Seq(ms match {
+            case ms if ms.size == 1 => Some(getMoneySourcesRow(Value(Text(ms.toMessages.mkString))))
+            case ms if ms.size > 1 => Some(getMoneySourcesRow(toBulletList(ms.toMessages)))
+            case _ => None
+          }).flatten ++ Seq(
             ms.bankMoneySource map { source =>
               row(
                 "msb.which_currencies.source.which_banks",

@@ -24,7 +24,6 @@ import javax.inject.Inject
 
 class LegalNameFormProvider @Inject()() extends BooleanFormProvider {
 
-  def apply(): Form[PreviousName] = createForm[PreviousName](
-    "hasPreviousName", "error.required.rp.hasPreviousName"
-  )(x => PreviousName(Some(x), None, None, None), _.hasPreviousName.getOrElse(false))
+  private val error = "error.required.rp.hasPreviousName"
+  def apply(): Form[Boolean] = Form[Boolean]("hasPreviousName" -> boolean(error, error))
 }

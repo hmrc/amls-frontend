@@ -44,7 +44,8 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
       getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
         responsiblePerson.fold(NotFound(notFoundView)) { person =>
           (person.personName, person.legalName) match {
-            case (Some(name), Some(previousName)) => Ok(view(formProvider().fill(previousName), edit, index, flow, name.titleName))
+            case (Some(name), Some(previousName)) if previousName.hasPreviousName.isDefined =>
+              Ok(view(formProvider().fill(previousName.hasPreviousName.get), edit, index, flow, name.titleName))
             case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
             case _ => NotFound(notFoundView)
           }
@@ -62,20 +63,20 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
         data => {
           for {
             _ <- {
-              data.hasPreviousName match {
-                case Some(true) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                  rp.legalName(data)
+              if (data) {
+                updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+                  rp.hasPreviousName(data)
                 }
-                case Some(false) => updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+              } else {
+                updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
                   rp.legalName(PreviousName(Some(false), None, None, None)).copy(legalNameChangeDate = None)
                 }
-                case None => throw new Exception("An UnknownException has occurred: LegalNameController")
               }
             }
-          } yield edit match {
-            case true if data.hasPreviousName.contains(true) => Redirect(routes.LegalNameInputController.get(index, edit, flow))
-            case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-            case false if data.hasPreviousName.contains(true) => Redirect(routes.LegalNameInputController.get(index, edit, flow))
+          } yield (edit, data) match {
+            case (true, true) => Redirect(routes.LegalNameInputController.get(index, edit, flow))
+            case (true, false) => Redirect(routes.DetailedAnswersController.get(index, flow))
+            case (false, true) => Redirect(routes.LegalNameInputController.get(index, edit, flow))
             case _ => Redirect(routes.KnownByController.get(index, edit, flow))
           }
         }.recoverWith {

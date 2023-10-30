@@ -119,6 +119,23 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
         }
     }
 
+    "set hasPreviousName correctly" when {
+
+      "given true" in {
+        val updated = ResponsiblePerson(legalName = Some(PreviousName(None, None, None, None))).hasPreviousName(true)
+
+        updated.legalName.flatMap(_.hasPreviousName).value mustBe true
+      }
+
+      "given false" in {
+        val updated = ResponsiblePerson(
+          legalName = Some(PreviousName(Some(true), Some("first"), Some("middle"), Some("last")))
+        ).hasPreviousName(false)
+
+        updated.legalName.flatMap(_.hasPreviousName).value mustBe false
+      }
+    }
+
     "Successfully validate if the model is complete" when {
       "json is complete" when {
         "both Fit and proper and approval are both set only" in {

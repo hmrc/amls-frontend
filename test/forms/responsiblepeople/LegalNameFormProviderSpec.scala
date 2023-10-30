@@ -18,18 +18,15 @@ package forms.responsiblepeople
 
 import forms.behaviours.BooleanFieldBehaviours
 import models.responsiblepeople.PreviousName
-import play.api.data.Form
+import play.api.data.{Form, FormError}
 
-class LegalNameFormProviderSpec extends BooleanFieldBehaviours[PreviousName] {
+class LegalNameFormProviderSpec extends BooleanFieldBehaviours[Boolean] {
 
-  override val form: Form[PreviousName] = new LegalNameFormProvider()()
+  override val form: Form[Boolean] = new LegalNameFormProvider()()
   override val fieldName: String = "hasPreviousName"
   override val errorMessage: String = "error.required.rp.hasPreviousName"
 
   "LegalNameFormProvider" must {
-
-    behave like booleanFieldWithModel(
-      PreviousName(Some(true), None, None, None), PreviousName(Some(false), None, None, None)
-    )
+    behave like booleanField(form, fieldName, FormError(fieldName, errorMessage))
   }
 }
