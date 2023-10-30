@@ -44,6 +44,8 @@ sealed trait TradingPremisesMsbService {
       case ForeignExchange => messages(s"${message}05")
     }
   }
+
+  def index = value.substring(1)
 }
 
 case class TradingPremisesMsbServices(services : Set[TradingPremisesMsbService])
@@ -74,13 +76,13 @@ object TradingPremisesMsbService extends Enumerable.Implicits {
 
     val filteredValues = filterValues.fold(all)(all diff _)
 
-    filteredValues.zipWithIndex.map { case (msbService, index) =>
+    filteredValues.map { msbService =>
 
       CheckboxItem(
         content = Text(messages(s"msb.services.list.lbl.${msbService.value}")),
         value = msbService.toString,
-        id = Some(s"value_$index"),
-        name = Some(s"value[$index]")
+        id = Some(s"value_${msbService.index}"),
+        name = Some(s"value[${msbService.index}]")
       )
     }.sortBy(_.value)
 
