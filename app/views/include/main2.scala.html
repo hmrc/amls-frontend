@@ -19,10 +19,13 @@
 @import views.ViewHelpers
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcNewTabLink
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablink.NewTabLink
+@import views.html.components.report_a_problem_link
 
-@this(govUkTemplate: GovUkTemplate,
-        viewHelpers: ViewHelpers,
-        hmrcNewTabLink: HmrcNewTabLink
+@this(
+    govUkTemplate: GovUkTemplate,
+    viewHelpers: ViewHelpers,
+    hmrcNewTabLink: HmrcNewTabLink,
+    reportAProblemLink: report_a_problem_link
 )
 
 @(
@@ -116,7 +119,7 @@
 }
 
 @getHelpForm = {
-    @{viewHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
+    @{reportAProblemLink(appConfig.reportAProblemNonJSUrl)}
 }
 
 

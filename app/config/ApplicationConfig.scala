@@ -18,7 +18,10 @@ package config
 
 import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
+import play.api.mvc.Request
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
+import java.net.URLEncoder
 
 @Singleton
 class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: ServicesConfig) {
@@ -38,8 +41,10 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
   lazy val authHost = baseUrl("auth")
   lazy val assetsPrefix = getConfigString(s"assets.url") + getConfigString(s"assets.version")
 
-  val reportAProblemPartialUrl = getConfigString("contact-frontend.report-problem-url.with-js")
-  val reportAProblemNonJSUrl = getConfigString("contact-frontend.report-problem-url.non-js")
+  def reportAProblemNonJSUrl(implicit request: Request[_]): String = {
+    getConfigString("contact-frontend.report-problem-url.non-js") +
+    "&referrerUrl=" + URLEncoder.encode(request.host + request.uri, "utf-8")
+  }
   val betaFeedbackUrl = getConfigString("contact-frontend.beta-feedback-url.authenticated")
   val betaFeedbackUnauthenticatedUrl = getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 
