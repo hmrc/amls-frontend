@@ -17,9 +17,13 @@
 @import config.{ApplicationConfig}
 @import views.html.layouts.GovUkTemplate
 @import views.ViewHelpers
+@import views.html.components.report_a_problem_link
 
-@this(govUkTemplate: GovUkTemplate,
-        viewHelpers: ViewHelpers)
+@this(
+    govUkTemplate: GovUkTemplate,
+    viewHelpers: ViewHelpers,
+    reportAProblemLink: report_a_problem_link
+)
 
 @(
     title: String,
@@ -88,7 +92,7 @@
 }
 
 @getHelpForm = {
-    @{viewHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
+    @{reportAProblemLink(appConfig.reportAProblemNonJSUrl)}
 }
 
 @content = {
