@@ -43,7 +43,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   def reportAProblemNonJSUrl(implicit request: Request[_]): String = {
     getConfigString("contact-frontend.report-problem-url.non-js") +
-    "&referrerUrl=" + URLEncoder.encode(request.host + request.uri, "utf-8")
+    "&referrerUrl=" + URLEncoder.encode(frontendBaseUrl + request.uri, "utf-8")
   }
   val betaFeedbackUrl = getConfigString("contact-frontend.beta-feedback-url.authenticated")
   val betaFeedbackUnauthenticatedUrl = getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
