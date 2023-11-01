@@ -44,7 +44,7 @@ class correspondence_addressUkSpec extends AmlsViewSpec with MustMatchers  {
           "Name",
           "BusinessName",
           "addressLine1",
-          "addressLine1",
+          None,
           None,
           None,
           "AB12CD"))
@@ -60,7 +60,7 @@ class correspondence_addressUkSpec extends AmlsViewSpec with MustMatchers  {
         "Name",
         "BusinessName",
         "addressLine1",
-        "addressLine1",
+        None,
         None,
         None,
         "AB12CD"

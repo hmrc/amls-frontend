@@ -108,7 +108,7 @@ class AdditionalExtraAddressControllerNonUKSpec extends AmlsSpec with MockitoSug
 
         val address = PersonAddressNonUK(
           "existingAddressLine1",
-          "existingAddressLine1",
+          Some("existingAddressLine1"),
           Some("existingAddressLine3"),
           Some("existingAddressLine4"),
           Country("Spain", "ES")
@@ -131,7 +131,7 @@ class AdditionalExtraAddressControllerNonUKSpec extends AmlsSpec with MockitoSug
 
         val doc = Jsoup.parse(contentAsString(result))
         doc.getElementById("addressLineNonUK1").`val`() mustBe address.addressLineNonUK1
-        doc.getElementById("addressLineNonUK2").`val`() mustBe address.addressLineNonUK2
+        doc.getElementById("addressLineNonUK2").`val`() mustBe address.addressLineNonUK2.get
         doc.getElementById("addressLineNonUK3").`val`() mustBe address.addressLineNonUK3.get
         doc.getElementById("addressLineNonUK4").`val`() mustBe address.addressLineNonUK4.get
         doc.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
@@ -163,7 +163,7 @@ class AdditionalExtraAddressControllerNonUKSpec extends AmlsSpec with MockitoSug
             "country" -> "ES"
           )
 
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val additionalExtraAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress), additionalExtraAddress = Some(additionalExtraAddress))
@@ -198,7 +198,7 @@ class AdditionalExtraAddressControllerNonUKSpec extends AmlsSpec with MockitoSug
             "country" -> "ES"
           )
 
-          val UKAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Poland", "PL"))
+          val UKAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("Poland", "PL"))
           val additionalAddress = ResponsiblePersonAddress(UKAddress, None)
           val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -225,7 +225,7 @@ class AdditionalExtraAddressControllerNonUKSpec extends AmlsSpec with MockitoSug
             "country" -> "ES"
           )
 
-          val UKAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Poland", "PL"))
+          val UKAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("Poland", "PL"))
           val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(additionalExtraAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))

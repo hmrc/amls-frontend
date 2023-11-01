@@ -43,14 +43,14 @@ class businessDetailsSpec extends AmlsSpec {
 
   val regOfficeIsUK = RegisteredOfficeIsUK(true)
 
-  val regOfficeOrMainPlaceUK =  RegisteredOfficeUK("38B", "line2", None, None, "AA1 1AA")
+  val regOfficeOrMainPlaceUK =  RegisteredOfficeUK("38B", Some("line2"), None, None, "AA1 1AA")
 
   val correspondenceAddressIsUk = CorrespondenceAddressIsUk(true)
 
   val correspondenceAddressUk = CorrespondenceAddressUk("Name",
     "Business Name",
     "address 1",
-    "address 2",
+    Some("address 2"),
     Some("address 3"),
     Some("address 4"),
     "AA11 1AA")
@@ -344,9 +344,9 @@ class businessDetailsSpec extends AmlsSpec {
 
       "is different" must {
         "set the hasChanged & registeredOffice Properties" in {
-          val res = completeModel.registeredOffice(RegisteredOfficeUK("Line 1 New", "Line 2 New", None, None, "NEW CODE"))
+          val res = completeModel.registeredOffice(RegisteredOfficeUK("Line 1 New", Some("Line 2 New"), None, None, "NEW CODE"))
           res.hasChanged must be (true)
-          res.registeredOffice must be (Some(RegisteredOfficeUK("Line 1 New", "Line 2 New", None, None, "NEW CODE")))
+          res.registeredOffice must be (Some(RegisteredOfficeUK("Line 1 New", Some("Line 2 New"), None, None, "NEW CODE")))
         }
       }
     }
@@ -394,9 +394,9 @@ class businessDetailsSpec extends AmlsSpec {
 
       "is different" must {
         "set the hasChanged & correspondenceAddress Properties" in {
-          val res = completeModel.correspondenceAddress(CorrespondenceAddress(Some(CorrespondenceAddressUk("name new", "Business name new", "Line 1 New", "Line 2 New", None, None, "NEW CODE")), None))
+          val res = completeModel.correspondenceAddress(CorrespondenceAddress(Some(CorrespondenceAddressUk("name new", "Business name new", "Line 1 New", Some("Line 2 New"), None, None, "NEW CODE")), None))
           res.hasChanged must be (true)
-          res.correspondenceAddress must be (Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("name new", "Business name new", "Line 1 New", "Line 2 New", None, None, "NEW CODE")), None)))
+          res.correspondenceAddress must be (Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("name new", "Business name new", "Line 1 New", Some("Line 2 New"), None, None, "NEW CODE")), None)))
         }
       }
     }

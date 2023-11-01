@@ -33,7 +33,7 @@ class is_residentialSpec extends AmlsViewSpec with MustMatchers {
     lazy val is_residential = app.injector.instanceOf[is_residential]
     implicit val requestWithToken = addTokenForView()
 
-    val address=Address("56 Southview Road", "Newcastle Upon Tyne", Some("Tyne and Wear"), Some ("Whitehill"), Some("NE3 6JAX"), Country(
+    val address=Address("56 Southview Road", Some("Newcastle Upon Tyne"), Some("Tyne and Wear"), Some ("Whitehill"), Some("NE3 6JAX"), Country(
       "United Kingdom", "UK"
     ))
   }

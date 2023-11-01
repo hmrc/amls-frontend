@@ -35,7 +35,7 @@ class confirm_addressSpec extends AmlsViewSpec with MustMatchers {
   }
 
   "confirm_address view" must {
-    val address = Address("#11", "some building", Some("Some street"), Some("city"), None, Country("United Kingdome","UK"))
+    val address = Address("#11", Some("some building"), Some("Some street"), Some("city"), None, Country("United Kingdome","UK"))
     "have correct title, heading and load UI with empty form" in new ViewFixture {
 
       val form2 = EmptyForm

@@ -25,14 +25,14 @@ import play.api.libs.json.{JsSuccess, Json}
 class PersonAddressSpec extends PlaySpec {
 
   val DefaultAddressLine1 = "Default Line 1"
-  val DefaultAddressLine2 = "Default Line 2"
+  val DefaultAddressLine2 = Some("Default Line 2")
   val DefaultAddressLine3 = Some("Default Line 3")
   val DefaultAddressLine4 = Some("Default Line 4")
   val DefaultPostcode = "AA1 1AA"
   val DefaultCountry = Country("Albania", "AL")
 
   val NewAddressLine1 = "New Line 1"
-  val NewAddressLine2 = "New Line 2"
+  val NewAddressLine2 = Some("New Line 2")
   val NewAddressLine3 = Some("New Line 3")
   val NewAddressLine4 = Some("New Line 4")
   val NewPostcode = "AA1 1AA"
@@ -55,7 +55,7 @@ class PersonAddressSpec extends PlaySpec {
   val DefaultUKModel = Map(
     "isUK" -> Seq("true"),
     "addressLine1" -> Seq(DefaultAddressLine1),
-    "addressLine2" -> Seq(DefaultAddressLine2),
+    "addressLine2" -> Seq("Default Line 2"),
     "addressLine3" -> Seq("Default Line 3"),
     "addressLine4" -> Seq("Default Line 4"),
     "postCode" -> Seq(DefaultPostcode)
@@ -64,7 +64,7 @@ class PersonAddressSpec extends PlaySpec {
   val DefaultNonUKModel = Map(
     "isUK" -> Seq("false"),
     "addressLineNonUK1" -> Seq(DefaultAddressLine1),
-    "addressLineNonUK2" -> Seq(DefaultAddressLine2),
+    "addressLineNonUK2" -> Seq("Default Line 2"),
     "addressLineNonUK3" -> Seq("Default Line 3"),
     "addressLineNonUK4" -> Seq("Default Line 4"),
     "country" -> Seq(DefaultCountry.code)
@@ -120,7 +120,7 @@ class PersonAddressSpec extends PlaySpec {
         val invalidNonUKModel = Map(
           "isUK" -> Seq("false"),
           "addressLineNonUK1" -> Seq(DefaultAddressLine1),
-          "addressLineNonUK2" -> Seq(DefaultAddressLine2),
+          "addressLineNonUK2" -> Seq("Default Line 2"),
           "addressLineNonUK3" -> Seq("Default Line 3"),
           "addressLineNonUK4" -> Seq("Default Line 4"),
           "country" -> Seq("GB")
@@ -144,14 +144,12 @@ class PersonAddressSpec extends PlaySpec {
             val data = Map(
               "isUK" -> Seq("true"),
               "addressLine1" -> Seq(""),
-              "addressLine2" -> Seq(""),
               "postCode" -> Seq("")
             )
 
             PersonAddress.formRule.validate(data) must
               be(Invalid(Seq(
                 (Path \ "addressLine1") -> Seq(ValidationError("error.required.address.line1")),
-                (Path \ "addressLine2") -> Seq(ValidationError("error.required.address.line2")),
                 (Path \ "postCode") -> Seq(ValidationError("error.required.postcode"))
               )))
           }
@@ -159,14 +157,12 @@ class PersonAddressSpec extends PlaySpec {
             val data = Map(
               "isUK" -> Seq("false"),
               "addressLineNonUK1" -> Seq(""),
-              "addressLineNonUK2" -> Seq(""),
               "country" -> Seq("")
             )
 
             PersonAddress.formRule.validate(data) must
               be(Invalid(Seq(
                 (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
-                (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.address.line2")),
                 (Path \ "country") -> Seq(ValidationError("error.required.country"))
               )))
           }

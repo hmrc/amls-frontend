@@ -91,7 +91,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
           val personName = Some(PersonName("firstname", None, "lastname"))
 
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
@@ -134,7 +134,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "timeAtAddress" -> "03"
           )
 
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(SixToElevenMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
@@ -157,7 +157,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "timeAtAddress" -> "04"
           )
 
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
@@ -180,7 +180,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "timeAtAddress" -> "03"
           )
 
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(SixToElevenMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))

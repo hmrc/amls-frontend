@@ -25,7 +25,7 @@ case class CorrespondenceAddressNonUk(
                                      yourName: String,
                                      businessName: String,
                                      addressLineNonUK1: String,
-                                     addressLineNonUK2: String,
+                                     addressLineNonUK2: Option[String],
                                      addressLineNonUK3: Option[String],
                                      addressLineNonUK4: Option[String],
                                      country: Country
@@ -36,7 +36,7 @@ case class CorrespondenceAddressNonUk(
       Some(yourName),
       Some(businessName),
       Some(addressLineNonUK1),
-      Some(addressLineNonUK2),
+      addressLineNonUK2,
       addressLineNonUK3,
       addressLineNonUK4,
       Some(country.toString)
@@ -72,7 +72,7 @@ object CorrespondenceAddressNonUk {
             (__ \ "yourName").read(alternativeAddressNameType) ~
             (__ \ "businessName").read(alternativeAddressTradingNameType) ~
             (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress("line1")) ~
-            (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress("line2")) ~
+            (__ \ "addressLineNonUK2").read(optionR(validateAddress("line2"))) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress("line3"))) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress("line4"))) ~
             (__ \ "country").read(validateCountry)
@@ -85,7 +85,7 @@ object CorrespondenceAddressNonUk {
         "yourName" -> Seq(a.yourName),
         "businessName" -> Seq(a.businessName),
         "addressLineNonUK1" -> Seq(a.addressLineNonUK1),
-        "addressLineNonUK2" -> Seq(a.addressLineNonUK2),
+        "addressLineNonUK2" -> a.addressLineNonUK2.toSeq,
         "addressLineNonUK3" -> a.addressLineNonUK3.toSeq,
         "addressLineNonUK4" -> a.addressLineNonUK4.toSeq,
         "country" -> Seq(a.country.code)

@@ -40,7 +40,7 @@ class confirm_registered_office_or_main_placeSpec extends AmlsViewSpec with Must
       val form2: ValidForm[ConfirmRegisteredOffice] = Form2(ConfirmRegisteredOffice(true))
 
       def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
         place(form2, address, true)
       }
 
@@ -52,7 +52,7 @@ class confirm_registered_office_or_main_placeSpec extends AmlsViewSpec with Must
       val form2: ValidForm[ConfirmRegisteredOffice] = Form2(ConfirmRegisteredOffice(true))
 
       def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
         place(form2, address, true)
       }
       heading.html must be(Messages("businessdetails.confirmingyouraddress.title"))
@@ -68,7 +68,7 @@ class confirm_registered_office_or_main_placeSpec extends AmlsViewSpec with Must
         ))
 
       def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
         place(form2, address, true)
       }
 
@@ -82,7 +82,7 @@ class confirm_registered_office_or_main_placeSpec extends AmlsViewSpec with Must
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
+      val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
       def view = place(form2, address, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty

@@ -59,7 +59,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec {
           val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "01"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
@@ -84,7 +84,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec {
           val requestWithParams = requestWithUrlEncodedBody(
             "timeAtAddress" -> "03"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(OneToThreeYears))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))

@@ -73,7 +73,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "data exists in the keystore" in new Fixture {
 
-        val correspondenceAddress = CorrespondenceAddress(Some(CorrespondenceAddressUk("Name Test", "Test", "Test", "Test", Some("test"), None, "POSTCODE")), None)
+        val correspondenceAddress = CorrespondenceAddress(Some(CorrespondenceAddressUk("Name Test", "Test", "Test", Some("Test"), Some("test"), None, "POSTCODE")), None)
         val businessDetails = BusinessDetails(None, None, None, None, None, None,None, None, Some(CorrespondenceAddressIsUk(true)), Some(correspondenceAddress))
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
@@ -111,7 +111,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "a valid form request is sent in the body" in new Fixture {
 
-        val address = CorrespondenceAddressUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
+        val address = CorrespondenceAddressUk("Test", "Test", "old line 1", Some("old line 2"), Some("old line 3"), None, "AA1 1AA")
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(true)), Some(CorrespondenceAddress(Some(address), None)))))
 
@@ -149,7 +149,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "a valid form request is sent in the body when editing" in new Fixture {
 
-        val address = CorrespondenceAddressUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, "AA1 1AA")
+        val address = CorrespondenceAddressUk("Test", "Test", "old line 1", Some("old line 2"), Some("old line 3"), None, "AA1 1AA")
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(true)), Some(CorrespondenceAddress(Some(address), None)))))
 

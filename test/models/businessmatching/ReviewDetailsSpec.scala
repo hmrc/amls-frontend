@@ -31,7 +31,7 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
     businessName = "Name",
     businessType = Some(BusinessType.SoleProprietor),
     businessAddress = Address(
-      "1 Test Street", "Test Town", None, None, None, Country("United Kingdom", "GB")
+      "1 Test Street", Some("Test Town"), None, None, None, Country("United Kingdom", "GB")
     ),
     safeId = "safeId"
   )
@@ -93,14 +93,14 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
     "properly convert valid UK business matching address model to business customer address model" in {
       val bmAddressModel = BusinessMatchingAddress(
         "Address line1",
-        "Address line 2",
+        Some("Address line 2"),
         Some("Address line 3"),
         Some("Address line4"),
         Some("AA11AA"), "GB")
 
       val expectedAddressModel = Address(
         "Address line1",
-        "Address line 2",
+        Some("Address line 2"),
         Some("Address line 3"),
         Some("Address line4"),
         Some("AA11AA"),
@@ -112,14 +112,14 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
     "properly convert valid non-UK business matching address model to business customer address model" in {
       val bmAddressModel = BusinessMatchingAddress(
         "Address line1",
-        "Address line 2",
+        Some("Address line 2"),
         Some("Address line 3"),
         Some("Address line4"),
         None, "US")
 
       val expectedAddressModel = Address(
         "Address line1",
-        "Address line 2",
+        Some("Address line 2"),
         Some("Address line 3"),
         Some("Address line4"),
         None,
@@ -131,14 +131,14 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
     "properly convert business matching address model with not existing country code to business customer address model" in {
       val bmAddressModel = BusinessMatchingAddress(
         "Address line1",
-        "Address line 2",
+        Some("Address line 2"),
         Some("Address line 3"),
         Some("Address line4"),
         None, "XYZ")
 
       val expectedAddressModel = Address(
         "Address line1",
-        "Address line 2",
+        Some("Address line 2"),
         Some("Address line 3"),
         Some("Address line4"),
         None,
@@ -150,14 +150,14 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
     "properly convert business matching address model with missing country code to business customer address model" in {
       val bmAddressModel = BusinessMatchingAddress(
         "Address line1",
-        "Address line 2",
+        Some("Address line 2"),
         Some("Address line 3"),
         Some("Address line4"),
         None, "")
 
       val expectedAddressModel = Address(
         "Address line1",
-        "Address line 2",
+        Some("Address line 2"),
         Some("Address line 3"),
         Some("Address line4"),
         None,

@@ -41,7 +41,7 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
 
     val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
     val businessActivitiesWithouMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-    val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB"))
+    val businessAddress = Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB"))
     val reviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor), businessAddress, "XE0000000000000")
     val typeOfBusinessModel = TypeOfBusiness("test")
     val companyRegistrationNumberModel = CompanyRegistrationNumber("12345678")

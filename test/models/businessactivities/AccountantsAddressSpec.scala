@@ -24,14 +24,14 @@ import play.api.libs.json.{JsSuccess, Json}
 class AccountantsAddressSpec extends PlaySpec {
 
   val testAddressLine1 = "Default Line 1"
-  val testAddressLine2 = "Default Line 2"
+  val testAddressLine2 = Some("Default Line 2")
   val testAddressLine3 = Some("Default Line 3")
   val testAddressLine4 = Some("Default Line 4")
   val testPostcode = "AA1 1AA"
   val testCountry = Country("United Kingdom", "GB")
 
   val NewAddressLine1 = "New Line 1"
-  val NewAddressLine2 = "New Line 2"
+  val NewAddressLine2 = Some("New Line 2")
   val NewAddressLine3 = Some("New Line 3")
   val NewAddressLine4 = Some("New Line 4")
   val NewPostcode = "AA1 1AA"
@@ -67,7 +67,7 @@ class AccountantsAddressSpec extends PlaySpec {
   val testUKModel = Map(
     "isUK" -> Seq("true"),
     "addressLine1" -> Seq(testAddressLine1),
-    "addressLine2" -> Seq(testAddressLine2),
+    "addressLine2" -> Seq("Default Line 2"),
     "addressLine3" -> Seq("Default Line 3"),
     "addressLine4" -> Seq("Default Line 4"),
     "postCode" -> Seq(testPostcode)
@@ -76,7 +76,7 @@ class AccountantsAddressSpec extends PlaySpec {
   val testNonUKModel = Map(
     "isUK" -> Seq("false"),
     "addressLineNonUK1" -> Seq(testAddressLine1),
-    "addressLineNonUK2" -> Seq(testAddressLine2),
+    "addressLineNonUK2" -> Seq("Default Line 2"),
     "addressLineNonUK3" -> Seq("Default Line 3"),
     "addressLineNonUK4" -> Seq("Default Line 4"),
     "country" -> Seq(testCountry.code)

@@ -31,7 +31,7 @@ class TradingPremisesSpec extends AmlsSpec {
     "foo",
     Address(
       "1",
-      "2",
+      Some("2"),
       None,
       None,
       "asdfasdf"

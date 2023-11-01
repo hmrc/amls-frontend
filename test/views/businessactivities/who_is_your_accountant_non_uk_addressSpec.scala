@@ -36,7 +36,7 @@ class who_is_your_accountant_non_uk_addressSpec extends AmlsViewSpec with MustMa
 
   val defaultName = WhoIsYourAccountantName("accountantName",Some("tradingName"))
   val defaultIsUkTrue = WhoIsYourAccountantIsUk(true)
-  val defaultNonUkAddress = NonUkAccountantsAddress("line1","line2",None,None, Country("India", "IN"))
+  val defaultNonUkAddress = NonUkAccountantsAddress("line1",Some("line2"),None,None, Country("India", "IN"))
 
   "who_is_your_accountant_non_uk_address view" must {
     "have correct title" in new ViewFixture {

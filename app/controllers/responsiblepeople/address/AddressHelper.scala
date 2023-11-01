@@ -152,9 +152,9 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
 
   def modelFromForm(f: InvalidForm): PersonAddress = {
     if (f.data.get("isUK").contains(Seq("true"))) {
-      PersonAddressUK("", "", None, None, "")
+      PersonAddressUK("", None, None, None, "")
     } else {
-      PersonAddressNonUK("", "", None, None, Country("", ""))
+      PersonAddressNonUK("", None, None, None, Country("", ""))
     }
   }
 

@@ -103,7 +103,7 @@ class summarySpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
           whoIsYourAccountant = Some(WhoIsYourAccountant(
             Some(WhoIsYourAccountantName("AccountantName", Some("tradingName"))),
             Some(WhoIsYourAccountantIsUk(true)),
-            Some(UkAccountantsAddress("line1", "line2", Some("line3"), Some("line4"), "AB12CD")))),
+            Some(UkAccountantsAddress("line1", Some("line2"), Some("line3"), Some("line4"), "AB12CD")))),
           taxMatters = Some(TaxMatters(true)),
           transactionRecordTypes = Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("SoftwareName"))))
         ),

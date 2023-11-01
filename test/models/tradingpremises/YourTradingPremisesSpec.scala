@@ -41,7 +41,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers with JodaWrites
     "foo",
     Address(
       "1",
-      "2",
+      Some("2"),
       None,
       None,
       "AA11 1AA"
@@ -57,7 +57,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers with JodaWrites
         "addressLine1" -> Seq("1"),
         "addressLine2" -> Seq("2"),
         "postcode" -> Seq("AA11 1AA")
-      )) must be (Valid(YourTradingPremises("foo",Address("1","2",None,None,"AA11 1AA",None),None,None,None)))
+      )) must be (Valid(YourTradingPremises("foo",Address("1",Some("2"),None,None,"AA11 1AA",None),None,None,None)))
 
     }
 
@@ -77,7 +77,7 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers with JodaWrites
       "given a future date" in {
 
         val data = YourTradingPremises.formW.writes(model.copy( startDate = Some(LocalDate.now().plusDays(1))))
-        YourTradingPremises.formR.validate(data) must be(Valid(YourTradingPremises("foo",Address("1","2",None,None,"AA11 1AA",None),Some(true),Some(LocalDate.now().plusDays(1)),None)))
+        YourTradingPremises.formR.validate(data) must be(Valid(YourTradingPremises("foo",Address("1",Some("2"),None,None,"AA11 1AA",None),Some(true),Some(LocalDate.now().plusDays(1)),None)))
 0
 
       }

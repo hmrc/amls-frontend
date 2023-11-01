@@ -111,7 +111,7 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
       }
       "display the previous home address with non-UK fields populated" in new Fixture {
 
-        val nonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
+        val nonUKAddress = PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Spain", "ES"))
         val additionalAddress = ResponsiblePersonAddress(nonUKAddress, Some(SixToElevenMonths))
         val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
@@ -153,10 +153,9 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
           val requestWithParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "Line 1",
-            "addressLineNonUK2" -> "Line 2",
             "country" -> "ES"
           )
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -176,7 +175,6 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
           captor.getValue match {
             case d: DataEvent =>
               d.detail("addressLine1") mustBe "Line 1"
-              d.detail("addressLine2") mustBe "Line 2"
               d.detail("country") mustBe "Spain"
           }
         }
@@ -201,7 +199,6 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
 
           val document: Document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
-          document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
           document.select("a[href=#country]").html() must include(Messages("error.required.country"))
         }
 
@@ -210,7 +207,6 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
           val requestWithMissingParams = requestWithUrlEncodedBody(
             "isUK" -> "false",
             "addressLineNonUK1" -> "",
-            "addressLineNonUK2" -> "",
             "country" -> "GB"
           )
 
@@ -227,7 +223,6 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
 
           val document: Document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#addressLineNonUK1]").html() must include(Messages("error.required.address.line1"))
-          document.select("a[href=#addressLineNonUK2]").html() must include(Messages("error.required.address.line2"))
           document.select("a[href=#country]").html() must include(Messages("error.required.select.non.uk", s"${Messages("error.required.select.non.uk.previous.address")}"))
         }
 
@@ -239,7 +234,7 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
             "addressLineNonUK2" -> "Line &2",
             "country" -> "ES"
           )
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -273,7 +268,7 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
             "addressLineNonUK2" -> "New line 2",
             "country" -> "FR"
           )
-          val NonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain","ES"))
+          val NonUKAddress = PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Spain","ES"))
           val additionalAddress = ResponsiblePersonAddress(NonUKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(personName, addressHistory = Some(history))
@@ -313,7 +308,7 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
           "addressLineNonUK2" -> "Line 2",
           "country" -> "ES"
           )
-          val NonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain","ES"))
+          val NonUKAddress = PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Spain","ES"))
           val additionalAddress = ResponsiblePersonAddress(NonUKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(personName, addressHistory = Some(history))
@@ -336,7 +331,7 @@ class AdditionalAddressControllerNonUKSpec extends AmlsSpec with MockitoSugar {
             "addressLineNonUK2" -> "Line 2",
             "country" -> "ES"
           )
-          val NonUKAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain","ES"))
+          val NonUKAddress = PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Spain","ES"))
           val additionalAddress = ResponsiblePersonAddress(NonUKAddress, None)
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(personName, addressHistory = Some(history))

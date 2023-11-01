@@ -32,11 +32,11 @@ class NewHomeAddressSpec extends PlaySpec {
       "postCode" -> Seq("AA1 1AA")
     )
 
-    val model = NewHomeAddress(PersonAddressUK("some address1","some address2",Some("Default Line 3"),
+    val model = NewHomeAddress(PersonAddressUK("some address1",Some("some address2"),Some("Default Line 3"),
       Some("Default Line 4"),"AA1 1AA"))
 
     "read form data successfully when input is valid" in {
-      NewHomeAddress.formRule.validate(viewMap) must be(Valid(NewHomeAddress(PersonAddressUK("some address1","some address2",Some("Default Line 3"),
+      NewHomeAddress.formRule.validate(viewMap) must be(Valid(NewHomeAddress(PersonAddressUK("some address1",Some("some address2"),Some("Default Line 3"),
         Some("Default Line 4"),"AA1 1AA"))))
     }
 

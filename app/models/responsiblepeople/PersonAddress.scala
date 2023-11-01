@@ -30,7 +30,7 @@ sealed trait PersonAddress {
     case a: PersonAddressUK =>
       Seq(
         Some(a.addressLine1),
-        Some(a.addressLine2),
+        a.addressLine2,
         a.addressLine3,
         a.addressLine4,
         Some(a.postCode)
@@ -38,7 +38,7 @@ sealed trait PersonAddress {
     case a: PersonAddressNonUK =>
       Seq(
         Some(a.addressLineNonUK1),
-        Some(a.addressLineNonUK2),
+        a.addressLineNonUK2,
         a.addressLineNonUK3,
         a.addressLineNonUK4,
         Some(a.country.toString)
@@ -57,22 +57,22 @@ sealed trait PersonAddress {
   }
 
   def isEmpty = this match {
-    case PersonAddressUK("", "", _, _, "") => true
-    case PersonAddressNonUK("", "", _, _, Country("", "")) => true
+    case PersonAddressUK("", _, _, _, "") => true
+    case PersonAddressNonUK("", _, _, _, Country("", "")) => true
     case _ => false
   }
 }
 
 case class PersonAddressUK(
                       addressLine1: String,
-                      addressLine2: String,
+                      addressLine2: Option[String],
                       addressLine3: Option[String],
                       addressLine4: Option[String],
                       postCode: String) extends PersonAddress
 
 case class PersonAddressNonUK(
                          addressLineNonUK1: String,
-                         addressLineNonUK2: String,
+                         addressLineNonUK2: Option[String],
                          addressLineNonUK3: Option[String],
                          addressLineNonUK4: Option[String],
                          country: Country) extends PersonAddress
@@ -116,14 +116,14 @@ object PersonAddress {
 
     def readUKaddress =
       (__ \ "addressLine1").read(addressLine1Rule) ~
-        (__ \ "addressLine2").read(addressLine2Rule) ~
+        (__ \ "addressLine2").read(optionR(addressLine2Rule)) ~
         (__ \ "addressLine3").read(optionR(addressLine3Rule)) ~
         (__ \ "addressLine4").read(optionR(addressLine4Rule)) ~
         (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
 
     def readNonUKaddress =
       (__ \ "addressLineNonUK1").read(addressLine1Rule) ~
-        (__ \ "addressLineNonUK2").read(addressLine2Rule) ~
+        (__ \ "addressLineNonUK2").read(optionR(addressLine2Rule)) ~
         (__ \ "addressLineNonUK3").read(optionR(addressLine3Rule)) ~
         (__ \ "addressLineNonUK4").read(optionR(addressLine4Rule)) ~
         (__ \ "country").read(validateCountry)
@@ -147,14 +147,14 @@ object PersonAddress {
 
     def readUKaddress =
       (__ \ "addressLine1").read(addressLine1Rule) ~
-        (__ \ "addressLine2").read(addressLine2Rule) ~
+        (__ \ "addressLine2").read(optionR(addressLine2Rule)) ~
         (__ \ "addressLine3").read(optionR(addressLine3Rule)) ~
         (__ \ "addressLine4").read(optionR(addressLine4Rule)) ~
         (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
 
     def readNonUKaddress =
       (__ \ "addressLineNonUK1").read(addressLine1Rule) ~
-        (__ \ "addressLineNonUK2").read(addressLine2Rule) ~
+        (__ \ "addressLineNonUK2").read(optionR(addressLine2Rule)) ~
         (__ \ "addressLineNonUK3").read(optionR(addressLine3Rule)) ~
         (__ \ "addressLineNonUK4").read(optionR(addressLine4Rule)) ~
         (__ \ "country").read(validateCountry)
@@ -170,7 +170,7 @@ object PersonAddress {
       Map(
         "isUK" -> Seq("true"),
         "addressLine1" -> Seq(a.addressLine1),
-        "addressLine2" -> Seq(a.addressLine2),
+        "addressLine2" -> a.addressLine2.toSeq,
         "addressLine3" -> a.addressLine3.toSeq,
         "addressLine4" -> a.addressLine4.toSeq,
         "postCode" -> Seq(a.postCode)
@@ -179,7 +179,7 @@ object PersonAddress {
       Map(
         "isUK" -> Seq("false"),
         "addressLineNonUK1" -> Seq(a.addressLineNonUK1),
-        "addressLineNonUK2" -> Seq(a.addressLineNonUK2),
+        "addressLineNonUK2" -> a.addressLineNonUK2.toSeq,
         "addressLineNonUK3" -> a.addressLineNonUK3.toSeq,
         "addressLineNonUK4" -> a.addressLineNonUK4.toSeq,
         "country" -> Seq(a.country.code)
@@ -193,14 +193,14 @@ object PersonAddress {
     (__ \ "personAddressPostCode").read[String] andKeep (
       (
         (__ \ "personAddressLine1").read[String] and
-        (__ \ "personAddressLine2").read[String] and
+        (__ \ "personAddressLine2").readNullable[String] and
         (__ \ "personAddressLine3").readNullable[String] and
         (__ \ "personAddressLine4").readNullable[String] and
         (__ \ "personAddressPostCode").read[String])(PersonAddressUK.apply _) map identity[PersonAddress]
       ) orElse
       (
         (__ \ "personAddressLine1").read[String] and
-        (__ \ "personAddressLine2").read[String] and
+        (__ \ "personAddressLine2").readNullable[String] and
         (__ \ "personAddressLine3").readNullable[String] and
         (__ \ "personAddressLine4").readNullable[String] and
         (__ \ "personAddressCountry").read[Country])(PersonAddressNonUK.apply _)
@@ -214,7 +214,7 @@ object PersonAddress {
       case a: PersonAddressUK =>
         (
             (__ \ "personAddressLine1").write[String] and
-            (__ \ "personAddressLine2").write[String] and
+            (__ \ "personAddressLine2").writeNullable[String] and
             (__ \ "personAddressLine3").writeNullable[String] and
             (__ \ "personAddressLine4").writeNullable[String] and
             (__ \ "personAddressPostCode").write[String]
@@ -222,7 +222,7 @@ object PersonAddress {
       case a: PersonAddressNonUK =>
         (
             (__ \ "personAddressLine1").write[String] and
-            (__ \ "personAddressLine2").write[String] and
+            (__ \ "personAddressLine2").writeNullable[String] and
             (__ \ "personAddressLine3").writeNullable[String] and
             (__ \ "personAddressLine4").writeNullable[String] and
             (__ \ "personAddressCountry").write[Country]

@@ -47,13 +47,13 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
       confirm_registered_office_or_main_place = view)
   }
 
-  private val ukAddress = RegisteredOfficeUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
-  private val nonUkAddress = RegisteredOfficeNonUK("line1", "line2", Some("line3"), Some("line4"), Country("United States of America", "US"))
+  private val ukAddress = RegisteredOfficeUK("line1", Some("line2"), Some("line3"), Some("line4"), "AA1 1AA")
+  private val nonUkAddress = RegisteredOfficeNonUK("line1", Some("line2"), Some("line3"), Some("line4"), Country("United States of America", "US"))
   private val businessDetails = BusinessDetails(None, None, None, None, None, None, Some(ukAddress), None)
   val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-    Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "ghghg")
+    Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "ghghg")
   val reviewDtlsNonUk = reviewDtls.copy(
-    businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), None, Country("United States of America", "US")))
+    businessAddress = Address("line1", Some("line2"), Some("line3"), Some("line4"), None, Country("United States of America", "US")))
   val bm = BusinessMatching(Some(reviewDtls))
   val emptyCache = CacheMap("", Map.empty)
 

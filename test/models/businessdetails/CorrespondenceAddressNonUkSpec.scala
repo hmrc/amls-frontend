@@ -57,7 +57,7 @@ class CorrespondenceAddressNonUkSpec extends PlaySpec with MockitoSugar {
           "yourName" -> Seq(DefaultYourName),
           "businessName" -> Seq(DefaultBusinessName),
           "addressLineNonUK1" -> Seq(DefaultAddressLine1),
-          "addressLineNonUK2" -> Seq(DefaultAddressLine2),
+          "addressLineNonUK2" -> Seq("Default Line 2"),
           "addressLineNonUK3" -> Seq("Default Line 3"),
           "addressLineNonUK4" -> Seq("Default Line 4"),
           "country" -> Seq("GB")
@@ -109,7 +109,6 @@ class CorrespondenceAddressNonUkSpec extends PlaySpec with MockitoSugar {
             "yourName" -> Seq(""),
             "businessName" -> Seq(""),
             "addressLineNonUK1" -> Seq(""),
-            "addressLineNonUK2" -> Seq(""),
             "country" -> Seq("")
           )
 
@@ -118,7 +117,6 @@ class CorrespondenceAddressNonUkSpec extends PlaySpec with MockitoSugar {
               (Path \ "yourName") -> Seq(ValidationError("error.required.yourname")),
               (Path \ "businessName") -> Seq(ValidationError("error.required.name.of.business")),
               (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
-              (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.address.line2")),
               (Path \ "country") -> Seq(ValidationError("error.required.country"))
             )))
         }
@@ -137,7 +135,7 @@ class CorrespondenceAddressNonUkSpec extends PlaySpec with MockitoSugar {
   val DefaultYourName = "Default Your Name"
   val DefaultBusinessName = "Default Business Name"
   val DefaultAddressLine1 = "Default Line 1"
-  val DefaultAddressLine2 = "Default Line 2"
+  val DefaultAddressLine2 = Some("Default Line 2")
   val DefaultAddressLine3 = Some("Default Line 3")
   val DefaultAddressLine4 = Some("Default Line 4")
   val DefaultPostcode = "AA1 1AA"
@@ -146,7 +144,7 @@ class CorrespondenceAddressNonUkSpec extends PlaySpec with MockitoSugar {
   val NewYourName = "New Your Name"
   val NewBusinessName = "New Business Name"
   val NewAddressLine1 = "New Line 1"
-  val NewAddressLine2 = "New Line 2"
+  val NewAddressLine2 = Some("New Line 2")
   val NewAddressLine3 = Some("New Line 3")
   val NewAddressLine4 = Some("New Line 4")
   val NewPostcode = "AA1 1AA"
@@ -164,7 +162,7 @@ class CorrespondenceAddressNonUkSpec extends PlaySpec with MockitoSugar {
     "yourName" -> Seq(DefaultYourName),
     "businessName" -> Seq(DefaultBusinessName),
     "addressLineNonUK1" -> Seq(DefaultAddressLine1),
-    "addressLineNonUK2" -> Seq(DefaultAddressLine2),
+    "addressLineNonUK2" -> Seq("Default Line 2"),
     "addressLineNonUK3" -> Seq("Default Line 3"),
     "addressLineNonUK4" -> Seq("Default Line 4"),
     "country" -> Seq(DefaultCountry.code)

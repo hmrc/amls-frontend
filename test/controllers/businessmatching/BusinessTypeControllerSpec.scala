@@ -60,7 +60,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures {
     "display Registration Number page for CORPORATE_BODY" in new Fixture {
 
      val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-       Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
+       Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
@@ -73,7 +73,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures {
     "display Registration Number page for LLP" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
+        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
@@ -86,7 +86,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures {
     "display Type of Business Page" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
+        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
@@ -99,7 +99,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures {
     "display Register Services Page" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LPrLLP),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
+        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
@@ -112,7 +112,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures {
     "redirect to register services controller when sole proprietor" in new Fixture {
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
+        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))
@@ -130,7 +130,7 @@ class BusinessTypeControllerSpec extends AmlsSpec with ScalaFutures {
       )
 
       val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
-        Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
+        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "XE0000000000000")
 
       when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
         Future.successful(Some(BusinessMatching(Some(reviewDtls), None))))

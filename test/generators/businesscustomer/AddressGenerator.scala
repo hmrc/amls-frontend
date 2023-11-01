@@ -29,6 +29,6 @@ trait AddressGenerator extends BaseGenerator with CountryGenerator {
     line2 <- stringOfLengthGen(nameLength)
     postcode <- postcodeGen
     country <- countryGen
-  } yield Address(line1, line2, None, None, Some(postcode), country)
+  } yield Address(line1, Some(line2), None, None, Some(postcode), country)
 
 }
