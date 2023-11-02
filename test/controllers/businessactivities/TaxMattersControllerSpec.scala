@@ -59,7 +59,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
             whoIsYourAccountant = Some(WhoIsYourAccountant(
               Some(WhoIsYourAccountantName("Accountant name", accountantsTradingName = None)),
               Some(WhoIsYourAccountantIsUk(true)),
-              Some(UkAccountantsAddress("", "", None, None, ""))))))))
+              Some(UkAccountantsAddress("", None, None, None, ""))))))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -77,7 +77,7 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
             whoIsYourAccountant = Some(WhoIsYourAccountant(
               Some(WhoIsYourAccountantName("Accountant name", accountantsTradingName = None)),
               Some(WhoIsYourAccountantIsUk(true)),
-              Some(UkAccountantsAddress("", "", None, None, ""))))))))
+              Some(UkAccountantsAddress("", None, None, None, ""))))))))
 
         val result = controller.get()(request)
         status(result) must be(OK)

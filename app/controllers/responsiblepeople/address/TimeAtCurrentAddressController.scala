@@ -39,7 +39,7 @@ class TimeAtCurrentAddressController @Inject() (val dataCacheConnector: DataCach
                                                 view: TimeAtAddressView,
                                                 implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
+  final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", None, None, None, ""), None)
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>

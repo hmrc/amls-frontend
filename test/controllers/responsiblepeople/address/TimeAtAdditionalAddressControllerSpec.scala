@@ -65,7 +65,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar w
       "display the page" when {
         "with existing data" in new Fixture {
 
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
@@ -125,7 +125,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar w
           .withFormUrlEncodedBody(
             "timeAtAddress" -> ZeroToFiveMonths.toString
           )
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -192,7 +192,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar w
             .withFormUrlEncodedBody(
               "timeAtAddress" -> ZeroToFiveMonths.toString
             )
-            val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+            val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
             val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
             val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -216,8 +216,9 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar w
             .withFormUrlEncodedBody(
               "timeAtAddress" -> OneToThreeYears.toString
             )
-            val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(OneToThreeYears))
+
+            val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+            val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
             val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
@@ -239,8 +240,8 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar w
             .withFormUrlEncodedBody(
               "timeAtAddress" -> ThreeYearsPlus.toString
             )
-            val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ThreeYearsPlus))
+            val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+            val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
             val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
@@ -265,7 +266,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar w
             .withFormUrlEncodedBody(
               "timeAtAddress" -> ZeroToFiveMonths.toString
             )
-            val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+            val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
             val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
             val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -289,8 +290,8 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar w
             .withFormUrlEncodedBody(
               "timeAtAddress" -> OneToThreeYears.toString
             )
-            val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(OneToThreeYears))
+            val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+            val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
             val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
             when(timeAtAdditionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
@@ -312,8 +313,8 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar w
             .withFormUrlEncodedBody(
               "timeAtAddress" -> ThreeYearsPlus.toString
             )
-            val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
-            val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ThreeYearsPlus))
+            val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
+            val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
             val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 

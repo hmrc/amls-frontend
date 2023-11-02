@@ -35,7 +35,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with TradingPremisesGenerator 
 
   val ytp = YourTradingPremises(
     "foo",
-    Address("123 Test Road", "Some Village", Some("A Town"), Some("Big City"), "AA1 1BB", None),
+    Address("123 Test Road", Some("Some Village"), Some("A Town"), Some("Big City"), "AA1 1BB", None),
     Some(true),
     Some(new LocalDate(2010, 10, 10)),
     None

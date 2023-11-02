@@ -22,9 +22,9 @@ import play.api.data.Forms.{mapping, optional}
 
 trait CorrespondenceAddressFormProvider[A] extends AddressMappings {
 
-  def toObject: (String, String, String, String, Option[String], Option[String], String) => A
+  def toObject: (String, String, String, Option[String], Option[String], Option[String], String) => A
 
-  def fromObject: A => Option[(String, String, String, String, Option[String], Option[String], String)]
+  def fromObject: A => Option[(String, String, String, Option[String], Option[String], Option[String], String)]
 
   val nameMaxLength = 140
   val businessNameMaxLength = 120
@@ -46,7 +46,7 @@ trait CorrespondenceAddressFormProvider[A] extends AddressMappings {
         )
       ),
       "addressLine1" -> addressLineMapping("line1"),
-      "addressLine2" -> addressLineMapping("line2"),
+      "addressLine2" -> optional(addressLineMapping("line2")),
       "addressLine3" -> optional(addressLineMapping("line3")),
       "addressLine4" -> optional(addressLineMapping("line4")),
       postcodeOrCountryMapping(isUKAddress)

@@ -89,11 +89,10 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
           val requestWithParams = FakeRequest(POST, routes.NewHomeAddressNonUKController.post(1).url)
           .withFormUrlEncodedBody(
             "addressLine1" -> "new address line1",
-            "addressLine2" -> "new address line2",
             "country" -> "ES"
           )
 
-          val nonUKAddress = PersonAddressNonUK("new address line1", "new address line2", None, None, Country("Spain","ES"))
+          val nonUKAddress = PersonAddressNonUK("new address line1", None, None, None, Country("Spain","ES"))
           val additionalAddress = ResponsiblePersonCurrentAddress(nonUKAddress, Some(OneToThreeYears), Some(DateOfChange(LocalDate.now().minusMonths(13))))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -124,24 +123,23 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
           val requestWithParams = FakeRequest(POST, routes.NewHomeAddressNonUKController.post(1).url)
           .withFormUrlEncodedBody(
             "addressLine1" -> "new address line1",
-            "addressLine2" -> "new address line2",
             "country" -> "ES"
           )
 
-          val ukAddress = PersonAddressUK("Line 111", "Line 222", None, None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 111", None, None, None, "AA1 1AA")
           val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now().minusMonths(7))))
-          val nCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressNonUK("new address line1", "new address line2", None, None, Country("Spain","ES")), Some(SixToElevenMonths), Some(DateOfChange(LocalDate.now().minusMonths(7))))
+          val nCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressNonUK("new address line1", None, None, None, Country("Spain","ES")), Some(SixToElevenMonths), Some(DateOfChange(LocalDate.now().minusMonths(7))))
 
-          val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
-          val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
+          val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", None, None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
+          val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", None, None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
 
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
             additionalAddress = Some(additionalAddress),
             additionalExtraAddress = Some(additionalExtraAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-          val pushCurrentToAdditional = ResponsiblePersonAddress(PersonAddressUK("Line 111", "Line 222", None, None, "AA1 1AA"), Some(ZeroToFiveMonths))
-          val pushCurrentToExtraAdditional = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
+          val pushCurrentToAdditional = ResponsiblePersonAddress(PersonAddressUK("Line 111", None, None, None, "AA1 1AA"), Some(ZeroToFiveMonths))
+          val pushCurrentToExtraAdditional = ResponsiblePersonAddress(PersonAddressUK("Line 11", None, None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
 
 
           val upDatedHistory = ResponsiblePersonAddressHistory(currentAddress = Some(nCurrentAddress),
@@ -176,15 +174,14 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
           val requestWithParams = FakeRequest(POST, routes.NewHomeAddressNonUKController.post(1).url)
           .withFormUrlEncodedBody(
             "addressLine1" -> "new address line1",
-            "addressLine2" -> "new address line2",
             "country" -> "ES"
           )
 
-          val newCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressNonUK("new address line1", "new address line2", None, None, Country("Spain","ES")), Some(ThreeYearsPlus), Some(DateOfChange(LocalDate.now().minusMonths(37))))
-          val ukAddress1 = PersonAddressUK("Line 11", "Line 21", None, None, "AA1 1AA")
+          val newCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressNonUK("new address line1", None, None, None, Country("Spain","ES")), Some(ThreeYearsPlus), Some(DateOfChange(LocalDate.now().minusMonths(37))))
+          val ukAddress1 = PersonAddressUK("Line 11", None, None, None, "AA1 1AA")
           val currentAddress = ResponsiblePersonCurrentAddress(ukAddress1, Some(ThreeYearsPlus), Some(DateOfChange(LocalDate.now().minusMonths(37))))
-          val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
-          val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
+          val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", None, None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
+          val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", None, None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
 
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
             additionalAddress = Some(additionalAddress),
@@ -272,7 +269,7 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
               "country" -> "ES"
             )
 
-            val ukAddress = PersonAddressNonUK("line1", "line2", None, None, Country("Spain","ES"))
+            val ukAddress = PersonAddressNonUK("line1", Some("line2"), None, None, Country("Spain","ES"))
             val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
             val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))

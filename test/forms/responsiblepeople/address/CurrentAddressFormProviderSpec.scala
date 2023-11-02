@@ -30,8 +30,8 @@ class CurrentAddressFormProviderSpec extends BooleanFieldBehaviours[ResponsibleP
   "CurrentAddressFormProvider" must {
 
     behave like booleanFieldWithModel(
-      ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None, None),
-      ResponsiblePersonCurrentAddress(PersonAddressNonUK("", "", None, None, Country("", "")), None)
+      ResponsiblePersonCurrentAddress(PersonAddressUK("", None, None, None, ""), None, None),
+      ResponsiblePersonCurrentAddress(PersonAddressNonUK("", None, None, None, Country("", "")), None)
     )
   }
 }

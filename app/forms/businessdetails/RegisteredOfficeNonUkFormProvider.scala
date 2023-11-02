@@ -26,11 +26,11 @@ class RegisteredOfficeNonUkFormProvider @Inject()() extends AddressFormProvider[
 
   override val countryErrorKey: String = "error.required.atb.registered.office.not.uk"
 
-  override def toObject: (String, String, Option[String], Option[String], String) => RegisteredOffice = {
+  override def toObject: (String, Option[String], Option[String], Option[String], String) => RegisteredOffice = {
     case (line1, line2, line3, line4, country) => RegisteredOfficeNonUK(line1, line2, line3, line4, parseCountry(country))
   }
 
-  override def fromObject: RegisteredOffice => Option[(String, String, Option[String], Option[String], String)] = {
+  override def fromObject: RegisteredOffice => Option[(String, Option[String], Option[String], Option[String], String)] = {
     case RegisteredOfficeNonUK(addressLine1, addressLine2, addressLine3, addressLine4, country, _) =>
       Some((addressLine1, addressLine2, addressLine3, addressLine4, country.code))
     case _ => None

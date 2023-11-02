@@ -60,7 +60,7 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
     val testBusinessMatchingConnector = new BusinessMatchingConnector(mock[HttpClient], appConfig)
 
-    val address = BusinessMatchingAddress("1 Test Street", "Test Town", None, None, None, "UK")
+    val address = BusinessMatchingAddress("1 Test Street", Some("Test Town"), None, None, None, "UK")
 
     val validResponseDetail = BusinessMatchingReviewDetails(
       businessName = "Test Business",

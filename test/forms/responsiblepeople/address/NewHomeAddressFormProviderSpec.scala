@@ -30,8 +30,8 @@ class NewHomeAddressFormProviderSpec extends BooleanFieldBehaviours[NewHomeAddre
   "NewHomeAddressFormProvider" must {
 
     behave like booleanFieldWithModel(
-      NewHomeAddress(PersonAddressUK("", "", None, None, "")),
-      NewHomeAddress(PersonAddressNonUK("", "", None, None, Country("", "")))
+      NewHomeAddress(PersonAddressUK("", None, None, None, "")),
+      NewHomeAddress(PersonAddressNonUK("", None, None, None, Country("", "")))
     )
   }
 }

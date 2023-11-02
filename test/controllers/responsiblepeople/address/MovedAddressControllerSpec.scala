@@ -47,7 +47,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecti
   "MovedAddress" when {
 
     val personName = PersonName("firstName", Some("middleName"), "lastName")
-    val UKAddress = PersonAddressUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
+    val UKAddress = PersonAddressUK("line1", Some("line2"), Some("line3"), Some("line4"), "AA1 1AA")
     val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, None)
     val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
 

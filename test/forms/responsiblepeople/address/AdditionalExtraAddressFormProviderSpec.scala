@@ -30,8 +30,8 @@ class AdditionalExtraAddressFormProviderSpec extends BooleanFieldBehaviours[Resp
   "AdditionalExtraAddressFormProvider" must {
 
     behave like booleanFieldWithModel(
-      ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None),
-      ResponsiblePersonAddress(PersonAddressNonUK("", "", None, None, Country("", "")), None)
+      ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None),
+      ResponsiblePersonAddress(PersonAddressNonUK("", None, None, None, Country("", "")), None)
     )
   }
 }

@@ -32,8 +32,8 @@ class AddressModifiedEventSpec extends AmlsSpec {
   "The AddressModifiedAuditEvent" must {
     "create the proper detail" when {
       "given a current address and an old address" in {
-        val currentAddress = AuditAddress("Addr Line 1", "Addr Line 2", "Line 3".some, "Spain", "AA1 1AA".some)
-        val oldAddress = AuditAddress("Old addr Line 1", "Old addr Line 2", "Old line 3".some, "France", "NE1 1ET".some)
+        val currentAddress = AuditAddress("Addr Line 1", "Addr Line 2".some, "Line 3".some, "Spain", "AA1 1AA".some)
+        val oldAddress = AuditAddress("Old addr Line 1", "Old addr Line 2".some, "Old line 3".some, "France", "NE1 1ET".some)
 
         val expectedResult = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "Addr Line 1",
@@ -55,15 +55,13 @@ class AddressModifiedEventSpec extends AmlsSpec {
       }
 
       "given a current address and an old address without the optional fields" in {
-        val currentAddress = AuditAddress("Addr Line 1", "Addr Line 2", None, "Spain", None)
-        val oldAddress = AuditAddress("Old addr Line 1", "Old addr Line 2", None, "France", None)
+        val currentAddress = AuditAddress("Addr Line 1", None, None, "Spain", None)
+        val oldAddress = AuditAddress("Old addr Line 1", None, None, "France", None)
 
         val expectedResult = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "Addr Line 1",
-          "addressLine2" -> "Addr Line 2",
           "country" -> "Spain",
           "originalLine1" -> "Old addr Line 1",
-          "originalLine2" -> "Old addr Line 2",
           "originalCountry" -> "France"
         )
 

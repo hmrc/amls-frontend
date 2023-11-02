@@ -32,7 +32,7 @@ class IsResidentialViewSpec extends AmlsViewSpec with MustMatchers {
 
   implicit val request = FakeRequest()
 
-  val address = Address("56 Southview Road", "Newcastle Upon Tyne", Some("Tyne and Wear"), Some("Whitehill"), Some("NE3 6JAX"), Country(
+  val address = Address("56 Southview Road", Some("Newcastle Upon Tyne"), Some("Tyne and Wear"), Some("Whitehill"), Some("NE3 6JAX"), Country(
     "United Kingdom", "UK"
   ))
 

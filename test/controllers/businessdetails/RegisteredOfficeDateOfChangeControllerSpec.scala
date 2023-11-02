@@ -68,7 +68,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
       )
 
       val date = new LocalDate(2010, 10, 1)
-      val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
+      val office = RegisteredOfficeUK("305", Some("address line"), Some("address line2"), Some("address line3"), "AA1 1AA")
       val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(date)))
 
       val business = BusinessDetails(registeredOffice = Some(office), activityStartDate = Some(ActivityStartDate(date)))
@@ -104,7 +104,8 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
 
       val date = new LocalDate(2005, 4, 26)
 
-      val office = RegisteredOfficeNonUK("305", "address line", Some("address line2"), Some("address line3"), Country("Finland", "FIN"))
+      val office = RegisteredOfficeNonUK("305", Some("address line"), Some("address line2"), Some("address line3"), Country("Finland", "FIN"))
+
       val updatedOffice = office.copy(dateOfChange = Some(DateOfChange(date)))
 
       val business = BusinessDetails(registeredOffice = Some(office), activityStartDate = Some(ActivityStartDate(date)))
@@ -152,7 +153,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
         "dateOfChange.day" -> "01"
       )
 
-      val office = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
+      val office = RegisteredOfficeUK("305", Some("address line"), Some("address line2"), Some("address line3"), "AA1 1AA")
 
       val business = BusinessDetails(
         activityStartDate = Some(ActivityStartDate(new LocalDate(2015, 10, 1))),

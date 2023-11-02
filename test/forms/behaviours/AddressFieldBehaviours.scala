@@ -67,7 +67,7 @@ trait AddressFieldBehaviours extends FieldBehaviours with Constraints {
           }
         }
 
-        if (line == 1 || line == 2) {
+        if (line == 1) {
 
           behave like mandatoryField(
             form,

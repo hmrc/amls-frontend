@@ -80,7 +80,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with MustMatchers with Table
 
       val msbServices = BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, ForeignExchange))
       val BusinessActivitiesModel = BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-      val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
+      val businessAddress = Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
       val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0000000000000")
       val TypeOfBusinessModel = TypeOfBusiness("test")
       val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
@@ -144,7 +144,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with MustMatchers with Table
     "include the provided data for an UnincorporatedBody with No MSB Services" in new ViewFixture {
 
       val businessActivitiesWithoutMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-      val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
+      val businessAddress = Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
       val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0000000000000")
       val TypeOfBusinessModel = TypeOfBusiness("test")
       val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")

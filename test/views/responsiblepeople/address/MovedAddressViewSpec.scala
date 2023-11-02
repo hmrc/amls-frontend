@@ -30,7 +30,7 @@ class MovedAddressViewSpec extends AmlsViewSpec with MustMatchers {
   lazy val fp = inject[MovedAddressFormProvider]
 
   val name = "firstName lastName"
-  val address = PersonAddressUK("#11", "some building", Some("Some street"), Some("city"), "AA111AA")
+  val address = PersonAddressUK("#11", Some("some building"), Some("Some street"), Some("city"), "AA111AA")
 
   implicit val request = FakeRequest()
 

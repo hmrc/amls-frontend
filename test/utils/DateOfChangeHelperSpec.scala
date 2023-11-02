@@ -29,14 +29,14 @@ class DateOfChangeHelperSpec extends AmlsSpec {
 
     val originalModel = RegisteredOfficeUK(
       "addressLine1",
-      "addressLine2",
+      None,
       None,
       None,
       "postCode",
       None
     )
 
-    val changeModel = RegisteredOfficeUK("","",None, None, "", None)
+    val changeModel = RegisteredOfficeUK("",None,None, None, "", None)
     "DateOfChangeHelper" must {
 
       "redirect to Summary Controller" when {

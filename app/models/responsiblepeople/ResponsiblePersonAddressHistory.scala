@@ -40,7 +40,7 @@ object ResponsiblePersonAddressHistory {
 
   implicit val format = Json.format[ResponsiblePersonAddressHistory]
 
-  def default() = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
+  def default() = ResponsiblePersonCurrentAddress(PersonAddressUK("", None, None, None, ""), None)
 
   def isRPAddressInUK(address: Option[ResponsiblePersonAddress]): Boolean = {
     address match {

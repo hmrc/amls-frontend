@@ -143,7 +143,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     val testReviewDetails: ReviewDetails = ReviewDetails(
       testBusinessName,
       Some(BusinessType.LimitedCompany),
-      Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")),
+      Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")),
       "XE0001234567890"
     )
 

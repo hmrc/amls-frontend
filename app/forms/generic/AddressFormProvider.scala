@@ -24,14 +24,14 @@ trait AddressFormProvider[A] extends AddressMappings {
 
   val countryErrorKey: String
 
-  def toObject: (String, String, Option[String], Option[String], String) => A
+  def toObject: (String, Option[String], Option[String], Option[String], String) => A
 
-  def fromObject: A => Option[(String, String, Option[String], Option[String], String)]
+  def fromObject: A => Option[(String, Option[String], Option[String], Option[String], String)]
 
   def createForm(isUKAddress: Boolean): Form[A] = Form[A](
     mapping(
       "addressLine1" -> addressLineMapping("line1"),
-      "addressLine2" -> addressLineMapping("line2"),
+      "addressLine2" -> optional(addressLineMapping("line2")),
       "addressLine3" -> optional(addressLineMapping("line3")),
       "addressLine4" -> optional(addressLineMapping("line4")),
       postcodeOrCountryMapping(isUKAddress)

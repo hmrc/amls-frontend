@@ -39,7 +39,7 @@ sealed trait AccountantsAddress {
     case a: UkAccountantsAddress =>
       Seq(
         Some(a.addressLine1),
-        Some(a.addressLine2),
+        a.addressLine2,
         a.addressLine3,
         a.addressLine4,
         Some(a.postCode)
@@ -47,7 +47,7 @@ sealed trait AccountantsAddress {
     case a: NonUkAccountantsAddress =>
       Seq(
         Some(a.addressLine1),
-        Some(a.addressLine2),
+        a.addressLine2,
         a.addressLine3,
         a.addressLine4,
         Some(a.country.toString)
@@ -57,7 +57,7 @@ sealed trait AccountantsAddress {
 
 case class UkAccountantsAddress(
                                  addressLine1: String,
-                                 addressLine2: String,
+                                 addressLine2: Option[String],
                                  addressLine3: Option[String],
                                  addressLine4: Option[String],
                                  postCode: String
@@ -65,7 +65,7 @@ case class UkAccountantsAddress(
 
 case class NonUkAccountantsAddress(
                                     addressLine1: String,
-                                    addressLine2: String,
+                                    addressLine2: Option[String],
                                     addressLine3: Option[String],
                                     addressLine4: Option[String],
                                     country: Country
@@ -93,7 +93,7 @@ object AccountantsAddress {
     import jto.validation.forms.Rules._
       (
         (__ \ "addressLine1").read(addressLine1Rule) ~
-        (__ \ "addressLine2").read(addressLine2Rule) ~
+        (__ \ "addressLine2").read(optionR(addressLine2Rule)) ~
         (__ \ "addressLine3").read(optionR(addressLine3Rule)) ~
         (__ \ "addressLine4").read(optionR(addressLine4Rule)) ~
         (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
@@ -104,7 +104,7 @@ object AccountantsAddress {
     import jto.validation.forms.Rules._
       (
         (__ \ "addressLineNonUK1").read(addressLine1Rule) ~
-        (__ \ "addressLineNonUK2").read(addressLine2Rule) ~
+        (__ \ "addressLineNonUK2").read(optionR(addressLine2Rule)) ~
         (__ \ "addressLineNonUK3").read(optionR(addressLine3Rule)) ~
         (__ \ "addressLineNonUK4").read(optionR(addressLine4Rule)) ~
         (__ \ "country").read[Country]
@@ -114,14 +114,14 @@ object AccountantsAddress {
   implicit val formWrites = Write[AccountantsAddress, UrlFormEncoded] {
         case address: UkAccountantsAddress => Map(
           "addressLine1" -> Seq(address.addressLine1),
-          "addressLine2" -> Seq(address.addressLine2),
+          "addressLine2" -> address.addressLine2.toSeq,
           "addressLine3" -> address.addressLine3.toSeq,
           "addressLine4" -> address.addressLine4.toSeq,
           "postCode" -> Seq(address.postCode)
         )
         case address: NonUkAccountantsAddress => Map(
           "addressLineNonUK1" -> Seq(address.addressLine1),
-          "addressLineNonUK2" -> Seq(address.addressLine2),
+          "addressLineNonUK2" -> address.addressLine2.toSeq,
           "addressLineNonUK3" -> address.addressLine3.toSeq,
           "addressLineNonUK4" -> address.addressLine4.toSeq,
           "country" -> Seq(address.country.code)
@@ -134,13 +134,13 @@ object AccountantsAddress {
     import play.api.libs.json._
     (__ \ "accountantsAddressPostCode").read[String] andKeep (
         ((__ \ "accountantsAddressLine1").read[String] and
-        (__ \ "accountantsAddressLine2").read[String] and
+        (__ \ "accountantsAddressLine2").readNullable[String] and
         (__ \ "accountantsAddressLine3").readNullable[String] and
         (__ \ "accountantsAddressLine4").readNullable[String] and
         (__ \ "accountantsAddressPostCode").read[String])  (UkAccountantsAddress.apply _) map identity[AccountantsAddress]
       ) orElse
         ( (__ \ "accountantsAddressLine1").read[String] and
-          (__ \ "accountantsAddressLine2").read[String] and
+          (__ \ "accountantsAddressLine2").readNullable[String] and
           (__ \ "accountantsAddressLine3").readNullable[String] and
           (__ \ "accountantsAddressLine4").readNullable[String] and
           (__ \ "accountantsAddressCountry").read[Country]) (NonUkAccountantsAddress.apply _)
@@ -155,7 +155,7 @@ object AccountantsAddress {
       case a: UkAccountantsAddress =>
         (
             (__ \ "accountantsAddressLine1").write[String] and
-            (__ \ "accountantsAddressLine2").write[String] and
+            (__ \ "accountantsAddressLine2").writeNullable[String] and
             (__ \ "accountantsAddressLine3").writeNullable[String] and
             (__ \ "accountantsAddressLine4").writeNullable[String] and
             (__ \ "accountantsAddressPostCode").write[String]
@@ -163,7 +163,7 @@ object AccountantsAddress {
       case a: NonUkAccountantsAddress =>
         (
             (__ \ "accountantsAddressLine1").write[String] and
-            (__ \ "accountantsAddressLine2").write[String] and
+            (__ \ "accountantsAddressLine2").writeNullable[String] and
             (__ \ "accountantsAddressLine3").writeNullable[String] and
             (__ \ "accountantsAddressLine4").writeNullable[String] and
             (__ \ "accountantsAddressCountry").write[Country]

@@ -41,7 +41,7 @@ class LettersAddressViewSpec extends AmlsViewSpec with MustMatchers {
       val formWithData = formProvider().fill(LettersAddress(true))
 
       def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1",Some("line2"),None,None,"AB12CD")
         viewUnderTest(formWithData, address, true)
       }
 
@@ -65,7 +65,7 @@ class LettersAddressViewSpec extends AmlsViewSpec with MustMatchers {
       )
 
       def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1",Some("line2"),None,None,"AB12CD")
         viewUnderTest(invalidForm, address, true)
       }
 
@@ -74,6 +74,6 @@ class LettersAddressViewSpec extends AmlsViewSpec with MustMatchers {
       doc.getElementById("lettersAddress-error").text() must include(messages(errorMessage))
     }
 
-    behave like pageWithBackLink(viewUnderTest(formProvider(), RegisteredOfficeUK("line1","line2",None,None,"AB12CD")))
+    behave like pageWithBackLink(viewUnderTest(formProvider(), RegisteredOfficeUK("line1",Some("line2"),None,None,"AB12CD")))
   }
 }

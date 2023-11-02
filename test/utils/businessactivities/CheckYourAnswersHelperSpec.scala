@@ -460,7 +460,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with Injecting {
 
         "accountant non-UK address is present" in {
 
-          val address = NonUkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), Country("United States", "US"))
+          val address = NonUkAccountantsAddress("address1", Some("address2"), Some("address3"), Some("address4"), Country("United States", "US"))
 
           val result = cyaHelper.createSummaryList(
             completeModel.copy(
@@ -544,7 +544,7 @@ object BusinessActivitiesValues {
   val defaultWhoIsYourAccountant = WhoIsYourAccountant(
     Some(WhoIsYourAccountantName("Accountant's name", Some("Accountant's trading name"))),
     Some(WhoIsYourAccountantIsUk(true)),
-    Some(UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE"))
+    Some(UkAccountantsAddress("address1", Some("address2"), Some("address3"), Some("address4"), "POSTCODE"))
   )
   val defaultIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
   val defaultTaxMatters = TaxMatters(false)

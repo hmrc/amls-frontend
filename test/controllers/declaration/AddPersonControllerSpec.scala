@@ -65,7 +65,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
           businessType = Some(LimitedCompany),
           businessAddress = Address (
             line_1 = "",
-            line_2 = "",
+            line_2 = None,
             line_3 = None,
             line_4 = None,
             postcode = None,

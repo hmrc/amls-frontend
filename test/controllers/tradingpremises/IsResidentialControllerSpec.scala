@@ -38,7 +38,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
     val request = addToken(authRequest)
 
-    val ytp = YourTradingPremises("foo", Address("1st line of address","2nd line of address",Some("3rd line of address"),Some("4th line of address"),"AA1 1BB",None), Some(true), Some(new LocalDate(2010, 10, 10)), None)
+    val ytp = YourTradingPremises("foo", Address("1st line of address",Some("2nd line of address"),Some("3rd line of address"),Some("4th line of address"),"AA1 1BB",None), Some(true), Some(new LocalDate(2010, 10, 10)), None)
 
     val pageTitle = messages("tradingpremises.isResidential.title", "firstname lastname") + " - " +
       messages("summary.tradingpremises") + " - " +
@@ -94,7 +94,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
           document.title mustBe pageTitle
           document.select("input[value=true]").hasAttr("checked") must be(true)
           document.body().text() must include (ytp.tradingPremisesAddress.addressLine1)
-          document.body().text() must include (ytp.tradingPremisesAddress.addressLine2)
+          document.body().text() must include (ytp.tradingPremisesAddress.addressLine2.get)
           document.body().text() must include (ytp.tradingPremisesAddress.addressLine3.get)
           document.body().text() must include (ytp.tradingPremisesAddress.addressLine4.get)
           document.body().text() must include (ytp.tradingPremisesAddress.postcode)
@@ -250,7 +250,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
 
       override val ytp = YourTradingPremises(
         "foo",
-        Address("1","2",None,None,"AA1 1BB",None),
+        Address("1",None,None,None,"AA1 1BB",None),
         Some(false),
         Some(new LocalDate(2010, 10, 10)),
         None

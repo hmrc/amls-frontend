@@ -29,7 +29,7 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuditHelper
 
-case class AuditAddress(addressLine1: String, addressLine2: String, addressLine3: Option[String], country: String, postCode: Option[String])
+case class AuditAddress(addressLine1: String, addressLine2: Option[String], addressLine3: Option[String], country: String, postCode: Option[String])
 
 object AuditAddress {
   implicit val format = Json.format[AuditAddress]
@@ -53,16 +53,16 @@ object AddressModifiedEvent {
 
     val currentAddressObj = Json.obj(
       "addressLine1" -> event.currentAddress.addressLine1,
-      "addressLine2" -> event.currentAddress.addressLine2,
       "country" -> event.currentAddress.country) ++?
+      ("addressLine2" -> event.currentAddress.addressLine2) ++?
       ("addressLine3" -> event.currentAddress.addressLine3) ++?
       ("postCode" -> event.currentAddress.postCode)
 
     event.oldAddress.fold(currentAddressObj){ old =>
       currentAddressObj ++ Json.obj(
         "originalLine1" -> old.addressLine1,
-        "originalLine2" -> old.addressLine2,
         "originalCountry" -> old.country) ++?
+        ("originalLine2" -> old.addressLine2) ++?
         ("originalLine3" -> old.addressLine3) ++?
         ("originalPostCode" -> old.postCode)
     }

@@ -18,7 +18,10 @@ package config
 
 import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
+import play.api.mvc.Request
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
+import java.net.URLEncoder
 
 @Singleton
 class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: ServicesConfig) {
@@ -32,16 +35,16 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   private def getConfigString(key: String) = servicesConfig.getConfString(key, throw new Exception(s"Could not find config '$key'"))
 
-  val contactFormServiceIdentifier = "AMLS"
-
   lazy val contactHost = baseUrl("contact-frontend")
   lazy val authHost = baseUrl("auth")
   lazy val feedbackFrontendUrl = baseUrl("feedback-frontend") + "/feedback/AMLS"
   lazy val assetsPrefix = getConfigString(s"assets.url") + getConfigString(s"assets.version")
 
-  val reportAProblemPartialUrl = getConfigString("contact-frontend.report-problem-url.with-js")
-  val reportAProblemNonJSUrl = getConfigString("contact-frontend.report-problem-url.non-js")
   lazy val contactFrontendReportUrl = baseUrl("contact-frontend") + getConfigString("contact-frontend.report-url")
+  def reportAProblemNonJSUrl(implicit request: Request[_]): String = {
+    getConfigString("contact-frontend.report-problem-url.non-js") +
+    "&referrerUrl=" + URLEncoder.encode(frontendBaseUrl + request.uri, "utf-8")
+  }
   val betaFeedbackUrl = getConfigString("contact-frontend.beta-feedback-url.authenticated")
   val betaFeedbackUnauthenticatedUrl = getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 

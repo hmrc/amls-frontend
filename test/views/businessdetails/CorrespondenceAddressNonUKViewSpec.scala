@@ -53,7 +53,7 @@ class CorrespondenceAddressNonUKViewSpec extends AmlsViewSpec with MustMatchers 
         "Name",
         "BusinessName",
         "addressLine1",
-        "addressLine1",
+        Some("addressLine2"),
         None,
         None,
         Country("AB12CD", "XX")
@@ -70,7 +70,7 @@ class CorrespondenceAddressNonUKViewSpec extends AmlsViewSpec with MustMatchers 
         "Name",
         "BusinessName",
         "addressLine1",
-        "addressLine1",
+        Some("addressLine2"),
         None,
         None,
         Country("Antarctica", "XX")

@@ -51,11 +51,11 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
   }
 
   val emptyCache = CacheMap("", Map.empty)
-  val businessAddress = BusinessCustomerAddress("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB"))
+  val businessAddress = BusinessCustomerAddress("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB"))
   val reviewDtls = ReviewDetails(
     "BusinessName",
     Some(BusinessType.LimitedCompany),
-    BusinessCustomerAddress("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")),
+    BusinessCustomerAddress("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")),
     "ghghg"
   )
 

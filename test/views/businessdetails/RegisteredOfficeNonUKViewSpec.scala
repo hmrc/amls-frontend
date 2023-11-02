@@ -43,7 +43,7 @@ class RegisteredOfficeNonUKViewSpec extends AmlsViewSpec with MustMatchers with 
   "registered_office view" must {
     "have correct title" in new ViewFixture {
 
-      val formWithData: Form[RegisteredOffice] = formProvider().fill(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
+      val formWithData: Form[RegisteredOffice] = formProvider().fill(RegisteredOfficeUK("line1",Some("line2"),None,None,"AB12CD"))
 
       def view = registered_office_non_uk(formWithData, true, mockAutoComplete.formOptions)
 
@@ -52,7 +52,7 @@ class RegisteredOfficeNonUKViewSpec extends AmlsViewSpec with MustMatchers with 
 
     "have correct headings" in new ViewFixture {
 
-      val formWithData: Form[RegisteredOffice] = formProvider().fill(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
+      val formWithData: Form[RegisteredOffice] = formProvider().fill(RegisteredOfficeUK("line1",Some("line2"),None,None,"AB12CD"))
 
       def view = registered_office_non_uk(formWithData, true, mockAutoComplete.formOptions)
 

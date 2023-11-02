@@ -41,14 +41,18 @@ class AdditionalExtraAddressUKViewSpec extends AmlsViewSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = uKView(fp().fill(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None)), true, 1, None, name)
+      def view = uKView(
+        fp().fill(ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None)), true, 1, None, name
+      )
 
       doc.title must startWith (messages("responsiblepeople.additional_extra_address_country.title", name))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = uKView(fp().fill(ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)), true, 1, None, name)
+      def view = uKView(
+        fp().fill(ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None)), true, 1, None, name
+      )
 
       heading.html must be(messages("responsiblepeople.additional_extra_address_country.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))

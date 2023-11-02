@@ -88,7 +88,7 @@ class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
             whoIsYourAccountant = Some(WhoIsYourAccountant(
               Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
               Some(WhoIsYourAccountantIsUk(false)),
-              Some(NonUkAccountantsAddress("line1","line2",Some("line3"),Some("line4"), Country("Albania", "AL")))
+              Some(NonUkAccountantsAddress("line1",Some("line2"),Some("line3"),Some("line4"), Country("Albania", "AL")))
             ))
           ))))
 

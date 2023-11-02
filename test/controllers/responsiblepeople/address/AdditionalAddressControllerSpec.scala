@@ -95,7 +95,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
 
       "display the additionalAddressPage when existing data in mongoCache for UK address" in new Fixture {
 
-        val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+        val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
         val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
         val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePerson(personName, addressHistory = Some(history))
@@ -114,7 +114,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
       }
 
       "display the additionalAddressPage when existing data in mongoCache for NonUK address" in new Fixture {
-        val NonUKAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("Norway", "NW"))
+        val NonUKAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("Norway", "NW"))
         val additionalAddress = ResponsiblePersonAddress(NonUKAddress, Some(ZeroToFiveMonths))
         val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePerson(personName, addressHistory = Some(history))
@@ -175,7 +175,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
           .withFormUrlEncodedBody(
             "isUK" -> "true")
 
-          val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -220,7 +220,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
           .withFormUrlEncodedBody(
             "isUK" -> "false")
 
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val additionalAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress), additionalAddress = Some(additionalAddress))
@@ -239,7 +239,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
           verify(additionalAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any(), any())
           captor.getValue.head.isComplete mustBe false
-          captor.getValue.head.addressHistory.value.additionalAddress mustBe Some(ResponsiblePersonAddress(PersonAddressNonUK("", "", None, None, Country("", "")), None))
+          captor.getValue.head.addressHistory.value.additionalAddress mustBe Some(ResponsiblePersonAddress(PersonAddressNonUK("", None, None, None, Country("", "")), None))
         }
       }
 
@@ -250,7 +250,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
           .withFormUrlEncodedBody(
             "isUK" -> "true")
 
-          val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("", ""))
+          val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("", ""))
           val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val additionalAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress), additionalAddress = Some(additionalAddress))
@@ -269,7 +269,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
           verify(additionalAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any(), any())
           captor.getValue.head.isComplete mustBe false
-          captor.getValue.head.addressHistory.value.additionalAddress mustBe Some(ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None))
+          captor.getValue.head.addressHistory.value.additionalAddress mustBe Some(ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None))
         }
       }
     }

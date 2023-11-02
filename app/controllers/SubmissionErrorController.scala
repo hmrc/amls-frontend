@@ -33,24 +33,18 @@ class SubmissionErrorController @Inject()(authAction: AuthAction,
                                           badRequestView: BadRequestView) extends AmlsBaseController(ds, cc){
 
   def duplicateEnrolment(): Action[AnyContent] = authAction { implicit request =>
-    Ok(duplicateEnrolmentView(buildReferrerUrl(SubmissionErrorController.duplicateEnrolment())))
+    Ok(duplicateEnrolmentView(appConfig.reportAProblemNonJSUrl))
   }
 
   def duplicateSubmission(): Action[AnyContent] = authAction { implicit request =>
-    Ok(duplicateSubmissionView(buildReferrerUrl(SubmissionErrorController.duplicateSubmission())))
+    Ok(duplicateSubmissionView(appConfig.reportAProblemNonJSUrl))
   }
 
   def wrongCredentialType(): Action[AnyContent] = authAction { implicit request =>
-    Ok(wrongCredentialTypeView(buildReferrerUrl(SubmissionErrorController.wrongCredentialType())))
+    Ok(wrongCredentialTypeView(appConfig.reportAProblemNonJSUrl))
   }
 
   def badRequest(): Action[AnyContent] = authAction { implicit request =>
-    Ok(badRequestView(buildReferrerUrl(SubmissionErrorController.badRequest())))
-  }
-
-  private def buildReferrerUrl(endpoint: Call)(implicit request: Request[_]): String = {
-    val referrerUrl = s"${appConfig.frontendBaseUrl}/${endpoint.relative}"
-    val encodedUrl = URLEncoder.encode(referrerUrl, "UTF-8")
-    s"${appConfig.contactFrontendReportUrl}?service=${appConfig.contactFormServiceIdentifier}&$encodedUrl"
+    Ok(badRequestView(appConfig.reportAProblemNonJSUrl))
   }
 }

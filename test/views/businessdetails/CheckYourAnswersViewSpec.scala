@@ -66,10 +66,10 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
           Some(CorporationTaxRegisteredYes("3456")),
           Some(ContactingYou(Some("01234567890"), Some("test@test.com"))),
           Some(RegisteredOfficeIsUK(true)),
-          Some(RegisteredOfficeUK("line1", "line2", Some("line3"), Some("line4"), "AB12CD")),
+          Some(RegisteredOfficeUK("line1", Some("line2"), Some("line3"), Some("line4"), "AB12CD")),
           Some(true),
           Some(CorrespondenceAddressIsUk(true)),
-          Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("your name", "business name", "line1", "line2", Some("line3"), Some("line4"), "AB12CD")), None)),
+          Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("your name", "business name", "line1", Some("line2"), Some("line3"), Some("line4"), "AB12CD")), None)),
           hasChanged = false
         ),
         showRegisteredForMLR = true

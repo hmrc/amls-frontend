@@ -59,17 +59,17 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
     val mockCacheMap = mock[CacheMap]
   }
 
-  private val ukAddress = RegisteredOfficeUK("line_1", "line_2", Some(""), Some(""), "AA1 1AA")
+  private val ukAddress = RegisteredOfficeUK("line_1", Some("line_2"), Some(""), Some(""), "AA1 1AA")
   private val businessDetails = BusinessDetails(None, None, None, None, None, None, Some(ukAddress), None,
     correspondenceAddressIsUk = Some(CorrespondenceAddressIsUk(true)),
-    correspondenceAddress = Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("", "", "", "", Some(""), Some(""), "")), None)))
+    correspondenceAddress = Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("", "", "", Some(""), Some(""), Some(""), "")), None)))
 
   private val completeBusinessDetails = BusinessDetails(
     registeredOfficeIsUK = Some(RegisteredOfficeIsUK(true)),
     registeredOffice = Some(ukAddress),
     altCorrespondenceAddress = Some(true),
     correspondenceAddressIsUk = Some(CorrespondenceAddressIsUk(true)),
-    correspondenceAddress = Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("", "", "", "", Some(""), Some(""), "")), None)))
+    correspondenceAddress = Some(CorrespondenceAddress(Some(CorrespondenceAddressUk("", "", "", Some(""), Some(""), Some(""), "")), None)))
 
   "ConfirmRegisteredOfficeController" must {
     "Get" must {

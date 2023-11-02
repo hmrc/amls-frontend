@@ -144,7 +144,7 @@ class TestOnlyController @Inject()(implicit val dataCacheConnector: DataCacheCon
       val c = (1 until 1625) map { i =>
           TradingPremises(
             Some(RegisteringAgentPremises(false)),
-            Some(YourTradingPremises(s"Test $i", Address(s"Trading Premises $i", "Line 2", None, None, "RE1 1ER"), Some(true), Some(LocalDate.now()))),
+            Some(YourTradingPremises(s"Test $i", Address(s"Trading Premises $i", None, None, None, "RE1 1ER"), Some(true), Some(LocalDate.now()))),
             Some(LimitedLiabilityPartnership),
             whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
             hasChanged = true,

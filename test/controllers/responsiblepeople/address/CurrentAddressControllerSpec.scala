@@ -105,7 +105,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
 
       "display the address country page with yes selected when UK address is stored in mongo" in new Fixture {
 
-        val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+        val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
         val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
@@ -124,7 +124,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
 
       "display the address country page with no selected when non-UK address is stored in mongo" in new Fixture {
 
-        val nonUkAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("NZ", "New Zealand"))
+        val nonUkAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("NZ", "New Zealand"))
         val additionalAddress = ResponsiblePersonCurrentAddress(nonUkAddress, Some(ZeroToFiveMonths))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
@@ -171,7 +171,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
           .withFormUrlEncodedBody(
             "isUK" -> "false")
 
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val additionalAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress), additionalAddress = Some(additionalAddress))
@@ -190,7 +190,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
           verify(currentAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any(), any())
           captor.getValue.head.isComplete mustBe false
-          captor.getValue.head.addressHistory.value.currentAddress mustBe Some(ResponsiblePersonCurrentAddress(PersonAddressNonUK("", "", None, None, Country("", "")), Some(ZeroToFiveMonths), None))
+          captor.getValue.head.addressHistory.value.currentAddress mustBe Some(ResponsiblePersonCurrentAddress(PersonAddressNonUK("", None, None, None, Country("", "")), Some(ZeroToFiveMonths), None))
         }
       }
 
@@ -201,7 +201,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
           .withFormUrlEncodedBody(
             "isUK" -> "true")
 
-          val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("", ""))
+          val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("", ""))
           val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val additionalAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress), additionalAddress = Some(additionalAddress))
@@ -220,7 +220,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
           verify(currentAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any(), any())
           captor.getValue.head.isComplete mustBe false
-          captor.getValue.head.addressHistory.value.currentAddress mustBe Some(ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), Some(ZeroToFiveMonths), None))
+          captor.getValue.head.addressHistory.value.currentAddress mustBe Some(ResponsiblePersonCurrentAddress(PersonAddressUK("", None, None, None, ""), Some(ZeroToFiveMonths), None))
         }
       }
 

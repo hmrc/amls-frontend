@@ -47,7 +47,7 @@ class BusinessActivitiesSpec extends AmlsSpec {
   val DefaultWhoIsYourAccountant = WhoIsYourAccountant(
     Some(WhoIsYourAccountantName("Accountant's name", Some("Accountant's trading name"))),
     Some(WhoIsYourAccountantIsUk(true)),
-    Some(UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE"))
+    Some(UkAccountantsAddress("address1", Some("address2"), Some("address3"), Some("address4"), "POSTCODE"))
   )
   val DefaultIdentifySuspiciousActivity = IdentifySuspiciousActivity(true)
   val DefaultTaxMatters = TaxMatters(false)
@@ -68,7 +68,7 @@ class BusinessActivitiesSpec extends AmlsSpec {
   val NewWhoIsYourAccountant = WhoIsYourAccountant(
     Some(WhoIsYourAccountantName("newName", Some("newTradingName"))),
     Some(WhoIsYourAccountantIsUk(true)),
-    Some(UkAccountantsAddress("98E", "Building1", Some("street1"), Some("road1"), "AA11 1AA"))
+    Some(UkAccountantsAddress("98E", Some("Building1"), Some("street1"), Some("road1"), "AA11 1AA"))
   )
   val NewTaxMatters = TaxMatters(true)
 

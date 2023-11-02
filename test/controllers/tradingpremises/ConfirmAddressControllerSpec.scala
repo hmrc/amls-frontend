@@ -120,7 +120,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
 
       val safeId = "X87FUDIKJJKJH87364"
 
-      val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB"))
+      val businessAddress = Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB"))
       val reviewDetailsModel = ReviewDetails("Business name from review details", Some(BusinessType.SoleProprietor), businessAddress, safeId)
       val bmWithNewReviewDetails = bm.copy(reviewDetails = Some(reviewDetailsModel))
 

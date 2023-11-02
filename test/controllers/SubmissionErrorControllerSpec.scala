@@ -22,7 +22,7 @@ import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import play.api.mvc.Result
 import play.api.test.Helpers._
-import play.api.test.Injecting
+import play.api.test.{FakeRequest, Injecting}
 import utils.AmlsSpec
 import views.html.submission._
 
@@ -43,7 +43,7 @@ class SubmissionErrorControllerSpec extends AmlsSpec with ScalaFutures with Inje
   )
 
   def contactUrl(str: String) =
-    s"http://localhost:9250/contact/report-technical-problem?service=AMLS&http%3A%2F%2Flocalhost%3A9222%2Fanti-money-laundering%2Fsubscribe%2F$str"
+    s"http://localhost:9250/contact/report-technical-problem?service=AMLS&referrerUrl=http%3A%2F%2Flocalhost%3A9222%2Fanti-money-laundering%2Fsubscribe%2F$str"
 
   def getLink(res: Future[Result]) = Jsoup.parse(contentAsString(res)).getElementById("report-link")
 
@@ -53,7 +53,9 @@ class SubmissionErrorControllerSpec extends AmlsSpec with ScalaFutures with Inje
 
       "render the correct page and link to contact-frontend" in {
 
-        val result = controller.duplicateEnrolment()(requestWithToken)
+        val result = controller.duplicateEnrolment()(
+          FakeRequest("GET", controllers.routes.SubmissionErrorController.duplicateEnrolment().url)
+        )
 
         status(result) mustBe OK
 
@@ -65,7 +67,9 @@ class SubmissionErrorControllerSpec extends AmlsSpec with ScalaFutures with Inje
 
       "render the correct page and link to contact-frontend" in {
 
-        val result = controller.duplicateSubmission()(requestWithToken)
+        val result = controller.duplicateSubmission()(
+          FakeRequest("GET", controllers.routes.SubmissionErrorController.duplicateSubmission().url)
+        )
 
         status(result) mustBe OK
         getLink(result).attr("href") mustBe contactUrl("duplicate-submission")
@@ -76,7 +80,9 @@ class SubmissionErrorControllerSpec extends AmlsSpec with ScalaFutures with Inje
 
       "render the correct page and link to contact-frontend" in {
 
-        val result = controller.wrongCredentialType()(requestWithToken)
+        val result = controller.wrongCredentialType()(
+          FakeRequest("GET", controllers.routes.SubmissionErrorController.wrongCredentialType().url)
+        )
 
         status(result) mustBe OK
         getLink(result).attr("href") mustBe contactUrl("wrong-credential-type")
@@ -87,7 +93,9 @@ class SubmissionErrorControllerSpec extends AmlsSpec with ScalaFutures with Inje
 
       "render the correct page and link to contact-frontend" in {
 
-        val result = controller.badRequest()(requestWithToken)
+        val result = controller.badRequest()(
+          FakeRequest("GET", controllers.routes.SubmissionErrorController.badRequest().url)
+        )
 
         status(result) mustBe OK
         getLink(result).attr("href") mustBe contactUrl("bad-request")

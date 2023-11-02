@@ -151,7 +151,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
 
       "display the home address with UK fields populated" in new Fixture {
 
-        val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+        val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
         val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
         val responsiblePeople = ResponsiblePerson(personName = personName,addressHistory = Some(history))
@@ -179,10 +179,9 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressUKController.post(1).url)
           .withFormUrlEncodedBody(
             "addressLine1" -> "Line 1",
-            "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -210,7 +209,6 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
           captor.getValue match {
             case d: DataEvent =>
               d.detail("addressLine1") mustBe "Line 1"
-              d.detail("addressLine2") mustBe "Line 2"
               d.detail("postCode") mustBe "AA1 1AA"
           }
         }
@@ -224,7 +222,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "New line 2",
             "postCode" -> "TE1 1ET"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
@@ -268,7 +266,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
@@ -300,7 +298,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA")
 
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
@@ -331,7 +329,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA")
 
-          val ukAddress = PersonAddressNonUK("", "", None, None, Country("", ""))
+          val ukAddress = PersonAddressNonUK("", None, None, None, Country("", ""))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
@@ -362,7 +360,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA")
 
-          val ukAddress = PersonAddressNonUK("", "", None, None, Country("", ""))
+          val ukAddress = PersonAddressNonUK("", None, None, None, Country("", ""))
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -394,7 +392,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -423,12 +421,12 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
         "given an invalid address" in new Fixture {
 
           val requestWithParams = FakeRequest(POST, routes.CurrentAddressUKController.post(1).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "Line &1",
-            "addressLine2" -> "Line *2",
-            "postCode" -> "AA1 1AA"
-          )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "Line &1",
+              "addressLine2" -> "Line *2",
+              "postCode" -> "AA1 1AA"
+            )
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
@@ -442,10 +440,10 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
 
           val result = currentAddressController.post(RecordId)(requestWithParams)
           status(result) must be(BAD_REQUEST)
-          val document: Document  = Jsoup.parse(contentAsString(result))
+          val document: Document = Jsoup.parse(contentAsString(result))
           document.title mustBe s"Error: $pageTitle"
           val errorCount = 2
-          val elementsWithError : Elements = document.getElementsByClass("govuk-error-message")
+          val elementsWithError: Elements = document.getElementsByClass("govuk-error-message")
           elementsWithError.size() must be(errorCount)
           val elements = elementsWithError.asScala.map(_.text())
           elements(0) must include(messages("error.text.validation.address.line1"))
@@ -455,11 +453,10 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
         "the default fields for UK are not supplied" in new Fixture {
 
           val requestWithMissingParams = FakeRequest(POST, routes.CurrentAddressUKController.post(1).url)
-          .withFormUrlEncodedBody(
-            "addressLine1" -> "",
-            "addressLine2" -> "",
-            "postCode" -> ""
-          )
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "",
+              "postCode" -> ""
+            )
 
           when(currentAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -472,7 +469,6 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
 
           val document: Document = Jsoup.parse(contentAsString(result))
           document.select("a[href=#addressLine1]").html() must include(messages("error.required.address.line1"))
-          document.select("a[href=#addressLine2]").html() must include(messages("error.required.address.line2"))
           document.select("a[href=#postcode]").html() must include(messages("error.required.postcode"))
         }
       }
@@ -486,7 +482,7 @@ class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with Moc
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA"
           )
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))

@@ -35,9 +35,9 @@ trait ResponsiblePeopleValues extends NinoUtil {
     val residenceUk = UKResidence(Nino("AA111111A"))
     val residenceCountry = Country("United Kingdom", "GB")
     val residenceNationality = Country("United Kingdom", "GB")
-    val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA111AA")
+    val currentPersonAddress = PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA111AA")
     val currentAddress = ResponsiblePersonCurrentAddress(currentPersonAddress, Some(ZeroToFiveMonths))
-    val additionalPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA11AA")
+    val additionalPersonAddress = PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA11AA")
     val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, Some(OneToThreeYears))
     val soleProprietorOfAnotherBusiness = SoleProprietorOfAnotherBusiness(true)
     //scalastyle:off magic.number
@@ -71,8 +71,8 @@ trait ResponsiblePeopleValues extends NinoUtil {
     private val residence = UKResidence(Nino(nino))
     private val residenceCountry = Country("United Kingdom", "GB")
     private val residenceNationality = Country("United Kingdom", "GB")
-    private val newPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))
-    private val newAdditionalPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("France", "FR"))
+    private val newPersonAddress = PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Spain", "ES"))
+    private val newAdditionalPersonAddress = PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("France", "FR"))
     private val currentAddress = ResponsiblePersonCurrentAddress(newPersonAddress, Some(ZeroToFiveMonths))
     private val additionalAddress = ResponsiblePersonAddress(newAdditionalPersonAddress, Some(ZeroToFiveMonths))
 
@@ -1154,7 +1154,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     nonUKPassport = Some(NoPassport),
     dateOfBirth = Some(DateOfBirth(new LocalDate(1990, 2, 24))),
     contactDetails = Some(ContactDetails("0912345678", "TEST@EMAIL.COM")),
-    addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", "add2", Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
+    addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", Some("add2"), Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
     positions = Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(PositionStartDate(new LocalDate(2002, 2, 2))))),
     saRegistered = Some(SaRegisteredNo),
     vatRegistered = Some(VATRegisteredNo),

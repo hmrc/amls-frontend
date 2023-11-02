@@ -1164,21 +1164,21 @@ trait ResponsiblePeopleValues extends NinoUtil {
 
   val personAddress1: PersonAddressUK = PersonAddressUK(
     "addressLine1",
-    "addressLine2",
+    Some("addressLine2"),
     Some("addressLine3"),
     Some("addressLine4"),
     "postCode1"
   )
   val personAddress2: PersonAddressUK = PersonAddressUK(
     "addressLine5",
-    "addressLine6",
+    Some("addressLine6"),
     Some("addressLine7"),
     Some("addressLine8"),
     "postCode2"
   )
   val personAddress3: PersonAddressUK = PersonAddressUK(
     "addressLine9",
-    "addressLine10",
+    Some("addressLine10"),
     Some("addressLine11"),
     Some("addressLine12"),
     "postCode3"
@@ -1186,7 +1186,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
 
   val nonUKAddress1: PersonAddressNonUK = PersonAddressNonUK(
     "6277 Brookmere Road",
-    "Small Town",
+    Some("Small Town"),
     Some("Big County"),
     Some("Washington D.C"),
     Country("United States", "US")
@@ -1194,7 +1194,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
 
   val nonUKAddress2: PersonAddressNonUK = PersonAddressNonUK(
     "The Cottage",
-    "Sleepy Village",
+    Some("Sleepy Village"),
     Some("Country Retreat"),
     Some("Farming Area"),
     Country("France", "FR")
@@ -1202,7 +1202,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
 
   val nonUKAddress3: PersonAddressNonUK = PersonAddressNonUK(
     "51 Apartment Block",
-    "Suburbia",
+    Some("Suburbia"),
     Some("District 4"),
     Some("Capital City"),
     Country("Spain", "ES")

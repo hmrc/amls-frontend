@@ -20,7 +20,6 @@ import forms.businessdetails.ConfirmRegisteredOfficeFormProvider
 import models.businessdetails.{ConfirmRegisteredOffice, RegisteredOfficeUK}
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.ConfirmRegisteredOfficeOrMainPlaceView
@@ -40,11 +39,11 @@ class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with MustM
       val formWithData = formProvider().fill(ConfirmRegisteredOffice(true))
 
       def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
         place(formWithData, address, true)
       }
 
-      doc.title must startWith(Messages("businessdetails.confirmingyouraddress.title") + " - " + Messages("summary.businessdetails"))
+      doc.title must startWith(messages("businessdetails.confirmingyouraddress.title") + " - " + messages("summary.businessdetails"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -52,12 +51,12 @@ class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with MustM
       val formWithData = formProvider().fill(ConfirmRegisteredOffice(true))
 
       def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
         place(formWithData, address, true)
       }
-      heading.html must be(Messages("businessdetails.confirmingyouraddress.title"))
-      subHeading.html must include(Messages("summary.businessdetails"))
 
+      heading.html must be(messages("businessdetails.confirmingyouraddress.title"))
+      subHeading.html must include(messages("summary.businessdetails"))
     }
 
     "show errors in the correct locations" in new ViewFixture {
@@ -70,7 +69,7 @@ class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with MustM
       )
 
       def view = {
-        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
+        val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
         place(formWithErrors, address, true)
       }
 
@@ -80,7 +79,7 @@ class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with MustM
     }
 
     "have a back link" in new ViewFixture {
-      val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
+      val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
       def view = place(formProvider(), address, true)
 
       assert(doc.getElementById("back-link").isInstanceOf[Element])

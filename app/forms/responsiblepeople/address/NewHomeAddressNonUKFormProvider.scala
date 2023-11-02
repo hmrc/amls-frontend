@@ -26,12 +26,12 @@ class NewHomeAddressNonUKFormProvider @Inject()() extends AddressFormProvider[Ne
 
   override val countryErrorKey: String = "error.required.enter.non.uk"
 
-  override def toObject: (String, String, Option[String], Option[String], String) => NewHomeAddress = {
+  override def toObject: (String, Option[String], Option[String], Option[String], String) => NewHomeAddress = {
     case (line1, line2, line3, line4, code) =>
       NewHomeAddress(PersonAddressNonUK(line1, line2, line3, line4, parseCountry(code)))
   }
 
-  override def fromObject: NewHomeAddress => Option[(String, String, Option[String], Option[String], String)] = {
+  override def fromObject: NewHomeAddress => Option[(String, Option[String], Option[String], Option[String], String)] = {
     case NewHomeAddress(PersonAddressNonUK(addressLine1, addressLine2, addressLine3, addressLine4, country)) =>
       Some((addressLine1, addressLine2, addressLine3, addressLine4, country.code))
     case _ => None

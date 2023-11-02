@@ -42,12 +42,12 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
     Some(ContactingYou(Some(phoneNo), Some(email))),
     Some(RegisteredOfficeIsUK(true)),
     Some(RegisteredOfficeUK(
-      "Line 1", "Line 2", Some("Line 3"), Some("Line 4"), "AG1 3RE", Some(DateOfChange(now.minusYears(1)))
+      "Line 1", Some("Line 2"), Some("Line 3"), Some("Line 4"), "AG1 3RE", Some(DateOfChange(now.minusYears(1)))
     )),
     Some(true),
     Some(CorrespondenceAddressIsUk(true)),
     Some(CorrespondenceAddress(
-      Some(CorrespondenceAddressUk("John Smith", "Big Corp", "Line A", "Line B", Some("Line C"), Some("Line D"), "UE3 5DQ")),
+      Some(CorrespondenceAddressUk("John Smith", "Big Corp", "Line A", Some("Line B"), Some("Line C"), Some("Line D"), "UE3 5DQ")),
       None
     ))
   )
@@ -217,7 +217,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
           override val summaryListRows: Seq[SummaryListRow] =
             cyaHelper.createSummaryList(
               model.copy(registeredOffice = Some(RegisteredOfficeNonUK(
-                address(0), address(1), Some(address(2)), Some(address(3)), Country(address(4), "US"), None
+                address(0), Some(address(1)), Some(address(2)), Some(address(3)), Country(address(4), "US"), None
               ))),
               true
             ).rows
@@ -317,7 +317,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
         "answer is yes and address is not in the UK" in new RowFixture {
 
           val nonUkAddress = CorrespondenceAddressNonUk(
-            "Ben Jones", "Business Ltd", "123 Street", "Test Lane", None, None, Country("United States", "US")
+            "Ben Jones", "Business Ltd", "123 Street", Some("Test Lane"), None, None, Country("United States", "US")
           )
 
           override val summaryListRows: Seq[SummaryListRow] =

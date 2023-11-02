@@ -44,7 +44,6 @@ error.required.dateofchange.1900 = Date of the change must be after 1900
 error.required.dateofchange.future = Date of the change must be today or in the past
 
 error.required.address.line1 = Enter address line 1
-error.required.address.line2 = Enter address line 2
 error.max.length.address.line = You can’t enter more than 35 characters
 error.max.length.address.line1 = Address line 1 must be 35 characters or less
 error.max.length.address.line2 = Address line 2 must be 35 characters or less
@@ -452,7 +451,6 @@ error.required.enter.non.uk = Enter a country that is not the United Kingdom bec
 error.required.enter.non.uk.previous = Enter a country that is not the United Kingdom because this person’s previous address was not in the UK
 error.required.enter.non.uk.previous.other = Enter a country that is not the United Kingdom because this person’s other previous address was not in the UK
 error.required.enter.addressline.one = Enter address line 1
-error.required.enter.addressline.two = Enter address line 2
 error.required.enter.postcode = Enter a postcode, like AA1 1AA
 error.required.enter.country = Enter a country name, like France
 error.required.enter.addresslineone.regex = Address line 1 must only include letters a to z, numbers, apostrophes, commas, dashes, exclamation marks, full stops, hyphens, quotation marks, slashes, spaces, and round brackets
@@ -750,7 +748,7 @@ lbl.registration.status.short = Status
 
 legend.address = Address
 lbl.address.line1 = Address line 1
-lbl.address.line2 = Address line 2
+lbl.address.line2 = Address line 2 (optional)
 lbl.address.line3 = Address line 3 (optional)
 lbl.address.line4 = Address line 4 (optional)
 lbl.address.postcode = Postcode

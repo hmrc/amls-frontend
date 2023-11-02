@@ -41,8 +41,8 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
   val line1 = "Address Line 1"
   val line2 = "Address Line 2"
   val postcode = "AA1 2QQ"
-  val office = RegisteredOfficeUK(line1, line2, postCode = postcode)
-  val address = Address(line1, line2, None, None, Some(postcode), Country("United Kingdom", "UK"))
+  val office = RegisteredOfficeUK(line1, Some(line2), postCode = postcode)
+  val address = Address(line1, Some(line2), None, None, Some(postcode), Country("United Kingdom", "UK"))
 
   "ConfirmRegisteredOfficeService" when {
 

@@ -135,7 +135,7 @@ class SubmissionServiceSpec extends AmlsSpec
     } thenReturn Some(reviewDetails)
     when {
       businessDetails.registeredOffice
-    } thenReturn Some(RegisteredOfficeUK("Line 1", "Line 2", None, None, "postcode", None))
+    } thenReturn Some(RegisteredOfficeUK("Line 1", None, None, None, "postcode", None))
     when {
       businessMatching.activities
     } thenReturn Some(activities)

@@ -194,7 +194,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
   )
 
   val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-    Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+    Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
 
   val noMsbNoTcsp = Some(BusinessActivities(Set(TelephonePaymentService, BillPaymentServices, AccountancyServices, EstateAgentBusinessService)))
   val tcspAndOther = Some(BusinessActivities(Set(TelephonePaymentService, BillPaymentServices, AccountancyServices, EstateAgentBusinessService, TrustAndCompanyServices)))
@@ -627,7 +627,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "the status is 'approved' and there is no current mongo cache" in new Fixture {
         val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
 
         val statusResponse = mock[ReadStatusResponse]
         when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
@@ -655,7 +655,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
     "show the withdrawal link" when {
       "the status is 'ready for review'" in new Fixture {
         val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
 
         val statusResponse = mock[ReadStatusResponse]
         when(statusResponse.processingDate).thenReturn(LocalDateTime.now)
@@ -682,7 +682,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
     "show the deregister link" when {
       "the status is 'approved'" in new Fixture {
         val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
 
         val statusResponse = mock[ReadStatusResponse]
         when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)

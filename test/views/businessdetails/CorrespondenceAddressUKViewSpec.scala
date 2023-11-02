@@ -48,7 +48,7 @@ class CorrespondenceAddressUKViewSpec extends AmlsViewSpec with MustMatchers {
           "Name",
           "BusinessName",
           "addressLine1",
-          "addressLine1",
+          Some("addressLine2"),
           None,
           None,
           "AB12CD"))
@@ -64,7 +64,7 @@ class CorrespondenceAddressUKViewSpec extends AmlsViewSpec with MustMatchers {
         "Name",
         "BusinessName",
         "addressLine1",
-        "addressLine1",
+        Some("addressLine2"),
         None,
         None,
         "AB12CD"

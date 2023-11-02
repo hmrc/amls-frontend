@@ -31,7 +31,7 @@ class ActivityStartDateViewSpec extends AmlsViewSpec with MustMatchers {
 
   implicit val request = FakeRequest()
 
-  val address = Address("line 1", "Line 2", None, None, "postcode")
+  val address = Address("line 1", Some("Line 2"), None, None, "postcode")
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addTokenForView()

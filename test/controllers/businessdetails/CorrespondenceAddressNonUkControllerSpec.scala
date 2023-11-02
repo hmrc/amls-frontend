@@ -77,7 +77,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
       "data exists in the keystore" in new Fixture {
 
         val correspondenceAddress = CorrespondenceAddress(None,
-          Some(CorrespondenceAddressNonUk("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))))
+          Some(CorrespondenceAddressNonUk("Name Test", "Test", "Test", Some("Test"), Some("test"), None, Country("Albania", "AL"))))
         val businessDetails = BusinessDetails(None, None, None, None, None,None, None, None, None, Some(correspondenceAddress))
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
@@ -115,7 +115,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
       "a valid form request is sent in the body" in new Fixture {
 
-        val address = CorrespondenceAddressNonUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, Country("Albania", "AL"))
+        val address = CorrespondenceAddressNonUk("Test", "Test", "old line 1", Some("old line 2"), Some("old line 3"), None, Country("Albania", "AL"))
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, Some(CorrespondenceAddress(None, Some(address))))))
 
@@ -149,7 +149,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
       "a valid form request is sent in the body when editing" in new Fixture {
 
-        val address = CorrespondenceAddressNonUk("Test", "Test", "old line 1", "old line 2", Some("old line 3"), None, Country("Albania", "AL"))
+        val address = CorrespondenceAddressNonUk("Test", "Test", "old line 1", Some("old line 2"), Some("old line 3"), None, Country("Albania", "AL"))
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, Some(CorrespondenceAddress(None, Some(address))))))
 

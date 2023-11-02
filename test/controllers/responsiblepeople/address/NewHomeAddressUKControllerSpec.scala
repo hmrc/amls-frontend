@@ -89,11 +89,10 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec with Injecting {
           val requestWithParams = FakeRequest(POST, routes.NewHomeAddressUKController.post(1).url)
             .withFormUrlEncodedBody(
               "addressLine1" -> "Line 1",
-              "addressLine2" -> "Line 2",
               "postCode" -> "AA1 1AA"
             )
 
-          val ukAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 1", None, None, None, "AA1 1AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(OneToThreeYears), Some(DateOfChange(LocalDate.now().minusMonths(13))))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
@@ -125,24 +124,23 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec with Injecting {
           val requestWithParams = FakeRequest(POST, routes.NewHomeAddressUKController.post(1).url)
             .withFormUrlEncodedBody(
               "addressLine1" -> "Line 1",
-              "addressLine2" -> "Line 2",
               "postCode" -> "AA1 1AA"
             )
 
-          val ukAddress = PersonAddressUK("Line 111", "Line 222", None, None, "AA1 1AA")
+          val ukAddress = PersonAddressUK("Line 111", None, None, None, "AA1 1AA")
           val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths), Some(DateOfChange(LocalDate.now().minusMonths(7))))
-          val nCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressUK("Line 1", "Line 2", None, None, "AA1 1AA"), Some(SixToElevenMonths), Some(DateOfChange(LocalDate.now().minusMonths(7))))
+          val nCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressUK("Line 1", None, None, None, "AA1 1AA"), Some(SixToElevenMonths), Some(DateOfChange(LocalDate.now().minusMonths(7))))
 
-          val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
-          val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
+          val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", None, None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
+          val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", None, None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
 
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
             additionalAddress = Some(additionalAddress),
             additionalExtraAddress = Some(additionalExtraAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-          val pushCurrentToAdditional = ResponsiblePersonAddress(PersonAddressUK("Line 111", "Line 222", None, None, "AA1 1AA"), Some(ZeroToFiveMonths))
-          val pushCurrentToExtraAdditional = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
+          val pushCurrentToAdditional = ResponsiblePersonAddress(PersonAddressUK("Line 111", None, None, None, "AA1 1AA"), Some(ZeroToFiveMonths))
+          val pushCurrentToExtraAdditional = ResponsiblePersonAddress(PersonAddressUK("Line 11", None, None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
 
 
           val upDatedHistory = ResponsiblePersonAddressHistory(currentAddress = Some(nCurrentAddress),
@@ -178,14 +176,13 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec with Injecting {
           val requestWithParams = FakeRequest(POST, routes.NewHomeAddressUKController.post(1).url)
             .withFormUrlEncodedBody(
               "addressLine1" -> "Line 11",
-              "addressLine2" -> "Line 21",
               "postCode" -> "AA1 1AA"
             )
 
-          val ukAddress1 = PersonAddressUK("Line 11", "Line 21", None, None, "AA1 1AA")
+          val ukAddress1 = PersonAddressUK("Line 11", None, None, None, "AA1 1AA")
           val currentAddress = ResponsiblePersonCurrentAddress(ukAddress1, Some(ThreeYearsPlus), Some(DateOfChange(LocalDate.now().minusMonths(37))))
-          val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", "Line 22", None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
-          val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", "Line 22", None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
+          val additionalAddress = ResponsiblePersonAddress(PersonAddressUK("Line 11", None, None, None, "AB1 1BA"), Some(ZeroToFiveMonths))
+          val additionalExtraAddress = ResponsiblePersonAddress(PersonAddressUK("Line 21", None, None, None, "BB1 1BB"), Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
             additionalAddress = Some(additionalAddress),
             additionalExtraAddress = Some(additionalExtraAddress))
@@ -223,7 +220,6 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec with Injecting {
           val requestWithParams = FakeRequest(POST, routes.NewHomeAddressUKController.post(1).url)
           .withFormUrlEncodedBody(
             "addressLine1" -> "Line &1",
-            "addressLine2" -> "Line *2",
             "postCode" -> "AA1 1AA"
           )
 
@@ -289,7 +285,7 @@ class NewHomeAddressUKControllerSpec extends AmlsSpec with Injecting {
               "postCode" -> "AA1 1AA"
             )
 
-            val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+            val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
             val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
             val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))

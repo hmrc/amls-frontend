@@ -56,7 +56,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
 
   "RemoveTradingPremisesController" must {
 
-    val address = Address("1", "2", None, None, "asdfasdf")
+    val address = Address("1", None, None, None, "asdfasdf")
     val year = 1990
     val month = 2
     val day = 24
@@ -411,7 +411,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
     "foo",
     Address(
       "1",
-      "2",
+      None,
       None,
       None,
       "asdfasdf"

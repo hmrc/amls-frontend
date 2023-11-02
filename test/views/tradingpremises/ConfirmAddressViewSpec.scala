@@ -36,7 +36,7 @@ class ConfirmAddressViewSpec extends AmlsViewSpec with MustMatchers {
   }
 
   "ConfirmAddressView" must {
-    val address = Address("#11", "some building", Some("Some street"), Some("city"), None, Country("United Kingdome","UK"))
+    val address = Address("#11", Some("some building"), Some("Some street"), Some("city"), None, Country("United Kingdom","UK"))
     "have correct title, heading and load UI with empty form" in new ViewFixture {
 
       val pageTitle = messages("tradingpremises.confirmaddress.title") + " - " +
@@ -49,7 +49,7 @@ class ConfirmAddressViewSpec extends AmlsViewSpec with MustMatchers {
       heading.html must be(messages("tradingpremises.confirmaddress.title"))
       subHeading.html must include(messages("summary.tradingpremises"))
 
-      doc.getElementsMatchingOwnText("#11").text mustBe "#11 some building Some street city United Kingdome"
+      doc.getElementsMatchingOwnText("#11").text mustBe "#11 some building Some street city United Kingdom"
       doc.select("input[type=radio]").size mustBe 2
     }
 

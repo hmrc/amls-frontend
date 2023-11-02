@@ -37,7 +37,7 @@ sealed trait TestHelper extends AmlsSummaryViewSpec {
     "foo",
     Address(
       "1",
-      "2",
+      Some("2"),
       None,
       None,
       "asdfasdf"

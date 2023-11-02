@@ -26,11 +26,11 @@ class AdditionalAddressUKFormProvider @Inject()() extends AddressFormProvider[Re
 
   override val countryErrorKey: String = ""
 
-  override def toObject: (String, String, Option[String], Option[String], String) => ResponsiblePersonAddress = {
+  override def toObject: (String, Option[String], Option[String], Option[String], String) => ResponsiblePersonAddress = {
     case (line1, line2, line3, line4, postcode) =>
       ResponsiblePersonAddress(PersonAddressUK(line1, line2, line3, line4, postcode), None)
   }
-  override def fromObject: ResponsiblePersonAddress => Option[(String, String, Option[String], Option[String], String)] = {
+  override def fromObject: ResponsiblePersonAddress => Option[(String, Option[String], Option[String], Option[String], String)] = {
     case ResponsiblePersonAddress(PersonAddressUK(line1, line2, line3, line4, postCode), _) =>
       Some((line1, line2, line3, line4, postCode))
     case _ => None

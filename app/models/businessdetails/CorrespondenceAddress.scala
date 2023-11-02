@@ -43,7 +43,7 @@ object CorrespondenceAddress {
           (__ \ "yourName").read[String] and
           (__ \ "businessName").read[String] and
           (__ \ "correspondenceAddressLine1").read[String] and
-          (__ \ "correspondenceAddressLine2").read[String] and
+          (__ \ "correspondenceAddressLine2").readNullable[String] and
           (__ \ "correspondenceAddressLine3").readNullable[String] and
           (__ \ "correspondenceAddressLine4").readNullable[String] and
           (__ \ "correspondencePostCode").read[String])(CorrespondenceAddressUk.apply _)
@@ -53,7 +53,7 @@ object CorrespondenceAddress {
           (__ \ "yourName").read[String] and
           (__ \ "businessName").read[String] and
           (__ \ "correspondenceAddressLine1").read[String] and
-          (__ \ "correspondenceAddressLine2").read[String] and
+          (__ \ "correspondenceAddressLine2").readNullable[String] and
           (__ \ "correspondenceAddressLine3").readNullable[String] and
           (__ \ "correspondenceAddressLine4").readNullable[String] and
           (__ \ "correspondenceCountry").read[Country])(CorrespondenceAddressNonUk.apply _)
@@ -71,7 +71,7 @@ object CorrespondenceAddress {
           (__ \ "yourName").write[String] and
           (__ \ "businessName").write[String] and
           (__ \ "correspondenceAddressLine1").write[String] and
-          (__ \ "correspondenceAddressLine2").write[String] and
+          (__ \ "correspondenceAddressLine2").writeNullable[String] and
           (__ \ "correspondenceAddressLine3").writeNullable[String] and
           (__ \ "correspondenceAddressLine4").writeNullable[String] and
           (__ \ "correspondencePostCode").write[String]
@@ -81,7 +81,7 @@ object CorrespondenceAddress {
           (__ \ "yourName").write[String] and
           (__ \ "businessName").write[String] and
           (__ \ "correspondenceAddressLine1").write[String] and
-          (__ \ "correspondenceAddressLine2").write[String] and
+          (__ \ "correspondenceAddressLine2").writeNullable[String] and
           (__ \ "correspondenceAddressLine3").writeNullable[String] and
           (__ \ "correspondenceAddressLine4").writeNullable[String] and
           (__ \ "correspondenceCountry").write[Country]

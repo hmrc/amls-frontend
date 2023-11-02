@@ -89,7 +89,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           "customer is a Partnership" in new Fixture {
 
             val partnership = ReviewDetails("BusinessName", Some(Partnership),
-              Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+              Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
             mockCacheGetEntry(Some(BusinessMatching(Some(partnership))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())
@@ -109,7 +109,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           "customer is a LLP" in new Fixture {
 
             val llp = ReviewDetails("BusinessName", Some(LPrLLP),
-              Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+              Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
             mockCacheGetEntry(Some(BusinessMatching(Some(llp))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())
@@ -127,7 +127,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           "customer is a Limited Company" in new Fixture {
 
             val details = ReviewDetails("BusinessName", Some(LimitedCompany),
-              Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+              Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
             mockCacheGetEntry(Some(BusinessMatching(Some(details))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())
@@ -152,7 +152,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             )
 
             val partnership = ReviewDetails("BusinessName", Some(LPrLLP),
-              Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
+              Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
 
             mockCacheGetEntry(Some(BusinessMatching(Some(partnership))), BusinessMatching.key)
             mockCacheUpdate(Some(BusinessDetails.key), BusinessDetails())

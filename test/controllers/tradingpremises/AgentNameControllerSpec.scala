@@ -354,7 +354,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
     }
   }
-  val address = Address("1", "2",None,None,"asdfasdf")
+  val address = Address("1", None,None,None,"asdfasdf")
   val year =1990
   val month = 2
   val day = 24

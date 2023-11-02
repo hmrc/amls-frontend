@@ -119,7 +119,7 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
     val completePersonName = Some(PersonName("Katie", None, "Test"))
     val completeRp1 = ResponsiblePerson(completePersonName)
-    val address = Address("1", "2", None, None, "AA1 1BB", None)
+    val address = Address("1", None, None, None, "AA1 1BB", None)
     override def view = update_services_summary(AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
       subSectors = Some(BusinessMatchingMsbServices(Set(

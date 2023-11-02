@@ -90,7 +90,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
       "display the 'When did this person start their role in the business?' page" in new Fixture {
         val mockCacheMap = mock[CacheMap]
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.SoleProprietor),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
         when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -153,7 +153,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
         val positions = Positions(Set(BeneficialOwner), startDate)
         val responsiblePeople = ResponsiblePerson(personName = personName, positions = Some(positions))
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
+          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
 
         val mockCacheMap = mock[CacheMap]

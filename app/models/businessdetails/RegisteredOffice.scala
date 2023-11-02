@@ -38,7 +38,7 @@ sealed trait RegisteredOffice {
     case a: RegisteredOfficeUK =>
       Seq(
         Some(a.addressLine1),
-        Some(a.addressLine2),
+        a.addressLine2,
         a.addressLine3,
         a.addressLine4,
         Some(a.postCode)
@@ -46,7 +46,7 @@ sealed trait RegisteredOffice {
     case a: RegisteredOfficeNonUK =>
       Seq(
         Some(a.addressLine1),
-        Some(a.addressLine2),
+        a.addressLine2,
         a.addressLine3,
         a.addressLine4,
         Some(a.country.toString)
@@ -58,7 +58,7 @@ sealed trait RegisteredOffice {
 
 case class RegisteredOfficeUK(
                                addressLine1: String,
-                               addressLine2: String,
+                               addressLine2: Option[String] = None,
                                addressLine3: Option[String] = None,
                                addressLine4: Option[String] = None,
                                postCode: String,
@@ -67,7 +67,7 @@ case class RegisteredOfficeUK(
 
 case class RegisteredOfficeNonUK(
                                   addressLine1: String,
-                                  addressLine2: String,
+                                  addressLine2: Option[String] = None,
                                   addressLine3: Option[String] = None,
                                   addressLine4: Option[String] = None,
                                   country: Country,
@@ -90,21 +90,21 @@ object RegisteredOffice {
       case true =>
         (
           (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress("line1")) ~
-            (__ \ "addressLine2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress("line2")) ~
+            (__ \ "addressLine2").read(optionR(validateAddress("line2"))) ~
             (__ \ "addressLine3").read(optionR(validateAddress("line3"))) ~
             (__ \ "addressLine4").read(optionR(validateAddress("line4"))) ~
             (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
-          ) ((addr1: String, addr2: String, addr3: Option[String], addr4: Option[String], postCode: String) =>
+          ) ((addr1: String, addr2: Option[String], addr3: Option[String], addr4: Option[String], postCode: String) =>
             RegisteredOfficeUK(addr1, addr2, addr3, addr4, postCode, None))
 
       case false =>
         (
           (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress("line1")) ~
-            (__ \ "addressLineNonUK2").read(notEmpty.withMessage("error.required.address.line2") andThen validateAddress("line2")) ~
+            (__ \ "addressLineNonUK2").read(optionR(validateAddress("line2"))) ~
             (__ \ "addressLineNonUK3").read(optionR(validateAddress("line3"))) ~
             (__ \ "addressLineNonUK4").read(optionR(validateAddress("line4"))) ~
             (__ \ "country").read(validateCountry)
-          ) ((addr1: String, addr2: String, addr3: Option[String], addr4: Option[String], country: Country) =>
+          ) ((addr1: String, addr2: Option[String], addr3: Option[String], addr4: Option[String], country: Country) =>
           RegisteredOfficeNonUK(addr1, addr2, addr3, addr4, country, None))
     }
   }
@@ -114,7 +114,7 @@ object RegisteredOffice {
       Map(
         "isUK" -> Seq("true"),
         "addressLine1" -> f.addressLine1,
-        "addressLine2" -> f.addressLine2,
+        "addressLine2" -> Seq(f.addressLine2.getOrElse("")),
         "addressLine3" -> Seq(f.addressLine3.getOrElse("")),
         "addressLine4" -> Seq(f.addressLine4.getOrElse("")),
         "postCode" -> f.postCode
@@ -123,7 +123,7 @@ object RegisteredOffice {
       Map(
         "isUK" -> Seq("false"),
         "addressLineNonUK1" -> f.addressLine1,
-        "addressLineNonUK2" -> f.addressLine2,
+        "addressLineNonUK2" -> Seq(f.addressLine2.getOrElse("")),
         "addressLineNonUK3" -> Seq(f.addressLine3.getOrElse("")),
         "addressLineNonUK4" -> Seq(f.addressLine4.getOrElse("")),
         "country" -> f.country.code
@@ -138,7 +138,7 @@ object RegisteredOffice {
       (__ \ "postCode").read[String] andKeep
         (
           (__ \ "addressLine1").read[String] and
-            (__ \ "addressLine2").read[String] and
+            (__ \ "addressLine2").readNullable[String] and
             (__ \ "addressLine3").readNullable[String] and
             (__ \ "addressLine4").readNullable[String] and
             (__ \ "postCode").read[String] and
@@ -147,7 +147,7 @@ object RegisteredOffice {
       ) orElse
       (
         (__ \ "addressLineNonUK1").read[String] and
-          (__ \ "addressLineNonUK2").read[String] and
+          (__ \ "addressLineNonUK2").readNullable[String] and
           (__ \ "addressLineNonUK3").readNullable[String] and
           (__ \ "addressLineNonUK4").readNullable[String] and
           (__ \ "country").read[Country] and

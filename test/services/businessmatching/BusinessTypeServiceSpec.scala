@@ -56,7 +56,7 @@ class BusinessTypeServiceSpec extends AmlsSpec
             val bm = BusinessMatching().reviewDetails(ReviewDetails(
               "Big Corp",
               Some(businessType),
-              Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+              Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
               "wdvhibsd9vh823fwdj"
             ))
             when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
@@ -74,7 +74,7 @@ class BusinessTypeServiceSpec extends AmlsSpec
           val bm = BusinessMatching().reviewDetails(ReviewDetails(
             "Big Corp",
             None,
-            Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+            Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
             "wdvhibsd9vh823fwdj"
           ))
           when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
@@ -110,7 +110,7 @@ class BusinessTypeServiceSpec extends AmlsSpec
         val reviewDetails = ReviewDetails(
           "Big Corp",
           None,
-          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+          Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
           "wdvhibsd9vh823fwdj"
         )
 

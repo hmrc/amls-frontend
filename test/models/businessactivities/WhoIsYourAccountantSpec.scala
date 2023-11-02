@@ -27,7 +27,7 @@ class WhoIsYourAccountantSpec extends WordSpec with Matchers {
   val testTradingName = Some("Default Trading Name")
 
   val testAddressLine1 = "Default Line 1"
-  val testAddressLine2 = "Default Line 2"
+  val testAddressLine2 = Some("Default Line 2")
   val testAddressLine3 = Some("Default Line 3")
   val testAddressLine4 = Some("Default Line 4")
   val testPostcode = "AA1 1AA"

@@ -49,7 +49,7 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     line1 <- stringOfLengthGen(10)
     line2 <- stringOfLengthGen(10)
     postCode <- postcodeGen
-  } yield PersonAddressUK(line1, line2, None, None, postCode)
+  } yield PersonAddressUK(line1, Some(line2), None, None, postCode)
 
   val responsiblePersonGen: Gen[ResponsiblePerson] = for {
     personName <- personNameGen

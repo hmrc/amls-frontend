@@ -90,7 +90,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
 
         val ukAddress = PersonAddressUK(
           "existingAddressLine1",
-          "existingAddressLine1",
+          Some("existingAddressLine1"),
           Some("existingAddressLine3"),
           Some("existingAddressLine4"),
           "AA11AA"
@@ -121,7 +121,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
 
         val ukAddress = PersonAddressNonUK(
           "existingAddressLine1",
-          "existingAddressLine1",
+          Some("existingAddressLine1"),
           Some("existingAddressLine3"),
           Some("existingAddressLine4"),
           Country("Spain", "ES")
@@ -272,7 +272,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
         .withFormUrlEncodedBody(
           "isUK" -> "false")
 
-        val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA1 1AA")
+        val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
         val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
         val additionalAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
@@ -293,7 +293,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
         val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
         verify(additionalExtraAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any(), any())
         captor.getValue.head.isComplete mustBe false
-        captor.getValue.head.addressHistory.value.additionalExtraAddress mustBe Some(ResponsiblePersonAddress(PersonAddressNonUK("", "", None, None, Country("", "")), None))
+        captor.getValue.head.addressHistory.value.additionalExtraAddress mustBe Some(ResponsiblePersonAddress(PersonAddressNonUK("", None, None, None, Country("", "")), None))
       }
     }
 
@@ -304,7 +304,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
         .withFormUrlEncodedBody(
           "isUK" -> "true")
 
-        val ukAddress = PersonAddressNonUK("Line 1", "Line 2", Some("Line 3"), None, Country("", ""))
+        val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("", ""))
         val currentAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
         val additionalAddress = ResponsiblePersonAddress(ukAddress, Some(ZeroToFiveMonths))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress),
@@ -325,7 +325,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
         val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
         verify(additionalExtraAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any(), any())
         captor.getValue.head.isComplete mustBe false
-        captor.getValue.head.addressHistory.value.additionalExtraAddress mustBe Some(ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None))
+        captor.getValue.head.addressHistory.value.additionalExtraAddress mustBe Some(ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None))
       }
     }
   }

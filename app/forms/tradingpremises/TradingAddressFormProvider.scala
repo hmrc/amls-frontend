@@ -37,19 +37,19 @@ class TradingAddressFormProvider @Inject()() extends AddressMappings {
         )
       ),
       "addressLine1" -> addressLineMapping("line1"),
-      "addressLine2" -> addressLineMapping("line2"),
+      "addressLine2" -> optional(addressLineMapping("line2")),
       "addressLine3" -> optional(addressLineMapping("line3")),
       "addressLine4" -> optional(addressLineMapping("line4")),
       postcodeOrCountryMapping(true)
     )(toObject)(fromObject)
   )
 
-  private def toObject: (String, String, String, Option[String], Option[String], String) => YourTradingPremises = {
+  private def toObject: (String, String, Option[String], Option[String], Option[String], String) => YourTradingPremises = {
     case (name, line1, line2, line3, line4, postcode) =>
       YourTradingPremises(name, Address(line1, line2, line3, line4, postcode))
   }
 
-  private def fromObject: YourTradingPremises => Option[(String, String, String, Option[String], Option[String], String)] = {
+  private def fromObject: YourTradingPremises => Option[(String, String, Option[String], Option[String], Option[String], String)] = {
     case YourTradingPremises(name, Address(addressLine1, addressLine2, addressLine3, addressLine4, postcode, _), _, _, _) =>
       Some((name, addressLine1, addressLine2, addressLine3, addressLine4, postcode))
     case _ => None
