@@ -86,12 +86,6 @@ object BusinessActivity extends Enumerable.Implicits {
     override val value: String = "08"
   }
 
-  implicit val enumerable: Enumerable[BusinessActivity] =
-    Enumerable(BusinessActivities.all.toSeq.map(v => v.toString -> v): _*)
-
-  /* TODO Check what the hell is going on with read/write values being different for form and standard json formats
-  */
-
   implicit val activityFormRead = Rule[String, BusinessActivity] {
       case "01" => Valid(AccountancyServices)
       case "02" => Valid(ArtMarketParticipant)
@@ -115,9 +109,6 @@ object BusinessActivity extends Enumerable.Implicits {
       case TelephonePaymentService => "08"
   }
 
-  /* TODO Check what the hell is going on with read/write values being different for form and standard json formats
-  */
-
   implicit val jsonActivityReads: Reads[BusinessActivity] = Reads {
     case JsString("01") => JsSuccess(AccountancyServices)
     case JsString("08") => JsSuccess(ArtMarketParticipant)
@@ -140,6 +131,9 @@ object BusinessActivity extends Enumerable.Implicits {
     case TrustAndCompanyServices => JsString("06")
     case TelephonePaymentService => JsString("07")
   }
+
+  implicit val enumerable: Enumerable[BusinessActivity] =
+    Enumerable(BusinessActivities.all.toSeq.map(v => v.toString -> v): _*)
 }
 
 object BusinessActivities extends Logging {
