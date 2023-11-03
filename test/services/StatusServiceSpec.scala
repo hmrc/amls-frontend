@@ -16,13 +16,17 @@
 
 package services
 
-import connectors.AmlsConnector
-import models.ReadStatusResponse
+import connectors.{AmlsConnector, DataCacheConnector}
+import models.{Country, ReadStatusResponse}
+import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.SoleProprietor
 import models.registrationprogress.{Completed, NotStarted, Section}
 import models.status._
 import org.joda.time.{DateTimeUtils, LocalDate, LocalDateTime}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.mockito.verification.VerificationMode
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -37,6 +41,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
    val service = new StatusService(
     amlsConnector = mock[AmlsConnector],
+    dataCacheConnector = mock[DataCacheConnector],
     enrolmentsService = mock[AuthEnrolmentsService],
     sectionsProvider = mock[SectionsProvider],
     environment = mock[Environment]
@@ -45,6 +50,11 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
   val amlsRegNo = Some("X0123456789")
   val accountTypeId = ("accountType", "accountId")
   val credId = "123412345"
+
+  val safeId = "J4JF8EJ3NDJWI32W"
+  val address = Address("line 1", None, None, None, None, Country("United Kingdom", "GB"))
+  val reviewDetails = ReviewDetails("businessName", Some(SoleProprietor), address, safeId, None)
+  val businessMatching = BusinessMatching(reviewDetails = Some(reviewDetails))
   
   implicit val hc = mock[HeaderCarrier]
   implicit val ec = app.injector.instanceOf[ExecutionContext]
@@ -204,14 +214,30 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       }
     }
 
-    "return SafeId" in {
-      val safeId = "J4JF8EJ3NDJWI32W"
+    "return SafeId preferring Mongo cache" in {
+      reset(service.amlsConnector)
+      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(service.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(Future.successful(Some(businessMatching)))
+
+      whenReady(service.getSafeIdFromReadStatus("amlsref", accountTypeId, credId)) {
+        _ mustEqual Some(safeId)
+      }
+
+      verify(service.amlsConnector, never).status(any(), any())(any(), any(), any())
+    }
+
+    "return SafeId using AMLS backend as fallback" in {
       when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any())).thenReturn(Future.successful(Some("amlsref")))
       when(service.sectionsProvider.sections(any[String]())(any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
       when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(safeId = Some(safeId))))
-      whenReady(service.getSafeIdFromReadStatus("amlsref", accountTypeId)) {
+      when(service.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(Future.successful(None))
+
+      whenReady(service.getSafeIdFromReadStatus("amlsref", accountTypeId, credId)) {
         _ mustEqual Some(safeId)
       }
+
+      verify(service.amlsConnector, times(1)).status(any(), any())(any(), any(), any())
     }
   }
 

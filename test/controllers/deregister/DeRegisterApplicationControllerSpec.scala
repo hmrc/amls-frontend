@@ -79,10 +79,8 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec {
     } thenReturn Future.successful(DeRegisterSubscriptionResponse("Some date"))
 
     when {
-      controller.statusService.getSafeIdFromReadStatus(any(), any())(any(), any())
+      controller.statusService.getSafeIdFromReadStatus(any(), any(), any())(any(), any())
     } thenReturn Future.successful(Some(safeId))
-
-
   }
 
   "The DeRegisterApplicationController" when {

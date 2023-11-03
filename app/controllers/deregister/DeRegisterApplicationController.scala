@@ -44,7 +44,7 @@ class DeRegisterApplicationController @Inject() (authAction: AuthAction,
             bm <- OptionT(cache.fetch[BusinessMatching](request.credId, BusinessMatching.key))
             amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
             ba <- OptionT.fromOption[Future](bm.activities)
-            id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId))
+            id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId, request.credId))
             name <- BusinessName.getName(request.credId, Some(id), request.accountTypeId)
           } yield {
             val activities = ba.businessActivities map {
