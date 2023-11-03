@@ -45,7 +45,7 @@
     }
 }
 
-@layout(pageTitle = messages("declaration.renew.registration.title")) {
+@layout(s"${messages("declaration.renew.registration.title")} - ${messages("summary.declaration")}") {
 
     @errorSummary(form)
 

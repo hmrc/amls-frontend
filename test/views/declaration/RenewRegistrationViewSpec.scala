@@ -44,7 +44,7 @@ class RenewRegistrationViewSpec extends AmlsViewSpec with MustMatchers {
 
       def view = renewView(fp(), Some(endDate))
 
-      doc.title mustBe s"${messages("declaration.renew.registration.title")} - ${messages("title.amls")} - ${messages("title.gov")}"
+      doc.title mustBe s"${messages("declaration.renew.registration.title")} - ${messages("summary.declaration")} - ${messages("title.amls")} - ${messages("title.gov")}"
       heading.html must include(messages("declaration.renew.registration.title"))
       subHeading.html must include(messages("summary.declaration"))
 

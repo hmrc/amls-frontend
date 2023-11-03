@@ -313,19 +313,22 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           )
         )
       },
-      model.customersOutsideUK.map { boa =>
-        SummaryListRow(
-          Key(Text(messages("renewal.customer.outside.uk.countries.title"))),
-          boa.countries match {
-            case Some(countries) if countries.length == 1 => Value(Text(countries.head.name))
-            case Some(countries) => toBulletList(countries.map(_.name))
-            case None => throw new Exception("Countries are required for Summary List Row")
-          },
-          actions = editAction(
-            controllers.renewal.routes.CustomersOutsideUKController.get(true).url,
-            "customersoutsideuk-edit"
+      model.customersOutsideUK.flatMap { boa =>
+        def makeRow(value: Value) = {
+          SummaryListRow(
+            Key(Text(messages("renewal.customer.outside.uk.countries.title"))),
+            value,
+            actions = editAction(
+              controllers.renewal.routes.CustomersOutsideUKController.get(true).url,
+              "customersoutsideuk-edit"
+            )
           )
-        )
+        }
+        boa.countries match {
+          case Some(countries) if countries.length == 1 => Some(makeRow(Value(Text(countries.head.name))))
+          case Some(countries) => Some(makeRow(toBulletList(countries.map(_.name))))
+          case _ => None
+        }
       }
     ).flatten
 
