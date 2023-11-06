@@ -157,7 +157,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       }
 
 
-      "redirect to registration progress" when {
+      "render the registration progress" when {
         "status is ready for renewal and" must {
           "redirectWithNominatedOfficer" in new Fixture {
 
@@ -187,69 +187,156 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         "a section has changed" when {
 
           "application is pre-submission" must {
-            "enable the submission button" in new Fixture {
+            "enable the submission button" when {
+              "all tasks have the status 'Completed'" in new Fixture {
 
-              when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
-                .thenReturn(Seq(
-                  TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
-                  TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
-                ))
+                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                  .thenReturn(Seq(
+                    TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
+                    TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
+                  ))
 
-              mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+                mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-              val responseF = controller.get()(request)
-              status(responseF) must be(OK)
+                val responseF = controller.get()(request)
+                status(responseF) must be(OK)
 
-              val submitButton = Jsoup.parse(contentAsString(responseF)).getElementById("progress-continue")
-              submitButton.hasAttr("disabled") must be(false)
+                val submitButton = Jsoup.parse(contentAsString(responseF)).getElementById("progress-continue")
+                submitButton.hasAttr("disabled") must be(false)
+              }
+
+              "all tasks have the status 'Updated'" in new Fixture {
+
+                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                  .thenReturn(Seq(
+                    TaskRow("TESTSECTION1", "/foo", false, Updated, TaskRow.completedTag),
+                    TaskRow("TESTSECTION2", "/bar", true, Updated, TaskRow.completedTag)
+                  ))
+
+                mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+
+                val responseF = controller.get()(request)
+                status(responseF) must be(OK)
+
+                val submitButton = Jsoup.parse(contentAsString(responseF)).getElementById("progress-continue")
+                submitButton.hasAttr("disabled") must be(false)
+              }
+
+              "all tasks have the status 'Completed' or 'Updated'" in new Fixture {
+
+                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                  .thenReturn(Seq(
+                    TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
+                    TaskRow("TESTSECTION2", "/bar", true, Updated, TaskRow.completedTag)
+                  ))
+
+                mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+
+                val responseF = controller.get()(request)
+                status(responseF) must be(OK)
+
+                val submitButton = Jsoup.parse(contentAsString(responseF)).getElementById("progress-continue")
+                submitButton.hasAttr("disabled") must be(false)
+              }
             }
           }
 
           "application is post-submission" must {
-            "show Submit Updates form" in new Fixture {
+            "show Submit Updates form" when {
+              "all tasks have the status 'Completed'" in new Fixture {
 
-              mockApplicationStatus(SubmissionReadyForReview)
+                mockApplicationStatus(SubmissionReadyForReview)
 
-              mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+                mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-              when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
-                .thenReturn(Seq(
-                  TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
-                  TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
-                ))
+                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                  .thenReturn(Seq(
+                    TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
+                    TaskRow("TESTSECTION2", "/bar", true, Completed, TaskRow.completedTag)
+                  ))
 
-              val responseF = controller.get()(request)
-              status(responseF) must be(OK)
+                val responseF = controller.get()(request)
+                status(responseF) must be(OK)
 
-              val html = Jsoup.parse(contentAsString(responseF))
-              html.text() must include(messages("progress.submit.updates"))
+                val html = Jsoup.parse(contentAsString(responseF))
+                html.text() must include(messages("progress.submit.updates"))
 
-              html.getElementsByTag("form")
-                .first().attr("action") must be(controllers.routes.RegistrationProgressController.post().url)
+                html.getElementsByTag("form")
+                  .first().attr("action") must be(controllers.routes.RegistrationProgressController.post().url)
 
-              html.getElementById("progress-continue").select("button").text() must be(messages("button.continue"))
+                html.getElementById("progress-continue").select("button").text() must be(messages("button.continue"))
+              }
+
+              "all tasks have the status 'Updated'" in new Fixture {
+
+                mockApplicationStatus(SubmissionReadyForReview)
+
+                mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+
+                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                  .thenReturn(Seq(
+                    TaskRow("TESTSECTION1", "/foo", true, Updated, TaskRow.updatedTag),
+                    TaskRow("TESTSECTION2", "/bar", true, Updated, TaskRow.updatedTag)
+                  ))
+
+                val responseF = controller.get()(request)
+                status(responseF) must be(OK)
+
+                val html = Jsoup.parse(contentAsString(responseF))
+                html.text() must include(messages("progress.submit.updates"))
+
+                html.getElementsByTag("form")
+                  .first().attr("action") must be(controllers.routes.RegistrationProgressController.post().url)
+
+                html.getElementById("progress-continue").select("button").text() must be(messages("button.continue"))
+              }
+
+              "all tasks have the status 'Completed' or 'Updated'" in new Fixture {
+
+                mockApplicationStatus(SubmissionReadyForReview)
+
+                mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+
+                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                  .thenReturn(Seq(
+                    TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
+                    TaskRow("TESTSECTION2", "/bar", true, Updated, TaskRow.updatedTag)
+                  ))
+
+                val responseF = controller.get()(request)
+                status(responseF) must be(OK)
+
+                val html = Jsoup.parse(contentAsString(responseF))
+                html.text() must include(messages("progress.submit.updates"))
+
+                html.getElementsByTag("form")
+                  .first().attr("action") must be(controllers.routes.RegistrationProgressController.post().url)
+
+                html.getElementById("progress-continue").select("button").text() must be(messages("button.continue"))
+              }
             }
           }
-
         }
 
         "no section has changed" when {
 
           "application is pre-submission" must {
-            "enable the submission button" in new Fixture {
+            "enable the submission button" when {
+              "all tasks have the status 'Completed'" in new Fixture {
 
-              when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
-                .thenReturn(Seq(
-                  TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
-                  TaskRow("TESTSECTION2", "/bar", false, Completed, TaskRow.completedTag)
-                ))
+                when(mockSectionsProvider.taskRows(any[CacheMap])(any()))
+                  .thenReturn(Seq(
+                    TaskRow("TESTSECTION1", "/foo", false, Completed, TaskRow.completedTag),
+                    TaskRow("TESTSECTION2", "/bar", false, Completed, TaskRow.completedTag)
+                  ))
 
-              mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
+                mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(completeResponsiblePerson)), ResponsiblePerson.key)
 
-              val responseF = controller.get()(request)
-              status(responseF) must be(OK)
-              val submitButton = Jsoup.parse(contentAsString(responseF)).getElementById("progress-continue")
-              submitButton.hasAttr("disabled") must be(false)
+                val responseF = controller.get()(request)
+                status(responseF) must be(OK)
+                val submitButton = Jsoup.parse(contentAsString(responseF)).getElementById("progress-continue")
+                submitButton.hasAttr("disabled") must be(false)
+              }
             }
           }
 
