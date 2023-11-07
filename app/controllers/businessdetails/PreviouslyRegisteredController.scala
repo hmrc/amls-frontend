@@ -19,12 +19,9 @@ package controllers.businessdetails
 import com.google.inject.Inject
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.businessdetails.PreviouslyRegisteredFormProvider
-import models.businessdetails._
-import models.businessmatching.BusinessMatching
-import models.businessmatching.BusinessType.SoleProprietor
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.businessdetails.PreviouslyRegisteredService
-import utils.{AuthAction, ControllerHelper}
+import utils.AuthAction
 import views.html.businessdetails.PreviouslyRegisteredView
 
 import scala.concurrent.Future
@@ -47,27 +44,19 @@ class PreviouslyRegisteredController @Inject ()(val authAction: AuthAction,
     implicit request => {
       formProvider().bindFromRequest().fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
-        data =>
-          service.updatePreviouslyRegistered(request.credId, data).map { optCache =>
-            (for {
-              cache <- optCache
-              bmOpt = cache.getEntry[BusinessMatching](BusinessMatching.key)
-              businessType <- ControllerHelper.getBusinessType(bmOpt)
-            } yield {
-              routingLogic(edit, businessType == SoleProprietor)
-            }).getOrElse(routingLogic(edit, true))
+        data => service.updatePreviouslyRegistered(request.credId, data).map {
+          _.fold(Redirect(routes.ConfirmRegisteredOfficeController.get(edit))) { _ =>
+            getRouting(edit)
           }
+        }
       )
     }
   }
 
-  private def routingLogic(edit: Boolean, default: Boolean = false): Result = {
-    if(default) {
-      Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
-    } else if (edit) {
+  private def getRouting(edit: Boolean): Result =
+    if (edit) {
       Redirect(routes.SummaryController.get)
     } else {
       Redirect(routes.ActivityStartDateController.get(edit))
     }
-  }
 }

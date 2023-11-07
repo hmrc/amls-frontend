@@ -81,7 +81,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       document.select("input[value=true]").hasAttr("checked") must be(true)
     }
 
-    "on post with valid data and businessType is corporate" in new Fixture {
+    "on post with valid data" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.PreviouslyRegisteredController.post().url).withFormUrlEncodedBody(
         "value" -> "true",
@@ -106,7 +106,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
       verify(mockService).updatePreviouslyRegistered(any(), meq(update))(any())
     }
 
-    "on post with valid data and load confirm address page when businessType is SoleProprietor" in new Fixture {
+    "on post with valid data and update returns None" in new Fixture {
 
       val newRequest = FakeRequest(POST, routes.PreviouslyRegisteredController.post().url).withFormUrlEncodedBody(
         "value" -> "false"
@@ -120,33 +120,11 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
         .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
 
       when(mockService.updatePreviouslyRegistered(any(), meq(update))(any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
+        .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessdetails.routes.ConfirmRegisteredOfficeController.get().url))
-
-      verify(mockService).updatePreviouslyRegistered(any(), meq(update))(any())
-    }
-
-    "on post with valid data" in new Fixture {
-
-      val newRequest = FakeRequest(POST, routes.PreviouslyRegisteredController.post().url).withFormUrlEncodedBody(
-        "value" -> "false"
-      )
-      val reviewDtls = ReviewDetails("BusinessName", None,
-        Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"),Country("United Kingdom", "GB")), "ghghg")
-
-      val update = PreviouslyRegisteredNo
-
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(Some(reviewDtls))))
-      when(mockService.updatePreviouslyRegistered(any(), meq(update))(any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.businessdetails.routes.ConfirmRegisteredOfficeController.get().url))
+      redirectLocation(result) must be(Some(routes.ConfirmRegisteredOfficeController.get().url))
 
       verify(mockService).updatePreviouslyRegistered(any(), meq(update))(any())
     }
