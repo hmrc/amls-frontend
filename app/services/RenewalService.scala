@@ -23,7 +23,7 @@ import connectors.DataCacheConnector
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.businessmatching._
-import models.registrationprogress.{Completed, NotStarted, Started, TaskRow}
+import models.registrationprogress.{Completed, NotStarted, Started, TaskRow, Updated}
 import models.renewal.Renewal.ValidationRules._
 import models.renewal._
 import play.api.i18n.Messages
@@ -191,7 +191,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
   }
 
   def canSubmit(renewalSection: TaskRow, variationSections: Seq[TaskRow]) = {
-    variationSections.forall(_.status == Completed) &&
+    variationSections.forall(row => row.status == Completed || row.status == Updated) &&
             !renewalSection.status.equals(Started) &&
             (variationSections :+ renewalSection).exists(_.hasChanged)
   }

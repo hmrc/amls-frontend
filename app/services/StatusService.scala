@@ -19,7 +19,7 @@ package services
 import com.google.inject.Inject
 import connectors.AmlsConnector
 import models.ReadStatusResponse
-import models.registrationprogress.{Completed, TaskRow}
+import models.registrationprogress.{Completed, TaskRow, Updated}
 import models.status._
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
@@ -148,8 +148,8 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
   private def notYetSubmitted(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages) = {
 
     def isComplete(seq: Seq[TaskRow]): Boolean =
-      seq forall {
-        _.status == Completed
+      seq forall { row =>
+        row.status == Completed || row.status == Updated
       }
 
     sectionsProvider.taskRows(cacheId) map {
