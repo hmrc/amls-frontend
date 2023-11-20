@@ -131,7 +131,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
       "Prepopulate form with multiple saved data" in new Fixture {
 
-        val positions = Positions(Set(DesignatedMember, BeneficialOwner), startDate)
+        val positions = Positions(Set(BeneficialOwner, Director), startDate)
         val responsiblePeople = ResponsiblePerson(personName = personName, positions = Some(positions))
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
@@ -152,7 +152,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
         document.title must include(pageTitle)
         PositionWithinBusiness.all map { pos =>
           val checkboxIsChecked = document.select(s"input[value=${pos.toString}]").hasAttr("checked")
-          if (pos == DesignatedMember || pos == BeneficialOwner) checkboxIsChecked mustBe true else checkboxIsChecked mustBe false
+          if (pos == BeneficialOwner || pos == Director) checkboxIsChecked mustBe true else checkboxIsChecked mustBe false
         }
       }
     }

@@ -747,7 +747,12 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       val startedRenewal = TaskRow("renewal", "/foo", true, Started, TaskRow.incompleteTag)
       val completedUnchangedRenewal = TaskRow("renewal", "/foo", false, Completed, TaskRow.completedTag)
       val completedChangedRenewal = TaskRow("renewal", "/foo", true, Completed, TaskRow.completedTag)
+      val updatedChangedRenewal = TaskRow("renewal", "/foo", true, Updated, TaskRow.updatedTag)
 
+      val sectionsCompletedAndUpdated = Seq(
+        TaskRow("", "/foo", false, Completed, TaskRow.completedTag),
+        TaskRow("", "/foo", true, Updated, TaskRow.updatedTag)
+      )
       val sectionsCompletedAndChanged = Seq(
           TaskRow("", "/foo", false, Completed, TaskRow.completedTag),
           TaskRow("", "/foo", true, Completed, TaskRow.completedTag)
@@ -798,6 +803,13 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         }
       }
 
+      "sections are updated only" in new CanSubmitFixture {
+        service.canSubmit(completedUnchangedRenewal, Seq(updatedChangedRenewal)) must be(true)
+      }
+
+      "sections are a combination of completed and updated" in new CanSubmitFixture {
+        service.canSubmit(completedUnchangedRenewal, sectionsCompletedAndUpdated) must be(true)
+      }
     }
 
     "return false" when {

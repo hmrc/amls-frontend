@@ -106,6 +106,7 @@ object RoleWithinBusinessRelease7 extends Enumerable.Implicits {
     val rolesForBusinessType: Seq[RoleType] = businessType match {
       case Some(BtSoleProprietor) => constants :+ SoleProprietor
       case Some(Partnership) => constants :+ Partner
+      case Some(LimitedCompany) if businessType.contains(LPrLLP) => Seq(BeneficialShareholder, DesignatedMember, Director) ++ constants
       case Some(LimitedCompany) => Seq(BeneficialShareholder, Director) ++ constants
       case Some(LPrLLP) => DesignatedMember +: constants
       case Some(UnincorporatedBody) => constants

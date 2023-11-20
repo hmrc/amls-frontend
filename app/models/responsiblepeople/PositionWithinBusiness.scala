@@ -134,9 +134,10 @@ object PositionWithinBusiness extends Enumerable.Implicits {
     (businessType match {
       case BTSoleProprietor => optionalCheckboxes :+ SoleProprietor
       case Partnership => optionalCheckboxes :+ Partner
+      case LimitedCompany if businessType == LPrLLP =>
+        Seq(BeneficialOwner, DesignatedMember, Director) ++ optionalCheckboxes
       case LimitedCompany =>
-        val additionalRows = if (!isDeclaration) Seq(BeneficialOwner, DesignatedMember) else Seq(DesignatedMember)
-        additionalRows ++ optionalCheckboxes
+        Seq(BeneficialOwner, Director) ++ optionalCheckboxes
       case LPrLLP => DesignatedMember +: optionalCheckboxes
       case UnincorporatedBody => optionalCheckboxes
     }) :+ Other("")

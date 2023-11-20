@@ -18,7 +18,7 @@ package services
 
 import connectors.AmlsConnector
 import models.ReadStatusResponse
-import models.registrationprogress.{Completed, NotStarted, TaskRow}
+import models.registrationprogress.{Completed, NotStarted, TaskRow, Updated}
 import models.status._
 import org.joda.time.{DateTimeUtils, LocalDate, LocalDateTime}
 import org.mockito.Matchers._
@@ -70,17 +70,51 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       }
     }
 
-    "return SubmissionReady" in {
+    "return SubmissionReady" when {
 
-      when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
-        .thenReturn(Future.successful(None))
+      "task rows have Completed status" in {
 
-      when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
-        .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
+        when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
 
-      when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
-      whenReady(service.getStatus(None, accountTypeId, credId)) {
-        _ mustEqual SubmissionReady
+        when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+          .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
+
+        when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
+        whenReady(service.getStatus(None, accountTypeId, credId)) {
+          _ mustEqual SubmissionReady
+        }
+      }
+
+      "task rows have Updated status" in {
+
+        when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+          .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", true, Updated, TaskRow.updatedTag))))
+
+        when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
+        whenReady(service.getStatus(None, accountTypeId, credId)) {
+          _ mustEqual SubmissionReady
+        }
+      }
+
+      "task rows have a combination of Completed and Updated status" in {
+
+        when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+          .thenReturn(Future.successful(Seq(
+            TaskRow("test", "/foo", false, Completed, TaskRow.completedTag),
+            TaskRow("test2", "/bar", true, Updated, TaskRow.updatedTag),
+          )))
+
+        when(service.amlsConnector.status(any(), any())(any(), any(), any())).thenReturn(Future.successful(readStatusResponse))
+        whenReady(service.getStatus(None, accountTypeId, credId)) {
+          _ mustEqual SubmissionReady
+        }
       }
     }
 
@@ -313,12 +347,54 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       }
     }
 
-    "return pre-submission status if mlrRegNumber is not defined" in {
+    "return pre-submission status" when {
 
-      val result = service.getDetailedStatus(None, ("", ""), "credId")
+      "mlrRegNumber is not defined and row status is Completed" in {
 
-      whenReady(result) {
-        _._1 mustBe SubmissionReady
+        when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+          .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", false, Completed, TaskRow.completedTag))))
+
+        val result = service.getDetailedStatus(None, ("", ""), "credId")
+
+        whenReady(result) {
+          _._1 mustBe SubmissionReady
+        }
+      }
+
+      "mlrRegNumber is not defined and row status is Updated" in {
+
+        when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+          .thenReturn(Future.successful(Seq(TaskRow("test", "/foo", true, Updated, TaskRow.updatedTag))))
+
+        val result = service.getDetailedStatus(None, ("", ""), "credId")
+
+        whenReady(result) {
+          _._1 mustBe SubmissionReady
+        }
+      }
+
+      "mlrRegNumber is not defined and row status is a combination of Completed and Updated" in {
+
+        when(service.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(service.sectionsProvider.taskRows(any[String]())(any(), any(), any()))
+          .thenReturn(Future.successful(Seq(
+            TaskRow("test", "/foo", false, Completed, TaskRow.completedTag),
+            TaskRow("test2", "/bar", true, Updated, TaskRow.updatedTag)
+          )))
+
+        val result = service.getDetailedStatus(None, ("", ""), "credId")
+
+        whenReady(result) {
+          _._1 mustBe SubmissionReady
+        }
       }
     }
   }
