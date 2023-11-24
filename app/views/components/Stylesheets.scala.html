@@ -14,10 +14,11 @@
  * limitations under the License.
  *@
 
-@this()
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcAccessibleAutocompleteCss
+
+@this(autocompleteCss: HmrcAccessibleAutocompleteCss)
 
 @()
 
-<link href="@routes.Assets.versioned("autocomplete/accessible-autocomplete.min.css")" rel="stylesheet" />
-<link href="@routes.Assets.versioned("autocomplete/location-autocomplete.min.css")" rel="stylesheet" />
+@autocompleteCss()
 <link href='@controllers.routes.Assets.versioned("stylesheets/application.css")' media="all" rel="stylesheet" type="text/css" />

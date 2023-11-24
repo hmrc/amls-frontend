@@ -48,21 +48,8 @@
     }
 }
 
-@autocompleteScript = {
-
-    <script type="text/javascript">
-        for (let i = 0; i < 10; i++) {
-            openregisterLocationPicker({
-                selectElement: document.getElementById('location-autocomplete-' + i.toString()),
-                url: '@routes.Assets.versioned("autocomplete/location-autocomplete-graph.json")'
-            })
-        }
-    </script>
-}
-
 @layout(
-    pageTitle = messages("renewal.customer.outside.uk.countries.title") + " - " + messages("summary.renewal"),
-    additionalScript = HtmlContent(autocompleteScript)
+    pageTitle = messages("renewal.customer.outside.uk.countries.title") + " - " + messages("summary.renewal")
 ) {
 
     @errorSummary(preparedForm, preparedErrorSummaryMapping)

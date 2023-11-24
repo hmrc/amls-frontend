@@ -15,6 +15,7 @@
  *@
 
 @import config.ApplicationConfig
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 @import views.html.components.forms.ErrorSummary
 @import views.html.components.{SectionSubtitle, Heading, Button, ReturnLink}
@@ -50,23 +51,9 @@
     }
 }
 
-@autocompleteScript = {
-
-    <script type="text/javascript">
-        for (let i = 0; i < 3; i++) {
-            accessibleAutocomplete.enhanceSelectElement({
-            autoselect: true,
-            defaultValue: '',
-            minLength: 1,
-            selectElement: document.getElementById('currency-autocomplete-' + i.toString()),
-            });
-        }
-    </script>
-}
 
 @layout(
-    pageTitle = messages("msb.which_currencies.title") + " - " + messages("summary.msb"),
-    additionalScript = HtmlContent(autocompleteScript)
+    pageTitle = messages("msb.which_currencies.title") + " - " + messages("summary.msb")
 ) {
 
     @errorSummary(preparedForm, preparedErrorSummaryMapping)
@@ -91,6 +78,7 @@
                         items = currencyData,
                         attributes = Map("data-gov-autocomplete" -> "true")
                     )
+                    .asAccessibleAutocomplete(Some(AccessibleAutocomplete(autoSelect = true)))
                     .withFormField(preparedForm(s"currencies[$i]"))
                 )
             }

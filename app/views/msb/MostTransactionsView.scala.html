@@ -49,21 +49,8 @@
     }
 }
 
-@autocompleteScript = {
-
-    <script type="text/javascript">
-        for (let i = 0; i < 3; i++) {
-            openregisterLocationPicker({
-                selectElement: document.getElementById('location-autocomplete-' + i.toString()),
-                url: '@routes.Assets.versioned("autocomplete/location-autocomplete-graph.json")'
-            })
-        }
-    </script>
-}
-
 @layout(
-    pageTitle = messages("msb.most.transactions.title") + " - " + messages("summary.msb"),
-    additionalScript = HtmlContent(autocompleteScript)
+    pageTitle = messages("msb.most.transactions.title") + " - " + messages("summary.msb")
 ) {
 
     @errorSummary(preparedForm, preparedErrorSummaryMapping)

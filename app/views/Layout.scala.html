@@ -20,7 +20,6 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcReportTechnicalIssueHelper
 @import views.html.helper.CSPNonce
 @import config.ApplicationConfig
-@import controllers.routes
 
 @this(
     appConfig: ApplicationConfig,
@@ -34,7 +33,8 @@
     hmrcScripts: HmrcScripts,
     stylesheets: components.Stylesheets,
     govukBackLink: GovukBackLink,
-    hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper
+    hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
+    autocompleteJavascript: HmrcAccessibleAutocompleteJavascript
 )
 
 @(
@@ -43,8 +43,7 @@
     canSignOut: Boolean = true,
     showBackLink: Boolean = true,
     fullWidthLayout: Boolean = false,
-    showDeskproLink: Boolean = true,
-    additionalScript: Content = Empty
+    showDeskproLink: Boolean = true
 )(mainContent: Html)(implicit request: Request[_], messages: Messages)
 
 @headScripts = {
@@ -76,16 +75,8 @@
 @scripts = {
     <script src='@controllers.routes.Assets.versioned("lib/govuk-frontend/govuk/all.js")'></script>
     <script src='@controllers.routes.Assets.versioned("lib/hmrc-frontend/hmrc/all.js")'></script>
-    <script src="@routes.Assets.versioned("autocomplete/accessible-autocomplete.min.js")"></script>
-    <script src="@routes.Assets.versioned("autocomplete/location-autocomplete.min.js")"></script>
     <script>window.GOVUKFrontend.initAll();window.HMRCFrontend.initAll()</script>
-    <script type="text/javascript">
-            openregisterLocationPicker({
-                selectElement: document.getElementById('location-autocomplete'),
-                url: '@routes.Assets.versioned("autocomplete/location-autocomplete-graph.json")'
-            })
-    </script>
-    @additionalScript.asHtml
+    @autocompleteJavascript()
 }
 
 @mainContentWithGetHelp = {
