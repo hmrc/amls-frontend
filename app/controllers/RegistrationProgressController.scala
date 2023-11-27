@@ -70,7 +70,7 @@ class RegistrationProgressController @Inject()(protected[controllers] val authAc
                 val newTaskRows = sectionsProvider.taskRowsFromBusinessActivities(
                   newActivities, businessMatching.msbServices)(cacheMap, messages.preferred(request)
                 )
-                val taskRows = sectionsProvider.taskRows(cacheMap) //TODO taskRows is null
+                val taskRows = sectionsProvider.taskRows(cacheMap)
                 val taskListToDisplay = TaskList(taskRows.filter(tr => tr.msgKey != BusinessMatching.messageKey) diff newTaskRows)
                 val canEditPreapplication = Set(NotCompleted, SubmissionReady, SubmissionDecisionApproved).contains(status)
                 val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage()).toSeq)

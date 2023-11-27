@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 class MovedAddressFormProvider @Inject()() extends Mappings {
 
-  private val error = "error.required.rp.moved.address" //TODO - This message needs changing to something without a variable
+  private val error = "error.required.rp.moved.address"
 
   def apply(): Form[Boolean] = Form[Boolean]("movedAddress" -> boolean(error, error))
 }

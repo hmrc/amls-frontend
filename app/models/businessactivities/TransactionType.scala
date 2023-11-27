@@ -38,9 +38,10 @@ object TransactionTypes extends Enumerable.Implicits {
     override val value: String = "02"
   }
 
-  case object DigitalOther extends WithName("digitalOther") with TransactionType { //TODO find a way to use DigitalSoftware without this
+  case object DigitalOther extends WithName("digitalOther") with TransactionType {
     override val value: String = "03"
   }
+
   case class DigitalSoftware(name: String) extends WithName("digitalSoftware") with TransactionType {
     override val value: String = "03"
   }

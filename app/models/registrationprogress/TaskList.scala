@@ -21,7 +21,7 @@ import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
 
 case class TaskList(rows: Seq[TaskRow])
-case class TaskRow(msgKey: String, href: String, hasChanged: Boolean = false, status: Status, tag: Tag) //TODO implement updated to everything, see Amp.scala
+case class TaskRow(msgKey: String, href: String, hasChanged: Boolean = false, status: Status, tag: Tag)
 
 object TaskRow {
 

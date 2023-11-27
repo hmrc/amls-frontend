@@ -320,14 +320,6 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
           val result = addPersonController.post()(roleMissingInRequest)
           status(result) must be(BAD_REQUEST)
         }
-
-        "throw an exception if business type is not defined" in new Fixture {
-          val invalidForm = InvalidForm(Map.empty, Seq.empty)
-
-          a[IllegalArgumentException] must be thrownBy {
-            addPersonController.updateFormErrors(invalidForm, None)
-          }
-        }
       }
     }
   }

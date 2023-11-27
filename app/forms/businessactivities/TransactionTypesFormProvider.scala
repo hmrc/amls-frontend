@@ -46,7 +46,6 @@ class TransactionTypesFormProvider @Inject()() extends Mappings {
       )
     )(apply)(unapply)
   )
-// TODO probably a better way to handle this, come back and see
   private def apply(transactionTypes: Seq[TransactionType], maybeName: Option[String]): TransactionTypes = (transactionTypes, maybeName) match {
     case (tt, Some(n)) if tt.contains(DigitalOther) =>
       val modifiedTransactions = tt.map(t => if(t == DigitalOther) DigitalSoftware(n) else t)

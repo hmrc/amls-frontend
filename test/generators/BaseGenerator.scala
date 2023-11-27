@@ -103,7 +103,7 @@ trait BaseGenerator {
       )
     ).suchThat(_.nonEmpty)
 
-  val invalidCharForNames: Gen[String] = //TODO Might have a few characters that actually pass regex, double check
+  val invalidCharForNames: Gen[String] =
     Gen.oneOf[String](
       Seq(
         "ƒ", "„", "…", "†", "‡", "ˆ", "‰", "‹", "Œ", "•", "™", "œ", "¡", "¢", "¤", "¦", "§", "¨", "©", "ª",

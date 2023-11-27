@@ -34,7 +34,7 @@ class RemoveResponsiblePersonFormProvider @Inject()() extends Mappings {
       booleanKey -> boolean(),
       "endDate" -> mandatoryIfTrue(
         booleanKey,
-        jodaLocalDate( //TODO these messages need sorting with content design, see Scott
+        jodaLocalDate(
         invalidKey = "error.invalid.tp.date.not.real",
         allRequiredKey = "error.required.tp.all",
         twoRequiredKey = "error.required.tp.two",

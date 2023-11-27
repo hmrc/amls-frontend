@@ -77,7 +77,6 @@ class AdditionalAddressController @Inject()(override val dataCacheConnector: Dat
         }
     }
 
-  //TODO This needs to be changed, current model creation is not fit for purpose
   private def processForm(data: ResponsiblePersonAddress, credId: String, index: Int, edit: Boolean, flow: Option[String])
                          (implicit hc: HeaderCarrier): Future[Result] = {
 

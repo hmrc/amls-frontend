@@ -58,8 +58,6 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
         formWithErrors =>
 
           dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) flatMap { bm =>
-            val businessType = ControllerHelper.getBusinessType(bm)
-//            val updatedForm = updateFormErrors(formWithErrors, businessType) TODO content review should negate this
             addPersonView(request.amlsRefNumber, request.accountTypeId, request.credId, BadRequest, formWithErrors)
           },
         data =>
@@ -74,21 +72,6 @@ class AddPersonController @Inject () (val dataCacheConnector: DataCacheConnector
           }
       )
     }
-  }
-
-  //TODO this needs to be removed and error messages checked by Thomas - raise on Tuesday
-  def updateFormErrors(f: InvalidForm, businessType: Option[BusinessType])(implicit messages: Messages): InvalidForm = {
-    val message = businessType match {
-      case Some(bt) => BusinessType.errorMessageFor(bt) //TODO will need content review
-      case _ => throw new IllegalArgumentException("[Controllers][AddPersonController] business type is not known")
-    }
-
-    val newErrors: Seq[(Path, Seq[ValidationError])] = f.errors.map {
-      case (p, _) if p == Path("positions") => (p, Seq(ValidationError(Seq(message))))
-      case (p, s) => (p, s)
-    }
-
-    f.copy(errors = newErrors)
   }
 
   private def isResponsiblePerson(data: AddPerson): Boolean = {

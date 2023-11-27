@@ -48,7 +48,6 @@ class WhichProfessionalBodyFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  // TODO probably a better way to handle this, come back and see
   private def apply(businessType: Seq[BusinessType], maybeDetails: Option[String]): ProfessionalBodies = (businessType, maybeDetails) match {
     case (services, Some(detail)) if services.contains(Other("")) =>
       val modifiedTransactions = services.map(service => if (service == Other("")) Other(detail) else service)

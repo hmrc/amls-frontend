@@ -27,9 +27,7 @@ trait IsAddressUKFormProvider[A] extends Mappings {
   protected val error: String
 
   /*
-    TODO:
-    This needs to be changed, current model creation is not fit for purpose,
-    should be changed to simple boolean and leave object instantiation to address input controllers
+    TODO: This needs to be changed, current model creation is not fit for purpose
    */
   def apply(): Form[A] = Form[A](
     mapping(

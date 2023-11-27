@@ -16,38 +16,32 @@
 
 package models.payments
 
+import models.payments.PaymentStatuses.Created
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.Json
 import utils.AmlsSpec
 
-class PaymentSpec extends AmlsSpec with ScalaFutures { //TODO come back and sort this
+import java.time.LocalDateTime
 
-  val paymentJson =
-    """
-      |{
-      |  "_id": "59b1204b2e000028005c0442",
-      |  "amlsRefNo": "XSML00000200738",
-      |  "safeId": "",
-      |  "reference": "XH002610109496",
-      |  "description": "BACS Payment",
-      |  "amountInPence": 31500,
-      |  "status": "Created",
-      |  "createdAt": "2017-09-07T10:32:43.526",
-      |  "isBacs": true
-      |}
-      |""".stripMargin
+class PaymentSpec extends AmlsSpec with ScalaFutures {
 
-  "payment" must {
-    "deserialise" in {
-      val payment = Json.parse(paymentJson).as[Payment]
-      println(s"\nthe payment is: $payment\n")
+  "Payment" must {
+    "round trip through JSON formatting" in {
 
-      //      val payment = Payment("59602100ecfc04ab8ebfddf1c00de1d0", "XQML00000167165", "XIML00000438461", "XHrRexvcfa", Some("some description"),
-      //        1000, PaymentStatuses.Created, LocalDateTime.now(), None, None)
+      val payment = Payment(
+        "59b1204b2e000028005c0442",
+        "XSML00000200738",
+        "",
+        "XH002610109496",
+        Some("BACS Payment"),
+        31500,
+        Created,
+        LocalDateTime.of(2017, 9, 7, 10, 32, 43, 526),
+        Some(true)
+      )
 
-      println(s"\ngoing the other way around:\n${Json.prettyPrint(Json.toJson(payment))} \n")
-
-      1 mustEqual 1
+      val json = Json.toJson(payment)
+      json.as[Payment] mustBe payment
     }
   }
 }

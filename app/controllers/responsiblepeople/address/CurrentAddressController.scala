@@ -68,7 +68,6 @@ class CurrentAddressController @Inject ()(val dataCacheConnector: DataCacheConne
         }
     }
 
-  //TODO This needs to be changed, current model creation is not fit for purpose
   private def processForm(data: ResponsiblePersonCurrentAddress, credId: String, index: Int, edit: Boolean, flow: Option[String])
                          (implicit hc: HeaderCarrier): Future[Result] = {
 

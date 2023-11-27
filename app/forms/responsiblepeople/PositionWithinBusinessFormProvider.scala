@@ -47,7 +47,6 @@ class PositionWithinBusinessFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  // TODO probably a better way to handle this, come back and see
   private def apply(positionsWithinBusiness: Seq[PositionWithinBusiness], maybeOtherPosition: Option[String]): Set[PositionWithinBusiness] = (positionsWithinBusiness, maybeOtherPosition) match {
     case (positions, Some(name)) if positions.contains(Other("")) => positions.map(x => if (x == Other("")) Other(name) else x).toSet
     case (positions, Some(n)) if !positions.contains(Other("")) => throw new IllegalArgumentException("Cannot have name without digital software")

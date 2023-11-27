@@ -48,7 +48,6 @@ class ProvidedServicesFormProvider @Inject()() extends Mappings {
     )(apply)(unapply)
   )
 
-  // TODO probably a better way to handle this, come back and see
   private def apply(services: Seq[TcspService], maybeDetails: Option[String]): ProvidedServices = (services, maybeDetails) match {
     case (services, Some(detail)) if services.contains(Other("")) =>
       val modifiedTransactions = services.map(service => if (service == Other("")) Other(detail) else service)

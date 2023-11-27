@@ -65,7 +65,7 @@ class RiskAssessmentController @Inject() (val dataCacheConnector: DataCacheConne
             for {
               businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
               _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, businessActivities.riskAssessmentHasPolicy(data))
-            } yield redirectDependingOnAccountancyServices(ControllerHelper.isAccountancyServicesSelected(businessMatching), data) //TODO Don't think this works, investigate
+            } yield redirectDependingOnAccountancyServices(ControllerHelper.isAccountancyServicesSelected(businessMatching), data)
           }
         } recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))

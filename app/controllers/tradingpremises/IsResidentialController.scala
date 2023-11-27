@@ -64,7 +64,7 @@ class IsResidentialController @Inject()(
       implicit request =>
         dataCacheConnector.fetchAll(request.credId).flatMap { cacheO =>
           formProvider().bindFromRequest().fold(
-            formWithError => { // TODO this block makes address disappear, this is behaviour in main
+            formWithError => {
               val address = for {
                 cache <- cacheO
                 tradingPremises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
