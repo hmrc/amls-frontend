@@ -1,0 +1,86 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import components.{Heading, TaskRowComponent, Button, ServicesSidebar}
+@import config.ApplicationConfig
+@import views.html.helper.CSRF
+@import models.registrationprogress.TaskList
+
+@this(
+    layout: Layout,
+    heading: Heading,
+    servicesSidebar: ServicesSidebar,
+    taskRow: TaskRowComponent,
+    button: Button
+)
+
+@(
+    taskList: TaskList,
+    declarationAvailable: Boolean,
+    businessName: String,
+    serviceNames: Seq[String],
+    canEditPreApplication: Boolean,
+    hasCompleteNominatedOfficer: Boolean = false,
+    nominatedOfficerName: Option[String] = None
+)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@layout(
+    pageTitle = messages("progress.title"),
+    showBackLink = false
+) {
+
+    @* Heading *@
+    <div class="govuk-grid-row govuk-!-margin-bottom-4">
+        <div class="govuk-grid-column-full">
+            @heading("progress.title")
+            <p class="govuk-body">@messages("progress.lede")</p>
+            <p class="govuk-body">@messages("progress.saved.automatically")</p>
+        </div>
+    </div>
+
+    @* registration progress *@
+    @servicesSidebar(canEditPreApplication, displayLink = true, businessName, serviceNames.toList.sorted, hasCompleteNominatedOfficer, nominatedOfficerName)
+
+    <div class="govuk-grid-row govuk-!-margin-top-6">
+        <div class="govuk-grid-column-full">
+            <h2 class="govuk-heading-m">@messages("progress.sections.subheading")</h2>
+            @* Main sections *@
+            <ul class="app-task-list__items govuk-!-padding-left-0">
+                @(taskList.rows.map(taskRow(_)))
+            </ul>
+        </div>
+    </div>
+
+    @* the page bottom section *@
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h2 class="govuk-heading-m">@messages("progress.submit.title")</h2>
+            <p class="govuk-body">@if(declarationAvailable) {
+                @messages("progress.declarationavailable")
+            } else {
+                @messages("progress.declarationunavailable")
+            }
+            </p>
+
+            @if(declarationAvailable) {
+                <form class="grid-layout__column grid-layout__column--3-3 display-block" method="post" action="@controllers.routes.RegistrationProgressController.post.url">
+                    @CSRF.formField
+                    @button("progress.submit", "progress-continue")
+                </form>
+            }
+        </div>
+    </div>
+}

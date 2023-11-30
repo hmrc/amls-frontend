@@ -1,0 +1,129 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.businessmatching.BusinessMatchingMsbService
+@import models.businessmatching.BusinessActivity
+@import models.businessmatching.BusinessActivity._
+@import views.html.components.{SectionSubtitle, Heading, Button}
+
+@this(
+    layout: Layout,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    formHelper: FormWithCSRF,
+    button: Button
+)
+
+@(activities: Set[BusinessActivity], hideSupervisionDetails: Boolean, subsectors: Set[BusinessMatchingMsbService], isTdiOrBpspPresent: Boolean = false, isAspOrTcspPresent: Boolean = false)(implicit request: Request[_], messages: Messages)
+
+@layout(messages("businessmatching.updateservice.newserviceinformation.title") + " - " + messages("summary.updateservice")){
+
+    @subtitle("summary.updateservice")
+
+    @heading("businessmatching.updateservice.newserviceinformation.heading")
+
+    @if(activities.size == 1) {
+        @activities match {
+            case list if list.contains(AccountancyServices) => {
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
+                <ul class="govuk-list govuk-list--bullet">
+                    @activities.toList.map { ba =>
+                        <li>@ba.getMessage(true)</li>
+                    }
+                        <li>@messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
+                </ul>
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.6", activities.head.getMessage(true))</p>
+            }
+            case list if list.contains(TrustAndCompanyServices) => {
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
+                <ul class="govuk-list govuk-list--bullet">
+                    @activities.toList.map { ba =>
+                        <li>@ba.getMessage(true)</li>
+                    }
+                        <li>@messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
+                </ul>
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.6", activities.head.getMessage(true))</p>
+            }
+            case list if list.contains(MoneyServiceBusiness) && subsectors.size == 1 => {
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.1", activities.head.getMessage(true))</p>
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.6.msb.single")</p>
+            }
+            case list if list.contains(MoneyServiceBusiness) && subsectors.size > 1 => {
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.1", activities.head.getMessage(true))</p>
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.6.msb.single")</p>
+            }
+            case list if isTdiOrBpspPresent => {
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.6", activities.head.getMessage(true))</p>
+            }
+            case list if isTdiOrBpspPresent => {
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.6", activities.head.getMessage(true))</p>
+            }
+            case _ => {
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.1", activities.head.getMessage(true))</p>
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.6", activities.head.getMessage(true))</p>
+            }
+        }
+        <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.7")</p>
+    }
+
+    @if(activities.size > 1) {
+        @activities match {
+            case list if isTdiOrBpspPresent && isAspOrTcspPresent && list.diff(Set(BillPaymentServices, TelephonePaymentService)).nonEmpty => {
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
+                <ul class="govuk-list govuk-list--bullet">
+                    @activities.diff(Set(BillPaymentServices, TelephonePaymentService)).toList.map { ba =>
+                        <li>@ba.getMessage(true)</li>
+                    }
+                    @if(isAspOrTcspPresent && !hideSupervisionDetails) {
+                        <li>@messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
+                    }
+                </ul>
+            }
+            case list if isTdiOrBpspPresent && list.diff(Set(BillPaymentServices, TelephonePaymentService)).size == 1 => {
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.1",
+                    list.diff(Set(BillPaymentServices, TelephonePaymentService)).map(_.getMessage(true)).mkString(" "))</p>
+            }
+            case list if isTdiOrBpspPresent => {
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
+                <ul class="govuk-list govuk-list--bullet">
+                    @activities.diff(Set(BillPaymentServices, TelephonePaymentService)).toList.map { ba =>
+                        <li>@ba.getMessage(true)</li>
+                    }
+                    @if(isAspOrTcspPresent && !hideSupervisionDetails) {
+                        <li>@messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
+                    }
+                </ul>
+            }
+            case _ => {
+                <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
+                <ul class="govuk-list govuk-list--bullet">
+                    @activities.toList.map { ba =>
+                        <li>@ba.getMessage(true)</li>
+                    }
+                    @if(isAspOrTcspPresent && !hideSupervisionDetails) {
+                        <li>@messages("businessmatching.updateservice.newserviceinformation.info.supervision")</li>
+                    }
+                </ul>
+            }
+        }
+        <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.3")</p>
+        <p class="govuk-body">@messages("businessmatching.updateservice.newserviceinformation.info.4")</p>
+    }
+
+    @formHelper(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.post()) {
+        @button("Continue", "newserviceinfo-submit")
+    }
+}

@@ -18,12 +18,14 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+
 import javax.inject.Inject
 import models.businessmatching.BusinessMatching
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import utils.AuthAction
-import views.html.msb.what_you_need
+import views.html.msb.WhatYouNeedView
+
 import scala.concurrent.Future
 
 class WhatYouNeedController @Inject()(authAction: AuthAction,
@@ -31,23 +33,25 @@ class WhatYouNeedController @Inject()(authAction: AuthAction,
                                       val statusService: StatusService,
                                       val dataCacheConnector: DataCacheConnector,
                                       val cc: MessagesControllerComponents,
-                                      what_you_need: what_you_need) extends AmlsBaseController(ds, cc) {
+                                      view: WhatYouNeedView) extends AmlsBaseController(ds, cc) {
 
-  def get = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetchAll(request.credId) flatMap {
-          optionalCache =>
-            (for {
-              cache <- optionalCache
-              businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-              bmMsbServices <- businessMatching.msbServices
-            } yield {
-              Future.successful(Ok(what_you_need(bmMsbServices)))
-            }) getOrElse Future.successful(Ok(what_you_need()))
-        }
+  def get: Action[AnyContent] = authAction.async {
+    implicit request =>
+      val call = routes.ExpectedThroughputController.get()
+
+      dataCacheConnector.fetchAll(request.credId) flatMap {
+        optionalCache =>
+          (for {
+            cache <- optionalCache
+            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+            bmMsbServices <- businessMatching.msbServices
+          } yield {
+            Future.successful(Ok(view(call, bmMsbServices)))
+          }) getOrElse Future.successful(Ok(view(call)))
+      }
   }
 
-  def post = authAction.async {
-        Future.successful(Redirect(routes.ExpectedThroughputController.get()))
+  def post: Action[AnyContent] = authAction {
+    Redirect(routes.ExpectedThroughputController.get())
   }
 }

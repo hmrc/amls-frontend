@@ -19,17 +19,15 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
-import forms.EmptyForm
-import javax.inject.{Inject, Singleton}
+import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.flowmanagement.{AddBusinessTypeFlowModel, NoPSRPageId}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.flowmanagement.Router
 import utils.AuthAction
-import views.html.businessmatching.updateservice.add.cannot_add_services
+import views.html.businessmatching.updateservice.add.CannotAddServicesView
 
-import scala.concurrent.Future
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class NoPsrController @Inject()(
@@ -39,18 +37,17 @@ class NoPsrController @Inject()(
                                  val helper: AddBusinessTypeHelper,
                                  val router: Router[AddBusinessTypeFlowModel],
                                  val cc: MessagesControllerComponents,
-                                 cannot_add_services: cannot_add_services) extends AmlsBaseController(ds, cc) {
+                                 view: CannotAddServicesView) extends AmlsBaseController(ds, cc) {
 
-  def get = authAction.async {
-      implicit request =>
-        Future.successful(Ok(cannot_add_services(EmptyForm)))
+  def get: Action[AnyContent] = authAction {
+    implicit request => Ok(view())
   }
 
-  def post() = authAction.async {
-      implicit request =>
-        (for {
-          _ <- helper.clearFlowModel(request.credId)
-          route <- OptionT.liftF(router.getRoute(request.credId, NoPSRPageId, AddBusinessTypeFlowModel()))
-        } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NoPsrController")
+  def post(): Action[AnyContent] = authAction.async {
+    implicit request =>
+      (for {
+        _ <- helper.clearFlowModel(request.credId)
+        route <- OptionT.liftF(router.getRoute(request.credId, NoPSRPageId, AddBusinessTypeFlowModel()))
+      } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NoPsrController")
   }
 }

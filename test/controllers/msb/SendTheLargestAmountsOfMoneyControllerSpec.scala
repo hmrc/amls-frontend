@@ -17,25 +17,27 @@
 package controllers.msb
 
 import controllers.actions.SuccessfulAuthAction
+import forms.msb.SendLargestAmountsFormProvider
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.BusinessActivity.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions, SendTheLargestAmountsOfMoney}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.msb.send_largest_amounts_of_money
+import views.html.msb.SendLargestAmountsOfMoneyView
 
-class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSugar with PatienceConfiguration with IntegrationPatience {
+class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
+  with MockitoSugar with PatienceConfiguration with IntegrationPatience with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[send_largest_amounts_of_money]
+    lazy val view = inject[SendLargestAmountsOfMoneyView]
     val controller = new SendTheLargestAmountsOfMoneyController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
@@ -43,7 +45,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       mockServiceFlow,
       mockAutoComplete,
       cc = mockMcc,
-      send_largest_amounts_of_money = view
+      formProvider = inject[SendLargestAmountsFormProvider],
+      view = view
     )
 
     mockCacheFetch[ServiceChangeRegister](None, None)
@@ -60,10 +63,10 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      document.title() must be (Messages("msb.send.the.largest.amounts.of.money.title") +
-        " - " + Messages("summary.msb") +
-        " - " + Messages("title.amls") +
-        " - " + Messages("title.gov"))
+      document.title() must be (messages("msb.send.the.largest.amounts.of.money.title") +
+        " - " + messages("summary.msb") +
+        " - " + messages("title.amls") +
+        " - " + messages("title.gov"))
     }
 
     "pre-populate the 'Where to Send The Largest Amounts Of Money' Page" in new Fixture  {
@@ -90,7 +93,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("msb.send.the.largest.amounts.of.money.title"))
+        contentAsString(result) must include(messages("msb.send.the.largest.amounts.of.money.title"))
       }
 
       "application is in variation mode and no service has been added" in new Fixture {
@@ -100,13 +103,14 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("msb.send.the.largest.amounts.of.money.title"))
+        contentAsString(result) must include(messages("msb.send.the.largest.amounts.of.money.title"))
       }
     }
 
     "on post with valid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url)
+      .withFormUrlEncodedBody(
         "largestAmountsOfMoney[0]" -> "GS"
       )
 
@@ -120,7 +124,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
     "on post with valid data in edit mode when the next page's data is in the store" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url)
+      .withFormUrlEncodedBody(
         "largestAmountsOfMoney[0]" -> "GB"
       )
 
@@ -142,7 +147,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
     "on post with valid data in edit mode when the next page's data isn't in the store" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url)
+      .withFormUrlEncodedBody(
         "largestAmountsOfMoney[0]" -> "GB"
       )
 
@@ -158,7 +164,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url)
+      .withFormUrlEncodedBody(
         "largestAmountsOfMoney[0]" -> ""
       )
 
@@ -168,8 +175,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
 
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#largestAmountsOfMoney]").html() must include(Messages("error.invalid.countries.msb.sendlargestamount.country"))
+      contentAsString(result) must include(messages("error.invalid.countries.msb.sendlargestamount.country"))
     }
   }
 }

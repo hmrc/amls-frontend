@@ -18,17 +18,18 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
+import forms.renewal.MostTransactionsFormProvider
+import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing}
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange}
 import models.businessmatching._
-import models.renewal.{MostTransactions, Renewal}
-import play.api.mvc.{MessagesControllerComponents, Result}
+import models.renewal.Renewal
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{AutoCompleteService, RenewalService}
-import utils.{AuthAction, ControllerHelper}
-import views.html.renewal.most_transactions
+import utils.AuthAction
+import views.html.renewal.MostTransactionsView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
-
 
 @Singleton
 class MostTransactionsController @Inject()(val authAction: AuthAction,
@@ -37,50 +38,47 @@ class MostTransactionsController @Inject()(val authAction: AuthAction,
                                            val renewalService: RenewalService,
                                            val autoCompleteService: AutoCompleteService,
                                            val cc: MessagesControllerComponents,
-                                           most_transactions: most_transactions) extends AmlsBaseController(ds, cc) {
+                                           formProvider: MostTransactionsFormProvider,
+                                           view: MostTransactionsView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        cache.fetch[Renewal](request.credId, Renewal.key) map {
-          response =>
-            val form = (for {
-              msb <- response
-              transactions <- msb.mostTransactions
-            } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
-            Ok(most_transactions(form, edit, autoCompleteService.getCountries))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      cache.fetch[Renewal](request.credId, Renewal.key) map {
+        response =>
+          val form = (for {
+            msb <- response
+            transactions <- msb.mostTransactions
+          } yield formProvider().fill(transactions)).getOrElse(formProvider())
+          Ok(view(form, edit, autoCompleteService.formOptions))
+      }
   }
 
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        Form2[MostTransactions](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(most_transactions(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
-          case ValidForm(_, data) =>
-            cache.fetchAll(request.credId).flatMap {
-              optMap =>
-                val result = for {
-                  cacheMap <- optMap
-                  renewal <- cacheMap.getEntry[Renewal](Renewal.key)
-                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-                  ba <- bm.activities
-                  services <- bm.msbServices
-                } yield renewalService.updateRenewal(request.credId, renewal.mostTransactions(data)) map { _ =>
-                  if (!edit) {
-                    redirectTo(services.msbServices, ba.businessActivities)
-                  } else {
-                    Redirect(routes.SummaryController.get)
-                  }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
+        data =>
+          cache.fetchAll(request.credId).flatMap {
+            optMap =>
+              val result = for {
+                cacheMap <- optMap
+                renewal <- cacheMap.getEntry[Renewal](Renewal.key)
+                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                ba <- bm.activities
+                services <- bm.msbServices
+              } yield renewalService.updateRenewal(request.credId, renewal.mostTransactions(data)) map { _ =>
+                if (!edit) {
+                  redirectTo(services.msbServices, ba.businessActivities)
+                } else {
+                  Redirect(routes.SummaryController.get)
                 }
-                result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
-            }
-        }
+              }
+              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+          }
+      )
   }
-
-  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
-    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "mostTransactionsCountries", index => index / 2)
-
 
   private def redirectTo(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity]): Result = {
       (services, businessActivities) match {

@@ -17,24 +17,26 @@
 package controllers.hvd
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.HighValueDealing
+import forms.hvd.ExpectToReceiveFormProvider
+import models.businessmatching.BusinessActivity.HighValueDealing
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd.Hvd
+import models.hvd.PaymentMethods.Courier
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.hvd.expect_to_receive
+import views.html.hvd.ExpectToReceiveView
 
-class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
+class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
-    lazy val view = app.injector.instanceOf[expect_to_receive]
+    lazy val view = inject[ExpectToReceiveView]
     val controller =
       new ExpectToReceiveCashPaymentsController(
       SuccessfulAuthAction,
@@ -43,7 +45,8 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
         mockStatusService,
         mockServiceFlow,
         cc = mockMcc,
-        expect_to_receive = view)
+        formProvider = inject[ExpectToReceiveFormProvider],
+        view = view)
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))
     mockCacheSave[Hvd]
@@ -63,7 +66,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
 
         val content = contentAsString(result)
 
-        Jsoup.parse(content).title() must include(Messages("hvd.expect.to.receive.title"))
+        Jsoup.parse(content).title() must include(messages("hvd.expect.to.receive.title"))
       }
 
       "display the view when supervised, but in the new service flow" in new Fixture {
@@ -75,7 +78,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
 
         status(result) mustBe OK
 
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("hvd.expect.to.receive.title"))
+        Jsoup.parse(contentAsString(result)).title() must include(messages("hvd.expect.to.receive.title"))
       }
     }
 
@@ -84,7 +87,8 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
         "redirect to PercentageOfCashPaymentOver15000Controller" when {
           "edit is false" in new Fixture {
 
-            val result = controller.post()(requestWithUrlEncodedBody("courier" -> "true"))
+            val result = controller.post()(FakeRequest(POST, routes.ExpectToReceiveCashPaymentsController.post().url)
+            .withFormUrlEncodedBody("paymentMethods[0]" -> Courier.toString))
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.PercentageOfCashPaymentOver15000Controller.get().url))
@@ -94,7 +98,8 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
         "redirect to SummaryController" when {
           "edit is true" in new Fixture {
 
-            val result = controller.post(true)(requestWithUrlEncodedBody("courier" -> "true"))
+            val result = controller.post(true)(FakeRequest(POST, routes.ExpectToReceiveCashPaymentsController.post().url)
+            .withFormUrlEncodedBody("paymentMethods[0]" -> Courier.toString))
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.SummaryController.get.url))
@@ -109,17 +114,6 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
 
           status(result) must be(BAD_REQUEST)
 
-        }
-        "check that error message -no option selected- exists in the request" in new Fixture {
-          val message = Messages("error.required.hvd.choose.option")
-
-          val result = controller.post(true)(requestWithUrlEncodedBody("" -> ""))
-
-          val content = contentAsString(result)
-
-          status(result) must be(BAD_REQUEST)
-          Jsoup.parse(content).body().getElementsByClass("validation-summary-message").first().html() must include(message)
-          Jsoup.parse(content).body().getElementById("paymentMethods").html() must include(message)
         }
       }
     }

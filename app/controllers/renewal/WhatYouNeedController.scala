@@ -20,16 +20,16 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessMatching, BusinessMatchingMsbServices}
-import models.registrationprogress.{NotStarted, Section, Started}
-import play.api.mvc.{MessagesControllerComponents, Request}
+import models.registrationprogress.{NotStarted, Section, Started, TaskRow}
+import play.api.Logging
+import play.api.mvc._
 import services.RenewalService
 import utils.AuthAction
-import views.html.renewal._
-import play.api.Logging
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
+import views.html.renewal.WhatYouNeedView
+
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WhatYouNeedController @Inject()(
@@ -38,9 +38,9 @@ class WhatYouNeedController @Inject()(
                                        val ds: CommonPlayDependencies,
                                        renewalService: RenewalService,
                                        val cc: MessagesControllerComponents,
-                                       what_you_need: what_you_need)(implicit executionContext: ExecutionContext) extends AmlsBaseController(ds, cc) with Logging {
+                                       view: WhatYouNeedView)(implicit executionContext: ExecutionContext) extends AmlsBaseController(ds, cc) with Logging {
 
-  def get = authAction.async {
+  def get: Action[AnyContent] = authAction.async {
     implicit request =>
         (for {
           bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key))
@@ -57,9 +57,9 @@ class WhatYouNeedController @Inject()(
 
   def getSection(renewalService: RenewalService,
                  credId: String, ba: Option[BusinessActivities],
-                 msbActivities: Option[BusinessMatchingMsbServices])(implicit request: Request[_]) = {
-    renewalService.getSection(credId) map {
-      case Section(_, NotStarted | Started, _, _) => Ok(what_you_need(ba, msbActivities))
+                 msbActivities: Option[BusinessMatchingMsbServices])(implicit request: Request[_]): Future[Result] = {
+    renewalService.getTaskRow(credId) map {
+      case TaskRow(_, _, _, NotStarted | Started, _) => Ok(view(ba, msbActivities))
       case _ => Redirect(controllers.routes.RegistrationProgressController.get)
     }
   }

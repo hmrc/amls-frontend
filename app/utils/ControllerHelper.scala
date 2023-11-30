@@ -21,6 +21,7 @@ import connectors.DataCacheConnector
 import forms.InvalidForm
 import models.businessactivities.{BusinessActivities => BA}
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.eab.Eab
 import models.renewal.CustomersOutsideUK
@@ -99,18 +100,16 @@ object ControllerHelper {
     }
   }
 
-  def isAccountancyServicesSelected(bm: Option[BusinessMatching]): Boolean = {
-    bm match {
-      case Some(matching) => matching.activities.foldLeft(false) { (x, y) =>
-        y.businessActivities.contains(AccountancyServices)
-      }
+  def isAccountancyServicesSelected(bm: BusinessMatching): Boolean = {
+    bm.activities match {
+      case Some(activities) => activities.businessActivities.contains(AccountancyServices)
       case _ => false
     }
   }
 
   //For repeating section
   def allowedToEdit(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
-                   (implicit statusService: StatusService, hc: HeaderCarrier ,ec: ExecutionContext): Future[Boolean] = {
+                   (implicit statusService: StatusService, hc: HeaderCarrier ,ec: ExecutionContext, messages: Messages): Future[Boolean] = {
     statusService.getStatus(amlsRegistrationNo, accountTypeId, credId) map {
       case SubmissionReady | NotCompleted | SubmissionReadyForReview  => true
       case _ => false
@@ -119,7 +118,7 @@ object ControllerHelper {
 
   def allowedToEdit(activity: BusinessActivity, msbSubSector: Option[BusinessMatchingMsbService] = None,
                     amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
-                   (implicit statusService: StatusService, cacheConnector: DataCacheConnector, hc: HeaderCarrier, serviceFlow: ServiceFlow ,ec: ExecutionContext): Future[Boolean] = for {
+                   (implicit statusService: StatusService, cacheConnector: DataCacheConnector, hc: HeaderCarrier, serviceFlow: ServiceFlow ,ec: ExecutionContext, messages: Messages): Future[Boolean] = for {
     status <- statusService.getStatus(amlsRegistrationNo, accountTypeId, credId)
     isNewActivity <- serviceFlow.isNewActivity(credId, activity)
     changeRegister <- cacheConnector.fetch[ServiceChangeRegister](credId, ServiceChangeRegister.key)
@@ -176,7 +175,7 @@ object ControllerHelper {
 
   def rpTitleName(rp:Option[ResponsiblePerson]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 
-  def notFoundView(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig, error: views.html.error) = {
+  def notFoundView(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig, error: views.html.ErrorView) = {
     error(Messages("error.not-found.title"),
       Messages("error.not-found.heading"),
       Messages("error.not-found.message"))

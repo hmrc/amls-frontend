@@ -49,7 +49,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AuthAction, ControllerHelper}
-import views.html.start
+import views.html.Start
 
 import scala.concurrent.Future
 
@@ -65,7 +65,7 @@ class LandingController @Inject()(val landingService: LandingService,
                                   implicit override val messagesApi: MessagesApi,
                                   val config: ApplicationConfig,
                                   parser: BodyParsers.Default,
-                                  start: start,
+                                  start: Start,
                                   headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper with Logging {
 
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(appConfig).absoluteUrl, "utf-8")

@@ -18,6 +18,7 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.VATRegisteredFormProvider
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{PersonName, ResponsiblePerson, VATRegisteredNo, VATRegisteredYes}
 import org.jsoup.Jsoup
@@ -27,22 +28,24 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.responsiblepeople.vat_registered
+import views.html.responsiblepeople.VATRegisteredView
 
 import scala.concurrent.Future
 
-class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
     self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[vat_registered]
+    lazy val view = inject[VATRegisteredView]
     val controller = new VATRegisteredController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
-      vat_registered = view,
+      formProvider = inject[VATRegisteredFormProvider],
+      view = view,
       error = errorView)
   }
 
@@ -98,10 +101,10 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         "go to RegisteredForSelfAssessmentController" when {
           "edit = false" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.VATRegisteredController.post(1).url)
+            .withFormUrlEncodedBody(
               "registeredForVAT" -> "true",
-              "vrnNumber" -> "123456789",
-              "personName" -> "Person Name"
+              "vrnNumber" -> "123456789"
             )
 
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
@@ -119,10 +122,10 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         "go to DetailedAnswersController" when {
           "edit = true" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.VATRegisteredController.post(1).url)
+            .withFormUrlEncodedBody(
               "registeredForVAT" -> "true",
-              "vrnNumber" -> "123456789",
-              "personName" -> "Person Name"
+              "vrnNumber" -> "123456789"
             )
 
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
@@ -141,9 +144,9 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
-            "registeredForVATYes" -> "1234567890",
-            "personName" -> "Person Name"
+          val newRequest = FakeRequest(POST, routes.VATRegisteredController.post(1).url)
+          .withFormUrlEncodedBody(
+            "registeredForVATYes" -> "1234567890"
           )
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
@@ -155,10 +158,10 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
       "Responsible Person cannot be found with given index" must {
         "respond with NOT_FOUND" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.VATRegisteredController.post(1).url)
+          .withFormUrlEncodedBody(
             "registeredForVAT" -> "true",
-            "vrnNumber" -> "123456789",
-            "personName" -> "Person Name"
+            "vrnNumber" -> "123456789"
           )
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))

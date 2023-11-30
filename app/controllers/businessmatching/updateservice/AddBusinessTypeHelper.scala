@@ -25,6 +25,7 @@ import models.businessactivities.BusinessActivities
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching._
 import models.businessmatching.{BusinessActivities => BMBusinessActivities}
+import models.businessmatching.BusinessActivity._
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision

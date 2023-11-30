@@ -17,11 +17,15 @@
 package controllers.tradingpremises
 
 import controllers.actions.SuccessfulAuthAction
+import forms.DateOfChangeFormProvider
+import forms.tradingpremises.AgentNameFormProvider
 import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
-import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
+import models.businessmatching.BusinessActivity.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
+import models.tradingpremises.BusinessStructure.SoleProprietor
 import models.tradingpremises._
+import models.tradingpremises.TradingPremisesMsbService._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
@@ -29,29 +33,31 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.date_of_change
-import views.html.tradingpremises.agent_name
+import views.html.DateOfChangeView
+import views.html.tradingpremises.AgentNameView
 
 import scala.concurrent.Future
 
-class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
+class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with TradingPremisesGenerator with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
-    lazy val view1 = app.injector.instanceOf[agent_name]
-    lazy val view2 = app.injector.instanceOf[date_of_change]
+    lazy val view1 = inject[AgentNameView]
+    lazy val view2 = inject[DateOfChangeView]
     val controller = new AgentNameController(
       mockCacheConnector,
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockStatusService,
       cc = mockMcc,
-      agent_name = view1,
-      date_of_change = view2,
+      formProvider = inject[AgentNameFormProvider],
+      dateFormProvider = inject[DateOfChangeFormProvider],
+      agentView = view1,
+      dateView = view2,
       error = errorView
     )
 
@@ -76,27 +82,37 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
         val document = Jsoup.parse(contentAsString(result))
 
-        val title = s"${Messages("tradingpremises.agentname.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+        val title = s"${messages("tradingpremises.agentname.title")} - ${messages("summary.tradingpremises")} - ${messages("title.amls")} - ${messages("title.gov")}"
 
         document.title() must be(title)
-        document.select("input[type=text]").`val`() must be(empty)
+        document.getElementById("agentName").text() must be("")
       }
 
       "display main Summary Page" in new Fixture {
 
+        val year = "1996"
+        val month = "11"
+        val day = "28"
+
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises(agentName = Some(AgentName("test")))))))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(agentName = Some(
+            AgentName("John Doe", agentDateOfBirth = Some(LocalDate.parse(s"$year-$month-$day")))
+          ))))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
 
-        val title = s"${Messages("tradingpremises.agentname.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-
+        val title = s"${messages("tradingpremises.agentname.title")} - ${messages("summary.tradingpremises")} - ${messages("title.amls")} - ${messages("title.gov")}"
         document.title() must be(title)
-        document.select("input[type=text]").`val`() must be("test")
+
+        document.getElementById("agentName").`val`() must include("John Doe")
+        document.getElementById("agentDateOfBirth.day").`val`() must include(day)
+        document.getElementById("agentDateOfBirth.month").`val`() must include(month)
+        document.getElementById("agentDateOfBirth.year").`val`() must include(year)
       }
+
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
 
@@ -113,7 +129,8 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
     "post is called" must {
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentNameController.post(99).url)
+          .withFormUrlEncodedBody(
             "agentName" -> "text",
             "agentDateOfBirth.day" -> "15",
             "agentDateOfBirth.month" -> "2",
@@ -128,9 +145,10 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       "respond with SEE_OTHER" when {
         "edit is false and given valid data" in new Fixture {
 
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentNameController.post(1).url)
+          .withFormUrlEncodedBody(
             "agentName" -> "text",
             "agentDateOfBirth.day" -> "15",
             "agentDateOfBirth.month" -> "2",
@@ -144,10 +162,11 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
         "edit is true and given valid data" in new Fixture {
 
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentNameController.post(1, true).url)
+          .withFormUrlEncodedBody(
             "agentName" -> "text",
             "agentDateOfBirth.day" -> "15",
             "agentDateOfBirth.month" -> "2",
@@ -156,7 +175,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
           val result = controller.post(1, true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+          redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
         }
       }
@@ -164,7 +183,8 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentNameController.post(1).url)
+          .withFormUrlEncodedBody(
             "agentName" -> ""
           )
 
@@ -177,12 +197,13 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody("agentName" -> "text",
+        val newRequest = FakeRequest(POST, routes.AgentNameController.post(1).url)
+        .withFormUrlEncodedBody("agentName" -> "text",
           "agentDateOfBirth.day" -> "15",
           "agentDateOfBirth.month" -> "2",
           "agentDateOfBirth.year" -> "1956")
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
@@ -209,9 +230,10 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse.copy(lineId = Some(1)))))
 
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentNameController.post(1, true).url)
+          .withFormUrlEncodedBody(
             "agentName" -> "someName",
             "agentDateOfBirth.day" -> "15",
             "agentDateOfBirth.month" -> "2",
@@ -230,9 +252,10 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse.copy(lineId = Some(1)))))
 
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentNameController.post(1, true).url)
+          .withFormUrlEncodedBody(
             "agentName" -> "test",
             "agentDateOfBirth.day" -> "24",
             "agentDateOfBirth.month" -> "2",
@@ -241,7 +264,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           val result = controller.post(1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+          redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
         }
       }
 
@@ -251,9 +274,10 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse.copy(lineId = None))))
 
-          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
+          when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))  thenReturn Future.successful(SubmissionDecisionApproved)
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentNameController.post(1).url)
+          .withFormUrlEncodedBody(
             "agentName" -> "someName",
             "agentDateOfBirth.day" -> "15",
             "agentDateOfBirth.month" -> "2",
@@ -274,7 +298,8 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       "handle the date of change form post" when {
         "given valid data for a agent name" in new Fixture {
 
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.AgentNameController.post(1).url)
+            .withFormUrlEncodedBody(
             "dateOfChange.year" -> "2010",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"
@@ -294,7 +319,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           val result = controller.saveDateOfChange(1)(postRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+          redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
           val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
           verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(TradingPremises.key), captor.capture())(any(), any())
@@ -306,7 +331,8 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
         }
 
         "given a date of change which is before the activity start date" in new Fixture {
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.AgentNameController.post(1).url)
+            .withFormUrlEncodedBody(
             "dateOfChange.year" -> "2003",
             "dateOfChange.month" -> "10",
             "dateOfChange.day" -> "01"

@@ -19,43 +19,46 @@ package controllers.renewal
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.renewal.TransactionsInLast12MonthsFormProvider
 import models.Country
+import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
 import models.businessmatching._
 import models.moneyservicebusiness.{SendMoneyToOtherCountry, MoneyServiceBusiness => moneyServiceBusiness}
 import models.renewal.{CustomersOutsideUK, Renewal, TransactionsInLast12Months}
 import org.jsoup.Jsoup
-import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.renewal.transactions_in_last_12_months
+import views.html.renewal.TransactionsInLast12MonthsView
 
 import scala.concurrent.Future
 
-class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar {
+class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self =>
     val renewalService = mock[RenewalService]
     val request = addToken(authRequest)
     val mockDataCacheConnector = mock[DataCacheConnector]
-    lazy val view = app.injector.instanceOf[transactions_in_last_12_months]
+    lazy val view = inject[TransactionsInLast12MonthsView]
     lazy val controller = new TransactionsInLast12MonthsController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockDataCacheConnector,
       renewalService,
       cc = mockMcc,
-      transactions_in_last_12_months = view)
+      formProvider = inject[TransactionsInLast12MonthsFormProvider],
+      view = view)
 
     when {
-      renewalService.getRenewal(any())(any(), any())
+      renewalService.getRenewal(any())(any())
     } thenReturn Future.successful(Renewal().some)
 
     val msbModel = moneyServiceBusiness(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)))
@@ -64,20 +67,21 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
   trait FormSubmissionFixture extends Fixture {
     def formData(valid: Boolean) = if (valid) {"txnAmount" -> "1500"} else {"txnAmount" -> "abc"}
-    def formRequest(valid: Boolean) = requestWithUrlEncodedBody(formData(valid))
+    def formRequest(valid: Boolean) = FakeRequest(POST, routes.TransactionsInLast12MonthsController.post().url)
+    .withFormUrlEncodedBody(formData(valid))
 
     val cache = mock[CacheMap]
 
     when {
-      renewalService.updateRenewal(any(),any())(any(), any())
+      renewalService.updateRenewal(any(),any())(any())
     } thenReturn Future.successful(cache)
 
     when {
       mockDataCacheConnector.fetchAll(any())(any())
     } thenReturn Future.successful(Some(cache))
 
-    def post(edit: Boolean = false, valid: Boolean = true)(block: Result => Unit) =
-      block(await(controller.post(edit)(formRequest(valid))))
+    def post(edit: Boolean = false, valid: Boolean = true)(block: Future[Result] => Unit) =
+      block(controller.post(edit)(formRequest(valid)))
   }
 
   "Calling the GET action" must {
@@ -88,7 +92,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
-        doc.select(".heading-xlarge").text mustBe Messages("renewal.msb.transfers.header")
+        doc.select("h1").text mustBe messages("renewal.msb.transfers.header")
       }
 
       "edit is true" in new Fixture {
@@ -103,7 +107,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       "reads the current value from the renewals model" in new Fixture {
 
         when {
-          renewalService.getRenewal(any())(any(), any())
+          renewalService.getRenewal(any())(any())
         } thenReturn Future.successful(Renewal(transactionsInLast12Months = TransactionsInLast12Months("2500").some).some)
 
         val result = controller.get(true)(request)
@@ -111,7 +115,7 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
 
         doc.select("input[name=txnAmount]").first.attr("value") mustBe "2500"
 
-        verify(renewalService).getRenewal(any())(any(), any())
+        verify(renewalService).getRenewal(any())(any())
       }
     }
   }
@@ -136,110 +140,12 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
             .thenReturn(Some(msbModel))
 
           post() { result =>
-            result.header.status mustBe SEE_OTHER
-            result.header.headers.get("Location") mustBe routes.SendMoneyToOtherCountryController.get().url.some
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe routes.SendMoneyToOtherCountryController.get().url.some
           }
 
         }
       }
-
-      /*"they do send money to other countries" must {
-        "redirect to SendTheLargestAmountsOfMoneyController" in new FormSubmissionFixture {
-
-          when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
-            .thenReturn(Some(Renewal(
-              customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB","GB")))))
-            )))
-
-          when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(
-              activities = Some(BusinessActivities(Set(HighValueDealing))),
-              msbServices = Some(MsbServices(Set(TransmittingMoney)))
-            )))
-
-          when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
-            .thenReturn(Some(msbModel))
-
-          post() { result =>
-            result.header.status mustBe SEE_OTHER
-            result.header.headers.get("Location") mustBe routes.SendTheLargestAmountsOfMoneyController.get().url.some
-          }
-        }
-      }*/
-
-      /*"they do not send money to other countries" when {
-        "msb is CurrencyExchange" must {
-          "redirect to CETransactionsInLast12MonthsController" in new FormSubmissionFixture {
-
-            when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
-              .thenReturn(Some(Renewal(
-                customersOutsideUK = Some(CustomersOutsideUK(None))
-              )))
-
-            when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-              .thenReturn(Some(BusinessMatching(
-                activities = Some(BusinessActivities(Set(HighValueDealing))),
-                msbServices = Some(MsbServices(Set(TransmittingMoney, CurrencyExchange)))
-              )))
-
-            when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
-              .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
-
-            post() { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustBe routes.CETransactionsInLast12MonthsController.get().url.some
-            }
-          }
-        }
-        "msb is not CurrenyExchange" when {
-          "business activities include hvd" must {
-            "redirect to PercentageOfCashPaymentOver15000Controller" in new FormSubmissionFixture {
-
-              when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
-                .thenReturn(Some(Renewal(
-                  customersOutsideUK = Some(CustomersOutsideUK(None))
-                )))
-
-              when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-                .thenReturn(Some(BusinessMatching(
-                  activities = Some(BusinessActivities(Set(HighValueDealing))),
-                  msbServices = Some(MsbServices(Set(TransmittingMoney)))
-                )))
-
-              when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
-                .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
-
-              post() { result =>
-                result.header.status mustBe SEE_OTHER
-                result.header.headers.get("Location") mustBe routes.PercentageOfCashPaymentOver15000Controller.get().url.some
-              }
-            }
-          }
-          "business activities do not include hvd" must {
-            "redirect to SummaryController" in new FormSubmissionFixture {
-
-              when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
-                .thenReturn(Some(Renewal(
-                  customersOutsideUK = Some(CustomersOutsideUK(None))
-                )))
-
-              when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-                .thenReturn(Some(BusinessMatching(
-                  activities = Some(BusinessActivities(Set(MoneyServiceBusiness))),
-                  msbServices = Some(MsbServices(Set(TransmittingMoney)))
-                )))
-
-              when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
-                .thenReturn(Some(msbModelDoNotSendMoneyToOtherCountries))
-
-              post() { result =>
-                result.header.status mustBe SEE_OTHER
-                result.header.headers.get("Location") mustBe routes.SummaryController.get().url.some
-              }
-            }
-          }
-        }
-      }*/
 
       "redirect to the summary page when edit = true" in new FormSubmissionFixture {
 
@@ -258,8 +164,30 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
           .thenReturn(Some(msbModel))
 
         post(edit = true) { result =>
-          result.header.status mustBe SEE_OTHER
-          result.header.headers.get("Location") mustBe routes.SummaryController.get.url.some
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe routes.SummaryController.get.url.some
+        }
+      }
+
+      "redirect to the summary page when edit = false and TransmittingMoney is not present in MSB" in new FormSubmissionFixture {
+
+        when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
+          .thenReturn(Some(Renewal(
+            customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("", "")))))
+          )))
+
+        when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(
+            activities = Some(BusinessActivities(Set(HighValueDealing))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+          )))
+
+        when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
+          .thenReturn(Some(msbModel))
+
+        post() { result =>
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe routes.SummaryController.get.url.some
         }
       }
 
@@ -281,18 +209,22 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
             .thenReturn(Some(msbModel))
 
           post(valid = false) { result =>
-            result.header.status mustBe BAD_REQUEST
-            verify(renewalService, never()).updateRenewal(any(),any())(any(), any())
+            status(result) mustBe BAD_REQUEST
+            verify(renewalService, never()).updateRenewal(any(),any())(any())
           }
         }
       }
 
       "save the model data into the renewal object" in new FormSubmissionFixture {
 
+        val renewal = Renewal(
+          customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("", "")))))
+        )
+
+        val expected = renewal.transactionsInLast12Months(TransactionsInLast12Months("1500"))
+
         when(cache.getEntry[Renewal](eqTo(Renewal.key))(any()))
-          .thenReturn(Some(Renewal(
-            customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("","")))))
-          )))
+          .thenReturn(Some(renewal))
 
         when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(
@@ -303,12 +235,9 @@ class TransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSuga
         when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
           .thenReturn(Some(msbModel))
 
-        post() { _ =>
-          val captor = ArgumentCaptor.forClass(classOf[Renewal])
-
-          verify(renewalService).updateRenewal(any(), captor.capture())(any(), any())
-
-          captor.getValue.transactionsInLast12Months mustBe TransactionsInLast12Months("1500").some
+        post() { result =>
+          status(result) mustBe SEE_OTHER
+          verify(renewalService).updateRenewal(any(), eqTo(expected))(any())
         }
       }
     }

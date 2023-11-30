@@ -18,6 +18,7 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.PositionWithinBusinessStartDateFormProvider
 import generators.ResponsiblePersonGenerator
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
@@ -30,25 +31,26 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, StatusConstants}
-import views.html.responsiblepeople.position_within_business_start_date
+import views.html.responsiblepeople.PositionWithinBusinessStartDateView
 
 import scala.concurrent.Future
 
-class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator {
+class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with Injecting {
 
   trait Fixture {
     self =>
       val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[position_within_business_start_date]
+    lazy val view = inject[PositionWithinBusinessStartDateView]
       val controller = new PositionWithinBusinessStartDateController (
         dataCacheConnector = mock[DataCacheConnector],
         authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
-        position_within_business_start_date = view,
+        formProvider = inject[PositionWithinBusinessStartDateFormProvider],
+        view = view,
         error = errorView)
 
       object DefaultValues {
@@ -74,8 +76,8 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
   private val startDate: Option[PositionStartDate] = Some(PositionStartDate(new LocalDate()))
 
   val pageTitle = "When did this person start their role in the business? - " +
-    Messages("summary.responsiblepeople") + " - " +
-    Messages("title.amls") + " - " + Messages("title.gov")
+    messages("summary.responsiblepeople") + " - " +
+    messages("title.amls") + " - " + messages("title.gov")
 
   val pageHeader = "When did firstname lastname start their role in the business?"
 
@@ -104,7 +106,6 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
         document.title must include(pageTitle)
         document.body().html() must include(pageHeader)
-
       }
 
       "display the 'When did this person start their role in the business?' page when no business matching available" in new Fixture {
@@ -125,7 +126,6 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
         document.title must include(pageTitle)
         document.body().html() must include(pageHeader)
-
       }
 
       "display the 'When did this person start their role in the business?' page when no start date" in new Fixture {
@@ -146,7 +146,6 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
         document.title must include(pageTitle)
         document.body().html() must include(pageHeader)
-
       }
 
       "prepopulate form with a single saved data" in new Fixture {
@@ -169,16 +168,17 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
         val document: Document = Jsoup.parse(contentAsString(result))
         document.title must include(pageTitle)
-        document.select("input[id=startDate-day]").`val`() must be(startDate.get.startDate.dayOfMonth().get.toString)
-        document.select("input[id=startDate-month]").`val`() must be(startDate.get.startDate.monthOfYear().get.toString)
-        document.select("input[id=startDate-year]").`val`() must be(startDate.get.startDate.getYear.toString)
+        document.select("input[id=startDate.day]").`val`() must be(startDate.get.startDate.dayOfMonth().get.toString)
+        document.select("input[id=startDate.month]").`val`() must be(startDate.get.startDate.monthOfYear().get.toString)
+        document.select("input[id=startDate.year]").`val`() must be(startDate.get.startDate.getYear.toString)
       }
     }
 
     "post is called" must {
       "respond with BAD_REQUEST" when {
         "the year field has too few digits" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PositionWithinBusinessStartDateController.post(1).url)
+          .withFormUrlEncodedBody(
             "startDate.day" -> "24",
             "startDate.month" -> "2",
             "startDate.year" -> "90")
@@ -204,7 +204,8 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
 
           "the year field has too many digits" in new Fixture {
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.PositionWithinBusinessStartDateController.post(1).url)
+            .withFormUrlEncodedBody(
             "startDate.day" -> "24",
             "startDate.month" -> "2",
             "startDate.year" -> "19905")
@@ -226,7 +227,8 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
           "the date fields are empty" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody("positions" -> "01", "startDate.day" -> "", "startDate.month" -> "", "startDate.year" -> "")
+            val newRequest = FakeRequest(POST, routes.PositionWithinBusinessStartDateController.post(1).url)
+            .withFormUrlEncodedBody("startDate.day" -> "", "startDate.month" -> "", "startDate.year" -> "")
 
             val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
@@ -244,8 +246,8 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
       "when edit is false" must {
         "redirect to the 'Sole proprietor of another business?' page" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
-            "positions" -> "04",
+          val newRequest = FakeRequest(POST, routes.PositionWithinBusinessStartDateController.post(1).url)
+          .withFormUrlEncodedBody(
             "startDate.day" -> "24",
             "startDate.month" -> "2",
             "startDate.year" -> "1990")
@@ -265,8 +267,8 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
 
       "when edit is true" must {
         "redirect to the 'Check your answers' page" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
-            "positions" -> "04",
+          val newRequest = FakeRequest(POST, routes.PositionWithinBusinessStartDateController.post(1).url)
+          .withFormUrlEncodedBody(
             "startDate.day" -> "24",
             "startDate.month" -> "2",
             "startDate.year" -> "1990")

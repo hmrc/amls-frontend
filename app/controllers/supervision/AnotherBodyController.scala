@@ -18,49 +18,49 @@ package controllers.supervision
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.supervision.AnotherBodyFormProvider
 import models.supervision.{AnotherBody, AnotherBodyNo, AnotherBodyYes, Supervision}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
+import views.html.supervision.AnotherBodyView
 
-import views.html.supervision.another_body
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class AnotherBodyController @Inject()(val dataCacheConnector: DataCacheConnector,
                                       val authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
                                       val cc: MessagesControllerComponents,
-                                      another_body: another_body,
-                                      implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+                                      formProvider: AnotherBodyFormProvider,
+                                      view: AnotherBodyView,
+                                      implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
 
-        dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
-          response =>
-            val form: Form2[AnotherBody] = (for {
-              supervision <- response
-              anotherBody <- supervision.anotherBody
-            } yield Form2[AnotherBody](anotherBody)).getOrElse(EmptyForm)
-            Ok(another_body(form, edit))
-        }
+      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
+        response =>
+          val form = (for {
+            supervision <- response
+            anotherBody <- supervision.anotherBody
+          } yield formProvider().fill(anotherBody)).getOrElse(formProvider())
+          Ok(view(form, edit))
+      }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request =>
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
 
-        Form2[AnotherBody](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(another_body(f, edit)))
-          case ValidForm(_, data: AnotherBody) =>
-            for {
-              supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
-              _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key, updateData(supervision, data))
-              updatedSupervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
-            } yield redirectTo(edit, updatedSupervision)
-        }
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
+          for {
+            supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
+            _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key, updateData(supervision, data))
+            updatedSupervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
+          } yield redirectTo(edit, updatedSupervision)
+      )
   }
 
   private def updateData(supervision: Supervision, data: AnotherBody): Supervision = {

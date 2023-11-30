@@ -16,117 +16,83 @@
 
 package models.hvd
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{ValidationError, _}
-import jto.validation.forms._
-import play.api.libs.json.{Json, Reads, Writes}
-
+import models.{Enumerable, WithName}
+import play.api.i18n.Messages
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.json._
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
 case class PaymentMethods(
                          courier: Boolean,
                          direct: Boolean,
                          other: Option[String]
-                         )
-
-sealed trait PaymentMethods0 {
-
-  import models.FormTypes._
-
-  private implicit def rule[A]
-  (implicit
-   s: Path => Rule[A, String],
-   b: Path => Rule[A, Option[Boolean]]
-  ): Rule[A, PaymentMethods] =
-    From[A] { __ =>
-
-      import utils.MappingUtils.Implicits.RichRule
-
-      val minLength = 1
-      val maxLength = 255
-
-      def minLengthR(l: Int) = Rule.zero[String].flatMap[String] {
-        case s if s.length >= l =>
-          Rule(_ => Valid(s))
-        case _ =>
-          Rule(_ => Invalid(Seq(Path -> Seq(ValidationError("error.minLength", l)))))
-      }
-
-      def maxLengthR(l: Int) = Rule.zero[String].flatMap[String] {
-        case s if s.length <= l =>
-          Rule(_ => Valid(s))
-        case _ =>
-          Rule(_ => Invalid(Seq(Path -> Seq(ValidationError("error.maxLength", l)))))
-      }
-
-      val detailsR: Rule[String, String] =
-        (minLengthR(minLength) withMessage "error.required.hvd.describe") andThen
-        (maxLengthR(maxLength) withMessage "error.maxlength.hvd.describe") andThen
-        basicPunctuationPattern("error.required.hvd.format")
-
-      val booleanR = b andThen { _ map { case Some(b) => b; case None => false } }
-
-      (
-        (__ \ "courier").read(booleanR) ~
-        (__ \ "direct").read(booleanR) ~
-        (__ \ "other").read(booleanR).flatMap[Option[String]] {
-          case true =>
-            (__ \ "details").read(detailsR) map Some.apply
-          case false =>
-            Rule(_ => Valid(None))
-        }
-      )(PaymentMethods.apply).validateWith("error.required.hvd.choose.option"){
-        methods =>
-          methods.courier || methods.direct || methods.other.isDefined
-      }
-    }
-
-  private implicit def write: Write[PaymentMethods, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-    (
-        (__ \ "courier").write[Boolean] ~
-        (__ \ "direct").write[Boolean] ~
-        (__ \ "other").write[Boolean].contramap[Option[_]] {
-          case Some(_) => true
-          case None => false
-        } ~
-        (__ \ "details").write[Option[String]]
-      )(a => (a.courier, a.direct, a.other, a.other))
-    }
-
-  val formR: Rule[UrlFormEncoded, PaymentMethods] = {
-    import jto.validation.forms.Rules._
-    implicitly[Rule[UrlFormEncoded, PaymentMethods]]
-  }
-
-  val jsonR: Reads[PaymentMethods] = {
-    import jto.validation.playjson.Rules.{pickInJson => _, _}
-    import utils.JsonMapping._
-    implicitly
-  }
-
-  val formW: Write[PaymentMethods, UrlFormEncoded] = {
-    implicitly[Write[PaymentMethods, UrlFormEncoded]]
-  }
-
-  val jsonW = Writes[PaymentMethods] {x =>
-    val jsMethods = Json.obj("courier" -> x.courier,
-      "direct" -> x.direct,
-      "other" -> x.other.isDefined)
-    val jsDetails = Json.obj("details" -> x.other)
-    x.other.isDefined match {
-      case true => jsMethods ++ jsDetails
-      case false => jsMethods
-    }
-
+                         ) {
+  def getSummaryMessages(implicit messages: Messages): Seq[String] = {
+    Seq(
+      if(courier) Some(messages("hvd.receiving.option.01")) else None,
+      if(direct) Some(messages("hvd.receiving.option.02")) else None,
+      other
+    ).flatten
   }
 }
 
-object PaymentMethods {
+sealed trait PaymentMethod
 
-  object Cache extends PaymentMethods0
+object PaymentMethods extends Enumerable.Implicits {
 
-  implicit val formR: Rule[UrlFormEncoded, PaymentMethods] = Cache.formR
-  implicit val jsonR: Reads[PaymentMethods] = Cache.jsonR
-  implicit val formW: Write[PaymentMethods, UrlFormEncoded] = Cache.formW
-  implicit val jsonW: Writes[PaymentMethods] = Cache.jsonW
+  def apply(methods: Seq[PaymentMethod], detail: Option[String]): PaymentMethods = {
+    PaymentMethods(
+      methods.contains(Courier),
+      methods.contains(Direct),
+      if (methods.exists(_.isInstanceOf[Other])) detail else None
+    )
+  }
+
+  case object Courier extends WithName("courier") with PaymentMethod
+
+  case object Direct extends WithName("direct") with PaymentMethod
+
+  case class Other(method: String) extends WithName("other") with PaymentMethod
+
+  val all: Seq[PaymentMethod] = Seq(Courier, Direct, Other(""))
+
+  def formValues(html: Html)(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex map {
+    case (method, index) =>
+
+      val conditional = if(method.toString == Other("").toString) Some(html) else None
+
+      CheckboxItem(
+        content = Text(messages(s"hvd.receiving.option.0${index + 1}")),
+        value = method.toString,
+        id = Some(s"paymentMethods_$index"),
+        name = Some(s"paymentMethods[$index]"),
+        conditionalHtml = conditional
+      )
+  }
+
+  implicit val enumerable: Enumerable[PaymentMethod] = Enumerable(all.map(v => v.toString -> v): _*)
+
+  implicit val reads: Reads[PaymentMethods] = {
+    (
+      (JsPath \ "courier").read[Boolean] and
+        (JsPath \ "direct").read[Boolean] and
+        (JsPath \ "other").read[Boolean] and
+        (JsPath \ "details").readNullable[String]
+      )((courier, direct, _, details) =>
+        PaymentMethods(
+          courier, direct, details
+        )
+      )
+  }
+
+  implicit val writes: OWrites[PaymentMethods] = (obj: PaymentMethods) => {
+    Json.obj(
+      "courier" -> obj.courier,
+      "direct" -> obj.direct,
+      "other" -> obj.other.isDefined,
+      "details" -> obj.other
+    )
+  }
 }

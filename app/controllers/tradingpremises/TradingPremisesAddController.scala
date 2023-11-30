@@ -32,7 +32,7 @@ class TradingPremisesAddController @Inject()(val dataCacheConnector: DataCacheCo
                                              val authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val cc: MessagesControllerComponents,
-                                             implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                             implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   private def isMSBSelected(cacheMap: Option[CacheMap]): Boolean = {
     val test = for {

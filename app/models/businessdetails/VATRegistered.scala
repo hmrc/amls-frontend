@@ -16,10 +16,11 @@
 
 package models.businessdetails
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
+import play.api.i18n.Messages
 import play.api.libs.json._
-import cats.data.Validated.Valid
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 
 sealed trait VATRegistered
 
@@ -28,24 +29,18 @@ case object VATRegisteredNo extends VATRegistered
 
 object VATRegistered {
 
-  import models.FormTypes._
-  import utils.MappingUtils.Implicits._
+  def formValues(html: Html)(implicit messages: Messages): Seq[RadioItem] = HmrcYesNoRadioItems().map { radioItem =>
 
-  implicit val formRule: Rule[UrlFormEncoded, VATRegistered] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "registeredForVAT").read[Boolean].withMessage("error.required.atb.registered.for.vat") flatMap {
-      case true =>
-        (__ \ "vrnNumber").read(vrnType) map VATRegisteredYes.apply
-      case false => Rule.fromMapping { _ => Valid(VATRegisteredNo) }
-    }
-  }
-
-  implicit val formWrites: Write[VATRegistered, UrlFormEncoded] = Write {
-    case VATRegisteredYes(value) =>
-      Map("registeredForVAT" -> Seq("true"),
-        "vrnNumber" -> Seq(value)
+    if (radioItem.value.contains("true")) {
+      radioItem.copy(
+        id = Some("registeredForVAT-true"),
+        conditionalHtml = Some(html)
       )
-    case VATRegisteredNo => Map("registeredForVAT" -> Seq("false"))
+    } else {
+      radioItem.copy(
+        id = Some("registeredForVAT-false")
+      )
+    }
   }
 
   implicit val jsonReads: Reads[VATRegistered] =

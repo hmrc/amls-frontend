@@ -18,8 +18,10 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.ExperienceTrainingFormProvider
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import models.businessmatching.BusinessActivity._
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{ExperienceTrainingNo, ExperienceTrainingYes, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
@@ -28,32 +30,34 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.responsiblepeople.experience_training
+import views.html.responsiblepeople.ExperienceTrainingView
 
 import scala.concurrent.Future
 
-class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   val RecordId = 1
 
-  def getMessage(service: BusinessActivity): String = Messages("businessactivities.registerservices.servicename.lbl." + BusinessMatchingActivities.getValue(service))
+  def getMessage(service: BusinessActivity): String =
+    messages("businessactivities.registerservices.servicename.lbl." + BusinessMatchingActivities.getValue(service))
 
   trait Fixture {
     self => val request = addToken(authRequest)
 
     val dataCacheConnector = mock[DataCacheConnector]
-    lazy val view = app.injector.instanceOf[experience_training]
+    lazy val view = inject[ExperienceTrainingView]
     val controller = new ExperienceTrainingController (
       dataCacheConnector = dataCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      experience_training = view,
+      formProvider = inject[ExperienceTrainingFormProvider],
+      view = view,
       error = errorView)
   }
 
@@ -61,9 +65,9 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
   "ExperienceTrainingController" must {
 
-    val pageTitle = Messages("responsiblepeople.experiencetraining.title", "firstname lastname") + " - " +
-      Messages("summary.responsiblepeople") + " - " +
-      Messages("title.amls") + " - " + Messages("title.gov")
+    val pageTitle = messages("responsiblepeople.experiencetraining.title", "firstname lastname") + " - " +
+      messages("summary.responsiblepeople") + " - " +
+      messages("title.amls") + " - " + messages("title.gov")
 
     val personName = Some(PersonName("firstname", None, "lastname"))
 
@@ -92,7 +96,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
         contentAsString(result) must include(getMessage(BillPaymentServices))
         contentAsString(result) must include(getMessage(EstateAgentBusinessService))
 
-        contentAsString(result) must include(Messages("responsiblepeople.experiencetraining.title"))
+        contentAsString(result) must include(messages("responsiblepeople.experiencetraining.title"))
       }
 
     "on get display the page with pre populated data for the Yes Option" in new Fixture {
@@ -139,7 +143,8 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
 
     "on post with valid data and training selected yes" in new Fixture {
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.ExperienceTrainingController.post(1).url)
+      .withFormUrlEncodedBody(
         "experienceTraining" -> "true",
         "experienceInformation" -> "I do not remember when I did the training"
       )
@@ -164,7 +169,8 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
     }
 
     "on post with valid data and training selected no" in new Fixture {
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.ExperienceTrainingController.post(1).url)
+      .withFormUrlEncodedBody(
         "experienceTraining" -> "false"
       )
 
@@ -188,7 +194,8 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
     }
 
     "on post with invalid data" in new Fixture {
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.ExperienceTrainingController.post(1).url)
+      .withFormUrlEncodedBody(
         "experienceTraining" -> "not a boolean value"
       )
       val mockCacheMap = mock[CacheMap]
@@ -220,7 +227,8 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       val businessMatchingActivities = BusinessMatchingActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivities))))
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.ExperienceTrainingController.post(1).url)
+      .withFormUrlEncodedBody(
         "experienceTraining" -> "true",
         "experienceInformation" -> "I do not remember when I did the training"
       )

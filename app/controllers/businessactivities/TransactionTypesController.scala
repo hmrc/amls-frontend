@@ -21,11 +21,13 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.businessactivities.TransactionTypesFormProvider
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, TransactionTypes}
-import play.api.mvc.MessagesControllerComponents
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import views.html.businessactivities.transaction_types
+import views.html.businessactivities.TransactionTypesView
 
 import scala.concurrent.Future
 
@@ -33,19 +35,21 @@ class TransactionTypesController @Inject()(val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
                                            val cacheConnector: DataCacheConnector,
                                            val cc: MessagesControllerComponents,
-                                           transaction_types: transaction_types) extends AmlsBaseController(ds, cc) {
+                                           formProvider: TransactionTypesFormProvider,
+                                           view: TransactionTypesView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      def form(ba: BusinessActivities) = ba.transactionRecordTypes.fold[Form2[TransactionTypes]](EmptyForm)(Form2(_))
+      def form(ba: BusinessActivities): Form[TransactionTypes] =
+        ba.transactionRecordTypes.fold(formProvider())(formProvider().fill)
 
       for {
         ba <- OptionT(cacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key))
-      } yield Ok(transaction_types(form(ba), edit))
+      } yield Ok(view(form(ba), edit))
     } getOrElse InternalServerError("Cannot fetch business activities")
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
       lazy val redirect = Redirect(if(edit) {
         routes.SummaryController.get
@@ -53,17 +57,15 @@ class TransactionTypesController @Inject()(val authAction: AuthAction,
         routes.IdentifySuspiciousActivityController.get()
       })
 
-      Form2[TransactionTypes](request.body) match {
-        case ValidForm(_, data) => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => {
           for {
             bm <- OptionT(cacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key))
             _ <- OptionT.liftF(cacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, bm.transactionRecordTypes(data)))
           } yield redirect
         } getOrElse InternalServerError("Unable to update Business Activities Transaction Types")
-
-        case f: InvalidForm =>
-          Future.successful(BadRequest(transaction_types(f, edit)))
-      }
+      )
     }
   }
 }

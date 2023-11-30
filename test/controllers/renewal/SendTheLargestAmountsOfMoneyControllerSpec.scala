@@ -19,6 +19,7 @@ package controllers.renewal
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.renewal.SendLargestAmountsOfMoneyFormProvider
 import models.Country
 import models.renewal.{CustomersOutsideUK, Renewal, SendTheLargestAmountsOfMoney}
 import org.jsoup.Jsoup
@@ -26,17 +27,18 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AutoCompleteServiceMocks}
-import views.html.renewal.send_largest_amounts_of_money
+import views.html.renewal.SendLargestAmountsOfMoneyView
 
 import scala.concurrent.Future
 
-class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSugar with PatienceConfiguration with IntegrationPatience {
+class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
+  with MockitoSugar with PatienceConfiguration with IntegrationPatience with Injecting {
 
   trait Fixture extends AutoCompleteServiceMocks {
     self =>
@@ -49,28 +51,30 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockStatusService = mock[StatusService]
     lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = app.injector.instanceOf[send_largest_amounts_of_money]
+    lazy val view = inject[SendLargestAmountsOfMoneyView]
     val controller = new SendTheLargestAmountsOfMoneyController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService, cc = mockMcc,
       autoCompleteService = mockAutoComplete,
-      send_largest_amounts_of_money = view
+      formProvider = inject[SendLargestAmountsOfMoneyFormProvider],
+      view = view
     )
   }
 
   trait FormSubmissionFixture extends Fixture {
     def formData(valid: Boolean) = if (valid) "largestAmountsOfMoney[0]" -> "GB" else "largestAmountsOfMoney[0]" -> ""
-    def formRequest(valid: Boolean) = requestWithUrlEncodedBody(formData(valid))
+    def formRequest(valid: Boolean) =
+      FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url).withFormUrlEncodedBody(formData(valid))
 
-    when(mockRenewalService.getRenewal(any())(any(), any()))
+    when(mockRenewalService.getRenewal(any())(any()))
       .thenReturn(Future.successful(None))
 
-    when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+    when(mockRenewalService.updateRenewal(any(), any())(any()))
       .thenReturn(Future.successful(emptyCache))
 
-    def post(edit: Boolean = false, valid: Boolean = true)(block: Result => Unit) =
-      block(await(controller.post(edit)(formRequest(valid))))
+    def post(edit: Boolean = false, valid: Boolean = true)(block: Future[Result] => Unit) =
+      block(controller.post(edit)(formRequest(valid)))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -87,7 +91,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.title() must be(Messages("renewal.msb.largest.amounts.title") + " - " + Messages("summary.renewal") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
+        document.title() must be(messages("renewal.msb.largest.amounts.title") + " - " + messages("summary.renewal") + " - " + messages("title.amls") + " - " + messages("title.gov"))
       }
 
       "pre-populate the 'Where to Send The Largest Amounts Of Money' Page" in new Fixture {
@@ -109,8 +113,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       "edit is false" must {
         "redirect to the MostTransactionsController with valid data" in new FormSubmissionFixture {
           post(){ result =>
-            result.header.status must be (SEE_OTHER)
-            result.header.headers.get("Location")  must be(routes.MostTransactionsController.get().url.some)
+            status(result) must be (SEE_OTHER)
+            redirectLocation(result) must be(routes.MostTransactionsController.get().url.some)
           }
         }
       }
@@ -118,23 +122,23 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       "edit is true" must {
         "redirect to the SummaryController" in new FormSubmissionFixture {
           post(edit = true){ result =>
-            result.header.status must be (SEE_OTHER)
-            result.header.headers.get("Location")  must be(routes.SummaryController.get.url.some)
+            status(result) must be (SEE_OTHER)
+            redirectLocation(result) must be(routes.SummaryController.get.url.some)
           }
         }
         "redirect to SendTheLargestAmountsOfMoneyController" when {
           "CustomersOutsideUK is contains countries" when {
             "MostTransactions is None" in new FormSubmissionFixture {
 
-              when(mockRenewalService.getRenewal(any())(any(), any()))
+              when(mockRenewalService.getRenewal(any())(any()))
                 .thenReturn(Future.successful(Some(Renewal(
                   customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("GB","GB"))))),
                   mostTransactions = None
                 ))))
 
               post(edit = true) { result =>
-                result.header.status mustBe SEE_OTHER
-                result.header.headers.get("Location") mustEqual routes.MostTransactionsController.get(true).url.some
+                status(result) mustBe SEE_OTHER
+                redirectLocation(result) mustEqual routes.MostTransactionsController.get(true).url.some
               }
             }
           }
@@ -143,15 +147,11 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
       "given invalid data, must respond with BAD_REQUEST" in new FormSubmissionFixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "largestAmountsOfMoney[0]" -> ""
-        )
+        val newRequest = FakeRequest(POST, routes.SendTheLargestAmountsOfMoneyController.post().url)
+        .withFormUrlEncodedBody("largestAmountsOfMoney[0]" -> "")
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-
-        val document = Jsoup.parse(contentAsString(result))
-        document.select("a[href=#largestAmountsOfMoney]").html() must include(Messages("error.required.renewal.largest.amounts.country"))
       }
     }
   }

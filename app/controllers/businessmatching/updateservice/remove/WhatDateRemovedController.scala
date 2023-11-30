@@ -20,60 +20,47 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
-import jto.validation.Write
-import jto.validation.forms.UrlFormEncoded
-import models.DateOfChange
-import models.flowmanagement.{RemoveBusinessTypeFlowModel, _}
-import play.api.mvc.MessagesControllerComponents
+import forms.DateOfChangeFormProvider
+import models.flowmanagement._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-import views.html.date_of_change
+import views.html.DateOfChangeView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class WhatDateRemovedController @Inject()(
-                                           authAction: AuthAction,
-                                           val ds: CommonPlayDependencies,
-                                           val dataCacheConnector: DataCacheConnector,
-                                           val router: Router[RemoveBusinessTypeFlowModel],
-                                           val cc: MessagesControllerComponents,
-                                           date_of_change: date_of_change) extends AmlsBaseController(ds, cc) {
+class WhatDateRemovedController @Inject()(authAction: AuthAction,
+                                          val ds: CommonPlayDependencies,
+                                          val dataCacheConnector: DataCacheConnector,
+                                          val router: Router[RemoveBusinessTypeFlowModel],
+                                          val cc: MessagesControllerComponents,
+                                          formProvider: DateOfChangeFormProvider,
+                                          view: DateOfChangeView) extends AmlsBaseController(ds, cc) {
 
-  implicit val dateWrites: Write[DateOfChange, UrlFormEncoded] =
-    Write {
-      case DateOfChange(b) => Map(
-        "dateOfChange.day" -> Seq(b.getDayOfMonth.toString),
-        "dateOfChange.month" -> Seq(b.getMonthOfYear.toString),
-        "dateOfChange.year" -> Seq(b.getYear.toString)
-      )
-    }
-
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      getFormData(request.credId) map { case model =>
-        val form = model.dateOfChange map { v => Form2(v) } getOrElse EmptyForm
-        Ok(date_of_change(form, "summary.updateservice", routes.WhatDateRemovedController.post(edit), false, "button.continue"))
-      } getOrElse  InternalServerError("Get: Unable to show date_of_change Activities page. Failed to retrieve data")
+      getFormData(request.credId) map { model =>
+        val form = model.dateOfChange.fold(formProvider())(formProvider().fill)
+        Ok(view(form, "summary.updateservice", routes.WhatDateRemovedController.post(edit), false, "button.continue"))
+      } getOrElse InternalServerError("Get: Unable to show date_of_change Activities page. Failed to retrieve data")
     }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        Form2[DateOfChange](request.body)(DateOfChange.formRulePreApp) match {
-          case form: InvalidForm =>
-            Future.successful(BadRequest(date_of_change(form, "summary.updateservice", routes.WhatDateRemovedController.post(edit), false, "button.continue")))
-
-           case ValidForm(_, data) => dataCacheConnector.update[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key) {
-              case Some(model) => model.copy(dateOfChange = Some(data))
-              case None => throw new Exception("An UnknownException has occurred: UpdateServiceDateofChangeController")
-            } flatMap {
-              case Some(model) => router.getRoute(request.credId, WhatDateRemovedPageId, model, edit)
-              case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: UpdateServiceDateofChangeController"))
-            }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, "summary.updateservice", routes.WhatDateRemovedController.post(edit), false, "button.continue"))),
+        data => dataCacheConnector.update[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key) {
+          case Some(model) => model.copy(dateOfChange = Some(data))
+          case None => throw new Exception("An UnknownException has occurred: UpdateServiceDateofChangeController")
+        } flatMap {
+          case Some(model) => router.getRoute(request.credId, WhatDateRemovedPageId, model, edit)
+          case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: UpdateServiceDateofChangeController"))
         }
+      )
   }
 
   private def getFormData(credId: String)(implicit hc: HeaderCarrier): OptionT[Future, RemoveBusinessTypeFlowModel] = for {

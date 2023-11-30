@@ -18,16 +18,17 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.msb.WhichCurrenciesFormProvider
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+
 import javax.inject.Inject
 import models.moneyservicebusiness._
-import play.api.mvc.MessagesControllerComponents
-import services.StatusService
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{CurrencyAutocompleteService, StatusService}
 import services.businessmatching.ServiceFlow
 import utils.ControllerHelper
 import utils.AuthAction
-import views.html.msb.which_currencies
-
+import views.html.msb.WhichCurrenciesView
 
 import scala.concurrent.Future
 
@@ -37,42 +38,41 @@ class WhichCurrenciesController @Inject() (authAction: AuthAction,
                                            implicit val statusService: StatusService,
                                            implicit val serviceFlow: ServiceFlow,
                                            val cc: MessagesControllerComponents,
-                                           which_currencies: which_currencies) extends AmlsBaseController(ds, cc) {
+                                           autocompleteService: CurrencyAutocompleteService,
+                                           formProvider: WhichCurrenciesFormProvider,
+                                           view: WhichCurrenciesView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
       dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
         response =>
           val form = (for {
             msb <- response
             currencies <- msb.whichCurrencies
-          } yield Form2[WhichCurrencies](currencies)).getOrElse(EmptyForm)
+          } yield currencies).fold(formProvider())(formProvider().fill)
 
-          Ok(which_currencies(form, edit))
+          Ok(view(form, edit, autocompleteService.formOptions))
       }
     }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[WhichCurrencies](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(which_currencies(alignFormDataWithValidationErrors(f), edit)))
-        case ValidForm(_, data: WhichCurrencies) =>
-              for {
-                msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-                _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
-                  updateCurrencies(msb, data))
-              } yield edit match {
-                case true => Redirect(routes.SummaryController.get)
-                case _ => Redirect(routes.UsesForeignCurrenciesController.get())
-              }
-      }
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit, autocompleteService.formOptions))),
+        data =>
+          for {
+            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+            _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
+              updateCurrencies(msb, data))
+          } yield edit match {
+            case true => Redirect(routes.SummaryController.get)
+            case _ => Redirect(routes.UsesForeignCurrenciesController.get())
+          }
+      )
     }
   }
-
-  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
-    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "currencies")
 
   def updateCurrencies(oldMsb: Option[MoneyServiceBusiness], newWhichCurrencies: WhichCurrencies): Option[MoneyServiceBusiness] = {
     oldMsb match {

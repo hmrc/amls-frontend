@@ -18,16 +18,18 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.msb.UsesForeignCurrenciesFormProvider
+
 import javax.inject.Inject
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, ForeignExchange}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService}
+import models.businessmatching.BusinessMatchingMsbService.ForeignExchange
 import models.moneyservicebusiness._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
-import views.html.msb.uses_foreign_currencies
+import views.html.msb.UsesForeignCurrenciesView
 
 import scala.concurrent.Future
 
@@ -37,46 +39,47 @@ class UsesForeignCurrenciesController @Inject()(authAction: AuthAction,
                                                 implicit val statusService: StatusService,
                                                 implicit val serviceFlow: ServiceFlow,
                                                 val cc: MessagesControllerComponents,
-                                                uses_foreign_currencies: uses_foreign_currencies) extends AmlsBaseController(ds, cc) {
+                                                formProvider: UsesForeignCurrenciesFormProvider,
+                                                view: UsesForeignCurrenciesView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request => {
-        dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
-          response =>
-            val form: Form2[UsesForeignCurrencies] = (for {
-              msb <- response
-              currencies <- msb.whichCurrencies
-              usesForeign <- currencies.usesForeignCurrencies
-            } yield Form2[UsesForeignCurrencies](usesForeign)).getOrElse(EmptyForm)
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request => {
+      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
+        response =>
+          val form = (for {
+            msb <- response
+            currencies <- msb.whichCurrencies
+            usesForeign <- currencies.usesForeignCurrencies
+          } yield usesForeign).fold(formProvider())(formProvider().fill)
 
-            Ok(uses_foreign_currencies(form, edit))
-        }
+          Ok(view(form, edit))
       }
+    }
   }
 
   def post(edit: Boolean = false) = authAction.async {
-      implicit request => {
-        Form2[UsesForeignCurrencies](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(uses_foreign_currencies(f, edit)))
-          case ValidForm(_, data: UsesForeignCurrencies) =>
-            dataCacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
-              val result = for {
-                cacheMap <- maybeCache
-                msb <- cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
-                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-                services <- bm.msbServices
-                register <- cacheMap.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
-              } yield {
-                dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
-                  updateCurrencies(msb, data)) map {
-                  _ => routing(services.msbServices, register, msb, edit, data)
-                }
+    implicit request => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
+          dataCacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
+            val result = for {
+              cacheMap <- maybeCache
+              msb <- cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+              bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+              services <- bm.msbServices
+              register <- cacheMap.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
+            } yield {
+              dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
+                updateCurrencies(msb, data)) map {
+                _ => routing(services.msbServices, register, msb, edit, data)
               }
-              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
-        }
-      }
+            result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+          }
+      )
+    }
   }
 
   def updateCurrencies(oldMsb: MoneyServiceBusiness, usesForeignCurrencies: UsesForeignCurrencies): Option[MoneyServiceBusiness] =

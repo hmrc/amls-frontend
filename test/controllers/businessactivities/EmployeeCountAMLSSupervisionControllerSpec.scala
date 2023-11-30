@@ -16,32 +16,38 @@
 
 package controllers.businessactivities
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.businessactivities.{BusinessActivities, HowManyEmployees}
+import forms.businessactivities.EmployeeCountAMLSSupervisionFormProvider
+import models.businessactivities.EmployeeCountAMLSSupervision
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.test
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
+import services.businessactivities.EmployeeCountAMLSSupervisionService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessactivities.business_employees_amls_supervision
+import views.html.businessactivities.BusinessEmployeesAMLSSupervisionView
 
 import scala.concurrent.Future
 
-class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
+
+  val mockService = mock[EmployeeCountAMLSSupervisionService]
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[business_employees_amls_supervision]
+    lazy val view = app.injector.instanceOf[BusinessEmployeesAMLSSupervisionView]
     val controller = new EmployeeCountAMLSSupervisionController (
-      dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      business_employees_amls_supervision = view)
+      service = mockService,
+      formProvider = inject[EmployeeCountAMLSSupervisionFormProvider],
+      view = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -51,7 +57,7 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
     "get is called" must {
       "display the how many employees work on activities covered by AMLS page with an empty form" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(mockService.getEmployeeCountAMLSSupervision(any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -64,22 +70,24 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
       "display the how many employees work on activities covered by AMLS page with pre populated data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-          .thenReturn(Future.successful(Some(BusinessActivities(howManyEmployees = Some(HowManyEmployees(Some("163"), Some("17")))))))
+        val count = "17"
+
+        when(mockService.getEmployeeCountAMLSSupervision(any())(any()))
+          .thenReturn(Future.successful(Some(count)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
 
-        document.select("input[name=employeeCountAMLSSupervision]").`val` must be("17")
-
+        document.select("input[name=employeeCountAMLSSupervision]").`val` must be(count)
       }
     }
 
     "post is called" must {
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.EmployeeCountAMLSSupervisionController.post().url)
+          .withFormUrlEncodedBody(
           "employeeCountAMLSSupervision" -> ""
         )
         val result = controller.post()(newRequest)
@@ -88,15 +96,14 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
       "redirect to the TransactionRecordController when given valid data and edit is false" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "employeeCountAMLSSupervision" -> "123"
+        val count = "123"
+        val newRequest = test.FakeRequest(POST, routes.EmployeeCountAMLSSupervisionController.post().url)
+          .withFormUrlEncodedBody(
+          "employeeCountAMLSSupervision" -> count
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        when(mockService.updateHowManyEmployees(any(), eqTo(EmployeeCountAMLSSupervision(count)))(any()))
+          .thenReturn(Future.successful(Some(emptyCache)))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -105,20 +112,19 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
       "redirect to the SummaryController when given valid data and edit is true" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "employeeCountAMLSSupervision" -> "12345"
+        val count = "12345"
+
+        val newRequest = test.FakeRequest(POST, routes.EmployeeCountAMLSSupervisionController.post(true).url)
+          .withFormUrlEncodedBody(
+          "employeeCountAMLSSupervision" -> count
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        when(mockService.updateHowManyEmployees(any(), eqTo(EmployeeCountAMLSSupervision(count)))(any()))
+          .thenReturn(Future.successful(Some(emptyCache)))
 
         val resultTrue = controller.post(true)(newRequest)
         status(resultTrue) must be(SEE_OTHER)
         redirectLocation(resultTrue) must be(Some(routes.SummaryController.get.url))
-
       }
     }
   }

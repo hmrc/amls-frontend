@@ -1,0 +1,80 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import views.html.components.forms.{ErrorSummary, InputText}
+@import views.html.components.{Button, Heading, ReturnLink, SectionSubtitle}
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    inputText: InputText,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean, index: Int)(implicit request: Request[_], messages: Messages, lang:Lang, appConfig: ApplicationConfig)
+
+@layout(pageTitle = s"${messages("bankdetails.bankaccount.ukaccount")} - ${messages("summary.bankdetails")}") {
+
+    @errorSummary(form)
+
+    @subtitle(messages("summary.bankdetails"))
+
+    @formHelper(action = controllers.bankdetails.routes.BankAccountUKController.post(index, edit)) {
+
+        @heading("bankdetails.bankaccount.ukaccount")
+
+        @inputText(
+            Input(
+                id = "sortCode",
+                name = "sortCode",
+                inputType = "numeric",
+                label = Label(
+                    content = Text(messages("bankdetails.bankaccount.sortcode"))
+                ),
+                hint = Some(Hint(
+                    content = Text(messages("bankdetails.bankaccount.sortcode.hint"))
+                )),
+                classes = "govuk-!-width-one-quarter"
+            ),
+            form("sortCode")
+        )
+
+        @inputText(
+            Input(
+                id = "accountNumber",
+                name = "accountNumber",
+                inputType = "numeric",
+                label = Label(
+                    content = Text(messages("bankdetails.bankaccount.accountnumber"))
+                ),
+                hint = Some(Hint(
+                    content = Text(messages("bankdetails.bankaccount.accountnumber.hint"))
+                )),
+                classes = "govuk-!-width-one-third"
+            ),
+            form("accountNumber")
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

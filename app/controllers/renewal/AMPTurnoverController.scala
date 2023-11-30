@@ -18,15 +18,16 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
-import javax.inject.{Inject, Singleton}
-import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
-import models.renewal.{AMPTurnover, Renewal}
-import play.api.mvc.MessagesControllerComponents
+import forms.renewal.AMPTurnoverFormProvider
+import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.renewal.Renewal
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RenewalService
 import utils.{AuthAction, ControllerHelper}
-import views.html.renewal.amp_turnover
+import views.html.renewal.AMPTurnoverView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -35,9 +36,10 @@ class AMPTurnoverController @Inject()(val dataCacheConnector: DataCacheConnector
                                       val ds: CommonPlayDependencies,
                                       val renewalService: RenewalService,
                                       val cc: MessagesControllerComponents,
-                                      amp_turnover: amp_turnover) extends AmlsBaseController(ds, cc) {
+                                      formProvider: AMPTurnoverFormProvider,
+                                      view: AMPTurnoverView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetchAll(request.credId) map {
         optionalCache =>
@@ -47,18 +49,17 @@ class AMPTurnoverController @Inject()(val dataCacheConnector: DataCacheConnector
             val form = (for {
               renewal <- cache.getEntry[Renewal](Renewal.key)
               ampTurnover <- renewal.ampTurnover
-            } yield Form2[AMPTurnover](ampTurnover)) getOrElse EmptyForm
-            Ok(amp_turnover(form, edit))
-
-          }) getOrElse Ok(amp_turnover(EmptyForm, edit))
+            } yield formProvider().fill(ampTurnover)) getOrElse formProvider()
+            Ok(view(form, edit))
+          }) getOrElse Ok(view(formProvider(), edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[AMPTurnover](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(amp_turnover(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             renewal <- renewalService.getRenewal(request.credId)
             _ <- renewalService.updateRenewal(request.credId, renewal.ampTurnover(data))
@@ -70,7 +71,7 @@ class AMPTurnoverController @Inject()(val dataCacheConnector: DataCacheConnector
               getRouting(ControllerHelper.getBusinessActivity(businessMatching))
             }
           }
-      }
+      )
     }
   }
 

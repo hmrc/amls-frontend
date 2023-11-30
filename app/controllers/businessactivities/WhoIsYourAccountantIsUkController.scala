@@ -19,21 +19,22 @@ package controllers.businessactivities
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.businessactivities.AccountantIsUKAddressFormProvider
 import models.businessactivities.{BusinessActivities, WhoIsYourAccountant, WhoIsYourAccountantIsUk}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper}
-import views.html.businessactivities.who_is_your_accountant_is_uk_address
+import views.html.businessactivities.AccountantIsUKAddressView
 
 class WhoIsYourAccountantIsUkController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                   val autoCompleteService: AutoCompleteService,
                                                   val authAction: AuthAction,
                                                   val ds: CommonPlayDependencies,
                                                   val cc: MessagesControllerComponents,
-                                                  who_is_your_accountant_is_uk_address: who_is_your_accountant_is_uk_address) extends AmlsBaseController(ds, cc) {
+                                                  formProvider: AccountantIsUKAddressFormProvider,
+                                                  view: AccountantIsUKAddressView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
@@ -41,20 +42,20 @@ class WhoIsYourAccountantIsUkController @Inject()(val dataCacheConnector: DataCa
             businessActivities <- response
             isUk <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.isUk)
           } yield {
-            Form2[WhoIsYourAccountantIsUk](isUk)
-          }).getOrElse(EmptyForm)
-          Ok(who_is_your_accountant_is_uk_address(form, edit, ControllerHelper.accountantName(response)))
+            formProvider().fill(isUk)
+          }).getOrElse(formProvider())
+          Ok(view(form, edit, ControllerHelper.accountantName(response)))
       }
   }
 
-  def post(edit : Boolean = false) = authAction.async {
+  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[WhoIsYourAccountantIsUk](request.body) match {
-        case f: InvalidForm =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
           dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-            response => BadRequest(who_is_your_accountant_is_uk_address(f, edit, ControllerHelper.accountantName(response)))
-          }
-        case ValidForm(_, data) =>
+            response => BadRequest(view(formWithErrors, edit, ControllerHelper.accountantName(response)))
+          },
+        data =>
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, updateModel(businessActivity, data))
@@ -63,7 +64,7 @@ class WhoIsYourAccountantIsUkController @Inject()(val dataCacheConnector: DataCa
           } else {
             Redirect(routes.WhoIsYourAccountantNonUkAddressController.get(edit))
           }
-      }
+      )
   }
 
   private def updateModel(ba: BusinessActivities, data: WhoIsYourAccountantIsUk): BusinessActivities = {

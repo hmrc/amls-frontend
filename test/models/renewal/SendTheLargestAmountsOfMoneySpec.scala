@@ -102,12 +102,12 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
         SendTheLargestAmountsOfMoney.formR.validate(
           Map(
             "largestAmountsOfMoney[0]" -> Seq("GB"),
-            "largestAmountsOfMoney[1]" -> Seq("MK"),
+            "largestAmountsOfMoney[1]" -> Seq("BE"),
             "largestAmountsOfMoney[2]" -> Seq("JO")
           )
         ) must be(Valid(SendTheLargestAmountsOfMoney(Seq(
           Country("United Kingdom", "GB"),
-          Country("Macedonia, the Former Yugoslav Republic of", "MK"),
+          Country("Belgium", "BE"),
           Country("Jordan", "JO")
         ))))
       }
@@ -120,7 +120,7 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
           Map(
             "largestAmountsOfMoney[0]" -> Seq("GB"),
             "largestAmountsOfMoney[1]" -> Seq("hjjkhjkjh"),
-            "largestAmountsOfMoney[2]" -> Seq("MK")
+            "largestAmountsOfMoney[2]" -> Seq("BE")
           )
         )
         x must be (Invalid(Seq((Path \ "largestAmountsOfMoney" \ 1) -> Seq(ValidationError("error.invalid.country")))))

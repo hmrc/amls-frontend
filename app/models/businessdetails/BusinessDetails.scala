@@ -16,7 +16,8 @@
 
 package models.businessdetails
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress._
+import play.api.i18n.Messages
 import play.api.libs.json.{Json, Reads}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -87,16 +88,44 @@ case class BusinessDetails(
 
 object BusinessDetails {
 
-  def section(implicit cache: CacheMap): Section = {
+  def taskRow(implicit cache: CacheMap, messages: Messages) = {
+
     val messageKey = "businessdetails"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.businessdetails.routes.WhatYouNeedController.get)
+    val notStarted = TaskRow(
+      messageKey,
+      controllers.businessdetails.routes.WhatYouNeedController.get.url,
+      hasChanged = false,
+      NotStarted,
+      TaskRow.notStartedTag
+    )
+
     cache.getEntry[BusinessDetails](key).fold(notStarted) {
+      case model if model.isComplete && model.hasChanged =>
+        TaskRow(
+          messageKey,
+          controllers.businessdetails.routes.SummaryController.get.url,
+          true,
+          Updated,
+          TaskRow.updatedTag
+        )
       case model if model.isComplete =>
-        Section(messageKey, Completed, model.hasChanged, controllers.businessdetails.routes.SummaryController.get)
+        TaskRow(
+          messageKey,
+          controllers.businessdetails.routes.SummaryController.get.url,
+          model.hasChanged,
+          Completed,
+          TaskRow.completedTag
+        )
       case BusinessDetails(None, None, None, None, None, _, None, None, None, None, _, _) =>
         notStarted
       case model =>
-        Section(messageKey, Started, model.hasChanged, controllers.businessdetails.routes.WhatYouNeedController.get)
+        TaskRow(
+          messageKey,
+          controllers.businessdetails.routes.WhatYouNeedController.get.url,
+          model.hasChanged,
+          Started,
+          TaskRow.incompleteTag
+        )
     }
   }
 

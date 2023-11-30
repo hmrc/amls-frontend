@@ -18,6 +18,8 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.tradingpremises.RemoveAgentPremisesReasonsFormProvider
+import models.tradingpremises.AgentRemovalReason.Other
 import models.tradingpremises.TradingPremises
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -25,26 +27,28 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.tradingpremises.remove_agent_premises_reasons
+import views.html.tradingpremises.RemoveAgentPremisesReasonsView
 
 import scala.concurrent.Future
 
-class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSugar {
+class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   import models.tradingpremises.RemovalReasonConstants._
 
   trait Fixture {
     self =>
     implicit val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[remove_agent_premises_reasons]
+    lazy val view = inject[RemoveAgentPremisesReasonsView]
     val controller = new RemoveAgentPremisesReasonsController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      remove_agent_premises_reasons = view,
+      formProvider = inject[RemoveAgentPremisesReasonsFormProvider],
+      view = view,
       error = errorView)
 
     val tradingPremises = TradingPremises()
@@ -85,8 +89,9 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
       "return a bad request if there is a validation problem" in new Fixture {
 
-        val formRequest = requestWithUrlEncodedBody(
-          "removalReason" -> Form.OTHER
+        val formRequest = FakeRequest(POST, routes.RemoveAgentPremisesReasonsController.post(1).url)
+        .withFormUrlEncodedBody(
+          "removalReason" -> Other.toString
         )
 
         val result = controller.post(1)(formRequest)
@@ -97,8 +102,9 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
       "save the reason data to mongoCache" in new Fixture {
 
-        val formRequest = requestWithUrlEncodedBody(
-          "removalReason" -> Form.OTHER,
+        val formRequest = FakeRequest(POST, routes.RemoveAgentPremisesReasonsController.post(1).url)
+        .withFormUrlEncodedBody(
+          "removalReason" -> Other.toString,
           "removalReasonOther" -> "Some reason"
         )
 
@@ -117,8 +123,9 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
       "redirect to the 'Remove trading premises' page" in new Fixture {
 
-        val formRequest = requestWithUrlEncodedBody(
-          "removalReason" -> Form.OTHER,
+        val formRequest = FakeRequest(POST, routes.RemoveAgentPremisesReasonsController.post(1).url)
+        .withFormUrlEncodedBody(
+          "removalReason" -> Other.toString,
           "removalReasonOther" -> "Some reason"
         )
 
@@ -128,7 +135,6 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
         redirectLocation(result) must be(Some(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url))
 
       }
-
     }
   }
 

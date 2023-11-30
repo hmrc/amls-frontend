@@ -18,14 +18,13 @@ package controllers.supervision
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.supervision.{ProfessionalBody, Supervision}
-import play.api.mvc.MessagesControllerComponents
+import forms.supervision.PenalisedByProfessionalFormProvider
+import models.supervision.Supervision
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
+import views.html.supervision.PenalisedByProfessionalView
 
-import views.html.supervision.penalised_by_professional
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class PenalisedByProfessionalController @Inject()(
@@ -33,31 +32,32 @@ class PenalisedByProfessionalController @Inject()(
                                                    val authAction: AuthAction,
                                                    val ds: CommonPlayDependencies,
                                                    val cc: MessagesControllerComponents,
-                                                   penalised_by_professional: penalised_by_professional) extends AmlsBaseController(ds, cc) {
+                                                   formProvider: PenalisedByProfessionalFormProvider,
+                                                   view: PenalisedByProfessionalView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
         response =>
           val form = (for {
             supervision <- response
             professionalBody <- supervision.professionalBody
-          } yield Form2[ProfessionalBody](professionalBody)).getOrElse(EmptyForm)
-          Ok(penalised_by_professional(form, edit))
+          } yield formProvider().fill(professionalBody)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[ProfessionalBody](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(penalised_by_professional(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
             _ <- dataCacheConnector.save[Supervision](request.credId, Supervision.key,
               supervision.professionalBody(data))
           } yield Redirect(routes.SummaryController.get)
-      }
+      )
   }
 }

@@ -18,21 +18,20 @@ package controllers.supervision
 
 import controllers.actions.SuccessfulAuthAction
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.supervision.what_you_need
+import views.html.supervision.WhatYouNeedView
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[what_you_need]
+    lazy val view = app.injector.instanceOf[WhatYouNeedView]
     val controller = new WhatYouNeedController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      what_you_need = view)
+      view = view)
   }
 
   "WhatYouNeedController" must {
@@ -42,9 +41,9 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        val pageTitle = Messages("title.wyn") + " - " +
-          Messages("summary.supervision") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
+        val pageTitle = messages("title.wyn") + " - " +
+          messages("summary.supervision") + " - " +
+          messages("title.amls") + " - " + messages("title.gov")
 
         contentAsString(result) must include(pageTitle)
       }

@@ -18,14 +18,14 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
-import javax.inject.{Inject, Singleton}
+import forms.tradingpremises.AgentCompanyDetailsFormProvider
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, RepeatingSection}
-import views.html.tradingpremises.agent_company_details
+import views.html.tradingpremises.AgentCompanyDetailsView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 
@@ -35,31 +35,32 @@ class AgentCompanyDetailsController @Inject()(val dataCacheConnector: DataCacheC
                                               val ds: CommonPlayDependencies,
                                               override val messagesApi: MessagesApi,
                                               val cc: MessagesControllerComponents,
-                                              agent_company_details: agent_company_details,
-                                              implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                              formProvider: AgentCompanyDetailsFormProvider,
+                                              view: AgentCompanyDetailsView,
+                                              implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false) = {
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = {
     authAction.async {
         implicit request =>
           getData[TradingPremises](request.credId, index) map {
             case Some(tp) => {
               val form = tp.agentCompanyDetails match {
-                case Some(data) => Form2[AgentCompanyDetails](data)
-                case None => EmptyForm
+                case Some(data) => formProvider().fill(data)
+                case None => formProvider()
               }
-              Ok(agent_company_details(form, index, edit))
+              Ok(view(form, index, edit))
             }
             case None => NotFound(notFoundView)
           }
     }
   }
 
-  def post(index: Int, edit: Boolean = false) = authAction.async {
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request => {
-        Form2[AgentCompanyDetails](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(agent_company_details(f, index, edit)))
-          case ValidForm(_, data) => {
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, index, edit))),
+          data => {
             for {
               result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_,tp) =>
                 TradingPremises(tp.registeringAgentPremises,
@@ -67,14 +68,15 @@ class AgentCompanyDetailsController @Inject()(val dataCacheConnector: DataCacheC
                   tp.businessStructure, None, Some(data), None, tp.whatDoesYourBusinessDoAtThisAddress,
                   tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
               }
-            } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => TPControllerHelper.redirectToNextPage(result, index, edit)
+            } yield if (edit) {
+              Redirect(routes.CheckYourAnswersController.get(index))
+            } else {
+              TPControllerHelper.redirectToNextPage(result, index, edit)
             }
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
-        }
+        )
       }
   }
 }

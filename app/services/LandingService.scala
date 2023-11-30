@@ -38,6 +38,7 @@ import models.status.RenewalSubmitted
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import play.api.i18n.Messages
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -73,7 +74,7 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
   }
 
   def refreshCache(amlsRefNumber: String, credId: String, accountTypeId: (String, String))
-                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+                  (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[CacheMap] = {
     for {
       viewResponse           <- desConnector.view(amlsRefNumber, accountTypeId)
       subscriptionResponse   <- cacheConnector.fetch[SubscriptionResponse](credId, SubscriptionResponse.key).recover { case _ => None }
@@ -121,7 +122,7 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
   private def upsertCacheEntries(appCache: CacheMap, viewResponse: ViewResponse, subscriptionResponse: Option[SubscriptionResponse],
                                  amendVariationResponse: Option[AmendVariationRenewalResponse], amlsRegistrationNo: String,
                                  accountTypeId: (String, String), cacheId: String)
-                                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+                                (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[CacheMap] = {
 
     val cachedViewResponse = cacheConnector.upsertNewAuth[Option[ViewResponse]](appCache, ViewResponse.key, Some(viewResponse))
 
@@ -251,7 +252,7 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
     Some(viewResponse.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))
 
   private def saveRenewalData(viewResponse: ViewResponse, cacheMap: CacheMap, amlsRegistrationNo: String, accountTypeId: (String, String), cacheId: String)
-                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+                             (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[CacheMap] = {
 
     import models.businessactivities.{InvolvedInOther => BAInvolvedInOther}
     import models.hvd.{PercentageOfCashPaymentOver15000 => HvdRPercentageOfCashPaymentOver15000}

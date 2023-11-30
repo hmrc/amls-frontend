@@ -25,12 +25,18 @@ import play.api.libs.json.Reads.StringReads
 import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 import cats.data.Validated.{Invalid, Valid}
+import models.{Enumerable, WithName}
 import play.api.i18n.Messages
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
 case class Products(items: Set[ItemType]) {
 
 
-  def sorted = {
+  def sorted: Seq[ItemType] = {
+    import Products._
+
     val sortedItemTypes = Seq(Alcohol, Antiques, Caravans, Cars, Clothing, Gold,
       Jewellery, MobilePhones, OtherMotorVehicles, ScrapMetals, Tobacco)
 
@@ -44,63 +50,110 @@ case class Products(items: Set[ItemType]) {
 }
 
 sealed trait ItemType {
-  val value: String =
-    this match {
-      case Alcohol => "01"
-      case Tobacco => "02"
-      case Antiques => "03"
-      case Cars => "04"
-      case OtherMotorVehicles => "05"
-      case Caravans => "06"
-      case Jewellery => "07"
-      case Gold => "08"
-      case ScrapMetals => "09"
-      case MobilePhones => "10"
-      case Clothing => "11"
-      case Other(_) => "12"
-    }
+  val value: String
 
-  def getMessage(implicit messages: Messages): String = this match {
-    case Alcohol => messages("hvd.products.option.01")
-    case Tobacco => messages("hvd.products.option.02")
-    case Antiques => messages("hvd.products.option.03")
-    case Cars => messages("hvd.products.option.04")
-    case OtherMotorVehicles => messages("hvd.products.option.05")
-    case Caravans => messages("hvd.products.option.06")
-    case Jewellery => messages("hvd.products.option.07")
-    case Gold => messages("hvd.products.option.08")
-    case ScrapMetals => messages("hvd.products.option.09")
-    case MobilePhones => messages("hvd.products.option.10")
-    case Clothing => messages("hvd.products.option.11")
-    case Other(x) => x
+  def getMessage(implicit messages: Messages): String = {
+    import Products._
+
+    this match {
+      case Other("") => messages("hvd.products.option.12")
+      case Other(x) => x
+      case itemType => messages(s"hvd.products.option.${itemType.value}")
+    }
   }
 }
 
-case object Alcohol extends ItemType
+object Products extends Enumerable.Implicits {
 
-case object Tobacco extends ItemType
+  case object Alcohol extends WithName("alcohol") with ItemType {
+    override val value: String = "01"
+  }
 
-case object Antiques extends ItemType
+  case object Tobacco extends WithName("tobacco") with ItemType {
+    override val value: String = "02"
+  }
 
-case object Cars extends ItemType
+  case object Antiques extends WithName("antiques") with ItemType {
+    override val value: String = "03"
+  }
 
-case object OtherMotorVehicles extends ItemType
+  case object Cars extends WithName("cars") with ItemType {
+    override val value: String = "04"
+  }
 
-case object Caravans extends ItemType
+  case object OtherMotorVehicles extends WithName("otherMotorVehicles") with ItemType {
+    override val value: String = "05"
+  }
 
-case object Jewellery extends ItemType
+  case object Caravans extends WithName("caravans") with ItemType {
+    override val value: String = "06"
+  }
 
-case object Gold extends ItemType
+  case object Jewellery extends WithName("jewellery") with ItemType {
+    override val value: String = "07"
+  }
 
-case object ScrapMetals extends ItemType
+  case object Gold extends WithName("gold") with ItemType {
+    override val value: String = "08"
+  }
 
-case object MobilePhones extends ItemType
+  case object ScrapMetals extends WithName("scrapMetals") with ItemType {
+    override val value: String = "09"
+  }
 
-case object Clothing extends ItemType
+  case object MobilePhones extends WithName("mobilePhones") with ItemType {
+    override val value: String = "10"
+  }
 
-case class Other(details: String) extends ItemType
+  case object Clothing extends WithName("clothing") with ItemType {
+    override val value: String = "11"
+  }
 
-object Products{
+  case class Other(details: String) extends WithName("other") with ItemType {
+    override val value: String = "12"
+  }
+
+  val all: Seq[ItemType] = Seq(
+    Alcohol,
+    Tobacco,
+    Antiques,
+    Cars,
+    OtherMotorVehicles,
+    Caravans,
+    Jewellery,
+    Gold,
+    ScrapMetals,
+    MobilePhones,
+    Clothing,
+    Other("")
+  )
+
+  def formValues(html: Html)(implicit messages: Messages): Seq[CheckboxItem] = {
+    val allButOther = all.filterNot(_.value == Other("").value).zipWithIndex.map { case (itemType, index) =>
+
+      val conditional = if (itemType.value == Other("").value) Some(html) else None
+
+      CheckboxItem(
+        content = Text(itemType.getMessage),
+        value = itemType.toString,
+        id = Some(s"products_$index"),
+        name = Some(s"products[$index]"),
+        conditionalHtml = conditional
+      )
+    }.sortBy(_.content.asHtml.body)
+
+    val otherCheckbox = CheckboxItem(
+      content = Text(Other("").getMessage),
+      value = Other("").toString,
+      id = Some(s"products_${allButOther.length}"),
+      name = Some(s"products[${allButOther.length}]"),
+      conditionalHtml = Some(html)
+    )
+
+    allButOther :+ otherCheckbox
+  }
+
+  implicit val enumerable: Enumerable[ItemType] = Enumerable(all.map(v => v.toString -> v): _*)
 
   import utils.MappingUtils.Implicits._
 

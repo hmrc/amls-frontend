@@ -19,12 +19,19 @@ package models.tradingpremises
 import jto.validation.{From, Path, Rule, Write}
 import jto.validation.forms._
 import jto.validation.ValidationError
+import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import play.api.libs.json.Writes
 import play.api.libs.json._
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
 
 sealed trait BusinessStructure {
+
+  import models.tradingpremises.BusinessStructure._
+
+  val value: String
   def message(implicit messages: Messages): String =
     this match {
       case SoleProprietor =>
@@ -40,13 +47,27 @@ sealed trait BusinessStructure {
     }
 }
 
-case object SoleProprietor extends BusinessStructure
-case object LimitedLiabilityPartnership extends BusinessStructure
-case object Partnership extends BusinessStructure
-case object IncorporatedBody extends BusinessStructure
-case object UnincorporatedBody extends BusinessStructure
+object BusinessStructure extends Enumerable.Implicits {
 
-object BusinessStructure {
+  case object SoleProprietor extends WithName("soleProprietor") with BusinessStructure {
+    override val value: String = "01"
+  }
+
+  case object LimitedLiabilityPartnership extends WithName("limitedLiabilityPartnership") with BusinessStructure {
+    override val value: String = "02"
+  }
+
+  case object Partnership extends WithName("partnership") with BusinessStructure {
+    override val value: String = "03"
+  }
+
+  case object IncorporatedBody extends WithName("incorporatedBody") with BusinessStructure {
+    override val value: String = "04"
+  }
+
+  case object UnincorporatedBody extends WithName("unincorporatedBody") with BusinessStructure {
+    override val value: String = "05"
+  }
 
   import utils.MappingUtils.Implicits._
 
@@ -95,4 +116,22 @@ object BusinessStructure {
     case UnincorporatedBody =>
       Map("agentsBusinessStructure" -> Seq("05"))
   }
+
+  def formValues()(implicit messages: Messages): Seq[RadioItem] = all.sortBy(_.toString).map { structure =>
+    RadioItem(
+      content = Text(messages(s"businessType.lbl.${structure.value}")),
+      id = Some(structure.toString),
+      value = Some(structure.toString)
+    )
+  }
+
+  val all: Seq[BusinessStructure] = Seq(
+    SoleProprietor,
+    LimitedLiabilityPartnership,
+    Partnership,
+    IncorporatedBody,
+    UnincorporatedBody
+  )
+
+  implicit val enumerable: Enumerable[BusinessStructure] = Enumerable(all.map(v => v.toString -> v): _*)
 }

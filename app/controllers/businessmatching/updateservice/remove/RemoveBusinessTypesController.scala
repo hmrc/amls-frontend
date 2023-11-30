@@ -19,19 +19,19 @@ package controllers.businessmatching.updateservice.remove
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
+import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.businessmatching.RemoveBusinessActivitiesFormProvider
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.AuthAction
-import views.html.businessmatching.updateservice.remove.remove_activities
+import utils.{AuthAction, AuthorisedRequest}
+import views.html.businessmatching.updateservice.remove.RemoveActivitiesView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -43,65 +43,44 @@ class RemoveBusinessTypesController @Inject()(
                                                val removeBusinessTypeHelper: RemoveBusinessTypeHelper,
                                                val router: Router[RemoveBusinessTypeFlowModel],
                                                val cc: MessagesControllerComponents,
-                                               remove_activities: remove_activities) extends AmlsBaseController(ds, cc) {
+                                               formProvider: RemoveBusinessActivitiesFormProvider,
+                                               view: RemoveActivitiesView) extends AmlsBaseController(ds, cc) {
 
-  import models.businessmatching.BusinessActivities._
-
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
         (for {
           model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key))
             .orElse(OptionT.some(RemoveBusinessTypeFlowModel()))
           (_, values) <- getFormData(request.credId)
+          valuesAsActivities = BusinessActivities.all.toSeq diff values.map(BusinessActivities.getBusinessActivity)
+          form = formProvider(valuesAsActivities.length)
         } yield {
-          val form = model.activitiesToRemove.fold[Form2[Set[BusinessActivity]]](EmptyForm)(a => Form2(a))
-          Ok(remove_activities(form, edit, values))
+          val formForView = model.activitiesToRemove.fold(form) { x =>
+            form.fill(x.toSeq)
+          }
+          Ok(view(formForView, edit, valuesAsActivities))
         }) getOrElse InternalServerError("Get: Unable to show remove Activities page. Failed to retrieve data")
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
-
-        val errorMessage = (for {
-          submittedActivities <- businessMatchingService.getSubmittedBusinessActivities(request.credId)
-        } yield {if(submittedActivities.size > 2) {
-          "error.required.bm.remove.service.multiple"
-        } else {
-          "error.required.bm.remove.service"
-        }}).value
-
-        val formData = (for {
+        (for {
           data <- getFormData(request.credId)
-        } yield data).value
-
-        errorMessage.flatMap(msg =>
-              formData flatMap {
-                case Some((names, values)) =>
-                  Form2[Set[BusinessActivity]](request.body)(combinedReader(names.size, msg.getOrElse(""))) match {
-                    case f: InvalidForm => getFormData(request.credId) map {
-                      case (_, values) =>
-                        BadRequest(remove_activities(f, edit, values))
-                    } getOrElse InternalServerError("Post: Invalid form on Remove Activities page")
-
-                    case ValidForm(_, data) =>
-                      (for {
-                        model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key)) orElse OptionT.some(RemoveBusinessTypeFlowModel())
-                        dateApplicable <- removeBusinessTypeHelper.dateOfChangeApplicable(request.credId, data)
-                        servicesChanged <- OptionT.some[Future, Boolean](model.activitiesToRemove.getOrElse(Set.empty) != data)
-                        newModel <- OptionT.some[Future, RemoveBusinessTypeFlowModel](
-                          model.copy(activitiesToRemove = Some(data), dateOfChange = if (!dateApplicable || servicesChanged) None else model.dateOfChange)
-                        )
-                        _ <- OptionT.liftF(dataCacheConnector.save(request.credId, RemoveBusinessTypeFlowModel.key, newModel))
-
-                        route <- OptionT.liftF(router.getRoute(request.credId, WhatBusinessTypesToRemovePageId, newModel, edit))
-                      } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: RemoveActivitiesController")
-
-                  }
-                case None => throw new Exception("An UnknownException has occurred: RemoveActivitiesController")
-              }
-
-        )
-
+          form = formProvider(data._2.size)
+        } yield {
+          form.bindFromRequest().fold(
+            formWithErrors => Future.successful(
+              BadRequest(view(
+                formWithErrors,
+                edit,
+                BusinessActivities.all.toSeq diff data._2.map(BusinessActivities.getBusinessActivity)
+            ))),
+            formValue => saveAndRedirect(formValue, edit)
+          )
+        }).value flatMap {
+          case Some(value) => value
+          case None => Future.successful(InternalServerError("Unexpected error with form submission"))
+        }
       }
 
   private def getFormData(credId: String)(implicit hc: HeaderCarrier) = for {
@@ -117,5 +96,18 @@ class RemoveBusinessTypesController @Inject()(
     val activityValues = activities.toSeq.sortBy(_.getMessage()) map BusinessActivities.getValue
 
     (existingActivityNames, activityValues)
+  }
+
+  private def saveAndRedirect(formValue: Seq[BusinessActivity], edit: Boolean)(implicit request: AuthorisedRequest[AnyContent]): Future[Result] = {
+    (for {
+      model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key)) orElse OptionT.some(RemoveBusinessTypeFlowModel())
+      dateApplicable <- removeBusinessTypeHelper.dateOfChangeApplicable(request.credId, formValue.toSet)
+      servicesChanged <- OptionT.some[Future, Boolean](model.activitiesToRemove.getOrElse(Set.empty) != formValue.toSet)
+      newModel <- OptionT.some[Future, RemoveBusinessTypeFlowModel](
+        model.copy(activitiesToRemove = Some(formValue.toSet), dateOfChange = if (!dateApplicable || servicesChanged) None else model.dateOfChange)
+      )
+      _ <- OptionT.liftF(dataCacheConnector.save(request.credId, RemoveBusinessTypeFlowModel.key, newModel))
+      route <- OptionT.liftF(router.getRoute(request.credId, WhatBusinessTypesToRemovePageId, newModel, edit))
+    } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: RemoveActivitiesController")
   }
 }

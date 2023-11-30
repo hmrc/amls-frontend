@@ -19,14 +19,13 @@ package controllers.responsiblepeople.address
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.responsiblepeople.address.AdditionalAddressNonUKFormProvider
 import models.responsiblepeople._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.address.additional_extra_address_NonUK
-
+import views.html.responsiblepeople.address.AdditionalExtraAddressNonUKView
 
 import scala.concurrent.Future
 
@@ -36,29 +35,34 @@ class AdditionalExtraAddressNonUKController @Inject()(val dataCacheConnector: Da
                                                       autoCompleteService: AutoCompleteService,
                                                       val ds: CommonPlayDependencies,
                                                       val cc: MessagesControllerComponents,
-                                                      additional_extra_address_NonUK: additional_extra_address_NonUK,
-                                                      implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper {
+                                                      formProvider: AdditionalAddressNonUKFormProvider,
+                                                      view: AdditionalExtraAddressNonUKView,
+                                                      implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, Some(ResponsiblePersonAddressHistory(_, _, Some(additionalExtraAddress))), _, _, _, _, _, _, _, _, _, _, _, _)) =>
-          Ok(additional_extra_address_NonUK(Form2[ResponsiblePersonAddress](additionalExtraAddress), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
-          Ok(additional_extra_address_NonUK(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
-        case _ => NotFound(notFoundView)
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.addressHistory) match {
+            case (Some(name), Some(ResponsiblePersonAddressHistory(_, _, Some(additionalExtraAddress)))) =>
+              Ok(view(formProvider().fill(additionalExtraAddress), edit, index, flow, name.titleName, autoCompleteService.formOptionsExcludeUK))
+            case (Some(name), _) =>
+              Ok(view(formProvider(), edit, index, flow, name.titleName, autoCompleteService.formOptionsExcludeUK))
+            case _ => NotFound(notFoundView)
+          }
+        }
       }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
     authAction.async {
       implicit request =>
-        (Form2[ResponsiblePersonAddress](request.body) match {
-          case f: InvalidForm =>
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(additional_extra_address_NonUK(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
-            }
-          case ValidForm(_, data) => {
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.formOptionsExcludeUK))
+            },
+          data => {
             getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
               (for {
                 rp <- responsiblePerson
@@ -70,7 +74,7 @@ class AdditionalExtraAddressNonUKController @Inject()(val dataCacheConnector: Da
               }) getOrElse updateAdditionalExtraAddressAndRedirect(request.credId, data, index, edit, flow)
             }
           }
-        }).recoverWith {
+        ).recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }

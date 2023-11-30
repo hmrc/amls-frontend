@@ -21,18 +21,17 @@ import cats.implicits._
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
+import forms.businessmatching.MsbSubSectorsFormProvider
 import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, SubSectorsPageId}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import utils.AuthAction
-import views.html.businessmatching.updateservice.add.msb_subservices
+import views.html.businessmatching.updateservice.add.MsbSubSectorsView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
-
 
 @Singleton
 class SubSectorsController @Inject()(authAction: AuthAction,
@@ -42,37 +41,35 @@ class SubSectorsController @Inject()(authAction: AuthAction,
                                      val router: Router[AddBusinessTypeFlowModel],
                                      val config:ApplicationConfig,
                                      val cc: MessagesControllerComponents,
-                                     msb_subservices: msb_subservices) extends AmlsBaseController(ds, cc) {
+                                     formProvider: MsbSubSectorsFormProvider,
+                                     view: MsbSubSectorsView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
         (for {
           model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key)) orElse OptionT.some(AddBusinessTypeFlowModel())
         } yield {
           val flowSubServices: Set[BusinessMatchingMsbService] = model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices
-          val form: Form2[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(flowSubServices))
+          val form = formProvider().fill(flowSubServices.toSeq)
 
-          Ok(msb_subservices(form, edit, config.fxEnabledToggle))
+          Ok(view(form, edit, config.fxEnabledToggle))
         }) getOrElse InternalServerError("Get: Unable to show Sub-Services page. Failed to retrieve data")
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
-        import jto.validation.forms.Rules._
-        Form2[BusinessMatchingMsbServices](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(msb_subservices(f, edit, config.fxEnabledToggle)))
-          case ValidForm(_, data) => {
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, edit, config.fxEnabledToggle))),
+          data =>
             dataCacheConnector.update[AddBusinessTypeFlowModel](request.credId, AddBusinessTypeFlowModel.key) {
-              case Some(model) => {
-                model.msbServices(data)
-              }
+              case Some(model) =>
+                model.msbServices(BusinessMatchingMsbServices(data.toSet))
               case _ => throw new Exception("An Unknown Exception has occurred")
             } flatMap {
               case Some(model) => router.getRoute(request.credId, SubSectorsPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: SubServicesController"))
             }
-          }
-        }
+        )
   }
 }

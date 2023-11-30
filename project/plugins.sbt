@@ -16,5 +16,6 @@ addSbtPlugin("org.scoverage"      %% "sbt-scoverage"          % "2.0.6")
 addSbtPlugin("org.scalastyle"     %% "scalastyle-sbt-plugin"  % "1.0.0")
 addSbtPlugin("com.typesafe.sbt"   %  "sbt-digest"             % "1.1.3")
 addSbtPlugin("net.virtual-void"   %  "sbt-dependency-graph"   % "0.9.2")
+addSbtPlugin("org.irundaia.sbt"   % "sbt-sassify"             % "1.4.12")
 
 

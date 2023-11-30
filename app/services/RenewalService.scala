@@ -20,32 +20,58 @@ import cats.data.OptionT
 import cats.data.Validated.Valid
 import cats.implicits._
 import connectors.DataCacheConnector
-import javax.inject.{Inject, Singleton}
+import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.businessmatching._
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress.{Completed, NotStarted, Started, TaskRow, Updated}
 import models.renewal.Renewal.ValidationRules._
 import models.renewal._
+import play.api.i18n.Messages
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.MappingUtils._
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
-  def getSection(credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
+  def getTaskRow(credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, messages: Messages) = {
 
-    val notStarted = Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get)
+    val notStarted = TaskRow(
+      Renewal.sectionKey,
+      controllers.renewal.routes.WhatYouNeedController.get.url,
+      hasChanged = false,
+      NotStarted,
+      TaskRow.notStartedTag
+    )
 
     this.getRenewal(credId).flatMap {
       case Some(model) =>
         isRenewalComplete(model, credId) flatMap { x =>
           if (x) {
-            Future.successful(Section(Renewal.sectionKey, Completed, model.hasChanged, controllers.renewal.routes.SummaryController.get))
+            Future.successful(
+              TaskRow(
+                Renewal.sectionKey,
+                controllers.renewal.routes.SummaryController.get.url,
+                model.hasChanged,
+                Completed,
+                TaskRow.completedTag
+              )
+            )
           } else {
             model match {
               case Renewal(None, None, None, None, None, _, _, _, _, _, _, _, _, _, _, _, _, _) => Future.successful(notStarted)
-              case _ => Future.successful(Section(Renewal.sectionKey, Started, model.hasChanged, controllers.renewal.routes.WhatYouNeedController.get))
+              case _ => Future.successful(
+                TaskRow(
+                  Renewal.sectionKey,
+                  controllers.renewal.routes.WhatYouNeedController.get.url,
+                  model.hasChanged,
+                  Started,
+                  TaskRow.incompleteTag
+                )
+              )
             }
           }
         }
@@ -53,13 +79,14 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     }
   }
 
-  def getRenewal(cacheId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) =
+  def getRenewal(cacheId: String)(implicit headerCarrier: HeaderCarrier): Future[Option[Renewal]] =
     dataCache.fetch[Renewal](cacheId, Renewal.key)
 
-  def updateRenewal(credId: String, renewal: Renewal)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) =
+  // TODO make private and update usages to new update function
+  def updateRenewal(credId: String, renewal: Renewal)(implicit headerCarrier: HeaderCarrier): Future[CacheMap] =
     dataCache.save[Renewal](credId, Renewal.key, renewal)
 
-  def isRenewalComplete(renewal: Renewal, credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
+  def isRenewalComplete(renewal: Renewal, credId: String)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = {
 
     val isComplete = for {
       cache <- OptionT(dataCache.fetchAll(credId))
@@ -163,10 +190,34 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     }
   }
 
-  def canSubmit(renewalSection: Section, variationSections: Seq[Section]) = {
-    variationSections.forall(_.status == Completed) &&
+  def canSubmit(renewalSection: TaskRow, variationSections: Seq[TaskRow]) = {
+    variationSections.forall(row => row.status == Completed || row.status == Updated) &&
             !renewalSection.status.equals(Started) &&
             (variationSections :+ renewalSection).exists(_.hasChanged)
   }
 
+  def getFirstBusinessActivityInLowercase(cacheId: String)
+                                         (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Option[String]] = {
+    getBusinessMatching(cacheId)
+      .map(optBm => optBm.flatMap(bm => bm.alphabeticalBusinessActivitiesLowerCase())
+        .flatMap(activities => if (activities.length == 1) activities.headOption else None))
+  }
+
+  def getBusinessMatching(cacheId: String)(implicit headerCarrier: HeaderCarrier): Future[Option[BusinessMatching]] =
+    dataCache.fetch[BusinessMatching](cacheId, BusinessMatching.key)
+
+  /*
+   TODO:
+    - Update controllers usages of updateRenewal with this
+    - Make old method private
+   */
+  def fetchAndUpdateRenewal(credId: String, updateAction: Renewal => Renewal)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, CacheMap]] = {
+
+    dataCache.fetchAll(credId).flatMap {
+      _.flatMap(_.getEntry[Renewal](Renewal.sectionKey))
+        .map(renewal => updateRenewal(credId, updateAction(renewal)))
+        .toRight("Unable to get data from the cache")
+        .sequence
+    }
+  }
 }

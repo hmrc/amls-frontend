@@ -16,18 +16,18 @@
 
 package controllers.renewal
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.Country
+import models.businessmatching.BusinessActivity._
 import models.businessmatching._
 import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import play.api.i18n.Messages
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContentAsFormUrlEncoded, Request, Result}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -41,7 +41,6 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     self =>
     val request = addToken(authRequest)
 
-    val dataCacheConnector = mock[DataCacheConnector]
     val renewalService = mock[RenewalService]
     val authAction = SuccessfulAuthAction
 
@@ -50,7 +49,6 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[RenewalService].to(renewalService))
       .overrides(bind[AuthAction].to(authAction))
       .build()
@@ -63,7 +61,8 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
     def formData(data: Option[Request[AnyContentAsFormUrlEncoded]]) = data match {
       case Some(d) => d
-      case None => requestWithUrlEncodedBody("isOutside" -> "true")
+      case None => FakeRequest(POST, routes.CustomersOutsideUKController.post().url)
+        .withFormUrlEncodedBody("isOutside" -> "true")
     }
 
     def formRequest(data: Option[Request[AnyContentAsFormUrlEncoded]]) = formData(data)
@@ -76,12 +75,8 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     val customersOutsideIsUK = CustomersOutsideIsUK(true)
 
     when {
-      renewalService.updateRenewal(any(),any())(any(), any())
-    } thenReturn Future.successful(cache)
-
-    when {
-      dataCacheConnector.fetchAll(any())(any())
-    } thenReturn Future.successful(Some(cache))
+      renewalService.fetchAndUpdateRenewal(any(), any())(any(), any())
+    } thenReturn Future.successful(Right(cache))
 
     when {
       cache.getEntry[Renewal](Renewal.key)
@@ -125,7 +120,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     "get is called" must {
       "load the page" in new Fixture {
 
-        when(renewalService.getRenewal(any())(any(), any()))
+        when(renewalService.getRenewal(any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -133,16 +128,16 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        val pageTitle = Messages("renewal.customer.outside.uk.title") + " - " +
-          Messages("summary.renewal") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
+        val pageTitle = messages("renewal.customer.outside.uk.title") + " - " +
+          messages("summary.renewal") + " - " +
+          messages("title.amls") + " - " + messages("title.gov")
 
         document.title() mustBe pageTitle
       }
 
       "pre-populate the Customer outside UK Page" in new Fixture {
 
-        when(renewalService.getRenewal(any())(any(), any()))
+        when(renewalService.getRenewal(any())(any()))
           .thenReturn(Future.successful(Some(Renewal(customersOutsideIsUK = Some(CustomersOutsideIsUK(true))))))
 
         val result = controller.get()(request)
@@ -182,7 +177,10 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
           "user answers no, not in edit mode and business is an hvd" in new FormSubmissionFixture {
             post(
               businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing)))),
-              data = Some(addToken(authRequest.withFormUrlEncodedBody("isOutside" -> "false")))
+              data = Some(addToken(
+                FakeRequest(POST, routes.CustomersOutsideIsUKController.post().url)
+                  .withFormUrlEncodedBody("isOutside" -> "false")
+              ))
             ) { result =>
               result.header.status mustBe SEE_OTHER
               result.header.headers.get("Location") mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)

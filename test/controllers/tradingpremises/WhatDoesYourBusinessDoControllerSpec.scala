@@ -19,7 +19,10 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.DateOfChangeFormProvider
+import forms.tradingpremises.WhatDoesYourBusinessDoFormProvider
 import models.businessactivities.{BusinessActivities, ExpectedBusinessTurnover, InvolvedInOtherYes}
+import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady}
 import models.tradingpremises._
@@ -33,18 +36,19 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.auth.core.AffinityGroup.Individual
 import uk.gov.hmrc.auth.core.{Enrolments, User}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedRequest}
-import views.html.date_of_change
-import views.html.tradingpremises.what_does_your_business_do
+import utils.{AmlsSpec, AuthorisedRequest, DateHelper}
+import views.html.DateOfChangeView
+import views.html.tradingpremises.WhatDoesYourBusinessDoView
 
 import scala.concurrent.Future
 
-class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter {
+class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val mockCacheMap = mock[CacheMap]
@@ -57,16 +61,18 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view1 = app.injector.instanceOf[what_does_your_business_do]
-    lazy val view2 = app.injector.instanceOf[date_of_change]
+    lazy val view1 = inject[WhatDoesYourBusinessDoView]
+    lazy val view2 = inject[DateOfChangeView]
 
     val whatDoesYourBusinessDoController = new WhatDoesYourBusinessDoController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       cc = mockMcc,
-      what_does_your_business_do = view1,
-      date_of_change = view2,
+      formProvider = inject[WhatDoesYourBusinessDoFormProvider],
+      dateChangeFormProvider = inject[DateOfChangeFormProvider],
+      activitiesView = view1,
+      dateChangeView = view2,
       error = errorView
     )
 
@@ -80,7 +86,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
     when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
       .thenReturn(Future.successful(Some(mockCacheMap)))
 
-    when(whatDoesYourBusinessDoController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).
+    when(whatDoesYourBusinessDoController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())).
       thenReturn(Future.successful(SubmissionReady))
   }
 
@@ -108,7 +114,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           status(result) must be(OK)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select(s"input[id=activities-01]").hasAttr("checked") must be(false)
+          document.getElementById("value_1").hasAttr("checked") must be(false)
         }
 
         "there is data - with form populated" in new Fixture {
@@ -132,8 +138,9 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           val document: Document = Jsoup.parse(contentAsString(result))
 
           status(result) must be(OK)
-          document.select(s"input[id=activities-01]").hasAttr("checked") must be(true)
 
+          document.getElementById("value_1").hasAttr("checked") must be(true)
+          document.getElementById("value_3").hasAttr("checked") must be(true)
         }
       }
 
@@ -203,7 +210,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           val result = whatDoesYourBusinessDoController.get(recordId1, true)(request)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId1).url))
+          redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(recordId1).url))
         }
       }
 
@@ -240,8 +247,9 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
-          val invalidRequest = requestWithUrlEncodedBody(
-            "activities" -> ""
+          val invalidRequest = FakeRequest(POST, routes.WhatDoesYourBusinessDoController.post(1, false).url)
+          .withFormUrlEncodedBody(
+            "value[1]" -> ""
           )
           val result = whatDoesYourBusinessDoController.post(recordId1)(invalidRequest)
 
@@ -263,11 +271,12 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
 
-          val newRequest = requestWithUrlEncodedBody("activities[0]" -> "01")
+          val newRequest = FakeRequest(POST, routes.WhatDoesYourBusinessDoController.post(1, true).url)
+          .withFormUrlEncodedBody("value[1]" -> AccountancyServices.toString)
 
           val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId1).url))
+          redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(recordId1).url))
         }
 
 
@@ -283,15 +292,16 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
-          val newRequest = requestWithUrlEncodedBody(
-            "activities[0]" -> "01",
-            "activities[1]" -> "02",
-            "activities[2]" -> "03"
+          val newRequest = FakeRequest(POST, routes.WhatDoesYourBusinessDoController.post(1, false).url)
+          .withFormUrlEncodedBody(
+            "value[1]" -> AccountancyServices.toString,
+            "value[2]" -> ArtMarketParticipant.toString,
+            "value[3]" -> BillPaymentServices.toString
           )
 
           val result = whatDoesYourBusinessDoController.post(recordId1)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId1).url))
+          redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(recordId1).url))
         }
 
         "given a valid request and money services were specified" must {
@@ -309,7 +319,10 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
             when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
               .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
 
-            val newRequest = requestWithUrlEncodedBody("activities[0]" -> "01", "activities[1]" -> "06")
+            val newRequest = FakeRequest(POST, routes.WhatDoesYourBusinessDoController.post(1, true).url)
+            .withFormUrlEncodedBody(
+              "value[1]" -> AccountancyServices.toString, "value[2]" -> MoneyServiceBusiness.toString
+            )
 
             val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -322,7 +335,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
           "redirect to the dateOfChange page when no money services have been added" in new Fixture {
 
-            when(whatDoesYourBusinessDoController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).
+            when(whatDoesYourBusinessDoController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())).
               thenReturn(Future.successful(SubmissionDecisionApproved))
 
             val model = WhatDoesYourBusinessDo(Set(AccountancyServices))
@@ -336,7 +349,10 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
             when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
               .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
 
-            val newRequest = requestWithUrlEncodedBody("activities[0]" -> "02", "activities[1]" -> "01")
+            val newRequest = FakeRequest(POST, routes.WhatDoesYourBusinessDoController.post(1, true).url)
+            .withFormUrlEncodedBody(
+              "value[1]" -> ArtMarketParticipant.toString, "value[2]" -> AccountancyServices.toString
+            )
 
             val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -350,7 +366,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
           "redirect to the dateOfChange page when no money services have been added" in new Fixture {
 
-            when(whatDoesYourBusinessDoController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).
+            when(whatDoesYourBusinessDoController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())).
               thenReturn(Future.successful(ReadyForRenewal(None)))
 
             val model = WhatDoesYourBusinessDo(Set(AccountancyServices))
@@ -364,7 +380,10 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
             when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
               .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesSingle))))
 
-            val newRequest = requestWithUrlEncodedBody("activities[0]" -> "02", "activities[1]" -> "01")
+            val newRequest = FakeRequest(POST, routes.WhatDoesYourBusinessDoController.post(1, true).url)
+            .withFormUrlEncodedBody(
+              "value[1]" -> ArtMarketParticipant.toString, "value[2]" -> AccountancyServices.toString
+            )
 
             val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -385,25 +404,27 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
-          val newRequest = requestWithUrlEncodedBody(
-            "activities[0]" -> "01",
-            "activities[1]" -> "02",
-            "activities[2]" -> "03"
+          val newRequest = FakeRequest(POST, routes.WhatDoesYourBusinessDoController.post(1, true).url)
+          .withFormUrlEncodedBody(
+            "value[1]" -> AccountancyServices.toString,
+            "value[2]" -> ArtMarketParticipant.toString,
+            "value[3]" -> BillPaymentServices.toString
           )
 
           val result = whatDoesYourBusinessDoController.post(recordId1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId1).url))
+          redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(recordId1).url))
         }
       }
 
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "activities[0]" -> "01",
-          "activities[1]" -> "03",
-          "activities[2]" -> "04"
+        val newRequest = FakeRequest(POST, routes.WhatDoesYourBusinessDoController.post(1, false).url)
+        .withFormUrlEncodedBody(
+          "value[1]" -> AccountancyServices.toString,
+          "value[2]" -> BillPaymentServices.toString,
+          "value[3]" -> EstateAgentBusinessService.toString
         )
 
         when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -418,7 +439,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
         val result = whatDoesYourBusinessDoController.post(1)(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+        redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
         verify(mockDataCacheConnector).save[Seq[TradingPremises]](
           any(),
@@ -443,11 +464,42 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
     "the dateOfChange action is posted to" must {
 
+      "return 400 when given date is before start date" in new Fixture {
+
+        val postRequest = FakeRequest(POST, routes.WhatDoesYourBusinessDoController.saveDateOfChange(1).url)
+          .withFormUrlEncodedBody(
+            "dateOfChange.year" -> "2010",
+            "dateOfChange.month" -> "10",
+            "dateOfChange.day" -> "01"
+          )
+
+        val date = new LocalDate(2011, 10, 1)
+
+        val authorisedRequest = AuthorisedRequest(postRequest, Some("REF"), "CREDID", Individual, Enrolments(Set()), ("TYPE", "ID"), Some("GROUPID"), Some(User))
+
+        val data = WhatDoesYourBusinessDo(Set(AccountancyServices))
+
+        val yourPremises = mock[YourTradingPremises]
+        when(yourPremises.startDate) thenReturn Some(date)
+
+        val premises = TradingPremises(yourTradingPremises = Some(yourPremises), whatDoesYourBusinessDoAtThisAddress = Some(data))
+
+        when(whatDoesYourBusinessDoController.dataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any(), any()))
+          .thenReturn(Future.successful(Some(Seq(premises))))
+
+        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
+          (any(), any())).thenReturn(Future.successful(Some(Seq(premises))))
+
+        val result = whatDoesYourBusinessDoController.saveDateOfChange(1)(authorisedRequest)
+
+        status(result) must be(BAD_REQUEST)
+        contentAsString(result) must include(messages("error.expected.tp.dateofchange.after.startdate", DateHelper.formatDate(date)))
+      }
+
       "update the dateOfChange field in the data" in new Fixture {
 
-
-
-        val postRequest = requestWithUrlEncodedBody(
+        val postRequest = FakeRequest(POST, routes.WhatDoesYourBusinessDoController.saveDateOfChange(1).url)
+          .withFormUrlEncodedBody(
           "dateOfChange.year" -> "2010",
           "dateOfChange.month" -> "10",
           "dateOfChange.day" -> "01"
@@ -475,7 +527,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
         val result = whatDoesYourBusinessDoController.saveDateOfChange(1)(authorisedRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+        redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
         val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
         verify(whatDoesYourBusinessDoController.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(TradingPremises.key), captor.capture())(any(), any())

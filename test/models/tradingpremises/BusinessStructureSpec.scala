@@ -17,8 +17,9 @@
 package models.tradingpremises
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Path, Invalid, Valid}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
+import models.tradingpremises.BusinessStructure._
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class BusinessStructureSpec extends PlaySpec {

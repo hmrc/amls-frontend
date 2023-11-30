@@ -16,50 +16,39 @@
 
 package models.businessactivities
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
 import models.renewal.BusinessTurnover
+import models.{Enumerable, WithName}
 import play.api.libs.json._
 
-sealed trait ExpectedBusinessTurnover
+sealed trait ExpectedBusinessTurnover {
+  val value: String
+}
 
-object ExpectedBusinessTurnover {
+object ExpectedBusinessTurnover extends Enumerable.Implicits {
 
-  case object First extends ExpectedBusinessTurnover
-  case object Second extends ExpectedBusinessTurnover
-  case object Third extends ExpectedBusinessTurnover
-  case object Fourth extends ExpectedBusinessTurnover
-  case object Fifth extends ExpectedBusinessTurnover
-  case object Sixth extends ExpectedBusinessTurnover
-  case object Seventh extends ExpectedBusinessTurnover
+  case object First extends WithName("zeroPlus") with ExpectedBusinessTurnover {
+    override val value: String = "01"
+  }
+  case object Second extends WithName("fifteenThousandPlus") with ExpectedBusinessTurnover {
+    override val value: String = "02"
+  }
+  case object Third extends WithName("fiftyThousandPlus") with ExpectedBusinessTurnover {
+    override val value: String = "03"
+  }
+  case object Fourth extends WithName("oneHundredThousandPlus") with ExpectedBusinessTurnover {
+    override val value: String = "04"
+  }
+  case object Fifth extends WithName("twoHundredFiftyThousandPlus") with ExpectedBusinessTurnover {
+    override val value: String = "05"
+  }
+  case object Sixth extends WithName("oneMillionPlus") with ExpectedBusinessTurnover {
+    override val value: String = "06"
+  }
+  case object Seventh extends WithName("tenMillionPlus") with ExpectedBusinessTurnover {
+    override val value: String = "07"
+  }
 
   import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, ExpectedBusinessTurnover] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "expectedBusinessTurnover").read[String].withMessage("error.required.ba.business.turnover") flatMap {
-      case "01" => First
-      case "02" => Second
-      case "03" => Third
-      case "04" => Fourth
-      case "05" => Fifth
-      case "06" => Sixth
-      case "07" => Seventh
-      case _ =>
-        (Path \ "expectedBusinessTurnover") -> Seq(ValidationError("error.invalid"))
-    }
-  }
-
-  implicit val formWrites: Write[ExpectedBusinessTurnover, UrlFormEncoded] = Write {
-    case First => "expectedBusinessTurnover" -> "01"
-    case Second => "expectedBusinessTurnover" -> "02"
-    case Third => "expectedBusinessTurnover" -> "03"
-    case Fourth => "expectedBusinessTurnover" -> "04"
-    case Fifth => "expectedBusinessTurnover" -> "05"
-    case Sixth => "expectedBusinessTurnover" -> "06"
-    case Seventh => "expectedBusinessTurnover" -> "07"
-  }
 
   implicit val jsonReads = {
     import play.api.libs.json.Reads.StringReads
@@ -97,4 +86,15 @@ object ExpectedBusinessTurnover {
     case _ => throw new Exception("Invalid business turnover value")
   }
 
+  val all: Seq[ExpectedBusinessTurnover] = Seq(
+    First,
+    Second,
+    Third,
+    Fourth,
+    Fifth,
+    Sixth,
+    Seventh
+  )
+
+  implicit val enumerable: Enumerable[ExpectedBusinessTurnover] = Enumerable(all.map(v => v.toString -> v): _*)
 }

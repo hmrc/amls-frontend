@@ -21,7 +21,10 @@ import cats.implicits._
 import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
+import forms.businessmatching.MsbSubSectorsFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
+import models.businessmatching.BusinessActivity.{AccountancyServices, MoneyServiceBusiness}
+import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, SubSectorsPageId}
 import models.moneyservicebusiness.MoneyServiceBusinessTestData
@@ -29,12 +32,12 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.updateservice.add.msb_subservices
-
+import views.html.businessmatching.updateservice.add.MsbSubSectorsView
 
 import scala.concurrent.Future
 
@@ -49,7 +52,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-    lazy val view = app.injector.instanceOf[msb_subservices]
+    lazy val view = app.injector.instanceOf[MsbSubSectorsView]
     val controller = new SubSectorsController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
@@ -57,7 +60,8 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       router = createRouter[AddBusinessTypeFlowModel],
       config = config,
       cc = mockMcc,
-      msb_subservices = view
+      formProvider = app.injector.instanceOf[MsbSubSectorsFormProvider],
+      view = view
     )
 
 
@@ -78,6 +82,22 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
   "SubServicesController" when {
 
     "get is called" must {
+
+      "return OK with 'msb_subservices' unpopulated view when cache is empty" in new Fixture {
+
+        when(config.fxEnabledToggle) thenReturn true
+        mockCacheFetch(None)
+        val result = controller.get()(request)
+
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("businessmatching.updateservice.msb.services.heading"))
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("input[type=checkbox]").size mustBe 5
+        document.select("input[type=checkbox][checked]").size mustBe 0
+        document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
+      }
+
       "return OK with 'msb_subservices' populated view and FXtoggle is enabled" in new Fixture {
 
         when(config.fxEnabledToggle) thenReturn true
@@ -91,8 +111,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[type=checkbox]").size mustBe 5
         document.select("input[type=checkbox][checked]").size mustBe 2
-        document.select(".amls-error-summary").size mustBe 0
-
+        document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
       }
 
       "return OK with 'msb_subservices' populated view and FXtoggle is not enabled" in new Fixture {
@@ -108,8 +127,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[type=checkbox]").size mustBe 4
         document.select("input[type=checkbox][checked]").size mustBe 2
-        document.select(".amls-error-summary").size mustBe 0
-
+        document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
       }
     }
 
@@ -125,7 +143,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[type=checkbox]").size mustBe 4
       document.select("input[type=checkbox][checked]").size mustBe 0
-      document.select(".amls-error-summary").size mustBe 0
+      document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
     }
 
     "return OK with a 'msb_subservices' not populated view and FXtoggle is enabled" in new Fixture {
@@ -139,7 +157,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[type=checkbox]").size mustBe 5
       document.select("input[type=checkbox][checked]").size mustBe 0
-      document.select(".amls-error-summary").size mustBe 0
+      document.getElementsByClass("govuk-list govuk-error-summary__list").size mustBe 0
     }
 
 
@@ -147,7 +165,9 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
       "return a bad request when no data has been posted" in new Fixture {
 
-        val result = controller.post()(requestWithUrlEncodedBody("" -> ""))
+        val result = controller.post()(FakeRequest(POST, routes.SubSectorsController.post().url)
+          .withFormUrlEncodedBody("" -> "")
+        )
 
         status(result) mustBe BAD_REQUEST
       }
@@ -157,9 +177,11 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
           mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
             hasChanged = true))
 
-          val result = controller.post()(requestWithUrlEncodedBody(
-            "msbServices[]" -> "01"
-          ))
+          val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
+            "value[1]" -> TransmittingMoney.toString
+          )
+
+          val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
           controller.router.verify("internalId", SubSectorsPageId,
@@ -175,10 +197,12 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             hasChanged = true)
           )
 
-          val result = controller.post()(requestWithUrlEncodedBody(
-            "msbServices[]" -> "03",
-            "msbServices[]" -> "04"
-          ))
+          val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
+            "value[1]" -> ChequeCashingNotScrapMetal.toString,
+            "value[2]" -> ChequeCashingScrapMetal.toString
+          )
+
+          val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
           controller.router.verify("internalId", SubSectorsPageId,
@@ -195,10 +219,12 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             hasChanged = true)
           )
 
-          val result = controller.post()(requestWithUrlEncodedBody(
-            "msbServices[]" -> "03",
-            "msbServices[]" -> "04"
-          ))
+          val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
+            "value[1]" -> ChequeCashingNotScrapMetal.toString,
+            "value[2]" -> ChequeCashingScrapMetal.toString
+          )
+
+          val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
           controller.router.verify("internalId", SubSectorsPageId,
@@ -215,10 +241,12 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             hasChanged = true)
           )
 
-          val result = controller.post()(requestWithUrlEncodedBody(
-            "msbServices[]" -> "03",
-            "msbServices[]" -> "04"
-          ))
+          val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
+            "value[1]" -> ChequeCashingNotScrapMetal.toString,
+            "value[2]" -> ChequeCashingScrapMetal.toString
+          )
+
+          val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
           controller.router.verify("internalId", SubSectorsPageId,
@@ -235,16 +263,34 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
             hasChanged = true)
           )
 
-          val result = controller.post()(requestWithUrlEncodedBody(
-            "msbServices[]" -> "03",
-            "msbServices[]" -> "04"
-          ))
+          val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
+            "value[1]" -> ChequeCashingNotScrapMetal.toString,
+            "value[2]" -> ChequeCashingScrapMetal.toString
+          )
+
+          val result = controller.post()(newRequest)
 
           status(result) mustBe SEE_OTHER
           controller.router.verify("internalId", SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               hasChanged = true))
+        }
+      }
+
+      "return 500" when {
+
+        "update returns None" in new Fixture {
+
+          when(mockCacheConnector.update[AddBusinessTypeFlowModel](any(), any())(any())(any(), any()))
+            .thenReturn(Future.successful(None))
+
+          val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(
+            "value[1]" -> ChequeCashingNotScrapMetal.toString,
+            "value[2]" -> ChequeCashingScrapMetal.toString
+          )
+
+          status(controller.post()(newRequest)) mustBe INTERNAL_SERVER_ERROR
         }
       }
     }

@@ -19,24 +19,24 @@ package controllers.businessactivities
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import play.api.mvc.MessagesControllerComponents
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, WhoIsYourAccountantName}
+import forms.businessactivities.WhoIsYourAccountantNameFormProvider
+import models.businessactivities.BusinessActivities
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AutoCompleteService
 import utils.AuthAction
-import views.html.businessactivities.who_is_your_accountant
-
+import views.html.businessactivities.WhoIsYourAccountantNameView
 
 import scala.concurrent.Future
 
 class WhoIsYourAccountantNameController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                              val autoCompleteService: AutoCompleteService,
-                                              val authAction: AuthAction,
-                                              val ds: CommonPlayDependencies,
-                                              val cc: MessagesControllerComponents,
-                                                  who_is_your_accountant: who_is_your_accountant) extends AmlsBaseController(ds, cc) {
+                                                  val autoCompleteService: AutoCompleteService,
+                                                  val authAction: AuthAction,
+                                                  val ds: CommonPlayDependencies,
+                                                  val cc: MessagesControllerComponents,
+                                                  formProvider: WhoIsYourAccountantNameFormProvider,
+                                                  view: WhoIsYourAccountantNameView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
@@ -44,18 +44,18 @@ class WhoIsYourAccountantNameController @Inject()(val dataCacheConnector: DataCa
             businessActivities <- response
             whoIsYourAccountant <- businessActivities.whoIsYourAccountant.flatMap(acc => acc.names)
           } yield {
-            Form2[WhoIsYourAccountantName](whoIsYourAccountant)
-          }).getOrElse(EmptyForm)
-          Ok(who_is_your_accountant(form, edit))
+            formProvider().fill(whoIsYourAccountant)
+          }).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit : Boolean = false) = authAction.async {
+  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[WhoIsYourAccountantName](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(who_is_your_accountant(f, edit)))
-        case ValidForm(_, data) => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => {
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
@@ -67,6 +67,6 @@ class WhoIsYourAccountantNameController @Inject()(val dataCacheConnector: DataCa
             Redirect(routes.WhoIsYourAccountantIsUkController.get())
           }
         }
-      }
+      )
   }
 }

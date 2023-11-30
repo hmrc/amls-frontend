@@ -19,20 +19,37 @@ package models.renewal
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
+import models.{Enumerable, WithName}
 import models.businessactivities.ExpectedAMLSTurnover
 import play.api.libs.json._
 
-sealed trait AMLSTurnover
+sealed trait AMLSTurnover {
+  val value: String
+}
 
-object AMLSTurnover {
+object AMLSTurnover extends Enumerable.Implicits {
 
-  case object First extends AMLSTurnover
-  case object Second extends AMLSTurnover
-  case object Third extends AMLSTurnover
-  case object Fourth extends AMLSTurnover
-  case object Fifth extends AMLSTurnover
-  case object Sixth extends AMLSTurnover
-  case object Seventh extends AMLSTurnover
+  case object First extends WithName("zeroPlus") with AMLSTurnover {
+    override val value: String = "01"
+  }
+  case object Second extends WithName("fifteenThousandPlus") with AMLSTurnover {
+    override val value: String = "02"
+  }
+  case object Third extends WithName("fiftyThousandPlus") with AMLSTurnover {
+    override val value: String = "03"
+  }
+  case object Fourth extends WithName("oneHundredThousandPlus") with AMLSTurnover {
+    override val value: String = "04"
+  }
+  case object Fifth extends WithName("twoHundredFiftyThousandPlus") with AMLSTurnover {
+    override val value: String = "05"
+  }
+  case object Sixth extends WithName("oneMillionPlus") with AMLSTurnover {
+    override val value: String = "06"
+  }
+  case object Seventh extends WithName("tenMillionPlus") with AMLSTurnover {
+    override val value: String = "07"
+  }
 
   import utils.MappingUtils.Implicits._
 
@@ -113,4 +130,16 @@ object AMLSTurnover {
     case AMLSTurnover.Seventh => ExpectedAMLSTurnover.Seventh
     case _ => throw new Exception("Invalid AMLS turnover")
   }
+
+  val all: Seq[AMLSTurnover] = Seq(
+    First,
+    Second,
+    Third,
+    Fourth,
+    Fifth,
+    Sixth,
+    Seventh
+  )
+
+  implicit val enumerable: Enumerable[AMLSTurnover] = Enumerable(all.map(v => v.toString -> v): _*)
 }

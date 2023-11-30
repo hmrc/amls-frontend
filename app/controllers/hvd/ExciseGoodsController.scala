@@ -18,17 +18,18 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.hvd.ExciseGoodsFormProvider
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+
 import javax.inject.Inject
-import models.businessmatching.HighValueDealing
+import models.businessmatching.BusinessActivity.HighValueDealing
 import models.hvd.{ExciseGoods, Hvd}
-import play.api.mvc.{Call, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
-
 import utils.DateOfChangeHelper
-import views.html.hvd.excise_goods
+import views.html.hvd.ExciseGoodsView
 
 import scala.concurrent.Future
 
@@ -38,37 +39,38 @@ class ExciseGoodsController @Inject() (val dataCacheConnector: DataCacheConnecto
                                        val ds: CommonPlayDependencies,
                                        val serviceFlow: ServiceFlow,
                                        val cc: MessagesControllerComponents,
-                                       excise_goods: excise_goods) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                                       formProvider: ExciseGoodsFormProvider,
+                                       view: ExciseGoodsView) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = authAction.async {
-        implicit request =>
-          dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
-            response =>
-              val form: Form2[ExciseGoods] = (for {
-                hvd <- response
-                exciseGoods <- hvd.exciseGoods
-              } yield Form2[ExciseGoods](exciseGoods)).getOrElse(EmptyForm)
-              Ok(excise_goods(form, edit))
-          }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
+        response =>
+          val form = (for {
+            hvd <- response
+            exciseGoods <- hvd.exciseGoods
+          } yield formProvider().fill(exciseGoods)).getOrElse(formProvider())
+          Ok(view(form, edit))
+      }
     }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request => {
-        Form2[ExciseGoods](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(excise_goods(f, edit)))
-          case ValidForm(_, data) =>
-            for {
-              hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
-              status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-              _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.exciseGoods(data))
-              isNewActivity <- serviceFlow.isNewActivity(request.credId, HighValueDealing)
-            } yield {
-              val redirect = !isNewActivity && redirectToDateOfChange[ExciseGoods](status, hvd.exciseGoods, data)
-              Redirect(getNextPage(redirect, edit))
-            }
-        }
-      }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
+          for {
+            hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
+            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+            _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, hvd.exciseGoods(data))
+            isNewActivity <- serviceFlow.isNewActivity(request.credId, HighValueDealing)
+          } yield {
+            val redirect = !isNewActivity && redirectToDateOfChange[ExciseGoods](status, hvd.exciseGoods, data)
+            Redirect(getNextPage(redirect, edit))
+          }
+      )
+    }
   }
 
   private def getNextPage(redirect: Boolean, edit:Boolean): Call = {

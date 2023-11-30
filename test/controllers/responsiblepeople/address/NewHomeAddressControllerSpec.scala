@@ -18,19 +18,21 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.address.NewHomeAddressFormProvider
 import models.Country
 import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.{verify, when}
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
-import views.html.responsiblepeople.address.new_home_address
+import views.html.responsiblepeople.address.NewHomeAddressView
 
 import scala.concurrent.Future
 
-class NewHomeAddressControllerSpec extends AmlsSpec {
+class NewHomeAddressControllerSpec extends AmlsSpec with Injecting {
 
   val RecordId = 1
 
@@ -38,13 +40,14 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
-    lazy val view = app.injector.instanceOf[new_home_address]
+    lazy val view = inject[NewHomeAddressView]
     val controller = new NewHomeAddressController(
       SuccessfulAuthAction,
       dataCacheConnector,
       commonDependencies,
       mockMcc,
-      new_home_address = view,
+      inject[NewHomeAddressFormProvider],
+      view = view,
       error = errorView
     )
   }
@@ -94,8 +97,8 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("isUK-true").hasAttr("checked") must be(true)
-        document.getElementById("isUK-false").hasAttr("checked") must be(false)
+        document.getElementById("isUK").hasAttr("checked") must be(true)
+        document.getElementById("isUK-2").hasAttr("checked") must be(false)
       }
 
       "display the new home address page successfully with preloaded data for NonUK address" in new Fixture {
@@ -112,8 +115,8 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("isUK-true").hasAttr("checked") must be(false)
-        document.getElementById("isUK-false").hasAttr("checked") must be(true)
+        document.getElementById("isUK").hasAttr("checked") must be(false)
+        document.getElementById("isUK-2").hasAttr("checked") must be(true)
       }
     }
 
@@ -121,7 +124,8 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
       "save data and redirect to NewHomeAddressUKController" when {
         "yes selected" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.NewHomeAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "true"
           )
 
@@ -141,7 +145,8 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
       "save data and redirect to NewHomeAddressNonUKController" when {
         "no selected" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.NewHomeAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "false"
           )
 
@@ -161,7 +166,8 @@ class NewHomeAddressControllerSpec extends AmlsSpec {
       "respond with BAD_REQUEST" when {
         "isUK field is not supplied" in new Fixture {
 
-          val line1MissingRequest = requestWithUrlEncodedBody()
+          val line1MissingRequest = FakeRequest(POST, routes.NewHomeAddressController.post(1).url)
+          .withFormUrlEncodedBody()
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))

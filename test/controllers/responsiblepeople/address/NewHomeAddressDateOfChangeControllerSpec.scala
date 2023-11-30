@@ -18,32 +18,35 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.address.NewHomeAddressDateOfChangeFormProvider
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthAction}
+import utils.AmlsSpec
+import views.html.responsiblepeople.address.NewHomeDateOfChangeView
 
 import scala.concurrent.Future
 
-class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
+class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec with Injecting {
 
   trait Fixture {
     self =>
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
 
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .build()
-
-    val controller = app.injector.instanceOf[NewHomeAddressDateOfChangeController]
+    val controller = new NewHomeAddressDateOfChangeController(
+      dataCacheConnector = dataCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      formProvider = inject[NewHomeAddressDateOfChangeFormProvider],
+      view = inject[NewHomeDateOfChangeView],
+      error = errorView
+    )
 
     val cacheMap = mock[CacheMap]
   }
@@ -93,7 +96,8 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
 
     "Post:" must {
       "redirect to next page successfully for valid input" in new Fixture {
-        val postRequest = requestWithUrlEncodedBody(
+        val postRequest = FakeRequest(POST, routes.NewHomeAddressDateOfChangeController.post(1).url)
+        .withFormUrlEncodedBody(
           "dateOfChange.day" -> "20",
           "dateOfChange.month" -> "5",
           "dateOfChange.year" -> "2014"
@@ -109,7 +113,8 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
       }
 
       "fail validation on invalid input" in new Fixture {
-        val postRequest = requestWithUrlEncodedBody(
+        val postRequest = FakeRequest(POST, routes.NewHomeAddressDateOfChangeController.post(1).url)
+        .withFormUrlEncodedBody(
           "dateOfChange.month" -> "10",
           "dateOfChange.day" -> "01"
         )

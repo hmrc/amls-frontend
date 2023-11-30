@@ -19,24 +19,50 @@ package models.deregister
 import jto.validation.forms.Rules.{maxLength, notEmpty}
 import jto.validation.{From, Path, Rule, ValidationError, Write}
 import jto.validation.forms.UrlFormEncoded
+import models.{Enumerable, WithName}
 import models.FormTypes._
 import play.api.libs.json._
 
-sealed trait DeregistrationReason
+sealed trait DeregistrationReason {
+  val value: String
+}
 
-object DeregistrationReason {
+object DeregistrationReason extends Enumerable.Implicits {
 
-  case object OutOfScope extends DeregistrationReason
+  case object OutOfScope extends WithName("outOfScope") with DeregistrationReason {
+    override val value: String = "01"
+  }
 
-  case object NotTradingInOwnRight extends DeregistrationReason
+  case object NotTradingInOwnRight extends WithName("notTradingInOwnRight") with DeregistrationReason {
+    override val value: String = "02"
+  }
 
-  case object UnderAnotherSupervisor extends DeregistrationReason
+  case object UnderAnotherSupervisor extends WithName("underAnotherSupervisor") with DeregistrationReason {
+    override val value: String = "03"
+  }
 
-  case object ChangeOfLegalEntity extends DeregistrationReason
+  case object ChangeOfLegalEntity extends WithName("changeOfLegalEntity") with DeregistrationReason {
+    override val value: String = "04"
+  }
 
-  case object HVDPolicyOfNotAcceptingHighValueCashPayments extends DeregistrationReason
+  case object HVDPolicyOfNotAcceptingHighValueCashPayments extends WithName("notAcceptingPayments") with DeregistrationReason {
+    override val value: String = "05"
+  }
 
-  case class Other(otherReason: String) extends DeregistrationReason
+  case class Other(otherReason: String) extends WithName("other") with DeregistrationReason {
+    override val value: String = "06"
+  }
+
+  val all: Seq[DeregistrationReason] = Seq(
+    OutOfScope,
+    NotTradingInOwnRight,
+    UnderAnotherSupervisor,
+    ChangeOfLegalEntity,
+    HVDPolicyOfNotAcceptingHighValueCashPayments,
+    Other("")
+  )
+
+  implicit val enumerable: Enumerable[DeregistrationReason] = Enumerable(all.map(v => v.toString -> v): _*)
 
   import utils.MappingUtils.Implicits._
 

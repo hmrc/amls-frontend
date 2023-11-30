@@ -18,14 +18,14 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.responsiblepeople.{DateOfBirth, ResponsiblePerson}
+import forms.responsiblepeople.DateOfBirthFormProvider
+import models.responsiblepeople.ResponsiblePerson
 import play.api.i18n.MessagesApi
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.date_of_birth
+import views.html.responsiblepeople.DateOfBirthView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class DateOfBirthController @Inject()(
@@ -34,41 +34,45 @@ class DateOfBirthController @Inject()(
                                        authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
                                        val cc: MessagesControllerComponents,
-                                       date_of_birth: date_of_birth,
-                                       implicit val error: views.html.error
+                                       formProvider: DateOfBirthFormProvider,
+                                       view: DateOfBirthView,
+                                       implicit val error: views.html.ErrorView
                                      ) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-      implicit request =>
-        getData[ResponsiblePerson](request.credId, index) map {
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,Some(dateOfBirth),_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-            Ok(date_of_birth(Form2[DateOfBirth](dateOfBirth), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-            Ok(date_of_birth(EmptyForm, edit, index, flow, personName.titleName))
-          case _ => NotFound(notFoundView)
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.dateOfBirth) match {
+            case (Some(name), Some(date)) => Ok(view(formProvider().fill(date), edit, index, flow, name.titleName))
+            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _ => NotFound(notFoundView)
+          }
         }
+      }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-      implicit request =>
-        Form2[DateOfBirth](request.body) match {
-          case f: InvalidForm => getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(date_of_birth(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          }
-          case ValidForm(_, data) => {
-            for {
-              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                rp.dateOfBirth(data)
-              }
-            } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-              case false => Redirect(routes.PersonResidentTypeController.get(index, edit, flow))
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => getData[ResponsiblePerson](request.credId, index) map { rp =>
+          BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+        },
+        data => {
+          for {
+            _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+              rp.dateOfBirth(data)
             }
-
-          }.recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+          } yield if (edit) {
+            Redirect(routes.DetailedAnswersController.get(index, flow))
+          } else {
+            Redirect(routes.PersonResidentTypeController.get(index, edit, flow))
           }
+
+        }.recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
+      )
   }
 
 }

@@ -19,20 +19,37 @@ package models.businessactivities
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
+import models.{Enumerable, WithName}
 import models.renewal.AMLSTurnover
 import play.api.libs.json._
 
-sealed trait ExpectedAMLSTurnover
+sealed trait ExpectedAMLSTurnover {
+  val value: String
+}
 
-object ExpectedAMLSTurnover {
+object ExpectedAMLSTurnover extends Enumerable.Implicits {
 
-  case object First extends ExpectedAMLSTurnover
-  case object Second extends ExpectedAMLSTurnover
-  case object Third extends ExpectedAMLSTurnover
-  case object Fourth extends ExpectedAMLSTurnover
-  case object Fifth extends ExpectedAMLSTurnover
-  case object Sixth extends ExpectedAMLSTurnover
-  case object Seventh extends ExpectedAMLSTurnover
+  case object First extends WithName("zeroPlus") with ExpectedAMLSTurnover {
+    override val value: String = "01"
+  }
+  case object Second extends WithName("fifteenThousandPlus") with ExpectedAMLSTurnover {
+    override val value: String = "02"
+  }
+  case object Third extends WithName("fiftyThousandPlus") with ExpectedAMLSTurnover {
+    override val value: String = "03"
+  }
+  case object Fourth extends WithName("oneHundredThousandPlus") with ExpectedAMLSTurnover {
+    override val value: String = "04"
+  }
+  case object Fifth extends WithName("twoHundredFiftyThousandPlus") with ExpectedAMLSTurnover {
+    override val value: String = "05"
+  }
+  case object Sixth extends WithName("oneMillionPlus") with ExpectedAMLSTurnover {
+    override val value: String = "06"
+  }
+  case object Seventh extends WithName("tenMillionPlus") with ExpectedAMLSTurnover {
+    override val value: String = "07"
+  }
 
 
   import utils.MappingUtils.Implicits._
@@ -112,4 +129,17 @@ object ExpectedAMLSTurnover {
     case ExpectedAMLSTurnover.Seventh => AMLSTurnover.Seventh
     case _ => throw new Exception("Invalid AMLS turnover")
   }
+
+  val all: Seq[ExpectedAMLSTurnover] = Seq(
+    First,
+    Second,
+    Third,
+    Fourth,
+    Fifth,
+    Sixth,
+    Seventh
+  )
+
+  implicit val enumerable: Enumerable[ExpectedAMLSTurnover] =
+    Enumerable(ExpectedAMLSTurnover.all.map(v => v.toString -> v): _*)
 }

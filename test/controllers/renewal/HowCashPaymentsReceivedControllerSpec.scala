@@ -18,20 +18,21 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.renewal.{CashPayments, CashPaymentsCustomerNotMet, HowCashPaymentsReceived, PaymentMethods, Renewal}
+import forms.renewal.HowCashPaymentsReceivedFormProvider
+import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
-import play.api.test.Helpers.{contentAsString, status}
+import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.renewal.how_cash_payments_received
+import views.html.renewal.HowCashPaymentsReceivedView
 
 import scala.concurrent.Future
 
-class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
+class HowCashPaymentsReceivedControllerSpec extends AmlsSpec with Injecting {
 
   lazy val mockDataCacheConnector = mock[DataCacheConnector]
   lazy val mockRenewalService = mock[RenewalService]
@@ -41,25 +42,26 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[how_cash_payments_received]
+    lazy val view = inject[HowCashPaymentsReceivedView]
     val controller = new HowCashPaymentsReceivedController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService, cc = mockMcc,
-      how_cash_payments_received = view
+      formProvider = inject[HowCashPaymentsReceivedFormProvider],
+      view = view
     )
 
-    when(mockRenewalService.getRenewal(any())(any(), any()))
+    when(mockRenewalService.getRenewal(any())(any()))
       .thenReturn(Future.successful(None))
 
-    when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+    when(mockRenewalService.updateRenewal(any(), any())(any()))
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
 
   "HowCashPaymentsReceived controller" when {
     "get is called" must {
       "load the page if renewal data is found" in new Fixture {
-          when(mockRenewalService.getRenewal(any())(any(), any()))
+          when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(Renewal(receiveCashPayments = Some(receiveCashPayments)))))
 
           val result = controller.get()(request)
@@ -67,10 +69,10 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
 
           val page = Jsoup.parse(contentAsString(result))
 
-          page.select("input[type=checkbox][name=cashPaymentMethods.courier][value=true]").hasAttr("checked") must be(true)
-          page.select("input[type=checkbox][name=cashPaymentMethods.direct][value=true]").hasAttr("checked") must be(true)
-          page.select("input[type=checkbox][name=cashPaymentMethods.other][value=true]").hasAttr("checked") must be(true)
-          page.select("input[type=text][name=cashPaymentMethods.details]").first().`val`() must be("other")
+          page.getElementById("paymentMethods_0").hasAttr("checked") must be(true)
+          page.getElementById("paymentMethods_1").hasAttr("checked") must be(true)
+          page.getElementById("paymentMethods_2").hasAttr("checked") must be(true)
+          page.getElementById("details").`val`() must be("other")
         }
 
         "show an empty form if no renewal data is found for this question" in new Fixture {
@@ -78,10 +80,10 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
           status(result) mustEqual OK
 
           val page = Jsoup.parse(contentAsString(result))
-          page.select("input[type=checkbox][name=cashPaymentMethods.courier][value=true]").hasAttr("checked") must be(false)
-          page.select("input[type=checkbox][name=cashPaymentMethods.direct][value=true]").hasAttr("checked") must be(false)
-          page.select("input[type=checkbox][name=cashPaymentMethods.other][value=true]").hasAttr("checked") must be(false)
-          page.select("input[type=text][name=cashPaymentMethods.details]").first().`val`() must be("")
+          page.getElementById("paymentMethods_0").hasAttr("checked") must be(false)
+          page.getElementById("paymentMethods_1").hasAttr("checked") must be(false)
+          page.getElementById("paymentMethods_2").hasAttr("checked") must be(false)
+          page.getElementById("details").`val`() must be("")
         }
     }
 
@@ -96,11 +98,11 @@ class HowCashPaymentsReceivedControllerSpec extends AmlsSpec {
 
       "a valid request is made" must {
         "redirect to summary page" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
-            "cashPaymentMethods.courier" -> "true",
-            "cashPaymentMethods.direct" -> "true",
-            "cashPaymentMethods.other" -> "true",
-            "cashPaymentMethods.details" -> "other"
+          val newRequest = FakeRequest(POST, routes.HowCashPaymentsReceivedController.post().url).withFormUrlEncodedBody(
+            "paymentMethods[0]" -> "courier",
+            "paymentMethods[1]" -> "direct",
+            "paymentMethods[2]" -> "other",
+            "details" -> "other"
           )
 
           val result = controller.post()(newRequest)

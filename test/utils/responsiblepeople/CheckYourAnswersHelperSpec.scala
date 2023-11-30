@@ -1,0 +1,1289 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package utils.responsiblepeople
+
+import controllers.responsiblepeople.NinoUtil
+import models.businessmatching.BusinessActivity.AccountancyServices
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.{Country, DateOfChange}
+import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
+import models.responsiblepeople._
+import org.joda.time.LocalDate
+import org.scalatest.Assertion
+import play.api.i18n.Messages
+import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import utils.{AmlsSpec, DateHelper}
+
+class CheckYourAnswersHelperSpec extends AmlsSpec {
+
+  lazy val cyaHelper: CheckYourAnswersHelper = app.injector.instanceOf[CheckYourAnswersHelper]
+
+  trait RowFixture extends ResponsiblePeopleValues {
+
+    val summaryListRows: Seq[SummaryListRow]
+
+    def assertRowMatches(index: Int, title: String, value: String, changeUrl: String, changeId: String): Assertion = {
+
+      val result = summaryListRows.lift(index).getOrElse(fail(s"Row for index $index does not exist"))
+
+      result.key.toString must include(messages(title))
+
+      result.value.toString must include(value)
+
+      checkChangeLink(result, changeUrl, changeId)
+    }
+
+    def checkChangeLink(slr: SummaryListRow, href: String, id: String): Assertion = {
+      val changeLink = slr.actions.flatMap(_.items.headOption).getOrElse(fail("No edit link present"))
+
+      changeLink.content.toString must include(messages("button.edit"))
+      changeLink.href mustBe href
+      changeLink.attributes("id") mustBe id
+    }
+
+    def toBulletList[A](coll: Seq[A]): String =
+      "<ul class=\"govuk-list govuk-list--bullet\">" +
+        coll.map { x =>
+          s"<li>$x</li>"
+        }.mkString +
+        "</ul>"
+
+    def booleanToLabel(bool: Boolean)(implicit messages: Messages): String = if (bool) {
+      messages("lbl.yes")
+    } else {
+      messages("lbl.no")
+    }
+
+    def addressToLines(addressLines: Seq[String]): String =
+      "<ul class=\"govuk-list\">" +
+      addressLines.map { line =>
+        s"""<li>$line<li>"""
+      }.mkString +"</ul>"
+  }
+
+  ".createSummaryList" when {
+
+    "Person Name is present" must {
+
+      "render the correct row" in new RowFixture {
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+          responsiblePeopleModel, businessMatching, personName.fullName, 1, None, true, true
+        ).rows
+
+        assertRowMatches(
+          0,
+          "responsiblepeople.personName.title",
+          personName.fullName,
+          controllers.responsiblepeople.routes.PersonNameController.get(1, true, None).url,
+          "rp-personname-edit"
+        )
+      }
+    }
+
+    "Person Name is present" must {
+
+      "render the correct rows" when {
+
+        "person has a previous legal name" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            1,
+            messages("responsiblepeople.legalName.heading", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.LegalNameController.get(1, true, None).url,
+            "rp-legalname-yes-no-edit"
+          )
+
+          assertRowMatches(
+            2,
+            messages("responsiblepeople.legalNameInput.heading", personName.titleName),
+            previousName.fullName,
+            controllers.responsiblepeople.routes.LegalNameInputController.get(1, true, None).url,
+            "rp-legalname-edit"
+          )
+
+          assertRowMatches(
+            3,
+            messages("responsiblepeople.legalnamechangedate.heading", personName.titleName),
+            DateHelper.formatDate(legalNameChangeDate),
+            controllers.responsiblepeople.routes.LegalNameChangeDateController.get(1, true, None).url,
+            "rp-legalnamechangedate-edit"
+          )
+        }
+
+        "person has no previous legal name" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(legalName = Some(PreviousName(Some(false), None, None, None)), legalNameChangeDate = None),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            1,
+            messages("responsiblepeople.legalName.heading", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.LegalNameController.get(1, true, None).url,
+            "rp-legalname-yes-no-edit"
+          )
+        }
+      }
+    }
+
+    "Known By is present" must {
+
+      "render the correct rows" when {
+
+        "person is known by another name" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            4,
+            messages("responsiblepeople.knownby.heading", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.KnownByController.get(1, true, None).url,
+            "rp-knownby-edit"
+          )
+
+          assertRowMatches(
+            5,
+            messages("responsiblepeople.knownby.answer", personName.titleName),
+            otherName,
+            controllers.responsiblepeople.routes.KnownByController.get(1, true, None).url,
+            "rp-knownby-true-edit"
+          )
+        }
+
+        "person has no previous legal name" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(knownBy = Some(KnownBy(Some(false), None))),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            4,
+            messages("responsiblepeople.knownby.heading", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.KnownByController.get(1, true, None).url,
+            "rp-knownby-edit"
+          )
+        }
+      }
+    }
+
+    "Date of Birth is present" must {
+
+      "render the correct row" in new RowFixture {
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+          responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+        ).rows
+
+        assertRowMatches(
+          6,
+          messages("responsiblepeople.detailed_answers.dob", personName.titleName),
+          DateHelper.formatDate(dateOfBirth),
+          controllers.responsiblepeople.routes.DateOfBirthController.get(1, true, None).url,
+          "date-of-birth"
+        )
+      }
+    }
+
+    "Residence is present" must {
+
+      "render the correct rows" when {
+
+        "person has UK residence" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            7,
+            messages("responsiblepeople.detailed_answers.uk_resident", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.PersonResidentTypeController.get(1, true, None).url,
+            "rp-ukresident-edit"
+          )
+
+          assertRowMatches(
+            8,
+            messages("responsiblepeople.detailed_answers.uk_resident.nino", personName.titleName),
+            nino,
+            controllers.responsiblepeople.routes.PersonResidentTypeController.get(1, true, None).url,
+            "rp-ukresident-true-edit"
+          )
+        }
+
+        "person has non-UK residence" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(personResidenceType = Some(nonUKResidenceType)),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            7,
+            messages("responsiblepeople.detailed_answers.uk_resident", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.PersonResidentTypeController.get(1, true, None).url,
+            "rp-ukresident-edit"
+          )
+        }
+      }
+    }
+
+    "Has UK Passport is present" must {
+
+      "render the correct rows" when {
+
+        "person has UK passport" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            9,
+            messages("responsiblepeople.detailed_answers.uk.passport", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.PersonUKPassportController.get(1, true, None).url,
+            "uk-passport"
+          )
+
+          assertRowMatches(
+            10,
+            messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName.titleName),
+            passportNumber,
+            controllers.responsiblepeople.routes.PersonUKPassportController.get(1, true, None).url,
+            "uk-passport-true-edit"
+          )
+        }
+
+        "person does not have a UK passport" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(ukPassport = Some(UKPassportNo)),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            9,
+            messages("responsiblepeople.detailed_answers.uk.passport", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.PersonUKPassportController.get(1, true, None).url,
+            "uk-passport"
+          )
+        }
+      }
+    }
+
+    "Has Non-UK Passport is present" must {
+
+      "render the correct rows" when {
+
+        "person has Non-UK passport" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            11,
+            messages("responsiblepeople.detailed_answers.non.uk.passport", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.PersonNonUKPassportController.get(1, true, None).url,
+            "rp-nonukpassport-edit"
+          )
+
+          assertRowMatches(
+            12,
+            messages("responsiblepeople.detailed_answers.uk_resident.passport_number", personName.titleName),
+            passportNumber,
+            controllers.responsiblepeople.routes.PersonNonUKPassportController.get(1, true, None).url,
+            "rp-nonukpassport-true-edit"
+          )
+        }
+
+        "person does not have a passport" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(nonUKPassport = Some(NoPassport)),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            11,
+            messages("responsiblepeople.detailed_answers.non.uk.passport", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.PersonNonUKPassportController.get(1, true, None).url,
+            "rp-nonukpassport-edit"
+          )
+        }
+      }
+    }
+
+    "Country of Birth is present" must {
+
+      "render the correct rows" when {
+
+        "person was born in the UK" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            13,
+            messages("responsiblepeople.country.of.birth.heading", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.CountryOfBirthController.get(1, true, None).url,
+            "rp-countryofbirth-edit"
+          )
+
+          assertRowMatches(
+            14,
+            messages("responsiblepeople.detailed_answers.country_of_birth", personName.titleName),
+            uk.name,
+            controllers.responsiblepeople.routes.CountryOfBirthController.get(1, true, None).url,
+            "rp-countryofbirth-answer-edit"
+          )
+        }
+
+        "person was not born in the UK" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(personResidenceType = Some(nonUKResidenceType)),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            12,
+            messages("responsiblepeople.country.of.birth.heading", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.CountryOfBirthController.get(1, true, None).url,
+            "rp-countryofbirth-edit"
+          )
+
+          assertRowMatches(
+            13,
+            messages("responsiblepeople.detailed_answers.country_of_birth", personName.titleName),
+            spain.name,
+            controllers.responsiblepeople.routes.CountryOfBirthController.get(1, true, None).url,
+            "rp-countryofbirth-answer-edit"
+          )
+        }
+      }
+    }
+
+    "Nationality is present" must {
+
+      "render the correct rows" when {
+
+        "person is a UK citizen" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            15,
+            messages("responsiblepeople.nationality.heading", personName.titleName),
+            messages("responsiblepeople.nationality.selection.british"),
+            controllers.responsiblepeople.routes.NationalityController.get(1, true, None).url,
+            "rp-nationality-edit"
+          )
+        }
+
+        "person is not a UK citizen" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(personResidenceType = Some(nonUKResidenceType)),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            14,
+            messages("responsiblepeople.nationality.heading", personName.titleName),
+            messages("responsiblepeople.nationality.selection.other"),
+            controllers.responsiblepeople.routes.NationalityController.get(1, true, None).url,
+            "rp-nationality-edit"
+          )
+
+          assertRowMatches(
+            15,
+            messages("responsiblepeople.nationality.selection.other.answer", personName.titleName),
+            usa.name,
+            controllers.responsiblepeople.routes.NationalityController.get(1, true, None).url,
+            "rp-nationality-other-edit"
+          )
+        }
+      }
+    }
+
+
+    "Contact Details is present" must {
+
+      "render the correct row" in new RowFixture {
+        override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+          responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+        ).rows
+
+        assertRowMatches(
+          16,
+          messages("responsiblepeople.contact_details.heading", personName.titleName),
+          s"""<p class="govuk-body">${messages("responsiblepeople.detailed_answers.phone_number")} $phoneNumber</p>
+            <p class="govuk-body">${messages("responsiblepeople.detailed_answers.email")} $email</p>
+          """,
+          controllers.responsiblepeople.routes.ContactDetailsController.get(1, true, None).url,
+          "rp-contactDetails-edit"
+        )
+      }
+    }
+
+    "Current Address is present" must {
+
+      "render the correct rows" when {
+
+        "Current address is UK and showHide is true" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            17,
+            messages("responsiblepeople.detailed_answers.address.UK", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.address.routes.MovedAddressController.get(1).url,
+            "rpaddress-isUK-edit"
+          )
+
+          assertRowMatches(
+            18,
+            messages("responsiblepeople.detailed_answers.address", personName.titleName),
+            addressToLines(currentAddress.personAddress.toLines),
+            controllers.responsiblepeople.address.routes.MovedAddressController.get(1).url,
+            "rpaddress-edit"
+          )
+
+          assertRowMatches(
+            19,
+            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages(s"responsiblepeople.timeataddress.${ZeroToFiveMonths.toString}"),
+            controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(1, true, None).url,
+            "rp-timeatataddress-edit"
+          )
+        }
+
+        "Current address is UK and showHide is false" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, false, true
+          ).rows
+
+          assertRowMatches(
+            17,
+            messages("responsiblepeople.detailed_answers.address.UK", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.address.routes.CurrentAddressController.get(1, true, None).url,
+            "rpaddress-isUK-edit"
+          )
+
+          assertRowMatches(
+            18,
+            messages("responsiblepeople.detailed_answers.address", personName.titleName),
+            addressToLines(currentAddress.personAddress.toLines),
+            controllers.responsiblepeople.address.routes.CurrentAddressUKController.get(1, true, None).url,
+            "rpaddress-edit"
+          )
+
+          assertRowMatches(
+            19,
+            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages(s"responsiblepeople.timeataddress.${ZeroToFiveMonths.toString}"),
+            controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(1, true, None).url,
+            "rp-timeatataddress-edit"
+          )
+        }
+
+        "Current address is Non-UK and showHide is true" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(
+              addressHistory = Some(ResponsiblePersonAddressHistory(currentAddress = Some(currentAddressNonUK)))
+            ),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            17,
+            messages("responsiblepeople.detailed_answers.address.UK", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.address.routes.MovedAddressController.get(1).url,
+            "rpaddress-isUK-edit"
+          )
+
+          assertRowMatches(
+            18,
+            messages("responsiblepeople.detailed_answers.address", personName.titleName),
+            addressToLines(currentAddressNonUK.personAddress.toLines),
+            controllers.responsiblepeople.address.routes.MovedAddressController.get(1).url,
+            "rpaddress-edit"
+          )
+
+          assertRowMatches(
+            19,
+            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages(s"responsiblepeople.timeataddress.${ZeroToFiveMonths.toString}"),
+            controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(1, true, None).url,
+            "rp-timeatataddress-edit"
+          )
+        }
+
+        "Current address is Non-UK and showHide is false" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(
+              addressHistory = Some(ResponsiblePersonAddressHistory(currentAddress = Some(currentAddressNonUK)))
+            ),
+            businessMatching, personName.titleName, 1, None, false, true
+          ).rows
+
+          assertRowMatches(
+            17,
+            messages("responsiblepeople.detailed_answers.address.UK", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.address.routes.CurrentAddressController.get(1, true, None).url,
+            "rpaddress-isUK-edit"
+          )
+
+          assertRowMatches(
+            18,
+            messages("responsiblepeople.detailed_answers.address", personName.titleName),
+            addressToLines(currentAddressNonUK.personAddress.toLines),
+            controllers.responsiblepeople.address.routes.CurrentAddressNonUKController.get(1, true, None).url,
+            "rpaddress-edit"
+          )
+
+          assertRowMatches(
+            19,
+            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages(s"responsiblepeople.timeataddress.${ZeroToFiveMonths.toString}"),
+            controllers.responsiblepeople.address.routes.TimeAtCurrentAddressController.get(1, true, None).url,
+            "rp-timeatataddress-edit"
+          )
+        }
+      }
+    }
+
+    "Additional Address is present" must {
+
+      "render the correct rows" when {
+
+        "Additional address is UK" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            20,
+            messages("responsiblepeople.detailed_answers.address.previous.UK", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.address.routes.AdditionalAddressController.get(1, true, None).url,
+            "rp-previousaddress-isUK-edit"
+          )
+
+          assertRowMatches(
+            21,
+            messages("responsiblepeople.detailed_answers.address.previous", personName.titleName),
+            addressToLines(additionalAddress.personAddress.toLines),
+            controllers.responsiblepeople.address.routes.AdditionalAddressUKController.get(1, true, None).url,
+            "rp-previousaddress-edit"
+          )
+
+          assertRowMatches(
+            22,
+            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages(s"responsiblepeople.timeataddress.${SixToElevenMonths.toString}"),
+            controllers.responsiblepeople.address.routes.TimeAtAdditionalAddressController.get(1, true, None).url,
+            "rp-timeatatpreviousaddress-edit"
+          )
+        }
+
+        "Additional address is Non-UK" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(
+              addressHistory = Some(
+                ResponsiblePersonAddressHistory(
+                  currentAddress = Some(currentAddress),
+                  additionalAddress = Some(additionalAddressNonUK)
+                )
+              )
+            ),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            20,
+            messages("responsiblepeople.detailed_answers.address.previous.UK", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.address.routes.AdditionalAddressController.get(1, true, None).url,
+            "rp-previousaddress-isUK-edit"
+          )
+
+          assertRowMatches(
+            21,
+            messages("responsiblepeople.detailed_answers.address.previous", personName.titleName),
+            addressToLines(additionalAddressNonUK.personAddress.toLines),
+            controllers.responsiblepeople.address.routes.AdditionalAddressNonUKController.get(1, true, None).url,
+            "rp-previousaddress-edit"
+          )
+
+          assertRowMatches(
+            22,
+            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages(s"responsiblepeople.timeataddress.${SixToElevenMonths.toString}"),
+            controllers.responsiblepeople.address.routes.TimeAtAdditionalAddressController.get(1, true, None).url,
+            "rp-timeatatpreviousaddress-edit"
+          )
+        }
+      }
+    }
+
+    "Extra Address is present" must {
+
+      "render the correct rows" when {
+
+        "Extra address is UK" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            23,
+            messages("responsiblepeople.detailed_answers.address.other.previous.UK", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.address.routes.AdditionalExtraAddressController.get(1, true, None).url,
+            "rp-otherpreviousaddress-isUK-edit"
+          )
+
+          assertRowMatches(
+            24,
+            messages("responsiblepeople.detailed_answers.address.other.previous", personName.titleName),
+            addressToLines(additionalExtraAddress.personAddress.toLines),
+            controllers.responsiblepeople.address.routes.AdditionalExtraAddressUKController.get(1, true, None).url,
+            "rp-otherpreviousaddress-edit"
+          )
+
+          assertRowMatches(
+            25,
+            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages(s"responsiblepeople.timeataddress.${OneToThreeYears.toString}"),
+            controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController.get(1, true, None).url,
+            "rp-timeatotherpreviousaddress-edit"
+          )
+        }
+
+        "Extra address is Non-UK" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(
+              addressHistory = Some(
+                ResponsiblePersonAddressHistory(
+                  currentAddress = Some(currentAddress),
+                  additionalAddress = Some(additionalAddressNonUK),
+                  additionalExtraAddress = Some(additionalExtraAddressNonUK)
+                )
+              )
+            ),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            23,
+            messages("responsiblepeople.detailed_answers.address.other.previous.UK", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.address.routes.AdditionalExtraAddressController.get(1, true, None).url,
+            "rp-otherpreviousaddress-isUK-edit"
+          )
+
+          assertRowMatches(
+            24,
+            messages("responsiblepeople.detailed_answers.address.other.previous", personName.titleName),
+            addressToLines(additionalExtraAddressNonUK.personAddress.toLines),
+            controllers.responsiblepeople.address.routes.AdditionalExtraAddressNonUKController.get(1, true, None).url,
+            "rp-otherpreviousaddress-edit"
+          )
+
+          assertRowMatches(
+            25,
+            messages("responsiblepeople.timeataddress.address_history.heading", personName.titleName),
+            messages(s"responsiblepeople.timeataddress.${OneToThreeYears.toString}"),
+            controllers.responsiblepeople.address.routes.TimeAtAdditionalExtraAddressController.get(1, true, None).url,
+            "rp-timeatotherpreviousaddress-edit"
+          )
+        }
+      }
+    }
+
+    "Positions is present" must {
+
+      "render the correct rows" when {
+
+        "multiple positions are present" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            26,
+            messages("responsiblepeople.position_within_business.heading", personName.titleName),
+            toBulletList(Set(BeneficialOwner, NominatedOfficer).map(p => PositionWithinBusiness.getPrettyName(p)).toList.sorted),
+            controllers.responsiblepeople.routes.PositionWithinBusinessController.get(1, true, None).url,
+            "rp-positionwithinbusiness-edit"
+          )
+
+          assertRowMatches(
+            27,
+            messages("responsiblepeople.position_within_business.startDate.heading", personName.titleName),
+            DateHelper.formatDate(positionStartDate),
+            controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(1, true, None).url,
+            "rp-positionstartdate-edit"
+          )
+        }
+
+        "one position is present" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(
+              positions = Some(Positions(Set(BeneficialOwner), Some(PositionStartDate(positionStartDate))))
+            ),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            26,
+            messages("responsiblepeople.position_within_business.heading", personName.titleName),
+            PositionWithinBusiness.getPrettyName(BeneficialOwner),
+            controllers.responsiblepeople.routes.PositionWithinBusinessController.get(1, true, None).url,
+            "rp-positionwithinbusiness-edit"
+          )
+
+          assertRowMatches(
+            27,
+            messages("responsiblepeople.position_within_business.startDate.heading", personName.titleName),
+            DateHelper.formatDate(positionStartDate),
+            controllers.responsiblepeople.routes.PositionWithinBusinessStartDateController.get(1, true, None).url,
+            "rp-positionstartdate-edit"
+          )
+        }
+      }
+    }
+
+    "Sole Proprietor is present" must {
+
+      "render the correct row" when {
+
+        "person is a sole proprietor" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            28,
+            messages("responsiblepeople.sole.proprietor.another.business.heading", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(1, true, None).url,
+            "rp-soleproprietor-edit"
+          )
+        }
+
+        "person is not a sole proprietor" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false))),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            28,
+            messages("responsiblepeople.sole.proprietor.another.business.heading", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(1, true, None).url,
+            "rp-soleproprietor-edit"
+          )
+        }
+      }
+    }
+
+    "VAT Registered is present" must {
+
+      "render the correct row" when {
+
+        "person has a VAT number" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            29,
+            messages("responsiblepeople.registeredforvat.heading", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.VATRegisteredController.get(1, true, None).url,
+            "rp-registeredforvat-edit"
+          )
+
+          assertRowMatches(
+            30,
+            messages("responsiblepeople.detailed_answers.registered_for_vat"),
+            vatNumber,
+            controllers.responsiblepeople.routes.VATRegisteredController.get(1, true, None).url,
+            "rp-registeredforvat-answer-edit"
+          )
+        }
+
+        "person does not have a VAT number" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(vatRegistered = Some(VATRegisteredNo)),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            29,
+            messages("responsiblepeople.registeredforvat.heading", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.VATRegisteredController.get(1, true, None).url,
+            "rp-registeredforvat-edit"
+          )
+        }
+      }
+    }
+
+    "SA Registered is present" must {
+
+      "render the correct row" when {
+
+        "person has a UTR number" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            31,
+            messages("responsiblepeople.registeredforselfassessment.heading", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1, true, None).url,
+          "rp-registeredforsa-edit"
+          )
+
+          assertRowMatches(
+            32,
+            messages("responsiblepeople.detailed_answers.registered_for_sa"),
+            utrNumber,
+            controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1, true, None).url,
+            "rp-registeredforsa-answer-edit"
+          )
+        }
+
+        "person does not have a UTR number" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(saRegistered = Some(SaRegisteredNo)),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            31,
+            messages("responsiblepeople.registeredforselfassessment.heading", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1, true, None).url,
+          "rp-registeredforsa-edit"
+          )
+        }
+      }
+    }
+
+    "Experience Training is present" must {
+
+      "render the correct row" when {
+
+        "person has had experience training with multiple business activities" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            33,
+            messages("responsiblepeople.experiencetraining.heading.multiple", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.ExperienceTrainingController.get(1, true, None).url,
+            "rp-training-edit"
+          )
+
+          assertRowMatches(
+            34,
+            messages("responsiblepeople.detailed_answers.previous_experience.detail", personName.titleName),
+            experienceDescription,
+            controllers.responsiblepeople.routes.ExperienceTrainingController.get(1, true, None).url,
+            "rp-training-answer-edit"
+          )
+        }
+
+        "person has had experience training with a single business activity" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel,
+            businessMatching.copy(
+              activities = Some(BusinessActivities(Set(AccountancyServices)))
+            ),
+            personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            33,
+            messages(
+              "responsiblepeople.experiencetraining.heading",
+              personName.titleName,
+              businessMatching.prefixedAlphabeticalBusinessTypes(true).fold("")(names => names.head)
+            ),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.ExperienceTrainingController.get(1, true, None).url,
+            "rp-training-edit"
+          )
+
+          assertRowMatches(
+            34,
+            messages("responsiblepeople.detailed_answers.previous_experience.detail", personName.titleName),
+            experienceDescription,
+            controllers.responsiblepeople.routes.ExperienceTrainingController.get(1, true, None).url,
+            "rp-training-answer-edit"
+          )
+        }
+
+        "person has no experience training with multiple business activities" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(experienceTraining = Some(ExperienceTrainingNo)),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            33,
+            messages("responsiblepeople.experiencetraining.heading.multiple", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.ExperienceTrainingController.get(1, true, None).url,
+            "rp-training-edit"
+          )
+        }
+
+        "person has no experience training with a single business activity" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(experienceTraining = Some(ExperienceTrainingNo)),
+            businessMatching.copy(
+              activities = Some(BusinessActivities(Set(AccountancyServices)))
+            ),
+            personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            33,
+            messages(
+              "responsiblepeople.experiencetraining.heading",
+              personName.titleName,
+              businessMatching.prefixedAlphabeticalBusinessTypes(true).fold("")(names => names.head)
+            ),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.ExperienceTrainingController.get(1, true, None).url,
+            "rp-training-edit"
+          )
+        }
+      }
+    }
+
+    "Training is present" must {
+
+      "render the correct row" when {
+
+        "person has had training" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            35,
+            messages("responsiblepeople.training.heading", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.TrainingController.get(1, true, None).url,
+            "rp-traininginmlre-edit"
+          )
+
+          assertRowMatches(
+            36,
+            messages("responsiblepeople.detailed_answers.training_in_anti_money_laundering", personName.titleName),
+            trainingDescription,
+            controllers.responsiblepeople.routes.TrainingController.get(1, true, None).url,
+            "rp-traininginmlre-answer-edit"
+          )
+        }
+
+        "person has no experience training with multiple business activities" in new RowFixture {
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(training = Some(TrainingNo)),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            35,
+            messages("responsiblepeople.training.heading", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.TrainingController.get(1, true, None).url,
+            "rp-traininginmlre-edit"
+          )
+        }
+      }
+    }
+
+    "Passed Fit And Proper Assessment is present" must {
+
+      "render the correct row" when {
+
+        "person has passed" in new RowFixture {
+
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            37,
+            messages("responsiblepeople.fit_and_proper.heading", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.FitAndProperController.get(1, true, None).url,
+            "fit-and-proper"
+          )
+        }
+
+        "person has not passed" in new RowFixture {
+
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            37,
+            messages("responsiblepeople.fit_and_proper.heading", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.FitAndProperController.get(1, true, None).url,
+            "fit-and-proper"
+          )
+        }
+      }
+    }
+
+    "Has Already Paid For Approval Check is present" must {
+
+      "render the correct row" when {
+
+        "person has paid" in new RowFixture {
+
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel, businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            38,
+            messages("responsiblepeople.approval_check.heading", personName.titleName),
+            booleanToLabel(true),
+            controllers.responsiblepeople.routes.ApprovalCheckController.get(1, true, None).url,
+          "approval-check"
+          )
+        }
+
+        "person has not paid" in new RowFixture {
+
+          override val summaryListRows: Seq[SummaryListRow] = cyaHelper.getSummaryList(
+            responsiblePeopleModel.copy(approvalFlags = ApprovalFlags(Some(true), Some(false))),
+            businessMatching, personName.titleName, 1, None, true, true
+          ).rows
+
+          assertRowMatches(
+            38,
+            messages("responsiblepeople.approval_check.heading", personName.titleName),
+            booleanToLabel(false),
+            controllers.responsiblepeople.routes.ApprovalCheckController.get(1, true, None).url,
+          "approval-check"
+          )
+        }
+      }
+    }
+  }
+}
+
+trait ResponsiblePeopleValues extends NinoUtil {
+
+  val nino: String = nextNino
+
+  val previousName: PreviousName = PreviousName(
+    Some(true),
+    Some("firstName"),
+    Some("middleName"),
+    Some("lastName")
+  )
+
+  val legalNameChangeDate: LocalDate = LocalDate.now().minusYears(1)
+
+  val personName: PersonName = PersonName(
+    "James",
+    Some("Michael"),
+    "Smith"
+  )
+
+  val otherName: String = "James Mark Jones"
+
+  val dateOfBirth: LocalDate = LocalDate.parse("1990-03-14")
+
+  val passportNumber: String = "123456789"
+
+  val uk: Country = Country("United Kingdom", "GB")
+  val spain: Country = Country("Spain", "ES")
+  val usa: Country = Country("United States", "US")
+
+  val residenceType: PersonResidenceType = PersonResidenceType(
+    UKResidence(Nino(nino)),
+    Some(uk),
+    Some(uk)
+  )
+
+  val nonUKResidenceType: PersonResidenceType = PersonResidenceType(
+    NonUKResidence,
+    Some(spain),
+    Some(usa)
+  )
+
+  val phoneNumber: String = "0142980012013"
+  val email: String = "e@mail.com"
+
+  val personAddress1: PersonAddressUK = PersonAddressUK(
+    "addressLine1",
+    Some("addressLine2"),
+    Some("addressLine3"),
+    Some("addressLine4"),
+    "postCode1"
+  )
+  val personAddress2: PersonAddressUK = PersonAddressUK(
+    "addressLine5",
+    Some("addressLine6"),
+    Some("addressLine7"),
+    Some("addressLine8"),
+    "postCode2"
+  )
+  val personAddress3: PersonAddressUK = PersonAddressUK(
+    "addressLine9",
+    Some("addressLine10"),
+    Some("addressLine11"),
+    Some("addressLine12"),
+    "postCode3"
+  )
+
+  val nonUKAddress1: PersonAddressNonUK = PersonAddressNonUK(
+    "6277 Brookmere Road",
+    Some("Small Town"),
+    Some("Big County"),
+    Some("Washington D.C"),
+    Country("United States", "US")
+  )
+
+  val nonUKAddress2: PersonAddressNonUK = PersonAddressNonUK(
+    "The Cottage",
+    Some("Sleepy Village"),
+    Some("Country Retreat"),
+    Some("Farming Area"),
+    Country("France", "FR")
+  )
+
+  val nonUKAddress3: PersonAddressNonUK = PersonAddressNonUK(
+    "51 Apartment Block",
+    Some("Suburbia"),
+    Some("District 4"),
+    Some("Capital City"),
+    Country("Spain", "ES")
+  )
+
+  val currentAddress: ResponsiblePersonCurrentAddress = ResponsiblePersonCurrentAddress(
+    personAddress = personAddress1,
+    timeAtAddress = Some(ZeroToFiveMonths),
+    dateOfChange = Some(DateOfChange(new LocalDate(1990, 2, 24)))
+  )
+
+  val additionalAddress: ResponsiblePersonAddress = ResponsiblePersonAddress(
+    personAddress = personAddress2,
+    timeAtAddress = Some(SixToElevenMonths)
+  )
+
+  val additionalExtraAddress: ResponsiblePersonAddress = ResponsiblePersonAddress(
+    personAddress = personAddress3,
+    timeAtAddress = Some(OneToThreeYears)
+  )
+
+  val addressHistory: ResponsiblePersonAddressHistory = ResponsiblePersonAddressHistory(
+    currentAddress = Some(currentAddress),
+    additionalAddress = Some(additionalAddress),
+    additionalExtraAddress = Some(additionalExtraAddress)
+  )
+
+  val currentAddressNonUK: ResponsiblePersonCurrentAddress = ResponsiblePersonCurrentAddress(
+    personAddress = nonUKAddress1,
+    timeAtAddress = Some(ZeroToFiveMonths),
+    dateOfChange = Some(DateOfChange(new LocalDate(1990, 2, 24)))
+  )
+
+  val additionalAddressNonUK: ResponsiblePersonAddress = ResponsiblePersonAddress(
+    personAddress = nonUKAddress2,
+    timeAtAddress = Some(SixToElevenMonths)
+  )
+
+  val additionalExtraAddressNonUK: ResponsiblePersonAddress = ResponsiblePersonAddress(
+    personAddress = nonUKAddress3,
+    timeAtAddress = Some(OneToThreeYears)
+  )
+
+  val addressHistoryNonUK: ResponsiblePersonAddressHistory = ResponsiblePersonAddressHistory(
+    currentAddress = Some(currentAddressNonUK),
+    additionalAddress = Some(additionalAddressNonUK),
+    additionalExtraAddress = Some(additionalExtraAddressNonUK)
+  )
+
+  val positionStartDate: LocalDate = new LocalDate(1990, 2, 24)
+
+  val positions: Positions = Positions(
+    positions = Set(BeneficialOwner, NominatedOfficer),
+    startDate = Some(PositionStartDate(positionStartDate))
+  )
+
+  val vatNumber: String = "9876543210"
+
+  val utrNumber: String = "12345678912"
+
+  val experienceDescription: String = "I have great experience in this"
+  val trainingDescription: String = "I have been trained in this"
+
+  val responsiblePeopleModel: ResponsiblePerson = ResponsiblePerson(
+    personName = Some(personName),
+    legalName = Some(previousName),
+    legalNameChangeDate = Some(legalNameChangeDate),
+    knownBy = Some(KnownBy(Some(true), Some(otherName))),
+    dateOfBirth = Some(DateOfBirth(dateOfBirth)),
+    personResidenceType = Some(residenceType),
+    ukPassport = Some(UKPassportYes(passportNumber)),
+    nonUKPassport = Some(NonUKPassportYes(passportNumber)),
+    contactDetails = Some(ContactDetails(phoneNumber, email)),
+    addressHistory = Some(addressHistory),
+    positions = Some(positions),
+    vatRegistered = Some(VATRegisteredYes(vatNumber)),
+    saRegistered = Some(SaRegisteredYes(utrNumber)),
+    experienceTraining = Some(ExperienceTrainingYes(experienceDescription)),
+    training = Some(TrainingYes(trainingDescription)),    approvalFlags = ApprovalFlags(Some(true), Some(true)),
+    soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true))
+  )
+
+  val businessMatching = BusinessMatching(activities = Some(BusinessActivities(BusinessActivities.all)))
+}

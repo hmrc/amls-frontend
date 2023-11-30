@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.renewal._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -28,6 +29,7 @@ import play.api.i18n.Messages
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{AnyContentAsFormUrlEncoded, Request, Result}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -66,7 +68,8 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
     def formData(data: Option[Request[AnyContentAsFormUrlEncoded]]) = data match {
       case Some(d) => d
-      case None => requestWithUrlEncodedBody("countries" -> "GB")
+      case None => FakeRequest(POST, routes.CustomersOutsideUKController.post().url)
+        .withFormUrlEncodedBody("countries[0]" -> "GB")
     }
 
     def formRequest(data: Option[Request[AnyContentAsFormUrlEncoded]]) = formData(data)
@@ -79,7 +82,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
     val customersOutsideIsUK = CustomersOutsideIsUK(true)
 
     when {
-      renewalService.updateRenewal(any(),any())(any(), any())
+      renewalService.updateRenewal(any(),any())(any())
     } thenReturn Future.successful(cache)
 
     when {
@@ -129,7 +132,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
     "get is called" must {
       "load the page" in new Fixture {
 
-        when(renewalService.getRenewal(any())(any(), any()))
+        when(renewalService.getRenewal(any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -146,7 +149,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
       "pre-populate the Customer outside UK Page" in new Fixture {
 
-        when(renewalService.getRenewal(any())(any(), any()))
+        when(renewalService.getRenewal(any())(any()))
           .thenReturn(Future.successful(Some(Renewal(customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))))))
 
         val result = controller.get()(request)
@@ -199,7 +202,11 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
       "given invalid data" must {
         "respond with BAD_REQUEST" in new FormSubmissionFixture {
-          post(data = Some(addToken(authRequest.withFormUrlEncodedBody("countries" -> "abc")))) { result: Result =>
+          post(data = Some(addToken(
+            FakeRequest(POST, routes.CustomersOutsideUKController.post().url)
+              .withFormUrlEncodedBody("countries" -> "abc")
+          ))
+          ) { result: Result =>
             result.header.status mustBe BAD_REQUEST
           }
         }

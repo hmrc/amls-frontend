@@ -18,8 +18,8 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.NationalityFormProvider
 import models.Country
-import models.autocomplete.NameValuePair
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
 import org.jsoup.Jsoup
@@ -27,40 +27,42 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.AutoCompleteService
 import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.responsiblepeople.nationality
+import views.html.responsiblepeople.NationalityView
 
 import scala.concurrent.Future
 
-class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil {
+class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil with Injecting {
 
   trait Fixture {
     //self =>
     val request = addToken(authRequest)
 
     val autoCompleteService = mock[AutoCompleteService]
-    lazy val view = app.injector.instanceOf[nationality]
+    lazy val view = inject[NationalityView]
     val controller = new NationalityController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       autoCompleteService = autoCompleteService,
       cc = mockMcc,
-      nationality = view,
+      formProvider = inject[NationalityFormProvider],
+      view = view,
       error = errorView
     )
 
     when {
-      controller.autoCompleteService.getCountries
-    } thenReturn Some(Seq(
-      NameValuePair("Country 1", "country:1"),
-      NameValuePair("Country 2", "country:2")
-    ))
+      controller.autoCompleteService.formOptionsExcludeUK
+    } thenReturn Seq(
+      SelectItem(Some("country:1"), "Country 1"),
+      SelectItem(Some("country:2"), "Country 2")
+    )
 
     val personName = Some(PersonName("firstname", None, "lastname"))
   }
@@ -79,11 +81,11 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       val result = controller.get(1)(request)
       status(result) must be(OK)
 
-      contentAsString(result) must include(Messages("responsiblepeople.nationality.title"))
+      contentAsString(result) must include(messages("responsiblepeople.nationality.title"))
 
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("input[type=radio][name=nationality][value=01]").hasAttr("checked") must be(false)
-      document.select("input[type=radio][name=nationality][value=02]").hasAttr("checked") must be(false)
+      document.select("input[type=radio][name=nationality][value=true]").hasAttr("checked") must be(false)
+      document.select("input[type=radio][name=nationality][value=false]").hasAttr("checked") must be(false)
     }
 
     "load Not found page" when {
@@ -98,7 +100,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
         status(result) must be(NOT_FOUND)
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.title mustBe s"${Messages("error.not-found.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+        document.title mustBe s"${messages("error.not-found.title")} - ${messages("title.amls")} - ${messages("title.gov")}"
 
       }
     }
@@ -114,7 +116,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       val result = controller.get(1)(request)
       status(result) must be(OK)
 
-      contentAsString(result) must include(Messages("responsiblepeople.nationality.title"))
+      contentAsString(result) must include(messages("responsiblepeople.nationality.title"))
 
       val document: Document = Jsoup.parse(contentAsString(result))
       document.select("input[type=radio][name=nationality][value=01]").hasAttr("checked") must be(false)
@@ -141,7 +143,8 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "fail submission on error" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody("" -> "")
+      val newRequest = FakeRequest(POST, routes.NationalityController.post(1).url)
+      .withFormUrlEncodedBody("" -> "")
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
@@ -151,14 +154,14 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
       val result = controller.post(1)(newRequest)
       status(result) must be(BAD_REQUEST)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#nationality]").html() must include(Messages("error.required.nationality"))
+      contentAsString(result) must include(messages("error.required.nationality"))
     }
 
     "submit with valid nationality data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "nationality" -> "01"
+      val newRequest = FakeRequest(POST, routes.NationalityController.post(1).url)
+      .withFormUrlEncodedBody(
+        "nationality" -> "true"
       )
 
       val responsiblePeople = ResponsiblePerson()
@@ -176,9 +179,10 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "submit with valid nationality data (with other country)" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "nationality" -> "02",
-        "otherCountry" -> "GB"
+      val newRequest = FakeRequest(POST, routes.NationalityController.post(1).url)
+      .withFormUrlEncodedBody(
+        "nationality" -> "false",
+        "country" -> "GB"
       )
 
       val responsiblePeople = ResponsiblePerson()
@@ -196,9 +200,10 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "submit with valid data in edit mode" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "nationality" -> "02",
-        "otherCountry" -> "GB"
+      val newRequest = FakeRequest(POST, routes.NationalityController.post(1).url)
+      .withFormUrlEncodedBody(
+        "nationality" -> "false",
+        "country" -> "GB"
       )
 
       val pResidenceType = PersonResidenceType(UKResidence(Nino(nextNino)), Some(Country("United Kingdom", "GB")), None)
@@ -222,8 +227,9 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "load NotFound page on exception" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "nationality" -> "01"
+      val newRequest = FakeRequest(POST, routes.NationalityController.post(1).url)
+      .withFormUrlEncodedBody(
+        "nationality" -> "true"
       )
 
       val responsiblePeople = ResponsiblePerson()
@@ -237,7 +243,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       val result = controller.post(10, true)(newRequest)
       status(result) must be(NOT_FOUND)
       val document: Document = Jsoup.parse(contentAsString(result))
-      document.title mustBe s"${Messages("error.not-found.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+      document.title mustBe s"${messages("error.not-found.title")} - ${messages("title.amls")} - ${messages("title.gov")}"
     }
   }
 }

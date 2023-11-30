@@ -19,17 +19,50 @@ package models.responsiblepeople
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
+import models.{Enumerable, WithName}
+import play.api.i18n.Messages
 import play.api.libs.json._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
-sealed trait TimeAtAddress
+sealed trait TimeAtAddress {
+  val value: String
+}
 
-object TimeAtAddress {
+object TimeAtAddress extends Enumerable.Implicits {
 
-  case object Empty extends TimeAtAddress
-  case object ZeroToFiveMonths extends TimeAtAddress
-  case object SixToElevenMonths extends TimeAtAddress
-  case object OneToThreeYears extends TimeAtAddress
-  case object ThreeYearsPlus extends TimeAtAddress
+  case object Empty extends TimeAtAddress {
+    override val value: String = ""
+  }
+  case object ZeroToFiveMonths extends WithName("zeroToFiveMonths") with TimeAtAddress {
+    override val value: String = "01"
+  }
+  case object SixToElevenMonths extends WithName("sixToElevenMonths") with TimeAtAddress {
+    override val value: String = "02"
+  }
+  case object OneToThreeYears extends WithName("oneToThreeYears") with TimeAtAddress {
+    override val value: String = "03"
+  }
+  case object ThreeYearsPlus extends WithName("threeYearsPlus") with TimeAtAddress {
+    override val value: String = "04"
+  }
+
+  val all: Seq[TimeAtAddress] = Seq(
+    ZeroToFiveMonths,
+    SixToElevenMonths,
+    OneToThreeYears,
+    ThreeYearsPlus
+  )
+
+  def formValues()(implicit messages: Messages): Seq[RadioItem] = all.map { item =>
+    RadioItem(
+      Text(messages(s"responsiblepeople.timeataddress.${item.toString}")),
+      Some(item.toString),
+      Some(item.toString)
+    )
+  }
+
+  implicit val enumerable: Enumerable[TimeAtAddress] = Enumerable(all.map(v => v.toString -> v): _*)
 
   import utils.MappingUtils.Implicits._
 
@@ -70,9 +103,6 @@ object TimeAtAddress {
 
   implicit val jsonWrites = Writes[TimeAtAddress] {
       case Empty => JsNull
-      case ZeroToFiveMonths => Json.obj("timeAtAddress" -> "01")
-      case SixToElevenMonths => Json.obj("timeAtAddress" -> "02")
-      case OneToThreeYears => Json.obj("timeAtAddress" -> "03")
-      case ThreeYearsPlus => Json.obj("timeAtAddress" -> "04")
+      case timeAtAddress: TimeAtAddress => Json.obj("timeAtAddress" -> timeAtAddress.value)
     }
 }

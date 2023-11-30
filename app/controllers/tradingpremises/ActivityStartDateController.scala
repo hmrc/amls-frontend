@@ -18,14 +18,17 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
-import javax.inject.{Inject, Singleton}
+import forms.tradingpremises.ActivityStartDateFormProvider
 import models.tradingpremises._
+import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.mvc._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, RepeatingSection}
-import views.html.tradingpremises.activity_start_date
+import views.html.tradingpremises.ActivityStartDateView
+
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.Future
 
 @Singleton
 class ActivityStartDateController @Inject()(override val messagesApi: MessagesApi,
@@ -33,18 +36,19 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
                                             val ds: CommonPlayDependencies,
                                             val dataCacheConnector: DataCacheConnector,
                                             val cc: MessagesControllerComponents,
-                                            activity_start_date: activity_start_date,
-                                            implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                            formProvider: ActivityStartDateFormProvider,
+                                            view: ActivityStartDateView,
+                                            implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false) = authAction.async {
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
         getData[TradingPremises](request.credId, index) map {
           case Some(tpSection) =>
             tpSection.yourTradingPremises match {
               case Some(YourTradingPremises(_, tradingPremisesAddress, _, None, _)) =>
-                Ok(activity_start_date(EmptyForm, index, edit, tradingPremisesAddress))
+                Ok(view(formProvider(), index, edit, tradingPremisesAddress))
               case Some(YourTradingPremises(_, tradingPremisesAddress, _, Some(startDate), _)) =>
-                Ok(activity_start_date(Form2[ActivityStartDate](ActivityStartDate(startDate)), index, edit, tradingPremisesAddress))
+                Ok(view(formProvider().fill(ActivityStartDate(startDate)), index, edit, tradingPremisesAddress))
               case _ =>
                NotFound(notFoundView)
             }
@@ -53,38 +57,38 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
         }
   }
 
-  def post(index: Int, edit: Boolean = false) = authAction.async {
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
-        Form2[ActivityStartDate](request.body) match {
-          case f: InvalidForm =>
-            handleInvalidForm(request.credId, index, edit, f)
-          case ValidForm(_, data) =>
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
+            handleInvalidForm(request.credId, index, edit, formWithErrors),
+          data =>
             handleValidForm(request.credId, index, edit, data)
-
-        }
+        )
   }
 
   private def handleValidForm(credId: String, index: Int, edit: Boolean, data: ActivityStartDate)
-                             (implicit hc: HeaderCarrier) = {
+                             (implicit hc: HeaderCarrier): Future[Result] = {
     for {
       _ <- updateDataStrict[TradingPremises](credId, index) { tp =>
         val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None)(x => Some(x.copy(startDate = Some(data.startDate))))
         tp.copy(yourTradingPremises = ytp, hasChanged = true)
       }
-    } yield edit match {
-      case true => Redirect(routes.DetailedAnswersController.get(index))
-      case false => Redirect(routes.IsResidentialController.get(index, edit))
+    } yield if (edit) {
+      Redirect(routes.CheckYourAnswersController.get(index))
+    } else {
+      Redirect(routes.IsResidentialController.get(index, edit))
     }
   }
 
-  private def handleInvalidForm(credId: String, index: Int, edit: Boolean, f: InvalidForm)
+  private def handleInvalidForm(credId: String, index: Int, edit: Boolean, f: Form[ActivityStartDate])
                                (implicit hc: HeaderCarrier,
-                                request: Request[_]) = {
+                                request: Request[_]): Future[Result] = {
     for {
       tp <- getData[TradingPremises](credId, index)
     } yield tp.flatMap(_.yourTradingPremises) match {
       case Some(ytp) =>
-        BadRequest(activity_start_date(f, index, edit, ytp.tradingPremisesAddress))
+        BadRequest(view(f, index, edit, ytp.tradingPremisesAddress))
       case _ => NotFound(notFoundView)
     }
   }

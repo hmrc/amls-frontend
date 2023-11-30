@@ -17,17 +17,19 @@
 package controllers.bankdetails
 
 import controllers.actions.SuccessfulAuthAction
+import models.bankdetails.BankAccountType._
 import models.bankdetails._
 import models.status.SubmissionReady
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.Injecting
+import utils.bankdetails.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.bankdetails.summary
+import views.html.bankdetails.CheckYourAnswersView
 
-class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
+class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
@@ -36,14 +38,15 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     val ukAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456789", "111111")))
     val nonUkIban = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(true)), Some(NonUKIBANNumber("DE89370400440532013000")))
     val nonUkAccount = BankAccount(Some(BankAccountIsUk(false)), Some(BankAccountHasIban(false)), Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
-    lazy val summaryView = app.injector.instanceOf[summary]
+    lazy val summaryView = inject[CheckYourAnswersView]
 
     val controller = new SummaryController(
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       mcc = mockMcc,
-      summary = summaryView)
+      inject[CheckYourAnswersHelper],
+      view = summaryView)
   }
 
   "Get" must {
@@ -62,7 +65,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       contentAsString(result) must include("My Personal Account")
       contentAsString(result) must include("11-11-11")
       contentAsString(result) must include("123456789")
-      contentAsString(result) must include(Messages("bankdetails.bankaccount.sortcode"))
+      contentAsString(result) must include(messages("bankdetails.bankaccount.sortcode"))
       contentAsString(result) mustNot include("My IBAN Account")
     }
 
@@ -90,7 +93,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) must be(OK)
       contentAsString(result) must include("My IBAN Account")
       contentAsString(result) must include("DE89370400440532013000")
-      contentAsString(result) must include(Messages("bankdetails.bankaccount.iban.title"))
+      contentAsString(result) must include(messages("bankdetails.bankaccount.iban.title"))
       contentAsString(result) mustNot include("My Personal Account")
     }
   }

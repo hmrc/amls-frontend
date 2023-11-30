@@ -1,0 +1,89 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
+@import views.html.components.forms.ErrorSummary
+@import views.html.components.{SectionSubtitle, Heading, Button, ReturnLink}
+
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    formHelper: FormWithCSRF,
+    govukSelect: GovukSelect,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean, currencyData: Seq[SelectItem])(implicit request: Request[_], messages: Messages)
+
+@preparedForm = @{
+    form.error("currencies") match {
+        case Some(value) => form.discardingErrors.withError("currencies[0]", value.message)
+        case None => form
+    }
+}
+
+@preparedErrorSummaryMapping = @{
+    preparedForm.errors match {
+        case errors => Some(
+            errors.zipWithIndex.toMap.map { case (error, index) =>
+                error.key -> s"currency-autocomplete-$index"
+            }
+        )
+        case Nil => None
+    }
+}
+
+@layout(
+    pageTitle = messages("renewal.msb.whichcurrencies.header") + " - " + messages("summary.renewal")
+) {
+
+    @errorSummary(preparedForm, preparedErrorSummaryMapping)
+
+    @subtitle("summary.renewal")
+
+    @heading("renewal.msb.whichcurrencies.header")
+
+    <p class="govuk-hint">@messages("msb.which_currencies.uptoThree.hint2")</p>
+
+    @formHelper(action = controllers.renewal.routes.WhichCurrenciesController.post(edit)) {
+
+        <div class="currencies-autocomplete-wrapper">
+            @for(i <- 0 until 3) {
+                @govukSelect(
+                    Select(
+                        id = s"currency-autocomplete-$i",
+                        name = s"currencies[$i]",
+                        label = Label(
+                            content = Text(messages(s"lbl.currency.line${i+1}"))
+                        ),
+                        items = currencyData,
+                        attributes = Map("data-gov-autocomplete" -> "true")
+                    )
+                    .asAccessibleAutocomplete(Some(AccessibleAutocomplete(autoSelect = true)))
+                    .withFormField(preparedForm(s"currencies[$i]"))
+                )
+            }
+        </div>
+
+        @button()
+    }
+
+    @returnLink(true, Some("renewal"))
+}

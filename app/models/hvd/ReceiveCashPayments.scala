@@ -26,39 +26,11 @@ case class ReceiveCashPayments(paymentMethods: Option[PaymentMethods])
 
 sealed trait ReceiveCashPayments0 {
 
-
-  implicit val formRule: Rule[UrlFormEncoded, ReceiveCashPayments] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    import utils.MappingUtils.Implicits.RichRule
-
-    (__ \ "receivePayments").read[Boolean].withMessage("error.required.hvd.receive.cash.payments") flatMap{
-      case true =>
-        (__ \ "paymentMethods").read[PaymentMethods] map (x => ReceiveCashPayments(Some(x)))
-      case false => Rule.fromMapping { _ => Valid(ReceiveCashPayments(None)) }
-    }
-  }
-
   implicit val jsonReads: Reads[ReceiveCashPayments] =
     (__ \ "receivePayments").read[Boolean] flatMap {
       case true => (__ \ "paymentMethods").read[PaymentMethods] map (x => ReceiveCashPayments(Some(x)))
       case false => Reads(_ => JsSuccess(ReceiveCashPayments(None)))
     }
-
-  val formR: Rule[UrlFormEncoded, ReceiveCashPayments] = {
-    implicitly[Rule[UrlFormEncoded, ReceiveCashPayments]]
-  }
-
-  val formWrite: Write[ReceiveCashPayments, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-
-     (
-        (__ \ "receivePayments").write[Boolean].contramap[Option[_]] {
-         case Some(_) => true
-         case None => false
-        } ~
-        (__ \ "paymentMethods").write[Option[PaymentMethods]]
-      )(a => (a.paymentMethods, a.paymentMethods))
-  }
 
   val jsonR: Reads[ReceiveCashPayments] = {
     implicitly[Reads[ReceiveCashPayments]]
@@ -81,9 +53,7 @@ object ReceiveCashPayments {
 
   private object Cache extends ReceiveCashPayments0
 
-  implicit val formR: Rule[UrlFormEncoded, ReceiveCashPayments] = Cache.formR
   implicit val jsonR: Reads[ReceiveCashPayments] = Cache.jsonReads
-  implicit val formW: Write[ReceiveCashPayments, UrlFormEncoded] = Cache.formWrite
   implicit val jsonW: Writes[ReceiveCashPayments] = Cache.jsonW
 
 

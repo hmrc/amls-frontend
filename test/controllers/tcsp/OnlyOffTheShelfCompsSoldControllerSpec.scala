@@ -18,32 +18,37 @@ package controllers.tcsp
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.tcsp.OnlyOffTheShelfCompsSoldFormProvider
 import models.tcsp._
+import models.tcsp.ProvidedServices._
+import models.tcsp.TcspTypes._
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.test
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
-import views.html.tcsp.only_off_the_shelf_comps_sold
+import views.html.tcsp.OnlyOffTheShelfCompsSoldView
 
 import scala.concurrent.Future
 
-
-class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)
 
     val cache = mock[DataCacheConnector]
-    lazy val view = app.injector.instanceOf[only_off_the_shelf_comps_sold]
+    lazy val view = inject[OnlyOffTheShelfCompsSoldView]
     lazy val controller = new OnlyOffTheShelfCompsSoldController(
       SuccessfulAuthAction,
       commonDependencies,
       cache,
       cc = mockMcc,
-      only_off_the_shelf_comps_sold = view)
+      formProvider = inject[OnlyOffTheShelfCompsSoldFormProvider],
+      view = view)
 
     val tcsp = Tcsp(
       Some(TcspTypes(Set(
@@ -70,7 +75,8 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
       "respond with BAD_REQUEST" when {
         "given invalid data" in new TestFixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.OnlyOffTheShelfCompsSoldController.post().url)
+          .withFormUrlEncodedBody(
             "onlyOffTheShelfCompsSold" -> "invalid"
           )
 
@@ -127,7 +133,8 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
             when(cache.fetch[Tcsp](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(companyFormationAgentTcsp)))
 
-            val result = controller.post()(requestWithUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
+            val result = controller.post()(FakeRequest(POST, routes.OnlyOffTheShelfCompsSoldController.post().url)
+            .withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
 
             status(result) mustBe SEE_OTHER
             verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
@@ -152,7 +159,8 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
                 hasChanged = true
               )
 
-              val result = controller.post(true)(requestWithUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
+              val result = controller.post(true)(FakeRequest(POST, routes.OnlyOffTheShelfCompsSoldController.post().url)
+              .withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
 
               status(result) mustBe SEE_OTHER
               verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
@@ -176,7 +184,8 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
                 hasChanged = true
               )
 
-              val result = controller.post(false)(requestWithUrlEncodedBody("onlyOffTheShelfCompsSold" -> "false"))
+              val result = controller.post(false)(FakeRequest(POST, routes.OnlyOffTheShelfCompsSoldController.post().url)
+              .withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "false"))
               status(result) mustBe SEE_OTHER
               verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get.url)

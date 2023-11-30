@@ -20,13 +20,14 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import play.api.i18n.Messages
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-import views.html.businessmatching.updateservice.remove.unable_to_remove_activity
+import views.html.businessmatching.updateservice.remove.UnableToRemoveActivityView
 
 import scala.concurrent.Future
 
@@ -35,16 +36,16 @@ class UnableToRemoveBusinessTypesController @Inject()(authAction: AuthAction,
                                                       val ds: CommonPlayDependencies,
                                                       val dataCacheConnector: DataCacheConnector,
                                                       val cc: MessagesControllerComponents,
-                                                      unable_to_remove_activity: unable_to_remove_activity) extends AmlsBaseController(ds, cc) {
+                                                      view: UnableToRemoveActivityView) extends AmlsBaseController(ds, cc) {
 
-  def get = authAction.async {
-      implicit request =>
-      getBusinessActivity(request.credId) map {
-        case activity => Ok(unable_to_remove_activity(activity))
+  def get: Action[AnyContent] = authAction.async {
+    implicit request =>
+      getBusinessActivity(request.credId) map { activity =>
+        Ok(view(activity))
       } getOrElse (InternalServerError("Get: Unable to show Unable to Remove Activities page"))
   }
 
-  private def getBusinessActivity(credId: String)(implicit hc: HeaderCarrier, messages: Messages) = for {
+  private def getBusinessActivity(credId: String)(implicit hc: HeaderCarrier, messages: Messages): OptionT[Future, String] = for {
     model <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
     activities <- OptionT.fromOption[Future](model.alphabeticalBusinessActivitiesLowerCase(false))
   } yield activities.head

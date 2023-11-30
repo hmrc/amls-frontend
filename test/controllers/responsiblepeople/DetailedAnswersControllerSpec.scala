@@ -23,37 +23,38 @@ import controllers.declaration
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LimitedCompany, Partnership}
+import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.responsiblepeople.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.responsiblepeople.detailed_answers
+import views.html.responsiblepeople.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePeopleValues with BusinessMatchingGenerator with OptionValues{
+class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePeopleValues with BusinessMatchingGenerator with OptionValues with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[detailed_answers]
+    lazy val view = inject[CheckYourAnswersView]
     val controller = new DetailedAnswersController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       config = mock[ApplicationConfig],
       cc = mockMcc,
-      detailed_answers = view,
+      cyaHelper = inject[CheckYourAnswersHelper],
+      view = view,
       error = errorView
       )
 
@@ -81,7 +82,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
         .thenReturn(Future.successful(Some(BusinessMatching())))
 
-      when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+      when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(status))
     }
 
@@ -97,7 +98,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("title.cya"))
+        contentAsString(result) must include(messages("title.cya"))
         contentAsString(result) must include("/anti-money-laundering/responsible-people/check-your-answers")
       }
     }
@@ -111,7 +112,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      val element = document.getElementsMatchingOwnText(messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
       element.hasAttr("href") must be(true)
     }
 
@@ -124,7 +125,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      val element = document.getElementsMatchingOwnText(messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
       element.hasAttr("href") must be(true)
     }
 
@@ -137,7 +138,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      val element = document.getElementsMatchingOwnText(messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
       element.hasAttr("href") must be(false)
     }
 
@@ -150,7 +151,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      val element = document.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
+      val element = document.getElementsMatchingOwnText(messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
       element.hasAttr("href") must be(true)
     }
 
@@ -163,7 +164,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("title.cya"))
+        contentAsString(result) must include(messages("title.cya"))
         contentAsString(result) must not include "/anti-money-laundering/responsible-people/your-answers"
       }
     }
@@ -178,7 +179,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           val result = controller.get(1)(request)
           status(result) must be(OK)
 
-          contentAsString(result) must include(Messages("title.cya"))
+          contentAsString(result) must include(messages("title.cya"))
         }
 
         "respond with OK and show the detailed answers page with a correctly formatted responsiblePerson startDate" in new Fixture {
@@ -293,7 +294,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
             .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(Partnership)))))))
 
-          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.post(1, flow)(request)
@@ -323,7 +324,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
             .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
 
-          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = controller.post(1, flow)(request)
@@ -353,7 +354,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
             .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
 
-          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.post(1, flow)(request)
@@ -383,7 +384,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
             .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
 
-          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
           val result = controller.post(1, flow)(request)

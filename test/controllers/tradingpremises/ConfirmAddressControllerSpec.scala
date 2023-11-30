@@ -18,6 +18,7 @@ package controllers.tradingpremises
 
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.actions.SuccessfulAuthAction
+import forms.tradingpremises.ConfirmAddressFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.Country
@@ -29,11 +30,11 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, StatusService}
+import services.StatusService
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.tradingpremises.confirm_address
+import views.html.tradingpremises.ConfirmAddressView
 
 import scala.concurrent.Future
 
@@ -47,23 +48,20 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
     val dataCache: DataCacheConnector = mockCacheConnector
     val reviewDetails = mock[ReviewDetails]
     val statusService = mock[StatusService]
-    val enrolments = mock[AuthEnrolmentsService]
     val amls = mock[AmlsConnector]
-    lazy val view = app.injector.instanceOf[confirm_address]
+    lazy val view = app.injector.instanceOf[ConfirmAddressView]
     val controller = new ConfirmAddressController(
       messagesApi,
       self.dataCache,
       SuccessfulAuthAction, ds = commonDependencies,
-      enrolments,
       statusService,
       amls,
       cc = mockMcc,
-      confirm_address = view
+      app.injector.instanceOf[ConfirmAddressFormProvider],
+      view = view
     )
 
-    when {
-      enrolments.amlsRegistrationNumber(any(), any())(any(), any())
-    } thenReturn Future.successful(Some(applicationReference))
+
 
     mockCacheFetchAll
   }
@@ -159,7 +157,8 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
             controller.statusService.getSafeIdFromReadStatus(any(), any())(any(), any())
           } thenReturn Future.successful(Some(safeId))
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.ConfirmAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "confirmAddress" -> "true"
           )
 
@@ -182,7 +181,8 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
         }
 
         "option is 'No' is selected confirming the mentioned address is the trading premises address" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.ConfirmAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "confirmAddress" -> "false"
           )
 
@@ -200,7 +200,8 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
       }
 
       "throw error message on not selecting the option" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody("" -> "")
+        val newRequest = FakeRequest(POST, routes.ConfirmAddressController.post(1).url)
+        .withFormUrlEncodedBody("" -> "")
 
         mockCacheFetch[BusinessMatching](Some(bm))
 

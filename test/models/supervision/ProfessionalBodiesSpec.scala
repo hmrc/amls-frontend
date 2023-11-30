@@ -17,6 +17,7 @@
 package models.supervision
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
+import models.supervision.ProfessionalBodies._
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 import utils.AmlsSpec

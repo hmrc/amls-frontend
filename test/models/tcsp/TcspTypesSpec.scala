@@ -17,9 +17,10 @@
 package models.tcsp
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Path, Invalid, Valid}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
-import play.api.libs.json.{JsSuccess, JsPath, JsError, Json}
+import models.tcsp.TcspTypes._
+import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class TcspTypesSpec extends PlaySpec {
 

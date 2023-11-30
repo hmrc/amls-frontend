@@ -18,29 +18,27 @@ package controllers.bankdetails
 
 import connectors.DataCacheConnector
 import controllers.CommonPlayDependencies
-import forms.EmptyForm
 import javax.inject.Inject
 import models.bankdetails.BankDetails
 import models.bankdetails.BankDetails.Filters._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import views.html.bankdetails.your_bank_accounts
+import views.html.bankdetails.YourBankAccountsView
 
 class YourBankAccountsController @Inject()(val dataCacheConnector: DataCacheConnector,
                                            val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
                                            val mcc: MessagesControllerComponents,
-                                           your_bank_accounts: your_bank_accounts) extends BankDetailsController(ds, mcc) {
+                                           view: YourBankAccountsView) extends BankDetailsController(ds, mcc) {
 
-  def get(complete: Boolean = false) = authAction.async {
+  def get(complete: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
         for {
           bankDetails <- dataCacheConnector.fetch[Seq[BankDetails]](request.credId, BankDetails.key)
         } yield bankDetails match {
           case Some(data) =>
             val filteredBankDetails = data.zipWithIndex.visibleAccounts.reverse
-            val result = Ok(your_bank_accounts(
-              EmptyForm,
+            val result = Ok(view(
               filteredBankDetails.incompleteAccounts,
               filteredBankDetails.completeAccounts
             ))

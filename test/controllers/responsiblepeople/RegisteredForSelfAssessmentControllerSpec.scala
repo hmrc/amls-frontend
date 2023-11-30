@@ -18,6 +18,7 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.SelfAssessmentRegisteredFormProvider
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{PersonName, ResponsiblePerson, SaRegisteredYes}
 import org.jsoup.Jsoup
@@ -28,22 +29,24 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import views.html.responsiblepeople.registered_for_self_assessment
+import views.html.responsiblepeople.SelfAssessmentRegisteredView
 
 import scala.concurrent.Future
 
-class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   val recordId = 1
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[registered_for_self_assessment]
+    lazy val view = inject[SelfAssessmentRegisteredView]
     val controller = new RegisteredForSelfAssessmentController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
-      registered_for_self_assessment = view,
+      formProvider = inject[SelfAssessmentRegisteredFormProvider],
+      view = view,
       error = errorView)
   }
 
@@ -93,7 +96,8 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
     "post is called" must {
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.RegisteredForSelfAssessmentController.post(1).url)
+        .withFormUrlEncodedBody(
           "saRegistered" -> "test"
         )
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
@@ -105,7 +109,8 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
       }
 
       "respond with NOT_FOUND when the index is out of bounds" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.RegisteredForSelfAssessmentController.post(1).url)
+        .withFormUrlEncodedBody(
           "saRegistered" -> "true",
           "utrNumber" -> "0123456789"
         )
@@ -119,7 +124,8 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
 
       "when edit is false" must {
         "redirect to the ExperienceTrainingController" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.RegisteredForSelfAssessmentController.post(1).url)
+          .withFormUrlEncodedBody(
             "saRegistered" -> "true",
             "utrNumber" -> "0123456789"
           )
@@ -136,7 +142,8 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
       }
       "when edit is true" must {
         "on post with valid data in edit mode" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.RegisteredForSelfAssessmentController.post(1).url)
+          .withFormUrlEncodedBody(
             "saRegistered" -> "true",
             "utrNumber" -> "0123456789"
           )

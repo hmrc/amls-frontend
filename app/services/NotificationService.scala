@@ -19,12 +19,13 @@ package services
 import cats.data.OptionT
 import cats.implicits._
 import connectors.AmlsNotificationConnector
-import javax.inject.{Inject, Singleton}
 import models.notifications.{ContactType, NotificationDetails, NotificationRow}
 import play.api.i18n._
 import uk.gov.hmrc.http.HeaderCarrier
-import scala.language.reflectiveCalls
+
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.language.reflectiveCalls
 
 @Singleton
 class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificationConnector, val messagesApi: MessagesApi) {
@@ -71,7 +72,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
                                  (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[NotificationDetails]] = {
 
     val staticMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
-      .getDeclaredConstructor().newInstance().asInstanceOf[{ def static(contactType: ContactType, url: String): String }]
+      .getDeclaredConstructor().newInstance().asInstanceOf[{ def static(contactType: ContactType, url: String): String }] //TODO this NEEDS to be changed
 
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId) map {
       case Some(notificationDetails) => {
@@ -92,7 +93,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
                                    (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[NotificationDetails]] = {
 
     val reminderMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
-      .getDeclaredConstructor().newInstance().asInstanceOf[{ def reminder(contactType: ContactType, paymentAmount: String, referenceNumber: String): String }]
+      .getDeclaredConstructor().newInstance().asInstanceOf[{ def reminder(contactType: ContactType, paymentAmount: String, referenceNumber: String): String }] //TODO this NEEDS to be changed
 
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId) map {
       case Some(notificationDetails) => {
@@ -115,7 +116,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
                                   (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[NotificationDetails]] = {
 
     val endDateMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
-      .getDeclaredConstructor().newInstance().asInstanceOf[{ def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String }]
+      .getDeclaredConstructor().newInstance().asInstanceOf[{ def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String }] //TODO this NEEDS to be changed
 
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId) map {
       case Some(notificationDetails) =>
@@ -138,7 +139,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
                                          (implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[NotificationDetails]] = {
 
     val endDateMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
-      .getDeclaredConstructor().newInstance().asInstanceOf[{ def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String }]
+      .getDeclaredConstructor().newInstance().asInstanceOf[{ def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String }] //TODO this NEEDS to be changed
 
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id, accountTypeId) map {
       case Some(notificationDetails) => {

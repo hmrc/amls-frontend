@@ -16,14 +16,13 @@
 
 package models.responsiblepeople
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress._
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
+import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
-
-import scala.collection.Seq
 
 case class ResponsiblePerson(personName: Option[PersonName] = None,
                              legalName: Option[PreviousName] = None,
@@ -83,6 +82,10 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
   def personName(p: PersonName): ResponsiblePerson =
     this.copy(personName = Some(p), hasChanged = hasChanged || !this.personName.contains(p),
       hasAccepted = hasAccepted && this.personName.contains(p))
+
+  def hasPreviousName(p: Boolean): ResponsiblePerson =
+    this.copy(legalName = this.legalName.map(_.copy(hasPreviousName = Some(p))), hasChanged = hasChanged || !this.legalName.map(_.hasPreviousName).contains(p),
+      hasAccepted = hasAccepted && this.legalName.map(_.hasPreviousName).contains(p))
 
   def legalName(p: PreviousName): ResponsiblePerson =
     this.copy(legalName = Some(p), hasChanged = hasChanged || !this.legalName.contains(p),
@@ -239,26 +242,59 @@ object ResponsiblePerson {
   def filterWithIndex(rp: Seq[ResponsiblePerson]): Seq[(ResponsiblePerson, Int)] =
     rp.zipWithIndex.reverse.filterNot(_._1.status.contains(StatusConstants.Deleted)).filterNot(_._1 == ResponsiblePerson())
 
-  def section(implicit cache: CacheMap): Section = {
+  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
 
     val messageKey = "responsiblepeople"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get())
+    val notStarted = TaskRow(
+      messageKey,
+      controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get().url,
+      hasChanged = false,
+      NotStarted,
+      TaskRow.notStartedTag
+    )
 
     cache.getEntry[Seq[ResponsiblePerson]](key).fold(notStarted) { rp =>
 
       if (filter(rp).equals(Nil)) {
-        Section(messageKey, NotStarted, anyChanged(rp), controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get())
+        TaskRow(
+          messageKey,
+          controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get().url,
+          anyChanged(rp),
+          NotStarted,
+          TaskRow.notStartedTag
+        )
       } else {
         filter(rp) match {
+          case responsiblePeople if responsiblePeople.nonEmpty && anyChanged(responsiblePeople) && responsiblePeople.forall {
+            _.isComplete
+          } => TaskRow(
+            messageKey,
+            controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
+            anyChanged(rp),
+            Updated,
+            TaskRow.updatedTag
+          )
           case responsiblePeople if responsiblePeople.nonEmpty && responsiblePeople.forall {
             _.isComplete
-          } => Section(messageKey, Completed, anyChanged(rp), controllers.responsiblepeople.routes.YourResponsiblePeopleController.get)
+          } => TaskRow(
+            messageKey,
+            controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
+            anyChanged(rp),
+            Completed,
+            TaskRow.completedTag
+          )
           case _ =>
             rp.indexWhere {
               case model if !model.isComplete && !model.status.contains(StatusConstants.Deleted) => true
               case _ => false
             }
-            Section(messageKey, Started, anyChanged(rp), controllers.responsiblepeople.routes.YourResponsiblePeopleController.get)
+            TaskRow(
+              messageKey,
+              controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url,
+              anyChanged(rp),
+              Started,
+              TaskRow.incompleteTag
+            )
         }
       }
     }
@@ -297,10 +333,10 @@ object ResponsiblePerson {
   }
 
   import play.api.libs.functional.syntax._
+  import play.api.libs.json.JodaReads._
+  import play.api.libs.json.JodaWrites._
   import play.api.libs.json._
   import utils.MappingUtils._
-  import play.api.libs.json.JodaWrites._
-  import play.api.libs.json.JodaReads._
 
   val flowFromDeclaration = "fromDeclaration"
 

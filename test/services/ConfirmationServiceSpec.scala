@@ -32,145 +32,48 @@ package services
  * limitations under the License.
  */
 import connectors.DataCacheConnector
-import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
-import models._
-import models.businesscustomer.ReviewDetails
-import models.businessmatching._
-import models.responsiblepeople.ResponsiblePerson
-import models.tradingpremises.TradingPremises
-import org.joda.time.DateTime
+import models.renewal.Renewal
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.AmlsSpec
 
 import scala.concurrent.Future
 
-class ConfirmationServiceSpec extends PlaySpec
-  with MockitoSugar
-  with ScalaFutures
-  with IntegrationPatience
-  with GuiceOneAppPerSuite
-  with ResponsiblePersonGenerator
-  with generators.tradingpremises.TradingPremisesGenerator
-  with AmlsReferenceNumberGenerator {
+class ConfirmationServiceSpec extends AmlsSpec {
 
-  trait Fixture {
+  val mockCacheConnector = mock[DataCacheConnector]
+  val cache = mock[CacheMap]
 
-    val TestConfirmationService = new ConfirmationService (
-      mock[DataCacheConnector]
-    )
+  val service = new ConfirmationService(mockCacheConnector)
 
-    val rpFee: BigDecimal = 100
-    val rpFeeWithRate: BigDecimal = 130
-    val tpFee: BigDecimal = 115
-    val tpFeeWithRate: BigDecimal = 125
-    val tpHalfFee: BigDecimal = tpFee / 2
-    val tpTotalFee: BigDecimal = tpFee + (tpHalfFee * 3)
-    val totalFee: BigDecimal = rpFee + tpTotalFee
-
-    val paymentRefNo = "XA000000000000"
-    val credId = "credId"
-
-    implicit val headerCarrier = HeaderCarrier()
-
-    val subscriptionResponse = SubscriptionResponse(
-      etmpFormBundleNumber = "",
-      amlsRefNo = amlsRegistrationNumber,
-      Some(SubscriptionFees(
-        registrationFee = 0,
-        fpFee = None,
-        fpFeeRate = Some(100),
-        approvalCheckFee = None,
-        approvalCheckFeeRate = Some(40),
-        premiseFee = 0,
-        premiseFeeRate = Some(115),
-        totalFees = 0,
-        paymentReference = paymentRefNo
-      )))
-
-    val amendmentResponse = AmendVariationRenewalResponse(
-      processingDate = "",
-      etmpFormBundleNumber = "",
-      registrationFee = 100,
-      fpFee = None,
-      fpFeeRate = Some(100),
-      approvalCheckFee = None,
-      approvalCheckFeeRate = Some(40),
-      premiseFee = 0,
-      premiseFeeRate = Some(115),
-      totalFees = 100,
-      paymentReference = Some(paymentRefNo),
-      difference = Some(0)
-    )
-
-    val variationResponse = AmendVariationRenewalResponse(
-      processingDate = "",
-      etmpFormBundleNumber = "",
-      registrationFee = 100,
-      fpFee = None,
-      fpFeeRate = Some(100),
-      approvalCheckFee = None,
-      approvalCheckFeeRate = Some(40),
-      premiseFee = 0,
-      premiseFeeRate = Some(115),
-      totalFees = 100,
-      paymentReference = Some(""),
-      difference = Some(0)
-    )
-
-    def feeResponse(responseType: ResponseType) = FeeResponse(
-      responseType,
-      amlsRegistrationNumber,
-      100,
-      None,
-      None,
-      0,
-      100,
-      Some(paymentRefNo),
-      None,
-      DateTime.now
-    )
-
-    val reviewDetails = mock[ReviewDetails]
-    val activities = mock[BusinessActivities]
-    val businessMatching = mock[BusinessMatching]
-    val cache = mock[CacheMap]
-
-    when {
-      businessMatching.activities
-    } thenReturn Some(activities)
-
-    when {
-      activities.businessActivities
-    } thenReturn Set[BusinessActivity]()
-
-    when {
-      cache.getEntry[BusinessMatching](BusinessMatching.key)
-    } thenReturn Some(businessMatching)
-
-    when {
-      cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
-    } thenReturn Some(amendmentResponse)
-
-    when {
-      cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-    } thenReturn Some(Seq(tradingPremisesGen.sample.get))
-
-    when {
-      cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-    } thenReturn Some(Seq(ResponsiblePerson()))
-
-    when {
-      TestConfirmationService.cacheConnector.fetchAll(eqTo(credId))(any())
-    } thenReturn Future.successful(Some(cache))
-  }
+  val credId = "123456"
 
   "SubmissionResponseService" when {
 
+    "isRenewalDefined is called" must {
+
+      "return true" when {
+
+        "renewal is retrieved from the cache" in {
+
+          when(mockCacheConnector.fetch[Renewal](eqTo(credId), eqTo(Renewal.key))(any(), any()))
+            .thenReturn(Future.successful(Some(Renewal())))
+
+          service.isRenewalDefined(credId).futureValue mustBe true
+        }
+      }
+
+      "return false" when {
+
+        "renewal is NOT retrieved from the cache" in {
+
+          when(mockCacheConnector.fetch[Renewal](eqTo(credId), eqTo(Renewal.key))(any(), any()))
+            .thenReturn(Future.successful(None))
+
+          service.isRenewalDefined(credId).futureValue mustBe false
+        }
+      }
+    }
   }
 }

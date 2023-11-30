@@ -17,26 +17,24 @@
 package utils
 
 import models.Country
-import models.registrationprogress.{Completed, Section, Started}
+import models.registrationprogress.{Completed, Started, TaskRow, Updated}
 import models.renewal._
 import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
+import org.mockito.Matchers.{any, eq => eqTo, _}
+import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import services.{RenewalService, SectionsProvider, StatusService}
-import org.mockito.Mockito.when
-import org.mockito.Matchers.any
-import utils.DeclarationHelper._
+import play.api.test.Helpers
 import play.api.test.Helpers._
-import org.mockito.Matchers.{eq => eqTo, _}
-import play.api.mvc.Call
-
-import scala.concurrent.Future
+import services.{RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.DeclarationHelper._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 
 class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar {
@@ -70,6 +68,8 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
   private val inCompleteRenewal = completeRenewal.copy(
     businessTurnover = None
   )
+
+  implicit val messages = Helpers.stubMessages()
 
   "currentPartnersNames" must {
     "return a sequence of full names of only undeleted partners" in {
@@ -143,7 +143,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     "return the correct message string given a SubmissionReady status" in {
 
       when{
-        statusService.getStatus(any(),any(), any())(any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
       await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.registration"
@@ -152,7 +152,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     "return the correct message string given a SubmissionReadyForReview status" in {
 
       when{
-        statusService.getStatus(any(),any(), any())(any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any(), any())
       } thenReturn Future.successful(SubmissionReadyForReview)
 
       await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.amendment.application"
@@ -161,7 +161,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     "return the correct message string given a SubmissionDecisionApproved status" in {
 
       when{
-        statusService.getStatus(any(),any(), any())(any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any(), any())
       } thenReturn Future.successful(SubmissionDecisionApproved)
 
       await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.amendment.application"
@@ -170,7 +170,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     "return the correct message string given a ReadyForRenewal status" in {
 
       when{
-        statusService.getStatus(any(),any(), any())(any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any(), any())
       } thenReturn Future.successful(ReadyForRenewal(None))
 
       await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.renewal.application"
@@ -179,7 +179,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     "return the correct message string given a RenewalSubmitted status" in {
 
       when{
-        statusService.getStatus(any(),any(), any())(any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any(), any())
       } thenReturn Future.successful(RenewalSubmitted(None))
 
       await(statusSubtitle(amlsRegNo, accountTypeId, credId)) mustBe "submit.renewal.application"
@@ -188,7 +188,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     "return an exception when any other status is given" in {
 
       when{
-        statusService.getStatus(any(),any(), any())(any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any(), any())
       } thenReturn Future.successful(SubmissionWithdrawn)
 
       a[Exception] mustBe thrownBy(await(statusSubtitle(amlsRegNo, accountTypeId, credId)))
@@ -200,13 +200,13 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
       "where renewal incomplete" must {
         "return true" in {
           when {
-            statusService.getStatus(any(),any(), any())(any(),any())
+            statusService.getStatus(any(),any(), any())(any(),any(), any())
           } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
 
           when(renewalService.isRenewalComplete(any(), any())(any(), any()))
             .thenReturn(Future.successful(false))
 
-          when(renewalService.getRenewal(any())(any(), any()))
+          when(renewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(inCompleteRenewal)))
 
           await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(true)
@@ -216,13 +216,13 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
       "where no renewal" must {
         "return true" in {
           when {
-            statusService.getStatus(any(),any(), any())(any(),any())
+            statusService.getStatus(any(),any(), any())(any(),any(), any())
           } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
 
           when(renewalService.isRenewalComplete(any(), any())(any(), any()))
             .thenReturn(Future.successful(false))
 
-          when(renewalService.getRenewal(any())(any(), any()))
+          when(renewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(None))
 
           await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(true)
@@ -232,13 +232,13 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
       "where renewal complete" must {
         "return false" in {
           when {
-            statusService.getStatus(any(),any(), any())(any(),any())
+            statusService.getStatus(any(),any(), any())(any(),any(), any())
           } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
 
           when(renewalService.isRenewalComplete(any(), any())(any(), any()))
             .thenReturn(Future.successful(true))
 
-          when(renewalService.getRenewal(any())(any(), any()))
+          when(renewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(Some(completeRenewal)))
 
           await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(false)
@@ -249,13 +249,13 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     "where not in renewal window post renewal" must {
       "return false" in {
         when{
-          statusService.getStatus(any(),any(), any())(any(),any())
+          statusService.getStatus(any(),any(), any())(any(),any(), any())
         } thenReturn Future.successful(RenewalSubmitted(None))
 
         when(renewalService.isRenewalComplete(any(), any())(any(), any()))
           .thenReturn(Future.successful(true))
 
-        when(renewalService.getRenewal(any())(any(), any()))
+        when(renewalService.getRenewal(any())(any()))
           .thenReturn(Future.successful(Some(completeRenewal)))
 
         await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(false)
@@ -265,10 +265,10 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     "where not in renewal window pre renewal" must {
       "return false" in {
         when{
-          statusService.getStatus(any(),any(),any())(any(),any())
+          statusService.getStatus(any(),any(),any())(any(),any(), any())
         } thenReturn Future.successful(SubmissionReady)
 
-        when(renewalService.getRenewal(any())(any(), any()))
+        when(renewalService.getRenewal(any())(any()))
           .thenReturn(Future.successful(None))
 
         await(promptRenewal(amlsRegNo, accountTypeId, credId)) mustBe(false)
@@ -280,7 +280,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     "return the end date where there is a date" in {
       val date = new LocalDate()
       when {
-        statusService.getStatus(any(),any(), any())(any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any(), any())
       } thenReturn Future.successful(ReadyForRenewal(Some(date)))
 
       await(statusEndDate(amlsRegNo, accountTypeId, credId)) mustBe(Some(date))
@@ -288,7 +288,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
 
     "return none where there is no date" in {
       when{
-        statusService.getStatus(any(),any(),any())(any(),any())
+        statusService.getStatus(any(),any(),any())(any(),any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
       await(statusEndDate(amlsRegNo, accountTypeId, credId)) mustBe(None)
@@ -298,7 +298,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
   "getSubheadingBasedOnStatus" must {
     "return renewal subheading if application is in renewal window and renewal is complete" in {
       when {
-        statusService.getStatus(any(),any(), any())(any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any(), any())
       } thenReturn Future.successful(ReadyForRenewal(Some(new LocalDate())))
 
       when(renewalService.isRenewalComplete(any(), any())(any(), any()))
@@ -310,7 +310,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
 
     "return submit application subheading if application is ready to submit" in {
       when {
-        statusService.getStatus(any(),any(), any())(any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any(), any())
       } thenReturn Future.successful(SubmissionReady)
 
       val result = getSubheadingBasedOnStatus(credId, amlsRegNo, accountTypeId, statusService, renewalService).value
@@ -319,7 +319,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
 
     "return update information subheading if application is in any other state" in {
       when {
-        statusService.getStatus(any(),any(), any())(any(),any())
+        statusService.getStatus(any(),any(), any())(any(),any(), any())
       } thenReturn Future.successful(SubmissionReadyForReview)
 
       val result = getSubheadingBasedOnStatus(credId, amlsRegNo, accountTypeId, statusService, renewalService).value
@@ -330,18 +330,23 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
   "sectionsComplete" must {
     val sectionsProvider = mock[SectionsProvider]
     val completedSections = Seq(
-      Section("s1", Completed, true,  mock[Call]),
-      Section("s2", Completed, true,  mock[Call])
+      TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
+      TaskRow("s2", "/bar", true, Completed, TaskRow.completedTag)
     )
 
     val incompleteSections = Seq(
-      Section("s1", Completed, true,  mock[Call]),
-      Section("s2", Started,   true,  mock[Call])
+      TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
+      TaskRow("s2", "/bar", true, Started, TaskRow.incompleteTag)
     )
 
-    "return false where one or more sections are imcomplete" in {
+    val completedAndUpdatedSections = Seq(
+      TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
+      TaskRow("s2", "/bar", true, Updated, TaskRow.updatedTag)
+    )
+
+    "return false where one or more sections are incomplete" in {
       when{
-        sectionsProvider.sections(eqTo(credId))(any(), any())
+        sectionsProvider.taskRows(eqTo(credId))(any(), any(), any())
       }.thenReturn(Future.successful(incompleteSections))
 
       await(sectionsComplete(credId, sectionsProvider)) mustBe(false)
@@ -349,10 +354,18 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
 
     "return true where all sections are complete" in {
       when{
-        sectionsProvider.sections(eqTo(credId))(any(), any())
+        sectionsProvider.taskRows(eqTo(credId))(any(), any(), any())
       }.thenReturn(Future.successful(completedSections))
 
       await(sectionsComplete(credId, sectionsProvider)) mustBe(true)
+    }
+
+    "return true where sections are either complete or updated" in {
+
+      when(sectionsProvider.taskRows(eqTo(credId))(any(), any(), any()))
+        .thenReturn(Future.successful(completedAndUpdatedSections))
+
+      await(sectionsComplete(credId, sectionsProvider)) mustBe true
     }
   }
 

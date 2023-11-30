@@ -17,27 +17,29 @@
 package controllers.supervision
 
 import controllers.actions.SuccessfulAuthAction
+import forms.supervision.SupervisionEndReasonsFormProvider
 import models.supervision._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.supervision.supervision_end_reasons
+import views.html.supervision.SupervisionEndReasonsView
 
-class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[supervision_end_reasons]
+    lazy val view = inject[SupervisionEndReasonsView]
     val controller = new SupervisionEndReasonsController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      supervision_end_reasons = view)
+      formProvider = inject[SupervisionEndReasonsFormProvider],
+      view = view)
   }
 
   "SupervisionEndReasonsController" must {
@@ -48,7 +50,7 @@ class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar wit
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("supervision.supervision_end_reasons.title"))
+      contentAsString(result) must include(messages("supervision.supervision_end_reasons.title"))
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("textarea[name=endingReason]").`val` must be("")
@@ -92,7 +94,8 @@ class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar wit
       val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
       val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.SupervisionEndReasonsController.post().url)
+      .withFormUrlEncodedBody(
         "anotherBody" -> "true",
         "endingReason" -> "Reason")
 
@@ -112,7 +115,8 @@ class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar wit
       val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
       val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.SupervisionEndReasonsController.post().url)
+      .withFormUrlEncodedBody(
         "anotherBody" -> "true",
         "endingReason" -> "Reason")
 
@@ -133,7 +137,8 @@ class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar wit
       val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
       val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.SupervisionEndReasonsController.post().url)
+      .withFormUrlEncodedBody(
         "anotherBody" -> "true",
         "endingReason" -> "Reason")
 

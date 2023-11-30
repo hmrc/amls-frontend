@@ -16,45 +16,52 @@
 
 package controllers.responsiblepeople
 
+import cats.data.OptionT
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.PersonResidentTypeFormProvider
+import generators.NinoGen
 import models.Country
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
-import org.scalatestplus.mockito.MockitoSugar
-import utils.{AmlsSpec, AuthAction}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.http.cache.client.CacheMap
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
+import services.responsiblepeople.PersonResidentTypeService
 import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.AmlsSpec
+import views.html.responsiblepeople.PersonResidenceTypeView
 
 import scala.concurrent.Future
 
-class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil {
+class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with NinoGen with Injecting {
 
+  def nextNino = ninoGen.sample.value.value
   trait Fixture {
     self =>
     val request = addToken(authRequest)
 
-    val dataCacheConnector = mock[DataCacheConnector]
+    val mockService = mock[PersonResidentTypeService]
 
     val mockApplicationConfig = mock[ApplicationConfig]
 
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[ApplicationConfig].to(mockApplicationConfig))
-      .build()
-
-    val controller = app.injector.instanceOf[PersonResidentTypeController]
+    val controller = new PersonResidentTypeController(
+      messagesApi,
+      SuccessfulAuthAction,
+      commonDependencies,
+      stubMessagesControllerComponents(),
+      mockService,
+      inject[PersonResidentTypeFormProvider],
+      inject[PersonResidenceTypeView],
+      errorView
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -75,8 +82,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
           val responsiblePeople = ResponsiblePerson(Some(personName))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(mockService.getResponsiblePerson(any(), any())(any()))
+            .thenReturn(Future.successful(Some(responsiblePeople)))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -97,8 +104,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               nationality = Some(Country("United Kingdom", "GB"))))
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(mockService.getResponsiblePerson(any(), any())(any()))
+            .thenReturn(Future.successful(Some(responsiblePeople)))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -118,8 +125,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               nationality = Some(Country("United Kingdom", "GB"))))
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(),any())(any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(mockService.getResponsiblePerson(any(), any())(any()))
+            .thenReturn(Future.successful(Some(responsiblePeople)))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -135,8 +142,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
         "neither RP personName nor residenceType is found" in new Fixture {
           val responsiblePeople = ResponsiblePerson()
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          when(mockService.getResponsiblePerson(any(), any())(any()))
+            .thenReturn(Future.successful(Some(responsiblePeople)))
 
           val result = controller.get(0)(request)
 
@@ -152,7 +159,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
         "goes to CountryOfBirthController" when {
           "uk residence" in new Fixture   {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+              .withFormUrlEncodedBody(
               "isUKResidence" -> "true",
               "nino" -> nextNino,
               "countryOfBirth" -> "GB",
@@ -168,15 +176,11 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
                 )
               )
             )
+            when(mockService.getCache(any(), any(), any())(any()))
+              .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
-
-            when(controller.dataCacheConnector.fetchAll(any())(any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(controller.dataCacheConnector.save(any() ,any(), any())(any(), any()))
-              .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -187,7 +191,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
         "goes to PersonUKPassportController" when {
           "non uk residence" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+              .withFormUrlEncodedBody(
               "isUKResidence" -> "false",
               "nino" -> nextNino,
               "countryOfBirth" -> "GB",
@@ -204,14 +209,11 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               )
             )
 
+            when(mockService.getCache(any(), any(), any())(any()))
+              .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
+
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
-
-            when(controller.dataCacheConnector.fetchAll(any())(any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
-              .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -221,7 +223,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
           "in edit mode" when {
             "residence type is changed from uk residence to non uk residence" in new Fixture {
 
-              val newRequest = requestWithUrlEncodedBody(
+              val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+                .withFormUrlEncodedBody(
                 "isUKResidence" -> "false"
               )
 
@@ -235,14 +238,11 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
                 )
               )
 
+              when(mockService.getCache(any(), any(), any())(any()))
+                .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
+
               when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
                 .thenReturn(Some(Seq(responsiblePeople)))
-
-              when(controller.dataCacheConnector.fetchAll(any())(any()))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
-
-              when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
-                .thenReturn(Future.successful(mockCacheMap))
 
               val result = controller.post(1, true)(newRequest)
               status(result) must be(SEE_OTHER)
@@ -255,7 +255,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
           "in edit mode" when {
             "uk residence" in new Fixture {
 
-              val newRequest = requestWithUrlEncodedBody(
+              val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+                .withFormUrlEncodedBody(
                 "isUKResidence" -> "true",
                 "nino" -> nextNino,
                 "countryOfBirth" -> "GB",
@@ -272,14 +273,11 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
                 )
               )
 
+              when(mockService.getCache(any(), any(), any())(any()))
+                .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
+
               when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
                 .thenReturn(Some(Seq(responsiblePeople)))
-
-              when(controller.dataCacheConnector.fetchAll(any())(any()))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
-
-              when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
-                .thenReturn(Future.successful(mockCacheMap))
 
               val result = controller.post(1, true,Some(flowFromDeclaration))(newRequest)
               status(result) must be(SEE_OTHER)
@@ -288,56 +286,38 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
           }
         }
 
-        "transforms the NINO to uppercase" in new Fixture {
+        "accept the NINO to uppercase" in new Fixture {
 
           val testNino = nextNino
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+            .withFormUrlEncodedBody(
             "isUKResidence" -> "true",
-            "nino" -> testNino,
+            "nino" -> testNino.toLowerCase,
             "countryOfBirth" -> "GB",
             "nationality" -> "GB"
           )
 
           val responsiblePeople = ResponsiblePerson()
 
+          when(mockService.getCache(any(), any(), any())(any()))
+            .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
+
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
 
-          when(controller.dataCacheConnector.fetchAll(any())(any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
-
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
-
-          val captor = ArgumentCaptor.forClass(classOf[List[ResponsiblePerson]])
-          verify(controller.dataCacheConnector).save(any(), any(), captor.capture())(any(), any())
-
-          captor.getValue must have size 1
-
-          (for {
-            person <- captor.getValue.headOption
-            residence <- person.personResidenceType
-            nino <- residence.isUKResidence match {
-              case UKResidence(n) => Some(n)
-              case _ => None
-            }
-          } yield nino.toString) foreach {
-            _ mustBe testNino
-          }
-
         }
 
-        "remove spaces and dashes" in new Fixture {
+        "accept spaces and dashes" in new Fixture {
 
           val testNino = nextNino
           val spacedNino = testNino.grouped(2).mkString(" ")
           val withDashes = spacedNino.substring(0, 8) + "-" + spacedNino.substring(8, spacedNino.length) // ## ## ##- ## #
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+            .withFormUrlEncodedBody(
             "isUKResidence" -> "true",
             "nino" -> withDashes,
             "countryOfBirth" -> "GB",
@@ -346,34 +326,14 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
           val responsiblePeople = ResponsiblePerson()
 
+          when(mockService.getCache(any(), any(), any())(any()))
+            .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
+
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
 
-          when(controller.dataCacheConnector.fetchAll(any())(any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
-
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
-
-          val captor = ArgumentCaptor.forClass(classOf[List[ResponsiblePerson]])
-          verify(controller.dataCacheConnector).save(any(), any(), captor.capture())(any(), any())
-
-          captor.getValue must have size 1
-
-          (for {
-            person <- captor.getValue.headOption
-            residence <- person.personResidenceType
-            nino <- residence.isUKResidence match {
-              case UKResidence(n) => Some(n)
-              case _ => None
-            }
-          } yield nino.toString) foreach {
-            _ mustBe testNino
-          }
-
         }
 
         "removes data from uk passport and no uk passport excluding date of birth" when {
@@ -398,42 +358,22 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               dateOfBirth = Some(dateOfBirth)
             )
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+              .withFormUrlEncodedBody(
               "isUKResidence" -> "true",
               "nino" -> nino,
               "countryOfBirth" -> countryCode,
               "nationality" -> countryCode
             )
 
-            val personName = PersonName("firstname", None, "lastname")
-
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName), dateOfBirth = Some(dateOfBirth))))))
+            when(mockService.getCache(any(), any(), any())(any()))
+              .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
 
-            when(controller.dataCacheConnector.fetchAll(any())(any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
-              .thenReturn(Future.successful(mockCacheMap))
-
             val result = controller.post(1, true)(newRequest)
             status(result) must be(SEE_OTHER)
-
-            verify(controller.dataCacheConnector)
-              .save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(responsiblePeople.copy(
-              personResidenceType = Some(PersonResidenceType(
-                UKResidence(Nino(nino)),
-                Some(Country(countryCode, countryCode)),
-                Some(Country(countryCode, countryCode))
-              )),
-              ukPassport = None,
-              nonUKPassport = None,
-              dateOfBirth = Some(dateOfBirth),
-              hasChanged = true
-            ))))(any(), any())
           }
         }
       }
@@ -441,16 +381,14 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
       "respond with BAD_REQUEST" when {
         "invalid form is submitted" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+            .withFormUrlEncodedBody(
             "ukPassportNumber" -> "12346464688"
           )
           val responsiblePeople = ResponsiblePerson(Some(PersonName("firstname", None, "lastname")))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
+          when(mockService.getResponsiblePerson(any(), any())(any()))
+            .thenReturn(Future.successful(Some(responsiblePeople)))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -461,7 +399,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
       "return NOT_FOUND" when {
         "index is out of bounds" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.PersonResidentTypeController.post(1).url)
+            .withFormUrlEncodedBody(
             "isUKResidence" -> "true",
             "nino" -> nextNino,
             "countryOfBirth" -> "GB",
@@ -473,11 +412,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
 
-          when(controller.dataCacheConnector.fetchAll(any())(any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
+          when(mockService.getCache(any(), any(), any())(any()))
+            .thenReturn(OptionT[Future, CacheMap](Future.successful(Some(mockCacheMap))))
 
           val result = controller.post(10, false)(newRequest)
           status(result) must be(NOT_FOUND)

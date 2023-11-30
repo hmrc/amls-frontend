@@ -16,17 +16,18 @@
 
 package controllers.businessdetails
 
-import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.businessdetails.VATRegisteredFormProvider
 import models.businessdetails._
-import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
-import play.api.mvc.MessagesControllerComponents
+import models.businessmatching.{BusinessMatching, BusinessType}
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper}
-import views.html.businessdetails._
+import views.html.businessdetails.VATRegisteredView
 
 import scala.concurrent.Future
 
@@ -35,30 +36,28 @@ class VATRegisteredController @Inject () (
                                            val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
                                            val cc: MessagesControllerComponents,
-                                           vat_registered: vat_registered) extends AmlsBaseController(ds, cc) {
+                                           formProvider: VATRegisteredFormProvider,
+                                           vat_registered: VATRegisteredView) extends AmlsBaseController(ds, cc) {
 
 
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response =>
-          val form: Form2[VATRegistered] = (for {
+          val form: Form[VATRegistered] = (for {
             businessDetails <- response
             vatRegistered <- businessDetails.vatRegistered
-          } yield Form2[VATRegistered](vatRegistered)).getOrElse(EmptyForm)
+          } yield formProvider().fill(vatRegistered)).getOrElse(formProvider())
           Ok(vat_registered(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[VATRegistered](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(vat_registered(f, edit)))
-
-        case ValidForm(_, data) =>
-
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(vat_registered(formWithErrors, edit))),
+        data => {
           val redirect = for {
             cache <- dataCacheConnector.fetchAll(request.credId)
             businessType <- Future.successful(getBusinessType(cache))
@@ -67,17 +66,18 @@ class VATRegisteredController @Inject () (
               case _ => BusinessDetails().vatRegistered(data)
             }
           } yield (businessType, edit) match {
-            case (_,true) => Redirect(routes.SummaryController.get)
+            case (_, true) => Redirect(routes.SummaryController.get)
             case (Some(LimitedCompany | LPrLLP), _) => Redirect(routes.CorporationTaxRegisteredController.get)
             case (_, false) => Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
           }
 
           redirect.map(identity)
-      }
+        }
+      )
     }
   }
 
-  private def getBusinessType(maybeCache: Option[CacheMap]) = for {
+  private def getBusinessType(maybeCache: Option[CacheMap]): Option[BusinessType] = for {
     cache <- maybeCache
     businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
   } yield businessType

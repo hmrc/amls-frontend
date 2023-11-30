@@ -17,40 +17,47 @@
 package controllers.businessactivities
 
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.ExpectedAMLSTurnoverFormProvider
 import models.businessactivities.ExpectedAMLSTurnover.First
 import models.businessactivities._
-import models.businessmatching.{BusinessActivities => Activities, _}
+import models.businessmatching.BusinessActivity._
+import models.businessmatching.{BusinessMatching, BusinessActivities => Activities}
 import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
+import play.api.test
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
+import services.businessactivities.ExpectedAMLSTurnoverService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessactivities.expected_amls_turnover
+import views.html.businessactivities.ExpectedAMLSTurnoverView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting with BeforeAndAfterEach {
+
+  val mockService = mock[ExpectedAMLSTurnoverService]
 
   trait Fixture {
     self =>
     val request = addToken(authRequest)
-    implicit val ec = app.injector.instanceOf[ExecutionContext]
+    implicit val ec = inject[ExecutionContext]
 
-    lazy val view = app.injector.instanceOf[expected_amls_turnover]
+    lazy val view = inject[ExpectedAMLSTurnoverView]
     val controller = new ExpectedAMLSTurnoverController (
-      dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       cc = mockMcc,
-      expected_amls_turnover = view
+      service = mockService,
+      formProvider = inject[ExpectedAMLSTurnoverFormProvider],
+      view = view
     )
 
     val mockCache = mock[CacheMap]
@@ -59,6 +66,8 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
   }
 
   val emptyCache = CacheMap("", Map.empty)
+
+  override def beforeEach(): Unit = reset(mockService)
 
   "ExpectedAMLSTurnoverController" when {
 
@@ -69,6 +78,7 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           val businessMatching = BusinessMatching(
             activities = Some(Activities(Set(
               AccountancyServices,
+              ArtMarketParticipant,
               BillPaymentServices,
               EstateAgentBusinessService,
               HighValueDealing,
@@ -78,17 +88,11 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
             )))
           )
 
-          when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
-          when(mockCache.getEntry[BusinessActivities](BusinessActivities.key))
-            .thenReturn(None)
-
-          when(mockCache.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(businessMatching))
-
-          when(controller.dataCacheConnector.fetchAll(any())(any()))
-            .thenReturn(Future.successful(Some(mockCache)))
+          when(mockService.getBusinessMatchingExpectedTurnover(any())(any()))
+            .thenReturn(Future.successful(Some((businessMatching, None))))
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -96,22 +100,12 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           val html = contentAsString(result)
           val document = Jsoup.parse(html)
 
-          document.select("input[value=01]").hasAttr("checked") must be(false)
-          document.select("input[value=02]").hasAttr("checked") must be(false)
-          document.select("input[value=03]").hasAttr("checked") must be(false)
-          document.select("input[value=04]").hasAttr("checked") must be(false)
-          document.select("input[value=05]").hasAttr("checked") must be(false)
-          document.select("input[value=06]").hasAttr("checked") must be(false)
-          document.select("input[value=07]").hasAttr("checked") must be(false)
+          ExpectedAMLSTurnover.all.foreach { value =>
+            document.select(s"input[value=${value.toString}]").hasAttr("checked") must be(false)
+            html must include(messages(s"businessactivities.registerservices.servicename.lbl.${value.value}"))
+          }
 
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.01"))
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.03"))
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.04"))
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.05"))
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.06"))
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.07"))
-          html must include(Messages("businessactivities.registerservices.servicename.lbl.08"))
-
+          html must include(messages("businessactivities.registerservices.servicename.lbl.08"))
         }
 
         "there is existing data" in new Fixture {
@@ -130,33 +124,27 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
             )))
           )
 
-          when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
-          when(controller.dataCacheConnector.fetchAll(any())(any()))
-            .thenReturn(Future.successful(Some(mockCache)))
-
-          when(mockCache.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(businessMatching))
-
-          when(mockCache.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
-            .thenReturn(model)
+          when(mockService.getBusinessMatchingExpectedTurnover(any())(any()))
+            .thenReturn(Future.successful(Some((businessMatching, Some(First)))))
 
           val result = controller.get()(request)
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          document.select("input[value=01]").hasAttr("checked") must be(true)
+          document.select("input[value=zeroPlus]").hasAttr("checked") must be(true)
         }
 
         "there is no cache data" in new Fixture {
 
           override def model = Some(BusinessActivities(expectedAMLSTurnover = Some(First)))
 
-          when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+          when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
-          when(controller.dataCacheConnector.fetchAll(any())(any()))
+          when(mockService.getBusinessMatchingExpectedTurnover(any())(any()))
             .thenReturn(Future.successful(None))
 
           val result = controller.get()(request)
@@ -169,36 +157,40 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
     "post is called" must {
       "on post with valid data" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "expectedAMLSTurnover" -> "01"
+        val newRequest = FakeRequest(POST, routes.ExpectedAMLSTurnoverController.post().url).withFormUrlEncodedBody(
+          "expectedAMLSTurnover" -> "zeroPlus"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
+        when(mockService.getBusinessMatching(any())(any()))
+          .thenReturn(Future.successful(Some(BusinessMatching())))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        when(mockService.updateBusinessActivities(any(), eqTo(First))(any()))
+          .thenReturn(Future.successful(Some(mockCache)))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessactivities.routes.BusinessFranchiseController.get().url))
+
+        verify(mockService).updateBusinessActivities(any(), eqTo(First))(any())
       }
 
       "on post with valid data in edit mode" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "expectedAMLSTurnover" -> "01"
+        val newRequest = test.FakeRequest(POST, routes.ExpectedAMLSTurnoverController.post().url).withFormUrlEncodedBody(
+          "expectedAMLSTurnover" -> "zeroPlus"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None))
+        when(mockService.getBusinessMatching(any())(any()))
+          .thenReturn(Future.successful(Some(BusinessMatching())))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        when(mockService.updateBusinessActivities(any(), eqTo(First))(any()))
+          .thenReturn(Future.successful(Some(mockCache)))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get.url))
+
+        verify(mockService).updateBusinessActivities(any(), eqTo(First))(any())
       }
 
       "on post with invalid data" in new Fixture {
@@ -215,12 +207,14 @@ class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with
           )))
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
-          .thenReturn(Future.successful(Some(businessMatching)))
+        when(mockService.getBusinessMatching(any())(any()))
+          .thenReturn(Future.successful(Some(BusinessMatching())))
 
         val result = controller.post(true)(request)
 
         status(result) mustBe BAD_REQUEST
+
+        verify(mockService, times(0)).updateBusinessActivities(any(), any())(any())
       }
     }
   }

@@ -1,0 +1,74 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import models.tcsp.ProvidedServices
+@import views.html.components.{Button, Heading, SectionSubtitle, ReturnLink}
+@import views.html.components.forms.{ErrorSummary, InputCheckbox, InputText}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    inputCheckbox: InputCheckbox,
+    inputText: InputText,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean)(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
+
+@conditionalHtml = {
+    @inputText(
+        Input(
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("tcsp.provided_services.service.lbl.details")),
+                classes = "govuk-label"
+            ),
+            id = "details",
+            name = "details"
+        ),
+        form("details")
+    )
+}
+
+@layout(pageTitle = messages("tcsp.provided_services.title") + " - " + messages("summary.tcsp")) {
+
+    @errorSummary(form, Some(Map("services" -> "services_6")))
+
+    @subtitle("summary.tcsp")
+
+    @heading("tcsp.provided_services.title")
+
+    @formHelper(action = controllers.tcsp.routes.ProvidedServicesController.post(edit)) {
+
+        @inputCheckbox(
+            Checkboxes(
+                name = "services",
+                hint = Some(Hint(content = Text(messages("lbl.select.all")))),
+                items = ProvidedServices.formValues(conditionalHtml)
+            ).withFormField(form("services"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

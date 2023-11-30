@@ -1,0 +1,80 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import components.{Button, ReturnLink, SectionSubtitle}
+@import components.forms.{InputCheckbox, ErrorSummary}
+@import models.businessmatching.BusinessActivity
+@import models.businessmatching.BusinessActivities
+
+@this(
+    formHelper: FormWithCSRF,
+    layout: Layout,
+    subtitle: SectionSubtitle,
+    inputCheckbox: InputCheckbox,
+    errorSummary: ErrorSummary,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean, activityValues: Seq[BusinessActivity])(implicit request: Request[_], messages: Messages)
+
+@messageSuffix = @{
+    if(activityValues.size == 2) {
+        "twobusinesses"
+    } else {
+        "multibusinesses"
+    }
+}
+
+@hintContent = @{
+    "<p>" + messages("businessmatching.updateservice.removeactivities.summary." + messageSuffix) + "</p><p>" +
+    messages("businessmatching.updateservice.removeactivities.list.heading." + messageSuffix) + "</p>"
+}
+
+
+@layout(pageTitle = messages("businessmatching.updateservice.removeactivities.title." + messageSuffix)) {
+
+    @formHelper(action = controllers.businessmatching.updateservice.remove.routes.RemoveBusinessTypesController.post(edit)) {
+
+        @errorSummary(form, Some(Map("value" -> "value_0")))
+
+        @subtitle("summary.updateservice")
+
+        @inputCheckbox(
+            Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(
+                        Legend(
+                            content = Text(messages("businessmatching.updateservice.removeactivities.title." + messageSuffix)),
+                            classes = "govuk-fieldset__legend--xl",
+                            isPageHeading = true
+                        )
+                    )
+                )),
+                hint = Some(
+                    Hint(
+                        content = HtmlContent(hintContent)
+                    )
+                ),
+                name = "value",
+                items = BusinessActivities.formValues(Some(activityValues), false)
+            ).withFormField(form("value"))
+        )
+
+        @button("businessmatching.updateservice.removeactivities.button")
+    }
+}

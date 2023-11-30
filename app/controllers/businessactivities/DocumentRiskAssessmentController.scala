@@ -17,66 +17,51 @@
 package controllers.businessactivities
 
 import com.google.inject.Inject
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, RiskAssessmentPolicy, RiskAssessmentTypes}
-import models.businessmatching.BusinessMatching
-import play.api.mvc.MessagesControllerComponents
+import forms.businessactivities.DocumentRiskAssessmentPolicyFormProvider
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.businessactivities.DocumentRiskAssessmentService
 import utils.{AuthAction, ControllerHelper}
-import views.html.businessactivities._
+import views.html.businessactivities.DocumentRiskAssessmentPolicyView
 
 import scala.concurrent.Future
 
 
-class DocumentRiskAssessmentController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                 val authAction: AuthAction,
-                                                 val ds: CommonPlayDependencies,
-                                                 val cc: MessagesControllerComponents,
-                                                 document_risk_assessment_policy: document_risk_assessment_policy,
-                                                 implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+class
+DocumentRiskAssessmentController @Inject()(val authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
+                                           val cc: MessagesControllerComponents,
+                                           service: DocumentRiskAssessmentService,
+                                           formProvider: DocumentRiskAssessmentPolicyFormProvider,
+                                           view: DocumentRiskAssessmentPolicyView,
+                                           implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-        response =>
-          val form: Form2[RiskAssessmentTypes] = (for {
-            businessActivities <- response
-            riskAssessmentPolicy: RiskAssessmentPolicy <- businessActivities.riskAssessmentPolicy
-          } yield Form2[RiskAssessmentTypes](riskAssessmentPolicy.riskassessments)).getOrElse(EmptyForm)
-          Ok(document_risk_assessment_policy(form, edit))
+      service.getRiskAssessmentPolicy(request.credId) map { responseOpt =>
+        val form = responseOpt.fold(formProvider())(x => formProvider().fill(x.riskassessments))
+        Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      import jto.validation.forms.Rules._
-      Form2[RiskAssessmentTypes](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(document_risk_assessment_policy(f, edit)))
-        case ValidForm(_, data: RiskAssessmentTypes) => {
-          dataCacheConnector.fetchAll(request.credId) flatMap { maybeCache =>
-            val businessMatching = for {
-              cacheMap <- maybeCache
-              bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-            } yield bm
-
-            for {
-              businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-              _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, businessActivities.riskAssessmentTypes(data))
-            } yield redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)))
-
-          }
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => {
+          service.updateRiskAssessmentType(request.credId, data).map(_.map { bm =>
+            redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(bm))
+          }).map(_.head)
         } recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
-      }
+      )
   }
 
-  private def redirectDependingOnEdit(edit: Boolean, accountancyServices: Boolean) =
+  private def redirectDependingOnEdit(edit: Boolean, accountancyServices: Boolean): Result =
     if (!edit && !accountancyServices) {
       Redirect(routes.AccountantForAMLSRegulationsController.get())
-  } else {
+    } else {
       Redirect(routes.SummaryController.get)
     }
 }

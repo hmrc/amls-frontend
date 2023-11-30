@@ -18,16 +18,17 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+
 import javax.inject.Inject
 import models.businessmatching.BusinessMatching
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.moneyservicebusiness.MoneyServiceBusiness
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
-
-import views.html.msb.summary
+import utils.msb.CheckYourAnswersHelper
+import views.html.msb.CheckYourAnswersView
 
 class SummaryController @Inject()(authAction: AuthAction,
                                   val ds: CommonPlayDependencies,
@@ -35,9 +36,10 @@ class SummaryController @Inject()(authAction: AuthAction,
                                   implicit val statusService: StatusService,
                                   implicit val serviceFlow: ServiceFlow,
                                   val cc: MessagesControllerComponents,
-                                  summary: summary) extends AmlsBaseController(ds, cc) {
+                                  cyaHelper: CheckYourAnswersHelper,
+                                  view: CheckYourAnswersView) extends AmlsBaseController(ds, cc) {
 
-  def get = authAction.async {
+  def get: Action[AnyContent] = authAction.async {
     implicit request =>
       dataCache.fetchAll(request.credId) map {
         optionalCache =>
@@ -45,15 +47,15 @@ class SummaryController @Inject()(authAction: AuthAction,
             cache <- optionalCache
             businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            register <- cache.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
+            businessMatchingMsb <- businessMatching.msbServices
           } yield {
-            Ok(summary(msb, businessMatching.msbServices, register))
+            Ok(view(cyaHelper.getSummaryList(msb, businessMatchingMsb)))
           }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
       }
   }
 
 
-  def post() = authAction.async {
+  def post(): Action[AnyContent] = authAction.async {
     implicit request =>
       for {
         model <- dataCache.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)

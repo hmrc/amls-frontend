@@ -16,17 +16,17 @@
 
 package controllers.responsiblepeople
 
-import javax.inject.{Inject, Singleton}
-import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.responsiblepeople.CountryOfBirthFormProvider
 import models.Country
 import models.responsiblepeople.{CountryOfBirth, PersonResidenceType, ResponsiblePerson}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.country_of_birth
+import views.html.responsiblepeople.CountryOfBirthView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 
@@ -36,51 +36,43 @@ class CountryOfBirthController @Inject()(authAction: AuthAction,
                                          val dataCacheConnector: DataCacheConnector,
                                          val autoCompleteService: AutoCompleteService,
                                          val cc: MessagesControllerComponents,
-                                         country_of_birth: country_of_birth,
-                                         implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                         formProvider: CountryOfBirthFormProvider,
+                                         view: CountryOfBirthView,
+                                         implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-      implicit request =>
-        getData[ResponsiblePerson](request.credId, index) map {
-          case Some(ResponsiblePerson(Some(personName),_,_,_,Some(personResidenceType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-            personResidenceType.countryOfBirth match {
-              case Some(country) =>
-                Ok(country_of_birth(
-                  Form2[CountryOfBirth](getCountryOfBirth(country)),
-                  edit,
-                  index,
-                  flow,
-                  personName.titleName,
-                  autoCompleteService.getCountries))
-
-              case _ =>
-                Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
-            }
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-            Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
-          case _ => NotFound(notFoundView)
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.personResidenceType) match {
+            case (Some(name), Some(PersonResidenceType(_, Some(countryOfBirth), _))) =>
+              Ok(view(formProvider().fill(getCountryOfBirth(countryOfBirth)), edit, index, flow, name.titleName, autoCompleteService.formOptions))
+            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName, autoCompleteService.formOptions))
+            case _ => NotFound(notFoundView)
+          }
         }
+      }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-      implicit request =>
-        Form2[CountryOfBirth](request.body) match {
-          case f: InvalidForm => getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(country_of_birth(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
-          }
-          case ValidForm(_, data) => {
-            for {
-              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                rp.personResidenceType(updateCountryOfBirth(rp.personResidenceType, data))
-              }
-            } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-              case false => Redirect(routes.NationalityController.get(index, edit, flow))
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => getData[ResponsiblePerson](request.credId, index) map { rp =>
+          BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.formOptions))
+        },
+        data => {
+          for {
+            _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+              rp.personResidenceType(updateCountryOfBirth(rp.personResidenceType, data))
             }
-          }.recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+          } yield edit match {
+            case true => Redirect(routes.DetailedAnswersController.get(index, flow))
+            case false => Redirect(routes.NationalityController.get(index, edit, flow))
           }
+        }.recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
+      )
   }
 
   private def getCountryOfBirth(countryOfBirth: Country): CountryOfBirth = {

@@ -1,0 +1,70 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import models.renewal.CashPaymentsCustomerNotMet
+@import views.html.components.forms.{ErrorSummary, InputYesNo}
+@import views.html.components.{SectionSubtitle, Heading, Button, ReturnLink}
+
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    formHelper: FormWithCSRF,
+    inputYesNo: InputYesNo,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+
+@(form: Form[CashPaymentsCustomerNotMet], edit: Boolean)(implicit messages: Messages, request: Request[_])
+
+@layout(messages("renewal.receiving.title") + " - " + messages("summary.renewal")) {
+
+    @errorSummary(form)
+
+    @subtitle("summary.renewal")
+
+    @heading("renewal.receiving.title")
+
+    <p class="govuk-body">@messages("renewal.receiving.info.line1")</p>
+    <p class="govuk-body">@messages("renewal.receiving.info.line2")</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("renewal.receiving.list.line1")</li>
+        <li>@messages("renewal.receiving.list.line2")</li>
+        <li>@messages("renewal.receiving.list.line3")</li>
+    </ul>
+
+    <p class="govuk-body">@messages("renewal.receiving.text")</p>
+
+    @formHelper(controllers.renewal.routes.CashPaymentsCustomersNotMetController.post(edit)) {
+
+        @inputYesNo(
+            Radios(
+                name = "receiveCashPayments",
+                items = HmrcYesNoRadioItems(),
+                classes = "govuk-radios govuk-radios--inline"
+            ).withFormField(form("receiveCashPayments"))
+        )
+
+        @button()
+
+        @returnLink(true, Some("renewal"))
+    }
+}

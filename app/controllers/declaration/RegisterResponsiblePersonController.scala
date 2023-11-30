@@ -20,12 +20,10 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import utils.AuthAction
-import views.html.declaration.register_responsible_person
-
-
+import views.html.declaration.RegisterResponsiblePersonView
 
 @Singleton
 class RegisterResponsiblePersonController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -33,17 +31,15 @@ class RegisterResponsiblePersonController @Inject()(val dataCacheConnector: Data
                                                     val ds: CommonPlayDependencies,
                                                     val statusService: StatusService,
                                                     val cc: MessagesControllerComponents,
-                                                    register_responsible_person: register_responsible_person) extends AmlsBaseController(ds, cc) {
+                                                    view: RegisterResponsiblePersonView) extends AmlsBaseController(ds, cc) {
 
-  def get() = authAction.async {
-    implicit request => {
-
+  def get(): Action[AnyContent] = authAction.async {
+    implicit request =>
       statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId) map {
         case ReadyForRenewal(_) |
              SubmissionDecisionApproved |
-             SubmissionReadyForReview => Ok(register_responsible_person("submit.amendment.application"))
-        case _ => Ok(register_responsible_person("submit.registration"))
+             SubmissionReadyForReview => Ok(view("submit.amendment.application"))
+        case _ => Ok(view("submit.registration"))
       }
-    }
   }
 }

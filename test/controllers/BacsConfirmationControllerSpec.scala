@@ -32,13 +32,12 @@ import org.joda.time.{DateTime, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.confirmation.{confirmation_bacs, confirmation_bacs_transitional_renewal}
+import views.html.confirmation.ConfirmationBacsView
 
 import scala.concurrent.Future
 
@@ -52,8 +51,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
     self =>
     val baseUrl = "http://localhost"
     val request = addToken(authRequest(uri = baseUrl))
-    lazy val view1 = app.injector.instanceOf[confirmation_bacs_transitional_renewal]
-    lazy val view2 = app.injector.instanceOf[confirmation_bacs]
+    lazy val view = app.injector.instanceOf[ConfirmationBacsView]
     val controller = new BacsConfirmationController(
       authAction = SuccessfulAuthAction,
       statusService = mock[StatusService],
@@ -63,8 +61,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       enrolmentService = mock[AuthEnrolmentsService],
       ds = commonDependencies,
       cc = mockMcc,
-      confirmation_bacs_transitional_renewal = view1,
-      confirmation_bacs = view2)
+      view = view)
 
     when(controller.enrolmentService.amlsRegistrationNumber(any(), any())(any(), any()))
       .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
@@ -124,7 +121,9 @@ class BacsConfirmationControllerSpec extends AmlsSpec
 
     val applicationConfig = app.injector.instanceOf[ApplicationConfig]
 
-    def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
+    def paymentsReturnLocation(ref: String) = ReturnLocation(
+      controllers.routes.PaymentConfirmationController.paymentConfirmation(ref)
+    )(applicationConfig)
 
     def setupBusinessMatching(companyName: String) = {
 
@@ -141,14 +140,14 @@ class BacsConfirmationControllerSpec extends AmlsSpec
     def setupStatus(status: SubmissionStatus): Unit = {
 
       when {
-        controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any())
+        controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any(), any())
       } thenReturn Future.successful(status)
 
       val statusResponse = mock[ReadStatusResponse]
       when(statusResponse.safeId) thenReturn safeIdGen.sample
 
       when {
-        controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any())
+        controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any())
       } thenReturn Future.successful((status, Some(statusResponse)))
     }
   }
@@ -167,7 +166,9 @@ class BacsConfirmationControllerSpec extends AmlsSpec
 
         status(result) mustBe OK
 
-        Jsoup.parse(contentAsString(result)).select("h1.heading-large").text must include(Messages("confirmation.payment.bacs.header"))
+        Jsoup.parse(contentAsString(result)).getElementsByTag("h1").first().text() must include(
+          messages("confirmation.payment.bacs.header")
+        )
 
       }
 
@@ -188,9 +189,9 @@ class BacsConfirmationControllerSpec extends AmlsSpec
         status(result) mustBe OK
 
         val doc = Jsoup.parse(contentAsString(result))
-        doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review"))
-        doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review3"))
-        doc.html() must include(Messages("confirmation.payment.renewal.info.hmrc_review4"))
+        doc.html() must include(messages("confirmation.payment.renewal.info.hmrc_review"))
+        doc.html() must include(messages("confirmation.payment.renewal.info.hmrc_review3"))
+        doc.html() must include(messages("confirmation.payment.renewal.info.hmrc_review4"))
 
       }
     }

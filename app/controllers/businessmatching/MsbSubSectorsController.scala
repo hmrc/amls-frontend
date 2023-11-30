@@ -20,19 +20,19 @@ import cats.data.OptionT
 import cats.implicits._
 import config.ApplicationConfig
 import connectors.DataCacheConnector
-import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.businessmatching._
+import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.businessmatching.MsbSubSectorsFormProvider
+import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router2
 import utils.AuthAction
-import views.html.businessmatching.services
+import views.html.businessmatching.MsbServicesView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class MsbSubSectorsController @Inject()(authAction: AuthAction,
@@ -44,35 +44,37 @@ class MsbSubSectorsController @Inject()(authAction: AuthAction,
                                         val helper: ChangeSubSectorHelper,
                                         val config: ApplicationConfig,
                                         val cc: MessagesControllerComponents,
-                                        services: services) extends AmlsBaseController(ds, cc) {
+                                        formProvider: MsbSubSectorsFormProvider,
+                                        services: MsbServicesView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
         (for {
           bm <- businessMatchingService.getModel(request.credId)
           status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
         } yield {
-          val form: Form2[BusinessMatchingMsbServices] = bm.msbServices map
-            Form2[BusinessMatchingMsbServices] getOrElse EmptyForm
-            Ok(services(form, edit, bm.preAppComplete, statusService.isPreSubmission(status), config.fxEnabledToggle))
-        }) getOrElse Ok(services(EmptyForm, edit, fxEnabledToggle = config.fxEnabledToggle))
+          val form = bm.msbServices.fold(formProvider())(services => formProvider().fill(services.msbServices.toSeq))
+          Ok(services(form, edit, bm.preAppComplete, statusService.isPreSubmission(status), config.fxEnabledToggle))
+        }) getOrElse Ok(services(formProvider(), edit, fxEnabledToggle = config.fxEnabledToggle))
   }
 
-  def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
-        import jto.validation.forms.Rules._
-        Form2[BusinessMatchingMsbServices](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(services(f, edit, fxEnabledToggle = config.fxEnabledToggle)))
-          case ValidForm(_, data) =>
+
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(services(formWithErrors, edit, fxEnabledToggle = config.fxEnabledToggle))),
+          data =>
             dataCacheConnector.update[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) {
-              _.getOrElse(ChangeSubSectorFlowModel()).copy(subSectors = Some(data.msbServices))
+              _.getOrElse(ChangeSubSectorFlowModel()).copy(subSectors = Some(data.toSet))
             } flatMap {
-              case Some(m@ChangeSubSectorFlowModel(Some(set), _)) if !(set contains TransmittingMoney) =>
-                helper.updateSubSectors(request.credId, m) flatMap { _ => router.getRoute(request.credId, SubSectorsPageId, m, edit, includeCompanyNotRegistered) }
+              case Some(m @ ChangeSubSectorFlowModel(Some(set), _)) if !(set contains TransmittingMoney) =>
+                helper.updateSubSectors(request.credId, m) flatMap { _ =>
+                  router.getRoute(request.credId, SubSectorsPageId, m, edit, includeCompanyNotRegistered)
+                }
               case Some(updatedModel) =>
                 router.getRoute(request.credId, SubSectorsPageId, updatedModel, edit, includeCompanyNotRegistered)
             }
-        }
+        )
   }
 }

@@ -18,16 +18,16 @@ package controllers.asp
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.asp.ServicesOfBusinessFormProvider
 import models.asp.{Asp, ServicesOfBusiness}
-import models.businessmatching.AccountancyServices
-import play.api.mvc.MessagesControllerComponents
+import models.businessmatching.BusinessActivity.AccountancyServices
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.{AuthAction, DateOfChangeHelper}
-import views.html.asp._
+import views.html.asp.ServicesOfBusinessView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -36,45 +36,45 @@ class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheCo
                                              val ds: CommonPlayDependencies,
                                              val serviceFlow: ServiceFlow,
                                              val cc: MessagesControllerComponents,
-                                             services_of_business: services_of_business) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                                             formProvider: ServicesOfBusinessFormProvider,
+                                             view: ServicesOfBusinessView) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetch[Asp](request.credId, Asp.key) map {
-          response =>
-            val form = (for {
-              business <- response
-              setOfServices <- business.services
-            } yield Form2[ServicesOfBusiness](setOfServices)).getOrElse(EmptyForm)
-            Ok(services_of_business(form, edit))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[Asp](request.credId, Asp.key) map {
+        response =>
+          val form = (for {
+            business <- response
+            setOfServices <- business.services
+          } yield formProvider().fill(setOfServices)).getOrElse(formProvider())
+          Ok(view(form, edit))
+      }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        import jto.validation.forms.Rules._
-        Form2[ServicesOfBusiness](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(services_of_business(f, edit)))
-          case ValidForm(_, data) =>
-
-            for {
-              businessServices <- dataCacheConnector.fetch[Asp](request.credId, Asp.key)
-              _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
-                businessServices.services(data))
-              status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-              isNewActivity <- serviceFlow.isNewActivity(request.credId, AccountancyServices)
-            } yield {
-              if (!isNewActivity && redirectToDateOfChange[ServicesOfBusiness](status, businessServices.services, data)) {
-                Redirect(routes.ServicesOfBusinessDateOfChangeController.get)
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithError =>
+          Future.successful(BadRequest(view(formWithError, edit))),
+        data =>
+          for {
+            businessServices <- dataCacheConnector.fetch[Asp](request.credId, Asp.key)
+            _ <- dataCacheConnector.save[Asp](request.credId, Asp.key,
+              businessServices.services(data))
+            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+            isNewActivity <- serviceFlow.isNewActivity(request.credId, AccountancyServices)
+          } yield {
+            if (!isNewActivity && redirectToDateOfChange[ServicesOfBusiness](status, businessServices.services, data)) {
+              Redirect(routes.ServicesOfBusinessDateOfChangeController.get)
+            } else {
+              if (edit) {
+                Redirect(routes.SummaryController.get)
               } else {
-                edit match {
-                  case true => Redirect(routes.SummaryController.get)
-                  case false => Redirect(routes.OtherBusinessTaxMattersController.get(edit))
-                }
+                Redirect(routes.OtherBusinessTaxMattersController.get(edit))
               }
             }
-        }
+          }
+      )
   }
 }
 

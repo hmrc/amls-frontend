@@ -17,29 +17,32 @@
 package controllers.supervision
 
 import controllers.actions.SuccessfulAuthAction
+import forms.supervision.WhichProfessionalBodyFormProvider
+import models.supervision.ProfessionalBodies._
 import models.supervision._
 import org.jsoup.Jsoup
 import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatestplus.play.PlaySpec
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import views.html.supervision.which_professional_body
+import views.html.supervision.WhichProfessionalBodyView
 
-class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with MockitoSugar {
+class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks with AuthorisedFixture { self =>
 
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[which_professional_body]
+    lazy val view = inject[WhichProfessionalBodyView]
     val controller = new WhichProfessionalBodyController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      which_professional_body = view)
+      formProvider = inject[WhichProfessionalBodyFormProvider],
+      view = view)
     mockCacheFetch[Supervision](Some(Supervision()))
     mockCacheSave[Supervision]
   }
@@ -61,9 +64,9 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
 
           val document = Jsoup.parse(contentAsString(result))
 
-          document.title() must include(Messages("supervision.whichprofessionalbody.title"))
-          document.select("input[value=12]").hasAttr("checked") must be(true)
-          document.select("input[value=14]").hasAttr("checked") must be(true)
+          document.title() must include(messages("supervision.whichprofessionalbody.title"))
+          document.select(s"input[value=${AssociationOfBookkeepers.toString}]").hasAttr("checked") must be(true)
+          document.select(s"input[value=${Other("").toString}]").hasAttr("checked") must be(true)
           document.select("input[name=specifyOtherBusiness]").`val`() must be("SomethingElse")
 
         }
@@ -74,11 +77,11 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
 
           status(result) must be(OK)
 
-          Jsoup.parse(contentAsString(result)).title() must include(Messages("supervision.whichprofessionalbody.title"))
+          Jsoup.parse(contentAsString(result)).title() must include(messages("supervision.whichprofessionalbody.title"))
 
           val document = Jsoup.parse(contentAsString(result))
 
-          document.title() must include(Messages("supervision.whichprofessionalbody.title"))
+          document.title() must include(messages("supervision.whichprofessionalbody.title"))
 
           document.select("input[type=checkbox]").hasAttr("checked") must be(false)
           document.select("input[name=specifyOtherBusiness]").`val`() must be(empty)
@@ -93,9 +96,10 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
         "redirect to PenalisedByProfessionalController" when {
           "not in edit mode" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
-              "businessType[0]" -> "01",
-              "businessType[1]" -> "02"
+            val newRequest = FakeRequest(POST, routes.WhichProfessionalBodyController.post().url)
+            .withFormUrlEncodedBody(
+              "businessType[0]" -> AccountingTechnicians.toString,
+              "businessType[1]" -> CharteredCertifiedAccountants.toString
             )
 
             val result = controller.post()(newRequest)
@@ -107,9 +111,10 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
         "redirect to SummaryController" when {
           "in edit mode" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
-              "businessType[0]" -> "01",
-              "businessType[1]" -> "02"
+            val newRequest = FakeRequest(POST, routes.WhichProfessionalBodyController.post().url)
+            .withFormUrlEncodedBody(
+              "businessType[0]" -> AccountingTechnicians.toString,
+              "businessType[1]" -> CharteredCertifiedAccountants.toString
             )
 
             val result = controller.post(true)(newRequest)
@@ -122,7 +127,8 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
       "invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody("" -> "")
+          val newRequest = FakeRequest(POST, routes.WhichProfessionalBodyController.post().url)
+          .withFormUrlEncodedBody("" -> "")
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -134,9 +140,10 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
   it must {
     "save the valid data to the supervision model" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "businessType[0]" -> "01",
-        "businessType[1]" -> "02"
+      val newRequest = FakeRequest(POST, routes.WhichProfessionalBodyController.post().url)
+      .withFormUrlEncodedBody(
+        "businessType[0]" -> AccountingTechnicians.toString,
+        "businessType[1]" -> CharteredCertifiedAccountants.toString
       )
 
       val result = controller.post()(newRequest)

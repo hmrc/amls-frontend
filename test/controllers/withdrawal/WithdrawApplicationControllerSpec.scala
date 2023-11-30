@@ -21,7 +21,6 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.actions.SuccessfulAuthAction
 import models.ReadStatusResponse
 import models.businesscustomer.ReviewDetails
-import models.businessmatching.BusinessMatching
 import models.registrationdetails.RegistrationDetails
 import models.status.SubmissionReadyForReview
 import org.joda.time.LocalDateTime
@@ -30,7 +29,7 @@ import org.mockito.Mockito._
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture}
-import views.html.withdrawal.withdraw_application
+import views.html.withdrawal.WithdrawApplicationView
 
 import scala.concurrent.Future
 
@@ -44,7 +43,7 @@ class WithdrawApplicationControllerSpec extends AmlsSpec {
     val cacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
     val enrolments = mock[AuthEnrolmentsService]
-    lazy val view = app.injector.instanceOf[withdraw_application]
+    lazy val view = app.injector.instanceOf[WithdrawApplicationView]
     val controller = new WithdrawApplicationController(
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -53,7 +52,7 @@ class WithdrawApplicationControllerSpec extends AmlsSpec {
       enrolments,
       statusService,
       cc = mockMcc,
-      withdraw_application = view)
+      view = view)
 
     val applicationReference = "SUIYD3274890384"
     val safeId = "X87FUDIKJJKJH87364"
@@ -75,11 +74,7 @@ class WithdrawApplicationControllerSpec extends AmlsSpec {
     } thenReturn Future.successful(RegistrationDetails(businessName, isIndividual = false))
 
     when {
-      cacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())
-    } thenReturn Future.successful(BusinessMatching(reviewDetails.some).some)
-
-    when {
-      statusService.getDetailedStatus(Some(any()), any(), any())(any(), any())
+      statusService.getDetailedStatus(Some(any()), any(), any())(any(), any(), any())
     } thenReturn Future.successful((SubmissionReadyForReview, statusResponse.some))
 
     when {

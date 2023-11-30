@@ -23,10 +23,9 @@ import models.flowmanagement.{AddBusinessTypeFlowModel, NoPSRPageId}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.updateservice.add.cannot_add_services
+import views.html.businessmatching.updateservice.add.CannotAddServicesView
 
 import scala.concurrent.Future
 
@@ -38,14 +37,14 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
     val request = addToken(authRequest)
 
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-    lazy val view = app.injector.instanceOf[cannot_add_services]
+    lazy val view = app.injector.instanceOf[CannotAddServicesView]
     val controller = new NoPsrController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       helper = mockUpdateServiceHelper,
       router = createRouter[AddBusinessTypeFlowModel],
       cc = mockMcc,
-      cannot_add_services = view
+      view = view
     )
   }
 
@@ -57,7 +56,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
           val result = controller.get()(request)
 
           status(result) mustBe OK
-          contentAsString(result) must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title"))
+          contentAsString(result) must include(messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title"))
         }
       }
     }

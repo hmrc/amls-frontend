@@ -18,17 +18,17 @@ package services.businessmatching
 
 import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
-import models.businessmatching._
+import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal}
 import models.tradingpremises.TradingPremisesMsbServices._
 import models.businessmatching.{BusinessMatchingMsbServices => BMMsbServices}
-import models.tradingpremises.{TradingPremisesMsbServices => TPMsbServices, WhatDoesYourBusinessDo}
+import models.tradingpremises.{WhatDoesYourBusinessDo, TradingPremisesMsbServices => TPMsbServices}
 import org.joda.time.LocalDate
-
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import services.TradingPremisesService
-import utils.{DependencyMocks, FutureAssertions, AmlsSpec, StatusConstants}
+import utils.{AmlsSpec, DependencyMocks, FutureAssertions, StatusConstants}
 
 class TradingPremisesServiceSpec extends PlaySpec
   with AmlsSpec

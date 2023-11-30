@@ -16,93 +16,77 @@
 
 package models.renewal
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, ValidationError, Write, _}
-import play.api.libs.json.{Json, Reads, Writes}
+import models.{Enumerable, WithName}
+import play.api.i18n.Messages
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.{CheckboxItem, Text}
 
 
 case class PaymentMethods(courier: Boolean,
                          direct: Boolean,
-                         other: Option[String])
+                         other: Option[String]) {
 
-sealed trait PaymentMethods0 {
+  def getSummaryMessages(implicit messages: Messages): Seq[String] = {
+    Seq(
+      if (courier) Some(messages("hvd.receiving.option.01")) else None,
+      if (direct) Some(messages("hvd.receiving.option.02")) else None,
+      other
+    ).flatten
+  }
+}
 
-  import models.FormTypes._
+sealed trait PaymentMethod
 
-  private implicit def rule[A]
-  (implicit
-   s: Path => Rule[A, String],
-   b: Path => Rule[A, Option[Boolean]]
-  ): Rule[A, PaymentMethods] =
-    From[A] { __ =>
+object PaymentMethods extends Enumerable.Implicits {
 
-      import utils.MappingUtils.Implicits.RichRule
-
-      val minLength = 1
-      val maxLength = 255
-
-      def minLengthR(l: Int) = Rule.zero[String].flatMap[String] {
-        case s if s.length >= l =>
-          Rule(_ => Valid(s))
-        case _ =>
-          Rule(_ => Invalid(Seq(Path -> Seq(ValidationError("error.minLength", l)))))
-      }
-
-      def maxLengthR(l: Int) = Rule.zero[String].flatMap[String] {
-        case s if s.length <= l =>
-          Rule(_ => Valid(s))
-        case _ =>
-          Rule(_ => Invalid(Seq(Path -> Seq(ValidationError("error.maxLength", l)))))
-      }
-
-      val detailsR: Rule[String, String] =
-        (minLengthR(minLength) withMessage "error.required.renewal.hvd.describe") andThen
-        (maxLengthR(maxLength) withMessage "error.required.renewal.hvd.describe.invalid.length") andThen
-        basicPunctuationPattern("error.required.renewal.hvd.describe.invalid.characters")
-
-      val booleanR = b andThen { _ map { case Some(b) => b; case None => false } }
-
-      (
-        (__ \ "courier").read(booleanR) ~
-        (__ \ "direct").read(booleanR) ~
-        (__ \ "other").read(booleanR).flatMap[Option[String]] {
-          case true =>
-            (__ \ "details").read(detailsR) map Some.apply
-          case false =>
-            Rule(_ => Valid(None))
-        }
-      )(PaymentMethods.apply _).validateWith("error.required.renewal.hvd.choose.option"){
-        methods =>
-          methods.courier || methods.direct || methods.other.isDefined
-      }
-    }
-
-  val formR: Rule[UrlFormEncoded, PaymentMethods] = {
-    import jto.validation.forms.Rules._
-    implicitly[Rule[UrlFormEncoded, PaymentMethods]]
+  def apply(methods: Seq[PaymentMethod], detail: Option[String]): PaymentMethods = {
+    PaymentMethods(
+      methods.contains(Courier),
+      methods.contains(Direct),
+      if (methods.exists(_.isInstanceOf[Other])) detail else None
+    )
   }
 
-  val jsonR: Reads[PaymentMethods] = {
-    import jto.validation.playjson.Rules.{pickInJson => _, _}
-    import utils.JsonMapping._
-    implicitly
+  case object Courier extends WithName("courier") with PaymentMethod
+
+  case object Direct extends WithName("direct") with PaymentMethod
+
+  case class Other(method: String) extends WithName("other") with PaymentMethod
+
+  val all: Seq[PaymentMethod] = Seq(Courier, Direct, Other(""))
+
+  def formValues(html: Html)(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex map {
+    case (method, index) =>
+
+      val conditional = if(method.toString == Other("").toString) Some(html) else None
+
+      CheckboxItem(
+        content = Text(messages(s"renewal.cash.payments.received.lbl${index + 1}")),
+        value = method.toString,
+        id = Some(s"paymentMethods_$index"),
+        name = Some(s"paymentMethods[$index]"),
+        conditionalHtml = conditional
+      )
   }
 
-  val formWrites: Write[PaymentMethods, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
+  implicit val enumerable: Enumerable[PaymentMethod] = Enumerable(all.map(v => v.toString -> v): _*)
+
+  implicit val jsonR: Reads[PaymentMethods] = {
     (
-      (__ \ "courier").write[Boolean] ~
-        (__ \ "direct").write[Boolean] ~
-        (__ \ "other").write[Boolean].contramap[Option[_]] {
-          case Some(_) => true
-          case None => false
-        } ~
-        (__ \ "details").write[Option[String]]
-      )(a => (a.courier, a.direct, a.other, a.other))
+      (JsPath \ "courier").read[Boolean] and
+        (JsPath \ "direct").read[Boolean] and
+        (JsPath \ "other").read[Boolean] and
+        (JsPath \ "details").readNullable[String]
+      )((courier, direct, _, details) =>
+      PaymentMethods(
+        courier, direct, details
+      )
+    )
   }
 
-  val jsonW = Writes[PaymentMethods] {x =>
+  implicit val jsonW = Writes[PaymentMethods] {x =>
     val jsMethods = Json.obj("courier" -> x.courier,
       "direct" -> x.direct,
       "other" -> x.other.isDefined)
@@ -112,14 +96,4 @@ sealed trait PaymentMethods0 {
       case false => jsMethods
     }
   }
-}
-
-object PaymentMethods {
-
-  object Cache extends PaymentMethods0
-
-  implicit val formR: Rule[UrlFormEncoded, PaymentMethods] = Cache.formR
-  implicit val jsonR: Reads[PaymentMethods] = Cache.jsonR
-  implicit val formW: Write[PaymentMethods, UrlFormEncoded] = Cache.formWrites
-  implicit val jsonW: Writes[PaymentMethods] = Cache.jsonW
 }

@@ -1,0 +1,74 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import models.hvd.Products
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
+@import views.html.components.forms.{ErrorSummary, InputCheckbox, InputText}
+@import views.html.components.{Button, Heading, ReturnLink, SectionSubtitle}
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    inputCheckbox: InputCheckbox,
+    inputText: InputText,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean)(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
+
+@conditionalHtml = {
+    @inputText(
+        Input(
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("lbl.give.details")),
+                classes = "govuk-label"
+            ),
+            id = "otherDetails",
+            name = "otherDetails"
+        ),
+        form("otherDetails")
+    )
+}
+
+@layout(pageTitle = messages("hvd.products.title") + " - " + messages("summary.hvd")) {
+
+    @errorSummary(form, Some(Map("products" -> "products_0")))
+
+    @subtitle("summary.hvd")
+
+    @heading("hvd.products.title")
+
+    @formHelper(action = controllers.hvd.routes.ProductsController.post(edit)) {
+
+        @inputCheckbox(
+            Checkboxes(
+                name = "products",
+                hint = Some(Hint(content = Text(messages("lbl.select.all")))),
+                items = Products.formValues(conditionalHtml)
+            ).withFormField(form("products"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

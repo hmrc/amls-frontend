@@ -16,27 +16,8 @@
 
 package models.renewal
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
+import play.api.libs.json._
 
 case class HowCashPaymentsReceived(paymentMethods: PaymentMethods)
 
-object HowCashPaymentsReceived {
-
-  implicit val formRule: Rule[UrlFormEncoded, HowCashPaymentsReceived] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "cashPaymentMethods").read[PaymentMethods] map HowCashPaymentsReceived.apply
-  }
-
-  implicit def formWrites: Write[HowCashPaymentsReceived, UrlFormEncoded] = Write {
-    case HowCashPaymentsReceived(paymentMethods) => Map(
-      "cashPaymentMethods.courier" -> Seq(paymentMethods.courier.toString),
-      "cashPaymentMethods.direct" -> Seq(paymentMethods.direct.toString),
-      "cashPaymentMethods.other" -> Seq(paymentMethods.other.isDefined.toString),
-      "cashPaymentMethods.details" -> Seq(paymentMethods.other match {
-        case Some(other) => other
-        case _ => ""
-      })
-    )
-  }
-}
+object HowCashPaymentsReceived

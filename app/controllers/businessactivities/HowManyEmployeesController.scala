@@ -17,55 +17,48 @@
 package controllers.businessactivities
 
 import com.google.inject.Inject
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, EmployeeCount, HowManyEmployees}
-import play.api.mvc.MessagesControllerComponents
+import forms.businessactivities.EmployeeCountFormProvider
+import models.businessactivities.EmployeeCount
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.businessactivities.HowManyEmployeesService
 import utils.AuthAction
-import views.html.businessactivities._
+import views.html.businessactivities.BusinessEmployeesCountView
 
 import scala.concurrent.Future
 
-class HowManyEmployeesController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction,
-                                            val ds: CommonPlayDependencies,
-                                            val cc: MessagesControllerComponents,
-                                            business_employees: business_employees) extends AmlsBaseController(ds, cc) {
+class HowManyEmployeesController @Inject()(val authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
+                                           val cc: MessagesControllerComponents,
+                                           service: HowManyEmployeesService,
+                                           formProvider: EmployeeCountFormProvider,
+                                           view: BusinessEmployeesCountView) extends AmlsBaseController(ds, cc) {
 
-  def updateData(howManyEmployees: Option[HowManyEmployees], data: EmployeeCount): HowManyEmployees = {
-    howManyEmployees.fold[HowManyEmployees](HowManyEmployees(employeeCount = Some(data.employeeCount)))(x =>
-      x.copy(employeeCount = Some(data.employeeCount)))
-  }
-
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request => {
-        dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-          response =>
-            val form: Form2[HowManyEmployees] = (for {
-              businessActivities <- response
-              employees <- businessActivities.howManyEmployees
-            } yield Form2[HowManyEmployees](employees)).getOrElse(EmptyForm)
-            Ok(business_employees(form, edit))
-        }
-      }
-  }
-
-  def post(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[EmployeeCount](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(business_employees(f, edit)))
-        case ValidForm(_, data) =>
-          for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivities.howManyEmployees(updateData(businessActivities.howManyEmployees, data)))
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get)
-            case false => Redirect(routes.TransactionRecordController.get())
-          }
+      service.getEmployeeCount(request.credId) map { countOpt =>
+        val form = countOpt.fold(formProvider())(count => formProvider().fill(EmployeeCount(count)))
+        Ok(view(form, edit))
       }
     }
+  }
+
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
+          service.updateEmployeeCount(request.credId, data) map { _ =>
+            redirect(edit)
+          }
+      )
+    }
+  }
+
+  private def redirect(edit: Boolean): Result = if (edit) {
+    Redirect(routes.SummaryController.get)
+  } else {
+    Redirect(routes.TransactionRecordController.get())
   }
 }

@@ -16,9 +16,13 @@
 
 package models.hvd
 
+import models.{Enumerable, WithName}
 import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
 sealed trait SalesChannel {
+  import SalesChannel._
   def getMessage(implicit messages: Messages): String = this match {
     case Retail => messages("hvd.how-will-you-sell-goods.channels.retail")
     case Wholesale => messages("hvd.how-will-you-sell-goods.channels.wholesale")
@@ -26,9 +30,23 @@ sealed trait SalesChannel {
   }
 }
 
-case object Retail extends SalesChannel
+object SalesChannel extends Enumerable.Implicits {
+  case object Retail extends WithName("retail") with SalesChannel
 
-case object Wholesale extends SalesChannel
+  case object Wholesale extends WithName("wholesale") with SalesChannel
 
-case object Auction extends SalesChannel
+  case object Auction extends WithName("auction") with SalesChannel
 
+  val all: Seq[SalesChannel] = Seq(Auction, Retail, Wholesale)
+
+  def formValues(implicit messages: Messages): Seq[CheckboxItem] = all.zipWithIndex.map { case (salesChannel, index) =>
+    CheckboxItem(
+      content = Text(salesChannel.getMessage),
+      value = salesChannel.toString,
+      id = Some(s"salesChannels_$index"),
+      name = Some(s"salesChannels[$index]")
+    )
+  }
+
+  implicit val enumerable: Enumerable[SalesChannel] = Enumerable(all.map(v => v.toString -> v): _*)
+}

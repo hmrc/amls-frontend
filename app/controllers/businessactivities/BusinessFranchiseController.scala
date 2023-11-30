@@ -16,51 +16,41 @@
 
 package controllers.businessactivities
 
-import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import models.businessactivities.{BusinessActivities, _}
-import play.api.mvc.MessagesControllerComponents
+import forms.businessactivities.BusinessFranchiseFormProvider
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.businessactivities.BusinessFranchiseService
 import utils.AuthAction
-import views.html.businessactivities._
+import views.html.businessactivities.BusinessFranchiseNameView
 
 import scala.concurrent.Future
 
-class BusinessFranchiseController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                             val authAction: AuthAction,
+class BusinessFranchiseController @Inject() (val authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val cc: MessagesControllerComponents,
-                                             business_franchise_name: business_franchise_name) extends AmlsBaseController(ds, cc) {
+                                             service: BusinessFranchiseService,
+                                             formProvider: BusinessFranchiseFormProvider,
+                                             view: BusinessFranchiseNameView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
    implicit request =>
-      dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-        response =>
-          val form: Form2[BusinessFranchise] = (for {
-            businessActivities <- response
-            businessFranchise <- businessActivities.businessFranchise
-          } yield Form2[BusinessFranchise](businessFranchise)).getOrElse(EmptyForm)
-          Ok(business_franchise_name(form, edit))
-      }
+     service.getBusinessFranchise(request.credId) map { franchiseOpt =>
+       Ok(view(franchiseOpt.fold(formProvider())(formProvider().fill), edit))
+     }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-    implicit request => {
-      Form2[BusinessFranchise](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(business_franchise_name(f, edit)))
-        case ValidForm(_, data) =>
-          for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivities.businessFranchise(data)
-            )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get)
-            case false => Redirect(routes.EmployeeCountAMLSSupervisionController.get())
-          }
-      }
-    }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest.fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => service.updateBusinessFranchise(request.credId, data).map(_ => redirectTo(edit))
+      )
+  }
+
+  private def redirectTo(edit: Boolean): Result = if (edit) {
+    Redirect(routes.SummaryController.get)
+  } else {
+    Redirect(routes.EmployeeCountAMLSSupervisionController.get())
   }
 }

@@ -20,41 +20,38 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import javax.inject.Inject
-import models.businessmatching.BusinessMatching
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{AuthEnrolmentsService, StatusService}
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName}
-import views.html.deregister.deregister_application
+import views.html.deregister.DeregisterApplicationView
 
-import scala.concurrent.Future
+import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
-class DeRegisterApplicationController @Inject() (authAction: AuthAction,
-                                                 val ds: CommonPlayDependencies,
-                                                 implicit val cache: DataCacheConnector,
-                                                 implicit val statusService: StatusService,
-                                                 enrolments: AuthEnrolmentsService,
-                                                 implicit val amls: AmlsConnector,
-                                                 val cc: MessagesControllerComponents,
-                                                 deregister_application: deregister_application) extends AmlsBaseController(ds, cc) {
+class DeRegisterApplicationController @Inject()(authAction: AuthAction,
+                                                val ds: CommonPlayDependencies,
+                                                val cache: DataCacheConnector,
+                                                val statusService: StatusService,
+                                                enrolments: AuthEnrolmentsService,
+                                                val amls: AmlsConnector,
+                                                val cc: MessagesControllerComponents,
+                                                view: DeregisterApplicationView) extends AmlsBaseController(ds, cc) {
 
-  def get() = authAction.async {
-        implicit request =>
-          (for {
-            bm <- OptionT(cache.fetch[BusinessMatching](request.credId, BusinessMatching.key))
-            amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-            ba <- OptionT.fromOption[Future](bm.activities)
-            id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId))
-            name <- BusinessName.getName(request.credId, Some(id), request.accountTypeId)
-          } yield {
-            val activities = ba.businessActivities map {
-              _.getMessage()
-            }
-            Ok(deregister_application(name, activities, amlsRegNumber))
-          }) getOrElse InternalServerError("Could not show the de-register page")
+  def get(): Action[AnyContent] = authAction.async {
+    implicit request =>
+      (for {
+        amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
+        id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId))
+        name <- BusinessName.getName(request.credId, Some(id), request.accountTypeId)(
+          implicitly[HeaderCarrier], implicitly[ExecutionContext], cache, amls
+        )
+      } yield {
+        Ok(view(name))
+      }) getOrElse InternalServerError("Could not show the de-register page")
     }
 
-  def post() = authAction.async {
-    Future.successful(Redirect(routes.DeregistrationReasonController.get))
+  def post(): Action[AnyContent] = authAction {
+    Redirect(routes.DeregistrationReasonController.get)
   }
 }

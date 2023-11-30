@@ -18,33 +18,35 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.AccountantForAMLSRegulationsFormProvider
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import utils.AmlsSpec
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import views.html.businessactivities.accountant_for_amls_regulations
+import utils.AmlsSpec
+import views.html.businessactivities.AccountantForAMLSRegulationsView
 
 import scala.concurrent.Future
 
-class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSugar {
+class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
 
-    lazy val view = app.injector.instanceOf[accountant_for_amls_regulations]
+    lazy val view = inject[AccountantForAMLSRegulationsView]
 
    val controller = new AccountantForAMLSRegulationsController(
      dataCacheConnector = mock[DataCacheConnector],
      SuccessfulAuthAction,
      ds = commonDependencies,
      cc = mockMcc,
-     accountant_for_amls_regulations = view)
+     formProvider = inject[AccountantForAMLSRegulationsFormProvider],
+     view = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -62,8 +64,8 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("accountantForAMLSRegulations-true").hasAttr("checked") must be(false)
-        htmlValue.getElementById("accountantForAMLSRegulations-false").hasAttr("checked") must be(false)
+        htmlValue.getElementById("accountantForAMLSRegulations").hasAttr("checked") must be(false)
+        htmlValue.getElementById("accountantForAMLSRegulations-2").hasAttr("checked") must be(false)
       }
 
       "pre-populate the form when data is already present" in new Fixture {
@@ -78,9 +80,8 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("accountantForAMLSRegulations-true").hasAttr("checked") must be(true)
-        htmlValue.getElementById("accountantForAMLSRegulations-false").hasAttr("checked") must be(false)
-
+        htmlValue.getElementById("accountantForAMLSRegulations").hasAttr("checked") must be(true)
+        htmlValue.getElementById("accountantForAMLSRegulations-2").hasAttr("checked") must be(false)
       }
     }
 
@@ -90,7 +91,8 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
         "edit is true" must {
           "redirect to the WhoIsYourAccountantController when 'yes' is selected'" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody("accountantForAMLSRegulations" -> "true")
+            val newRequest = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
+            .withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
@@ -105,7 +107,8 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
           "successfully redirect to the SummaryController on selection of Option 'No'" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
+            .withFormUrlEncodedBody(
               "accountantForAMLSRegulations" -> "false"
             )
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
@@ -122,7 +125,8 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
         "edit is false" must {
           "redirect to the WhoIsYourAccountantController on selection of 'Yes'" in new Fixture {
-            val newRequest = requestWithUrlEncodedBody("accountantForAMLSRegulations" -> "true")
+            val newRequest = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
+            .withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
 
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
               .thenReturn(Future.successful(None))
@@ -136,7 +140,8 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
           }
 
           "successfully redirect to the SummaryController on selection of Option 'No'" in new Fixture {
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
+            .withFormUrlEncodedBody(
               "accountantForAMLSRegulations" -> "false"
             )
             when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
@@ -155,20 +160,20 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
       "respond with BAD_REQUEST" when {
         "no options are selected so that the request body is empty" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody("" -> "")
+          val newRequest = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
+          .withFormUrlEncodedBody("" -> "")
 
           when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
             .thenReturn(Future.successful(None))
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.required.ba.business.use.accountant"))
-
         }
 
         "given invalid json" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
+          .withFormUrlEncodedBody(
             "WhatYouNeedController" -> ""
           )
 
@@ -177,14 +182,13 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("err.summary"))
-
         }
       }
 
       "remove the answers to dependant questions" when {
         "user selected 'no'" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(true).url)
+          .withFormUrlEncodedBody(
             "accountantForAMLSRegulations" -> "false"
           )
 

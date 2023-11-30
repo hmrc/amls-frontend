@@ -16,42 +16,43 @@
 
 package controllers.businessactivities
 
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import com.google.inject.Inject
+import forms.businessactivities.AccountantForAMLSRegulationsFormProvider
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import views.html.businessactivities._
+import views.html.businessactivities.AccountantForAMLSRegulationsView
 
 import scala.concurrent.Future
 
-class AccountantForAMLSRegulationsController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                        val authAction: AuthAction,
-                                                        val ds: CommonPlayDependencies,
-                                                        val cc: MessagesControllerComponents,
-                                                        accountant_for_amls_regulations: accountant_for_amls_regulations) extends AmlsBaseController(ds, cc) {
+class AccountantForAMLSRegulationsController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                       val authAction: AuthAction,
+                                                       val ds: CommonPlayDependencies,
+                                                       val cc: MessagesControllerComponents,
+                                                       formProvider: AccountantForAMLSRegulationsFormProvider,
+                                                       view: AccountantForAMLSRegulationsView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
-          val form: Form2[AccountantForAMLSRegulations] = (for {
+          val form = (for {
             businessActivities <- response
             accountant <- businessActivities.accountantForAMLSRegulations
-          } yield Form2[AccountantForAMLSRegulations](accountant)).getOrElse(EmptyForm)
+          } yield formProvider().fill(accountant)).getOrElse(formProvider())
 
-          Ok(accountant_for_amls_regulations(form, edit))
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[AccountantForAMLSRegulations](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(accountant_for_amls_regulations(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId,BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key, updateModel(businessActivities, Some(data)))
@@ -59,7 +60,7 @@ class AccountantForAMLSRegulationsController @Inject() (val dataCacheConnector: 
             case (false, true) | (true, true) => Redirect(routes.WhoIsYourAccountantNameController.get())
             case _ => Redirect(routes.SummaryController.get)
           }
-      }
+      )
     }
   }
 

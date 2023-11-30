@@ -19,61 +19,62 @@ package controllers.responsiblepeople
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{Nationality, ResponsiblePerson}
-import play.api.mvc.MessagesControllerComponents
+import forms.responsiblepeople.NationalityFormProvider
+import models.responsiblepeople.{PersonResidenceType, ResponsiblePerson}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.nationality
+import views.html.responsiblepeople.NationalityView
 
 import scala.concurrent.Future
 
-
 class NationalityController @Inject () (
-                                       val dataCacheConnector: DataCacheConnector,
-                                       authAction: AuthAction,
-                                       val ds: CommonPlayDependencies,
-                                       val autoCompleteService: AutoCompleteService,
-                                       val cc: MessagesControllerComponents,
-                                       nationality: nationality,
-                                       implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                         val dataCacheConnector: DataCacheConnector,
+                                         authAction: AuthAction,
+                                         val ds: CommonPlayDependencies,
+                                         val autoCompleteService: AutoCompleteService,
+                                         val cc: MessagesControllerComponents,
+                                         formProvider: NationalityFormProvider,
+                                         view: NationalityView,
+                                         implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-        implicit request =>
-          getData[ResponsiblePerson](request.credId, index) map {
-            case Some(ResponsiblePerson(Some(personName),_,_,_,Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-            => residencyType.nationality match {
-                case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
-                case _ => Ok(nationality(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
-              }
-            case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-            => Ok(nationality(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
-            case _
-            => NotFound(notFoundView)
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.personResidenceType) match {
+            case (Some(name), Some(PersonResidenceType(_, _, Some(nationality)))) =>
+              Ok(view(formProvider().fill(nationality), edit, index, flow, name.titleName, autoCompleteService.formOptionsExcludeUK))
+            case (Some(name), _) =>
+              Ok(view(formProvider(), edit, index, flow, name.titleName, autoCompleteService.formOptionsExcludeUK))
+            case _ => NotFound(notFoundView)
           }
+        }
       }
+  }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-        implicit request =>
-          Form2[Nationality](request.body) match {
-            case f: InvalidForm =>
-              getData[ResponsiblePerson](request.credId, index) map { rp =>
-                BadRequest(nationality(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
-              }
-            case ValidForm(_, data) => {
-              for {
-                _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                  val residenceType = rp.personResidenceType.map(x => x.copy(nationality = Some(data)))
-                  rp.personResidenceType(residenceType)
-                }
-              } yield edit match {
-                case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-                case false => Redirect(routes.ContactDetailsController.get(index, edit, flow))
-              }
-            }.recoverWith {
-              case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          getData[ResponsiblePerson](request.credId, index) map { rp =>
+            BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.formOptionsExcludeUK))
+          },
+        data => {
+          for {
+            _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+              val residenceType = rp.personResidenceType.map(x => x.copy(nationality = Some(data)))
+              rp.personResidenceType(residenceType)
             }
+          } yield if (edit) {
+            Redirect(routes.DetailedAnswersController.get(index, flow))
+          } else {
+            Redirect(routes.ContactDetailsController.get(index, edit, flow))
           }
-    }
+        }.recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+        }
+      )
+  }
 }

@@ -35,8 +35,7 @@ import org.joda.time.{DateTime, LocalDate}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import play.api.i18n.Messages
-import play.api.test.FakeRequest
+import play.api.test.{FakeRequest, Injecting}
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
@@ -51,17 +50,18 @@ import scala.concurrent.Future
 class PaymentConfirmationControllerSpec extends AmlsSpec
   with AmlsReferenceNumberGenerator
   with PaymentGenerator
-  with SubscriptionResponseGenerator {
+  with SubscriptionResponseGenerator
+  with Injecting {
 
   trait Fixture {
     self =>
     val baseUrl = "http://localhost"
     val request = addToken(authRequest(uri = baseUrl))
-    lazy val view1 = app.injector.instanceOf[payment_confirmation_renewal]
-    lazy val view2 = app.injector.instanceOf[payment_confirmation_amendvariation]
-    lazy val view3 = app.injector.instanceOf[payment_confirmation_transitional_renewal]
-    lazy val view4 = app.injector.instanceOf[payment_confirmation]
-    lazy val view5 = app.injector.instanceOf[payment_failure]
+    lazy val view1 = inject[PaymentConfirmationRenewalView]
+    lazy val view2 = inject[PaymentConfirmationAmendVariationView]
+    lazy val view3 = inject[PaymentConfirmationTransitionalRenewalView]
+    lazy val view4 = inject[PaymentConfirmationView]
+    lazy val view5 = inject[PaymentFailureView]
     val controller = new PaymentConfirmationController(
       authAction = SuccessfulAuthAction,
       statusService = mock[StatusService],
@@ -73,11 +73,11 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
       ds = commonDependencies,
       cc = mockMcc,
       feeHelper = mock[FeeHelper],
-      payment_confirmation_renewal = view1,
-      payment_confirmation_amendvariation = view2,
-      payment_confirmation_transitional_renewal = view3,
-      payment_confirmation = view4,
-      payment_failure = view5)
+      paymentConfirmationRenewalView = view1,
+      paymentConfirmationAmendVariationView = view2,
+      paymentConfirmationTransitionalRenewalView = view3,
+      paymentConfirmationView = view4,
+      paymentFailureView = view5)
 
     val amlsRegistrationNumber = "amlsRefNumber"
 
@@ -135,7 +135,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
       controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
     } thenReturn Future.successful(Some(businessDetails))
 
-    val applicationConfig = app.injector.instanceOf[ApplicationConfig]
+    val applicationConfig = inject[ApplicationConfig]
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.PaymentConfirmationController.paymentConfirmation(ref))(applicationConfig)
 
@@ -154,14 +154,14 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
     def setupStatus(status: SubmissionStatus): Unit = {
 
       when {
-        controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any())
+        controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any(), any())
       } thenReturn Future.successful(status)
 
       val statusResponse = mock[ReadStatusResponse]
       when(statusResponse.safeId) thenReturn safeIdGen.sample
 
       when {
-        controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any())
+        controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any())
       } thenReturn Future.successful((status, Some(statusResponse)))
     }
   }
@@ -184,9 +184,9 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.lede")
-        doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyNameFromRegistration)
+        doc.getElementsByTag("h1").first.text mustBe messages("confirmation.payment.lede")
+        doc.select(".govuk-panel__body").text must include(paymentReferenceNumber)
+        doc.select(".govuk-panel__body").text must include(companyNameFromRegistration)
       }
 
       "the application status is 'new submission' and has been previously registered" in new Fixture {
@@ -210,9 +210,9 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.html() must include(Messages("confirmation.payment.info.hmrc.review.1"))
-        doc.html() must include(Messages("confirmation.payment.info.hmrc.review.2"))
-        doc.html() must include(Messages("confirmation.payment.info.hmrc.review.3"))
+        doc.html() must include(messages("confirmation.payment.info.hmrc.review.1"))
+        doc.html() must include(messages("confirmation.payment.info.hmrc.review.2"))
+        doc.html() must include(messages("confirmation.payment.info.hmrc.review.3"))
       }
 
       "the application status is 'pending'" in new Fixture {
@@ -229,11 +229,11 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.title must include(Messages("confirmation.payment.amendvariation.title"))
-        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
+        doc.title must include(messages("confirmation.payment.amendvariation.title"))
+        doc.getElementsByTag("h1").first.text mustBe messages("confirmation.payment.amendvariation.lede")
+        doc.select(".govuk-panel__body").text must include(paymentReferenceNumber)
+        doc.select(".govuk-panel__body").text must include(companyNameFromRegistration)
+        contentAsString(result) must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'approved'" in new Fixture {
@@ -250,11 +250,11 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.title must include(Messages("confirmation.payment.amendvariation.title"))
-        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
+        doc.title must include(messages("confirmation.payment.amendvariation.title"))
+        doc.getElementsByTag("h1").first.text mustBe messages("confirmation.payment.amendvariation.lede")
+        doc.select(".govuk-panel__body").text must include(paymentReferenceNumber)
+        doc.select(".govuk-panel__body").text must include(companyNameFromRegistration)
+        contentAsString(result) must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'Renewal Submitted'" in new Fixture {
@@ -271,11 +271,11 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.title must include(Messages("confirmation.payment.amendvariation.title"))
-        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
+        doc.title must include(messages("confirmation.payment.amendvariation.title"))
+        doc.getElementsByTag("h1").first.text mustBe messages("confirmation.payment.amendvariation.lede")
+        doc.select(".govuk-panel__body").text must include(paymentReferenceNumber)
+        doc.select(".govuk-panel__body").text must include(companyNameFromRegistration)
+        contentAsString(result) must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'ready for renewal'" in new Fixture {
@@ -292,11 +292,11 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.title must include(Messages("confirmation.payment.renewal.title"))
-        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.renewal.lede")
-        doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
+        doc.title must include(messages("confirmation.payment.renewal.title"))
+        doc.getElementsByTag("h1").first.text mustBe messages("confirmation.payment.renewal.lede")
+        doc.select(".govuk-panel__body").text must include(paymentReferenceNumber)
+        doc.select(".govuk-panel__body").text must include(companyNameFromRegistration)
+        contentAsString(result) must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the application status is 'ready for renewal' and user has done only variation" in new Fixture {
@@ -313,11 +313,11 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.title must include(Messages("confirmation.payment.amendvariation.title"))
-        doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
-        doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyNameFromRegistration)
-        contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
+        doc.title must include(messages("confirmation.payment.amendvariation.title"))
+        doc.getElementsByTag("h1").first.text mustBe messages("confirmation.payment.amendvariation.lede")
+        doc.select(".govuk-panel__body").text must include(paymentReferenceNumber)
+        doc.select(".govuk-panel__body").text must include(companyNameFromRegistration)
+        contentAsString(result) must include(messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
       "the payment failed" in new Fixture {
@@ -342,8 +342,8 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         status(result) mustBe OK
 
         verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference), eqTo(("accType", "id")))(any(), any())
-        contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
-        contentAsString(result) must include(Messages("confirmation.payment.failed.reason.failure"))
+        contentAsString(result) must include(messages("confirmation.payment.failed.header"))
+        contentAsString(result) must include(messages("confirmation.payment.failed.reason.failure"))
       }
 
       "the payment was cancelled" in new Fixture {
@@ -367,8 +367,8 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         status(result) mustBe OK
 
         verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference), eqTo(("accType", "id")))(any(), any())
-        contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
-        contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
+        contentAsString(result) must include(messages("confirmation.payment.failed.header"))
+        contentAsString(result) must include(messages("confirmation.payment.failed.reason.cancelled"))
       }
 
       "payment data says 'Created' but querystring says 'Cancelled'" in new Fixture {
@@ -395,8 +395,8 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         status(result) mustBe OK
 
         verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference), eqTo(("accType", "id")))(any(), any())
-        contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
-        contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
+        contentAsString(result) must include(messages("confirmation.payment.failed.header"))
+        contentAsString(result) must include(messages("confirmation.payment.failed.reason.cancelled"))
       }
     }
   }

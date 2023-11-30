@@ -17,30 +17,32 @@
 package controllers.msb
 
 import controllers.actions.SuccessfulAuthAction
+import forms.msb.BusinessUseAnIPSPFormProvider
 import models.moneyservicebusiness.{BusinessUseAnIPSPYes, FundsTransfer, MoneyServiceBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.msb.business_use_an_ipsp
+import views.html.msb.BusinessUseAnIPSPView
 
 import scala.concurrent.Future
 
-class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
+class BusinessUseAnIPSPControllerSpec extends AmlsSpec with Injecting {
 
   trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
 
-    lazy val view = app.injector.instanceOf[business_use_an_ipsp]
+    lazy val view = inject[BusinessUseAnIPSPView]
     val controller = new BusinessUseAnIPSPController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      business_use_an_ipsp = view)
+      formProvider = inject[BusinessUseAnIPSPFormProvider],
+      view = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -54,7 +56,7 @@ class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("msb.ipsp.title"))
+      contentAsString(result) must include(messages("msb.ipsp.title"))
     }
 
     "on get display the Business Use An IPSP page with pre populated data" in new Fixture {
@@ -76,12 +78,13 @@ class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
 
       val result = controller.post()(request)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include (Messages("error.required.msb.ipsp"))
+      contentAsString(result) must include (messages("error.required.msb.ipsp"))
     }
 
     "on post with valid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.BusinessUseAnIPSPController.post().url)
+      .withFormUrlEncodedBody(
         "useAnIPSP" -> "true",
         "name" -> "name",
         "referenceNumber" -> "123456789123456"
@@ -100,7 +103,8 @@ class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
 
     "on post with valid data in edit mode with next page's data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.BusinessUseAnIPSPController.post(true).url)
+      .withFormUrlEncodedBody(
         "useAnIPSP" -> "false"
       )
 
@@ -121,7 +125,8 @@ class BusinessUseAnIPSPControllerSpec  extends AmlsSpec {
 
     "on post with valid data in edit mode without next page's data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.BusinessUseAnIPSPController.post(true).url)
+      .withFormUrlEncodedBody(
         "useAnIPSP" -> "false"
       )
 

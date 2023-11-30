@@ -17,31 +17,32 @@
 package controllers.hvd
 
 import controllers.actions.SuccessfulAuthAction
+import forms.hvd.CashPaymentFirstDateFormProvider
 import models.hvd._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.hvd.cash_payment_first_date
+import views.html.hvd.CashPaymentFirstDateView
 
 import scala.concurrent.Future
 
-
-class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
+class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[cash_payment_first_date]
+    lazy val view = inject[CashPaymentFirstDateView]
     val controller = new CashPaymentFirstDateController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      cash_payment_first_date = view)
+      formProvider = inject[CashPaymentFirstDateFormProvider],
+      view = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -59,7 +60,7 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.title mustBe Messages("hvd.cash.payment.date.title") + " - " + Messages("summary.hvd") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
+        htmlValue.title mustBe messages("hvd.cash.payment.date.title") + " - " + messages("summary.hvd") + " - " + messages("title.amls") + " - " + messages("title.gov")
       }
     }
 
@@ -67,7 +68,8 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to the Summary page when edit mode is on" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.CashPaymentFirstDateController.post().url)
+        .withFormUrlEncodedBody(
           "paymentDate.day" -> "12",
           "paymentDate.month" -> "5",
           "paymentDate.year" -> "1999"
@@ -86,7 +88,8 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to the Linked Payments page when edit mode is off" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.CashPaymentFirstDateController.post().url)
+        .withFormUrlEncodedBody(
           "paymentDate.day" -> "12",
           "paymentDate.month" -> "5",
           "paymentDate.year" -> "1999"
@@ -105,8 +108,8 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "show error if invalid data" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "acceptedAnyPayment" -> "true",
+        val newRequest = FakeRequest(POST, routes.CashPaymentFirstDateController.post().url)
+        .withFormUrlEncodedBody(
           "paymentDate.day" -> "",
           "paymentDate.month" -> "",
           "paymentDate.year" -> "")
@@ -115,13 +118,13 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.date.hvd.year.month.day"))
+        contentAsString(result) must include(messages("error.date.hvd.all"))
 
       }
 
       "show error if missing day" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
-          "acceptedAnyPayment" -> "true",
+        val newRequest = FakeRequest(POST, routes.CashPaymentFirstDateController.post().url)
+        .withFormUrlEncodedBody(
           "paymentDate.day" -> "",
           "paymentDate.month" -> "5",
           "paymentDate.year" -> "1999"
@@ -131,13 +134,14 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.date.hvd.day"))
+        contentAsString(result) must include(messages("error.date.hvd.one", "day"))
 
       }
 
       "show error if year field is in past" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody("acceptedAnyPayment" -> "true",
+        val newRequest = FakeRequest(POST, routes.CashPaymentFirstDateController.post().url)
+        .withFormUrlEncodedBody(
           "paymentDate.day" -> "12",
           "paymentDate.month" -> "5",
           "paymentDate.year" -> "122"
@@ -151,12 +155,13 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.date.hvd.past"))
+        contentAsString(result) must include(messages("error.date.hvd.past"))
       }
 
       "show error if in the future" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody("acceptedAnyPayment" -> "true",
+        val newRequest = FakeRequest(POST, routes.CashPaymentFirstDateController.post().url)
+        .withFormUrlEncodedBody(
           "paymentDate.day" -> "12",
           "paymentDate.month" -> "5",
           "paymentDate.year" -> "2200"
@@ -170,7 +175,7 @@ class CashPaymentFirstDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.date.hvd.future"))
+        contentAsString(result) must include(messages("error.date.hvd.future"))
       }
     }
   }

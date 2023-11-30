@@ -1,5 +1,5 @@
-GET         /business-email-address                                @controllers.businessdetails.ContactingYouController.get(edit: Boolean ?= false)
-POST        /business-email-address                                @controllers.businessdetails.ContactingYouController.post(edit: Boolean ?= false)
+GET         /business-email-address                                @controllers.businessdetails.BusinessEmailAddressController.get(edit: Boolean ?= false)
+POST        /business-email-address                                @controllers.businessdetails.BusinessEmailAddressController.post(edit: Boolean ?= false)
 
 GET         /business-telephone-number                             @controllers.businessdetails.ContactingYouPhoneController.get(edit: Boolean ?= false)
 POST        /business-telephone-number                             @controllers.businessdetails.ContactingYouPhoneController.post(edit: Boolean ?= false)

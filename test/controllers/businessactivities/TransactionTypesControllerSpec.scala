@@ -17,8 +17,10 @@
 package controllers.businessactivities
 
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.TransactionTypesFormProvider
 import generators.businessmatching.BusinessActivitiesGenerator
-import models.businessactivities.{BusinessActivities, DigitalSoftware, DigitalSpreadsheet, Paper, TransactionTypes}
+import models.businessactivities.TransactionTypes.{DigitalSoftware, DigitalSpreadsheet, Paper}
+import models.businessactivities.{BusinessActivities, TransactionTypes}
 import org.jsoup.Jsoup
 import play.api.test.Helpers._
 import org.scalatest.MustMatchers
@@ -26,21 +28,24 @@ import utils.{AmlsSpec, DependencyMocks}
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.{never, verify}
 import org.mockito.Matchers.{any, eq => eqTo}
-import views.html.businessactivities.transaction_types
+import play.api.test.{FakeRequest, Injecting}
+import views.html.businessactivities.TransactionTypesView
 
 class TransactionTypesControllerSpec extends AmlsSpec
   with MustMatchers
-  with BusinessActivitiesGenerator {
+  with BusinessActivitiesGenerator
+  with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
-    lazy val view = app.injector.instanceOf[transaction_types]
+    lazy val view = inject[TransactionTypesView]
     val request = addToken(authRequest)
     val controller = new TransactionTypesController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockCacheConnector,
       mockMcc,
-      transaction_types = view)
+      inject[TransactionTypesFormProvider],
+      view = view)
 
     mockCacheSave[BusinessActivities]
     mockCacheFetch(Some(BusinessActivities()))
@@ -63,8 +68,8 @@ class TransactionTypesControllerSpec extends AmlsSpec
         status(result) mustBe OK
 
         val html = Jsoup.parse(contentAsString(result))
-        html.select("input[type=checkbox][value=\"01\"]").first().attr("checked") mustBe "checked"
-        html.select("input[type=checkbox][value=\"02\"]").first().attr("checked") must not be "checked"
+        html.getElementById("types_1").hasAttr("checked") mustBe true
+        html.getElementById("types_2").hasAttr("checked") mustBe false
       }
     }
   }
@@ -72,14 +77,15 @@ class TransactionTypesControllerSpec extends AmlsSpec
   "post" when {
     "called with valid data" must {
       "save the data and redirect away" in new Fixture {
-        val form = Seq(
-          "types[]" -> "01",
-          "types[]" -> "02",
-          "types[]" -> "03",
-          "name" -> "example software"
+
+        val newRequest = FakeRequest(POST, routes.TransactionTypesController.post(false).url).withFormUrlEncodedBody(
+          "types[1]" -> "paper",
+          "types[2]" -> "digitalSpreadsheet",
+          "types[3]" -> "digitalOther",
+          "software" -> "example software"
         )
 
-        val result = controller.post()(requestWithUrlEncodedBody(form:_*))
+        val result = controller.post()(newRequest)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.businessactivities.routes.IdentifySuspiciousActivityController.get().url)
@@ -95,9 +101,11 @@ class TransactionTypesControllerSpec extends AmlsSpec
       }
 
       "return to the summary page when in edit mode" in new Fixture {
-        val form = "types[]" -> "01"
+        val newRequest = FakeRequest(POST, routes.TransactionTypesController.post(true).url).withFormUrlEncodedBody(
+          "types[1]" -> "paper"
+        )
 
-        val result = controller.post(edit = true)(requestWithUrlEncodedBody(form))
+        val result = controller.post(edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.businessactivities.routes.SummaryController.get.url)
@@ -106,9 +114,11 @@ class TransactionTypesControllerSpec extends AmlsSpec
 
     "called with invalid data" must {
       "return BAD_REQUEST and show the page again" in new Fixture {
-        val form = "types[]" -> "03"
+        val newRequest = FakeRequest(POST, routes.TransactionTypesController.post(true).url).withFormUrlEncodedBody(
+          "types[1]" -> ""
+        )
 
-        val result = controller.post()(requestWithUrlEncodedBody(form))
+        val result = controller.post()(newRequest)
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) must include(messages("businessactivities.do.keep.records"))

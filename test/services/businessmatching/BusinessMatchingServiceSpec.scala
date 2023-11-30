@@ -24,6 +24,7 @@ import models.asp.Asp
 import models.businessactivities.BusinessActivities
 import models.businessdetails.BusinessDetails
 import models.businessmatching.{BusinessActivities => BMActivities, _}
+import models.businessmatching.BusinessActivity._
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.eab.Eab
@@ -38,8 +39,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
-
-
 
 class BusinessMatchingServiceSpec extends PlaySpec
   with AmlsSpec

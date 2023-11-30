@@ -17,23 +17,18 @@
 package controllers.supervision
 
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import javax.inject.Inject
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
+import views.html.supervision.WhatYouNeedView
 
-import views.html.supervision.what_you_need
-
-import scala.concurrent.Future
-
+import javax.inject.Inject
 
 class WhatYouNeedController @Inject() (val authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
                                        val cc: MessagesControllerComponents,
-                                       what_you_need: what_you_need) extends AmlsBaseController(ds, cc) {
+                                       view: WhatYouNeedView) extends AmlsBaseController(ds, cc) {
 
-  def get() =
-    authAction.async {
-      implicit request =>
-        Future.successful(Ok(what_you_need()))
+  def get(): Action[AnyContent] = authAction { implicit request =>
+      Ok(view(controllers.supervision.routes.AnotherBodyController.get()))
     }
 }

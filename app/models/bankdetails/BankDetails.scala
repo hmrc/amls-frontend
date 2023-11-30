@@ -16,7 +16,8 @@
 
 package models.bankdetails
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.bankdetails.BankAccountType.NoBankAccountUsed
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
 import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -81,17 +82,52 @@ object BankDetails {
     }
   }
 
-  def section(implicit cache: CacheMap): Section = {
-    val msgKey = "bankdetails"
-    val defaultSection = Section(msgKey, NotStarted, false, controllers.bankdetails.routes.WhatYouNeedController.get)
+  def taskRow(implicit cache: CacheMap, messages: Messages) = {
 
-    cache.getEntry[Seq[BankDetails]](key).fold(defaultSection) {
-      case model if model.isEmpty => Section(msgKey, Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get)
-      case bds@model if model forall {
+    val messageKey = "bankdetails"
+    val notStarted = TaskRow(
+      messageKey,
+      controllers.bankdetails.routes.WhatYouNeedController.get.url,
+      hasChanged = false,
+      NotStarted,
+      TaskRow.notStartedTag
+    )
+
+    cache.getEntry[Seq[BankDetails]](key).fold(notStarted) {
+      case model if model.isEmpty =>
+        TaskRow(
+          messageKey,
+          controllers.bankdetails.routes.YourBankAccountsController.get().url,
+          hasChanged = false,
+          Completed,
+          TaskRow.completedTag
+        )
+      case bds@model if model.forall(_.isComplete) && anyChanged(model) =>
+        TaskRow(
+          messageKey,
+          controllers.bankdetails.routes.YourBankAccountsController.get().url,
+          true,
+          Updated,
+          TaskRow.updatedTag
+        )
+      case bds @ model if model forall {
         _.isComplete
-      } => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.YourBankAccountsController.get)
-      case bds@_ =>
-        Section(msgKey, Started, anyChanged(bds), controllers.bankdetails.routes.YourBankAccountsController.get)
+      } =>
+        TaskRow(
+          messageKey,
+          controllers.bankdetails.routes.YourBankAccountsController.get().url,
+          anyChanged(bds),
+          Completed,
+          TaskRow.completedTag
+        )
+      case bds @ _ =>
+        TaskRow(
+          messageKey,
+          controllers.bankdetails.routes.YourBankAccountsController.get.url,
+          anyChanged(bds),
+          Started,
+          TaskRow.incompleteTag
+        )
     }
   }
 

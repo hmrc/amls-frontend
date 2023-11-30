@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.asp.what_you_need
+import views.html.asp.WhatYouNeedView
 
 class WhatYouNeedControllerSpec extends AmlsSpec {
 
@@ -28,11 +28,9 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
     self =>
     val request = addToken(authRequest)
 
-    lazy val whatYouNeed = app.injector.instanceOf[what_you_need]
-
+    lazy val whatYouNeed = app.injector.instanceOf[WhatYouNeedView]
 
     val controller = new WhatYouNeedController(SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc, whatYouNeed)
-
   }
 
   "WhatYouNeedController" must {
@@ -41,9 +39,9 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
 
       "load the page" in new Fixture {
 
-        val pageTitle = Messages("title.wyn") + " - " +
-          Messages("summary.asp") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
+        val pageTitle = messages("title.wyn") + " - " +
+          messages("summary.asp") + " - " +
+          messages("title.amls") + " - " + messages("title.gov")
 
         val result = controller.get()(request)
         status(result) must be(OK)

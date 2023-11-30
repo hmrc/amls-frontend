@@ -18,21 +18,23 @@ package controllers.businessmatching.updateservice.add
 
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
+import forms.businessmatching.updateservice.add.AddMoreActivitiesFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.businessmatching.BusinessActivity.{BillPaymentServices, HighValueDealing, TelephonePaymentService}
 import models.flowmanagement.{AddBusinessTypeFlowModel, AddMoreBusinessTypesPageId}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.updateservice.add.add_more_activities
+import views.html.businessmatching.updateservice.add.AddMoreActivitiesView
 
 import scala.concurrent.Future
 
-class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
+class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingGenerator with Injecting {
 
   sealed trait Fixture extends DependencyMocks {
     self =>
@@ -40,14 +42,15 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
     val request = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
-    lazy val view = app.injector.instanceOf[add_more_activities]
+    lazy val view = inject[AddMoreActivitiesView]
 
     val controller = new AddMoreBusinessTypesController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel],
       cc = mockMcc,
-      add_more_activities = view
+      formProvider = inject[AddMoreActivitiesFormProvider],
+      view = view
     )
 
     val BusinessActivitiesModel = BusinessActivities(Set(BillPaymentServices, TelephonePaymentService))
@@ -69,7 +72,7 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
         val result = controller.get()(request)
 
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.addmoreactivities.title"))
+        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.addmoreactivities.title"))
       }
     }
 
@@ -80,7 +83,8 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
 
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
 
-            val result = controller.post()(requestWithUrlEncodedBody(
+            val result = controller.post()(FakeRequest(POST, routes.AddMoreBusinessTypesController.post().url)
+              .withFormUrlEncodedBody(
               "addmoreactivities" -> "true"
             ))
 
@@ -95,7 +99,8 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
               val flowModel = AddBusinessTypeFlowModel(Some(BillPaymentServices))
               mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), flowModel)
 
-              val result = controller.post()(requestWithUrlEncodedBody(
+              val result = controller.post()(FakeRequest(POST, routes.AddMoreBusinessTypesController.post().url)
+                .withFormUrlEncodedBody(
                 "addmoreactivities" -> "false"
               ))
 
@@ -109,7 +114,8 @@ class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingG
               val flowModel = AddBusinessTypeFlowModel(Some(HighValueDealing))
               mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), flowModel)
 
-              val result = controller.post()(requestWithUrlEncodedBody(
+              val result = controller.post()(FakeRequest(POST, routes.AddMoreBusinessTypesController.post().url)
+                .withFormUrlEncodedBody(
                 "addmoreactivities" -> "false"
               ))
 

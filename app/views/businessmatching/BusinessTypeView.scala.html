@@ -1,0 +1,62 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import models.businessmatching.BusinessType
+@import config.ApplicationConfig
+@import views.html.components.forms.ErrorSummary
+@import views.html.components.{SectionSubtitle, Button, ReturnLink}
+
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    formHelper: FormWithCSRF,
+    govukRadios: GovukRadios,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_])(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@layout(messages("businessmatching.businessType.title") + " - " + messages("summary.businessmatching")) {
+
+    @errorSummary(form, Some(Map("businessType" -> s"businessType-${BusinessType.all.head.value}")))
+
+    @subtitle("summary.businessmatching")
+
+    @formHelper(controllers.businessmatching.routes.BusinessTypeController.post()) {
+
+        @govukRadios(
+            Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("businessmatching.businessType.title")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
+                name = "businessType",
+                items = BusinessType.radioItems,
+                classes = "govuk-radios"
+            ).withFormField(form("businessType"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

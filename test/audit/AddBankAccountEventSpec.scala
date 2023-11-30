@@ -16,6 +16,7 @@
 
 package audit
 
+import models.bankdetails.BankAccountType._
 import models.bankdetails._
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier

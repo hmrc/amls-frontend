@@ -18,8 +18,8 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.address.CurrentAddressFormProvider
 import models.Country
-import models.autocomplete.NameValuePair
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.jsoup.Jsoup
@@ -27,19 +27,18 @@ import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfter, OptionValues}
-import play.api.i18n.Messages
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
-import services.AutoCompleteService
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
-import views.html.responsiblepeople.address.current_address
+import views.html.responsiblepeople.address.CurrentAddressView
 
 import scala.concurrent.Future
 
-class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with OptionValues with BeforeAndAfter {
+class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with OptionValues with BeforeAndAfter with Injecting {
 
   implicit val hc = HeaderCarrier()
   val mockDataCacheConnector = mock[DataCacheConnector]
@@ -55,31 +54,24 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
     self =>
     val request = addToken(authRequest)
 
-    val autoCompleteService = mock[AutoCompleteService]
-    lazy val view = app.injector.instanceOf[current_address]
+    lazy val view = inject[CurrentAddressView]
     val currentAddressController = new CurrentAddressController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
-      autoCompleteService = autoCompleteService,
       ds = commonDependencies,
       cc = mockMcc,
-      current_address = view,
+      formProvider = inject[CurrentAddressFormProvider],
+      view = view,
       error = errorView
     )
 
-    when {
-      autoCompleteService.getCountries
-    } thenReturn Some(Seq(
-      NameValuePair("United Kingdom", "UK"),
-      NameValuePair("Spain", "ES")
-    ))
   }
 
   "CurrentAddressController" when {
 
-    val pageTitle = Messages("responsiblepeople.wherepersonlives.title", "firstname lastname") + " - " +
-      Messages("summary.responsiblepeople") + " - " +
-      Messages("title.amls") + " - " + Messages("title.gov")
+    val pageTitle = messages("responsiblepeople.wherepersonlives.title", "firstname lastname") + " - " +
+      messages("summary.responsiblepeople") + " - " +
+      messages("title.amls") + " - " + messages("title.gov")
 
     val personName = Some(PersonName("firstname", None, "lastname"))
 
@@ -154,7 +146,8 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
       "redirect to CurrentAddressUkController" when {
         "true selected" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.CurrentAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "true")
 
           val responsiblePeople = ResponsiblePerson()
@@ -174,7 +167,8 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
       "redirect to CurrentAddressNonUkController and wipe old address" when {
         "changed the answer from yes to no" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.CurrentAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "false")
 
           val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
@@ -203,7 +197,8 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
       "redirect to CurrentAddressUkController and wipe old address" when {
         "changed the answer from no to yes" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.CurrentAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "true")
 
           val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("", ""))
@@ -232,7 +227,8 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
       "redirect to CurrentAddressNonUkController" when {
         "false selected" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.CurrentAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "false")
 
           val responsiblePeople = ResponsiblePerson()
@@ -253,7 +249,8 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
 
         "isUK field is not supplied" in new Fixture {
 
-          val line1MissingRequest = requestWithUrlEncodedBody()
+          val line1MissingRequest = FakeRequest(POST, routes.CurrentAddressController.post(1).url)
+          .withFormUrlEncodedBody()
 
           val responsiblePeople = ResponsiblePerson(personName)
 
@@ -267,7 +264,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Optio
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#isUK]").html() must include(Messages(s"error.required.uk.or.overseas.address.current", personName.get.titleName))
+          document.select("a[href=#isUK]").html() must include(messages(s"error.required.uk.or.overseas.address.current", personName.get.titleName))
         }
       }
     }

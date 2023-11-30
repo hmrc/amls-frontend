@@ -19,7 +19,9 @@ package models.businessmatching
 import generators.businessmatching.BusinessMatchingGenerator
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService._
+import models.registrationprogress._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -349,29 +351,63 @@ class BusinessMatchingSpec extends AmlsSpec with BusinessMatchingGenerator {
       }
     }
 
-    "section" must {
+    "taskRow" must {
 
-      "return `NotStarted` section when there is no section in mongoCache" in {
+      "return `NotStarted` task row when there is no task row in mongoCache" in {
         implicit val cache = CacheMap("", Map.empty)
-        BusinessMatching.section mustBe Section("businessmatching", NotStarted, false, controllers.businessmatching.routes.RegisterServicesController.get())
+        BusinessMatching.taskRow mustBe TaskRow(
+          "businessmatching",
+          controllers.businessmatching.routes.RegisterServicesController.get().url,
+          false,
+          NotStarted,
+          TaskRow.notStartedTag
+        )
       }
 
-      "return `Started` section when there is a section which isn't completed" in {
+      "return `Started` task row when there is a task row which isn't completed" in {
         implicit val cache = mock[CacheMap]
         when {
           cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
         } thenReturn Some(BusinessMatching())
-        BusinessMatching.section mustBe Section("businessmatching", Started, false, controllers.businessmatching.routes.RegisterServicesController.get())
+        BusinessMatching.taskRow mustBe TaskRow(
+          "businessmatching",
+          controllers.businessmatching.routes.RegisterServicesController.get().url,
+          false,
+          Started,
+          TaskRow.incompleteTag
+        )
       }
 
-      "return `Completed` section when there is a section which is completed" in {
+      "return `Completed` task row when there is a task row which is completed" in {
         implicit val cache = mock[CacheMap]
 
         when {
           cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
         } thenReturn Some(businessMatching)
 
-        BusinessMatching.section mustBe Section("businessmatching", Completed, false, controllers.businessmatching.routes.SummaryController.get)
+        BusinessMatching.taskRow mustBe TaskRow(
+          "businessmatching",
+          controllers.businessmatching.routes.SummaryController.get.url,
+          false,
+          Completed,
+          TaskRow.completedTag
+        )
+      }
+
+      "return `Updated` task row when there is a task row which is completed and has changed" in {
+        implicit val cache = mock[CacheMap]
+
+        when {
+          cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
+        } thenReturn Some(businessMatching.copy(hasChanged = true))
+
+        BusinessMatching.taskRow mustBe TaskRow(
+          "businessmatching",
+          controllers.businessmatching.routes.SummaryController.get.url,
+          true,
+          Updated,
+          TaskRow.updatedTag
+        )
       }
     }
   }

@@ -18,8 +18,9 @@ package models.hvd
 
 import org.scalatest.WordSpec
 import org.scalatest.MustMatchers
-import jto.validation.{Path, Invalid, Valid}
+import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
+import models.hvd.SalesChannel._
 import play.api.libs.json.Json
 
 

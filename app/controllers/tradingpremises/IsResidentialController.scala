@@ -18,30 +18,30 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
-import javax.inject.{Inject, Singleton}
+import forms.tradingpremises.IsResidentialFormProvider
 import models.businesscustomer.Address
 import models.businessmatching.BusinessMatching
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, RepeatingSection, StatusConstants}
-import views.html.tradingpremises.is_residential
+import views.html.tradingpremises.IsResidentialView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
-
 @Singleton
-class  IsResidentialController @Inject()(
-                                          override val messagesApi: MessagesApi,
-                                          val authAction: AuthAction,
-                                          val ds: CommonPlayDependencies,
-                                          val dataCacheConnector: DataCacheConnector,
-                                          val cc: MessagesControllerComponents,
-                                          is_residential: is_residential,
-                                          implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+class IsResidentialController @Inject()(
+                                         override val messagesApi: MessagesApi,
+                                         val authAction: AuthAction,
+                                         val ds: CommonPlayDependencies,
+                                         val dataCacheConnector: DataCacheConnector,
+                                         val cc: MessagesControllerComponents,
+                                         formProvider: IsResidentialFormProvider,
+                                         view: IsResidentialView,
+                                         implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false) = authAction.async{
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async{
       implicit request =>
         dataCacheConnector.fetchAll(request.credId).map { cacheO =>
           (for {
@@ -51,20 +51,20 @@ class  IsResidentialController @Inject()(
           } yield {
 
             val form = tp.yourTradingPremises match {
-              case Some(YourTradingPremises(_, _, Some(boolean), _, _)) => Form2[IsResidential](IsResidential(boolean))
-              case _ => EmptyForm
+              case Some(YourTradingPremises(_, _, Some(boolean), _, _)) => formProvider().fill(IsResidential(boolean))
+              case _ => formProvider()
             }
 
-            Ok(is_residential(form, tp.yourTradingPremises.map(_.tradingPremisesAddress.toBCAddress), index, edit))
+            Ok(view(form, tp.yourTradingPremises.map(_.tradingPremisesAddress.toBCAddress), index, edit))
           }) getOrElse NotFound(notFoundView)
         }
   }
 
-  def post(index: Int, edit: Boolean = false) = authAction.async {
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
         dataCacheConnector.fetchAll(request.credId).flatMap { cacheO =>
-          Form2[IsResidential](request.body) match {
-            case f: InvalidForm =>
+          formProvider().bindFromRequest().fold(
+            formWithError => {
               val address = for {
                 cache <- cacheO
                 tradingPremises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
@@ -72,8 +72,9 @@ class  IsResidentialController @Inject()(
                 address <- getAddress(bm) if isFirstTradingPremises(tradingPremises, index)
               } yield address
 
-              Future.successful(BadRequest(is_residential(f, address, index, edit)))
-            case ValidForm(_, data) =>
+              Future.successful(BadRequest(view(formWithError, address, index, edit)))
+            },
+            data =>
               for {
                 result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_, tp) =>
                   val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None) { yourTradingPremises =>
@@ -81,11 +82,12 @@ class  IsResidentialController @Inject()(
                   }
                   tp.yourTradingPremises(ytp)
                 }
-              } yield edit match {
-                case true => Redirect(routes.DetailedAnswersController.get(index))
-                case false => Redirect(routes.WhatDoesYourBusinessDoController.get(index))
+              } yield if (edit) {
+                Redirect(routes.CheckYourAnswersController.get(index))
+              } else {
+                Redirect(routes.WhatDoesYourBusinessDoController.get(index))
               }
-          }
+          )
         }
   }
 

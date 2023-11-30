@@ -20,10 +20,12 @@ import cats.data.OptionT
 import cats.implicits._
 import config.ApplicationConfig
 import connectors.DataCacheConnector
+
 import javax.inject.Inject
 import models.businessmatching.BusinessType.Partnership
 import models.businessmatching.{BusinessActivities => _, _}
 import models.responsiblepeople.ResponsiblePerson
+import play.api.i18n.Messages
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{ControllerHelper, DeclarationHelper}
@@ -39,7 +41,7 @@ class ProgressService @Inject()(
                                ){
 
   def getSubmitRedirect (amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String)
-                        (implicit ec: ExecutionContext, hc: HeaderCarrier) : Future[Option[Call]] = {
+                        (implicit ec: ExecutionContext, hc: HeaderCarrier, messages: Messages) : Future[Option[Call]] = {
 
     val result: OptionT[Future, Option[Call]] = for {
       status <- OptionT.liftF(statusService.getStatus(amlsRegistrationNo, accountTypeId, credId))

@@ -20,10 +20,19 @@ import models.autocomplete.NameValuePair
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import services.AutoCompleteService
+import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 
 trait AutoCompleteServiceMocks extends MockitoSugar {
 
   implicit val mockAutoComplete:AutoCompleteService = mock[AutoCompleteService]
+
+  val nonUKCountries: Seq[SelectItem] = Seq(
+    SelectItem(Some("AF"), "Afghanistan"),
+    SelectItem(Some("AX"), "Åland Islands"),
+    SelectItem(Some("AL"), "Albania"),
+    SelectItem(Some("DZ"), "Algeria"),
+    SelectItem(Some("AS"), "American Samoa")
+  )
 
   when {
     mockAutoComplete.getCountries
@@ -36,4 +45,11 @@ trait AutoCompleteServiceMocks extends MockitoSugar {
     NameValuePair("American Samoa", "AS")
   ))
 
+  when {
+    mockAutoComplete.formOptions
+  } thenReturn SelectItem(Some("GB"), "United Kingdom") +: nonUKCountries
+
+  when {
+    mockAutoComplete.formOptionsExcludeUK
+  } thenReturn nonUKCountries
 }

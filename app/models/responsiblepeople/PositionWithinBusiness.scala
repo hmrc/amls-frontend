@@ -19,33 +19,131 @@ package models.responsiblepeople
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Invalid, Path, Rule, Valid, ValidationError, Write}
 import models.FormTypes.basicPunctuationPattern
+import models.businessmatching.BusinessType
+import models.businessmatching.BusinessType.{SoleProprietor => BTSoleProprietor, _}
+import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import play.api.libs.json._
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.CheckboxItem
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import utils.TraversableValidators.minLengthR
 
-sealed trait PositionWithinBusiness
+sealed trait PositionWithinBusiness {
+  val value: String
 
-case object BeneficialOwner extends PositionWithinBusiness
+  def index: String = value.substring(1)
+}
 
-case object Director extends PositionWithinBusiness
+case object BeneficialOwner extends WithName("beneficialOwner") with PositionWithinBusiness {
+  override val value: String = "01"
+}
 
-case object InternalAccountant extends PositionWithinBusiness
+case object Director extends WithName("director") with PositionWithinBusiness {
+  override val value: String = "02"
+}
 
-case object NominatedOfficer extends PositionWithinBusiness
+case object InternalAccountant extends WithName("internalAccountant") with PositionWithinBusiness {
+  override val value: String = "03"
+}
 
-case object Partner extends PositionWithinBusiness
+case object NominatedOfficer extends WithName("nominatedOfficer") with PositionWithinBusiness {
+  override val value: String = "04"
+}
 
-case object SoleProprietor extends PositionWithinBusiness
+case object Partner extends WithName("partner") with PositionWithinBusiness {
+  override val value: String = "05"
+}
 
-case object DesignatedMember extends PositionWithinBusiness
+case object SoleProprietor extends WithName("soleProprietor") with PositionWithinBusiness {
+  override val value: String = "06"
+}
 
-case class Other(value: String) extends PositionWithinBusiness
+case object DesignatedMember extends WithName("designatedMember") with PositionWithinBusiness {
+  override val value: String = "07"
+}
 
-object PositionWithinBusiness
-{
+case object ExternalAccountant extends WithName("externalAccountant") with PositionWithinBusiness {
+  override val value: String = "08"
+}
+
+case class Other(value: String) extends WithName("other") with PositionWithinBusiness
+
+object PositionWithinBusiness extends Enumerable.Implicits {
 
   import jto.validation.forms.Rules._
   import utils.MappingUtils.Implicits.RichRule
+
+  val all: Seq[PositionWithinBusiness] = Seq(
+    BeneficialOwner,
+    Director,
+    InternalAccountant,
+    NominatedOfficer,
+    Partner,
+    SoleProprietor,
+    DesignatedMember,
+    ExternalAccountant,
+    Other("")
+  )
+
+  def formValues(html: Html,
+                 businessType: BusinessType,
+                 displayNominatedOfficer: Boolean,
+                 isDeclaration: Boolean
+  )(implicit messages: Messages): Seq[CheckboxItem] = {
+
+    val optionsList = buildOptionsList(businessType, isDeclaration, displayNominatedOfficer)
+
+    optionsList.zipWithIndex.map { case (position, index) =>
+      val conditional = if (position.toString == Other("").toString) Some(html) else None
+
+      if(businessType == LimitedCompany && isDeclaration && index == 0) {
+        CheckboxItem(
+          content = Text(messages("declaration.addperson.lbl.01")),
+          value = BeneficialOwner.toString,
+          id = Some(s"positions_${BeneficialOwner.index}"),
+          name = Some(s"positions[${BeneficialOwner.index}]")
+        )
+      } else if(position == Other("")) {
+        CheckboxItem(
+          content = Text(messages("responsiblepeople.position_within_business.lbl.09")),
+          value = position.toString,
+          id = Some(s"positions_9"),
+          name = Some(s"positions[9]"),
+          conditionalHtml = conditional
+        )
+      } else {
+        CheckboxItem(
+          content = Text(getPrettyName(position)),
+          value = position.toString,
+          id = Some(s"positions_${position.index}"),
+          name = Some(s"positions[${position.index}]"),
+          conditionalHtml = conditional
+        )
+      }
+    }
+  }
+
+  private def buildOptionsList(businessType: BusinessType, isDeclaration: Boolean, displayNominatedOfficer: Boolean): Seq[PositionWithinBusiness] = {
+
+    val optionalCheckboxes = Seq(
+      if (isDeclaration) Some(ExternalAccountant) else None,
+      if (displayNominatedOfficer) Some(NominatedOfficer) else None
+    ).flatten
+
+    (businessType match {
+      case BTSoleProprietor => optionalCheckboxes :+ SoleProprietor
+      case Partnership => optionalCheckboxes :+ Partner
+      case LimitedCompany if businessType == LPrLLP =>
+        Seq(BeneficialOwner, DesignatedMember, Director) ++ optionalCheckboxes
+      case LimitedCompany =>
+        Seq(BeneficialOwner, Director) ++ optionalCheckboxes
+      case LPrLLP => DesignatedMember +: optionalCheckboxes
+      case UnincorporatedBody => optionalCheckboxes
+    }) :+ Other("")
+  }
+
+  implicit val enumerable: Enumerable[PositionWithinBusiness] = Enumerable(all.map(v => v.toString -> v): _*)
 
   def getPrettyName(position:PositionWithinBusiness)(implicit message: Messages): String = {
     import play.api.i18n.Messages

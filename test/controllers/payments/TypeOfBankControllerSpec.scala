@@ -17,6 +17,7 @@
 package controllers.payments
 
 import controllers.actions.SuccessfulAuthAction
+import forms.payments.TypeOfBankFormProvider
 import generators.PaymentGenerator
 import models.{Country, FeeResponse}
 import models.ResponseType.SubscriptionResponseType
@@ -27,17 +28,17 @@ import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.play.PlaySpec
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.AmlsSpec
-import views.html.payments.type_of_bank
+import views.html.payments.TypeOfBankView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenerator {
+class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenerator with Injecting {
 
   trait Fixture { self =>
 
@@ -45,7 +46,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
 
     implicit val hc: HeaderCarrier = new HeaderCarrier()
     implicit val ec: ExecutionContext = mock[ExecutionContext]
-    lazy val view = app.injector.instanceOf[type_of_bank]
+    lazy val view = inject[TypeOfBankView]
     val controller = new TypeOfBankController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       auditConnector = mock[AuditConnector],
@@ -55,7 +56,8 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       cc = mockMcc,
       statusService = mock[StatusService],
       renewalService = mock[RenewalService],
-      type_of_bank = view
+      formProvider = inject[TypeOfBankFormProvider],
+      view = view
     )
 
     val paymentRef = paymentRefGen.sample.get
@@ -88,7 +90,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
     } thenReturn Some(Currency.fromInt(100))
 
     when {
-      controller.statusService.getStatus(any(), any(), any())(any(), any())
+      controller.statusService.getStatus(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(SubmissionReady)
 
     val completeRenewal = Renewal(
@@ -109,7 +111,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       hasChanged = true
     )
 
-    when(controller.renewalService.getRenewal(any())(any(), any()))
+    when(controller.renewalService.getRenewal(any())(any()))
       .thenReturn(Future.successful(Some(completeRenewal)))
 
     when(controller.renewalService.isRenewalComplete(any(), any())(any(), any()))
@@ -124,7 +126,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
         val result = controller.get()(request)
 
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("payments.typeofbank.title"))
+        contentAsString(result) must include(messages("payments.typeofbank.title"))
 
       }
     }
@@ -134,7 +136,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       "form value is true" must {
         "redirect to BankDetails" in new Fixture {
 
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.TypeOfBankController.post().url).withFormUrlEncodedBody(
             "typeOfBank" -> "true"
           )
 
@@ -149,7 +151,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       "form value is false" must {
         "redirect to BankDetails" in new Fixture {
 
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.TypeOfBankController.post().url).withFormUrlEncodedBody(
             "typeOfBank" -> "false"
           )
 
@@ -164,7 +166,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       "request is invalid" must {
         "return BAD_REQUEST" in new Fixture {
 
-          val postRequest = requestWithUrlEncodedBody(
+          val postRequest = FakeRequest(POST, routes.TypeOfBankController.post().url).withFormUrlEncodedBody(
             "typeOfBank" -> "01"
           )
 

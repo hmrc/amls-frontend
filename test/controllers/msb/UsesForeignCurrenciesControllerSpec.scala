@@ -17,8 +17,11 @@
 package controllers.msb
 
 import controllers.actions.SuccessfulAuthAction
+import forms.msb.UsesForeignCurrenciesFormProvider
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessActivities, BusinessMatching, BusinessMatchingMsbServices, ForeignExchange, MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.{BusinessActivities, BusinessMatching, BusinessMatchingMsbServices}
+import models.businessmatching.BusinessActivity.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.BusinessMatchingMsbService.ForeignExchange
 import models.moneyservicebusiness._
 import models.status.NotCompleted
 import org.jsoup.Jsoup
@@ -29,9 +32,10 @@ import org.scalatest.MustMatchers
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import views.html.msb.uses_foreign_currencies
+import views.html.msb.UsesForeignCurrenciesView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,13 +44,14 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
                                     with MustMatchers
                                     with PatienceConfiguration
                                     with IntegrationPatience
-                                    with ScalaFutures {
+                                    with ScalaFutures
+                                    with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[uses_foreign_currencies]
-    implicit val ec = app.injector.instanceOf[ExecutionContext]
+    lazy val view = inject[UsesForeignCurrenciesView]
+    implicit val ec = inject[ExecutionContext]
 
     when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
       .thenReturn(Future.successful(None))
@@ -59,7 +64,8 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow,
       cc = mockMcc,
-      uses_foreign_currencies = view)
+      formProvider = inject[UsesForeignCurrenciesFormProvider],
+      view = view)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
@@ -78,12 +84,21 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
   trait Fixture2 extends AuthorisedFixture with DependencyMocks with MoneyServiceBusinessTestData {
     self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[uses_foreign_currencies]
-    val controller = new UsesForeignCurrenciesController(SuccessfulAuthAction, ds = commonDependencies, mockCacheConnector, mockStatusService, mockServiceFlow, mockMcc, view)
-    implicit val ec = app.injector.instanceOf[ExecutionContext]
+    lazy val view = inject[UsesForeignCurrenciesView]
+    val controller = new UsesForeignCurrenciesController(
+      SuccessfulAuthAction,
+      ds = commonDependencies,
+      mockCacheConnector,
+      mockStatusService,
+      mockServiceFlow,
+      mockMcc,
+      inject[UsesForeignCurrenciesFormProvider],
+      view
+    )
+    implicit val ec = inject[ExecutionContext]
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(true)
 
     val emptyCache = CacheMap("", Map.empty)
@@ -158,11 +173,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
 
         status(result) mustEqual OK
 
-        document.select("select[name=currencies[0]] > option[value=USD]").hasAttr("selected")
         document.select("input[name=usesForeignCurrencies][checked]").`val` mustEqual "true"
-        document.select("input[name=bankMoneySource][checked]").`val` mustEqual ""
-        document.select("input[name=wholesalerMoneySource][checked]").`val` mustEqual ""
-        document.select("input[name=customerMoneySource][checked]").`val` mustEqual ""
       }
     }
 
@@ -170,9 +181,10 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
       "data is valid" should {
           "clear the foreign currency data when not using foreign currencies" in new Fixture2 {
 
-            val newRequest = requestWithUrlEncodedBody(
-              "usesForeignCurrencies" -> "false"
-            )
+            val newRequest = FakeRequest(POST, routes.UsesForeignCurrenciesController.post().url)
+              .withFormUrlEncodedBody(
+                "usesForeignCurrencies" -> "false"
+              )
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
@@ -186,9 +198,10 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
 
         "keep the foreign currency data when using foreign currencies" in new Fixture2 {
 
-            val newRequest = requestWithUrlEncodedBody(
-              "usesForeignCurrencies" -> "true"
-            )
+            val newRequest = FakeRequest(POST, routes.UsesForeignCurrenciesController.post().url)
+              .withFormUrlEncodedBody(
+                "usesForeignCurrencies" -> "true"
+              )
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)

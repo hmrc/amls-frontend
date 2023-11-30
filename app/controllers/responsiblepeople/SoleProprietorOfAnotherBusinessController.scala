@@ -18,14 +18,14 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
+import forms.responsiblepeople.SoleProprietorFormProvider
 import models.responsiblepeople.{ResponsiblePerson, SoleProprietorOfAnotherBusiness, VATRegistered}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.sole_proprietor
+import views.html.responsiblepeople.SoleProprietorView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 
@@ -35,32 +35,37 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
                                                           val ds: CommonPlayDependencies,
                                                           val statusService: StatusService,
                                                           val cc: MessagesControllerComponents,
-                                                          sole_proprietor: sole_proprietor,
-                                                          implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                          formProvider: SoleProprietorFormProvider,
+                                                          view: SoleProprietorView,
+                                                          implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request => {
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, Some(soleProprietorOfAnotherBusiness)))
-        => Ok(sole_proprietor(Form2[SoleProprietorOfAnotherBusiness](soleProprietorOfAnotherBusiness), edit, index, flow, personName.titleName))
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, None, _, _, _))
-        => Ok(sole_proprietor(EmptyForm, edit, index, flow, personName.titleName))
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, Some(vatRegistered), _, _, _, _, _, _, _, _, _))
-        => Redirect(routes.VATRegisteredController.get(index, edit, flow))
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, None, _, _, _, _, _, _, _, _, _))
-        =>  Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
-        case _ => NotFound(notFoundView)
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.soleProprietorOfAnotherBusiness, person.lineId, person.vatRegistered) match {
+            case (Some(name), Some(soleProprietor), _, _) =>
+              Ok(view(formProvider().fill(soleProprietor), edit, index, flow, name.titleName))
+            case (Some(name), _, None, _) =>
+              Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case (Some(_), _, _, Some(_)) =>
+              Redirect(routes.VATRegisteredController.get(index, edit, flow))
+            case (Some(_), _, _, None) =>
+              Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
+            case _ => NotFound(notFoundView)
+          }
+        }
       }
     }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[SoleProprietorOfAnotherBusiness](request.body) match {
-        case f: InvalidForm => getData[ResponsiblePerson](request.credId, index) flatMap { rp =>
-          Future.successful(BadRequest(sole_proprietor(f, edit, index, flow, ControllerHelper.rpTitleName(rp))))
-        }
-        case ValidForm(_, data) => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors => getData[ResponsiblePerson](request.credId, index) flatMap { rp =>
+          Future.successful(BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp))))
+        },
+        data => {
           for {
             _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
               rp.copy(soleProprietorOfAnotherBusiness = Some(data), vatRegistered = getVatRegData(rp, data))
@@ -68,21 +73,23 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
           } yield if(data.soleProprietorOfAnotherBusiness equals true) {
             Redirect(routes.VATRegisteredController.get(index, edit, flow))
           } else {
-            edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-              case false => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
+            if (edit) {
+              Redirect(routes.DetailedAnswersController.get(index, flow))
+            } else {
+              Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
             }
           }
         }.recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
-      }
+      )
   }
 
   def getVatRegData(rp: ResponsiblePerson, data: SoleProprietorOfAnotherBusiness): Option[VATRegistered] = {
-    data.soleProprietorOfAnotherBusiness match {
-      case true => rp.vatRegistered
-      case false => None
+    if (data.soleProprietorOfAnotherBusiness) {
+      rp.vatRegistered
+    } else {
+      None
     }
   }
 }

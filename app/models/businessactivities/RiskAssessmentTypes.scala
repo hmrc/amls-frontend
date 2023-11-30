@@ -19,16 +19,25 @@ package models.businessactivities
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
+import models.{Enumerable, WithName}
+import play.api.i18n.Messages
 import play.api.libs.json._
+import uk.gov.hmrc.govukfrontend.views.Aliases.{CheckboxItem, Text}
 import utils.TraversableValidators._
 
-sealed trait RiskAssessmentType
+sealed trait RiskAssessmentType {
+  val value: String
+}
 
-case object PaperBased extends RiskAssessmentType
+case object PaperBased extends WithName("paperBased") with RiskAssessmentType {
+  override val value: String = "01"
+}
 
-case object Digital extends RiskAssessmentType
+case object Digital extends WithName("digital") with RiskAssessmentType {
+  override val value: String = "02"
+}
 
-object RiskAssessmentType {
+object RiskAssessmentType extends Enumerable.Implicits {
 
   implicit val riskAssessmentFormRead = Rule[String, RiskAssessmentType] {
     case "01" => Valid(PaperBased)
@@ -54,11 +63,28 @@ object RiskAssessmentType {
       case PaperBased => JsString("01")
       case Digital => JsString("02")
     }
+
+  val all: Seq[RiskAssessmentType] = Seq(PaperBased, Digital)
+
+  implicit val enumerable: Enumerable[RiskAssessmentType] = Enumerable(all.map(v => v.toString -> v): _*)
 }
 
 case class RiskAssessmentTypes(riskassessments: Set[RiskAssessmentType])
 
 object RiskAssessmentTypes {
+
+  def formValues(implicit messages: Messages): Seq[CheckboxItem] = Seq(
+    (1, PaperBased),
+    (2, Digital)
+  ).map(i =>
+    CheckboxItem(
+      content = Text(messages(s"businessactivities.RiskAssessmentType.lbl.${i._2.value}")),
+      value = i._2.toString,
+      id = Some(s"riskassessments_${i._1}"),
+      name = Some(s"riskassessments[${i._1}]")
+    )
+  )
+
   import utils.MappingUtils.Implicits._
 
   implicit def formRule(implicit p: Path => Rule[UrlFormEncoded, Set[RiskAssessmentType]]):

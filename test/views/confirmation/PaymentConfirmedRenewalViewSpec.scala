@@ -17,15 +17,14 @@
 package views.confirmation
 
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
-import views.html.confirmation.payment_confirmation_renewal
+import views.html.confirmation.PaymentConfirmationRenewalView
 
 class PaymentConfirmedRenewalViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    lazy val payment_confirmation_renewal = app.injector.instanceOf[payment_confirmation_renewal]
+    lazy val payment_confirmation_renewal = inject[PaymentConfirmationRenewalView]
     implicit val requestWithToken = addTokenForView()
 
     val businessName = "Test Business Ltd"
@@ -39,26 +38,21 @@ class PaymentConfirmedRenewalViewSpec extends AmlsViewSpec with MustMatchers {
 
     "show the correct title" in new ViewFixture {
 
-      doc.title must startWith(Messages("confirmation.payment.renewal.title"))
-
+      doc.title must startWith(messages("confirmation.payment.renewal.title"))
     }
 
     "show the correct heading" in new ViewFixture {
 
-      heading.text must be(Messages("confirmation.payment.renewal.lede"))
-
+      heading.text must be(messages("confirmation.payment.renewal.lede"))
     }
 
     "show the company name and reference in the heading" in new ViewFixture {
 
-      val headingContainer = doc.select(".confirmation")
+      val headingContainer = doc.select(".govuk-panel__body")
 
       headingContainer.text must include(businessName)
-      headingContainer.text must include(Messages("confirmation.payment.reference_header", paymentReference))
+      headingContainer.text must include(messages("confirmation.payment.reference_header", paymentReference))
 
     }
-
-
   }
-
 }

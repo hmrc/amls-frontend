@@ -19,12 +19,12 @@ package controllers.businessdetails
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.businessdetails.CorrespondenceAddressIsUKFormProvider
 import models.businessdetails.{BusinessDetails, CorrespondenceAddress, CorrespondenceAddressIsUk}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.AuthAction
-import views.html.businessdetails._
+import views.html.businessdetails.CorrespondenceAddressIsUKView
 
 import scala.concurrent.Future
 
@@ -33,36 +33,43 @@ class CorrespondenceAddressIsUkController @Inject ()(val dataConnector: DataCach
                                                      val authAction: AuthAction,
                                                      val ds: CommonPlayDependencies,
                                                      val cc: MessagesControllerComponents,
-                                                     correspondence_address_is_uk: correspondence_address_is_uk) extends AmlsBaseController(ds, cc) {
+                                                     formProvider: CorrespondenceAddressIsUKFormProvider,
+                                                     view: CorrespondenceAddressIsUKView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
         response => {
-          response.flatMap(businessDetails =>
+          val form = response.flatMap(businessDetails =>
             businessDetails.correspondenceAddressIsUk.map(isUk => isUk.isUk)
               .orElse(businessDetails.correspondenceAddress.flatMap(ca => ca.isUk)))
-            .map(isUk => Ok(correspondence_address_is_uk(Form2[CorrespondenceAddressIsUk](CorrespondenceAddressIsUk(isUk)), edit)) )
-            .getOrElse(Ok(correspondence_address_is_uk(EmptyForm, edit)))
+                .fold(formProvider())(isUK => formProvider().fill(CorrespondenceAddressIsUk(isUK)))
+
+          Ok(view(form, edit))
         }
       }
   }
 
   def post(edit: Boolean = false) = authAction.async {
     implicit request => {
-      Form2[CorrespondenceAddressIsUk](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(correspondence_address_is_uk(f, edit)))
-        case ValidForm(_, isUk) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        isUk =>
           for {
             businessDetails <- dataConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key)
-            _ <- dataConnector.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.correspondenceAddressIsUk(isUk))
-            _ <- if (isUkHasChanged(businessDetails.correspondenceAddress, isUk = isUk)) { dataConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
-              businessDetails.correspondenceAddress(CorrespondenceAddress(None, None))) } else { Future.successful(None) }
+            detailsToSave = if (isUkHasChanged(businessDetails.correspondenceAddress, isUk = isUk)) {
+                              businessDetails
+                                .correspondenceAddressIsUk(isUk)
+                                .correspondenceAddress(CorrespondenceAddress(None, None))
+                            } else {
+                              businessDetails.correspondenceAddressIsUk(isUk)
+                            }
+            _ <- dataConnector.save[BusinessDetails](request.credId, BusinessDetails.key, detailsToSave)
           } yield isUk match {
             case CorrespondenceAddressIsUk(true) => Redirect(routes.CorrespondenceAddressUkController.get(edit))
             case CorrespondenceAddressIsUk(false) => Redirect(routes.CorrespondenceAddressNonUkController.get(edit))
           }
-      }
+      )
     }
   }
 

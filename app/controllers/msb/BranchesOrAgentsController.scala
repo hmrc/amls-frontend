@@ -18,15 +18,14 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.msb.BranchesOrAgentsFormProvider
 import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountries, MoneyServiceBusiness}
-import play.api.mvc.{Call, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import services.AutoCompleteService
 import utils.AuthAction
-import views.html.msb.branches_or_agents
+import views.html.msb.BranchesOrAgentsView
 
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheConnector,
@@ -34,27 +33,28 @@ class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheCon
                                             val ds: CommonPlayDependencies,
                                             val autoCompleteService: AutoCompleteService,
                                             val cc: MessagesControllerComponents,
-                                            branches_or_agents: branches_or_agents) extends AmlsBaseController(ds, cc) {
+                                            formProvider: BranchesOrAgentsFormProvider,
+                                            view: BranchesOrAgentsView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
         response =>
           val form = (for {
             msb <- response
             branches <- msb.branchesOrAgents
-          } yield Form2[BranchesOrAgentsHasCountries](branches.hasCountries)).getOrElse(EmptyForm)
-          Ok(branches_or_agents(form, edit))
+          } yield formProvider().fill(branches.hasCountries)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[BranchesOrAgentsHasCountries](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(branches_or_agents(f, edit)))
-        case ValidForm(_, data) => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => {
           for {
             msb <-  dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
             boa: BranchesOrAgents <- Future(msb.flatMap((m:MoneyServiceBusiness) => m.branchesOrAgents)
@@ -63,7 +63,7 @@ class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheCon
             _ <- dataCacheConnector.save(request.credId, MoneyServiceBusiness.key, msb.branchesOrAgents(boa))
           } yield Redirect(getNextPage(data, edit))
         }
-    }
+      )
   }
 
   private def getNextPage(data: BranchesOrAgentsHasCountries, edit: Boolean): Call =

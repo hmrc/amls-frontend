@@ -17,8 +17,9 @@
 package models.moneyservicebusiness
 
 import models.Country
+import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching._
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress._
 import org.mockito.Mockito._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -47,42 +48,83 @@ class MoneyServiceBusinessSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       }
     }
 
-    "have a section function that" when {
+    "return the correct TaskRow" when {
       implicit val cacheMap = mock[CacheMap]
 
+      "model has been updated" should {
+        "return an Updated TaskRow" in {
+
+          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(
+            msbServices = Some(BusinessMatchingMsbServices(
+              Set(ChequeCashingScrapMetal))
+            )
+          ))
+          when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(
+            completeMsb.copy(
+              hasChanged = true,
+              hasAccepted = true
+            )
+          )
+          MoneyServiceBusiness.taskRow must be(
+            TaskRow(
+              MoneyServiceBusiness.key,
+              controllers.msb.routes.SummaryController.get.url,
+              true,
+              Updated,
+              TaskRow.updatedTag
+            )
+          )
+        }
+      }
+
       "model is empty" should {
-        "return a NotStarted Section" in {
+        "return a NotStarted TaskRow" in {
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn None
           when(cacheMap.getEntry[MoneyServiceBusiness](BusinessMatching.key)) thenReturn None
-          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, NotStarted, false,  controllers.msb.routes.WhatYouNeedController.get))
+          MoneyServiceBusiness.taskRow must be(
+            TaskRow(
+              MoneyServiceBusiness.key,
+              controllers.msb.routes.WhatYouNeedController.get.url,
+              false,
+              NotStarted,
+              TaskRow.notStartedTag
+            )
+          )
         }
       }
 
       "model is incomplete" should {
-        "return a NotStarted Section" in {
+        "return an Incomplete TaskRow" in {
           when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(
             Set(ChequeCashingScrapMetal)))))
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn
             Some(MoneyServiceBusiness( throughput = Some(ExpectedThroughput.Second)))
-          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Started, false,  controllers.msb.routes.WhatYouNeedController.get))
+          MoneyServiceBusiness.taskRow must be(
+            TaskRow(
+              MoneyServiceBusiness.key,
+              controllers.msb.routes.WhatYouNeedController.get.url,
+              false,
+              Started,
+              TaskRow.incompleteTag
+            )
+          )
         }
       }
 
       "model is complete" should {
-        "return a Completed Section" in {
+        "return a Completed TaskRow" in {
           when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(
             Set(ChequeCashingScrapMetal)))))
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(completeMsb)
-          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Completed, false,  controllers.msb.routes.SummaryController.get))
-        }
-      }
-
-      "model is complete" should {
-        "return a Completed Section when all msb options selected in business matching" in {
-          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(
-            Set(ChequeCashingScrapMetal, TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal)))))
-          when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(completeMsb)
-          MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Completed, false,  controllers.msb.routes.SummaryController.get))
+          MoneyServiceBusiness.taskRow must be(
+            TaskRow(
+              MoneyServiceBusiness.key,
+              controllers.msb.routes.SummaryController.get.url,
+              false,
+              Completed,
+              TaskRow.completedTag
+            )
+          )
         }
       }
     }

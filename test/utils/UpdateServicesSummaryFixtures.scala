@@ -16,13 +16,14 @@
 
 package utils
 
-import forms.EmptyForm
+import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching._
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import models.tradingpremises.Address
 import views.Fixture
-import views.html.businessmatching.updateservice.add._
+import views.html.businessmatching.updateservice.add.UpdateServicesSummaryView
 
 /**
   * Trait to hold the fixtures used for data setup to mixin with the UpdateServicesSummarySpec class.
@@ -47,8 +48,8 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * View in simple form with high value dealing.
     */
   trait SimpleFlowModelViewFixture extends ViewFixture {
-    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
+    lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
+    override def view = update_services_summary(AddBusinessTypeFlowModel(
       activity = Some(HighValueDealing)))
   }
 
@@ -58,12 +59,12 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * View to include TrustAndCompanyServices.
     */
   trait SimpleTCSPViewFixture extends ViewFixture {
-    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
+    lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
     val completePersonName = Some(PersonName("Katie", None, "Test"))
     val completePersonName2 = Some(PersonName("David", None, "Test"))
     val completeRp1 = ResponsiblePerson(completePersonName)
     val completeRp2 = ResponsiblePerson(completePersonName2)
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
+    override def view = update_services_summary(AddBusinessTypeFlowModel(
       activity = Some(TrustAndCompanyServices)))
   }
 
@@ -73,8 +74,8 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * View to include TrustAndCompanyServices.
     */
   trait SimpleTCSPNoFitAndProperViewFixture extends ViewFixture {
-    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
+    lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
+    override def view = update_services_summary(AddBusinessTypeFlowModel(
       activity = Some(TrustAndCompanyServices)
     ))
   }
@@ -86,8 +87,8 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * Has single CurrencyExchange sub service.
     */
   trait MSBViewFixture extends ViewFixture {
-    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
+    lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
+    override def view = update_services_summary(AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
       subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
     ))
@@ -100,8 +101,8 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * Has single CurrencyExchange sub service.
     */
   trait MSBViewNoPremisesFixture extends ViewFixture {
-    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
+    lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
+    override def view = update_services_summary(AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
       subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
     ))
@@ -115,11 +116,11 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * Has PSR No.
     */
   trait MSBAllViewFixture extends ViewFixture {
-    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
+    lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
     val completePersonName = Some(PersonName("Katie", None, "Test"))
     val completeRp1 = ResponsiblePerson(completePersonName)
     val address = Address("1", None, None, None, "AA1 1BB", None)
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
+    override def view = update_services_summary(AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
       subSectors = Some(BusinessMatchingMsbServices(Set(
         TransmittingMoney,
@@ -139,8 +140,8 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * Has PSR No.
     */
   trait MSBSingleViewFixture extends ViewFixture {
-    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
+    lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
+    override def view = update_services_summary(AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
       subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
       businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))))
@@ -154,8 +155,8 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * Has no PSR No.
     */
   trait MSBNoPSRViewFixture extends ViewFixture {
-    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
+    lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
+    override def view = update_services_summary(AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
       subSectors = Some(BusinessMatchingMsbServices(Set(
         TransmittingMoney)
@@ -171,8 +172,8 @@ trait UpdateServicesSummaryFixtures  extends AmlsViewSpec {
     * Has a PSR No.
     */
   trait SingleSubSectorPSRMSBViewFixture extends ViewFixture {
-    lazy val update_services_summary = app.injector.instanceOf[update_services_summary]
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
+    lazy val update_services_summary = app.injector.instanceOf[UpdateServicesSummaryView]
+    override def view = update_services_summary(AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
       subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
       businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111"))

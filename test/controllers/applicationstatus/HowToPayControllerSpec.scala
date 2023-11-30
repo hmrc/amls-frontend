@@ -26,8 +26,7 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, FeeHelper}
-import play.api.i18n.Messages
-import views.html.applicationstatus.how_to_pay
+import views.html.applicationstatus.HowToPayView
 
 import scala.concurrent.Future
 
@@ -37,13 +36,13 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
     self =>
 
     val request = addToken(authRequest)
-    lazy val howToPay = app.injector.instanceOf[how_to_pay]
+    lazy val howToPay = app.injector.instanceOf[HowToPayView]
     val controller = new HowToPayController(
       authAction = SuccessfulAuthAction,
       feeHelper = mock[FeeHelper],
       cc = mockMcc,
       ds = commonDependencies,
-      how_to_pay = howToPay
+      view = howToPay
     )
   }
 
@@ -87,7 +86,7 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))
-          doc.getElementById("find-email-no-reference").html must include(Messages("howtopay.para.3.link"))
+          doc.getElementById("find-email-no-reference").html must include(messages("howtopay.para.3.link"))
         }
 
         "There is an empty payment reference number" in new Fixture {
@@ -100,7 +99,7 @@ class HowToPayControllerSpec extends AmlsSpec with SubscriptionResponseGenerator
           status(result) must be(OK)
 
           val doc = Jsoup.parse(contentAsString(result))
-          doc.getElementById("find-email-no-reference").html must include(Messages("howtopay.para.3.link"))
+          doc.getElementById("find-email-no-reference").html must include(messages("howtopay.para.3.link"))
         }
       }
     }

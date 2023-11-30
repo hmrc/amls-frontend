@@ -18,6 +18,7 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.AccountantIsUKAddressFormProvider
 import models.Country
 import models.businessactivities._
 import org.jsoup.Jsoup
@@ -25,26 +26,28 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
-import views.html.businessactivities.who_is_your_accountant_is_uk_address
+import views.html.businessactivities.AccountantIsUKAddressView
 
 import scala.concurrent.Future
 
-class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with PrivateMethodTester {
+class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with PrivateMethodTester with Injecting {
 
   trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks{
     self =>
     val request = addToken(authRequest)
 
-    lazy val view = app.injector.instanceOf[who_is_your_accountant_is_uk_address]
+    lazy val view = inject[AccountantIsUKAddressView]
     val controller = new WhoIsYourAccountantIsUkController (
       dataCacheConnector = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       autoCompleteService = mockAutoComplete,
       ds = commonDependencies,
       cc = mockMcc,
-      who_is_your_accountant_is_uk_address = view
+      formProvider = inject[AccountantIsUKAddressFormProvider],
+      view = view
     )
   }
 
@@ -64,8 +67,8 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with PrivateMethodT
         status(result) must be(OK)
 
         val page = Jsoup.parse(contentAsString(result))
-        page.getElementById("isUK-true").hasAttr("checked") must be(false)
-        page.getElementById("isUK-false").hasAttr("checked") must be(false)
+        page.getElementById("isUK").hasAttr("checked") must be(false)
+        page.getElementById("isUK-2").hasAttr("checked") must be(false)
       }
 
       "show the who is your accountant page when there is existing data" in new Fixture {
@@ -83,8 +86,8 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with PrivateMethodT
         status(result) must be(OK)
 
         val page = Jsoup.parse(contentAsString(result))
-        page.getElementById("isUK-true").hasAttr("checked") must be(false)
-        page.getElementById("isUK-false").hasAttr("checked") must be(true)
+        page.getElementById("isUK").hasAttr("checked") must be(false)
+        page.getElementById("isUK-2").hasAttr("checked") must be(true)
       }
     }
 
@@ -110,7 +113,8 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with PrivateMethodT
       "edit is true" must {
         "respond with SEE_OTHER and redirect to the SummaryController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhoIsYourAccountantIsUkController.post(true).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "true"
           )
 
@@ -130,7 +134,8 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with PrivateMethodT
       "edit is false" must {
         "respond with SEE_OTHER and redirect to the WhoIsYourAccountantUkAddressController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhoIsYourAccountantIsUkController.post(false).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "true"
           )
 
@@ -148,7 +153,8 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with PrivateMethodT
 
         "respond with SEE_OTHER and redirect to the WhoIsYourAccountantNonUkAddressController" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhoIsYourAccountantIsUkController.post(false).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "false"
           )
 

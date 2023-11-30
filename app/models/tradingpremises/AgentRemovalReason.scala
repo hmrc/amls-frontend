@@ -20,15 +20,85 @@ import cats.data.Validated.Valid
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, To, Write}
+import models.tradingpremises.AgentRemovalReason.{CeasedTrading, LackOfProfit, MajorComplianceIssues, MinorComplianceIssues, Other, RequestedByAgent}
+import models.tradingpremises.RemovalReasonConstants.Schema
+import models.{Enumerable, WithName}
+import play.api.i18n.Messages
 import play.api.libs.json.Json
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
-case class AgentRemovalReason(removalReason: String, removalReasonOther: Option[String] = None)
+case class AgentRemovalReason(removalReason: String, removalReasonOther: Option[String] = None) {
 
-object AgentRemovalReason {
+  def reasonToObj: AgentRemovalReasonAnswer = removalReason match {
+    case Schema.MAJOR_COMPLIANCE_ISSUES => MajorComplianceIssues
+    case Schema.MINOR_COMPLIANCE_ISSUES => MinorComplianceIssues
+    case Schema.LACK_OF_PROFIT => LackOfProfit
+    case Schema.CEASED_TRADING => CeasedTrading
+    case Schema.REQUESTED_BY_AGENT => RequestedByAgent
+    case Schema.OTHER => Other
+    case _ => throw new IllegalArgumentException("Invalid reason")
+  }
+}
+
+sealed trait AgentRemovalReasonAnswer {
+  val value: String
+}
+object AgentRemovalReason extends Enumerable.Implicits {
+
+  case object MajorComplianceIssues extends WithName("majorComplianceIssues") with AgentRemovalReasonAnswer {
+    val value = "01"
+  }
+  case object MinorComplianceIssues extends WithName("minorComplianceIssues") with AgentRemovalReasonAnswer {
+    val value = "02"
+  }
+  case object LackOfProfit extends WithName("lackOfProfit") with AgentRemovalReasonAnswer {
+    val value = "03"
+  }
+  case object CeasedTrading extends WithName("ceasedTrading") with AgentRemovalReasonAnswer {
+    val value = "04"
+  }
+  case object RequestedByAgent extends WithName("requestedByAgent") with AgentRemovalReasonAnswer {
+    val value = "05"
+  }
+  case object Other extends WithName("other") with AgentRemovalReasonAnswer {
+    val value = "06"
+  }
+
+  val all: Seq[AgentRemovalReasonAnswer] = Seq(
+    MajorComplianceIssues,
+    MinorComplianceIssues,
+    LackOfProfit,
+    CeasedTrading,
+    RequestedByAgent,
+    Other
+  )
+
+  implicit val enumerable: Enumerable[AgentRemovalReasonAnswer] = Enumerable(all.map(v => v.toString -> v): _*)
+
+  def formItems(conditionalHtml: Html)(implicit messages: Messages): Seq[RadioItem] = all.map { answer =>
+
+    if(answer == Other) {
+      RadioItem(
+        content = Text(messages(s"tradingpremises.remove_reasons.agent.premises.lbl.${answer.value}")),
+        id = Some(answer.toString),
+        value = Some(answer.toString),
+        conditionalHtml = Some(conditionalHtml)
+      )
+    } else {
+      RadioItem(
+        content = Text(messages(s"tradingpremises.remove_reasons.agent.premises.lbl.${answer.value}")),
+        id = Some(answer.toString),
+        value = Some(answer.toString)
+      )
+    }
+  }
+
 
   import RemovalReasonConstants._
-  import utils.MappingUtils.Implicits._
-  import models.FormTypes._
+            import utils.MappingUtils.Implicits._
+            import models.FormTypes._
 
   implicit val formats = Json.format[AgentRemovalReason]
 

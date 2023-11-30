@@ -16,10 +16,8 @@
 
 package models.responsiblepeople
 
-import cats.data.Validated.{Invalid, Valid}
-import models.{DateOfChange}
-import jto.validation.forms._
-import jto.validation.{From, Rule, To, ValidationError, Write}
+import play.api.libs.json._
+import models.DateOfChange
 
 
 case class ResponsiblePersonCurrentAddress(personAddress: PersonAddress,
@@ -27,40 +25,5 @@ case class ResponsiblePersonCurrentAddress(personAddress: PersonAddress,
                                            dateOfChange: Option[DateOfChange] = None)
 
 object ResponsiblePersonCurrentAddress {
-
-  import play.api.libs.json._
-
-  val validateCountry: Rule[PersonAddress, PersonAddress] = Rule.fromMapping[PersonAddress, PersonAddress] {
-    case address: PersonAddressNonUK if address.country.code == "GB" => Invalid(Seq(ValidationError(List("error.required.select.non.uk.address"))))
-    case address => Valid(address)
-  }
-
-  implicit val formRule: Rule[UrlFormEncoded, ResponsiblePersonCurrentAddress] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (
-      __.read(validateCountry) ~ (__ \ "timeAtAddress").read[Option[TimeAtAddress]]
-      ) ((personAddress:PersonAddress, _:Option[TimeAtAddress]) => ResponsiblePersonCurrentAddress(personAddress, None, None))
-  }
-
-  def addressFormRule(paFormRule: Rule[UrlFormEncoded, PersonAddress]): Rule[UrlFormEncoded, ResponsiblePersonCurrentAddress] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (
-      __.read(paFormRule andThen validateCountry) ~ (__ \ "timeAtAddress").read[Option[TimeAtAddress]]
-      ) ((personAddress:PersonAddress, _:Option[TimeAtAddress]) => ResponsiblePersonCurrentAddress(personAddress, None, None))
-  }
-
-  def unapplyNoDateOfChange(currentAddress:ResponsiblePersonCurrentAddress):Option[(PersonAddress,Option[TimeAtAddress])] =
-    Some((currentAddress.personAddress,currentAddress.timeAtAddress))
-
-  implicit val formWrites: Write[ResponsiblePersonCurrentAddress, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    (
-      __.write[PersonAddress] ~
-        __.write[Option[TimeAtAddress]]
-      ) (unlift(ResponsiblePersonCurrentAddress.unapplyNoDateOfChange))
-  }
-
   implicit val format = Json.format[ResponsiblePersonCurrentAddress]
-
 }

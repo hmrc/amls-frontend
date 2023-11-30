@@ -16,18 +16,20 @@
 
 package controllers.responsiblepeople.address
 
+import cats.data.OptionT
+import cats.implicits.catsStdInstancesForFuture
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
+import forms.{DateOfChangeFormProvider, FormHelpers}
 import models.DateOfChange
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonAddressHistory, ResponsiblePersonCurrentAddress}
-import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
+import play.api.data.Form
+import play.api.mvc._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
-import views.html.date_of_change
-
+import views.html.DateOfChangeView
 
 import scala.concurrent.Future
 
@@ -36,38 +38,42 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
                                                      val ds: CommonPlayDependencies,
                                                      statusService: StatusService,
                                                      val cc: MessagesControllerComponents,
-                                                     date_of_change: date_of_change) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                                     formProvider: DateOfChangeFormProvider,
+                                                     view: DateOfChangeView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
-  def get(index: Int, edit: Boolean) = authAction.async {
+  def get(index: Int, edit: Boolean): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _,
-        Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_, _, Some(doc))), _, _)), _, _, _, _, _, _, _, _, _, _, _, _))
-        => Ok(date_of_change(Form2[DateOfChange](DateOfChange(doc.dateOfChange)), "summary.responsiblepeople",
-          controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
-        ))
-        case _ => Ok(date_of_change(EmptyForm, "summary.responsiblepeople",
+      OptionT(getData[ResponsiblePerson](request.credId, index) map {
+        case Some(person) =>
+          for {
+            addressHistory <- person.addressHistory
+            currentAddress <- addressHistory.currentAddress
+            doc <- currentAddress.dateOfChange
+          } yield {
+            formProvider().fill(doc)
+          }
+        case _ => Some(formProvider())
+      }).getOrElse(formProvider()) map { form =>
+        Ok(view(form, "summary.responsiblepeople",
           controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
         ))
       }
   }
 
-  def post(index: Int, edit: Boolean) = authAction.async {
+  def post(index: Int, edit: Boolean): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[DateOfChange](request.body.asFormUrlEncoded.get) match {
-        case f: InvalidForm => {
-          invalidView(f, index, edit)
-        }
-        case ValidForm(_, dateOfChange) => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          invalidView(formWithErrors, index, edit),
+        dateOfChange =>
           validFormView(request.credId, index, dateOfChange, edit)
-        }
-      }
+      )
   }
 
-  private def invalidView(f: forms.Form2[_], index: Integer, edit: Boolean)
+  private def invalidView(f: Form[DateOfChange], index: Integer, edit: Boolean)
                                              (implicit request: Request[AnyContent]) = {
     Future.successful(BadRequest(
-      date_of_change(
+      view(
         f,
         "summary.responsiblepeople",
         controllers.responsiblepeople.address.routes.CurrentAddressDateOfChangeController.post(index, edit)
@@ -76,7 +82,7 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
   }
 
   private def validFormView(credId: String, index: Int, date: DateOfChange, edit: Boolean)
-                           (implicit request: Request[AnyContent]) = {
+                           (implicit request: Request[AnyContent]): Future[Result] = {
     doUpdate(credId, index, date).map { cache: CacheMap =>
       if (cache.getEntry[ResponsiblePerson](ResponsiblePerson.key).exists(_.isComplete)) {
         Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))

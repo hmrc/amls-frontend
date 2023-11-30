@@ -16,8 +16,10 @@
 
 package models.tradingpremises
 
-import models.businessmatching._
-import models.registrationprogress.{Completed, NotStarted, Started}
+import models.businessmatching.BusinessActivity._
+import models.registrationprogress._
+import models.tradingpremises.BusinessStructure._
+import models.tradingpremises.TradingPremisesMsbService._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -198,7 +200,7 @@ class TradingPremisesSpec extends AmlsSpec {
   }
 
   "Amendment and Variation flow" when {
-    "the section is complete with all the trading premises being removed" must {
+    "the taskRow is complete with all the trading premises being removed" must {
       "successfully redirect to what you need page" in {
         val mockCacheMap = mock[CacheMap]
 
@@ -208,15 +210,16 @@ class TradingPremisesSpec extends AmlsSpec {
             TradingPremises(status = Some(StatusConstants.Deleted), hasChanged = true)
           )))
 
-        val section = TradingPremises.section(mockCacheMap)
+        val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
-        section.hasChanged must be(true)
-        section.status must be(NotStarted)
-        section.call must be(controllers.tradingpremises.routes.TradingPremisesAddController.get(true))
+        taskRow.hasChanged must be(true)
+        taskRow.status must be(NotStarted)
+        taskRow.href must be(controllers.tradingpremises.routes.TradingPremisesAddController.get(true).url)
+        taskRow.tag must be(TaskRow.notStartedTag)
       }
     }
 
-    "the section is complete with all the trading premises being removed and has one incomplete model" must {
+    "the taskRow is complete with all the trading premises being removed and has one incomplete model" must {
       "successfully redirect to your trading premises page" in {
         val mockCacheMap = mock[CacheMap]
 
@@ -227,15 +230,16 @@ class TradingPremisesSpec extends AmlsSpec {
             TradingPremises(Some(RegisteringAgentPremises(true)), None, hasAccepted = true)
           )))
         
-        val section = TradingPremises.section(mockCacheMap)
+        val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
-        section.hasChanged must be(true)
-        section.status must be(Started)
-        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.get())
+        taskRow.hasChanged must be(true)
+        taskRow.status must be(Started)
+        taskRow.href must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
+        taskRow.tag must be(TaskRow.incompleteTag)
       }
     }
 
-    "the section is complete with one of the trading premises object being removed" must {
+    "the taskRow is complete with one of the trading premises object being removed" must {
       "successfully redirect to your trading premises page" in {
         val mockCacheMap = mock[CacheMap]
 
@@ -244,29 +248,31 @@ class TradingPremisesSpec extends AmlsSpec {
             completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
             completeModel)))
 
-        val section = TradingPremises.section(mockCacheMap)
+        val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
-        section.hasChanged must be(true)
-        section.status must be(Completed)
-        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.get())
+        taskRow.hasChanged must be(true)
+        taskRow.status must be(Completed)
+        taskRow.href must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
+        taskRow.tag must be(TaskRow.completedTag)
       }
     }
 
-    "the section is complete with all the trading premises unchanged" must {
+    "the taskRow is complete with all the trading premises unchanged" must {
       "successfully redirect to your trading premises page" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(completeModel, completeModel)))
-        val section = TradingPremises.section(mockCacheMap)
+        val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
-        section.hasChanged must be(false)
-        section.status must be(Completed)
-        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.get())
+        taskRow.hasChanged must be(false)
+        taskRow.status must be(Completed)
+        taskRow.href must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
+        taskRow.tag must be(TaskRow.completedTag)
       }
     }
 
-    "the section is complete with all the trading premises being modified" must {
+    "the taskRow is complete with all the trading premises being modified" must {
       "successfully redirect to your trading premises page" in {
         val mockCacheMap = mock[CacheMap]
 
@@ -276,47 +282,48 @@ class TradingPremisesSpec extends AmlsSpec {
             completeModel.copy(status = Some(StatusConstants.Updated), hasChanged = true, hasAccepted = true))
           ))
 
-        val section = TradingPremises.section(mockCacheMap)
+        val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
-        section.hasChanged must be(true)
-        section.status must be(Completed)
-        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.get())
+        taskRow.hasChanged must be(true)
+        taskRow.status must be(Updated)
+        taskRow.href must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
+        taskRow.tag must be(TaskRow.updatedTag)
       }
     }
   }
 
   it when {
 
-    "the section consists of just 1 empty Trading premises" must {
+    "the taskRow consists of just 1 empty Trading premises" must {
       "return a result indicating NotStarted" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(TradingPremises())))
 
-        TradingPremises.section(mockCacheMap).status must be(models.registrationprogress.NotStarted)
+        TradingPremises.taskRow(mockCacheMap, messages).status must be(models.registrationprogress.NotStarted)
       }
     }
 
-    "the section consists of a partially complete model followed by a completely empty one" must {
+    "the taskRow consists of a partially complete model followed by a completely empty one" must {
       "return a result indicating partial completeness" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(incompleteModel, TradingPremises())))
 
-        TradingPremises.section(mockCacheMap).status must be(models.registrationprogress.Started)
+        TradingPremises.taskRow(mockCacheMap, messages).status must be(models.registrationprogress.Started)
       }
     }
 
-    "the section consists of a complete model followed by an empty one" must {
+    "the taskRow consists of a complete model followed by an empty one" must {
       "return a result indicating partial completeness" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(completeModel, TradingPremises(hasAccepted = true))))
 
-        TradingPremises.section(mockCacheMap).status must be(models.registrationprogress.Started)
+        TradingPremises.taskRow(mockCacheMap, messages).status must be(models.registrationprogress.Started)
       }
     }
 
@@ -330,7 +337,7 @@ class TradingPremisesSpec extends AmlsSpec {
             TradingPremises(hasAccepted = true),
             incompleteModel)))
 
-        TradingPremises.section(mockCacheMap).call.url must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
+        TradingPremises.taskRow(mockCacheMap, messages).href must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
       }
     }
 

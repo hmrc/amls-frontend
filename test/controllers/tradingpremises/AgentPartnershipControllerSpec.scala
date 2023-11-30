@@ -17,6 +17,7 @@
 package controllers.tradingpremises
 
 import controllers.actions.SuccessfulAuthAction
+import forms.tradingpremises.AgentPartnershipFormProvider
 import generators.tradingpremises.TradingPremisesGenerator
 import models.TradingPremisesSection
 import models.tradingpremises.{AgentPartnership, TradingPremises}
@@ -27,24 +28,26 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.tradingpremises.agent_partnership
+import views.html.tradingpremises.AgentPartnershipView
 
 import scala.concurrent.Future
 
-class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
+class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with TradingPremisesGenerator with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[agent_partnership]
+    lazy val view = inject[AgentPartnershipView]
     val controller = new AgentPartnershipController(
       mockCacheConnector,
       SuccessfulAuthAction,
       ds = commonDependencies,
       messagesApi,
       cc = mockMcc,
-      agent_partnership = view,
+      formProvider = inject[AgentPartnershipFormProvider],
+      view = view,
       error = errorView)
 
     mockCacheFetchAll
@@ -64,7 +67,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
         val document = Jsoup.parse(contentAsString(result))
 
-        val title = s"${Messages("tradingpremises.agentpartnership.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+        val title = s"${messages("tradingpremises.agentpartnership.title")} - ${messages("summary.tradingpremises")} - ${messages("title.amls")} - ${messages("title.gov")}"
 
         document.title() must be(title)
         document.select("input[type=text]").`val`() must be(empty)
@@ -80,7 +83,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
         val document = Jsoup.parse(contentAsString(result))
 
-        val title = s"${Messages("tradingpremises.agentpartnership.title")} - ${Messages("summary.tradingpremises")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+        val title = s"${messages("tradingpremises.agentpartnership.title")} - ${messages("summary.tradingpremises")} - ${messages("title.amls")} - ${messages("title.gov")}"
 
         document.title() must be(title)
         document.select("input[type=text]").`val`() must be("test")
@@ -100,7 +103,8 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
     "post is called" must {
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentPartnershipController.post(99).url)
+          .withFormUrlEncodedBody(
             "agentPartnership" -> "text"
           )
 
@@ -111,7 +115,8 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
       "respond with SEE_OTHER" when {
         "edit is false and given valid data" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentPartnershipController.post(1).url)
+          .withFormUrlEncodedBody(
             "agentPartnership" -> "text"
           )
 
@@ -125,7 +130,8 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
         "edit is true and given valid data" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentPartnershipController.post(1, true).url)
+          .withFormUrlEncodedBody(
             "agentPartnership" -> "text"
           )
 
@@ -134,7 +140,7 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
           val result = controller.post(1, true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+          redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
         }
       }
@@ -142,7 +148,8 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.AgentPartnershipController.post(1).url)
+          .withFormUrlEncodedBody(
             "agentPartnership" -> ""
           )
 
@@ -153,7 +160,8 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
       }
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody("agentPartnership" -> "text")
+        val newRequest = FakeRequest(POST, routes.AgentPartnershipController.post(1).url)
+        .withFormUrlEncodedBody("agentPartnership" -> "text")
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse, TradingPremises())))
 

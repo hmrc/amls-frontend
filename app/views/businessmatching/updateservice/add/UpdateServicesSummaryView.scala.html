@@ -1,0 +1,142 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import controllers.businessmatching.updateservice.add.routes
+@import models.flowmanagement.AddBusinessTypeFlowModel
+@import models.businessmatching.BusinessActivity
+@import models.businessmatching.BusinessActivity.MoneyServiceBusiness
+@import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
+@import models.businessmatching.{BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
+@import views.html.components.{SectionSubtitle, Heading, Button}
+
+@this(
+    layout: Layout,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    govukSummaryList: GovukSummaryList,
+    formHelper: FormWithCSRF,
+    button: Button
+)
+
+@(model: AddBusinessTypeFlowModel)(implicit messages: Messages, request: Request[_])
+
+@activityRow(activity: BusinessActivity) = @{
+    SummaryListRow(
+        Key(Text(messages("businessmatching.updateservice.selectactivities.title"))),
+        Value(Text(activity.getMessage())),
+        actions = Some(Actions(
+            items = Seq(ActionItem(
+                routes.SelectBusinessTypeController.get(edit = true).url,
+                Text(messages("button.edit")),
+                attributes = Map("id" -> "selectactivities-edit")
+            ))
+        ))
+    )
+}
+
+@psrRow(bool: Boolean) = @{
+    SummaryListRow(
+        Key(Text(messages("businessmatching.psr.number.title"))),
+        Value(Text(
+            if(bool) {
+                messages("lbl.yes")
+            } else {
+                messages("lbl.no")
+            }
+        )),
+        actions = Some(Actions(
+            items = Seq(ActionItem(
+                routes.BusinessAppliedForPSRNumberController.get(true).url,
+                Text(messages("button.edit")),
+                attributes = Map("id" -> "psr-edit")
+            ))
+        ))
+    )
+}
+
+@layout(s"${messages("title.cya")} - ${messages("summary.updateservice")}", showBackLink = false) {
+
+    @subtitle("summary.updateservice")
+
+    @heading("title.cya")
+
+    @govukSummaryList(
+        SummaryList(
+            model.activity match {
+                case Some(activity) if activity == MoneyServiceBusiness =>
+                    model.subSectors.map { services =>
+                        val msb = Seq(
+                            activityRow(activity),
+                            SummaryListRow(
+                                Key(Text(messages("businessmatching.updateservice.msb.services.title"))),
+                                if(services.msbServices.size == 1) {
+                                    Value(Text(services.msbServices.head.getMessage))
+                                } else {
+                                    Value(
+                                        HtmlContent(
+                                            Html(
+                                                "<ul id=\"msb-service\" class=\"govuk-list govuk-list--bullet\">" +
+                                                    services.msbServices.toList.sortBy(_.getMessage).map { x =>
+                                                        s"<li>${messages(s"businessmatching.services.list.lbl.${x.value}")}</li>"
+                                                    }.sorted.mkString +
+                                                "</ul>"
+                                            )
+                                        )
+                                    )
+                                },
+                                actions = Some(Actions(
+                                    items = Seq(ActionItem(
+                                        routes.SubSectorsController.get(true).url,
+                                        Text(messages("button.edit")),
+                                        attributes = Map("id" -> "msbservices-edit")
+                                    ))
+                                ))
+                            )
+                        )
+
+                        val psr = if(services.msbServices.contains(TransmittingMoney)) {
+                            model.businessAppliedForPSRNumber match {
+                                case Some(BusinessAppliedForPSRNumberYes(psr)) => Seq(
+                                    psrRow(true),
+                                    SummaryListRow(
+                                        Key(Text(messages("businessmatching.psr.number.lbl"))),
+                                        Value(Text(psr)),
+                                        actions = Some(Actions(
+                                            items = Seq(ActionItem(
+                                                routes.BusinessAppliedForPSRNumberController.get(true).url,
+                                                Text(messages("button.edit")),
+                                                attributes = Map("id" -> "psr-answer-edit")
+                                            ))
+                                        ))
+                                    )
+                                )
+                                case Some(BusinessAppliedForPSRNumberNo) => Seq(psrRow(false))
+                                case _ => Seq.empty
+                            }
+                        } else Seq.empty
+
+                      msb ++ psr
+                    } getOrElse Seq.empty
+                case Some(activity) => Seq(activityRow(activity))
+                case _ => Seq.empty
+            }
+        )
+    )
+
+    @formHelper(controllers.businessmatching.updateservice.add.routes.AddBusinessTypeSummaryController.post()) {
+        @button("button.checkyouranswers.acceptandcomplete", "updatesummary-submit")
+    }
+}

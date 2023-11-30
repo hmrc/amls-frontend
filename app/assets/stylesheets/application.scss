@@ -1,0 +1,26 @@
+$govuk-assets-path: "/agent/assets/lib/govuk-frontend/govuk/assets/";
+@import "lib/govuk-frontend/govuk/base";
+
+.registration-status-tag {
+  float: right;
+}
+
+.autocomplete__wrapper {
+  width: 66.66%;
+}
+
+#currency-autocomplete-0, #currency-autocomplete-0__listbox {
+  width: 25%
+}
+
+#currency-autocomplete-1, #currency-autocomplete-1__listbox {
+  width: 25%
+}
+
+#currency-autocomplete-2, #currency-autocomplete-2__listbox {
+  width: 25%
+}
+
+div.currencies-autocomplete-wrapper > div.govuk-form-group > div > div.autocomplete__wrapper > span > input.autocomplete__hint {
+  width: 25%
+}

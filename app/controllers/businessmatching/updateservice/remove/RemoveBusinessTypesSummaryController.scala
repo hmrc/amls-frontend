@@ -21,14 +21,14 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
-import forms.EmptyForm
 import javax.inject.Inject
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, RemoveBusinessTypesSummaryPageId}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-import views.html.businessmatching.updateservice.remove.remove_activities_summary
+import views.html.businessmatching.updateservice.remove.RemoveActivitiesSummaryView
+
 import scala.concurrent.Future
 
 class RemoveBusinessTypesSummaryController @Inject()(authAction: AuthAction,
@@ -37,23 +37,23 @@ class RemoveBusinessTypesSummaryController @Inject()(authAction: AuthAction,
                                                      val helper: RemoveBusinessTypeHelper,
                                                      val router: Router[RemoveBusinessTypeFlowModel],
                                                      val cc: MessagesControllerComponents,
-                                                     remove_activities_summary: remove_activities_summary) extends AmlsBaseController(ds, cc) {
+                                                     view: RemoveActivitiesSummaryView) extends AmlsBaseController(ds, cc) {
 
-  def get = authAction.async {
-      implicit request => {
-        for {
-          flow <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key))
-        } yield Ok(remove_activities_summary(EmptyForm, flow))
-      } getOrElse InternalServerError("Unable to get the flow model")
+  def get: Action[AnyContent] = authAction.async {
+    implicit request => {
+      for {
+        flow <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key))
+      } yield Ok(view(flow))
+    } getOrElse InternalServerError("Unable to get the flow model")
   }
 
-  def post = authAction.async {
-      implicit request => {
-        for {
-          model <- updateSubscription(request.credId)
-          route <- OptionT.liftF(router.getRoute(request.credId, RemoveBusinessTypesSummaryPageId, model))
-        } yield route
-      } getOrElse InternalServerError("Unable to remove the business type")
+  def post: Action[AnyContent] = authAction.async {
+    implicit request => {
+      for {
+        model <- updateSubscription(request.credId)
+        route <- OptionT.liftF(router.getRoute(request.credId, RemoveBusinessTypesSummaryPageId, model))
+      } yield route
+    } getOrElse InternalServerError("Unable to remove the business type")
   }
 
   private def updateSubscription(credId: String)

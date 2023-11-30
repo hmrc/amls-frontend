@@ -16,57 +16,58 @@
 
 package controllers.responsiblepeople
 
-import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import models.responsiblepeople.{ResponsiblePerson, VATRegistered}
-import play.api.mvc.MessagesControllerComponents
+import forms.responsiblepeople.VATRegisteredFormProvider
+import models.responsiblepeople.ResponsiblePerson
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople._
+import views.html.responsiblepeople.VATRegisteredView
 
 import scala.concurrent.Future
 
-
 class VATRegisteredController @Inject () (
-                                         val dataCacheConnector: DataCacheConnector,
-                                         authAction: AuthAction,
-                                         val ds: CommonPlayDependencies,
-                                         val cc: MessagesControllerComponents,
-                                         vat_registered: vat_registered,
-                                         implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                           val dataCacheConnector: DataCacheConnector,
+                                           authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
+                                           val cc: MessagesControllerComponents,
+                                           formProvider: VATRegisteredFormProvider,
+                                           view: VATRegisteredView,
+                                           implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-
-
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-    getData[ResponsiblePerson](request.credId, index) map {
-      case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,Some(vat),_,_,_,_,_,_,_,_,_)) =>
-        Ok(vat_registered(Form2[VATRegistered](vat), edit, index, flow, personName.titleName))
-      case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-        Ok(vat_registered(EmptyForm, edit, index, flow, personName.titleName))
-      case _ => NotFound(notFoundView)
-        }
-    }
-
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-    implicit request =>
-        Form2[VATRegistered](request.body) match {
-          case f: InvalidForm => getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(vat_registered(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.vatRegistered) match {
+            case (Some(name), Some(registered)) => Ok(view(formProvider().fill(registered), edit, index, flow, name.titleName))
+            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _ => NotFound(notFoundView)
           }
-          case ValidForm(_, data) => {
-            for {
-              _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
-                rp.vatRegistered(data)
-              }
-            } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-              case false => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
+        }
+      }
+  }
+
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => getData[ResponsiblePerson](request.credId, index) map { rp =>
+          BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+        },
+        data => {
+          for {
+            _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
+              rp.vatRegistered(data)
             }
-          }.recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+          } yield if (edit) {
+            Redirect(routes.DetailedAnswersController.get(index, flow))
+          } else {
+            Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
           }
+        }.recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
+      )
     }
 }

@@ -29,7 +29,7 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
 
   def paymentRefGen: Gen[String] = stringOfLengthGen(refLength - 1) map { ref => s"X${ref.toUpperCase()}" }
 
-  def paymentIdGen: Gen[String] = alphaNumOfLengthGen(15)
+  def paymentIdGen: Gen[String] = stringOfLengthGen(15)
 
   def now: LocalDateTime = LocalDateTime.now()
 
@@ -42,7 +42,7 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
   )
 
   val paymentGen: Gen[Payment] = for {
-    _id <- alphaNumOfLengthGen(refLength)
+    _id <- stringOfLengthGen(refLength)
     amlsRefNo <- amlsRefNoGen
     safeId <- amlsRefNoGen
     ref <- paymentRefGen

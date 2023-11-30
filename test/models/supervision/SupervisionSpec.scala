@@ -16,7 +16,8 @@
 
 package models.supervision
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress._
+import models.supervision.ProfessionalBodies._
 import org.joda.time.LocalDate
 import org.mockito.Mockito._
 import play.api.libs.json.Json
@@ -45,62 +46,105 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
       Supervision.mongoKey() must be("supervision")
     }
 
-    "have a section function that" must {
+    "have a task row function that" must {
 
       implicit val cache = mock[CacheMap]
 
-      "return a NotStarted Section when there is no model in the cache" in {
+      "returns a Not Started task row when there is no model in the cache" in {
 
-        val notStartedSection = Section("supervision", NotStarted, false,  controllers.supervision.routes.WhatYouNeedController.get)
+        val notStartedTaskRow = TaskRow(
+          "supervision",
+          controllers.supervision.routes.WhatYouNeedController.get.url,
+          hasChanged = false,
+          NotStarted,
+          TaskRow.notStartedTag
+        )
 
         when(cache.getEntry[Supervision]("supervision")) thenReturn None
 
-        Supervision.section must be(notStartedSection)
-
+        Supervision.taskRow mustBe notStartedTaskRow
       }
 
-      "return a NotStarted Section when there is empty model in cache (everything None, except non optionals)" in {
+      "returns a Not Started task row when there is empty model in cache (everything None, except non optionals)" in {
 
-        val notStartedSection = Section("supervision", NotStarted, false,  controllers.supervision.routes.WhatYouNeedController.get)
+        val notStartedTaskRow = TaskRow(
+          "supervision",
+          controllers.supervision.routes.WhatYouNeedController.get.url,
+          hasChanged = false,
+          NotStarted,
+          TaskRow.notStartedTag
+        )
 
         when(cache.getEntry[Supervision]("supervision")) thenReturn Some(Supervision())
 
-        Supervision.section must be(notStartedSection)
-
+        Supervision.taskRow mustBe notStartedTaskRow
       }
 
-      "return a NotStarted Section when model is empty" in {
+      "returns a Not Started task row when model is empty" in {
 
-        val notStartedSection = Section("supervision", NotStarted, false,  controllers.supervision.routes.WhatYouNeedController.get)
+        val notStartedTaskRow = TaskRow(
+          "supervision",
+          controllers.supervision.routes.WhatYouNeedController.get.url,
+          false,
+          NotStarted,
+          TaskRow.notStartedTag
+        )
 
         when(cache.getEntry[Supervision]("supervision")) thenReturn None
 
-        Supervision.section must be(notStartedSection)
-
+        Supervision.taskRow mustBe notStartedTaskRow
       }
 
-      "return a Completed Section when model is complete" in {
+      "returns a Completed task row when model is complete" in {
 
         val complete = mock[Supervision]
-        val completedSection = Section("supervision", Completed, false,  controllers.supervision.routes.SummaryController.get)
+        val completedTaskRow = TaskRow(
+          "supervision",
+          controllers.supervision.routes.SummaryController.get.url,
+          false,
+          Completed,
+          TaskRow.completedTag
+        )
 
         when(complete.isComplete) thenReturn true
         when(cache.getEntry[Supervision]("supervision")) thenReturn Some(complete)
 
-        Supervision.section must be(completedSection)
-
+        Supervision.taskRow mustBe completedTaskRow
       }
 
-      "return a Started Section when model is incomplete" in {
+      "returns an Updated task row when model is complete and has changed" in {
+
+        val complete = mock[Supervision]
+        val updatedTaskRow = TaskRow(
+          "supervision",
+          controllers.supervision.routes.SummaryController.get.url,
+          true,
+          Updated,
+          TaskRow.updatedTag
+        )
+
+        when(complete.isComplete) thenReturn true
+        when(complete.hasChanged) thenReturn true
+        when(cache.getEntry[Supervision]("supervision")) thenReturn Some(complete)
+
+        Supervision.taskRow mustBe updatedTaskRow
+      }
+
+      "returns a Started task row when model is incomplete" in {
 
         val incomplete = mock[Supervision]
-        val startedSection = Section("supervision", Started, false,  controllers.supervision.routes.WhatYouNeedController.get)
+        val incompleteTaskRow = TaskRow(
+          "supervision",
+          controllers.supervision.routes.WhatYouNeedController.get.url,
+          false,
+          Started,
+          TaskRow.incompleteTag
+        )
 
         when(incomplete.isComplete) thenReturn false
         when(cache.getEntry[Supervision]("supervision")) thenReturn Some(incomplete)
 
-        Supervision.section must be(startedSection)
-
+        Supervision.taskRow mustBe incompleteTaskRow
       }
     }
 

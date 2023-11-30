@@ -20,16 +20,17 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.renewal.TotalThroughputFormProvider
+import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing}
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.businessmatching._
-import models.renewal.{Renewal, TotalThroughput}
-import play.api.mvc.{MessagesControllerComponents, Result}
+import models.renewal.Renewal
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.RenewalService
 import utils.AuthAction
+import views.html.renewal.TotalThroughputView
 
-import views.html.renewal.total_throughput
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class TotalThroughputController @Inject()(val authAction: AuthAction,
@@ -37,55 +38,56 @@ class TotalThroughputController @Inject()(val authAction: AuthAction,
                                           renewals: RenewalService,
                                           dataCacheConnector: DataCacheConnector,
                                           val cc: MessagesControllerComponents,
-                                          total_throughput: total_throughput) extends AmlsBaseController(ds, cc) {
+                                          formProvider: TotalThroughputFormProvider,
+                                          view: TotalThroughputView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        val maybeResult = for {
-          renewal <- OptionT(renewals.getRenewal(request.credId))
-          throughput <- OptionT.fromOption[Future](renewal.totalThroughput)
-        } yield {
-          Ok(total_throughput(Form2[TotalThroughput](throughput), edit))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      val maybeResult = for {
+        renewal <- OptionT(renewals.getRenewal(request.credId))
+        throughput <- OptionT.fromOption[Future](renewal.totalThroughput)
+      } yield {
+        Ok(view(formProvider().fill(throughput), edit))
+      }
 
-        maybeResult getOrElse Ok(total_throughput(EmptyForm, edit))
+      maybeResult getOrElse Ok(view(formProvider(), edit))
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        Form2[TotalThroughput](request.body) match {
-          case form: InvalidForm => Future.successful(BadRequest(total_throughput(form, edit)))
-          case ValidForm(_, model) =>
-            dataCacheConnector.fetchAll(request.credId) flatMap {
-              optMap =>
-                val result = for {
-                  cacheMap <- optMap
-                  renewal <- cacheMap.getEntry[Renewal](Renewal.key)
-                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-                  services <- bm.msbServices
-                  activities <- bm.activities
-                } yield {
-                  renewals.updateRenewal(request.credId, renewal.totalThroughput(model)) map { _ =>
-                    if (!edit) {
-                      standardRouting(services.msbServices, activities.businessActivities)
-                    } else {
-                      Redirect(routes.SummaryController.get)
-                    }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        value =>
+          dataCacheConnector.fetchAll(request.credId) flatMap {
+            optMap =>
+              val result = for {
+                cacheMap <- optMap
+                renewal <- cacheMap.getEntry[Renewal](Renewal.key)
+                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                services <- bm.msbServices
+                activities <- bm.activities
+              } yield {
+                renewals.updateRenewal(request.credId, renewal.totalThroughput(value)) map { _ =>
+                  if (!edit) {
+                    standardRouting(services.msbServices, activities.businessActivities)
+                  } else {
+                    Redirect(routes.SummaryController.get)
                   }
                 }
-                result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
-            }
-        }
+              }
+              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+          }
+      )
   }
 
   private def standardRouting(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity]): Result = {
-      if(services.contains(TransmittingMoney)) { Redirect(routes.TransactionsInLast12MonthsController.get()) }
-      else if(services.contains(CurrencyExchange)) { Redirect(routes.CETransactionsInLast12MonthsController.get()) }
-      else if(services.contains(ForeignExchange)) { Redirect(routes.FXTransactionsInLast12MonthsController.get()) }
-      else if(businessActivities.contains(HighValueDealing) || businessActivities.contains(AccountancyServices)) {
-        Redirect(routes.CustomersOutsideIsUKController.get())
-      } else {
-        Redirect(routes.SummaryController.get)
-      }
+    if(services.contains(TransmittingMoney)) { Redirect(routes.TransactionsInLast12MonthsController.get()) }
+    else if(services.contains(CurrencyExchange)) { Redirect(routes.CETransactionsInLast12MonthsController.get()) }
+    else if(services.contains(ForeignExchange)) { Redirect(routes.FXTransactionsInLast12MonthsController.get()) }
+    else if(businessActivities.contains(HighValueDealing) || businessActivities.contains(AccountancyServices)) {
+      Redirect(routes.CustomersOutsideIsUKController.get())
+    } else {
+      Redirect(routes.SummaryController.get)
+    }
   }
 }

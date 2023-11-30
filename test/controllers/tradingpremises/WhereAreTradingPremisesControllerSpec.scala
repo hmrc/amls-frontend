@@ -18,40 +18,39 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.DateOfChangeFormProvider
+import forms.tradingpremises.TradingAddressFormProvider
 import models._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{Document, Element}
-import org.jsoup.select.Elements
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers.{status => hstatus, _}
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
-import utils.AmlsSpec
-import views.html.date_of_change
-import views.html.tradingpremises.where_are_trading_premises
+import utils.{AmlsSpec, DateHelper}
+import views.html.DateOfChangeView
+import views.html.tradingpremises.WhereAreTradingPremisesView
 
-import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter {
+class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with Injecting {
 
   private val mockDataCacheConnector = mock[DataCacheConnector]
 
   trait Fixture  {
     self => val request = addToken(authRequest)
-    lazy val view1 = app.injector.instanceOf[where_are_trading_premises]
-    lazy val view2 = app.injector.instanceOf[date_of_change]
+    lazy val view1 = inject[WhereAreTradingPremisesView]
+    lazy val view2 = inject[DateOfChangeView]
 
     val controller = new WhereAreTradingPremisesController (
       dataCacheConnector = mockDataCacheConnector,
@@ -59,12 +58,14 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       statusService = mock[StatusService],
       auditConnector = mock[AuditConnector],
       cc = mockMcc,
-      where_are_trading_premises = view1,
-      date_of_change = view2,
+      formProvider = inject[TradingAddressFormProvider],
+      dateChangeFormProvider = inject[DateOfChangeFormProvider],
+      view = view1,
+      dateChangeView = view2,
       error = errorView
       )
 
-    when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
+    when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())
@@ -77,7 +78,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
   val emptyCache = CacheMap("", Map.empty)
   val fields = Array[String]("tradingName", "addressLine1", "addressLine2", "postcode")
-  val RecordId1 = 1
+  val recordId1 = 1
 
 
   "WhereAreTradingPremisesController" when {
@@ -92,11 +93,11 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
-        val result = controller.get(RecordId1, true)(request)
+        val result = controller.get(recordId1, true)(request)
         val document = Jsoup.parse(contentAsString(result))
 
         hstatus(result) must be(OK)
-        contentAsString(result) must include(Messages("tradingpremises.yourtradingpremises.title"))
+        contentAsString(result) must include(messages("tradingpremises.yourtradingpremises.title"))
         for (field <- fields)
           document.select(s"input[id=$field]").`val`() must not be empty
       }
@@ -106,7 +107,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-        val result = controller.get(RecordId1, false)(request)
+        val result = controller.get(recordId1, false)(request)
 
         hstatus(result) must be(OK)
 
@@ -117,7 +118,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
           (any(), any())).thenReturn(Future.successful(None))
 
-        val result = controller.get(RecordId1, false)(request)
+        val result = controller.get(recordId1, false)(request)
 
         hstatus(result) must be(NOT_FOUND)
       }
@@ -141,11 +142,12 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       "respond with SEE_OTHER" when {
         "edit mode is false, and redirect to the 'Activity Start Date' page" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.post(recordId1, false).url)
+          .withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
-            "postcode" -> "AA1 1AA"
+            "postCode" -> "AA1 1AA"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -157,7 +159,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
             meq(Seq(TradingPremises(yourTradingPremises = Some(updatedYtp), hasChanged = true))))(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = controller.post(RecordId1, false)(newRequest)
+          val result = controller.post(recordId1, false)(newRequest)
 
           hstatus(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.tradingpremises.routes.ActivityStartDateController.get(1).url))
@@ -172,16 +174,17 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
               d.detail("postCode") mustBe "AA1 1AA"
           }
         }
-        
+
         "fail submission on invalid uk address" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.post(recordId1, false).url)
+          .withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address **1",
             "addressLine2" -> "Address 2",
             "addressLine3" -> "Address 3",
             "addressLine4" -> "Address 4",
-            "postcode" -> "AA1 1AA"
+            "postCode" -> "AA1 1AA"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -190,24 +193,20 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = controller.post(RecordId1, false)(newRequest)
+          val result = controller.post(recordId1, false)(newRequest)
 
-          val document: Document  = Jsoup.parse(contentAsString(result))
-          val errorCount = 1
-          val elementsWithError : Elements = document.getElementsByClass("error-notification")
-          elementsWithError.size() must be(errorCount)
-          for (ele: Element <- elementsWithError.asScala) {
-            ele.html() must include(Messages("error.required.enter.addresslineone.regex"))
-          }
+          hstatus(result) mustBe BAD_REQUEST
+          contentAsString(result) must include(messages("error.text.validation.address.line1"))
         }
 
         "redirect to the 'Activity Start Date' page when no data in mongoCache" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.post(recordId1, false).url)
+          .withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
-            "postcode" -> "AA1 1AA"
+            "postCode" -> "AA1 1AA"
           )
           val newYtp = Some(YourTradingPremises(tradingName = "Trading Name",
             tradingPremisesAddress = Address("Address 1", Some("Address 2"), None, None, "AA1 1AA")))
@@ -219,7 +218,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
             .thenReturn(Future.successful(emptyCache))
 
 
-          val result = controller.post(RecordId1, false)(newRequest)
+          val result = controller.post(recordId1, false)(newRequest)
 
           hstatus(result) must be(SEE_OTHER)
           redirectLocation(result) must be(
@@ -228,11 +227,12 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
         "edit mode is true, and redirect to check your answer page" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.post(recordId1, true).url)
+          .withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
-            "postcode" -> "AA1 1AA"
+            "postCode" -> "AA1 1AA"
           )
 
           val oldAddress = Address("Old address 1", Some("Old address 2"), None, None, "Test")
@@ -243,11 +243,11 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = controller.post(RecordId1, true)(newRequest)
+          val result = controller.post(recordId1, true)(newRequest)
 
           hstatus(result) must be(SEE_OTHER)
           redirectLocation(result) must be(
-            Some(controllers.tradingpremises.routes.DetailedAnswersController.get(1).url))
+            Some(controllers.tradingpremises.routes.CheckYourAnswersController.get(1).url))
 
           val captor = ArgumentCaptor.forClass(classOf[DataEvent])
           verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
@@ -265,7 +265,8 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
       "respond with BAD_REQUEST" when {
         "given an invalid request" in new Fixture {
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.post(recordId1, true).url)
+          .withFormUrlEncodedBody(
             "tradingName" -> "Trading Name"
           )
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -274,7 +275,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = controller.post(RecordId1, true)(newRequest)
+          val result = controller.post(recordId1, true)(newRequest)
 
           hstatus(result) must be(BAD_REQUEST)
 
@@ -282,11 +283,12 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
         "date contains an invalid year too great in length" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.post(recordId1, false).url)
+          .withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1"*120,
             "addressLine2" -> "Address 2",
-            "postcode" -> "AA1 1AA"
+            "postCode" -> "AA1 1AA"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -295,10 +297,10 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          val result = controller.post(RecordId1, false)(newRequest)
+          val result = controller.post(recordId1, false)(newRequest)
 
           hstatus(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.required.enter.addresslineone.charcount"))
+          contentAsString(result) must include(messages("error.required.enter.addresslineone.charcount"))
 
         }
       }
@@ -306,11 +308,12 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       "respond with NOT_FOUND" when {
         "the given index is out of bounds" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.post(recordId1, false).url)
+          .withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",
             "addressLine1" -> "Address 1",
             "addressLine2" -> "Address 2",
-            "postcode" -> "AA1 1AA"
+            "postCode" -> "AA1 1AA"
           )
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -328,11 +331,12 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
       "set the hasChanged flag to true" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.post(1, false).url)
+        .withFormUrlEncodedBody(
           "tradingName" -> "Trading Name",
           "addressLine1" -> "Address 1",
           "addressLine2" -> "Address 2",
-          "postcode" -> "AA1 1AA"
+          "postCode" -> "AA1 1AA"
         )
 
         when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -360,11 +364,12 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
   "go to the date of change page" when {
     "the submission has been approved and trading name has changed" in new Fixture {
 
-      val initRequest = requestWithUrlEncodedBody(
+      val initRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.post(1, true).url)
+        .withFormUrlEncodedBody(
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
-        "postcode" -> "AA1 1AA"
+        "postCode" -> "AA1 1AA"
       )
 
       val address = Address("addressLine1", Some("addressLine2"), None, None, "AA1 1AA")
@@ -376,7 +381,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
       val result = controller.post(1, edit = true)(initRequest)
@@ -389,11 +394,12 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
   "go to the date of change page" when {
     "the status id ready for renewal and trading name has changed" in new Fixture {
 
-      val initRequest = requestWithUrlEncodedBody(
+      val initRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.post(1, true).url)
+        .withFormUrlEncodedBody(
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
-        "postcode" -> "AA1 1AA"
+        "postCode" -> "AA1 1AA"
       )
 
       val address = Address("addressLine1", Some("addressLine2"), None, None, "AA1 1AA")
@@ -405,7 +411,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(ReadyForRenewal(None)))
 
       val result = controller.post(1, edit = true)(initRequest)
@@ -418,11 +424,12 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
   "go to the check your answers page" when {
     "data has not changed" in new Fixture {
 
-      val initRequest = requestWithUrlEncodedBody(
+      val initRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.post(1, false).url)
+        .withFormUrlEncodedBody(
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
-        "postcode" -> "AA1 1AA"
+        "postCode" -> "AA1 1AA"
       )
 
       val address = Address("Address 1", Some("Address 2"), None, None, "AA1 1AA")
@@ -436,7 +443,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         .thenReturn(Future.successful(emptyCache))
 
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
 
@@ -448,11 +455,12 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
     "the trading premises instance is brand new" in new Fixture {
 
-      val initRequest = requestWithUrlEncodedBody(
+      val initRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.post(1, true).url)
+        .withFormUrlEncodedBody(
         "tradingName" -> "Trading Name",
         "addressLine1" -> "Address 1",
         "addressLine2" -> "Address 2",
-        "postcode" -> "AA1 1AA"
+        "postCode" -> "AA1 1AA"
       )
 
       val address = Address("Address 1", Some("Address 2"), None, None, "AA1 1AA")
@@ -464,13 +472,13 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
       val result = controller.post(1, edit = true)(initRequest)
 
       hstatus(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.DetailedAnswersController.get(1).url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.CheckYourAnswersController.get(1).url))
     }
   }
 
@@ -482,7 +490,8 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
   "handle the date of change form post" when {
     "given valid data for a trading premises name" in new Fixture {
 
-      val postRequest = requestWithUrlEncodedBody(
+      val postRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.dateOfChange(1).url)
+        .withFormUrlEncodedBody(
         "dateOfChange.year" -> "2010",
         "dateOfChange.month" -> "10",
         "dateOfChange.day" -> "01"
@@ -507,7 +516,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       val result = controller.saveDateOfChange(1)(postRequest)
 
       hstatus(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+      redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
       val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
       verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(TradingPremises.key), captor.capture())(any(), any())
@@ -526,14 +535,19 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       when(tp.yourTradingPremises) thenReturn Some(ytp)
       when(ytp.startDate) thenReturn Some(new LocalDate(2011,1,1))
 
-      val postRequest = requestWithUrlEncodedBody("invalid" -> "data")
+      val postRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.dateOfChange(1).url)
+        .withFormUrlEncodedBody(
+          "dateOfChange.day" -> "1",
+          "dateOfChange.month" -> "1",
+          "dateOfChange.year" -> "foo"
+        )
 
       when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any(), any())) thenReturn Future.successful(Some(Seq(tp)))
 
       val result = controller.saveDateOfChange(1)(postRequest)
 
       hstatus(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.expected.jodadate.format"))
+      contentAsString(result) must include(messages("error.invalid.year"))
     }
 
     "given a date of change in the future" in new Fixture {
@@ -544,7 +558,8 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       when(tp.yourTradingPremises) thenReturn Some(ytp)
       when(ytp.startDate) thenReturn Some(new LocalDate(2011,1,1))
 
-      val postRequest = requestWithUrlEncodedBody(
+      val postRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.dateOfChange(1).url)
+        .withFormUrlEncodedBody(
         "dateOfChange.day" -> "1",
         "dateOfChange.month" -> "1",
         "dateOfChange.year" -> LocalDate.now.plusYears(1).getYear.toString
@@ -555,19 +570,22 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       val result = controller.saveDateOfChange(1)(postRequest)
 
       hstatus(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.future.date"))
+      contentAsString(result) must include(messages("error.future.date"))
     }
 
   }
 
   "given a date of change which is before the activity start date" in new Fixture {
-    val postRequest = requestWithUrlEncodedBody(
+    val postRequest = FakeRequest(POST, routes.WhereAreTradingPremisesController.dateOfChange(1).url)
+      .withFormUrlEncodedBody(
       "dateOfChange.year" -> "2007",
       "dateOfChange.month" -> "10",
       "dateOfChange.day" -> "01"
     )
 
-    val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = Some(true), Some(new LocalDate(2008, 1, 1)), None)
+    val date = new LocalDate(2008, 1, 1)
+
+    val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = Some(true), Some(date), None)
     val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
 
     when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
@@ -576,6 +594,6 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
     val result = controller.saveDateOfChange(1)(postRequest)
 
     hstatus(result) must be(BAD_REQUEST)
-    contentAsString(result) must include(Messages("error.expected.tp.dateofchange.after.startdate", "01-01-2008"))
+    contentAsString(result) must include(messages("error.expected.tp.dateofchange.after.startdate", DateHelper.formatDate(date)))
   }
 }

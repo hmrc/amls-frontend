@@ -1,0 +1,128 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.{ ApplicationConfig}
+@import models.tradingpremises._
+@import utils.StatusConstants
+@import controllers.tradingpremises.ModelHelpers._
+@import models.status._
+@import views.html.components.{SectionSubtitle, Heading, Button}
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    button: Button
+)
+
+@(add: Boolean, status: SubmissionStatus, completeTp: Seq[(TradingPremises, Int)], incompleteTp: Seq[(TradingPremises, Int)])(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@tpDetail(tp: TradingPremises) = {
+    @{tp.yourTradingPremises match {
+        case Some(ytp) => ytp.tradingPremisesAddress.toLines.mkString(", ").toString
+        case None => messages("tradingpremises.nodetails")
+    }}
+}
+
+@layout(
+    pageTitle = messages("tradingpremises.yourpremises.title") + " - " + messages("tradingpremises.subheading"),
+    showBackLink = false
+) {
+
+    @subtitle("tradingpremises.subheading")
+
+    @heading("tradingpremises.yourpremises.title")
+
+    <p class="govuk-body">@messages("tradingpremises.yourpremises.line_1")</p>
+
+    <p class="govuk-body">@messages("tradingpremises.yourpremises.line_2")</p>
+
+    <p class="govuk-body"><a id="addTradingPremises" href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(true)">@messages("tradingpremises.summary.addanother")</a></p>
+
+    @if(completeTp.isEmpty & incompleteTp.isEmpty) {
+        <p class="govuk-body">@messages("tradingpremises.yourpremises.line_3")</p>
+    }
+
+    @if(incompleteTp.nonEmpty) {
+        <h2 id="incomplete-header" class="govuk-heading-m">@messages("tradingpremises.yourpremises.incomplete")</h2>
+        <div class="form-group">
+            <dl class="hmrc-add-to-a-list hmrc-add-to-a-list--short">
+
+            @incompleteTp.map { case (tp, index) =>
+                <div class="hmrc-add-to-a-list__contents">
+                    <dt id="incomplete-detail-@index" class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light govuk-!-width-three-quarters">
+                    @tpDetail(tp)
+                    </dt>
+                    <dd id="incomplete-action-panel-@index" class="hmrc-add-to-a-list__change">
+                        <a id="detail-edit-@index" href="@controllers.tradingpremises.routes.YourTradingPremisesController.getIndividual(index + 1, true).url">
+                            <span aria-hidden="true">@messages("button.edit")</span>
+                            <span hidden>@messages("button.edit") @tpDetail(tp)</span>
+                        </a>
+                    </dd>
+                    <dd class="hmrc-add-to-a-list__remove">
+                        <a id="detail-remove-@index" href="@tp.removeUrl(index + 1, add, status)">
+                            <span aria-hidden="true">@messages("button.remove")</span>
+                            <span hidden>@messages("button.remove") @tpDetail(tp)</span>
+                        </a>
+                    </dd>
+                </div>
+            }
+            </dl>
+        </div>
+    }
+
+    @if(completeTp.nonEmpty) {
+        @if(incompleteTp.nonEmpty) {
+            <h2 id="complete-header" class="govuk-heading-m">@messages("tradingpremises.yourpremises.complete")</h2>
+        }
+        <div class="form-group">
+            <dl class="hmrc-add-to-a-list hmrc-add-to-a-list--short">
+
+            @completeTp.map { case (tp, index) =>
+                <div class="hmrc-add-to-a-list__contents">
+                    <dt id="completed-detail-@index" class="hmrc-add-to-a-list__identifier hmrc-add-to-a-list__identifier--light govuk-!-width-three-quarters">
+                    @tpDetail(tp)
+                    </dt>
+                    <dd id="incomplete-action-panel-@index" class="hmrc-add-to-a-list__change">
+                        <a id="detail-edit-@index" href="@controllers.tradingpremises.routes.CheckYourAnswersController.get(index + 1).url">
+                            <span aria-hidden="true">@messages("button.edit")</span>
+                            <span hidden>@messages("button.edit") @tpDetail(tp)</span>
+                        </a>
+                    </dd>
+                    <dd class="hmrc-add-to-a-list__remove">
+                        <a id="detail-remove-@index" href="@tp.removeUrl(index + 1, add, status)">
+                            <span aria-hidden="true">@messages("button.remove")</span>
+                            <span hidden>@messages("button.remove") @tpDetail(tp)</span>
+                        </a>
+                    </dd>
+                </div>
+            }
+            </dl>
+        </div>
+    }
+
+    @formHelper(action = controllers.routes.RegistrationProgressController.get) {
+
+        @if(incompleteTp.nonEmpty || (completeTp.isEmpty & incompleteTp.isEmpty)) {
+            @button(messages("button.returntoapplicationprogress"))
+        } else {
+            @button(messages("button.checkyouranswers.acceptandcomplete"))
+        }
+    }
+}
+
+

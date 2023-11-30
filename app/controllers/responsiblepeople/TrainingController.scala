@@ -19,12 +19,14 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
+import forms.responsiblepeople.TrainingFormProvider
+
 import javax.inject.Inject
 import models.responsiblepeople.{ResponsiblePerson, Training}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.training
+import views.html.responsiblepeople.TrainingView
 
 import scala.concurrent.Future
 
@@ -34,31 +36,33 @@ class TrainingController @Inject()(
                                     authAction: AuthAction,
                                     val ds: CommonPlayDependencies,
                                     val cc: MessagesControllerComponents,
-                                    trainingView: training,
-                                    implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                    formProvider: TrainingFormProvider,
+                                    view: TrainingView,
+                                    implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
     authAction.async {
       implicit request =>
-        getData[ResponsiblePerson](request.credId, index) map {
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,Some(training),_,_,_,_,_,_,_))
-          => Ok(trainingView(Form2[Training](training), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(trainingView(EmptyForm, edit, index, flow, personName.titleName))
-          case _
-          => NotFound(notFoundView)
+        getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+          responsiblePerson.fold(NotFound(notFoundView)) { person =>
+            (person.personName, person.training) match {
+              case (Some(name), Some(training)) => Ok(view(formProvider().fill(training), edit, index, flow, name.titleName))
+              case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
+              case _ => NotFound(notFoundView)
+            }
+          }
         }
     }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
     authAction.async {
       implicit request => {
-        Form2[Training](request.body) match {
-          case f: InvalidForm =>
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(trainingView(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-            }
-          case ValidForm(_, data) => {
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            },
+          data => {
             for {
               _ <- fetchAllAndUpdateStrict[ResponsiblePerson](request.credId, index) { (_, rp) =>
                 rp.training(data)
@@ -67,7 +71,7 @@ class TrainingController @Inject()(
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
-        }
+        )
       }
     }
 

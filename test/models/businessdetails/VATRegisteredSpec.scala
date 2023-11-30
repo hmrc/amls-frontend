@@ -18,147 +18,17 @@ package models.businessdetails
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
+import play.api.i18n.Messages
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.test.FakeRequest
+import play.api.test.Helpers.stubMessagesApi
+import play.twirl.api.Html
 
 class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
-  "Form Validation" must {
-    "successfully validate" when {
-      "given a 'false' value" in {
+  implicit val messages: Messages = stubMessagesApi().preferred(FakeRequest())
 
-        VATRegistered.formRule.validate(Map("registeredForVAT" -> Seq("false"))) must
-          be(Valid(VATRegisteredNo))
-      }
-
-      "given a 'true' value with a valid vrn number" in {
-
-        val data = Map(
-          "registeredForVAT" -> Seq("true"),
-          "vrnNumber" -> Seq("123456789")
-        )
-
-        VATRegistered.formRule.validate(data) must
-          be(Valid(VATRegisteredYes("123456789")))
-      }
-    }
-
-    "fail validation" when {
-      "given missing mandatory field represented by an empty Map" in {
-
-        VATRegistered.formRule.validate(Map.empty) must
-          be(Invalid(Seq(
-            (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.atb.registered.for.vat"))
-          )))
-      }
-
-      "given missing mandatory field represented by an empty string" in {
-
-        val data = Map(
-          "registeredForVAT" -> Seq("")
-        )
-
-        VATRegistered.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.atb.registered.for.vat"))
-          )))
-      }
-
-      "given a 'true' value with a missing vrn number represented by an empty string" in {
-
-        val data = Map(
-          "registeredForVAT" -> Seq("true"),
-          "vrnNumber" -> Seq("")
-        )
-
-        VATRegistered.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "vrnNumber") -> Seq(ValidationError("error.required.vat.number"))
-          )))
-      }
-
-      "given a 'true' value with a missing vrn number represented by a missing field" in {
-
-        val data = Map(
-          "registeredForVAT" -> Seq("true")
-        )
-
-        VATRegistered.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "vrnNumber") -> Seq(ValidationError("error.required"))
-          )))
-      }
-
-      "given a 'true' value with a missing vrn number represented by a sequence of whitespace" in {
-
-        val data = Map(
-          "registeredForVAT" -> Seq("true"),
-          "vrnNumber" -> Seq("      \t")
-        )
-
-        VATRegistered.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "vrnNumber") -> Seq(ValidationError("error.required.vat.number"))
-          )))
-      }
-
-      "given a 'true' value with a vrn number with more than 9 characters" in {
-
-        val data = Map(
-          "registeredForVAT" -> Seq("true"),
-          "vrnNumber" -> Seq("1" * 10)
-        )
-
-        VATRegistered.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "vrnNumber") -> Seq(ValidationError("error.invalid.vat.number.length"))
-          )))
-      }
-
-      "given a 'true' value with a vrn number with fewer than 9 characters" in {
-
-        val data = Map(
-          "registeredForVAT" -> Seq("true"),
-          "vrnNumber" -> Seq("1" * 8)
-        )
-
-        VATRegistered.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "vrnNumber") -> Seq(ValidationError("error.invalid.vat.number.length"))
-          )))
-      }
-
-      "given a 'true' value with a vrn number containing non-numeric characters" in {
-
-        val data = Map(
-          "registeredForVAT" -> Seq("true"),
-          "vrnNumber" -> Seq("1ab2cd3ef")
-        )
-
-        VATRegistered.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "vrnNumber") -> Seq(ValidationError("error.invalid.vat.number"))
-          )))
-      }
-    }
-
-
-    "write correct data from enum value" in {
-
-      VATRegistered.formWrites.writes(VATRegisteredNo) must
-        be(Map("registeredForVAT" -> Seq("false")))
-
-    }
-
-    "write correct data from `Yes` value" in {
-
-      VATRegistered.formWrites.writes(VATRegisteredYes("12345678")) must
-        be(Map("registeredForVAT" -> Seq("true"), "vrnNumber" -> Seq("12345678")))
-    }
-  }
-
-  "JSON validation" must {
+  "VAT Registered" must {
 
     "successfully validate given an enum value" in {
 
@@ -192,6 +62,22 @@ class VATRegisteredSpec extends PlaySpec with MockitoSugar {
           "registeredForVAT" -> true,
           "vrnNumber" -> "12345678"
         ))
+    }
+
+    "return the correct radio button items" in {
+
+      val htmlText = "foo"
+
+      val radioButtons = VATRegistered.formValues(Html(s"<p>$htmlText</p>"))
+
+      radioButtons.head.id mustBe Some("registeredForVAT-true")
+      radioButtons.head.value mustBe Some("true")
+      radioButtons.head.conditionalHtml.isDefined mustBe true
+      radioButtons.head.conditionalHtml.get.toString() must include(htmlText)
+
+      radioButtons.last.id mustBe Some("registeredForVAT-false")
+      radioButtons.last.value mustBe Some("false")
+      radioButtons.last.conditionalHtml.isDefined mustBe false
     }
   }
 

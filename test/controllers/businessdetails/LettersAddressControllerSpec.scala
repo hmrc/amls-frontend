@@ -18,22 +18,24 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessdetails.LettersAddressFormProvider
 import models.businessdetails._
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
-import org.mockito.Mockito.{reset, _}
+import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessdetails.letters_address
+import views.html.businessdetails.LettersAddressView
 
 import scala.concurrent.Future
 
-class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfter {
+class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfter with Injecting {
 
   val dataCacheConnector = mock[DataCacheConnector]
 
@@ -43,13 +45,14 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[letters_address]
+    lazy val view = inject[LettersAddressView]
     val controller = new LettersAddressController (
       dataCache = dataCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      letters_address = view)
+      formProvider = inject[LettersAddressFormProvider],
+      view = view)
 
     val emptyCache = CacheMap("", Map.empty)
 
@@ -89,7 +92,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
     "Post" must {
       "remove the data for following questions and successfully redirect to the page on selection of 'Yes' [this is letters address]" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.LettersAddressController.post().url).withFormUrlEncodedBody(
           "lettersAddress" -> "true"
         )
 
@@ -122,7 +125,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
       }
 
       "keep the data and successfully redirect to the page on selection of Option 'No' [this is not letters address]" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.LettersAddressController.post().url).withFormUrlEncodedBody(
           "lettersAddress" -> "false"
         )
 
@@ -151,7 +154,8 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
       }
 
       "on post invalid data" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.LettersAddressController.post().url).withFormUrlEncodedBody(
+          "lettersAddress" -> ""
         )
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))
@@ -164,7 +168,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
       }
 
       "on post with invalid data show error" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.LettersAddressController.post().url).withFormUrlEncodedBody(
           "lettersAddress" -> ""
         )
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))
@@ -177,7 +181,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
       }
 
       "on post with no data" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.LettersAddressController.post().url).withFormUrlEncodedBody(
         )
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))

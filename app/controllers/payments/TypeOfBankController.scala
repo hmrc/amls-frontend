@@ -20,17 +20,15 @@ import audit.BacsPaymentEvent
 import cats.data.OptionT
 import cats.implicits._
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.payments.TypeOfBank
-import play.api.mvc.MessagesControllerComponents
+import forms.payments.TypeOfBankFormProvider
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AuthAction, DeclarationHelper}
-import views.html.payments.type_of_bank
+import views.html.payments.TypeOfBankView
 
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class TypeOfBankController @Inject()(val authAction: AuthAction,
@@ -42,35 +40,35 @@ class TypeOfBankController @Inject()(val authAction: AuthAction,
                                      val cc: MessagesControllerComponents,
                                      val statusService: StatusService,
                                      val renewalService: RenewalService,
-                                     type_of_bank: type_of_bank) extends AmlsBaseController(ds, cc) {
+                                     formProvider: TypeOfBankFormProvider,
+                                     view: TypeOfBankView) extends AmlsBaseController(ds, cc) {
 
-  def get() = authAction.async {
+  def get(): Action[AnyContent] = authAction.async {
     implicit request =>
       (for {
         subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
       } yield {
-        Ok(type_of_bank(EmptyForm, subHeading))
+        Ok(view(formProvider(), subHeading))
       }) getOrElse InternalServerError("Failed to retrieve data.")
   }
 
-  def post() = authAction.async {
+  def post(): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[TypeOfBank](request.body) match {
-        case ValidForm(_, data) =>
-
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          (for {
+            subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
+          } yield {
+            BadRequest(view(formWithErrors, subHeading))
+          }) getOrElse InternalServerError("Failed to retrieve data."),
+        data =>
           doAudit(data.isUK, request.amlsRefNumber, request.accountTypeId).map { _ =>
             Redirect(controllers.payments.routes.BankDetailsController.get(data.isUK).url)
           }
-
-        case f: InvalidForm => (for {
-          subHeading <- DeclarationHelper.getSubheadingBasedOnStatus(request.credId, request.amlsRefNumber, request.accountTypeId, statusService, renewalService)
-        } yield {
-          BadRequest(type_of_bank(f, subHeading))
-        }) getOrElse InternalServerError("Failed to retrieve data.")
-      }
+      )
   }
 
-  private def doAudit(ukBank: Boolean, amlsRefNumber: Option[String], accountTypeId: (String, String))(implicit hc: HeaderCarrier) = {
+  private def doAudit(ukBank: Boolean, amlsRefNumber: Option[String], accountTypeId: (String, String))(implicit hc: HeaderCarrier): Future[Option[AuditResult]] = {
     (for {
       ref <- OptionT(Future(amlsRefNumber))
       fees <- OptionT(feeResponseService.getFeeResponse(ref, accountTypeId))

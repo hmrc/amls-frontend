@@ -18,13 +18,10 @@ err.text.role.in.business.text.validation = Role in the business must only inclu
 
 error.browser.title.prefix = Error:
 
-error.required.date.day = Date your business started or will start activities must include a day
-error.required.date.month = Date your business started or will start activities must include a month
-error.required.date.year = Date your business started or will start activities must include a year
-error.required.date.month.day = Date your business started or will start activities must include a day and month
+error.required.date.required.one = Date your business started or will start activities must include a {0}
+error.required.date.required.two = Date your business started or will start activities must include a {0} and {1}
+error.required.date.required.all = Enter the date your business did or will start activities that need to be registered
 error.required.date.year.month = Date your business started or will start activities must include a month and year
-error.required.date.year.month.day = Enter the date your business did or will start activities that need to be registered
-error.required.date.year.day = Date your business started or will start activities must include a day and year
 
 error.invalid.date.after.1700 = The date your business started or will start activities must be on or after 1700
 error.invalid.date.tp.after.1700 = The date your business started or will start trading must be on or after 1700
@@ -85,7 +82,7 @@ error.invalid.lastname.length = Last name must be 35 characters or less
 error.invalid.firstname.validation = First name must only include letters a to z, hyphens, spaces, and apostrophes
 error.invalid.middlename.validation = Middle name must only include letters a to z, hyphens, spaces, and apostrophes
 error.invalid.lastname.validation = Last name must only include letters a to z, hyphens, spaces, and apostrophes
-error.invalid.position.validation = Select if you are a beneficial shareholder, director, nominated officer, an external accountant, or another role in the business
+error.invalid.position.validation = Select all roles that apply
 
 error.required.vat.number = Enter this person’s VAT registration number
 error.invalid.vat.number.length = VAT registration number must be 9 numbers
@@ -117,8 +114,6 @@ error.invalid.maxlength.255 = You can’t enter more than 255 characters
 error.invalid.maxlength.1200 = You can’t enter more than 1200 characters
 error.invalid.role.in.business.maxlength.255 = Role in the business must be 255 characters or less
 
-error.survey.satisfaction.required = Select one option to show how you feel about using the service
-
 error.required.phone.number = Enter your business telephone number
 err.invalid.phone.number = Enter a telephone number, like 01632 960 001, 07700900982 or +44 808 157 0192
 error.max.length.phone = You can’t enter more than 24 characters for the phone number
@@ -134,26 +129,26 @@ error.submission.problem.title = There’s a problem with your application
 error.submission.duplicate.title = There is a problem
 error.submission.badrequest.title = Sorry, there is a problem
 
-error.submission.badrequest.content = We cannot update your information.\n\
-  We have saved your information. Do not try and send it again.\n\
-  Send us your name and email address and we will find out and fix what caused the problem. We will reply within 2 working days.
+error.submission.badrequest.content.line1 = We cannot update your information.
+error.submission.badrequest.content.line2 = We have saved your information. Do not try and send it again.
+error.submission.badrequest.content.line3 = Please report the problem using the link below and we’ll get back to you within 2 working days.
 
-error.submission.duplicate.content = We’re sorry that there’s a problem. Please give us some details and an adviser will contact you to fix it.\n\
-  Please don’t try to resubmit your application, as this won’t work.
+error.submission.duplicate.content.line1 = We’re sorry that there’s a problem. Please give us some details and an adviser will contact you to fix it.
+error.submission.duplicate.content.line2 = Please don’t try to resubmit your application, as this won’t work.
 
-error.submission.duplicate_enrolment.content = You’ve already registered for Anti-Money Laundering Supervision using a different account and you must log in using that account.\n\
-  If you’re unable to use that account or need further help, please leave your contact details below and we’ll get back to you within 2 days.
+error.submission.duplicate_enrolment.content.line1 = You’ve already registered for Anti-Money Laundering Supervision using a different account and you must log in using that account.
+error.submission.duplicate_enrolment.content.line2 = If you’re unable to use that account or need further help, please report it using the link below and we’ll get back to you within 2 working days.
 
 error.submission.duplicate_enrolment.link.text = Report a problem with your application
 
-error.submission.duplicate_submission.content = You registered for anti-money laundering supervision using a different account. You must sign in using that account.\n\
-  If you cannot use that account or need any other help, send us your name and email address. We will reply within 2 working days.
+error.submission.duplicate_submission.content.line1 = You registered for anti-money laundering supervision using a different account. You must sign in using that account.
+error.submission.duplicate_submission.content.line2 = If you cannot use that account or need any other help, please report it using the link below and we’ll get back to you within 2 working days.
 
 error.submission.duplicate_submission.link.text = Report a problem
 
-error.submission.wrong_credentials.content = Your account doesn’t have enough access rights to register.\n\
-  You need to speak to your account administrator to change your access rights or you can create a new organisation Government Gateway account.\n\
-  If you are unable to change your access rights, can’t create a new organisation account or need further help, please leave your contact details below and we’ll get back to you within 2 days.
+error.submission.wrong_credentials.content.line1 = Your account doesn’t have enough access rights to register.
+error.submission.wrong_credentials.content.line2 = You need to speak to your account administrator to change your access rights or you can create a new organisation Government Gateway account.
+error.submission.wrong_credentials.content.line3 = If you are unable to change your access rights, can’t create a new organisation account or need further help, please report it using the link below and we’ll get back to you within 2 working days.
 
 ########################################################################################################################
 ############################        Custom Error Messages for Different Sections         ###############################
@@ -282,6 +277,11 @@ error.required.tp.month = Enter a month.
 error.invalid.tp.month = Enter a valid month. It must be a number between 1 and 12.
 error.required.tp.year = Enter a valid date in the format DD MM YYYY
 error.invalid.tp.year = Enter a valid year. It must be a 4-digit number.
+error.required.tp.one = Enter a {0}
+error.required.tp.two = Enter a {0} and {1}
+error.required.tp.all = Enter a date
+error.invalid.tp.date.not.real = Enter a valid date in the format DD MM YYYY
+
 error.required.tp.residential.address = Select yes if this is also a residential address
 error.required.tp.registered.business.name = Enter your agent’s registered business name.
 error.invalid.tp.registered.business.name = You can’t enter more than 140 characters for your agent’s registered business name.
@@ -299,14 +299,12 @@ error.invalid.char.tp.agent.registered.company.name = The company name can inclu
 error.required.tp.agent.name = Enter your agent’s full name
 error.length.tp.agent.name = Your agent’s name must be 140 characters or less
 error.char.tp.agent.name = Your agent’s name can include letters a to z, numbers, spaces and punctuation
-error.required.tp.agent.date.day = Your agent’s date of birth must include a day
-error.required.tp.agent.date.month = Your agent’s date of birth must include a month
-error.required.tp.agent.date.year = Your agent’s date of birth must include a year
-error.required.tp.agent.date.month.day = Your agent’s date of birth must include a day and month
-error.required.tp.agent.date.year.month = Your agent’s date of birth must include a month and year
-error.required.tp.agent.date.year.month.day = Enter your agent’s date of birth
-error.required.tp.agent.date.year.day = Your agent’s date of birth must include a day and year
+
+error.required.tp.agent.date.one = Your agent’s date of birth must include a {0}
+error.required.tp.agent.date.two = Your agent’s date of birth must include a {0} and {1}
+error.required.tp.agent.date.all = Enter your agent’s date of birth
 error.required.tp.agent.date.past = Your agent’s date of birth must be in the past
+
 error.required.tp.agent.partnership = Enter your agent’s partners
 error.invalid.tp.agent.partnership = Your agent’s partners must be 140 characters or less
 error.char.tp.agent.partnership = Your agent’s partners can include letters a to z, numbers, spaces and punctuation
@@ -315,13 +313,11 @@ error.required.tp.register.another.premises = Select yes if you want to register
 error.expected.tp.date.after.start = The date must be after you started trading at these premises, which was {0}
 error.expected.tp.dateofchange.after.startdate = The date must be after you started trading at these premises, which was {0}
 error.required.tp.confirm.address = Select yes if this is your trading premises address
-error.required.tp.address.date.day = Date your business started or will start trading from these premises must include a day
-error.required.tp.address.date.month = Date your business started or will start trading from these premises must include a month
-error.required.tp.address.date.year = Date your business started or will start trading from these premises must include a year
-error.required.tp.address.date.month.day = Date your business started or will start trading from these premises must include a day and month
-error.required.tp.address.date.year.month = Date your business started or will start trading from these premises must include a month and year
-error.required.tp.address.date.year.month.day = Enter the date your business did or will start trading from these premises
-error.required.tp.address.date.year.day = Date your business started or will start trading from these premises must include a day and year
+
+error.required.tp.address.date.one = Date your business started or will start trading from these premises must include a {0}
+error.required.tp.address.date.two = Date your business started or will start trading from these premises must include a {0} and {1}
+error.required.tp.address.date.all = Enter the date your business did or will start trading from these premises
+
 error.required.tp.services = Select which money service business activities take place at these premises
 
 ###############################  Estate Agency Business ###############################
@@ -378,13 +374,9 @@ error.rp.previous.last.length.invalid = Previous last name must be 35 characters
 error.rp.previous.first.char.invalid = Previous first name must only include letters a to z, hyphens, spaces and apostrophes
 error.rp.previous.middle.char.invalid = Previous middle name must only include letters a to z, hyphens, spaces and apostrophes
 error.rp.previous.last.char.invalid = Previous last name must only include letters a to z, hyphens, spaces and apostrophes
-error.rp.name_change.required.date.day = Date this person changed their name must include a day
-error.rp.name_change.required.date.month = Date this person changed their name must include a month
-error.rp.name_change.required.date.year = Date this person changed their name must include a year
-error.rp.name_change.required.date.month.day = Date this person changed their name must include a day and month
-error.rp.name_change.required.date.year.month = Date this person changed their name must include a month and year
-error.rp.name_change.required.date.year.month.day = Enter the date this person changed their name
-error.rp.name_change.required.date.year.day = Date this person changed their name must include a day and year
+error.rp.name_change.required.date.one = Date this person changed their name must include a {0}
+error.rp.name_change.required.date.two = Date this person changed their name must include a {0} and {1}
+error.rp.name_change.required.date.all = Enter the date this person changed their name
 error.rp.name_change.invalid.date.after.1900 = Date this person changed their name must be after 1900
 error.rp.name_change.invalid.date.future = Date this person changed their name must be today or in the past
 error.rp.name_change.invalid.date.not.real = Enter a real date for when this person changed their name
@@ -395,13 +387,9 @@ error.required.rp.hasOtherNames = Select yes if this person is known by other na
 error.required.rp.otherNames = Enter the other names this person is known by
 error.invalid.rp.maxlength.140 = Other names must be 140 characters or less
 error.invalid.rp.char = Other names can include letters a to z, numbers, spaces and punctuation
-error.rp.dob.required.date.day = Date of birth must include a day
-error.rp.dob.required.date.month = Date of birth must include a month
-error.rp.dob.required.date.year = Date of birth must include a year
-error.rp.dob.required.date.month.day = Date of birth must include a day and month
-error.rp.dob.required.date.year.month = Date of birth must include a month and year
-error.rp.dob.required.date.year.month.day = Enter this person’s date of birth
-error.rp.dob.required.date.year.day = Date of birth must include a day and year
+error.rp.dob.required.date.one = Date of birth must include a {0}
+error.rp.dob.required.date.two = Date of birth must include a {0} and {1}
+error.rp.dob.required.date.all = Enter this person’s date of birth
 error.rp.dob.invalid.date.after.1900 = Date of birth must be after 1900
 error.rp.dob.invalid.date.future = Date of birth must be in the past
 error.rp.dob.invalid.date.not.real = Enter a real date of birth
@@ -428,13 +416,9 @@ error.invalid.rp.contact.email = Enter an email address in the correct format
 error.invalid.rp.contact.email.length = Email address must be 100 characters or less
 error.invalid.rp.position_within_business.other_position.maxlength.255 = Role must be 255 characters or less
 error.invalid.rp.position_within_business.other_position = Role can include letters a to z, numbers, spaces and punctuation
-error.rp.position.required.date.day = Date this person started their role in the business must include a day
-error.rp.position.required.date.month = Date this person started their role in the business must include a month
-error.rp.position.required.date.year = Date this person started their role in the business must include a year
-error.rp.position.required.date.month.day = Date this person started their role in the business must include a day and month
-error.rp.position.required.date.year.month = Date this person started their role in the business must include a month and year
-error.rp.position.required.date.year.month.day = Enter the date this person started their role in the business
-error.rp.position.required.date.year.day = Date this person started their role in the business must include a day and year
+error.rp.position.required.date.one = Date this person started their role in the business must include a {0}
+error.rp.position.required.date.two = Date this person started their role in the business must include a {0} and {1}
+error.rp.position.required.date.all = Enter the date this person started their role in the business
 error.rp.position.invalid.date.after.1900 = Date this person started their role in the business must be after 1900
 error.rp.position.invalid.date.future = Date this person started their role in the business must be today or in the past
 error.rp.position.invalid.date.not.real = Enter a real date for when this person started their role in the business
@@ -463,6 +447,9 @@ error.required.select.non.uk.home.address = this person’s home address is not
 error.required.select.non.uk.other.previous.address = this person’s other previous address was not
 
 error.required.select.uk = Select yes if {0}’s home address is in the UK
+error.required.enter.non.uk = Enter a country that is not the United Kingdom because this person’s home address is not in the UK
+error.required.enter.non.uk.previous = Enter a country that is not the United Kingdom because this person’s previous address was not in the UK
+error.required.enter.non.uk.previous.other = Enter a country that is not the United Kingdom because this person’s other previous address was not in the UK
 error.required.enter.addressline.one = Enter address line 1
 error.required.enter.postcode = Enter a postcode, like AA1 1AA
 error.required.enter.country = Enter a country name, like France
@@ -524,24 +511,16 @@ error.invalid.professionalbody.info.about.penalty = Description of the penalty c
 
 error.invalid.supervision.supervisor = Name of previous supervising body can include letters a to z, numbers, spaces and punctuation
 
-error.supervision.start.required.date.day = Date your previous supervision started must include a day
-error.supervision.start.required.date.month = Date your previous supervision started must include a month
-error.supervision.start.required.date.year = Date your previous supervision started must include a year
-error.supervision.start.required.date.month.day = Date your previous supervision started must include a day and month
-error.supervision.start.required.date.year.month = Date your previous supervision started must include a month and year
-error.supervision.start.required.date.year.month.day = Enter the date your previous supervision started
-error.supervision.start.required.date.year.day = Date your previous supervision started must include a day and year
+error.supervision.start.required.date.one = Date your previous supervision started must include a {0}
+error.supervision.start.required.date.two = Date your previous supervision started must include a {0} and {1}
+error.supervision.start.required.date.all = Enter the date your previous supervision started
 error.supervision.start.invalid.date.after.1900 = Date your previous supervision started must be after 1900
 error.supervision.start.invalid.date.future = Date your previous supervision started must be in the past
 error.supervision.start.invalid.date.not.real = Enter a real date for when your previous supervision started
 
-error.supervision.end.required.date.day = Date your previous supervision ended must include a day
-error.supervision.end.required.date.month = Date your previous supervision ended must include a month
-error.supervision.end.required.date.year = Date your previous supervision ended must include a year
-error.supervision.end.required.date.month.day = Date your previous supervision ended must include a day and month
-error.supervision.end.required.date.year.month = Date your previous supervision ended must include a month and year
-error.supervision.end.required.date.year.month.day = Enter the date your previous supervision ended
-error.supervision.end.required.date.year.day = Date your previous supervision ended must include a day and year
+error.supervision.end.required.date.one = Date your previous supervision ended must include a {0}
+error.supervision.end.required.date.two = Date your previous supervision ended must include a {0} and {1}
+error.supervision.end.required.date.all = Enter the date your previous supervision ended
 error.supervision.end.invalid.date.after.1900 = Date your previous supervision ended must be after 1900
 error.supervision.end.invalid.date.future = Date your previous supervision ended must be in the past
 error.supervision.end.invalid.date.not.real = Enter a real date for when your previous supervision ended
@@ -607,13 +586,9 @@ error.required.hvd.choose.option = Select how you expect to receive cash payment
 error.required.hvd.excise.goods = Select yes if you will buy or sell duty-suspended excise goods
 error.required.hvd.percentage = Select what percentage of your turnover you expect to come from cash payments of €10,000 or more
 
-error.date.hvd.day = Date of the first payment must include a day
-error.date.hvd.month = Date of the first payment must include a month
-error.date.hvd.year = Date of the first payment must include a year
-error.date.hvd.month.day = Date of the first payment must include a day and month
-error.date.hvd.year.month = Date of the first payment must include a month and year
-error.date.hvd.year.day = Date of the first payment must include a day and year
-error.date.hvd.year.month.day = Enter the date of the first payment
+error.date.hvd.one = Date of the first payment must include a {0}
+error.date.hvd.two = Date of the first payment must include a {0} and {1}
+error.date.hvd.all = Enter the date of the first payment
 error.date.hvd.future = Date of the first payment must be today or in the past
 error.date.hvd.real = Enter a real date for the date of the first payment
 error.date.hvd.past = Date of the first payment must be after 1900
@@ -676,9 +651,9 @@ error.required.ba.renewal.select.yes = Select yes if you had customers who lived
 
 ################################# Declaration #####################################
 error.required.declaration.nominated.officer = Select one of your responsible people or register someone else as the nominated officer for the business
-error.required.declaration.who.is.registering = Select who is registering this business
 error.required.declaration.who.is.declaring.this.update = Select who is declaring this update
 error.required.declaration.who.is.declaring.this.renewal = Select who is declaring this renewal
+error.required.declaration.who.is.declaring.this.registration = Select who is registering this business
 error.required.declaration.first_name = Enter your first name
 error.required.declaration.last_name = Enter your last name
 error.required.declaration.specify.role = Enter your role in the business
@@ -690,6 +665,8 @@ error.required.declaration.add.position.for.unicorporated.body = Select if you a
 ########################################################################################################################
 ######################################      Custom Page Titles and Labels     ##########################################
 ########################################################################################################################
+
+site.service_name = Manage your anti-money laundering supervision
 
 title.gov = GOV.UK
 title.amls = Manage your anti-money laundering supervision
@@ -743,7 +720,7 @@ lbl.na = Not applicable
 lbl.day = Day
 lbl.month = Month
 lbl.year = Year
-lbl.date.example = For example, 31 03 2017.
+lbl.date.example = For example, 31 03 2017
 lbl.nationality = Country of nationality
 lbl.nationality.hint = If your nationality is British, select ‘United Kingdom’
 lbl.nino = National Insurance number
@@ -807,7 +784,7 @@ hint.9.digits = It is 9 numbers, like 123456789.
 hint.10.digits = For example: 1234567890
 hint.255.chars = Enter 255 characters or less.
 
-lbl.hint.crn = This is 8 characters and can be a mix of numbers and capital letters. Find it on your certificate of incorporation.
+lbl.hint.crn = This is 8 characters and can be a mix of numbers and capital letters. Find it on your certificate of incorporation
 
 lbl.hint.vat = This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789. You can find it on your VAT registration certificate.
 
@@ -822,8 +799,8 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.text1 = To use this service you should sign in with an ’organisation’ account, but it looks like you’ve tried to use either an ’individual’ or ’agent’ account.
 unauthorised.text2 = If you don’t have an organisation account you can
 unauthorised.register.link.text = register for a new one.
-unauthorised.role.content = Your account doesn’t have enough access rights to register.\n\
-  You need to speak to your account administrator to change your access rights or you can create a new organisation Government Gateway account.
+unauthorised.role.content.line1 = Your account doesn’t have enough access rights to register.
+unauthorised.role.content.line2 = You need to speak to your account administrator to change your access rights or you can create a new organisation Government Gateway account.
 
 ############################### Start Page ###############################
 start.title = Manage your anti-money laundering supervision
@@ -851,6 +828,8 @@ status.referenceno.short = Registration number
 status.incomplete = Incomplete
 status.status = Status
 status.complete = Completed
+status.updated = Updated
+status.notstarted = Not started
 status.notsubmitted = Not submitted
 status.submitted = Submitted
 status.feepaid = Fee paid
@@ -867,6 +846,10 @@ status.submissionready.description3 = To submit your application you need to com
 status.hassomethingchanged = About your business
 status.submissionready.changelink1 = Check or update your business information
 status.submissionready.buttontext = Continue
+status.visuallyhidden.text = This section is
+status.progress.add = Add {0}
+status.progress.edit = Edit {0}
+status.progress.manage = Manage {0}
 
 your.registration = Your registration
 your.registration.status = Registration status
@@ -1026,6 +1009,7 @@ howtopay.para.1 = If you have not already paid, you have 28 days to pay your fee
 howtopay.para.2 = Your fees were shown when you submitted your declaration. You’ll also find them in a ‘reminder to pay’ in
 howtopay.para.2.b = 14 days after you submit your application or update.
 howtopay.para.2.link = your messages
+howtopay.para.2.link.end = your messages.
 howtopay.para.3 = If you do not know what your fees are, you’ll need to email HMRC. You should write ‘fees not known’ in the subject line of your email.
 howtopay.para.3.b = If you do not know your payment reference or fees, you’ll need to email HMRC. You should write ‘fees and payment reference not known’ in the subject line of your email.
 howtopay.para.3.link = Find the email address and how to pay
@@ -1049,6 +1033,7 @@ progress.continue = Section incomplete
 progress.start = Start this section
 progress.submit = Continue
 progress.submit.title = Submit application
+progress.sections.subheading = Business information
 progress.declarationavailable = To submit your application you need to complete a declaration, and pay the fees.
 progress.declarationunavailable = When you have added your business information you will need to complete a declaration, and pay the fees.
 progress.businessmatching.name = Pre-application
@@ -1116,6 +1101,7 @@ amendment.title = About your business
 amendment.section-heading = Your registration
 amendment.text.1 = If something has changed in your business that is relevant to Money Laundering Regulations you must update and resubmit your information.
 amendment.text.2 = There may be an additional fee to pay if you increase the number of responsible people or trading premises.
+amendment.sections.subheading = Business information
 amendment.sidebar.heading = Submit amended application
 amendment.sidebar.text = You don’t need to re-submit your application until you’ve made changes to it.
 amendment.sidebar.button.text = Submit amendment
@@ -1515,9 +1501,8 @@ tradingpremises.yourpremises.complete = Complete
 tradingpremises.subheading = Trading premises
 tradingpremises.nodetails = Unspecified trading premises
 tradingpremises.virtualoffice.text_1.1 = You must tell us about
-tradingpremises.virtualoffice.text_1.1.link = https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register
 tradingpremises.virtualoffice.text_1.1.link.text = all premises (opens in a new tab)
-tradingpremises.virtualoffice.text_1.2 =where you carry out activities covered by the Money Laundering Regulations.
+tradingpremises.virtualoffice.text_1.2 = where you carry out activities covered by the Money Laundering Regulations.
 tradingpremises.virtualoffice.text_2 = This includes virtual offices.
 tradingpremises.virtualoffice.text_3 = You will need to pay a fee for each trading premises you register.
 
@@ -1566,6 +1551,7 @@ businessmatching.businessType.lbl.01 = Limited company
 businessmatching.businessType.lbl.03 = Partnership
 businessmatching.businessType.lbl.04 = Limited partnership or limited liability partnership
 businessmatching.businessType.lbl.05 = Unincorporated association or trust
+businessmatching.businessType.error = Select your business structure
 businessmatching.registerservices.title = Which services do you need to register?
 businessmatching.registerservices.other.title = What other service do you need to register?
 businessmatching.registerservices.details = What these services mean
@@ -1646,10 +1632,8 @@ businessmatching.cannotcontinuewiththeapplication.requiredinfo.second = You can 
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.third = The information you have given so far in this application has been saved. You have 28 days to return and complete your application.
 
 businessmatching.cannotchangeservices.title = You cannot continue with your change
-businessmatching.cannotchangeservices.requiredinfo = Your business must have a Payment Services Regulations (PSR) reference number in order\
-  to register for Money Service Business as part of your anti-money laundering supervision from HM Revenue and Customs.\n\
-  You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
-
+businessmatching.cannotchangeservices.requiredinfo.line1 = Your business must have a Payment Services Regulations (PSR) reference number in order to register for Money Service Business as part of your anti-money laundering supervision from HM Revenue and Customs.
+businessmatching.cannotchangeservices.requiredinfo.line2 = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
 businessmatching.cannotchangeservices.button.text = Return to about your business
 
 
@@ -2122,10 +2106,10 @@ responsiblepeople.timeataddress.address_history.current.heading = How long has {
 responsiblepeople.timeataddress.address_history.current.title = How long has this person lived at this address?
 responsiblepeople.timeataddress.address_history.heading = How long did {0} live at this address?
 responsiblepeople.timeataddress.address_history.title = How long did this person live at this address?
-responsiblepeople.timeataddress.5_months_history = 0 to 5 months
-responsiblepeople.timeataddress.11_months_history = 6 to 11 months
-responsiblepeople.timeataddress.3_years_history = 1 to 3 years
-responsiblepeople.timeataddress.more_years_history = More than 3 years
+responsiblepeople.timeataddress.zeroToFiveMonths = 0 to 5 months
+responsiblepeople.timeataddress.sixToElevenMonths = 6 to 11 months
+responsiblepeople.timeataddress.oneToThreeYears = 1 to 3 years
+responsiblepeople.timeataddress.threeYearsPlus = More than 3 years
 
 responsiblepeople.additional_address.heading = Was {0}’s previous home address in the UK?
 responsiblepeople.additional_address.title = Was this persons previous home address in the UK?
@@ -2317,17 +2301,12 @@ responsiblepeople.new.home.is.uk.heading = Is {0}’s new home address in the UK
 responsiblepeople.new.home.is.uk.title = Is this person’s new home address in the UK?
 
 responsiblepeople.new.home.is.uk.error.empty = Enter the date this person moved
-new.home.error.required.date.day = Date this person moved must include a day
-new.home.error.required.date.month = Date this person moved must include a month
-new.home.error.required.date.year = Date this person moved must include a year
-new.home.error.required.date.month.day = Date this person moved must include a day and month
-new.home.error.required.date.year.month = Date this person moved must include a month and year
-new.home.error.required.date.year.month.day = Enter the date this person moved
-new.home.error.required.date.year.day = Date this person moved must include a day and year
+new.home.error.required.date.one = Date this person moved must include a {0}
+new.home.error.required.date.two = Date this person moved must include a {0} and {1}
+new.home.error.required.date.all = Enter the date this person moved
 new.home.error.required.date.1900 = Date this person moved must be after 1900
 new.home.error.required.date.future = Date this person moved must be today or in the past
 new.home.error.required.date.fake = Enter a real date for when this person moved
-
 
 responsiblepeople.new.home.heading = What is {0}’s new home address?
 responsiblepeople.new.home.title = What is this person’s new home address?
@@ -2359,7 +2338,6 @@ tcsp.off-the-shelf.companies.lbl = Do you sell off-the-shelf companies?
 tcsp.create.complex.corporate.structures.lbl = Do you create complex corporate structures for clients, or are you planning to do so in the future?
 tcsp.servicesOfAnotherTcsp.title = Do you provide services at the address of another business?
 tcsp.servicesOfAnotherTcsp.hint.1 = You must tell us about
-tcsp.servicesOfAnotherTcsp.hint.1.link = https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register
 tcsp.servicesOfAnotherTcsp.hint.1.link.text = every premises (opens in a new tab)
 tcsp.servicesOfAnotherTcsp.hint.2 = you use, including virtual offices.
 tcsp.servicesOfAnotherTcsp.other.hint = Only include companies which are based in the UK and supervised by HM Revenue and Customs for Money Laundering Regulations.
@@ -2471,7 +2449,10 @@ msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dea
 msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 msb.services.list.lbl.05 = Foreign exchange
 msb.throughput.title = What is your expected total value of transactions for the next 12 months?
-msb.throughput.sub = <p>This is also known as your total throughput. It is <strong class="bold">not</strong> your total net profit or turnover.</p>
+msb.throughput.sub.p1 = This is also known as your total throughput.
+msb.throughput.sub.p2.prefix = It is
+msb.throughput.sub.p2.strong = not
+msb.throughput.sub.p2.suffix = your total net profit or turnover.
 msb.throughput.ipsp.hint = An IPSP is involved in the transfer of funds, but is not the payment service provider for the payer or the payee.
 msb.throughput.lbl.01 = £0 to £99,999
 msb.throughput.lbl.02 = £100,000 to £499,999
@@ -2691,6 +2672,8 @@ notifications.revr.title = Your supervision has been revoked
 notifications.nmrj.title = No longer considering refusal
 notifications.nmrv.title = No longer considering revocation
 
+notifications.back.link = Return to your messages
+
 ############################### Renewal ###############################
 renewal.whatyouneed.requiredinfo.heading = You’ll need to tell us:
 renewal.whatyouneed.line_1 = about any other activities your business was involved in over the last 12 months
@@ -2709,7 +2692,9 @@ renewal.whatyouneed.line_13 = which countries your customers lived or worked in,
 renewal.whatyouneed.line_14 = the percentage of your turnover that came from cash payments of €10,000 or more
 renewal.whatyouneed.line_15 = how you received cash payments of €10,000 or more from customers you had not met in person, if you received any
 renewal.progress.title = About your business
-renewal.progress.intro = If something has changed in your business that is relevant to Money Laundering Regulations you must update your information.\nYou’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for any additional responsible people.
+renewal.progress.intro.1 = If something has changed in your business that is relevant to Money Laundering Regulations you must update your information.
+renewal.progress.intro.2 = You’ll need to pay a fee for each of your trading premises. You may also need to pay a fee for any additional responsible people.
+renewal.progress.section = Sections
 renewal.progress.submit.header = Submit renewal
 renewal.progress.submit = Continue
 renewal.progress.edit = Edit your renewal
@@ -2767,7 +2752,9 @@ renewal.cash.payments.received.lbl3 = Another way
 renewal.cash.payments.received.lbl3.hint = Add how you received cash payments from customers you have not met in person
 
 renewal.msb.throughput.header = What was your total value of transactions in the last 12 months?
-renewal.msb.throughput.info = <p>This is also known as your total throughput. It is <strong class="bold">not</strong> your total net profit or turnover.</p>
+renewal.msb.throughput.info.prefix = This is also known as your total throughput. It is
+renewal.msb.throughput.info.bold = not
+renewal.msb.throughput.info.suffix = your total net profit or turnover.
 renewal.msb.throughput.selection.required = Select your total throughput in the last 12 months
 renewal.msb.throughput.selection.invalid = Select one option to show your total throughput in the last 12 months
 renewal.msb.throughput.selection.1 = £0 to £99,999
@@ -2799,25 +2786,8 @@ renewal.msb.largest.amounts.title = Which countries did you send the largest amo
 error.required.renewal.largest.amounts.country = Enter the countries you sent the largest amounts of money to in the last 12 months
 
 renewal.customers.outside.uk.hint.lbl = Where did these customers live or work?
-############################### Survey ###############################
-
-survey.satisfaction.heading = Give feedback
-survey.satisfaction.title = Satisfaction survey
-
-survey.satisfaction.text.1 = Overall, how did you feel about using the service?
-survey.satisfaction.text.2 = How could we improve this service?
-survey.satisfaction.hint = Please do not include any personal or financial information. We are unable to provide a response to your comments.
-
-survey.satisfaction.lbl.01 = Very satisfied
-survey.satisfaction.lbl.02 = Satisfied
-survey.satisfaction.lbl.03 = Neither satisfied or dissatisfied
-survey.satisfaction.lbl.04 = Dissatisfied
-survey.satisfaction.lbl.05 = Very dissatisfied
 
 survey.satisfaction.beforeyougo = Give feedback on the service
-survey.satisfaction.please = We use your feedback to make our services better. Please take the 
-survey.satisfaction.answer = feedback survey
-survey.satisfaction.helpus = now.
 
 ############################### Banners ###############################
 urr.title = Help improve GOV.UK

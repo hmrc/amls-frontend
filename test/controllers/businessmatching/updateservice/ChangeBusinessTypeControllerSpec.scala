@@ -19,7 +19,9 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
+import forms.businessmatching.updateservice.ChangeBusinessTypesFormProvider
 import models.businessmatching._
+import models.businessmatching.BusinessActivity.{HighValueDealing, MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
 import models.businessmatching.updateservice.Remove
 import models.businessmatching.updateservice.{Add, ChangeBusinessType}
 import models.flowmanagement.{ChangeBusinessTypesPageId, RemoveBusinessTypeFlowModel}
@@ -29,14 +31,15 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.updateservice.change_services
+import views.html.businessmatching.updateservice.ChangeServicesView
 
 import scala.concurrent.Future
 
 
-class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
+class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   sealed trait Fixture extends DependencyMocks {
     self =>
@@ -45,7 +48,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
     val bmService = mock[BusinessMatchingService]
 
 
-    lazy val view = app.injector.instanceOf[change_services]
+    lazy val view = inject[ChangeServicesView]
     val controller = new ChangeBusinessTypesController(
       SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
@@ -54,7 +57,8 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
       mock[RemoveBusinessTypeHelper],
       mock[AddBusinessTypeHelper],
       cc = mockMcc,
-      change_services = view
+      formProvider = inject[ChangeBusinessTypesFormProvider],
+      view = view
     )
 
     val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
@@ -85,7 +89,6 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
         status(result) must be(OK)
         Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.changeservices.title"))
-
       }
 
       "return OK with change_services view - no activities" in new Fixture {
@@ -113,7 +116,8 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
       "verify the router is called correctly" when {
         "request is add" in new Fixture {
 
-          val result = controller.post()(requestWithUrlEncodedBody("changeServices" -> "add"))
+          val result = controller.post()(FakeRequest(POST, routes.ChangeBusinessTypesController.post().url)
+          .withFormUrlEncodedBody("changeServices" -> "add"))
 
           status(result) must be(SEE_OTHER)
           controller.router.verify("internalId", ChangeBusinessTypesPageId, Add)
@@ -123,7 +127,8 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
       "verify the router is called correctly" when {
         "request is remove" in new Fixture {
 
-          val result = controller.post()(requestWithUrlEncodedBody("changeServices" -> "remove"))
+          val result = controller.post()(FakeRequest(POST, routes.ChangeBusinessTypesController.post().url)
+          .withFormUrlEncodedBody("changeServices" -> "remove"))
 
           status(result) must be(SEE_OTHER)
           controller.router.verify("internalId", ChangeBusinessTypesPageId, Remove)
@@ -143,7 +148,8 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "return Internal Server Error if the business matching model can't be obtained" in new Fixture {
 
-        val postRequest = requestWithUrlEncodedBody("" -> "")
+        val postRequest = FakeRequest(POST, routes.ChangeBusinessTypesController.post().url)
+        .withFormUrlEncodedBody("" -> "")
 
         mockCacheGetEntry[BusinessMatching](None, BusinessMatching.key)
 
@@ -152,7 +158,5 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) mustBe INTERNAL_SERVER_ERROR
       }
     }
-
   }
-
 }

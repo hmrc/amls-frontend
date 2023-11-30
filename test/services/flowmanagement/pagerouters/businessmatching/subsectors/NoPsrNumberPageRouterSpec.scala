@@ -27,12 +27,31 @@ class NoPsrNumberPageRouterSpec extends AmlsSpec {
     val router = new NoPsrNumberPageRouter
   }
 
-  "Getting the next route" must {
+  trait NotRegisteredFixture {
+    val router = new NoPsrNumberPageRouterCompanyNotRegistered
+  }
+
+  "NoPsrNumberPageRouter" must {
     "route to the 'Check your answers' page" in new Fixture {
       val model = ChangeSubSectorFlowModel()
       val result = router.getRoute("internalId", model)
 
       redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
+    }
+  }
+
+  "NoPsrNumberPageRouter" must {
+    "route to the 'Check your answers' page if company not registered is false" in new NotRegisteredFixture {
+      val model = ChangeSubSectorFlowModel()
+      val result = router.getRoute("internalId", model)
+
+      redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
+    }
+    "route to the 'Check company' page if company not registered is true" in new NotRegisteredFixture {
+      val model = ChangeSubSectorFlowModel()
+      val result = router.getRoute("internalId", model, includeCompanyNotRegistered = true)
+
+      redirectLocation(result) mustBe Some(routes.CheckCompanyController.get.url)
     }
   }
 }
