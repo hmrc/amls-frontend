@@ -29,7 +29,7 @@ class NotificationDetailsSpec extends PlaySpec with MustMatchers {
 
   "NotificationDetails" must {
 
-    "serialise json to model" ignore {
+    "serialise json to model" in {
 
       val model = NotificationDetails(
         Some(ContactType.MindedToRevoke),
@@ -39,26 +39,22 @@ class NotificationDetailsSpec extends PlaySpec with MustMatchers {
             Some(RevokedReason.RevokedCeasedTrading)
           )),
         Some("MessageText"),
-        false,
-        new DateTime(1479730062573L, DateTimeZone.UTC)
+        variation = false,
+        dateTime
       )
 
-      val json = Json.parse(
-        """
-          |{
-          | "contactType":"MTRV",
-          | "status":{
-          |   "status_type":"08",
-          |   "status_reason":"02"
-          | },
-          | "messageText": "MessageText",
-          | "variation":false,
-          | "receivedAt":{"$date":1479730062573}
-          | }
-        """.stripMargin)
+      val json = Json.obj(
+        "contactType" -> "MTRV",
+        "status" -> Json.obj(
+          "status_type" -> "08",
+          "status_reason" -> "02"
+        ),
+        "messageText" -> "MessageText",
+        "variation" -> false,
+        "receivedAt" -> Json.obj("$date" -> Json.obj("$numberLong" -> "1479730062573"))
+      )
 
-      Json.fromJson[NotificationDetails](json) must be(JsSuccess(model))
-
+      json.as[NotificationDetails] mustBe model
     }
 
   }
@@ -161,16 +157,59 @@ class NotificationDetailsSpec extends PlaySpec with MustMatchers {
   }
 
   "processGenericMessage" must {
-    "extract the text if defined withing CDATA tags" in {
-      val inputString = "<![CDATA[<P>This is the message</P>]]>"
-
-      NotificationDetails.processGenericMessage(inputString) mustBe "<P>This is the message</P>"
-    }
 
     "return the original text if not enclosed in CDATA tags" in {
       val inputString = "This is a message"
 
       NotificationDetails.processGenericMessage(inputString) mustBe inputString
+    }
+
+    "extract the text when it is defined within CDATA tags and" when {
+
+      "the text is alphanumeric " in {
+        val inputString = "<![CDATA[<P>Th1s 1s th3 m3ssag3</P>]]>"
+        NotificationDetails.processGenericMessage(inputString) mustBe "<P>Th1s 1s th3 m3ssag3</P>"
+      }
+
+      "the text contains parentheses" in {
+        val inputString = "<![CDATA[<P>Today is (Monday) 5th December</P>]]>"
+        NotificationDetails.processGenericMessage(inputString) mustBe "<P>Today is (Monday) 5th December</P>"
+      }
+
+      "the text contains square brackets" in {
+        val inputString = "<![CDATA[<P>Today is [Monday] 5th December</P>]]>"
+        NotificationDetails.processGenericMessage(inputString) mustBe "<P>Today is [Monday] 5th December</P>"
+      }
+
+      "the text contains curly brackets" in {
+        val inputString = "<![CDATA[<P>Today is {Monday} 5th December</P>]]>"
+        NotificationDetails.processGenericMessage(inputString) mustBe "<P>Today is {Monday} 5th December</P>"
+      }
+
+      "the text contains plus symbols" in {
+        val inputString = "<![CDATA[<P>Today is +Monday+ 5th December</P>]]>"
+        NotificationDetails.processGenericMessage(inputString) mustBe "<P>Today is +Monday+ 5th December</P>"
+      }
+
+      "the text contains asterisks" in {
+        val inputString = "<![CDATA[<P>Today is *Monday* 5th December</P>]]>"
+        NotificationDetails.processGenericMessage(inputString) mustBe "<P>Today is *Monday* 5th December</P>"
+      }
+
+      "the text contains pipes" in {
+        val inputString = "<![CDATA[<P>Today is |Monday| 5th December</P>]]>"
+        NotificationDetails.processGenericMessage(inputString) mustBe "<P>Today is |Monday| 5th December</P>"
+      }
+
+      "the text contains dollar symbols" in {
+        val inputString = "<![CDATA[<P>Today is $Monday$ 5th December</P>]]>"
+        NotificationDetails.processGenericMessage(inputString) mustBe "<P>Today is $Monday$ 5th December</P>"
+      }
+
+      "the text contains carets" in {
+        val inputString = "<![CDATA[<P>Today is ^Monday^ 5th December</P>]]>"
+        NotificationDetails.processGenericMessage(inputString) mustBe "<P>Today is ^Monday^ 5th December</P>"
+      }
     }
   }
 
