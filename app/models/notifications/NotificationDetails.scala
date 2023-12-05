@@ -18,11 +18,11 @@ package models.notifications
 
 import cats.implicits._
 import models.confirmation.Currency
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
-import org.joda.time.{DateTime, DateTimeZone, LocalDate}
-import play.api.libs.json._
-import uk.gov.hmrc.mongo.play.json.formats.{MongoJavatimeFormats, MongoJodaFormats}
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
+import org.joda.time.{DateTime, LocalDate}
 import play.api.libs.functional.syntax._
+import play.api.libs.json._
+import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
 import utils.ContactTypeHelper
 
 case class NotificationDetails(contactType: Option[ContactType],
@@ -101,7 +101,7 @@ object NotificationDetails {
   }
 
   def processGenericMessage(msg: String): String = {
-    val pattern = """(?i)<!\[CDATA\[([^\]]+)\]\]>""".r.unanchored
+    val pattern = """<!\[CDATA\[(.*)\]\]>""".r
     pattern.findFirstMatchIn(msg).fold(msg)(m => m.group(1))
   }
 
