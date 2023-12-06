@@ -170,7 +170,13 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
       Ok(view(
         businessName,
         toTable(currentRecordsWithIndexes, "current-application-notifications"),
-        previousRecordsWithIndexes.map(toTable(_, "previous-application-notifications"))
+        previousRecordsWithIndexes.flatMap(recordsWithIndex =>
+          if(recordsWithIndex.nonEmpty) {
+            Some(toTable(recordsWithIndex, "previous-application-notifications"))
+          } else {
+            None
+          }
+        )
       ))
     }) getOrElse (throw new Exception("Cannot retrieve business name"))
   }
