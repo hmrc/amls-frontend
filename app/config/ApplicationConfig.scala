@@ -37,7 +37,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   lazy val contactHost = baseUrl("contact-frontend")
   lazy val authHost = baseUrl("auth")
-  lazy val feedbackFrontendUrl = baseUrl("feedback-frontend") + "/feedback/AMLS"
+  lazy val feedbackFrontendUrl = getConfigString("feedback-frontend.url")
   lazy val assetsPrefix = getConfigString(s"assets.url") + getConfigString(s"assets.version")
 
   lazy val contactFrontendReportUrl = baseUrl("contact-frontend") + getConfigString("contact-frontend.report-url")
