@@ -440,8 +440,8 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         assertRowMatches(
           16,
           messages("responsiblepeople.contact_details.heading", personName.titleName),
-          s"""<p class="govuk-body">${messages("responsiblepeople.detailed_answers.phone_number")} $phoneNumber</p>
-            <p class="govuk-body">${messages("responsiblepeople.detailed_answers.email")} $email</p>
+          s"""<p class="govuk-body">${messages("responsiblepeople.detailed_answers.phone_number")}<br>$phoneNumber</p>
+            <p class="govuk-body">${messages("responsiblepeople.detailed_answers.email")}<br>$email</p>
           """,
           controllers.responsiblepeople.routes.ContactDetailsController.get(1, true, None).url,
           "rp-contactDetails-edit"

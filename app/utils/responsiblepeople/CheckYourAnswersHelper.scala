@@ -313,8 +313,8 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
       SummaryListRow(
         Key(Text(messages("responsiblepeople.contact_details.heading", personName))),
         Value(HtmlContent(
-          s"""<p class="govuk-body">${messages("responsiblepeople.detailed_answers.phone_number")} ${details.phoneNumber}</p>
-            <p class="govuk-body">${messages("responsiblepeople.detailed_answers.email")} ${details.emailAddress}</p>
+          s"""<p class="govuk-body">${messages("responsiblepeople.detailed_answers.phone_number")}<br>${details.phoneNumber}</p>
+            <p class="govuk-body">${messages("responsiblepeople.detailed_answers.email")}<br>${details.emailAddress}</p>
           """)),
         actions = editAction(
           controllers.responsiblepeople.routes.ContactDetailsController.get(idx, true, flow).url,
