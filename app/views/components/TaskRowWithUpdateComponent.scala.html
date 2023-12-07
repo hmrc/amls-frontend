@@ -29,6 +29,13 @@
         messages("status.progress.add", sectionName)
     }
 }
+@statusTag = @{
+    (taskRow.status == Updated || taskRow.status == Completed, taskRow.hasChanged) match {
+        case (true, true) => TaskRow.updatedTag
+        case (true, false) => TaskRow.completedTag
+        case (false, _) => taskRow.tag
+    }
+}
 
 <li id="@sectionName.replaceAll(" ", "-").toLowerCase.concat("-status")" class="app-task-list__item">
     <span class="app-task-list__task-name">
@@ -37,5 +44,5 @@
     <span hidden class="task-status">
     @messages("status.visuallyhidden.text")
     </span>
-    @govukTag(taskRow.tag)
+    @govukTag(statusTag)
 </li>

@@ -100,14 +100,6 @@ object BusinessDetails {
     )
 
     cache.getEntry[BusinessDetails](key).fold(notStarted) {
-      case model if model.isComplete && model.hasChanged =>
-        TaskRow(
-          messageKey,
-          controllers.businessdetails.routes.SummaryController.get.url,
-          true,
-          Updated,
-          TaskRow.updatedTag
-        )
       case model if model.isComplete =>
         TaskRow(
           messageKey,
