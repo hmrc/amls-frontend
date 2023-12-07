@@ -37,7 +37,7 @@ class AgentNameFormProviderSpec extends JodaDateBehaviours with StringFieldBehav
   val dateFieldName = "agentDateOfBirth"
 
   val maxDate: LocalDate = LocalDate.now()
-  val minDate: LocalDate = maxDate.minusYears(100)
+  val minDate: LocalDate = new LocalDate(1900, 1, 1)
 
   "AgentNameFormProvider" when {
 
