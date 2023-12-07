@@ -33,7 +33,8 @@
     (taskRow.status == Updated || taskRow.status == Completed, taskRow.hasChanged) match {
         case (true, true) => TaskRow.updatedTag
         case (true, false) => TaskRow.completedTag
-        case (false, _) => taskRow.tag
+        case (false, true) => TaskRow.incompleteTag
+        case (false, false) => taskRow.tag
     }
 }
 
