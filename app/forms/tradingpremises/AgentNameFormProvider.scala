@@ -41,6 +41,7 @@ class AgentNameFormProvider @Inject()() extends Mappings {
         twoRequiredKey = "error.required.tp.agent.date.two",
         requiredKey = "error.required.tp.agent.date.one"
       ).verifying(
+        jodaMinDate(new LocalDate(1900, 1, 1), "error.allowed.start.date"),
         jodaMaxDate(LocalDate.now(), "error.invalid.date.agent.not.real")
       )
     )((name, date) => AgentName(name, agentDateOfBirth = Some(date)))(x => x.agentDateOfBirth.map(y => (x.agentName, y)))
