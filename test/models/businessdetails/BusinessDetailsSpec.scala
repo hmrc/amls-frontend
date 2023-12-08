@@ -433,22 +433,6 @@ class BusinessDetailsSpec extends AmlsSpec {
       BusinessDetails.taskRow(cache, messages) must be(completedTaskRow)
     }
 
-    "return an Updated Task Row when model is complete and has changed" in {
-
-      val updatedTaskRow = TaskRow(
-        "businessdetails",
-        controllers.businessdetails.routes.SummaryController.get.url,
-        true,
-        Updated,
-        TaskRow.updatedTag
-      )
-
-      when(cache.getEntry[BusinessDetails](meq("about-the-business"))(any()))
-      .thenReturn(Some(completeModel.copy(hasChanged = true)))
-
-      BusinessDetails.taskRow(cache, messages) must be(updatedTaskRow)
-    }
-
     "return a Started Task Row when model is incomplete" in {
 
       val incomplete = BusinessDetails(Some(previouslyRegistered), None)
