@@ -38,14 +38,17 @@
 
     @formHelper(action = controllers.renewal.routes.FXTransactionsInLast12MonthsController.post(edit)) {
 
-        @heading("renewal.msb.fx.transactions.expected.title")
-
         @inputText(
             Input(
                 id = "fxTransaction",
                 name = "fxTransaction",
-                inputType = "numeric",
-                classes = "govuk-!-width-one-third"
+                inputmode = Some("numeric"),
+                classes = "govuk-!-width-one-third",
+                label = Label(
+                    isPageHeading = true,
+                    content = Text(messages("renewal.msb.fx.transactions.expected.title")),
+                    classes = "govuk-label--xl"
+                )
             ),
             form("fxTransaction")
         )

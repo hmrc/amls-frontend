@@ -39,16 +39,19 @@
 
     @subtitle("summary.msb")
 
-    @heading("msb.ce.transactions.expected.in.12.months.title")
-
     @formHelper(action = controllers.msb.routes.CurrencyExchangesInNext12MonthsController.post(edit)) {
 
         @inputText(
             Input(
                 id = "ceTransaction",
                 name = "ceTransaction",
-                inputType = "numeric",
-                classes = "govuk-!-width-one-quarter"
+                inputmode = Some("numeric"),
+                classes = "govuk-!-width-one-quarter",
+                label = Label(
+                    isPageHeading = true,
+                    content = Text(messages("msb.ce.transactions.expected.in.12.months.title")),
+                    classes = "govuk-label--xl"
+                )
             ),
             form("ceTransaction")
         )

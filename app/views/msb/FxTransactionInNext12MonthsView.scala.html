@@ -37,16 +37,19 @@
 
     @subtitle("summary.msb")
 
-    @heading("msb.fx.transactions.expected.in.12.months.title")
-
     @formHelper(action = controllers.msb.routes.FXTransactionsInNext12MonthsController.post(edit)) {
 
         @inputText(
             Input(
                 id = "fxTransaction",
                 name = "fxTransaction",
-                inputType = "numeric",
-                classes = "govuk-!-width-one-quarter"
+                inputmode = Some("numeric"),
+                classes = "govuk-!-width-one-quarter",
+                label = Label(
+                    isPageHeading = true,
+                    content = Text(messages("msb.fx.transactions.expected.in.12.months.title")),
+                    classes = "govuk-label--xl"
+                )
             ),
             form("fxTransaction")
         )

@@ -38,14 +38,17 @@
 
     @formHelper(action = controllers.renewal.routes.CETransactionsInLast12MonthsController.post(edit)) {
 
-        @heading("renewal.msb.ce.transactions.expected.title")
-
         @inputText(
             Input(
                 id = "ceTransaction",
                 name = "ceTransaction",
-                inputType = "numeric",
-                classes = "govuk-!-width-one-third"
+                inputmode = Some("numeric"),
+                classes = "govuk-!-width-one-third",
+                label = Label(
+                    isPageHeading = true,
+                    content = Text(messages("renewal.msb.ce.transactions.expected.title")),
+                    classes = "govuk-label--xl"
+                )
             ),
             form("ceTransaction")
         )

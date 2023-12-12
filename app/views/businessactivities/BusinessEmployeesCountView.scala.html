@@ -54,7 +54,12 @@
                 name = "employeeCount",
                 id = "employeeCount",
                 inputmode = Some("numeric"),
-                classes = "govuk-!-width-one-quarter"
+                classes = "govuk-!-width-one-quarter",
+                label = Label(
+                    isPageHeading = false,
+                    content = Text(messages("businessactivities.employees.title")),
+                    classes = "govuk-visually-hidden"
+                )
             ),
             field = form("employeeCount")
         )
