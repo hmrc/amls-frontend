@@ -22,6 +22,7 @@ import models.businessmatching.BusinessMatchingMsbServices
 import models.moneyservicebusiness._
 import org.scalatest.Assertion
 import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.Aliases
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryListRow
 import utils.AmlsSpec
 
@@ -614,6 +615,23 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
         ).rows
 
         assertRowIsNotPresent("msb.fx.transactions.expected.in.12.months.title")
+      }
+    }
+
+
+    "not display Money Sources rows" when {
+
+      "uses foreign currencies is false" in new RowFixture {
+        override val summaryListRows: Seq[Aliases.SummaryListRow] = cyaHelper.getSummaryList(
+          model.copy(whichCurrencies = Some(WhichCurrencies(
+            currencies,
+            Some(UsesForeignCurrenciesNo),
+            Some(fullMoneySourcesModel)
+          ))),
+          bmMsbServices
+        ).rows
+
+        assertRowIsNotPresent("msb.supply_foreign_currencies.title")
       }
     }
   }

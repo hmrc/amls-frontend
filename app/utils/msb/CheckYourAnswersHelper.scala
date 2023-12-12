@@ -299,17 +299,21 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
         ).flatten ++
         moneySources.fold(Seq.empty[SummaryListRow]) { sources =>
           Seq(
-            Some(SummaryListRow(
-              Key(Text(messages("msb.supply_foreign_currencies.title"))),
-              sources.toMessages match {
-                case source :: Nil => Value(Text(source))
-                case sources => toBulletList(sources)
-              },
-              actions = editAction(
-                controllers.msb.routes.MoneySourcesController.get(true).url,
-                "moneysources-edit"
-              )
-            )),
+            usesForeignCurrencies flatMap { foreignCurrencies =>
+              if(foreignCurrencies.value) {
+                Some(SummaryListRow(
+                  Key(Text(messages("msb.supply_foreign_currencies.title"))),
+                  sources.toMessages match {
+                    case source :: Nil => Value(Text(source))
+                    case sources => toBulletList(sources)
+                  },
+                  actions = editAction(
+                    controllers.msb.routes.MoneySourcesController.get(true).url,
+                    "moneysources-edit"
+                  )
+                ))
+              } else None
+            },
             sources.bankMoneySource map { bms =>
               row(
                 "msb.bank.names",
