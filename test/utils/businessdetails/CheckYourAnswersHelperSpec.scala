@@ -161,7 +161,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
           "businessdetails.registeredforvat.title",
           booleanToLabel(true),
           controllers.businessdetails.routes.VATRegisteredController.get(true).url,
-          "businessdetailsregform-edit"
+          "businessdetailsregformvat-edit"
         )
 
         val vatNoRow = summaryListRows.lift(3).map(x => (x.key.toString, x.value.toString))
@@ -180,7 +180,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFun
           "businessdetails.registeredforvat.title",
           booleanToLabel(false),
           controllers.businessdetails.routes.VATRegisteredController.get(true).url,
-          "businessdetailsregform-edit"
+          "businessdetailsregformvat-edit"
         )
       }
     }

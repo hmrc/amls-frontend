@@ -54,7 +54,12 @@
                 name = "employeeCountAMLSSupervision",
                 id = "employeeCountAMLSSupervision",
                 inputmode = Some("numeric"),
-                classes = "govuk-!-width-one-quarter"
+                classes = "govuk-!-width-one-quarter",
+                label = Label(
+                    isPageHeading = false,
+                    content = Text(messages("businessactivities.employees.amls.supervision.title")),
+                    classes = "govuk-visually-hidden"
+                )
             ),
             field = form("employeeCountAMLSSupervision")
         )

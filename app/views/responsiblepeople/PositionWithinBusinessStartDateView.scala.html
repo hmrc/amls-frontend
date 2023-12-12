@@ -59,8 +59,7 @@
         @govukDateInput(
             DateInput(
                 id = "startDate",
-                hint = Some(Hint(content = Text(messages("lbl.date.example")))),
-                attributes = Map("pattern" -> "[0-9]*")
+                hint = Some(Hint(content = Text(messages("lbl.date.example"))))
             ).withFormField(form("startDate"))
         )
 

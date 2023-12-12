@@ -89,7 +89,7 @@ class CheckYourAnswersHelper @Inject()(button: SubmissionButton, appConfig: Appl
 
     val vatAction = editAction(
       controllers.businessdetails.routes.VATRegisteredController.get(true).url,
-      "businessdetailsregform-edit"
+      "businessdetailsregformvat-edit"
     )
 
     businessDetails.vatRegistered.map {

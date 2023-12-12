@@ -38,14 +38,17 @@
 
     @formHelper(action = controllers.renewal.routes.TransactionsInLast12MonthsController.post(edit)) {
 
-        @heading("renewal.msb.transfers.header")
-
         @inputText(
             Input(
                 id = "txnAmount",
                 name = "txnAmount",
-                inputType = "numeric",
-                classes = "govuk-!-width-one-third"
+                inputmode = Some("numeric"),
+                classes = "govuk-!-width-one-third",
+                label = Label(
+                    isPageHeading = true,
+                    content = Text(messages("renewal.msb.transfers.header")),
+                    classes = "govuk-label--xl"
+                )
             ),
             form("txnAmount")
         )

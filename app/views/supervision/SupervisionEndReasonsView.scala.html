@@ -39,8 +39,6 @@
 
     @subtitle("summary.supervision")
 
-    @heading("supervision.supervision_end_reasons.title")
-
     @formHelper(action = controllers.supervision.routes.SupervisionEndReasonsController.post(edit)) {
 
         @inputTextArea(
@@ -49,7 +47,12 @@
                 name = "endingReason",
                 rows = 8,
                 errorMessage = form("endingReason").error.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*)))),
-                maxLength = Some(255)
+                maxLength = Some(255),
+                label = Label(
+                    isPageHeading = true,
+                    content = Text(messages("supervision.supervision_end_reasons.title")),
+                    classes = "govuk-label--xl"
+                )
             ).withFormField(form("endingReason"))
         )
 

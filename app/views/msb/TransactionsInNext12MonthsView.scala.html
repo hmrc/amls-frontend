@@ -39,16 +39,19 @@
 
     @subtitle("summary.msb")
 
-    @heading("msb.transactions.expected.title")
-
     @formHelper(action = controllers.msb.routes.TransactionsInNext12MonthsController.post(edit)) {
 
         @inputText(
             Input(
                 id = "txnAmount",
                 name = "txnAmount",
-                inputType = "numeric",
-                classes = "govuk-!-width-one-quarter"
+                inputmode = Some("numeric"),
+                classes = "govuk-!-width-one-quarter",
+                label = Label(
+                    isPageHeading = true,
+                    content = Text(messages("msb.transactions.expected.title")),
+                    classes = "govuk-label--xl"
+                )
             ),
             form("txnAmount")
         )

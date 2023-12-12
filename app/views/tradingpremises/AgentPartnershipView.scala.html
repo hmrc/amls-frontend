@@ -39,13 +39,16 @@
 
     @formHelper(action = controllers.tradingpremises.routes.AgentPartnershipController.post(index, edit)) {
 
-        @heading("tradingpremises.agentpartnership.title")
-
         @inputText(
             Input(
                 id = "agentPartnership",
                 name = "agentPartnership",
-                classes = "govuk-!-width-full"
+                classes = "govuk-!-width-full",
+                label = Label(
+                    isPageHeading = true,
+                    content = Text(messages("tradingpremises.agentpartnership.title")),
+                    classes = "govuk-label--xl"
+                )
             ),
             form("agentPartnership")
         )
