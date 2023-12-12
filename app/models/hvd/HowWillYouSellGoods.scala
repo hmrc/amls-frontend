@@ -18,6 +18,7 @@ package models.hvd
 
 import jto.validation.forms.UrlFormEncoded
 import jto.validation._
+import models.hvd.SalesChannel._
 import play.api.libs.json._
 import utils.TraversableValidators
 import utils.MappingUtils.Implicits._

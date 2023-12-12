@@ -115,7 +115,7 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
         Some("Address line 2"),
         Some("Address line 3"),
         Some("Address line4"),
-        None, "US")
+        None, "FR")
 
       val expectedAddressModel = Address(
         "Address line1",
@@ -123,7 +123,7 @@ class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
         Some("Address line 3"),
         Some("Address line4"),
         None,
-        Country("United States of America", "US"))
+        Country("France", "FR"))
 
       ReviewDetails.convert(bmAddressModel) mustBe(expectedAddressModel)
     }

@@ -20,63 +20,61 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.renewal.WhichCurrenciesFormProvider
 import models.renewal.{Renewal, WhichCurrencies}
-import play.api.mvc.MessagesControllerComponents
-import services.RenewalService
-import utils.{AuthAction, ControllerHelper}
-import views.html.renewal.which_currencies
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{CurrencyAutocompleteService, RenewalService}
+import utils.AuthAction
+import views.html.renewal.WhichCurrenciesView
 
+import javax.inject.Inject
 import scala.concurrent.Future
-
 
 class WhichCurrenciesController @Inject()(val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           renewalService: RenewalService,
                                           dataCacheConnector: DataCacheConnector,
                                           val cc: MessagesControllerComponents,
-                                          which_currencies: which_currencies) extends AmlsBaseController(ds, cc) {
+                                          autocompleteService: CurrencyAutocompleteService,
+                                          formProvider: WhichCurrenciesFormProvider,
+                                          view: WhichCurrenciesView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        val block = for {
-          renewal <- OptionT(renewalService.getRenewal(request.credId))
-          whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
-        } yield {
-          Ok(which_currencies(Form2[WhichCurrencies](whichCurrencies), edit))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      val block = for {
+        renewal <- OptionT(renewalService.getRenewal(request.credId))
+        whichCurrencies <- OptionT.fromOption[Future](renewal.whichCurrencies)
+      } yield {
+        Ok(view(formProvider().fill(whichCurrencies), edit, autocompleteService.formOptions))
+      }
 
-        block getOrElse Ok(which_currencies(EmptyForm, edit))
-
+      block getOrElse Ok(view(formProvider(), edit, autocompleteService.formOptions))
   }
 
   def post(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        Form2[WhichCurrencies](request.body) match {
-          case f: InvalidForm => Future.successful(BadRequest(which_currencies(alignFormDataWithValidationErrors(f), edit)))
-          case ValidForm(_, model) =>
-            dataCacheConnector.fetchAll(request.credId).flatMap {
-              optMap =>
-                val result = for {
-                  cacheMap <- optMap
-                  renewal <- cacheMap.getEntry[Renewal](Renewal.key)
-                } yield {
-                  renewalService.updateRenewal(request.credId, updateWhichCurrencies(renewal, model)) map { _ =>
-                    edit match {
-                      case true => Redirect(routes.SummaryController.get)
-                      case _ => Redirect(routes.UsesForeignCurrenciesController.get())
-                    }
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, autocompleteService.formOptions))),
+        data =>
+          dataCacheConnector.fetchAll(request.credId).flatMap {
+            optMap =>
+              val result = for {
+                cacheMap <- optMap
+                renewal <- cacheMap.getEntry[Renewal](Renewal.key)
+              } yield {
+                renewalService.updateRenewal(request.credId, updateWhichCurrencies(renewal, data)) map { _ =>
+                  if (edit) {
+                    Redirect(routes.SummaryController.get)
+                  } else {
+                    Redirect(routes.UsesForeignCurrenciesController.get())
                   }
-
                 }
-                result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
-            }
-        }
-  }
 
-  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
-    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "currencies")
+              }
+              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+          }
+      )
+  }
 
   def updateWhichCurrencies(oldRenewal: Renewal, whichCurrencies: WhichCurrencies) = {
     oldRenewal.whichCurrencies match {

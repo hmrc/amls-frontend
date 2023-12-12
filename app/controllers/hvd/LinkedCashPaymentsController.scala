@@ -18,52 +18,53 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.hvd.{Hvd, LinkedCashPayments}
-import play.api.mvc.MessagesControllerComponents
+import forms.hvd.LinkedCashPaymentsFormProvider
+import models.hvd.Hvd
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
+import views.html.hvd.LinkedCashPaymentsView
 
-import views.html.hvd.linked_cash_payments
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
-class LinkedCashPaymentsController @Inject() ( val dataCacheConnector: DataCacheConnector,
-                                               val authAction: AuthAction,
-                                               val ds: CommonPlayDependencies,
-                                               val cc: MessagesControllerComponents,
-                                               linked_cash_payments: linked_cash_payments) extends AmlsBaseController(ds, cc) {
+class LinkedCashPaymentsController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                              val authAction: AuthAction,
+                                              val ds: CommonPlayDependencies,
+                                              val cc: MessagesControllerComponents,
+                                              formProvider: LinkedCashPaymentsFormProvider,
+                                              view: LinkedCashPaymentsView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) =
+  def get(edit: Boolean = false): Action[AnyContent] =
     authAction.async {
       implicit request =>
         dataCacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
           response =>
-            val form: Form2[LinkedCashPayments] = (for {
+            val form = (for {
               hvd <- response
               linkedCashPayment <- hvd.linkedCashPayment
-            } yield Form2[LinkedCashPayments](linkedCashPayment)).getOrElse(EmptyForm)
-            Ok(linked_cash_payments(form, edit))
+            } yield formProvider().fill(linkedCashPayment)).getOrElse(formProvider())
+            Ok(view(form, edit))
         }
     }
 
-  def post(edit: Boolean = false) =
+  def post(edit: Boolean = false): Action[AnyContent] =
     authAction.async {
       implicit request => {
-        Form2[LinkedCashPayments](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(linked_cash_payments(f, edit)))
-          case ValidForm(_, data) =>
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, edit))),
+          data =>
             for {
               hvd <- dataCacheConnector.fetch[Hvd](request.credId, Hvd.key)
               _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key,
                 hvd.linkedCashPayment(data)
               )
-            } yield edit match {
-              case true  => Redirect(routes.SummaryController.get)
-              case false => Redirect(routes.ReceiveCashPaymentsController.get())
+            } yield if (edit) {
+              Redirect(routes.SummaryController.get)
+            } else {
+              Redirect(routes.ReceiveCashPaymentsController.get())
             }
-        }
+        )
       }
     }
 }

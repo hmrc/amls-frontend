@@ -1,0 +1,86 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import models.withdrawal.WithdrawalReason
+@import models.withdrawal.WithdrawalReason.Other
+@import views.html.components.forms.{ErrorSummary, InputText}
+@import views.html.components.{SectionSubtitle, Button}
+
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    formHelper: FormWithCSRF,
+    radios: GovukRadios,
+    inputText: InputText,
+    button: Button
+)
+
+@(form: Form[WithdrawalReason])(implicit messages: Messages, request: Request[_])
+
+@conditionalHtml = @{
+    inputText(
+        Input(
+            label = Label(
+                isPageHeading = false,
+                content = Text(messages("withdrawal.reason.lbl.specify.other.reason")),
+                classes = "govuk-label"
+            ),
+            id = "specifyOtherReason",
+            name = "specifyOtherReason"
+        ),
+        form("specifyOtherReason")
+    )
+}
+
+@radioItems = @{
+    WithdrawalReason.all.map { reason =>
+        RadioItem(
+            content = Text(messages(s"withdrawal.reason.lbl.${reason.value}")),
+            id = Some(reason.toString),
+            value = Some(reason.toString),
+            conditionalHtml = if(reason == Other("")) Some(conditionalHtml) else None
+        )
+    }
+}
+
+@layout(messages("withdrawal.reason.heading") + " - " + messages("title.yapp")) {
+
+    @errorSummary(form, Some(Map("withdrawalReason" -> WithdrawalReason.all.head.toString)))
+
+    @subtitle("summary.status")
+
+    @formHelper(controllers.withdrawal.routes.WithdrawalReasonController.post) {
+
+        @radios(
+            Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("withdrawal.reason.heading")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
+                name = "withdrawalReason",
+                items = radioItems,
+                classes = "govuk-radios"
+            ).withFormField(form("withdrawalReason"))
+        )
+
+        @button("withdrawal.reason.lbl.button")
+    }
+}

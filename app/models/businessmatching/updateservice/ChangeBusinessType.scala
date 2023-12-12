@@ -18,13 +18,19 @@ package models.businessmatching.updateservice
 
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
+import models.{Enumerable, WithName}
 
 sealed trait ChangeBusinessType
 
-case object Add extends ChangeBusinessType
-case object Remove extends ChangeBusinessType
+case object Add extends WithName("add") with ChangeBusinessType
+case object Remove extends WithName("remove") with ChangeBusinessType
 
-object ChangeBusinessType {
+object ChangeBusinessType extends Enumerable.Implicits {
+
+  val all: Seq[ChangeBusinessType] = Seq(Add, Remove)
+
+  implicit val enumerable: Enumerable[ChangeBusinessType] = Enumerable(all.map(v => v.toString -> v): _*)
+
   import jto.validation._
   import utils.MappingUtils.Implicits._
 

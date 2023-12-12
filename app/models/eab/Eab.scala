@@ -17,7 +17,8 @@
 package models.eab
 
 import config.ApplicationConfig
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
+import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
@@ -132,6 +133,45 @@ object Eab {
           Section(messageKey, Completed, model.hasChanged, generateRedirect(appConfig.eabSummaryUrl))
         } else {
           Section(messageKey, Started, model.hasChanged, generateRedirect(appConfig.eabWhatYouNeedUrl))
+        }
+    }
+  }
+
+  def taskRow(appConfig: ApplicationConfig)(implicit cache: CacheMap, messages: Messages): TaskRow = {
+    val messageKey = "eab"
+    val notStarted = TaskRow(
+      messageKey,
+      generateRedirect(appConfig.eabWhatYouNeedUrl).url,
+      hasChanged = false,
+      NotStarted,
+      TaskRow.notStartedTag
+    )
+    cache.getEntry[Eab](key).fold(notStarted) {
+      model =>
+        if (model.isComplete && model.hasChanged && model.hasAccepted) {
+          TaskRow(
+            messageKey,
+            generateRedirect(appConfig.eabSummaryUrl).url,
+            hasChanged = true,
+            status = Updated,
+            tag = TaskRow.updatedTag
+          )
+        } else if (model.isComplete && model.hasAccepted) {
+          TaskRow(
+            messageKey,
+            generateRedirect(appConfig.eabSummaryUrl).url,
+            model.hasChanged,
+            Completed,
+            TaskRow.completedTag
+          )
+        } else {
+          TaskRow(
+            messageKey,
+            generateRedirect(appConfig.eabWhatYouNeedUrl).url,
+            model.hasChanged,
+            Started,
+            TaskRow.incompleteTag
+          )
         }
     }
   }

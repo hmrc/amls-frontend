@@ -18,16 +18,15 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.hvd.ReceiveCashPaymentsFormProvider
 import models.hvd.Hvd
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
+import views.html.hvd.ReceiveCashView
 
-import views.html.hvd.receiving
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class ReceiveCashPaymentsController @Inject()(val authAction: AuthAction,
@@ -36,45 +35,42 @@ class ReceiveCashPaymentsController @Inject()(val authAction: AuthAction,
                                               implicit val serviceFlow: ServiceFlow,
                                               implicit val statusService: StatusService,
                                               val cc: MessagesControllerComponents,
-                                              receiving: receiving) extends AmlsBaseController(ds, cc) {
+                                              formProvider: ReceiveCashPaymentsFormProvider,
+                                              view: ReceiveCashView) extends AmlsBaseController(ds, cc) {
 
-  val NAME = "receivePayments"
-  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
-  implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.hvd.receive.cash.payments")
-
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        cacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
-          response =>
-            val form: Form2[Boolean] = (for {
-              hvd <- response
-              receivePayments <- hvd.receiveCashPayments
-            } yield Form2[Boolean](receivePayments)).getOrElse(EmptyForm)
-            Ok(receiving(form, edit))
-        }
-  }
-
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request => {
-        Form2[Boolean](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(receiving(f, edit)))
-          case ValidForm(_, data) => {
-            for {
-              hvd <- cacheConnector.fetch[Hvd](request.credId, Hvd.key)
-              _ <- cacheConnector.save[Hvd](request.credId, Hvd.key, {
-                (hvd.flatMap(h => h.receiveCashPayments).contains(true), data) match {
-                  case (true, false) => hvd.receiveCashPayments(data).copy(cashPaymentMethods = None)
-                  case _ => hvd.receiveCashPayments(data)
-                }
-              })
-            } yield redirectTo(data, hvd, edit)
-          }
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      cacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
+        response =>
+          val form = (for {
+            hvd <- response
+            receivePayments <- hvd.receiveCashPayments
+          } yield formProvider().fill(receivePayments)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
-  def redirectTo(data: Boolean, hvd: Hvd, edit: Boolean) =
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => {
+          for {
+            hvd <- cacheConnector.fetch[Hvd](request.credId, Hvd.key)
+            _ <- cacheConnector.save[Hvd](request.credId, Hvd.key, {
+              (hvd.flatMap(h => h.receiveCashPayments).contains(true), data) match {
+                case (true, false) => hvd.receiveCashPayments(data).copy(cashPaymentMethods = None)
+                case _ => hvd.receiveCashPayments(data)
+              }
+            })
+          } yield redirectTo(data, hvd, edit)
+        }
+      )
+    }
+  }
+
+  def redirectTo(data: Boolean, hvd: Hvd, edit: Boolean): Result =
     (data, edit, hvd.cashPaymentMethods.isDefined) match {
       case (true, _, false) => Redirect(routes.ExpectToReceiveCashPaymentsController.get(edit))
       case (_, true, _)     => Redirect(routes.SummaryController.get)

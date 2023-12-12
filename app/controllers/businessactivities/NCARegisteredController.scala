@@ -19,12 +19,11 @@ package controllers.businessactivities
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, NCARegistered}
-import play.api.mvc.MessagesControllerComponents
+import forms.businessactivities.NCARegisteredFormProvider
+import models.businessactivities.BusinessActivities
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-
-import views.html.businessactivities._
+import views.html.businessactivities.NCARegisteredView
 
 import scala.concurrent.Future
 
@@ -32,36 +31,38 @@ class NCARegisteredController @Inject() (val dataCacheConnector: DataCacheConnec
                                          val authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
                                          val cc: MessagesControllerComponents,
-                                         nca_registered: nca_registered) extends AmlsBaseController(ds, cc) {
+                                         formProvider: NCARegisteredFormProvider,
+                                         view: NCARegisteredView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
-          val form: Form2[NCARegistered] = (for {
+          val form = (for {
             businessActivities <- response
             ncaRegistered <- businessActivities.ncaRegistered
-          } yield Form2[NCARegistered](ncaRegistered)).getOrElse(EmptyForm)
-          Ok(nca_registered(form, edit))
+          } yield formProvider().fill(ncaRegistered)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
     }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[NCARegistered](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(nca_registered(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.ncaRegistered(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get)
-            case false => Redirect(routes.RiskAssessmentController.get())
+          } yield if (edit) {
+            Redirect(routes.SummaryController.get)
+          } else {
+            Redirect(routes.RiskAssessmentController.get())
           }
-      }
+      )
     }
 }

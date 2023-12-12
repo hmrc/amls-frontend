@@ -18,15 +18,15 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
+import forms.responsiblepeople.address.NewHomeAddressNonUKFormProvider
 import models.responsiblepeople.NewHomeAddress._
 import models.responsiblepeople._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AutoCompleteService
 import utils.{AuthAction, ControllerHelper}
-import views.html.responsiblepeople.address.new_home_address_NonUK
+import views.html.responsiblepeople.address.NewHomeAddressNonUKView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -35,28 +35,32 @@ class NewHomeAddressNonUKController @Inject()(authAction: AuthAction,
                                               val autoCompleteService: AutoCompleteService,
                                               val ds: CommonPlayDependencies,
                                               val cc: MessagesControllerComponents,
-                                              new_home_address_NonUK: new_home_address_NonUK,
-                                              implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with AddressHelper {
+                                              formProvider: NewHomeAddressNonUKFormProvider,
+                                              view: NewHomeAddressNonUKView,
+                                              implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with AddressHelper {
 
-  def get(index: Int) = authAction.async {
+  def get(index: Int): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
-        => Ok(new_home_address_NonUK(EmptyForm, index, personName.titleName, autoCompleteService.getCountries))
-        case _
-        => NotFound(notFoundView)
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          person.personName match {
+            case Some(name) =>
+              Ok(view(formProvider(), index, name.titleName, autoCompleteService.formOptionsExcludeUK))
+            case _ => NotFound(notFoundView)
+          }
+        }
       }
   }
 
-  def post(index: Int) =
+  def post(index: Int): Action[AnyContent] =
     authAction.async {
       implicit request =>
-        (Form2[NewHomeAddress](request.body) match {
-          case f: InvalidForm =>
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(new_home_address_NonUK(f, index, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
-            }
-          case ValidForm(_, data) => {
+              BadRequest(view(formWithErrors, index, ControllerHelper.rpTitleName(rp), autoCompleteService.formOptionsExcludeUK))
+            },
+          data =>
             for {
               moveDate <- dataCacheConnector.fetch[NewHomeDateOfChange](request.credId, NewHomeDateOfChange.key)
               _ <- updateDataStrict[ResponsiblePerson](request.credId, index) { rp =>
@@ -67,8 +71,7 @@ class NewHomeAddressNonUKController @Inject()(authAction: AuthAction,
             } yield {
               Redirect(controllers.responsiblepeople.routes.DetailedAnswersController.get(index))
             }
-          }
-        }).recoverWith {
+        ).recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }

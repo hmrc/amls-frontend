@@ -21,7 +21,11 @@ import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 import models.FormTypes.referenceNumberRule
+import play.api.i18n.Messages
 import play.api.libs.json._
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.RadioItem
+import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
 
 sealed trait ServicesOfAnotherTCSP
 
@@ -30,6 +34,20 @@ case class ServicesOfAnotherTCSPYes(mlrRefNumber: String) extends ServicesOfAnot
 case object ServicesOfAnotherTCSPNo extends ServicesOfAnotherTCSP
 
 object ServicesOfAnotherTCSP {
+
+  def formValues(html: Html)(implicit messages: Messages): Seq[RadioItem] = HmrcYesNoRadioItems().map { radioItem =>
+
+    if (radioItem.value.contains("true")) {
+      radioItem.copy(
+        id = Some("servicesOfAnotherTCSP-true"),
+        conditionalHtml = Some(html)
+      )
+    } else {
+      radioItem.copy(
+        id = Some("servicesOfAnotherTCSP-false")
+      )
+    }
+  }
 
   import utils.MappingUtils.Implicits._
 

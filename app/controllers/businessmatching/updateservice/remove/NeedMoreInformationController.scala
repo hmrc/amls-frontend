@@ -23,10 +23,10 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessActivity
 import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.flowmanagement.Router
 import utils.AuthAction
-import views.html.businessmatching.updateservice.remove.need_more_information
+import views.html.businessmatching.updateservice.remove.NeedMoreInformationView
 
 import scala.concurrent.Future
 
@@ -36,23 +36,22 @@ class NeedMoreInformationController @Inject()(authAction: AuthAction,
                                               implicit val dataCacheConnector: DataCacheConnector,
                                               val router: Router[RemoveBusinessTypeFlowModel],
                                               val cc: MessagesControllerComponents,
-                                              need_more_information: need_more_information) extends AmlsBaseController(ds, cc) {
+                                              view: NeedMoreInformationView) extends AmlsBaseController(ds, cc) {
 
-  def get() = authAction.async {
-      implicit request =>
-        (for {
-          model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key))
-          activities <- OptionT.fromOption[Future](model.activitiesToRemove) orElse OptionT.some[Future, Set[BusinessActivity]](Set.empty)
-        } yield {
-          val activityNames = activities map { _.getMessage() }
-          Ok(need_more_information(activityNames))
-         })getOrElse(InternalServerError("Cannot retrieve information from cache"))
+  def get(): Action[AnyContent] = authAction.async {
+    implicit request =>
+      (for {
+        model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key))
+        activities <- OptionT.fromOption[Future](model.activitiesToRemove) orElse OptionT.some[Future, Set[BusinessActivity]](Set.empty)
+      } yield {
+        Ok(view(activities))
+       }) getOrElse(InternalServerError("Cannot retrieve information from cache"))
   }
 
-  def post() = authAction.async {
-      implicit request =>
-        (for {
-            route <- OptionT.liftF(router.getRoute(request.credId, NeedToUpdatePageId, new RemoveBusinessTypeFlowModel()))
-        } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: Remove : NewServiceInformationController")
+  def post(): Action[AnyContent] = authAction.async {
+    implicit request =>
+      (for {
+        route <- OptionT.liftF(router.getRoute(request.credId, NeedToUpdatePageId, new RemoveBusinessTypeFlowModel()))
+      } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: Remove : NewServiceInformationController")
   }
 }

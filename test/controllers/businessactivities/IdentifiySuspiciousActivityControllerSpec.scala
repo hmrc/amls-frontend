@@ -18,33 +18,34 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.IdentifySuspiciousActivityFormProvider
 import models.businessactivities.{BusinessActivities, IdentifySuspiciousActivity}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.libs.json.Json
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.businessactivities.identify_suspicious_activity
+import views.html.businessactivities.IdentifySuspiciousActivityView
 
 import scala.concurrent.Future
 
-class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
+class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[identify_suspicious_activity]
+    lazy val view = inject[IdentifySuspiciousActivityView]
     val controller = new IdentifySuspiciousActivityController (
       dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      identify_suspicious_activity = view)
+      formProvider = inject[IdentifySuspiciousActivityFormProvider],
+      view = view)
   }
 
   "IdentifySuspiciousActivityController" when {
@@ -85,7 +86,8 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
     "post is called" must {
       "on post with valid data" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.IdentifySuspiciousActivityController.post(false).url)
+          .withFormUrlEncodedBody(
           "hasWrittenGuidance" -> "true"
         )
 
@@ -101,20 +103,29 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
       }
 
       "on post with invalid data" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.IdentifySuspiciousActivityController.post(false).url)
+          .withFormUrlEncodedBody(
           "hasWrittenGuidance" -> "grrrrr"
         )
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
+      }
 
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.select("span").html() must include(Messages("error.required.ba.suspicious.activity"))
+      "on post with empty data" in new Fixture {
+        val newRequest = FakeRequest(POST, routes.IdentifySuspiciousActivityController.post(false).url)
+          .withFormUrlEncodedBody(
+            "hasWrittenGuidance" -> ""
+          )
+
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
       }
 
       "on post with valid data in edit mode" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.IdentifySuspiciousActivityController.post(true).url)
+          .withFormUrlEncodedBody(
           "hasWrittenGuidance" -> "true"
         )
 

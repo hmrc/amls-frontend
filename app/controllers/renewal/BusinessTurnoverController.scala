@@ -18,15 +18,14 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
-import models.renewal.{BusinessTurnover, Renewal}
-import play.api.mvc.MessagesControllerComponents
+import forms.renewal.BusinessTurnoverFormProvider
+import models.renewal.Renewal
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RenewalService
 import utils.AuthAction
+import views.html.renewal.BusinessTurnoverView
 
-import views.html.renewal.business_turnover
-
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -35,34 +34,36 @@ class BusinessTurnoverController @Inject()(val dataCacheConnector: DataCacheConn
                                            val ds: CommonPlayDependencies,
                                            val renewalService: RenewalService,
                                            val cc: MessagesControllerComponents,
-                                           business_turnover: business_turnover) extends AmlsBaseController(ds, cc) {
+                                           formProvider: BusinessTurnoverFormProvider,
+                                           view: BusinessTurnoverView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       renewalService.getRenewal(request.credId).map {
         response =>
-          val form: Form2[BusinessTurnover] = (for {
+          val form = (for {
             renewal <- response
             businessTurnover <- renewal.businessTurnover
-          } yield Form2[BusinessTurnover](businessTurnover)).getOrElse(EmptyForm)
-          Ok(business_turnover(form, edit))
+          } yield formProvider().fill(businessTurnover)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[BusinessTurnover](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(business_turnover(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             renewal <- dataCacheConnector.fetch[Renewal](request.credId, Renewal.key)
             _ <- renewalService.updateRenewal(request.credId, renewal.businessTurnover(data))
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get)
-            case false => Redirect(routes.AMLSTurnoverController.get())
+          } yield if (edit) {
+            Redirect(routes.SummaryController.get)
+          } else {
+            Redirect(routes.AMLSTurnoverController.get())
           }
-      }
+      )
     }
   }
 }

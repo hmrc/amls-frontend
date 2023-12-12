@@ -17,8 +17,9 @@
 package models.amp
 
 import config.ApplicationConfig
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress._
 import models.renewal.AMPTurnover
+import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.mvc.Call
 import typeclasses.MongoKey
@@ -82,14 +83,40 @@ object Amp {
     Call(redirectCallType, destinationUrl)
   }
 
-  def section(appConfig: ApplicationConfig)(implicit cache: CacheMap): Section = {
-    val notStarted = Section(key, NotStarted, false, generateRedirect(appConfig.ampWhatYouNeedUrl))
+  def taskRow(appConfig: ApplicationConfig)(implicit cache: CacheMap, messages: Messages): TaskRow = {
+    val notStarted = TaskRow(
+      key,
+      generateRedirect(appConfig.ampWhatYouNeedUrl).url,
+      hasChanged = false,
+      NotStarted,
+      TaskRow.notStartedTag
+    )
     cache.getEntry[Amp](key).fold(notStarted) {
       model =>
-        if (model.isComplete && model.hasAccepted) {
-          Section(key, Completed, model.hasChanged, generateRedirect(appConfig.ampSummaryUrl))
+        if (model.isComplete && model.hasAccepted && model.hasChanged) {
+          TaskRow(
+            key,
+            generateRedirect(appConfig.ampSummaryUrl).url,
+            hasChanged = true,
+            status = Updated,
+            tag = TaskRow.updatedTag
+          )
+        } else if (model.isComplete && model.hasAccepted) {
+          TaskRow(
+            key,
+            generateRedirect(appConfig.ampSummaryUrl).url,
+            model.hasChanged,
+            Completed,
+            TaskRow.completedTag
+          )
         } else {
-          Section(key, Started, model.hasChanged, generateRedirect(appConfig.ampWhatYouNeedUrl))
+          TaskRow(
+            key,
+            generateRedirect(appConfig.ampWhatYouNeedUrl).url,
+            model.hasChanged,
+            Started,
+            TaskRow.incompleteTag
+          )
         }
     }
   }

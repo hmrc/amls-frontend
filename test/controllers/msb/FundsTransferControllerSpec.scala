@@ -17,6 +17,7 @@
 package controllers.msb
 
 import controllers.actions.SuccessfulAuthAction
+import forms.msb.FundsTransferFormProvider
 import models.moneyservicebusiness._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -24,25 +25,26 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.msb.funds_transfer
+import views.html.msb.FundsTransferView
 
 import scala.concurrent.Future
 
-class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[funds_transfer]
+    lazy val view = inject[FundsTransferView]
     val controller = new FundsTransferController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      funds_transfer = view)
+      formProvider = inject[FundsTransferFormProvider],
+      view = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -54,7 +56,7 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           (any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("msb.fundstransfer.title") + " - " + Messages("summary.msb") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
+      contentAsString(result) must include(messages("msb.fundstransfer.title") + " - " + messages("summary.msb") + " - " + messages("title.amls") + " - " + messages("title.gov"))
     }
 
     "on get, display the 'Do you transfer money without using formal banking systems?' page with pre populated data" in new Fixture {
@@ -71,20 +73,19 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
     }
 
     "on post with invalid data" in new Fixture {
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.FundsTransferController.post().url).withFormUrlEncodedBody(
         "transferWithoutFormalSystems" -> ""
       )
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
 
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("span").html() must include(Messages("error.required.msb.fundsTransfer"))
+      contentAsString(result) must include(messages("error.required.msb.fundsTransfer"))
     }
 
     "on post with valid data when user selects Yes" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.FundsTransferController.post().url).withFormUrlEncodedBody(
         "transferWithoutFormalSystems" -> "true"
       )
 
@@ -101,7 +102,7 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
     "on post with valid data whe user selects No" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.FundsTransferController.post().url).withFormUrlEncodedBody(
         "transferWithoutFormalSystems" -> "false"
       )
 
@@ -118,7 +119,7 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
     "on post with valid data in edit mode when the next page's data is in the store" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.FundsTransferController.post().url).withFormUrlEncodedBody(
         "transferWithoutFormalSystems" -> "true"
       )
 
@@ -147,7 +148,7 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
     "on post with valid data in edit mode when the next page's data is not in the store" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.FundsTransferController.post().url).withFormUrlEncodedBody(
         "transferWithoutFormalSystems" -> "true"
       )
 

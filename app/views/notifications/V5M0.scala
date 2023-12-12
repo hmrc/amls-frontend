@@ -20,12 +20,12 @@ import javax.inject.Inject
 import views.html.notifications.v5m0._
 
 class V5M0 @Inject()(
-                      val message_details: message_details,
-                      val minded_to_reject: minded_to_reject,
-                      val minded_to_revoke: minded_to_revoke,
-                      val no_longer_minded_to_reject: no_longer_minded_to_reject,
-                      val no_longer_minded_to_revoke :no_longer_minded_to_revoke,
-                      val rejection_reasons: rejection_reasons,
-                      val revocation_reasons: revocation_reasons
+                      val messageDetailsView: MessageDetailsView,
+                      val mindedToRejectView: MindedToRejectView,
+                      val mindedToRevokeView: MindedToRevokeView,
+                      val noLongerMindedToRejectView: NoLongerMindedToRejectView,
+                      val noLongerMindedToRevokeView: NoLongerMindedToRevokeView,
+                      val rejectionReasonsView: RejectionReasonsView,
+                      val revocationReasonsView: RevocationReasonsView
                     )
 

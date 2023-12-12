@@ -1,0 +1,45 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.status.SubmissionStatus
+@import models.status.SubmissionReadyForReview
+@import models.status.SubmissionDecisionApproved
+@import models.status.ReadyForRenewal
+@import models.status.RenewalSubmitted
+@import views.html.components.Anchor
+
+@this(anchor: Anchor)
+
+@(status: SubmissionStatus)(implicit messages: Messages, request: Request[_])
+
+@status match {
+    case SubmissionReadyForReview => {
+        <h2 class="govuk-heading-s">@messages("status.fees")</h2>
+        <p class="govuk-body">@messages("your.registration.fees")</p>
+        <p class="govuk-body">@anchor("status.howtopay", "how-to-pay", "how-to-pay")</p>
+    }
+    case SubmissionDecisionApproved | ReadyForRenewal(_) => {
+        <h2 class="govuk-heading-s">@messages("status.fees")</h2>
+        <p class="govuk-body">
+            @anchor("your.registration.how.to.pay", "how-to-pay", "how-to-pay")
+        </p>
+    }
+    case RenewalSubmitted(_) => {
+        <h2 class="govuk-heading-s">@messages("status.fees")</h2>
+        <p class="govuk-body">@messages("your.registration.renewal.fees")</p>
+        <p class="govuk-body">@anchor("status.howtopay", "how-to-pay", "how-to-pay")</p>
+    }
+}

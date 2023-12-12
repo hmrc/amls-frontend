@@ -17,12 +17,13 @@
 package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
-import models.businessmatching.TransmittingMoney
+import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.flowmanagement.{PageRouter, PageRouterCompanyNotRegistered}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class MsbSubSectorsPageRouter extends PageRouter[ChangeSubSectorFlowModel] {

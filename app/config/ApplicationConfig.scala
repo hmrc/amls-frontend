@@ -35,12 +35,12 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   private def getConfigString(key: String) = servicesConfig.getConfString(key, throw new Exception(s"Could not find config '$key'"))
 
-  val contactFormServiceIdentifier = "AMLS"
-
   lazy val contactHost = baseUrl("contact-frontend")
   lazy val authHost = baseUrl("auth")
+  lazy val feedbackFrontendUrl = getConfigString("feedback-frontend.url")
   lazy val assetsPrefix = getConfigString(s"assets.url") + getConfigString(s"assets.version")
 
+  lazy val contactFrontendReportUrl = baseUrl("contact-frontend") + getConfigString("contact-frontend.report-url")
   def reportAProblemNonJSUrl(implicit request: Request[_]): String = {
     getConfigString("contact-frontend.report-problem-url.non-js") +
     "&referrerUrl=" + URLEncoder.encode(frontendBaseUrl + request.uri, "utf-8")
@@ -115,4 +115,26 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
   lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
 
   lazy val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
+
+  val tradingPremisesVirtualOfficeLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register"
+
+  val tcspWhoNeedsToRegisterLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#premises-to-register"
+
+  val contactHmrcLink = "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/money-laundering"
+
+  val applicationWhoNeedsToRegisterLink = "https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register#businesses-already-supervised-for-money-laundering-purposes"
+
+  val tradeInformationLink = "https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019"
+
+  val legislationLink = "http://www.legislation.gov.uk/search"
+
+  val tribunalLink = "https://www.gov.uk/tax-tribunal"
+
+  val howToPayLink = "https://www.gov.uk/guidance/money-laundering-regulations-registration-fees#how-to-pay"
+
+  val cardPaymentLink = "https://www.gov.uk/pay-tax-debit-credit-card"
+
+  val waysToPayLink = "https://www.gov.uk/guidance/pay-money-laundering-regulations-fees-and-penalty-charges#ways-to-pay"
+
+  val registerNewOrgLink = "/coafe/government-gateway/register?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend"
 }

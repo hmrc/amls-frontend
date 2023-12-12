@@ -17,29 +17,30 @@
 package controllers.applicationstatus
 
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, FeeHelper}
-import views.html.applicationstatus.how_to_pay
+import views.html.applicationstatus.HowToPayView
 
 @Singleton
 class HowToPayController @Inject()(authAction: AuthAction,
                                    val ds: CommonPlayDependencies,
                                    val cc: MessagesControllerComponents,
                                    val feeHelper: FeeHelper,
-                                   how_to_pay: how_to_pay) extends AmlsBaseController(ds, cc) {
+                                   view: HowToPayView) extends AmlsBaseController(ds, cc) {
 
   val prefix = "[HowToPayController]"
 
-  def get = authAction.async {
+  def get: Action[AnyContent] = authAction.async {
     implicit request =>
       feeHelper.retrieveFeeResponse(request.amlsRefNumber, request.accountTypeId, request.groupIdentifier, prefix) map {
-        case Some(fees) if !isEmpty(fees.paymentReference) => Ok(how_to_pay(fees.paymentReference))
-        case _          => Ok(how_to_pay(None))
+        case Some(fees) if !isEmpty(fees.paymentReference) => Ok(view(fees.paymentReference))
+        case _          => Ok(view(None))
       }
   }
 
-  def isEmpty(x: Option[String]) = {
+  def isEmpty(x: Option[String]): Boolean = {
     x.isEmpty || x == null || (x.isDefined && x.get.trim.isEmpty)
   }
 }

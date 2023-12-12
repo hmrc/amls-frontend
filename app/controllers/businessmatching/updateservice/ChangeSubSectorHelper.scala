@@ -19,6 +19,8 @@ package controllers.businessmatching.updateservice
 import connectors.DataCacheConnector
 import javax.inject.Inject
 import models.businessmatching._
+import models.businessmatching.BusinessMatchingMsbService._
+import models.businessmatching.BusinessMatchingMsbServices
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.ChangeSubSectorFlowModel
 import models.moneyservicebusiness.MoneyServiceBusiness
@@ -206,7 +208,7 @@ class ChangeSubSectorHelper @Inject()(authAction: AuthAction,
 
   private def hasMsb(tp: TradingPremises): Boolean = tp match {
     case t if t.whatDoesYourBusinessDoAtThisAddress.isDefined
-      && t.whatDoesYourBusinessDoAtThisAddress.get.activities.contains(models.businessmatching.MoneyServiceBusiness) => true
+      && t.whatDoesYourBusinessDoAtThisAddress.get.activities.contains(BusinessActivity.MoneyServiceBusiness) => true
     case _ => false
   }
 }

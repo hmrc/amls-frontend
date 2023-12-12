@@ -1,0 +1,76 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import views.html.components.forms.{ErrorSummary, InputText}
+@import views.html.components.{Button, Heading, ReturnLink, SectionSubtitle}
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    inputText: InputText,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages, lang:Lang, appConfig: ApplicationConfig)
+
+@layout(pageTitle = s"${messages("businessdetails.contactingyou.email.title")} - ${messages("summary.businessdetails")}") {
+
+    @errorSummary(form)
+
+    @subtitle(messages("summary.businessdetails"))
+
+    @formHelper(action = controllers.businessdetails.routes.BusinessEmailAddressController.post(edit)) {
+
+        @heading("businessdetails.contactingyou.email.title")
+
+        <p class="govuk-body">@messages("businessdetails.contactingyou.lbl")</p>
+
+        @inputText(
+            Input(
+                id = "email",
+                name = "email",
+                inputType = "email",
+                label = Label(
+                    content = Text(messages("businessdetails.contactingyou.email.lbl"))
+                ),
+                classes = "govuk-!-width-one-half"
+            ),
+            form("email")
+        )
+
+        @inputText(
+            Input(
+                id = "confirmEmail",
+                name = "confirmEmail",
+                inputType = "email",
+                label = Label(
+                    content = Text(messages("businessdetails.contactingyou.confirm.email.lbl"))
+                ),
+                classes = "govuk-!-width-one-half"
+            ),
+            form("confirmEmail")
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

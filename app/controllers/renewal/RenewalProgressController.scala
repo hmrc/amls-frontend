@@ -20,16 +20,17 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
-import models.registrationprogress.Completed
+import models.registrationprogress.{Completed, TaskList}
 import models.responsiblepeople.ResponsiblePerson
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import play.api.mvc.MessagesControllerComponents
 import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
 import utils.{AuthAction, ControllerHelper}
-import views.html.renewal.renewal_progress
+import views.html.renewal.RenewalProgressView
 
 import scala.concurrent.Future
 
@@ -43,7 +44,7 @@ class RenewalProgressController @Inject()(val authAction: AuthAction,
                                           val businessMatchingService: BusinessMatchingService,
                                           val statusService: StatusService,
                                           val cc: MessagesControllerComponents,
-                                          renewal_progress: renewal_progress) extends AmlsBaseController(ds, cc) {
+                                          view: RenewalProgressView) extends AmlsBaseController(ds, cc) {
 
   def get = authAction.async {
       implicit request =>
@@ -51,21 +52,21 @@ class RenewalProgressController @Inject()(val authAction: AuthAction,
         val result = statusInfo map {
           case (r: ReadyForRenewal, _) => {
             for {
-              renewalSection <- OptionT.liftF(renewals.getSection(request.credId))
+              renewalTaskRow <- OptionT.liftF(renewals.getTaskRow(request.credId))
               cache <- OptionT(dataCacheConnector.fetchAll(request.credId))
               responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
               businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
             } yield {
               val businessName = businessMatching.reviewDetails.map(r => r.businessName).getOrElse("")
               val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage()).toSeq)
-              val variationSections = sectionsProvider.sections(cache).filter(_.name != BusinessMatching.messageKey)
-              val canSubmit = renewals.canSubmit(renewalSection, variationSections)
+              val variationTaskRows = sectionsProvider.taskRows(cache).filter(_.msgKey != BusinessMatching.messageKey)
+              val canSubmit = renewals.canSubmit(renewalTaskRow, variationTaskRows)
               val msbOrTcspExists = ControllerHelper.isMSBSelected(Some(businessMatching)) ||
                 ControllerHelper.isTCSPSelected(Some(businessMatching))
               val hasCompleteNominatedOfficer = ControllerHelper.hasCompleteNominatedOfficer(Option(responsiblePeople))
               val nominatedOfficerName = ControllerHelper.completeNominatedOfficerTitleName(Option(responsiblePeople))
 
-              Ok(renewal_progress(variationSections, businessName, activities, canSubmit, msbOrTcspExists, r, renewalSection.status == Completed, hasCompleteNominatedOfficer, nominatedOfficerName))
+              Ok(view(TaskList(variationTaskRows), businessName, activities, canSubmit, msbOrTcspExists, r, renewalTaskRow.status == Completed, hasCompleteNominatedOfficer, nominatedOfficerName))
             }
           }
           case (r:RenewalSubmitted, _) => OptionT.fromOption[Future](Some(Redirect(controllers.routes.RegistrationProgressController.get)))

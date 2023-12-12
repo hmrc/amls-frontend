@@ -17,17 +17,16 @@
 package models.renewal
 
 import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{From, Path, Rule, To, ValidationError, Write}
 import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Path, Rule, To, ValidationError, Write}
 import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
-import models.ValidationRule
+import models.{Enumerable, ValidationRule, WithName}
+import play.api.i18n.Messages
 import play.api.libs.json._
 
-case class BankMoneySource(bankNames : String)
+final case class BankMoneySource(bankNames : String)
 
-case class WholesalerMoneySource(wholesalerNames : String)
-
-case object CustomerMoneySource
+final case class WholesalerMoneySource(wholesalerNames : String)
 
 case class MoneySources(bankMoneySource: Option[BankMoneySource] = None,
                         wholesalerMoneySource: Option[WholesalerMoneySource] = None,
@@ -35,9 +34,36 @@ case class MoneySources(bankMoneySource: Option[BankMoneySource] = None,
 
   def size = List(this.bankMoneySource, this.wholesalerMoneySource, this.customerMoneySource).flatten.size
 
+  def toFormValues: Seq[MoneySource] = {
+    import models.renewal.MoneySources._
+    Seq(
+      if (bankMoneySource.isDefined) Some(Banks) else None,
+      if (wholesalerMoneySource.isDefined) Some(Wholesalers) else None,
+      customerMoneySource.flatMap(b => if (b) Some(Customers) else None)
+    ).flatten
+  }
+
+  def toMessages(implicit messages: Messages): Seq[String] = Seq(
+    this.bankMoneySource.map(_ => messages("msb.which_currencies.source.banks")),
+    this.wholesalerMoneySource.map(_ => messages("msb.which_currencies.source.wholesalers")),
+    this.customerMoneySource.flatMap(b => if (b) Some(messages("msb.which_currencies.source.customers")) else None)
+  ).flatten
 }
 
-object MoneySources {
+sealed trait MoneySource
+
+object MoneySources extends Enumerable.Implicits {
+
+  case object Banks extends WithName("banks") with MoneySource
+
+  case object Wholesalers extends WithName("wholesalers") with MoneySource
+
+  case object Customers extends WithName("customers") with MoneySource
+
+  val all: Seq[MoneySource] = Seq(Banks, Wholesalers, Customers)
+
+  implicit val enumerable: Enumerable[MoneySource] = Enumerable(all.map(v => v.toString -> v): _*)
+
   import jto.validation.forms.Rules._
   import utils.MappingUtils.Implicits._
 

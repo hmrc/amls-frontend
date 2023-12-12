@@ -19,6 +19,7 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
+import forms.businessmatching.CompanyRegistrationNumberFormProvider
 import models.businessmatching.{BusinessMatching, CompanyRegistrationNumber}
 import models.status.NotCompleted
 import org.jsoup.Jsoup
@@ -27,11 +28,12 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, CacheMocks, StatusMocks}
-import views.html.businessmatching.company_registration_number
+import views.html.businessmatching.CompanyRegistrationNumberView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,15 +44,15 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
     self => val request = addToken(authRequest)
     implicit val ec = app.injector.instanceOf[ExecutionContext]
 
-
-    lazy val view = app.injector.instanceOf[company_registration_number]
+    lazy val view = app.injector.instanceOf[CompanyRegistrationNumberView]
     val controller = new CompanyRegistrationNumberController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       mockCacheConnector,
       statusService = mockStatusService,
       mock[BusinessMatchingService],
       cc = mockMcc,
-      company_registration_number = view
+      app.injector.instanceOf[CompanyRegistrationNumberFormProvider],
+      view
     )
 
     val businessMatching = BusinessMatching(companyRegistrationNumber = Some(CompanyRegistrationNumber("12345678")))
@@ -91,29 +93,27 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[id=companyRegistrationNumber]").`val` must be("12345678")
+      document.getElementById("value").`val` must be("12345678")
     }
 
     "on post() give a bad request if invalid data sent" in new Fixture {
 
-        val invalidRequest = requestWithUrlEncodedBody(
-          "companyRegistrationNumber" -> "INVALID_DATA"
-        )
+      val invalidRequest = FakeRequest(POST, routes.CompanyRegistrationNumberController.post(true).url)
+        .withFormUrlEncodedBody(("value", "1234567#"))
 
-        val result = controller.post()(invalidRequest)
-        val document = Jsoup.parse(contentAsString(result))
-        val pageTitle = Messages("businessmatching.registrationnumber.title") + " - " +
-          Messages("summary.businessmatching") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
+      val result = controller.post()(invalidRequest)
+      val document = Jsoup.parse(contentAsString(result))
+      val pageTitle = Messages("businessmatching.registrationnumber.title") + " - " +
+        Messages("summary.businessmatching") + " - " +
+        Messages("title.amls") + " - " + Messages("title.gov")
 
-        document.title() mustBe s"Error: $pageTitle"
+      document.title() mustBe s"Error: $pageTitle"
     }
 
     "on post() redirect correctly if valid data sent and edit is true" in new Fixture {
 
-      val validRequest = requestWithUrlEncodedBody(
-        "companyRegistrationNumber" -> "12345678"
-      )
+      val validRequest = FakeRequest(POST, routes.CompanyRegistrationNumberController.post(true).url)
+        .withFormUrlEncodedBody(("value", "12345678"))
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(businessMatching)))
@@ -128,9 +128,8 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
     "on post() redirect correctly if valid data sent and edit is false" in new Fixture {
 
-      val validRequest = requestWithUrlEncodedBody(
-        "companyRegistrationNumber" -> "12345678"
-      )
+      val validRequest = FakeRequest(POST, routes.CompanyRegistrationNumberController.post(false).url)
+        .withFormUrlEncodedBody(("value", "12345678"))
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(businessMatching)))

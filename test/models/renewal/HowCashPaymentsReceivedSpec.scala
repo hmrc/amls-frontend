@@ -16,38 +16,15 @@
 
 package models.renewal
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import utils.AmlsSpec
 
 class HowCashPaymentsReceivedSpec extends AmlsSpec {
 
-  val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
+  val model = HowCashPaymentsReceived(PaymentMethods(courier = true, direct = true, other = Some("foo")))
 
   "HowCashPaymentsReceived" must {
-    "roundtrip through form" in {
-      val data = HowCashPaymentsReceived(paymentMethods)
-      HowCashPaymentsReceived.formRule.validate(HowCashPaymentsReceived.formWrites.writes(data)) mustEqual Valid(data)
-    }
+    "round trip through Json" ignore {
 
-    "fail to validate when no method is selected" in {
-      val data = Map.empty[String, Seq[String]]
-      HowCashPaymentsReceived.formRule.validate(data)
-        .mustEqual(Invalid(Seq((Path \ "cashPaymentMethods") -> Seq(ValidationError("error.required.renewal.hvd.choose.option")))))
-    }
-
-    "fail to validate when no text is entered in the details field" in {
-      val data = Map("cashPaymentMethods.other" -> Seq("true"))
-
-      HowCashPaymentsReceived.formRule.validate(data)
-        .mustEqual(Invalid(Seq((Path \ "cashPaymentMethods" \ "details") -> Seq(ValidationError("error.required")))))
-    }
-
-    "fail to validate when more than 255 characters are entered in the details field" in {
-      val data = Map("cashPaymentMethods.other" -> Seq("true"),
-        "cashPaymentMethods.details" -> Seq("a" * 260))
-
-      HowCashPaymentsReceived.formRule.validate(data)
-        .mustEqual(Invalid(Seq((Path \ "cashPaymentMethods" \ "details") -> Seq(ValidationError("error.required.renewal.hvd.describe.invalid.length")))))
     }
   }
 }

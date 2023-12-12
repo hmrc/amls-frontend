@@ -16,23 +16,38 @@
 
 package models.businessmatching
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation._
-import play.api.libs.json._
 import cats.data.Validated.{Invalid, Valid}
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
+import models.{Enumerable, WithName}
 import play.api.i18n.Messages
+import play.api.libs.json._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
-sealed trait BusinessType
+sealed trait BusinessType {
+  val value: String
+}
 
-object BusinessType {
+object BusinessType extends Enumerable.Implicits {
 
   import jto.validation.forms.Rules._
 
-  case object SoleProprietor extends BusinessType
-  case object LimitedCompany extends BusinessType
-  case object Partnership extends BusinessType
-  case object LPrLLP extends BusinessType
-  case object UnincorporatedBody extends BusinessType
+  case object LimitedCompany extends WithName("limitedCompany") with BusinessType {
+    override val value: String = "01"
+  }
+  case object SoleProprietor extends WithName("soleProprietor") with BusinessType {
+    override val value: String = "02"
+  }
+  case object Partnership extends WithName("partnership") with BusinessType {
+    override val value: String = "03"
+  }
+  case object LPrLLP extends WithName("limitedLiabilityPartnership") with BusinessType {
+    override val value: String = "04"
+  }
+  case object UnincorporatedBody extends WithName("unincorporatedBody") with BusinessType {
+    override val value: String = "05"
+  }
 
   def errorMessageFor(businessType: BusinessType)(implicit messages: Messages): String = {
     val common = "error.required.declaration.add.position.for"
@@ -75,7 +90,7 @@ object BusinessType {
         Map("businessType" -> Seq("05"))
     }
 
-  implicit val writes = Writes[BusinessType] {
+  implicit val writes: Writes[BusinessType] = Writes[BusinessType] {
     case LimitedCompany => JsString("Corporate Body")
     case SoleProprietor => JsString("Sole Trader")
     case Partnership => JsString("Partnership")
@@ -83,13 +98,33 @@ object BusinessType {
     case UnincorporatedBody => JsString("Unincorporated Body")
   }
 
-  implicit val reads = Reads[BusinessType] {
+  implicit val reads: Reads[BusinessType] = Reads[BusinessType] {
     case JsString("Corporate Body") => JsSuccess(LimitedCompany)
     case JsString("Sole Trader") => JsSuccess(SoleProprietor)
     case JsString("Partnership") => JsSuccess(Partnership)
     case JsString("LLP") => JsSuccess(LPrLLP)
     case JsString("Unincorporated Body") => JsSuccess(UnincorporatedBody)
     case _ =>
-      JsError(JsPath -> play.api.libs.json.JsonValidationError("error.invalid"))
+      JsError(JsPath, play.api.libs.json.JsonValidationError("error.invalid"))
   }
+
+  val all: Seq[BusinessType] = Seq(
+    LimitedCompany,
+    SoleProprietor,
+    Partnership,
+    LPrLLP,
+    UnincorporatedBody
+  )
+
+  def radioItems(implicit messages: Messages) = {
+    all map { bt =>
+      RadioItem(
+        Text(messages(s"businessmatching.businessType.lbl.${bt.value}")),
+        Some(s"businessType-${bt.value}"),
+        Some(bt.toString)
+      )
+    }
+  }
+
+  implicit val enumerable = Enumerable(all.map(v => v.toString -> v): _*)
 }

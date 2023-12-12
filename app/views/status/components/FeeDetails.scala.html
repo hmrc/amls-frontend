@@ -1,0 +1,45 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.ResponseType.{SubscriptionResponseType,AmendOrVariationResponseType}
+@import models.confirmation.Currency
+@import views.html.components.Button
+
+@this(button: Button)
+
+@(feeResponse: FeeResponse)(implicit request: Request[_], messages: Messages)
+
+<p class="govuk-body">@messages("fee.details.heading")</p>
+
+<div class="list panel-indent reg-online--pay-fee">
+    <div class="form-field-group">
+        @messages("fee.details.registration.fee.lbl")
+        <p class="heading-large numeric">
+        @feeResponse.responseType match {
+            case SubscriptionResponseType => {@Currency.fromBD(feeResponse.totalFees)}
+            case AmendOrVariationResponseType => {@Currency.fromBD(feeResponse.difference.getOrElse(0))}
+        }
+        </p>
+    </div>
+    <div class="form-field-group">
+        @messages("fee.reference.number.lbl")
+        <p class="heading-large numeric">@feeResponse.paymentReference</p>
+    </div>
+    <p class="govuk-body">@messages("fee.details.note")</p>
+
+</div>
+
+@button("button.payfee", "payfee", Some(controllers.routes.ConfirmationController.get.url))

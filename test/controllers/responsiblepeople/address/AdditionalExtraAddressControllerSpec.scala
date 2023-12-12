@@ -18,25 +18,25 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.address.AdditionalExtraAddressFormProvider
 import models.Country
-import models.autocomplete.NameValuePair
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfter, OptionValues}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
-import services.AutoCompleteService
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
-import views.html.responsiblepeople.address.additional_extra_address
+import views.html.responsiblepeople.address.AdditionalExtraAddressView
 
 import scala.concurrent.Future
 
-class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with OptionValues {
+class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with OptionValues with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
@@ -49,24 +49,16 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
     self =>
     val request = addToken(authRequest)
 
-    val autoCompleteService = mock[AutoCompleteService]
-    lazy val view = app.injector.instanceOf[additional_extra_address]
+    lazy val view = inject[AdditionalExtraAddressView]
     val additionalExtraAddressController = new AdditionalExtraAddressController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
-      autoCompleteService = autoCompleteService,
       ds = commonDependencies,
       cc = mockMcc,
-      additional_extra_address = view,
+      formProvider = inject[AdditionalExtraAddressFormProvider],
+      view = view,
       error = errorView
     )
-
-    when {
-      autoCompleteService.getCountries
-    } thenReturn Some(Seq(
-      NameValuePair("Country 1", "country:1"),
-      NameValuePair("Country 2", "country:2")
-    ))
   }
 
   val personName = Some(PersonName("firstname", None, "lastname"))
@@ -76,7 +68,6 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
   val mockCacheMap = mock[CacheMap]
 
   "AdditionalExtraAddressController" when {
-
 
     "get is called" must {
 
@@ -174,7 +165,8 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
       "go to AdditionalExtraAddressUKController" when {
         "user selected Yes" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.AdditionalExtraAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "true"
           )
 
@@ -195,7 +187,8 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
       "go to AdditionalExtraAddressNonUKController" when {
         "user selected No" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.AdditionalExtraAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "isUK" -> "false"
           )
 
@@ -216,7 +209,8 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
 
     "respond with BAD_REQUEST" when {
       "form is invalid" in new Fixture {
-        val requestWithParams = requestWithUrlEncodedBody()
+        val requestWithParams = FakeRequest(POST, routes.AdditionalExtraAddressController.post(1).url)
+        .withFormUrlEncodedBody()
 
         val responsiblePeople = ResponsiblePerson(personName)
 
@@ -233,7 +227,8 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
 
     "process form as valid" when {
       "isUK is defined and false" in new Fixture {
-        val requestWithParams = requestWithUrlEncodedBody(
+        val requestWithParams = FakeRequest(POST, routes.AdditionalExtraAddressController.post(1).url)
+        .withFormUrlEncodedBody(
           "isUK" -> "false"
         )
 
@@ -251,7 +246,8 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
       }
 
       "isUK is defined and true" in new Fixture {
-        val requestWithParams = requestWithUrlEncodedBody(
+        val requestWithParams = FakeRequest(POST, routes.AdditionalExtraAddressController.post(1).url)
+        .withFormUrlEncodedBody(
           "isUK" -> "true"
         )
 
@@ -272,7 +268,8 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
     "redirect to AdditionalExtraAddressNonUK and wipe old address" when {
       "changed the answer from yes to no" in new Fixture {
 
-        val requestWithParams = requestWithUrlEncodedBody(
+        val requestWithParams = FakeRequest(POST, routes.AdditionalExtraAddressController.post(1).url)
+        .withFormUrlEncodedBody(
           "isUK" -> "false")
 
         val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
@@ -303,7 +300,8 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar wi
     "redirect to AdditionalExtraAddressUkController and wipe old address" when {
       "changed the answer from no to yes" in new Fixture {
 
-        val requestWithParams = requestWithUrlEncodedBody(
+        val requestWithParams = FakeRequest(POST, routes.AdditionalExtraAddressController.post(1).url)
+        .withFormUrlEncodedBody(
           "isUK" -> "true")
 
         val ukAddress = PersonAddressNonUK("Line 1", Some("Line 2"), Some("Line 3"), None, Country("", ""))

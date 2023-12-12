@@ -18,33 +18,37 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.address.TimeAtAddressFormProvider
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.status.SubmissionDecisionApproved
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import play.api.test
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.responsiblepeople.address.time_at_address
+import views.html.responsiblepeople.address.TimeAtAddressView
 
 import scala.concurrent.Future
 
-class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec {
+class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val recordId = 1
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[time_at_address]
+    lazy val view = inject[TimeAtAddressView]
     val timeAtAddressController = new TimeAtCurrentAddressController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       cc = mockMcc,
-      time_at_address = view,
+      formProvider = inject[TimeAtAddressFormProvider],
+      view = view,
       error = errorView
     )
   }
@@ -56,8 +60,9 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec {
       "time at address is less than 1 year" must {
         "redirect to the AdditionalAddressController" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
-            "timeAtAddress" -> "01"
+          val requestWithParams = FakeRequest(POST, routes.TimeAtCurrentAddressController.post(1).url)
+          .withFormUrlEncodedBody(
+            "timeAtAddress" -> ZeroToFiveMonths.toString
           )
           val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
@@ -69,7 +74,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec {
           when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = timeAtAddressController.post(recordId, true)(requestWithParams)
@@ -81,8 +86,9 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec {
       "time at address is more than 1 year" must {
         "redirect to the correct location" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
-            "timeAtAddress" -> "03"
+          val requestWithParams = FakeRequest(POST, routes.TimeAtCurrentAddressController.post(1).url)
+          .withFormUrlEncodedBody(
+            "timeAtAddress" -> OneToThreeYears.toString
           )
           val ukAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA11AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(OneToThreeYears))
@@ -95,7 +101,7 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec {
           when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
-          when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any()))
+          when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
           val result = timeAtAddressController.post(recordId, true)(requestWithParams)

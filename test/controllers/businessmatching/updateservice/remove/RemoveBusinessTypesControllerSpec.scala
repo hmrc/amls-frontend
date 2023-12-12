@@ -20,7 +20,9 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
+import forms.businessmatching.RemoveBusinessActivitiesFormProvider
 import models.DateOfChange
+import models.businessmatching.BusinessActivity._
 import models.businessmatching._
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId}
 import org.joda.time.LocalDate
@@ -28,18 +30,16 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.updateservice.remove.remove_activities
-
+import views.html.businessmatching.updateservice.remove.RemoveActivitiesView
 
 import scala.concurrent.Future
 
 
 class RemoveBusinessTypesControllerSpec extends AmlsSpec {
-
 
   trait Fixture extends DependencyMocks {
     self =>
@@ -48,7 +48,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val mockRemoveBusinessTypeHelper = mock[RemoveBusinessTypeHelper]
-    lazy val view = app.injector.instanceOf[remove_activities]
+    lazy val view = app.injector.instanceOf[RemoveActivitiesView]
 
     val controller = new RemoveBusinessTypesController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
@@ -57,7 +57,8 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       removeBusinessTypeHelper = mockRemoveBusinessTypeHelper,
       router = createRouter[RemoveBusinessTypeFlowModel],
       cc = mockMcc,
-      remove_activities = view
+      formProvider = new RemoveBusinessActivitiesFormProvider,
+      view = view
     )
 
     when {
@@ -80,14 +81,19 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
+        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.removeactivities.title.multibusinesses"))
       }
     }
 
     "post" must {
       "return a bad request when no data has been posted" in new Fixture {
 
-        val result = controller.post()(requestWithUrlEncodedBody("" -> ""))
+        val newRequest = FakeRequest(POST, routes.RemoveBusinessTypesController.post().url)
+          .withFormUrlEncodedBody(
+            "value[1]" -> ""
+          )
+
+        val result = controller.post()(newRequest)
 
         status(result) mustBe BAD_REQUEST
       }
@@ -106,9 +112,12 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
-        val result = controller.post()(requestWithUrlEncodedBody(
-          "businessActivities[]" -> "04"
-        ))
+        val newRequest = FakeRequest(POST, routes.RemoveBusinessTypesController.post().url)
+          .withFormUrlEncodedBody(
+            "value[1]" -> "estateAgentBusinessService"
+          )
+
+        val result = controller.post()(newRequest)
 
         status(result) mustBe SEE_OTHER
       }
@@ -130,9 +139,12 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
-        val result = await(controller.post()(requestWithUrlEncodedBody(
-          "businessActivities[]" -> "05"
-        )))
+        val newRequest = FakeRequest(POST, routes.RemoveBusinessTypesController.post().url)
+          .withFormUrlEncodedBody(
+            "value[1]" -> "highValueDealing"
+          )
+
+        status(controller.post()(newRequest)) mustBe SEE_OTHER
 
         controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, flowModel.copy(dateOfChange = None, activitiesToRemove = Some(Set(HighValueDealing))))
       }
@@ -150,9 +162,12 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
-        val result = await(controller.post()(requestWithUrlEncodedBody(
-          "businessActivities[]" -> "05"
-        )))
+        val newRequest = FakeRequest(POST, routes.RemoveBusinessTypesController.post().url)
+          .withFormUrlEncodedBody(
+            "value[1]" -> "highValueDealing"
+          )
+
+        status(controller.post()(newRequest)) mustBe SEE_OTHER
 
         controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
       }
@@ -170,9 +185,12 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
-        val result = await(controller.post()(requestWithUrlEncodedBody(
-          "businessActivities[]" -> "05"
-        )))
+        val newRequest = FakeRequest(POST, routes.RemoveBusinessTypesController.post().url)
+          .withFormUrlEncodedBody(
+            "value[1]" -> "highValueDealing"
+          )
+
+        status(controller.post()(newRequest)) mustBe SEE_OTHER
 
         controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
       }
@@ -190,9 +208,12 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
-        val result = await(controller.post()(requestWithUrlEncodedBody(
-          "businessActivities[]" -> "05"
-        )))
+        val newRequest = FakeRequest(POST, routes.RemoveBusinessTypesController.post().url)
+          .withFormUrlEncodedBody(
+            "value[1]" -> "highValueDealing"
+          )
+
+        status(controller.post()(newRequest)) mustBe SEE_OTHER
 
         controller.router.verify("internalId", WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now))))
       }
@@ -222,21 +243,23 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
           TelephonePaymentService))),
           Some(RemoveBusinessTypeFlowModel.key))
 
-        val result = controller.post()(requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.RemoveBusinessTypesController.post().url)
+          .withFormUrlEncodedBody(
+            "value[1]" -> "accountancyServices",
+            "value[2]" -> "billPaymentServices",
+            "value[3]" -> "estateAgentBusinessService",
+            "value[4]" -> "highValueDealing",
+            "value[5]" -> "moneyServiceBusiness",
+            "value[6]" -> "trustAndCompanyServices",
+            "value[7]" -> "telephonePaymentService"
+          )
 
-        "businessActivities[]" -> "01",
-        "businessActivities[]" -> "03",
-        "businessActivities[]" -> "04",
-        "businessActivities[]" -> "05",
-        "businessActivities[]" -> "06",
-        "businessActivities[]" -> "07",
-        "businessActivities[]" -> "08"
-        ))
+        val result = controller.post()(newRequest)
 
         status(result) must be(BAD_REQUEST)
 
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.getElementsByClass("validation-summary-message").text() must include(Messages("error.required.bm.remove.leave.one"))
+        document.text() must include(messages("error.required.bm.remove.leave.one"))
       }
     }
   }

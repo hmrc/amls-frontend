@@ -19,21 +19,24 @@ package controllers.deregister
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
+import forms.deregister.DeregistrationReasonFormProvider
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessActivity.{HighValueDealing, MoneyServiceBusiness}
+import models.deregister.DeregistrationReason.{HVDPolicyOfNotAcceptingHighValueCashPayments, Other, OutOfScope}
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse, DeregistrationReason}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture}
-import views.html.deregister.deregistration_reason
+import views.html.deregister.DeregistrationReasonView
 
 import scala.concurrent.Future
 
-class DeregistrationReasonControllerSpec extends AmlsSpec {
+class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
 
   trait TestFixture extends AuthorisedFixture {
     self =>
@@ -43,16 +46,17 @@ class DeregistrationReasonControllerSpec extends AmlsSpec {
     val authService = mock[AuthEnrolmentsService]
     val dataCacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
-    lazy val view = app.injector.instanceOf[deregistration_reason]
+    lazy val view = inject[DeregistrationReasonView]
     lazy val controller = new DeregistrationReasonController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       dataCacheConnector,
       amlsConnector,
       authService,
-      statusService,
       mockMcc,
-      deregistration_reason = view)
+      formProvider = inject[DeregistrationReasonFormProvider],
+      view = view
+    )
 
     val amlsRegistrationNumber = "XA1234567890L"
 
@@ -82,19 +86,18 @@ class DeregistrationReasonControllerSpec extends AmlsSpec {
 
             val result = controller.get()(request)
             status(result) must be(OK)
-            contentAsString(result) must include(Messages("deregistration.reason.heading"))
+            contentAsString(result) must include(messages("deregistration.reason.heading"))
 
             val document = Jsoup.parse(contentAsString(result))
-            document.getElementById("deregistrationReason-01").hasAttr("checked") must be(false)
-            document.getElementById("deregistrationReason-02").hasAttr("checked") must be(false)
-            document.getElementById("deregistrationReason-03").hasAttr("checked") must be(false)
-            document.getElementById("deregistrationReason-04").hasAttr("checked") must be(false)
-            document.getElementById("deregistrationReason-05").hasAttr("checked") must be(false)
-            document.getElementById("deregistrationReason-06").hasAttr("checked") must be(false)
-            document.getElementById("specifyOtherReason").`val`() must be("")
 
+            DeregistrationReason.all foreach { reason =>
+              document.getElementById(reason.toString).hasAttr("checked") must be(false)
+            }
+
+            document.getElementById("specifyOtherReason").`val`() must be("")
           }
         }
+
         "hides hvd option" when {
           "hvd is not present in business activities" in new TestFixture {
 
@@ -107,21 +110,19 @@ class DeregistrationReasonControllerSpec extends AmlsSpec {
 
             val result = controller.get()(request)
             status(result) must be(OK)
-            contentAsString(result) must include(Messages("deregistration.reason.heading"))
+            contentAsString(result) must include(messages("deregistration.reason.heading"))
 
             val document = Jsoup.parse(contentAsString(result))
-            document.getElementById("deregistrationReason-01").hasAttr("checked") must be(false)
-            document.getElementById("deregistrationReason-02").hasAttr("checked") must be(false)
-            document.getElementById("deregistrationReason-03").hasAttr("checked") must be(false)
-            document.getElementById("deregistrationReason-04").hasAttr("checked") must be(false)
-            document.getElementById("deregistrationReason-05") must be(null)
-            document.getElementById("deregistrationReason-06").hasAttr("checked") must be(false)
-            document.getElementById("specifyOtherReason").`val`() must be("")
 
+            DeregistrationReason.all diff Seq(HVDPolicyOfNotAcceptingHighValueCashPayments) foreach { reason =>
+              document.getElementById(reason.toString).hasAttr("checked") must be(false)
+            }
+
+            document.select("input[type=radio]").size() must be(DeregistrationReason.all.length - 1)
+            document.getElementById("specifyOtherReason").`val`() must be("")
           }
         }
       }
-
     }
 
     "post is called" when {
@@ -132,8 +133,9 @@ class DeregistrationReasonControllerSpec extends AmlsSpec {
           "follows sending a deregistration to amls" when {
             "deregistrationReason is selection without other reason" in new TestFixture {
 
-              val newRequest = requestWithUrlEncodedBody(
-                "deregistrationReason" -> "01"
+              val newRequest = FakeRequest(POST, routes.DeregistrationReasonController.post().url)
+              .withFormUrlEncodedBody(
+                "deregistrationReason" -> OutOfScope.toString
               )
 
               val result = controller.post()(newRequest)
@@ -145,12 +147,13 @@ class DeregistrationReasonControllerSpec extends AmlsSpec {
               captor.getValue.deregistrationReason mustBe DeregistrationReason.OutOfScope
 
               redirectLocation(result) must be(Some(controllers.routes.LandingController.get.url))
-
             }
+
             "DeregistrationReason is selection with other reason" in new TestFixture {
 
-              val newRequest = requestWithUrlEncodedBody(
-                "deregistrationReason" -> "06",
+              val newRequest = FakeRequest(POST, routes.DeregistrationReasonController.post().url)
+              .withFormUrlEncodedBody(
+                "deregistrationReason" -> Other("").toString,
                 "specifyOtherReason" -> "reason"
               )
 
@@ -167,7 +170,6 @@ class DeregistrationReasonControllerSpec extends AmlsSpec {
             }
           }
         }
-
       }
 
       "given invalid data" must {
@@ -180,13 +182,13 @@ class DeregistrationReasonControllerSpec extends AmlsSpec {
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(),any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
-          val newRequest = requestWithUrlEncodedBody(
-            "deregistrationReason" -> "20"
+          val newRequest = FakeRequest(POST, routes.DeregistrationReasonController.post().url)
+          .withFormUrlEncodedBody(
+            "deregistrationReason" -> "foo"
           )
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
-
         }
 
         "return with BAD_REQUEST no HVD" in new TestFixture {
@@ -198,13 +200,13 @@ class DeregistrationReasonControllerSpec extends AmlsSpec {
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(),any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
-          val newRequest = requestWithUrlEncodedBody(
-            "deregistrationReason" -> "20"
+          val newRequest = FakeRequest(POST, routes.DeregistrationReasonController.post().url)
+          .withFormUrlEncodedBody(
+            "deregistrationReason" -> "bar"
           )
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
-
         }
       }
 
@@ -215,17 +217,15 @@ class DeregistrationReasonControllerSpec extends AmlsSpec {
             authService.amlsRegistrationNumber(Some(any()), Some(any()))(any(), any())
           } thenReturn Future.successful(None)
 
-          val newRequest = requestWithUrlEncodedBody(
-            "deregistrationReason" -> "01"
+          val newRequest = FakeRequest(POST, routes.DeregistrationReasonController.post().url)
+          .withFormUrlEncodedBody(
+            "deregistrationReason" -> OutOfScope.toString
           )
 
           val result = controller.post()(newRequest)
           status(result) must be(INTERNAL_SERVER_ERROR)
-
         }
       }
-
     }
-
   }
 }

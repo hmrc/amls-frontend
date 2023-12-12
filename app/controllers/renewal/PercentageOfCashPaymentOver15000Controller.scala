@@ -18,15 +18,14 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
-import javax.inject.{Inject, Singleton}
-import models.renewal.{PercentageOfCashPaymentOver15000, Renewal}
-import play.api.mvc.MessagesControllerComponents
+import forms.renewal.PercentageFormProvider
+import models.renewal.Renewal
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RenewalService
 import utils.AuthAction
+import views.html.renewal.PercentageView
 
-import views.html.renewal.percentage
-
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -35,37 +34,39 @@ class PercentageOfCashPaymentOver15000Controller @Inject()(val dataCacheConnecto
                                                            val ds: CommonPlayDependencies,
                                                            val renewalService: RenewalService,
                                                            val cc: MessagesControllerComponents,
-                                                           percentage: percentage) extends AmlsBaseController(ds, cc) {
+                                                           formProvider: PercentageFormProvider,
+                                                           view: PercentageView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Renewal](request.credId, Renewal.key) map {
         response =>
-          val form: Form2[PercentageOfCashPaymentOver15000] = (for {
+          val form = (for {
             renewal <- response
             percentageOfCashPaymentOver15000 <- renewal.percentageOfCashPaymentOver15000
-          } yield Form2[PercentageOfCashPaymentOver15000](percentageOfCashPaymentOver15000)).getOrElse(EmptyForm)
-          Ok(percentage(form, edit))
+          } yield formProvider().fill(percentageOfCashPaymentOver15000)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
 
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[PercentageOfCashPaymentOver15000](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(percentage(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             renewal <- renewalService.getRenewal(request.credId)
             _ <- renewalService.updateRenewal(request.credId, renewal.percentageOfCashPaymentOver15000(data))
           } yield redirectDependingOnEdit(edit)
-      }
+      )
     }
   }
 
-  private def redirectDependingOnEdit(edit: Boolean) = edit match {
-    case true => Redirect(routes.SummaryController.get)
-    case false => Redirect(routes.CashPaymentsCustomersNotMetController.get(edit))
+  private def redirectDependingOnEdit(edit: Boolean) = if (edit) {
+    Redirect(routes.SummaryController.get)
+  } else {
+    Redirect(routes.CashPaymentsCustomersNotMetController.get(edit))
   }
 
 }

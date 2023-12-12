@@ -1,0 +1,98 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import models.tcsp.ServicesOfAnotherTCSP
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import views.html.components.forms.{ErrorSummary, InputText, InputYesNo}
+@import views.html.components.{Button, Heading, ReturnLink, SectionSubtitle}
+
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    formHelper: FormWithCSRF,
+    inputText: InputText,
+    inputYesNo: InputYesNo,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@hasMlrRefError = @{
+    form.errors match {
+        case Nil => false
+        case x if x.head.key == "mlrRefNumber" => true
+        case _ => false
+    }
+}
+
+@preparedErrorSummary = @{
+    if(hasMlrRefError) {
+        errorSummary(form, Some(Map("mlrRefNumber" -> "mlrRefNumber")))
+    } else {
+        errorSummary(form, Some(Map("servicesOfAnotherTCSP" -> "servicesOfAnotherTCSP-true")))
+    }
+}
+
+@conditionalInput = {
+
+    @inputText(
+        Input(
+            label = Label(
+                content = Text(messages("tcsp.servicesOfAnotherTcsp.mlrregno.lbl")),
+                classes = "govuk-label"
+            ),
+            hint = Some(Hint(
+                content = Text(messages("hint.8.digits"))
+            )),
+            id = "mlrRefNumber",
+            name = "mlrRefNumber",
+        ),
+        form("mlrRefNumber")
+    )
+
+}
+
+@layout(pageTitle = s"${messages("tcsp.anothertcspsupervision.title")} - ${messages("summary.tcsp")}") {
+
+    @preparedErrorSummary
+
+    @subtitle(messages("summary.tcsp"))
+
+    @formHelper(action = controllers.tcsp.routes.AnotherTCSPSupervisionController.post(edit)) {
+
+        @inputYesNo(
+            Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text(messages("tcsp.anothertcspsupervision.title")),
+                        classes = "govuk-fieldset__legend--xl",
+                        isPageHeading = true
+                    ))
+                )),
+                name = "servicesOfAnotherTCSP",
+                items = ServicesOfAnotherTCSP.formValues(conditionalInput)
+            ).withFormField(form("servicesOfAnotherTCSP"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

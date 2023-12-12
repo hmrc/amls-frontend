@@ -19,50 +19,49 @@ package controllers.businessactivities
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.businessactivities.ExpectedBusinessTurnoverFormProvider
 import models.businessactivities._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import utils.AuthAction
-import views.html.businessactivities._
+import views.html.businessactivities.ExpectedBusinessTurnoverView
 
 import scala.concurrent.Future
 
 
-class ExpectedBusinessTurnoverController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                    implicit val statusService: StatusService,
-                                                    val authAction: AuthAction,
-                                                    val ds: CommonPlayDependencies,
-                                                    val cc: MessagesControllerComponents,
-                                                    expected_business_turnover: expected_business_turnover) extends AmlsBaseController(ds, cc) {
+class ExpectedBusinessTurnoverController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                   implicit val statusService: StatusService,
+                                                   val authAction: AuthAction,
+                                                   val ds: CommonPlayDependencies,
+                                                   val cc: MessagesControllerComponents,
+                                                   formProvider: ExpectedBusinessTurnoverFormProvider,
+                                                   view: ExpectedBusinessTurnoverView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
-          val form: Form2[ExpectedBusinessTurnover] = (for {
-            businessActivities <- response
-            expectedTurnover <- businessActivities.expectedBusinessTurnover
-          } yield Form2[ExpectedBusinessTurnover](expectedTurnover)).getOrElse(EmptyForm)
-          Ok(expected_business_turnover(form, edit))
+          val form = response.expectedBusinessTurnover.fold(formProvider())(formProvider().fill)
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[ExpectedBusinessTurnover](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(expected_business_turnover(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithError =>
+          Future.successful(BadRequest(view(formWithError, edit))),
+        data =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.expectedBusinessTurnover(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get)
-            case false => Redirect(routes.ExpectedAMLSTurnoverController.get())
+          } yield if (edit) {
+            Redirect(routes.SummaryController.get)
+          } else {
+            Redirect(routes.ExpectedAMLSTurnoverController.get())
           }
-      }
+      )
     }
 }

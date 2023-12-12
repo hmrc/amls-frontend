@@ -19,23 +19,26 @@ package controllers.renewal
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.renewal.SendMoneyToOtherCountryFormProvider
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService._
 import models.renewal.{Renewal, SendMoneyToOtherCountry}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.renewal.send_money_to_other_country
+import views.html.renewal.SendMoneyToOtherCountryView
 
 import scala.concurrent.Future
 
-class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
+class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self =>
@@ -46,21 +49,22 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
     lazy val mockStatusService = mock[StatusService]
     lazy val mockRenewalService = mock[RenewalService]
 
-    lazy val view = app.injector.instanceOf[send_money_to_other_country]
+    lazy val view = inject[SendMoneyToOtherCountryView]
     val controller = new SendMoneyToOtherCountryController(
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService,
       cc = mockMcc,
-      send_money_to_other_country = view
+      formProvider = inject[SendMoneyToOtherCountryFormProvider],
+      view = view
     )
 
     when {
-      mockRenewalService.getRenewal(any())(any(), any())
+      mockRenewalService.getRenewal(any())(any())
     } thenReturn Future.successful(Renewal().some)
 
     when {
-      mockRenewalService.updateRenewal(any(),any())(any(), any())
+      mockRenewalService.updateRenewal(any(),any())(any())
     } thenReturn Future.successful(cacheMap)
 
     when {
@@ -83,32 +87,32 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
     "load the page 'Did you send money to other countries in the past 12 months?'" in new Fixture {
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("renewal.msb.send.money.title"))
+      contentAsString(result) must include(messages("renewal.msb.send.money.title"))
     }
 
     "load the page 'Do you send money to other countries?' with pre populated data" in new Fixture {
       when {
-        mockRenewalService.getRenewal(any())(any(), any())
+        mockRenewalService.getRenewal(any())(any())
       } thenReturn Future.successful(Renewal(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))).some)
 
       val result = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("renewal.msb.send.money.title"))
+      contentAsString(result) must include(messages("renewal.msb.send.money.title"))
       document.select("input[name=money][checked]").`val` mustEqual "true"
     }
 
     "Show error message when user has not filled the mandatory fields" in new Fixture {
       setupBusinessMatching(msbServices = Set(TransmittingMoney, CurrencyExchange))
 
-      val result = controller.post()(requestWithUrlEncodedBody("" -> ""))
+      val result = controller.post()(FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url).withFormUrlEncodedBody("" -> ""))
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.renewal.send.money"))
+      contentAsString(result) must include(messages("error.required.renewal.send.money"))
     }
 
     "throw exception when Msb services in Business Matching returns none" in new Fixture {
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url).withFormUrlEncodedBody(
         "money" -> "false"
       )
 
@@ -124,7 +128,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
   "posting valid data" must {
     "redirect to the SendTheLargestAmountOfMoneyController" when {
       "post yes" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url).withFormUrlEncodedBody(
           "money" -> "true"
         )
 
@@ -138,7 +142,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to the CETransactionsInLast12MonthsController" when {
       "post no and has currency exchange" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url).withFormUrlEncodedBody(
           "money" -> "false"
         )
 
@@ -152,7 +156,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to the CETransactionsInLast12MonthsController" when {
       "post no and has currency exchange and foreign exchange" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url).withFormUrlEncodedBody(
           "money" -> "false"
         )
 
@@ -166,7 +170,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to the CETransactionsInLast12MonthsController" when {
       "post no and has foreign exchange" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url).withFormUrlEncodedBody(
           "money" -> "false"
         )
 
@@ -180,7 +184,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to the CustomersOutsideIsUKController" when {
       "post no and has HVD and ASP and NOT CE" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url).withFormUrlEncodedBody(
           "money" -> "false"
         )
 
@@ -194,7 +198,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to the CustomersOutsideIsUKController" when {
       "post no and has HVD" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url).withFormUrlEncodedBody(
           "money" -> "false"
         )
 
@@ -205,7 +209,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideIsUKController.get().url))
       }
       "not CE, not FX, and not HVD" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url).withFormUrlEncodedBody(
           "money" -> "false"
         )
 
@@ -219,7 +223,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to the summary" when {
       "in edit mode" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.SendMoneyToOtherCountryController.post().url).withFormUrlEncodedBody(
           "money" -> "false"
         )
 

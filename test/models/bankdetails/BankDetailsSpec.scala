@@ -17,8 +17,9 @@
 package models.bankdetails
 
 import models.CharacterSets
+import models.bankdetails.BankAccountType._
 import models.bankdetails.BankDetails._
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress._
 import play.api.libs.json.Json
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 
@@ -172,81 +173,114 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
  }
 }
 
-  "Section" must {
+  "taskRow" must {
 
-    "return a NotStarted Section" when {
+    "return a NotStarted TaskRow" when {
       "there is no data at all" in {
-        val notStartedSection = Section("bankdetails", NotStarted, false, controllers.bankdetails.routes.WhatYouNeedController.get)
+        val notStartedTaskRow = TaskRow(
+          "bankdetails",
+          controllers.bankdetails.routes.WhatYouNeedController.get.url,
+          false,
+          NotStarted,
+          TaskRow.notStartedTag
+        )
 
         mockCacheGetEntry[Seq[BankDetails]](None, BankDetails.key)
 
-        BankDetails.section(mockCacheMap) must be(notStartedSection)
+        BankDetails.taskRow(mockCacheMap, messages) must be(notStartedTaskRow)
       }
     }
 
-    "return a Completed Section" when {
+    "return a Completed TaskRow" when {
       "model is complete and has not changed" in {
         val complete = Seq(completeModel)
-        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get)
+        val completedTaskRow = TaskRow(
+          "bankdetails",
+          controllers.bankdetails.routes.YourBankAccountsController.get().url,
+          false,
+          Completed,
+          TaskRow.completedTag
+        )
 
         mockCacheGetEntry[Seq[BankDetails]](Some(complete), BankDetails.key)
 
-        BankDetails.section(mockCacheMap) must be(completedSection)
-      }
-
-      "model is complete and has changed" in {
-        val completeChangedModel = BankDetails(Some(accountType), Some("name"), Some(bankAccount), true, hasAccepted = true)
-
-        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.YourBankAccountsController.get)
-
-        mockCacheGetEntry[Seq[BankDetails]](Some(Seq(completeChangedModel)), BankDetails.key)
-
-        BankDetails.section(mockCacheMap) must be(completedSection)
+        BankDetails.taskRow(mockCacheMap, messages) must be(completedTaskRow)
       }
 
       "model is complete with No bankaccount option selected" in {
-        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get)
-
+        val completedTaskRow = TaskRow(
+          "bankdetails",
+          controllers.bankdetails.routes.YourBankAccountsController.get().url,
+          false,
+          Completed,
+          TaskRow.completedTag
+        )
         mockCacheGetEntry[Seq[BankDetails]](Some(Seq.empty), BankDetails.key)
 
-        val section = BankDetails.section(mockCacheMap)
-        section.hasChanged must be(false)
-        section.status must be(Completed)
-        BankDetails.section(mockCacheMap) must be(completedSection)
+        BankDetails.taskRow(mockCacheMap, messages) must be(completedTaskRow)
       }
 
       "model is complete with only deleted bankaccounts that have not changed" in {
         val deleted = Seq(completeModel.copy(status = Some(StatusConstants.Deleted)))
-        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get)
-
+        val completedTaskRow = TaskRow(
+          "bankdetails",
+          controllers.bankdetails.routes.YourBankAccountsController.get().url,
+          false,
+          Completed,
+          TaskRow.completedTag
+        )
         mockCacheGetEntry[Seq[BankDetails]](Some(deleted), BankDetails.key)
 
-        val section = BankDetails.section(mockCacheMap)
-        section.hasChanged must be(false)
-        section.status must be(Completed)
-        BankDetails.section(mockCacheMap) must be(completedSection)
+        BankDetails.taskRow(mockCacheMap, messages) must be(completedTaskRow)
+      }
+    }
+
+    "return an Updated TaskRow" when {
+
+      "model is complete and has changed" in {
+        val updatedChangedModel = BankDetails(Some(accountType), Some("name"), Some(bankAccount), true, hasAccepted = true)
+
+        val updatedTaskRow = TaskRow(
+          "bankdetails",
+          controllers.bankdetails.routes.YourBankAccountsController.get.url,
+          true,
+          Updated,
+          TaskRow.updatedTag
+        )
+
+        mockCacheGetEntry[Seq[BankDetails]](Some(Seq(updatedChangedModel)), BankDetails.key)
+
+        BankDetails.taskRow(mockCacheMap, messages) must be(updatedTaskRow)
       }
 
       "model is complete with only deleted bankaccounts that have changed" in {
         val deleted = Seq(completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true))
-        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.YourBankAccountsController.get)
-
+        val updatedTaskRow = TaskRow(
+          "bankdetails",
+          controllers.bankdetails.routes.YourBankAccountsController.get.url,
+          true,
+          Updated,
+          TaskRow.updatedTag
+        )
         mockCacheGetEntry[Seq[BankDetails]](Some(deleted), BankDetails.key)
 
-        val section = BankDetails.section(mockCacheMap)
-        section.hasChanged must be(true)
-        section.status must be(Completed)
-        BankDetails.section(mockCacheMap) must be(completedSection)
+        BankDetails.taskRow(mockCacheMap, messages) must be(updatedTaskRow)
       }
     }
 
-    "return a Started Section when model is incomplete" in {
+    "return a Started TaskRow when model is incomplete" in {
       val incomplete = Seq(accountTypePartialModel)
-      val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.YourBankAccountsController.get)
+      val startedTaskRow = TaskRow(
+        "bankdetails",
+        controllers.bankdetails.routes.YourBankAccountsController.get.url,
+        false,
+        Started,
+        TaskRow.incompleteTag
+      )
 
       mockCacheGetEntry[Seq[BankDetails]](Some(incomplete), BankDetails.key)
 
-      BankDetails.section(mockCacheMap) must be(startedSection)
+      BankDetails.taskRow(mockCacheMap, messages) must be(startedTaskRow)
     }
 
     "set hasChanged and hasAccepted when updating bankAccountType set to None" in {
@@ -256,63 +290,6 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with DependencyMocks w
       result.hasChanged mustBe true
       result.bankAccountType mustBe None
     }
-
-    "Amendment and Variation flow" must {
-
-      "redirect to Your Bank Accounts page" when {
-        "the section is complete with one of the bank details object being removed" in {
-
-          mockCacheGetEntry[Seq[BankDetails]](Some(Seq(
-            BankDetails(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true), completeModel)),
-            BankDetails.key
-          )
-          val section = BankDetails.section(mockCacheMap)
-
-          section.hasChanged must be(true)
-          section.status must be(Completed)
-          section.call must be(controllers.bankdetails.routes.YourBankAccountsController.get)
-        }
-
-        "the section is complete with all the bank details unchanged" in {
-
-          mockCacheGetEntry[Seq[BankDetails]](Some(Seq(completeModel, completeModel)), BankDetails.key)
-
-          val section = BankDetails.section(mockCacheMap)
-
-          section.hasChanged must be(false)
-          section.status must be(Completed)
-          section.call must be(controllers.bankdetails.routes.YourBankAccountsController.get)
-        }
-
-        "the section is complete with all the bank details being modified" in {
-
-          mockCacheGetEntry[Seq[BankDetails]](Some(Seq(completeModelChanged, completeModelChanged)), BankDetails.key)
-
-          val section = BankDetails.section(mockCacheMap)
-
-          section.hasChanged must be(true)
-          section.status must be(Completed)
-          section.call must be(controllers.bankdetails.routes.YourBankAccountsController.get)
-        }
-
-      }
-
-      "redirect to What You Need" when {
-        "there is no bank account data" in {
-
-          mockCacheGetEntry(None,
-            BankDetails.key)
-
-          val section = BankDetails.section(mockCacheMap)
-
-          section.hasChanged must be(false)
-          section.status must be(NotStarted)
-          section.call must be(controllers.bankdetails.routes.WhatYouNeedController.get)
-        }
-      }
-
-    }
-
   }
 
   "anyChanged" must {

@@ -1,0 +1,96 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import components.{Button, ReturnLink, SectionSubtitle, Heading}
+@import components.forms.{InputCheckbox, ErrorSummary}
+@import config.ApplicationConfig
+@import models.businessmatching.{BusinessActivities, BusinessActivity}
+
+@this(
+    formHelper: FormWithCSRF,
+    heading: Heading,
+    layout: Layout,
+    subtitle: SectionSubtitle,
+    inputCheckbox: InputCheckbox,
+    errorSummary: ErrorSummary,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean, existing: Seq[BusinessActivity], isPreSubmission: Boolean, showReturnLink: Boolean = true)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
+
+@title = @{
+    if(isPreSubmission)  "businessmatching.registerservices.title" else "businessmatching.registerservices.other.title"
+}
+
+@supportingContent = {
+    @if(isPreSubmission) {
+        @messages(title)
+    } else {
+        <div class="govuk-inset-text">
+            <p>@messages("businessmatching.registerservices.existing")</p>
+            @{existing map{ activity =>
+                messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}")
+            } mkString(", ")}
+        </div>
+    }
+}
+
+@maybeReturnLink = {
+    @if(showReturnLink) {
+        @returnLink(true)
+    }
+}
+
+@layout(pageTitle = s"""${messages(title)} - ${messages("summary.businessmatching")}""") {
+
+    @formHelper(action = controllers.businessmatching.routes.RegisterServicesController.post(edit)) {
+
+        @errorSummary(form, Some(Map("value" -> "value_1")))
+
+        @subtitle("summary.businessmatching")
+
+        @if(!isPreSubmission) { @heading(title) }
+
+        @inputCheckbox(
+            Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(
+                        Legend(
+                            content = HtmlContent(supportingContent),
+                            classes = if(isPreSubmission) "govuk-label--xl" else "govuk-body",
+                            isPageHeading = isPreSubmission
+                        )
+                    )
+                )),
+                hint = Some(
+                    Hint(
+                        content = Text(messages("lbl.select.all"))
+                    )
+                ),
+                name = "businessActivities",
+                items = BusinessActivities.formValues(Some(existing), true)
+            ).withFormField(form("value"))
+        )
+
+        @button()
+
+        @maybeReturnLink
+
+    }
+
+}

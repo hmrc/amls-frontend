@@ -16,18 +16,17 @@
 
 package controllers.businessmatching
 
-import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.businessmatching.ConfirmPostcodeFormProvider
 import models.Country
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessMatching, ConfirmPostcode}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
+import views.html.businessmatching.ConfirmPostcodeView
 
-import views.html.businessmatching.confirm_postcode
-
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -35,36 +34,36 @@ class ConfirmPostCodeController @Inject()(authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           val dataCacheConnector: DataCacheConnector,
                                           val cc: MessagesControllerComponents,
-                                          confirm_postcode: confirm_postcode) extends AmlsBaseController(ds, cc) {
+                                          formProvider: ConfirmPostcodeFormProvider,
+                                          view: ConfirmPostcodeView) extends AmlsBaseController(ds, cc) {
 
-
-  def get() = authAction.async {
-      implicit request =>
-        Future.successful(Ok(confirm_postcode(EmptyForm)))
+  def get(): Action[AnyContent] = authAction {
+    implicit request =>
+      Ok(view(formProvider()))
   }
 
-  def updateReviewDetails(reviewDetails: Option[ReviewDetails], postCodeModel: ConfirmPostcode): Option[models.businesscustomer.ReviewDetails] = {
+  private def updateReviewDetails(reviewDetails: Option[ReviewDetails], postCodeModel: ConfirmPostcode): Option[ReviewDetails] = {
     reviewDetails.fold[Option[ReviewDetails]](None) { dtls =>
       val updatedAddr = dtls.businessAddress.copy(postcode = Some(postCodeModel.postCode), country = Country("United Kingdom", "GB"))
       Some(dtls.copy(businessAddress = updatedAddr))
     }
   }
 
-  def post() = authAction.async {
-      implicit request => {
-        Form2[ConfirmPostcode](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(confirm_postcode(f)))
-          case ValidForm(_, data) =>
-            for {
-              bm <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-              _ <- dataCacheConnector.save[BusinessMatching](request.credId, BusinessMatching.key,
-                bm.copy(reviewDetails = updateReviewDetails(bm.reviewDetails, data)))
-            } yield {
-              Redirect(routes.BusinessTypeController.get)
-            }
-        }
-      }
+  def post(): Action[AnyContent] = authAction.async {
+    implicit request => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors))),
+        data =>
+          for {
+            bm <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+            _ <- dataCacheConnector.save[BusinessMatching](request.credId, BusinessMatching.key,
+              bm.copy(reviewDetails = updateReviewDetails(bm.reviewDetails, data)))
+          } yield {
+            Redirect(routes.BusinessTypeController.get)
+          }
+      )
+    }
   }
 }
 

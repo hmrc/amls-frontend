@@ -17,17 +17,15 @@
 package config
 
 import com.google.inject.Inject
-import play.api.Configuration
-import play.api.i18n.{Lang, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.Request
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
-import views.html.error
+import views.html.ErrorView
 
 class AmlsErrorHandler @Inject()(val messagesApi: MessagesApi,
-                                 val configuration: Configuration,
-                                 val error: error)
+                                 val errorView: ErrorView)
                                 (implicit val appConfig: ApplicationConfig) extends FrontendErrorHandler {
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]) =
-    error(pageTitle, heading, message)(implicitly, implicitly, Lang.defaultLang, implicitly)
+    errorView(pageTitle, heading, message)
 }

@@ -17,6 +17,7 @@
 package controllers.supervision
 
 import controllers.actions.SuccessfulAuthAction
+import forms.supervision.AnotherBodyFormProvider
 import models.supervision._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -24,21 +25,23 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.supervision.another_body
+import views.html.supervision.AnotherBodyView
 
-class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[another_body]
+    lazy val view = inject[AnotherBodyView]
     val controller = new AnotherBodyController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      another_body = view,
+      formProvider = inject[AnotherBodyFormProvider],
+      view = view,
       error = errorView)
   }
 
@@ -50,7 +53,7 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("supervision.another_body.title"))
+      contentAsString(result) must include(messages("supervision.another_body.title"))
     }
 
 
@@ -66,8 +69,9 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[name=anotherBody][checked]").`val` mustEqual "true"
-      document.select("input[name=supervisorName]").`val` must be("Name")
+      document.getElementById("anotherBody-true").hasAttr("checked") mustBe true
+      document.getElementById("anotherBody-false").hasAttr("checked") mustBe false
+      document.getElementById("supervisorName").`val` must be("Name")
     }
 
     "on get display the Another Body page with empty form when there is no data" in new Fixture {
@@ -84,15 +88,15 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       val document = Jsoup.parse(contentAsString(result))
 
-      document.select("input[name=anotherBody][checked]").`val` mustEqual "false"
-      document.select("input[name=supervisorName]").`val` must be("")
+      document.getElementById("anotherBody-true").hasAttr("checked") mustBe false
+      document.getElementById("anotherBody-false").hasAttr("checked") mustBe true
+      document.getElementById("supervisorName").`val` must be("")
     }
 
     "on post with valid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
-
-
+      val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
+      .withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 
       mockCacheSave[Supervision]
 
@@ -106,7 +110,8 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "on post with valid data for AnotherBodyYes" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+      val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
+      .withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 
       mockCacheFetch[Supervision](None)
 
@@ -125,7 +130,8 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
         val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
-        val newRequest = requestWithUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+        val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
+        .withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 
         mockCacheFetch[Supervision](None)
 
@@ -141,7 +147,8 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "redirect to summary when supervision is complete" in new Fixture with SupervisionValues {
 
-        val newRequest = requestWithUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+        val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
+        .withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
 
         mockCacheFetch[Supervision](None)
 
@@ -158,18 +165,19 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody("" -> "")
+      val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
+      .withFormUrlEncodedBody("" -> "")
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
 
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#anotherBody]").html() must be(Messages("error.required.supervision.anotherbody"))
+      contentAsString(result) must include(messages("error.required.supervision.anotherbody"))
     }
 
     "on post with valid data in edit mode for AnotherBodyNo" in new Fixture with SupervisionValues {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
+      .withFormUrlEncodedBody(
         "anotherBody" -> "false"
       )
 
@@ -186,7 +194,8 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "on post with valid data for AnotherBodyNo" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.AnotherBodyController.post().url)
+      .withFormUrlEncodedBody(
         "anotherBody" -> "false"
       )
 

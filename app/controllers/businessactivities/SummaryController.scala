@@ -21,22 +21,24 @@ import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.EmptyForm
 import models.businessactivities.BusinessActivities
-import models.businessmatching.{AccountancyServices, BusinessMatching}
-import play.api.mvc.MessagesControllerComponents
+import models.businessmatching.BusinessActivity.AccountancyServices
+import models.businessmatching.BusinessMatching
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import utils.AuthAction
-import views.html.businessactivities.summary
+import utils.businessactivities.CheckYourAnswersHelper
+import views.html.businessactivities.CheckYourAnswersView
 
-class SummaryController @Inject() (val dataCache: DataCacheConnector,
-                                   implicit val statusService: StatusService,
-                                   val authAction: AuthAction,
-                                   val ds: CommonPlayDependencies,
-                                   val cc: MessagesControllerComponents,
-                                   summary: summary) extends AmlsBaseController(ds, cc) {
+class SummaryController @Inject()(val dataCache: DataCacheConnector,
+                                  implicit val statusService: StatusService,
+                                  val authAction: AuthAction,
+                                  val ds: CommonPlayDependencies,
+                                  val cc: MessagesControllerComponents,
+                                  cyaHelper: CheckYourAnswersHelper,
+                                  view: CheckYourAnswersView) extends AmlsBaseController(ds, cc) {
 
-  def get = authAction.async {
+  def get: Action[AnyContent] = authAction.async {
     implicit request =>
       dataCache.fetchAll(request.credId) map {
         optionalCache =>
@@ -45,14 +47,15 @@ class SummaryController @Inject() (val dataCache: DataCacheConnector,
             businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             businessActivity <- cache.getEntry[BusinessActivities](BusinessActivities.key)
             bmActivities <- businessMatching.activities
+            needsAccountancyQuestions = !bmActivities.businessActivities.contains(AccountancyServices)
           } yield {
-            val hideReceiveAdvice = bmActivities.businessActivities.contains(AccountancyServices)
-              Ok(summary(EmptyForm, businessActivity, businessMatching, hideReceiveAdvice))
+              val summaryList = cyaHelper.createSummaryList(businessActivity, businessMatching, needsAccountancyQuestions)
+              Ok(view(summaryList))
           }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
       }
   }
 
-  def post = authAction.async {
+  def post: Action[AnyContent] = authAction.async {
     implicit request =>
       (for {
         businessActivity <- OptionT(dataCache.fetch[BusinessActivities](request.credId, BusinessActivities.key))

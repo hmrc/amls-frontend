@@ -19,57 +19,57 @@ package controllers.responsiblepeople.address
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.responsiblepeople.address.CurrentAddressFormProvider
 import models.responsiblepeople._
-import play.api.mvc.MessagesControllerComponents
-import services.AutoCompleteService
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, ControllerHelper, DateOfChangeHelper, RepeatingSection}
-import views.html.responsiblepeople.address.current_address
+import views.html.responsiblepeople.address.CurrentAddressView
 
 import scala.concurrent.Future
 
 class CurrentAddressController @Inject ()(val dataCacheConnector: DataCacheConnector,
-                                          autoCompleteService: AutoCompleteService,
                                           authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           val cc: MessagesControllerComponents,
-                                          current_address: current_address,
-                                          implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with AddressHelper {
+                                          formProvider: CurrentAddressFormProvider,
+                                          view: CurrentAddressView,
+                                          implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with AddressHelper {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _,
-        Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _, _, _, _, _, _, _, _, _, _, _, _))
-        => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName))
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
-        => Ok(current_address(EmptyForm, edit, index, flow, personName.titleName))
-        case _
-        => NotFound(notFoundView)
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.addressHistory) match {
+            case (Some(name), Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _))) =>
+              Ok(view(formProvider().fill(currentAddress), edit, index, flow, name.titleName))
+            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _ => NotFound(notFoundView)
+          }
+        }
       }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
     authAction.async {
       implicit request =>
-        (Form2[ResponsiblePersonCurrentAddress]
-          (request.body)(ResponsiblePersonCurrentAddress.addressFormRule(PersonAddress.formRule(AddressType.Current))) match {
-          case f: InvalidForm if f.data.get("isUK").isDefined
-          => processForm(ResponsiblePersonCurrentAddress(modelFromForm(f), None, None), request.credId, index, edit, flow)
-          case f: InvalidForm
-          => getData[ResponsiblePerson](request.credId, index) map { rp =>
-            BadRequest(current_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-          }
-          case ValidForm(_, data)
-          => processForm(data, request.credId, index, edit, flow)
-        }).recoverWith {
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
+            if (formWithErrors.data.contains("isUK")) {
+              processForm(ResponsiblePersonCurrentAddress(modelFromPlayForm(formWithErrors), None, None), request.credId, index, edit, flow)
+            } else {
+              getData[ResponsiblePerson](request.credId, index) map { rp =>
+                BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+              }
+            },
+          data => processForm(data, request.credId, index, edit, flow)
+        ).recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }
 
   private def processForm(data: ResponsiblePersonCurrentAddress, credId: String, index: Int, edit: Boolean, flow: Option[String])
-                         (implicit hc: HeaderCarrier) = {
+                         (implicit hc: HeaderCarrier): Future[Result] = {
 
     updateDataStrict[ResponsiblePerson](credId, index) { res =>
       (res.addressHistory, data.personAddress) match {

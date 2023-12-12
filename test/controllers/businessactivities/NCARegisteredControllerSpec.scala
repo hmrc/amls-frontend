@@ -18,31 +18,34 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.NCARegisteredFormProvider
 import models.businessactivities.{BusinessActivities, NCARegistered}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import utils.AmlsSpec
-import play.api.i18n.Messages
+import play.api.test
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import views.html.businessactivities.nca_registered
+import utils.AmlsSpec
+import views.html.businessactivities.NCARegisteredView
 
 import scala.concurrent.Future
 
 
-class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
+class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[nca_registered]
+    lazy val view = inject[NCARegisteredView]
     val controller = new NCARegisteredController (
       dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      nca_registered = view)
+      formProvider = inject[NCARegisteredFormProvider],
+      view = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -59,8 +62,8 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("ncaRegistered-true").hasAttr("checked") must be(false)
-        htmlValue.getElementById("ncaRegistered-false").hasAttr("checked") must be(false)
+        htmlValue.getElementById("ncaRegistered").hasAttr("checked") must be(false)
+        htmlValue.getElementById("ncaRegistered-2").hasAttr("checked") must be(false)
       }
 
       "load Yes when ncaRegistered from mongoCache returns True" in new Fixture {
@@ -75,7 +78,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("ncaRegistered-true").hasAttr("checked") must be(true)
+        htmlValue.getElementById("ncaRegistered").hasAttr("checked") must be(true)
       }
     }
 
@@ -83,7 +86,8 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
       "successfully redirect to the page on selection of 'Yes' when edit mode is on" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody("ncaRegistered" -> "true")
+        val newRequest = FakeRequest(POST, routes.NCARegisteredController.post(false).url)
+          .withFormUrlEncodedBody("ncaRegistered" -> "true")
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
@@ -97,7 +101,8 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "successfully redirect to the page on selection of 'Yes' when edit mode is off" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody("ncaRegistered" -> "true")
+        val newRequest = test.FakeRequest(POST, routes.NCARegisteredController.post(false).url)
+          .withFormUrlEncodedBody("ncaRegistered" -> "true")
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
@@ -114,7 +119,8 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
     "successfully redirect to the page on selection of Option 'No' when edit mode is on" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = test.FakeRequest(POST, routes.NCARegisteredController.post(false).url)
+        .withFormUrlEncodedBody(
         "ncaRegistered" -> "false"
       )
       when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
@@ -129,7 +135,8 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "successfully redirect to the page on selection of Option 'No' when edit mode is off" in new Fixture {
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = test.FakeRequest(POST, routes.NCARegisteredController.post(false).url)
+        .withFormUrlEncodedBody(
         "ncaRegistered" -> "false"
       )
       when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
@@ -146,14 +153,24 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
     "on post invalid data show error" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody("" -> "")
+      val newRequest = test.FakeRequest(POST, routes.NCARegisteredController.post(false).url)
+        .withFormUrlEncodedBody("ncaRegistered" -> "foo")
       when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.ba.select.nca"))
+    }
 
+    "on post empty data show error" in new Fixture {
+
+      val newRequest = test.FakeRequest(POST, routes.NCARegisteredController.post(false).url)
+        .withFormUrlEncodedBody("ncaRegistered" -> "")
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        .thenReturn(Future.successful(None))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
     }
   }
 }

@@ -20,7 +20,7 @@ import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json.Json
 
-case class WhoIsRegistering(person : String) {
+case class WhoIsRegistering(person: String) {
   val indexValue = """([0-9]+)$""".r.findFirstIn(person) map {_.toInt}
 }
 

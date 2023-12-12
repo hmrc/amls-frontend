@@ -20,18 +20,17 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
+import forms.tradingpremises.ConfirmAddressFormProvider
 import models.businesscustomer.{ReviewDetails, Address => BCAddress}
 import models.businessmatching.BusinessMatching
-import models.tradingpremises.{Address, ConfirmAddress, TradingPremises, YourTradingPremises}
+import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import play.api.i18n.MessagesApi
-import play.api.mvc.MessagesControllerComponents
-import services.{AuthEnrolmentsService, StatusService}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.StatusService
 import utils.{AuthAction, BusinessName, RepeatingSection}
-import views.html.tradingpremises.confirm_address
+import views.html.tradingpremises.ConfirmAddressView
 
-
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -39,19 +38,19 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                                          implicit val dataCacheConnector: DataCacheConnector,
                                          val authAction: AuthAction,
                                          val ds: CommonPlayDependencies,
-                                         enrolments: AuthEnrolmentsService,
                                          implicit val statusService: StatusService,
                                          implicit val amlsConnector: AmlsConnector,
                                          val cc: MessagesControllerComponents,
-                                         confirm_address: confirm_address) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                         formProvider: ConfirmAddressFormProvider,
+                                         view: ConfirmAddressView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def getAddress(businessMatching: BusinessMatching): Option[BCAddress] =
     businessMatching.reviewDetails.fold[Option[BCAddress]](None)(r => Some(r.businessAddress))
 
-  def get(index: Int) = authAction.async {
+  def get(index: Int): Action[AnyContent] = authAction.async {
     implicit request =>
       val redirect = Redirect(routes.WhereAreTradingPremisesController.get(index))
-      def ok(address: BCAddress) = Ok(confirm_address(EmptyForm, address, index))
+      def ok(address: BCAddress) = Ok(view(formProvider(), address, index))
 
       {
         for {
@@ -100,7 +99,7 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
     }
   }
 
-  def post(index: Int) = authAction.async {
+  def post(index: Int): Action[AnyContent] = authAction.async {
       implicit request =>
         val name: OptionT[Future, String] = for {
           amlsRegNumber <- OptionT.fromOption[Future](request.amlsRefNumber)
@@ -108,14 +107,14 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
           bName <- BusinessName.getName(request.credId, Some(id), request.accountTypeId)
         } yield bName
 
-        Form2[ConfirmAddress](request.body) match {
-          case f: InvalidForm => {
+        formProvider().bindFromRequest().fold(
+          formWithErrors => {
             for {
               bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key))
               address <- OptionT.fromOption[Future](getAddress(bm))
-            } yield BadRequest(confirm_address(f, address, index))
-          } getOrElse Redirect(routes.WhereAreTradingPremisesController.get(index))
-          case ValidForm(_, data) =>
+            } yield BadRequest(view(formWithErrors, address, index))
+          } getOrElse Redirect(routes.WhereAreTradingPremisesController.get(index)),
+          data =>
             data.confirmAddress match {
               case true => {
                 for {
@@ -129,7 +128,7 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                 Future.successful(Redirect(routes.WhereAreTradingPremisesController.get(index)))
               }
             }
-        }
+        )
   }
 
 }

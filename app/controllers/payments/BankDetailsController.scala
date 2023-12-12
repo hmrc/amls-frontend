@@ -20,13 +20,13 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+
 import javax.inject.Inject
 import models.SubmissionRequestStatus
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{AuthEnrolmentsService, FeeResponseService, RenewalService, StatusService}
 import utils.{AuthAction, DeclarationHelper}
-import views.html.payments.bank_details
-
+import views.html.payments.BankDetailsView
 
 import scala.concurrent.Future
 
@@ -38,10 +38,10 @@ class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector
                                       val statusService: StatusService,
                                       val cc: MessagesControllerComponents,
                                       val renewalService: RenewalService,
-                                      bank_details: bank_details) extends AmlsBaseController(ds, cc) {
+                                      view: BankDetailsView) extends AmlsBaseController(ds, cc) {
 
 
-  def get(isUK: Boolean = true) = authAction.async {
+  def get(isUK: Boolean = true): Action[AnyContent] = authAction.async {
     implicit request =>
       (for {
         submissionRequestStatus <- OptionT.liftF(dataCacheConnector.fetch[SubmissionRequestStatus](request.credId, SubmissionRequestStatus.key))
@@ -52,7 +52,7 @@ class BankDetailsController @Inject()(val dataCacheConnector: DataCacheConnector
         paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
       } yield {
         val amount = fees.toPay(status, submissionRequestStatus)
-          Ok(bank_details(isUK, amount, paymentReference, subHeading))
+          Ok(view(isUK, amount, paymentReference, subHeading))
       }) getOrElse InternalServerError("Failed to retrieve submission data")
   }
 }

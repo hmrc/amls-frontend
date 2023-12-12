@@ -18,26 +18,34 @@ package views
 
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
-import views.html.unauthorised_role
+import views.html.UnauthorisedRoleView
 
 class UnauthorisedRoleViewSpec extends AmlsViewSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    lazy val unauthorised_role = app.injector.instanceOf[unauthorised_role]
+    lazy val unauthorisedRoleView = app.injector.instanceOf[UnauthorisedRoleView]
     implicit val requestWithToken = addTokenForView()
 
-    def view = unauthorised_role()
+    def view = unauthorisedRoleView()
   }
 
-  "The 'unauthorised role' view" must {
+  "UnauthorisedRoleView" must {
     "display the correct headings and titles" in new ViewFixture {
       validateTitle("unauthorised.title")
-      doc.select("h1.heading-xlarge").text mustBe messages("unauthorised.title")
+      doc.getElementsByTag("h1").text mustBe messages("unauthorised.title")
     }
 
     "display the correct body content" in new ViewFixture {
-      validateParagraphizedContent("unauthorised.role.content")
+      val paragraphs = doc.getElementsByClass("govuk-body").text()
+      paragraphs must include(messages("unauthorised.role.content.line1"))
+      paragraphs must include(messages("unauthorised.role.content.line2"))
+    }
+
+    "display the correct button with link" in new ViewFixture {
+      val button = doc.getElementById("button")
+
+      button.text() mustBe messages("button.backtosignin")
+      button.attr("href") mustBe appConfig.logoutUrl
     }
   }
-
 }

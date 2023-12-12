@@ -18,16 +18,15 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.moneyservicebusiness.{MoneyServiceBusiness, TransactionsInNext12Months}
-import play.api.mvc.MessagesControllerComponents
+import forms.msb.TransactionsInNext12MonthsFormProvider
+import models.moneyservicebusiness.MoneyServiceBusiness
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
+import views.html.msb.TransactionsInNext12MonthsView
 
-import views.html.msb.transactions_in_next_12_months
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class TransactionsInNext12MonthsController @Inject()(authAction: AuthAction,
@@ -36,36 +35,37 @@ class TransactionsInNext12MonthsController @Inject()(authAction: AuthAction,
                                                      implicit val statusService: StatusService,
                                                      implicit val serviceFlow: ServiceFlow,
                                                      val cc: MessagesControllerComponents,
-                                                     transactions_in_next_12_months: transactions_in_next_12_months) extends AmlsBaseController(ds, cc) {
+                                                     formProvider: TransactionsInNext12MonthsFormProvider,
+                                                     view: TransactionsInNext12MonthsView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
-          response =>
-            val form: Form2[TransactionsInNext12Months] = (for {
-              msb <- response
-              transactions <- msb.transactionsInNext12Months
-            } yield Form2[TransactionsInNext12Months](transactions)).getOrElse(EmptyForm)
-            Ok(transactions_in_next_12_months(form, edit))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
+        response =>
+          val form = (for {
+            msb <- response
+            transactions <- msb.transactionsInNext12Months
+          } yield formProvider().fill(transactions)).getOrElse(formProvider())
+          Ok(view(form, edit))
+      }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request => {
-        Form2[TransactionsInNext12Months](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(transactions_in_next_12_months(f, edit)))
-          case ValidForm(_, data) =>
-            for {
-              msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-              _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
-                msb.transactionsInNext12Months(data)
-              )
-            } yield edit match {
-              case true if msb.sendMoneyToOtherCountry.isDefined => Redirect(routes.SummaryController.get)
-              case _ => Redirect(routes.SendMoneyToOtherCountryController.get(edit))
-            }
-        }
-      }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
+          for {
+            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+            _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
+              msb.transactionsInNext12Months(data)
+            )
+          } yield edit match {
+            case true if msb.sendMoneyToOtherCountry.isDefined => Redirect(routes.SummaryController.get)
+            case _ => Redirect(routes.SendMoneyToOtherCountryController.get(edit))
+          }
+      )
+    }
   }
 }

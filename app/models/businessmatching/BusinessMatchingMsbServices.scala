@@ -16,17 +16,28 @@
 
 package models.businessmatching
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, ValidationError, _}
-import models.tradingpremises.{ChequeCashingNotScrapMetal => TPChequeCashingNotScrapMetal, ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, ForeignExchange => TPForeignExchange, TransmittingMoney => TPTransmittingMoney}
+import jto.validation.{Rule, ValidationError, _}
+import models.tradingpremises.TradingPremisesMsbService.{
+  ChequeCashingNotScrapMetal => TPChequeCashingNotScrapMetal,
+  ChequeCashingScrapMetal => TPChequeCashingScrapMetal,
+  CurrencyExchange => TPCurrencyExchange,
+  ForeignExchange => TPForeignExchange,
+  TransmittingMoney => TPTransmittingMoney
+}
+import models.{CheckYourAnswersField, Enumerable, WithName}
 import play.api.i18n.Messages
-import play.api.libs.json.{Reads, Writes, _}
-import utils.TraversableValidators._
+import play.api.libs.json._
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
 
 case class BusinessMatchingMsbServices(msbServices : Set[BusinessMatchingMsbService])
 
-sealed trait BusinessMatchingMsbService {
+sealed trait BusinessMatchingMsbService extends CheckYourAnswersField {
+
+  import BusinessMatchingMsbService._
+
+  val value: String
 
   def getMessage(implicit messages: Messages): String = {
     val message = "businessmatching.services.list.lbl."
@@ -38,15 +49,27 @@ sealed trait BusinessMatchingMsbService {
       case ForeignExchange => Messages(s"${message}05")
     }
   }
+
+  def index: String = value.substring(1)
 }
 
-case object TransmittingMoney extends BusinessMatchingMsbService
-case object CurrencyExchange extends BusinessMatchingMsbService
-case object ChequeCashingNotScrapMetal extends BusinessMatchingMsbService
-case object ChequeCashingScrapMetal extends BusinessMatchingMsbService
-case object ForeignExchange extends BusinessMatchingMsbService
+object BusinessMatchingMsbService extends Enumerable.Implicits {
 
-object BusinessMatchingMsbService {
+  case object TransmittingMoney extends WithName("transmittingMoney") with BusinessMatchingMsbService {
+    override val value: String = "01"
+  }
+  case object CurrencyExchange extends WithName("currencyExchange") with BusinessMatchingMsbService {
+    override val value: String = "02"
+  }
+  case object ChequeCashingNotScrapMetal extends WithName("chequeCashingNotScrapMetal") with BusinessMatchingMsbService {
+    override val value: String = "03"
+  }
+  case object ChequeCashingScrapMetal extends WithName("chequeCashingScrapMetal") with BusinessMatchingMsbService {
+    override val value: String = "04"
+  }
+  case object ForeignExchange extends WithName("foreignExchange") with BusinessMatchingMsbService {
+    override val value: String = "05"
+  }
 
   implicit val serviceR = Rule[String, BusinessMatchingMsbService] {
     case "01" => Valid(TransmittingMoney)
@@ -81,11 +104,16 @@ object BusinessMatchingMsbService {
     case ChequeCashingScrapMetal => JsString("04")
     case ForeignExchange => JsString("05")
   }
+
+  implicit val enumerable: Enumerable[BusinessMatchingMsbService] =
+    Enumerable(BusinessMatchingMsbServices.all.map(v => v.toString -> v): _*)
 }
 
 object BusinessMatchingMsbServices {
 
-  val all: Set[BusinessMatchingMsbService] = Set(
+  import BusinessMatchingMsbService._
+
+  val all: Seq[BusinessMatchingMsbService] = Seq(
     TransmittingMoney,
     CurrencyExchange,
     ChequeCashingNotScrapMetal,
@@ -93,29 +121,19 @@ object BusinessMatchingMsbServices {
     ForeignExchange
   )
 
-  import utils.MappingUtils.Implicits._
+  def formValues(foreignExchangeEnabled: Boolean)(implicit messages: Messages): Seq[CheckboxItem] = {
 
-  implicit def formReads
-  (implicit
-   p: Path => RuleLike[UrlFormEncoded, Set[BusinessMatchingMsbService]]
-  ): Rule[UrlFormEncoded, BusinessMatchingMsbServices] =
-    From[UrlFormEncoded] { __ =>
-      (__ \ "msbServices").read(minLengthR[Set[BusinessMatchingMsbService]](1).withMessage("error.required.msb.services")).flatMap(BusinessMatchingMsbServices.apply)
-    }
+    val filteredServices = if(foreignExchangeEnabled) all else all.filterNot(_ == ForeignExchange)
 
-  def formReadsTP
-  (implicit
-   p: Path => RuleLike[UrlFormEncoded, Set[BusinessMatchingMsbService]]
-  ): Rule[UrlFormEncoded, BusinessMatchingMsbServices] =
-    From[UrlFormEncoded] { __ =>
-      (__ \ "msbServices").read(minLengthR[Set[BusinessMatchingMsbService]](1).withMessage("error.required.msb.services.tp")).flatMap(BusinessMatchingMsbServices.apply)
-    }
+    filteredServices.map { service =>
 
-  implicit def formWrites
-  (implicit
-   w: Write[BusinessMatchingMsbService, String]
-  ) = Write[BusinessMatchingMsbServices, UrlFormEncoded] { data =>
-    Map("msbServices[]" -> data.msbServices.toSeq.map(w.writes))
+      CheckboxItem(
+        content = Text(messages(s"msb.services.list.lbl.${service.value}")),
+        value = service.toString,
+        id = Some(s"value_${service.index}"),
+        name = Some(s"value[${service.index}]")
+      )
+    }.sortBy(_.value)
   }
 
   implicit val formats = Json.format[BusinessMatchingMsbServices]

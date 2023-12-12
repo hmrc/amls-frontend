@@ -18,22 +18,21 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, _}
-import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
+import connectors._
+import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, TrustAndCompanyServices}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.responsiblepeople.ResponsiblePerson
 import models.status._
 import models.{FeeResponse, ReadStatusResponse}
 import org.joda.time.LocalDate
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request, Result}
-import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName}
-import views.html.include.status._
-import views.html.status._
-import views.html.status.components.{fee_information, registration_status, withdraw_or_deregister_information}
+import views.html.status.YourRegistrationView
+import views.html.status.components._
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -51,7 +50,26 @@ class StatusController @Inject()(val landingService: LandingService,
                                  val feeResponseService: FeeResponseService,
                                  val cc: MessagesControllerComponents,
                                  val notificationConnector: AmlsNotificationConnector,
-                                 your_registration: your_registration) extends AmlsBaseController(ds, cc) {
+                                 feeInformation: FeeInformation,
+                                 registrationStatus: RegistrationStatus,
+                                 applicationIncomplete: ApplicationIncomplete,
+                                 applicationDeregistered: ApplicationDeregistered,
+                                 applicationRenewalSubmissionReady: ApplicationRenewalSubmissionReady,
+                                 applicationRenewalDue: ApplicationRenewalDue,
+                                 applicationSubmissionReady: ApplicationSubmissionReady,
+                                 applicationPending: ApplicationPending,
+                                 applicationRejected: ApplicationRejected,
+                                 applicationRevoked: ApplicationRevoked,
+                                 applicationExpired: ApplicationExpired,
+                                 applicationWithdrawn: ApplicationWithdrawn,
+                                 applicationRenewalSubmitted: ApplicationRenewalSubmitted,
+                                 applicationRenewalIncomplete: ApplicationRenewalIncomplete,
+                                 withdrawOrDeregisterInformation: WithdrawOrDeregisterInformation,
+                                 tradeInformationNoActivities: TradeInformationNoActivities,
+                                 tradeInformationOneActivity: TradeInformationOneActivity,
+                                 tradeInformation: TradeInformation,
+                                 tradeInformationFindOut: TradeInformationFindOut,
+                                 view: YourRegistrationView) extends AmlsBaseController(ds, cc) {
 
   def get(fromDuplicateSubmission: Boolean = false) = authAction.async {
     implicit request =>
@@ -138,16 +156,16 @@ class StatusController @Inject()(val landingService: LandingService,
       case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
         getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities, cacheId, unreadNotifications)
       case (_, _) => Future.successful(
-        Ok(your_registration(
+        Ok(view(
           regNo = mlrRegNumber.getOrElse(""),
           businessName = businessNameOption,
-          yourRegistrationInfo = application_incomplete(businessNameOption),
+          yourRegistrationInfo = Some(applicationIncomplete(businessNameOption)),
           unreadNotifications = unreadNotifications,
-          registrationStatus = registration_status(
+          registrationStatus = registrationStatus(
             amlsRegNo = mlrRegNumber,
             status = statusInfo._1
           ),
-          feeInformation = HtmlFormat.empty
+          feeInformation = None
         ))
       )
     }
@@ -166,47 +184,47 @@ class StatusController @Inject()(val landingService: LandingService,
 
     status match {
       case NotCompleted => Future.successful(
-        Ok(your_registration(
+        Ok(view(
           regNo = mlrRegNumber.getOrElse(""),
           businessName = businessNameOption,
-          yourRegistrationInfo = application_incomplete(businessNameOption),
+          yourRegistrationInfo = Some(applicationIncomplete(businessNameOption)),
           unreadNotifications = unreadNotifications,
-          registrationStatus = registration_status(
+          registrationStatus = registrationStatus(
             amlsRegNo = mlrRegNumber,
             status = status
           ),
-          feeInformation = HtmlFormat.empty
+          feeInformation = None
         ))
       )
       case SubmissionReady => {
         Future.successful(
-          Ok(your_registration(
+          Ok(view(
             regNo = mlrRegNumber.getOrElse(""),
             businessName = businessNameOption,
-            yourRegistrationInfo = application_submission_ready(controllers.routes.RegistrationProgressController.get, businessNameOption),
+            yourRegistrationInfo = Some(applicationSubmissionReady(controllers.routes.RegistrationProgressController.get, businessNameOption)),
             unreadNotifications = unreadNotifications,
-            registrationStatus = registration_status(
+            registrationStatus = registrationStatus(
               amlsRegNo = mlrRegNumber,
               status = status
             ),
-            feeInformation = HtmlFormat.empty
+            feeInformation = None
           ))
         )
       }
       case _ =>
         Future.successful(
-          Ok(your_registration(
+          Ok(view(
             regNo = mlrRegNumber.getOrElse(""),
             businessName = businessNameOption,
-            yourRegistrationInfo = application_pending(),
+            yourRegistrationInfo = Some(applicationPending()),
             unreadNotifications = unreadNotifications,
             displayContactLink = true,
-            registrationStatus = registration_status(
+            registrationStatus = registrationStatus(
               amlsRegNo = mlrRegNumber,
               status = status,
               canOrCannotTradeInformation = canOrCannotTradeInformation(activities)),
-            feeInformation = fee_information(status),
-            withdrawOrDeregisterInformation = withdraw_or_deregister_information(status))))
+            feeInformation = Some(feeInformation(status)),
+            withdrawOrDeregisterInformation = withdrawOrDeregisterInformation(status))))
     }
   }
 
@@ -222,67 +240,67 @@ class StatusController @Inject()(val landingService: LandingService,
         val endDate = statusDtls.fold[Option[LocalDate]](None)(_.currentRegYearEndDate)
 
         Ok {
-          your_registration(
+          view(
             regNo = mlrRegNumber.getOrElse(""),
             businessName = businessNameOption,
             unreadNotifications = unreadNotifications,
-            registrationStatus = registration_status(
+            registrationStatus = registrationStatus(
               amlsRegNo = mlrRegNumber,
               status = statusInfo._1,
               canOrCannotTradeInformation = canOrCannotTradeInformation(maybeActivities),
               endDate = endDate),
-            feeInformation = fee_information(statusInfo._1),
-            withdrawOrDeregisterInformation = withdraw_or_deregister_information(statusInfo._1))
+            feeInformation = Some(feeInformation(statusInfo._1)),
+            withdrawOrDeregisterInformation = withdrawOrDeregisterInformation(statusInfo._1))
         }
       }
 
       case (SubmissionDecisionRejected, _) =>
         Ok {
-          your_registration(
+          view(
             regNo = "",
             businessName = businessNameOption,
-            yourRegistrationInfo = application_rejected(businessNameOption),
+            yourRegistrationInfo = Some(applicationRejected(businessNameOption)),
             displayCheckOrUpdateLink = false,
             unreadNotifications = unreadNotifications,
-            registrationStatus = registration_status(
+            registrationStatus = registrationStatus(
               status = statusInfo._1),
-            feeInformation = HtmlFormat.empty)
+            feeInformation = None)
         }
       case (SubmissionDecisionRevoked, _) =>
         Ok {
-          your_registration(
+          view(
             regNo = "",
             businessName = businessNameOption,
-            yourRegistrationInfo = application_revoked(businessNameOption),
+            yourRegistrationInfo = Some(applicationRevoked(businessNameOption)),
             displayCheckOrUpdateLink = false,
             unreadNotifications = unreadNotifications,
-            registrationStatus = registration_status(
+            registrationStatus = registrationStatus(
               status = statusInfo._1),
-            feeInformation = HtmlFormat.empty)
+            feeInformation = None)
         }
       case (SubmissionDecisionExpired, _) =>
         Ok {
-          your_registration(
+          view(
             regNo = "",
             businessName = businessNameOption,
-            yourRegistrationInfo = application_expired(businessNameOption),
+            yourRegistrationInfo = Some(applicationExpired(businessNameOption)),
             displayCheckOrUpdateLink = false,
             unreadNotifications = unreadNotifications,
-            registrationStatus = registration_status(
+            registrationStatus = registrationStatus(
               status = statusInfo._1),
-            feeInformation = HtmlFormat.empty)
+            feeInformation = None)
         }
       case (SubmissionWithdrawn, _) => {
         Ok {
-          your_registration(
+          view(
             regNo = "",
             businessName = businessNameOption,
-            yourRegistrationInfo = application_withdrawn(businessNameOption),
+            yourRegistrationInfo = Some(applicationWithdrawn(businessNameOption)),
             displayCheckOrUpdateLink = false,
             unreadNotifications = unreadNotifications,
-            registrationStatus = registration_status(
+            registrationStatus = registrationStatus(
               status = statusInfo._1),
-            feeInformation = HtmlFormat.empty)
+            feeInformation = None)
         }
       }
       case (DeRegistered, _) =>
@@ -292,16 +310,16 @@ class StatusController @Inject()(val landingService: LandingService,
         } yield date
 
         Ok {
-          your_registration(
+          view(
             regNo = "",
             businessName = businessNameOption,
-            yourRegistrationInfo = application_deregistered(businessNameOption),
+            yourRegistrationInfo = Some(applicationDeregistered(businessNameOption)),
             displayCheckOrUpdateLink = false,
             unreadNotifications = unreadNotifications,
-            registrationStatus = registration_status(
+            registrationStatus = registrationStatus(
               status = statusInfo._1,
               endDate = deregistrationDate),
-            feeInformation = HtmlFormat.empty)
+            feeInformation = None)
         }
       case _ => InternalServerError("Post: An UnknowException has occurred: RegisterServicesController")
     }
@@ -320,16 +338,16 @@ class StatusController @Inject()(val landingService: LandingService,
       case (RenewalSubmitted(renewalDate), _) =>
         Future.successful(
           Ok(
-            your_registration(
+            view(
               regNo = mlrRegNumber.getOrElse(""),
               businessName = businessNameOption,
-              yourRegistrationInfo = application_renewal_submitted(),
+              yourRegistrationInfo = Some(applicationRenewalSubmitted()),
               unreadNotifications = unreadNotifications,
-              registrationStatus = registration_status(
+              registrationStatus = registrationStatus(
                 amlsRegNo = mlrRegNumber,
                 status = statusInfo._1,
                 endDate = renewalDate),
-              feeInformation = fee_information(statusInfo._1))
+              feeInformation = Some(feeInformation(statusInfo._1)))
           )
         )
       case (ReadyForRenewal(renewalDate), _) => {
@@ -339,48 +357,48 @@ class StatusController @Inject()(val landingService: LandingService,
               if (complete) {
                 Future.successful(
                   Ok(
-                    your_registration(
+                    view(
                       regNo = mlrRegNumber.getOrElse(""),
                       businessName = businessNameOption,
-                      yourRegistrationInfo = application_renewal_submission_ready(businessNameOption),
+                      yourRegistrationInfo = Some(applicationRenewalSubmissionReady(businessNameOption)),
                       unreadNotifications = unreadNotifications,
-                      registrationStatus = registration_status(
+                      registrationStatus = registrationStatus(
                         amlsRegNo = mlrRegNumber,
                         status = statusInfo._1,
                         endDate = renewalDate),
-                      feeInformation = fee_information(statusInfo._1))
+                      feeInformation = Some(feeInformation(statusInfo._1)))
                   )
                 )
               } else {
                 Future.successful(
                   Ok(
-                    your_registration(
+                    view(
                       regNo = mlrRegNumber.getOrElse(""),
                       businessName = businessNameOption,
-                      yourRegistrationInfo = application_renewal_incomplete(businessNameOption),
+                      yourRegistrationInfo = Some(applicationRenewalIncomplete(businessNameOption)),
                       unreadNotifications = unreadNotifications,
-                      registrationStatus = registration_status(
+                      registrationStatus = registrationStatus(
                         amlsRegNo = mlrRegNumber,
                         status = statusInfo._1,
                         endDate = renewalDate),
-                      feeInformation = fee_information(statusInfo._1))
+                      feeInformation = Some(feeInformation(statusInfo._1)))
                   )
                 )
               }
             }
           case _ => Future.successful(
             Ok {
-              your_registration(
+              view(
                 regNo = mlrRegNumber.getOrElse(""),
                 businessName = businessNameOption,
-                yourRegistrationInfo = application_renewal_due(businessNameOption, renewalDate),
+                yourRegistrationInfo = Some(applicationRenewalDue(businessNameOption, renewalDate)),
                 unreadNotifications = unreadNotifications,
-                registrationStatus = registration_status(
+                registrationStatus = registrationStatus(
                   amlsRegNo = mlrRegNumber,
                   status = statusInfo._1,
                   endDate = renewalDate),
-                feeInformation = fee_information(statusInfo._1),
-                withdrawOrDeregisterInformation = withdraw_or_deregister_information(statusInfo._1))
+                feeInformation = Some(feeInformation(statusInfo._1)),
+                withdrawOrDeregisterInformation = withdrawOrDeregisterInformation(statusInfo._1))
             })
         }
       }
@@ -405,10 +423,10 @@ class StatusController @Inject()(val landingService: LandingService,
 
   private def canOrCannotTradeInformation(activities: Option[BusinessActivities])(implicit request: Request[AnyContent]) =
     (hasMsb(activities), hasTcsp(activities), hasOther(activities)) match {
-      case (false, false, true) => trade_information_no_msb_or_tcsp()
-      case (true, _, false) | (_, true, false) => trade_information_msb_or_tcsp_only()
-      case (true, _, true) | (_, true, true) => trade_information()
-      case (_, _, _) => trade_information_find_out()
+      case (false, false, true) => tradeInformationNoActivities()
+      case (true, _, false) | (_, true, false) => tradeInformationOneActivity()
+      case (true, _, true) | (_, true, true) => tradeInformation()
+      case (_, _, _) => tradeInformationFindOut()
     }
 
   def countUnreadNotifications(amlsRefNo: Option[String], safeId: Option[String], accountTypeId: (String, String))(implicit headerCarrier: HeaderCarrier) = {

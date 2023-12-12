@@ -18,14 +18,14 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
-import models.renewal.{CETransactionsInLast12Months, Renewal}
-import play.api.mvc.MessagesControllerComponents
+import forms.renewal.CETransactionsInLast12MonthsFormProvider
+import models.renewal.Renewal
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RenewalService
 import utils.AuthAction
-import views.html.renewal.ce_transactions_in_last_12_months
+import views.html.renewal.CETransactionsInLast12MonthsView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -34,33 +34,35 @@ class CETransactionsInLast12MonthsController @Inject()(val dataCacheConnector: D
                                                        val ds: CommonPlayDependencies,
                                                        val renewalService: RenewalService,
                                                        val cc: MessagesControllerComponents,
-                                                       ce_transactions_in_last_12_months: ce_transactions_in_last_12_months) extends AmlsBaseController(ds, cc) {
-  def get(edit: Boolean = false) = authAction.async {
+                                                       formProvider: CETransactionsInLast12MonthsFormProvider,
+                                                       view: CETransactionsInLast12MonthsView) extends AmlsBaseController(ds, cc) {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Renewal](request.credId, Renewal.key) map {
         response =>
-          val form: Form2[CETransactionsInLast12Months] = (for {
+          val form = (for {
             renewal <- response
             transactions <- renewal.ceTransactionsInLast12Months
-          } yield Form2[CETransactionsInLast12Months](transactions)).getOrElse(EmptyForm)
-          Ok(ce_transactions_in_last_12_months(form, edit))
+          } yield formProvider().fill(transactions)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[CETransactionsInLast12Months](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(ce_transactions_in_last_12_months(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             renewal <- dataCacheConnector.fetch[Renewal](request.credId, Renewal.key)
             _ <- renewalService.updateRenewal(request.credId, renewal.ceTransactionsInLast12Months(data))
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get)
-            case false => Redirect(routes.WhichCurrenciesController.get(edit))
+          } yield if (edit) {
+            Redirect(routes.SummaryController.get)
+          } else {
+            Redirect(routes.WhichCurrenciesController.get(edit))
           }
-      }
+      )
     }
   }
 }

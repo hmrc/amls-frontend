@@ -16,8 +16,10 @@
 
 package models.moneyservicebusiness
 
-import models.businessmatching.{BusinessMatching, CurrencyExchange, ForeignExchange, TransmittingMoney}
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
+import models.registrationprogress._
+import play.api.i18n.Messages
 import play.api.libs.json._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.ControllerHelper
@@ -127,17 +129,46 @@ object MoneyServiceBusiness {
 
   val key = "msb"
 
-  def section(implicit cache: CacheMap): Section = {
-    val messageKey = key
-    val notStarted = Section(messageKey, NotStarted, false, controllers.msb.routes.WhatYouNeedController.get)
+  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+    val notStarted = TaskRow(
+      key,
+      controllers.msb.routes.WhatYouNeedController.get.url,
+      hasChanged = false,
+      NotStarted,
+      TaskRow.notStartedTag
+    )
 
     cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {
       model =>
         val msbService = ControllerHelper.getMsbServices(cache.getEntry[BusinessMatching](BusinessMatching.key)).getOrElse(Set.empty)
-        if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange))) {
-          Section(messageKey, Completed, model.hasChanged, controllers.msb.routes.SummaryController.get)
+        val isComplete = model.isComplete(
+          msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange)
+        )
+
+        if (isComplete && model.hasChanged) {
+          TaskRow(
+            key,
+            controllers.msb.routes.SummaryController.get.url,
+            hasChanged = true,
+            status = Updated,
+            tag = TaskRow.updatedTag
+          )
+        } else if (isComplete) {
+          TaskRow(
+            key,
+            controllers.msb.routes.SummaryController.get.url,
+            model.hasChanged,
+            Completed,
+            TaskRow.completedTag
+          )
         } else {
-          Section(messageKey, Started, model.hasChanged, controllers.msb.routes.WhatYouNeedController.get)
+          TaskRow(
+            key,
+            controllers.msb.routes.WhatYouNeedController.get.url,
+            model.hasChanged,
+            Started,
+            TaskRow.incompleteTag
+          )
         }
     }
   }

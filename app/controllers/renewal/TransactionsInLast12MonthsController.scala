@@ -20,16 +20,16 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.renewal.TransactionsInLast12MonthsFormProvider
+import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.businessmatching._
-import models.renewal.{Renewal, TransactionsInLast12Months}
-import play.api.mvc.MessagesControllerComponents
+import models.renewal.Renewal
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RenewalService
 import utils.AuthAction
+import views.html.renewal.TransactionsInLast12MonthsView
 
-import views.html.renewal.transactions_in_last_12_months
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class TransactionsInLast12MonthsController @Inject()(
@@ -38,37 +38,38 @@ class TransactionsInLast12MonthsController @Inject()(
                                                       val dataCacheConnector: DataCacheConnector,
                                                       renewalService: RenewalService,
                                                       val cc: MessagesControllerComponents,
-                                                      transactions_in_last_12_months: transactions_in_last_12_months) extends AmlsBaseController(ds, cc) {
+                                                      formProvider: TransactionsInLast12MonthsFormProvider,
+                                                      view: TransactionsInLast12MonthsView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        (for {
-          renewal <- OptionT(renewalService.getRenewal(request.credId))
-          transfers <- OptionT.fromOption[Future](renewal.transactionsInLast12Months)
-        } yield {
-          Ok(transactions_in_last_12_months(Form2[TransactionsInLast12Months](transfers), edit))
-        }) getOrElse Ok(transactions_in_last_12_months(EmptyForm, edit))
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      (for {
+        renewal <- OptionT(renewalService.getRenewal(request.credId))
+        transfers <- OptionT.fromOption[Future](renewal.transactionsInLast12Months)
+      } yield {
+        Ok(view(formProvider().fill(transfers), edit))
+      }) getOrElse Ok(view(formProvider(), edit))
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        Form2[TransactionsInLast12Months](request.body) match {
-          case f: InvalidForm => Future.successful(BadRequest(transactions_in_last_12_months(f, edit)))
-          case ValidForm(_, model) =>
-            dataCacheConnector.fetchAll(request.credId) flatMap {
-              optMap =>
-                (for {
-                  cacheMap <- optMap
-                  renewal <- cacheMap.getEntry[Renewal](Renewal.key)
-                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-                  services <- bm.msbServices
-                } yield {
-                  renewalService.updateRenewal(request.credId, renewal.transactionsInLast12Months(model)) map { _ =>
-                    redirectTo(services.msbServices, edit)
-                  }
-                }) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
-            }
-        }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        value =>
+          dataCacheConnector.fetchAll(request.credId) flatMap {
+            optMap =>
+              (for {
+                cacheMap <- optMap
+                renewal <- cacheMap.getEntry[Renewal](Renewal.key)
+                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                services <- bm.msbServices
+              } yield {
+                renewalService.updateRenewal(request.credId, renewal.transactionsInLast12Months(value)) map { _ =>
+                  redirectTo(services.msbServices, edit)
+                }
+              }) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+          }
+      )
   }
 
    private def redirectTo(services: Set[BusinessMatchingMsbService], edit: Boolean) =

@@ -18,32 +18,34 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.renewal.CETransactionsInLast12MonthsFormProvider
 import models.renewal.{CETransactionsInLast12Months, Renewal}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.renewal.ce_transactions_in_last_12_months
+import views.html.renewal.CETransactionsInLast12MonthsView
 
 import scala.concurrent.Future
 
-class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar  {
+class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
-    lazy val view = app.injector.instanceOf[ce_transactions_in_last_12_months]
+    lazy val view = inject[CETransactionsInLast12MonthsView]
     val controller = new CETransactionsInLast12MonthsController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService, cc = mockMcc,
-      ce_transactions_in_last_12_months = view
+      formProvider = inject[CETransactionsInLast12MonthsFormProvider],
+      view = view
     )
   }
 
@@ -58,7 +60,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("renewal.msb.ce.transactions.expected.title"))
+      contentAsString(result) must include(messages("renewal.msb.ce.transactions.expected.title"))
     }
 
     "load the page 'How many currency exchange transactions' with pre populated data" in new Fixture  {
@@ -75,31 +77,33 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "Show error message when user has not filled the mandatory fields" in new Fixture  {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.CETransactionsInLast12MonthsController.post().url)
+        .withFormUrlEncodedBody(
         "ceTransaction" -> ""
       )
 
       when(controller.dataCacheConnector.fetch[Renewal](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
 
-      when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+      when(mockRenewalService.updateRenewal(any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include (Messages("error.required.renewal.ce.transactions.in.12months"))
+      contentAsString(result) must include (messages("error.required.renewal.ce.transactions.in.12months"))
 
     }
 
     "Successfully save data in mongoCache and navigate to Next page" in new Fixture {
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.CETransactionsInLast12MonthsController.post().url)
+        .withFormUrlEncodedBody(
         "ceTransaction" -> "12345678963"
       )
 
       when(controller.dataCacheConnector.fetch[Renewal](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
 
-      when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+      when(mockRenewalService.updateRenewal(any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -112,20 +116,20 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       val incomingModel = Renewal(
       )
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.CETransactionsInLast12MonthsController.post().url)
+        .withFormUrlEncodedBody(
         "ceTransaction" -> "12345678963"
       )
 
       when(controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))
         (any(), any())).thenReturn(Future.successful(Some(incomingModel)))
 
-      when(mockRenewalService.updateRenewal(any(), any())(any(), any()))
+      when(mockRenewalService.updateRenewal(any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get.url))
     }
-
   }
 }

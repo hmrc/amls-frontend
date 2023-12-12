@@ -18,12 +18,11 @@ package controllers
 
 import controllers.actions.SuccessfulAuthAction
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.AmlsSpec
-import views.html.{unauthorised, unauthorised_role}
+import views.html.{UnauthorisedView, UnauthorisedRoleView}
 
 class AmlsControllerSpec extends AmlsSpec {
 
@@ -32,8 +31,8 @@ class AmlsControllerSpec extends AmlsSpec {
 
       implicit val unauthenticatedRequest = FakeRequest()
       val request = addToken(unauthenticatedRequest)
-      lazy val view1 = app.injector.instanceOf[unauthorised]
-      lazy val view2 = app.injector.instanceOf[unauthorised_role]
+      lazy val view1 = app.injector.instanceOf[UnauthorisedView]
+      lazy val view2 = app.injector.instanceOf[UnauthorisedRoleView]
       val controller = new AmlsController(SuccessfulAuthAction,
         commonDependencies,
         mockMcc,
@@ -47,13 +46,13 @@ class AmlsControllerSpec extends AmlsSpec {
       "load the unauthorised page with an unauthenticated request" in new UnauthenticatedFixture {
           val result = controller.unauthorised(request)
           status(result) must be(OK)
-          contentAsString(result) must include(Messages("unauthorised.title"))
+          contentAsString(result) must include(messages("unauthorised.title"))
         }
 
       "load the unauthorised role with an unauthenticated request" in new UnauthenticatedFixture {
         val result = controller.unauthorised_role(request)
         status(result) mustBe UNAUTHORIZED
-        contentAsString(result) must include(Messages("unauthorised.title"))
+        contentAsString(result) must include(messages("unauthorised.title"))
       }
     }
 }

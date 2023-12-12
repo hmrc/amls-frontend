@@ -17,8 +17,8 @@
 package controllers.responsiblepeople
 
 import config.ApplicationConfig
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.TrainingFormProvider
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{PersonName, ResponsiblePerson, TrainingNo, TrainingYes}
 import org.jsoup.Jsoup
@@ -27,15 +27,15 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils._
+import views.html.responsiblepeople.TrainingView
 
 import scala.concurrent.Future
 
-class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   val recordId = 1
 
@@ -44,14 +44,16 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
     lazy val mockApplicationConfig = mock[ApplicationConfig]
 
-    lazy val defaultBuilder = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[AuthAction].to(SuccessfulAuthAction))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-
-    val builder = defaultBuilder
-    lazy val app = builder.build()
-    lazy val controller = app.injector.instanceOf[TrainingController]
+    lazy val controller = new TrainingController(
+      messagesApi,
+      mockCacheConnector,
+      SuccessfulAuthAction,
+      commonDependencies,
+      mockMcc,
+      inject[TrainingFormProvider],
+      inject[TrainingView],
+      errorView
+    )
 
   }
 
@@ -113,7 +115,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
     "post is called" when {
       "index is out of bounds, must respond with NOT_FOUND" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.TrainingController.post(1).url)
+        .withFormUrlEncodedBody(
           "training" -> "true",
           "information" -> "test"
         )
@@ -131,7 +134,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       "given valid data" when {
         "edit is false" must {
           "redirect to FitAndProperNoticeController" in new Fixture {
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.TrainingController.post(1).url)
+            .withFormUrlEncodedBody(
               "training" -> "true",
               "information" -> "I do not remember when I did the training"
             )
@@ -153,7 +157,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
         "edit is true" must {
           "redirect to DetailedAnswersController" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.TrainingController.post(1).url)
+            .withFormUrlEncodedBody(
               "training" -> "true",
               "information" -> "I do not remember when I did the training"
             )
@@ -169,7 +174,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       }
 
       "given invalid data, must respond with BAD_REQUEST" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.TrainingController.post(1).url)
+        .withFormUrlEncodedBody(
           "training" -> "not a boolean value"
         )
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())

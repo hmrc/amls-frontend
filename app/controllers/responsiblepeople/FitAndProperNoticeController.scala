@@ -18,24 +18,19 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, RepeatingSection}
-import views.html.responsiblepeople.fit_and_proper_notice
-
-import scala.concurrent.Future
-
+import views.html.responsiblepeople.FitAndProperNoticeView
 
 @Singleton
 class FitAndProperNoticeController @Inject()(val dataCacheConnector: DataCacheConnector,
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val cc: MessagesControllerComponents,
-                                             fit_and_proper_notice: fit_and_proper_notice) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                             view: FitAndProperNoticeView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
-    implicit request =>
-        Future(Ok(fit_and_proper_notice(EmptyForm, edit, index, flow, "")))
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction {
+    implicit request => Ok(view(edit, index, flow))
   }
 }

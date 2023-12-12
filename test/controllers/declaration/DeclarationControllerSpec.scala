@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
-import models.registrationprogress.{Completed, Section, Started}
+import models.registrationprogress.{Completed, Section, Started, TaskRow}
 import models.renewal.{AMLSTurnover, AMPTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
 import models.status.{NotCompleted, ReadyForRenewal, SubmissionReadyForReview}
 import models.{Country, ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
@@ -34,9 +34,9 @@ import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.{RenewalService, SectionsProvider}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.declaration.declare
-import scala.language.postfixOps
+import views.html.declaration.DeclareView
 
+import scala.language.postfixOps
 import scala.concurrent.Future
 
 class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
@@ -45,7 +45,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     self =>
     val request = addToken(authRequest)
     val mockSectionsProvider = mock[SectionsProvider]
-    lazy val view = app.injector.instanceOf[declare]
+    lazy val view = app.injector.instanceOf[DeclareView]
     val declarationController = new DeclarationController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mock[DataCacheConnector],
@@ -53,7 +53,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       cc = mockMcc,
       sectionsProvider = mockSectionsProvider,
       renewalService = mock[RenewalService],
-      declare = view
+      view = view
     )
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
@@ -94,7 +94,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       hasChanged = true
     )
 
-    when(declarationController.renewalService.getRenewal(any())(any(), any()))
+    when(declarationController.renewalService.getRenewal(any())(any()))
       .thenReturn(Future.successful(Some(completeRenewal)))
 
     when(declarationController.renewalService.isRenewalComplete(any(), any())(any(), any()))
@@ -104,13 +104,13 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
   "Declaration get" must {
     "with completed sections" must {
       val completedSections = Seq(
-        Section("s1", Completed, true, mock[Call]),
-        Section("s2", Completed, true, mock[Call])
+        TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
+        TaskRow("s2", "/bar", true, Completed, TaskRow.completedTag)
       )
 
       "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
         when {
-          mockSectionsProvider.sections(any[String])(any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -126,7 +126,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "load the declaration page for pre-submissions if name and business matching is found" in new Fixture {
         when {
-          mockSectionsProvider.sections(any[String])(any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -145,7 +145,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "load the declaration page for pre-submissions if name and business matching is found (renewal)" in new Fixture {
         when {
-          mockSectionsProvider.sections(any[String])(any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -164,7 +164,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "load the declaration page for pre-submissions if name and business matching is found (amendment)" in new Fixture {
         when {
-          mockSectionsProvider.sections(any[String])(any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -183,7 +183,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "report error if retrieval of amlsRegNo fails" in new Fixture {
         when {
-          mockSectionsProvider.sections(any[String])(any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -204,13 +204,13 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "with incomplete sections" must {
       val incompleteSections = Seq(
-        Section("s1", Completed, true, mock[Call]),
-        Section("s2", Started, true, mock[Call])
+        TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
+        TaskRow("s2", "/foo", true, Started, TaskRow.incompleteTag)
       )
 
       "redirect to the RegistrationProgressController" in new Fixture {
         when {
-          mockSectionsProvider.sections(any[String])(any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
         }.thenReturn(Future.successful(incompleteSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -229,13 +229,13 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
   "Declaration getWithAmendment" must {
     "with completed sections" must {
       val completedSections = Seq(
-        Section("s1", Completed, true, mock[Call]),
-        Section("s2", Completed, true, mock[Call])
+        TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
+        TaskRow("s2", "/bar", true, Completed, TaskRow.completedTag)
       )
 
       "load the declaration for amendments page for submissions if name and business matching is found" in new Fixture {
         when {
-          mockSectionsProvider.sections(any[String])(any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -253,7 +253,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
         when {
-          mockSectionsProvider.sections(any[String])(any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -269,7 +269,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "redirect to the declaration-persons for amendments page if name and/or business matching not found and submission is ready for review" in new Fixture {
         when {
-          mockSectionsProvider.sections(any[String])(any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
@@ -286,13 +286,13 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
     "with incomplete sections" must {
       val incompleteSections = Seq(
-        Section("s1", Completed, true, mock[Call]),
-        Section("s2", Started, true, mock[Call])
+        TaskRow("s1", "/foo", true, Completed, TaskRow.completedTag),
+        TaskRow("s2", "/bar", true, Started, TaskRow.incompleteTag)
       )
 
       "redirect to the RegistrationProgressController" in new Fixture {
         when {
-          mockSectionsProvider.sections(any[String])(any(), any())
+          mockSectionsProvider.taskRows(any[String])(any(), any(), any())
         }.thenReturn(Future.successful(incompleteSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())

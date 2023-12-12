@@ -16,6 +16,7 @@
 
 package models.tcsp
 
+import models.tcsp.ProvidedServices._
 import play.api.i18n.Messages
 import utils.AmlsSpec
 

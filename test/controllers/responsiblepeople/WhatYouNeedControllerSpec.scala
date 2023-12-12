@@ -17,26 +17,31 @@
 package controllers.responsiblepeople
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
+import forms.responsiblepeople.PersonNameFormProvider
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import utils.{AmlsSpec, DependencyMocks}
-import play.api.i18n.Messages
 import play.api.test.Helpers._
-import views.html.responsiblepeople.what_you_need
+import play.api.test.Injecting
+import views.html.responsiblepeople.WhatYouNeedView
 
 import scala.concurrent.Future
 
-class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[what_you_need]
+    lazy val view = inject[WhatYouNeedView]
     val controller = new WhatYouNeedController (
-      dataCacheConnector = mockCacheConnector, authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
-      what_you_need = view)
+      dataCacheConnector = mockCacheConnector,
+      authAction = SuccessfulAuthAction,
+      ds = commonDependencies,
+      cc = mockMcc,
+      view = view)
   }
 
   "WhatYouNeedController" must {
@@ -52,9 +57,9 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         val result = controller.get(1)(request)
         status(result) must be(OK)
 
-        val pageTitle = Messages("title.wyn") + " - " +
-          Messages("summary.responsiblepeople") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
+        val pageTitle = messages("title.wyn") + " - " +
+          messages("summary.responsiblepeople") + " - " +
+          messages("title.amls") + " - " + messages("title.gov")
 
         contentAsString(result) must include(pageTitle)
       }

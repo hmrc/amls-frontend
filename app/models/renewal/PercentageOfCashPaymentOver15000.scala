@@ -19,17 +19,30 @@ package models.renewal
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
+import models.{Enumerable, WithName}
 import play.api.libs.json._
 
-sealed trait PercentageOfCashPaymentOver15000
+sealed trait PercentageOfCashPaymentOver15000 {
+  val value: String
+}
 
-object PercentageOfCashPaymentOver15000 {
+object PercentageOfCashPaymentOver15000 extends Enumerable.Implicits {
 
-  case object First extends PercentageOfCashPaymentOver15000
-  case object Second extends PercentageOfCashPaymentOver15000
-  case object Third extends PercentageOfCashPaymentOver15000
-  case object Fourth extends PercentageOfCashPaymentOver15000
-  case object Fifth extends PercentageOfCashPaymentOver15000
+  case object First extends WithName("zeroToTwenty") with PercentageOfCashPaymentOver15000 {
+    override val value: String = "01"
+  }
+  case object Second extends WithName("twentyOneToForty") with PercentageOfCashPaymentOver15000 {
+    override val value: String = "02"
+  }
+  case object Third extends WithName("fortyOneToSixty") with PercentageOfCashPaymentOver15000 {
+    override val value: String = "03"
+  }
+  case object Fourth extends WithName("sixtyOneToEighty") with PercentageOfCashPaymentOver15000 {
+    override val value: String = "04"
+  }
+  case object Fifth extends WithName("eightyOneToOneHundred") with PercentageOfCashPaymentOver15000 {
+    override val value: String = "05"
+  }
 
   import utils.MappingUtils.Implicits._
 
@@ -84,4 +97,14 @@ object PercentageOfCashPaymentOver15000 {
     case PercentageOfCashPaymentOver15000.Fifth => models.hvd.PercentageOfCashPaymentOver15000.Fifth
     case _ => throw new Exception("Invalid PercentageOfCashPaymentOver15000")
   }
+
+  val all: Seq[PercentageOfCashPaymentOver15000] = Seq(
+    First,
+    Second,
+    Third,
+    Fourth,
+    Fifth
+  )
+
+  implicit val enumerable: Enumerable[PercentageOfCashPaymentOver15000] = Enumerable(all.map(v => v.toString -> v): _*)
 }

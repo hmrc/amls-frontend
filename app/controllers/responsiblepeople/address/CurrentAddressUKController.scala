@@ -19,48 +19,49 @@ package controllers.responsiblepeople.address
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.responsiblepeople.address.CurrentAddressUKFormProvider
 import models.responsiblepeople._
-import play.api.mvc.MessagesControllerComponents
-import services.{AutoCompleteService, StatusService}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, ControllerHelper, DateOfChangeHelper, RepeatingSection}
-import views.html.responsiblepeople.address.current_address_UK
-
+import views.html.responsiblepeople.address.CurrentAddressUKView
 
 import scala.concurrent.Future
 
 class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheConnector,
                                             implicit val auditConnector: AuditConnector,
-                                            autoCompleteService: AutoCompleteService,
                                             statusService: StatusService,
                                             authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
                                             val cc: MessagesControllerComponents,
-                                            current_address_UK: current_address_UK,
-                                            implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper with DateOfChangeHelper {
+                                            formProvider: CurrentAddressUKFormProvider,
+                                            view: CurrentAddressUKView,
+                                            implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with AddressHelper with DateOfChangeHelper {
 
-  def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+  def get(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[ResponsiblePerson](request.credId, index) map {
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _,
-        Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _)), _, _, _, _, _, _, _, _, _, _, _, _))
-        => Ok(current_address_UK(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName))
-        case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
-        => Ok(current_address_UK(EmptyForm, edit, index, flow, personName.titleName))
-        case _ => NotFound(notFoundView)
+      getData[ResponsiblePerson](request.credId, index) map { responsiblePerson =>
+        responsiblePerson.fold(NotFound(notFoundView)) { person =>
+          (person.personName, person.addressHistory) match {
+            case (Some(name), Some(ResponsiblePersonAddressHistory(Some(currentAddress), _, _))) =>
+              Ok(view(formProvider().fill(currentAddress), edit, index, flow, name.titleName))
+            case (Some(name), _) => Ok(view(formProvider(), edit, index, flow, name.titleName))
+            case _ => NotFound(notFoundView)
+          }
+        }
       }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
     authAction.async {
       implicit request =>
-        (Form2[ResponsiblePersonCurrentAddress](request.body) match {
-          case f: InvalidForm =>
+        formProvider().bindFromRequest().fold(
+          formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
-              BadRequest(current_address_UK(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
-            }
-          case ValidForm(_, data) => {
+              BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            },
+          data => {
             getData[ResponsiblePerson](request.credId, index) flatMap { responsiblePerson =>
               val currentAddressWithTime = (for {
                 rp <- responsiblePerson
@@ -73,7 +74,7 @@ class CurrentAddressUKController @Inject ()(val dataCacheConnector: DataCacheCon
               }
             }
           }
-        }).recoverWith {
+        ).recoverWith {
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
     }

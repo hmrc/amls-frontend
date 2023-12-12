@@ -21,28 +21,29 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.tcsp.what_you_need
+import views.html.tcsp.WhatYouNeedView
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[what_you_need]
+    lazy val view = app.injector.instanceOf[WhatYouNeedView]
     val controller = new WhatYouNeedController(
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      what_you_need = view)
+      view = view)
   }
 
   "WhatYouNeedController" when {
 
     "get is called" must {
 
-      "respond with SEE_OTHER and redirect to the 'what you need' page" in new Fixture {
+      "return OK and render the 'what you need' page" in new Fixture {
 
         val result = controller.get()(request)
         status(result) must be(OK)
+        contentAsString(result) must include(s"${messages("title.wyn")} - ${messages("summary.tcsp")}")
       }
     }
   }

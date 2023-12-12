@@ -20,6 +20,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
+import models.hvd.Products._
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
@@ -266,6 +267,12 @@ class ProductsSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerTest {
         val messagesApi = app.injector.instanceOf[MessagesApi]
         implicit val messages: Messages = messagesApi.preferred(Seq(lang))
         Clothing.getMessage must be("Clothing")
+      }
+
+      "return correct text for Other with empty string" in {
+        val messagesApi = app.injector.instanceOf[MessagesApi]
+        implicit val messages: Messages = messagesApi.preferred(Seq(lang))
+        Other("").getMessage must be("Other things")
       }
 
       "return correct text for Other" in {

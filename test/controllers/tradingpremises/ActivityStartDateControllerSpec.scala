@@ -18,6 +18,7 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.tradingpremises.ActivityStartDateFormProvider
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -27,14 +28,15 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction}
-import views.html.tradingpremises.activity_start_date
+import views.html.tradingpremises.ActivityStartDateView
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
+class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with Injecting {
 
   val address = Address("1", None, None, None, "AA1 1BB", None)
 
@@ -44,14 +46,15 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
     val authAction: AuthAction = SuccessfulAuthAction
-    lazy val view = app.injector.instanceOf[activity_start_date]
+    lazy val view = inject[ActivityStartDateView]
     val controller = new ActivityStartDateController(
       messagesApi,
       authAction,
       commonDependencies,
       self.cache,
       cc = mockMcc,
-      activity_start_date = view,
+      formProvider = inject[ActivityStartDateFormProvider],
+      view = view,
       error = errorView)
   }
 
@@ -96,7 +99,8 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
     "POST:" must {
       "successfully redirect to next page on valid input" in new Fixture {
-        val postRequest = requestWithUrlEncodedBody(
+        val postRequest = FakeRequest(POST, routes.ActivityStartDateController.post(1, false).url)
+        .withFormUrlEncodedBody(
           "startDate.day" -> "20",
           "startDate.month" -> "5",
           "startDate.year" -> "2014"
@@ -113,7 +117,8 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
       }
 
       "successfully redirect to next page on valid input in edit mode" in new Fixture {
-        val postRequest = requestWithUrlEncodedBody(
+        val postRequest = FakeRequest(POST, routes.ActivityStartDateController.post(1, true).url)
+        .withFormUrlEncodedBody(
           "startDate.day" -> "20",
           "startDate.month" -> "5",
           "startDate.year" -> "2014"
@@ -131,12 +136,13 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
         val result = controller.post(1, true)(postRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+        redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
       }
 
       "throw error on missing required field" in new Fixture {
-        val postRequest = requestWithUrlEncodedBody(
+        val postRequest = FakeRequest(POST, routes.ActivityStartDateController.post(1, false).url)
+        .withFormUrlEncodedBody(
           "startDate.day" -> "",
           "startDate.month" -> "5",
           "startDate.year" -> "2014"

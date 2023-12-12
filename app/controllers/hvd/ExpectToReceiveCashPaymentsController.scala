@@ -18,69 +18,58 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
-import jto.validation.{Path, ValidationError}
-import models.hvd.{Hvd, PaymentMethods}
-import play.api.mvc.MessagesControllerComponents
+import forms.hvd.ExpectToReceiveFormProvider
+import models.hvd.Hvd
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
+import views.html.hvd.ExpectToReceiveView
 
-import views.html.hvd.expect_to_receive
-
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class ExpectToReceiveCashPaymentsController @Inject()( val authAction: AuthAction,
-                                                       val ds: CommonPlayDependencies,
-                                                       implicit val cacheConnector: DataCacheConnector,
-                                                       implicit val statusService: StatusService,
-                                                       implicit val serviceFlow: ServiceFlow,
-                                                       val cc: MessagesControllerComponents,
-                                                       expect_to_receive: expect_to_receive) extends AmlsBaseController(ds, cc) {
+class ExpectToReceiveCashPaymentsController @Inject()(val authAction: AuthAction,
+                                                      val ds: CommonPlayDependencies,
+                                                      implicit val cacheConnector: DataCacheConnector,
+                                                      implicit val statusService: StatusService,
+                                                      implicit val serviceFlow: ServiceFlow,
+                                                      val cc: MessagesControllerComponents,
+                                                      formProvider: ExpectToReceiveFormProvider,
+                                                      view: ExpectToReceiveView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       cacheConnector.fetch[Hvd](request.credId, Hvd.key) map {
         response =>
-          val form: Form2[PaymentMethods] = (for {
+          val form = (for {
             hvd <- response
             receivePayments <- hvd.cashPaymentMethods
           } yield {
-            Form2[PaymentMethods](receivePayments)
-          }).getOrElse(EmptyForm)
+            formProvider().fill(receivePayments)
+          }).getOrElse(formProvider())
 
-          Ok(expect_to_receive(form, edit))
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[PaymentMethods](request.body) match {
-        case f: InvalidForm =>
-          val message = "error.required.hvd.choose.option"
-          findValidationMessage(f.errors, message) match {
-            case true =>
-              val paymentMethodsNotSelected = f.copy(errors = Seq((Path("paymentMethods"), Seq(ValidationError(Seq(message))))))
-              Future.successful(BadRequest(expect_to_receive(paymentMethodsNotSelected, edit)))
-            case _ =>
-              Future.successful(BadRequest(expect_to_receive(f, edit)))
-          }
-
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             hvd <- cacheConnector.fetch[Hvd](request.credId, Hvd.key)
             _ <- cacheConnector.save[Hvd](request.credId, Hvd.key,
               hvd.cashPaymentMethods(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get)
-            case false => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+          } yield if (edit) {
+            Redirect(routes.SummaryController.get)
+          } else {
+            Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
           }
-      }
+      )
   }
-
-  def findValidationMessage(formErrors: Seq[(Path, Seq[ValidationError])], message: String) =
-    formErrors.flatMap(errors => errors._2.map(_.message == message)).contains(true)
 }

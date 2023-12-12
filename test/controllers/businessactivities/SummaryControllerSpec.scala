@@ -19,35 +19,41 @@ package controllers.businessactivities
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.Country
+import models.businessactivities.TransactionTypes.{DigitalSoftware, Paper}
 import models.businessactivities._
-import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
+import models.businessmatching.{BusinessMatching, BusinessActivities => BMBusinessActivities}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
-import utils.AmlsSpec
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import views.html.businessactivities.summary
+import utils.AmlsSpec
+import utils.businessactivities.CheckYourAnswersHelper
+import views.html.businessactivities.CheckYourAnswersView
+
 import scala.concurrent.{ExecutionContext, Future}
 
-class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
+class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    implicit val ec = app.injector.instanceOf[ExecutionContext]
+    implicit val ec = inject[ExecutionContext]
 
-    lazy val view = app.injector.instanceOf[summary]
+    lazy val view = inject[CheckYourAnswersView]
     val controller = new SummaryController (
       dataCache = mock[DataCacheConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       statusService = mock[StatusService],
       cc = mockMcc,
-      summary = view
+      cyaHelper = inject[CheckYourAnswersHelper],
+      view = view
     )
 
     val mockCacheMap = mock[CacheMap]
@@ -78,7 +84,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     "load the summary page when section data is available" in new Fixture {
 
       val model = BusinessActivities(None)
-      when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+      when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCache.fetchAll(any())(any()))
@@ -96,7 +102,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+      when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCache.fetchAll(any())(any()))
@@ -124,7 +130,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
           .thenReturn(Some(completeModel))
 
 
-        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get()(request)
@@ -148,7 +154,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         when(mockCacheMap.getEntry[BusinessActivities](eqTo(BusinessActivities.key))(any()))
           .thenReturn(Some(completeModel))
 
-        when(controller.statusService.getStatus(any(), any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get()(request)

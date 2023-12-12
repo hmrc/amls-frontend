@@ -16,82 +16,48 @@
 
 package controllers.businessmatching
 
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.businessmatching.BusinessTypeFormProvider
+import models.businessmatching.BusinessType
 import models.businessmatching.BusinessType._
-import models.businessmatching.{BusinessMatching, BusinessType}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.businessmatching.BusinessTypeService
 import utils.AuthAction
 import views.html.businessmatching._
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
-class BusinessTypeController @Inject()(val dataCache: DataCacheConnector,
-                                       authAction: AuthAction,
+class BusinessTypeController @Inject()(authAction: AuthAction,
                                        val ds: CommonPlayDependencies,
                                        val cc: MessagesControllerComponents,
-                                       business_type: business_type) extends AmlsBaseController(ds, cc) {
+                                       service: BusinessTypeService,
+                                       formProvider: BusinessTypeFormProvider,
+                                       view: BusinessTypeView) extends AmlsBaseController(ds, cc) {
 
-  def get() = authAction.async {
+  def get(): Action[AnyContent] = authAction.async {
     implicit request =>
-      dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key) map {
-        maybeBusinessMatching =>
-          val redirect = for {
-            businessMatching <- maybeBusinessMatching
-            reviewDetails <- businessMatching.reviewDetails
-            businessType <- reviewDetails.businessType
-          } yield businessType match {
-            case UnincorporatedBody =>
-              Redirect(routes.TypeOfBusinessController.get())
-            case LPrLLP | LimitedCompany =>
-              Redirect(routes.CompanyRegistrationNumberController.get())
-            case _ =>
-              Redirect(routes.RegisterServicesController.get())
-          }
-          redirect getOrElse Ok(business_type(EmptyForm))
+      service.getBusinessType(request.credId) map { btOpt =>
+         btOpt.map(getResultByBusiness).getOrElse(Ok(view(formProvider())))
       }
   }
 
-  def post() = authAction.async {
+  def post(): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[BusinessType](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(business_type(f)))
-        case ValidForm(_, data) =>
-          dataCache.fetch[BusinessMatching](request.credId, BusinessMatching.key) flatMap {
-            bm =>
-              val updatedDetails = for {
-                businessMatching <- bm
-                reviewDetails <- businessMatching.reviewDetails
-              } yield {
-                businessMatching.copy(
-                  reviewDetails = Some(
-                    reviewDetails.copy(
-                      businessType = Some(data)
-                    )
-                  )
-                )
-              }
-              updatedDetails map {
-                details =>
-                  dataCache.save[BusinessMatching](request.credId, BusinessMatching.key, updatedDetails) map {
-                    _ =>
-                      data match {
-                        case UnincorporatedBody =>
-                          Redirect(routes.TypeOfBusinessController.get())
-                        case LPrLLP | LimitedCompany =>
-                          Redirect(routes.CompanyRegistrationNumberController.get())
-                        case _ =>
-                          Redirect(routes.RegisterServicesController.get())
-                      }
-                  }
-              } getOrElse Future.successful {
-                Redirect(routes.RegisterServicesController.get())
-              }
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors))),
+        data =>
+          service.updateBusinessType(request.credId, data).map {
+            _.fold(Redirect(routes.RegisterServicesController.get()))(getResultByBusiness)
           }
-      }
+      )
+  }
+
+  private def getResultByBusiness(businessType: BusinessType): Result = businessType match {
+    case UnincorporatedBody => Redirect(routes.TypeOfBusinessController.get())
+    case LPrLLP | LimitedCompany => Redirect(routes.CompanyRegistrationNumberController.get())
+    case _ => Redirect(routes.RegisterServicesController.get())
   }
 }
 

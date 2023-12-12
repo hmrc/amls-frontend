@@ -1,0 +1,78 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package views.tradingpremises
+
+import forms.tradingpremises.ActivityStartDateFormProvider
+import models.tradingpremises.Address
+import org.scalatest.MustMatchers
+import play.api.test.FakeRequest
+import utils.AmlsViewSpec
+import views.Fixture
+import views.html.tradingpremises.ActivityStartDateView
+
+class ActivityStartDateViewSpec extends AmlsViewSpec with MustMatchers {
+
+  lazy val activity_start_date = inject[ActivityStartDateView]
+  lazy val fp = inject[ActivityStartDateFormProvider]
+
+  implicit val request = FakeRequest()
+
+  val address = Address("line 1", Some("Line 2"), None, None, "postcode")
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addTokenForView()
+  }
+
+  "ActivityStartDateView" must {
+    "have correct title, heading and load UI with empty form" in new ViewFixture {
+
+      val pageTitle = messages("tradingpremises.startDate.title") + " - " +
+        messages("summary.tradingpremises") + " - " +
+        messages("title.amls") + " - " + messages("title.gov")
+
+      def view = {
+        activity_start_date(fp(), 1, false, address)
+      }
+
+      val expectedAddressInHtml = """<p class="govuk-body"> line 1<br> Line 2<br> postcode<br> </p>"""
+
+      doc.html must include(expectedAddressInHtml)
+      doc.title must be(pageTitle)
+      heading.html must be(messages("tradingpremises.startDate.title"))
+      subHeading.html must include(messages("summary.tradingpremises"))
+
+      doc.getElementsContainingOwnText(messages("lbl.day")).hasText must be(true)
+      doc.getElementsContainingOwnText(messages("lbl.month")).hasText must be(true)
+      doc.getElementsContainingOwnText(messages("lbl.year")).hasText must be(true)
+
+      doc.getElementsContainingOwnText(messages("lbl.date.example")).hasText must be(true)
+    }
+
+    behave like pageWithErrors(
+      activity_start_date(
+        fp().withError("startDate.day", messages("error.required.tp.address.date.one", messages("lbl.day"))),
+        1,
+        false,
+        address
+      ),
+      "startDate",
+      messages("error.required.tp.address.date.one", messages("lbl.day"))
+    )
+
+    behave like pageWithBackLink(activity_start_date(fp(), 1, true, address))
+  }
+}

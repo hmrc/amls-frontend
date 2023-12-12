@@ -1,0 +1,58 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import models.asp.Service
+@import views.html.components.{Button, Heading, SectionSubtitle, ReturnLink}
+@import views.html.components.forms.{ErrorSummary, InputCheckbox}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    inputCheckbox: InputCheckbox,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean)(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
+
+@layout(pageTitle = messages("asp.services.title") + " - " + messages("summary.asp")) {
+
+    @errorSummary(form, Some(Map("services" -> "services_0")))
+
+    @subtitle("summary.asp")
+
+    @heading("asp.services.title")
+
+    @formHelper(action = controllers.asp.routes.ServicesOfBusinessController.post(edit)) {
+
+        @inputCheckbox(
+            Checkboxes(
+                name = "services",
+                hint = Some(Hint(content = Text(messages("lbl.select.all")))),
+                items = Service.formValues
+            ).withFormField(form("services"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

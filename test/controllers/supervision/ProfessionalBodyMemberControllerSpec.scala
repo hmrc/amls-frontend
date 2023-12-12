@@ -17,6 +17,8 @@
 package controllers.supervision
 
 import controllers.actions.SuccessfulAuthAction
+import forms.supervision.MemberOfProfessionalBodyFormProvider
+import models.supervision.ProfessionalBodies._
 import models.supervision._
 import org.jsoup.Jsoup
 import org.scalatestplus.mockito.MockitoSugar
@@ -25,25 +27,26 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.supervision.member_of_professional_body
+import views.html.supervision.MemberOfProfessionalBodyView
+
 import scala.language.postfixOps
-
 import scala.concurrent.{Await, Future}
-
 import scala.concurrent.duration._
 
-class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
+class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[member_of_professional_body]
+    lazy val view = inject[MemberOfProfessionalBodyView]
     val controller = new ProfessionalBodyMemberController (
       dataCacheConnector = mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      member_of_professional_body = view)
+      formProvider = inject[MemberOfProfessionalBodyFormProvider],
+      view = view)
 
     mockCacheSave[Supervision]
 
@@ -132,7 +135,8 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
         "isAMember field is true" when {
           "edit is false" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
+            .withFormUrlEncodedBody(
               "isAMember" -> "true"
             )
 
@@ -145,7 +149,8 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
           "edit is true" when {
             "professionalBodies is not defined" in new Fixture {
 
-              val newRequest = requestWithUrlEncodedBody(
+              val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
+              .withFormUrlEncodedBody(
                 "isAMember" -> "true"
               )
 
@@ -176,7 +181,8 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
         "isMember is false" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
+          .withFormUrlEncodedBody(
             "isAMember" -> "false"
           )
 
@@ -213,7 +219,8 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
           "isMember is true" when {
             "ProfessionalBodyMemberYes is already defined and professional bodies provided" in new Fixture {
 
-              val newRequest = requestWithUrlEncodedBody(
+              val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
+              .withFormUrlEncodedBody(
                 "isAMember" -> "true"
               )
 
@@ -242,7 +249,8 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody("" -> "")
+      val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
+      .withFormUrlEncodedBody("" -> "")
 
       mockCacheFetch[Supervision](None)
 
@@ -260,7 +268,8 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
     "remove professionalBodies data" when {
       "updated from ProfessionalBodyMemberYes to No" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
+        .withFormUrlEncodedBody(
           "isAMember" -> "false"
         )
 
@@ -282,7 +291,8 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
       }
       "ProfessionalBodyMemberNo and professionalBodies is defined" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.ProfessionalBodyMemberController.post().url)
+        .withFormUrlEncodedBody(
           "isAMember" -> "false"
         )
 

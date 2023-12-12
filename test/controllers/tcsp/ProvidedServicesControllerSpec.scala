@@ -17,31 +17,34 @@
 package controllers.tcsp
 
 import controllers.actions.SuccessfulAuthAction
-import models.tcsp.{Other, ProvidedServices, Tcsp}
+import forms.tcsp.ProvidedServicesFormProvider
+import models.tcsp.ProvidedServices.{Other, PhonecallHandling}
+import models.tcsp.{ProvidedServices, Tcsp}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.tcsp.provided_services
+import views.html.tcsp.ProvidedServicesView
 
 import scala.concurrent.Future
 
-class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[provided_services]
+    lazy val view = inject[ProvidedServicesView]
     val controller = new ProvidedServicesController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      provided_services = view,
+      formProvider = inject[ProvidedServicesFormProvider],
+      view = view,
       error = errorView)
   }
 
@@ -66,8 +69,7 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-
-        document.select("input[id=services-08]").attr("checked") must be("checked")
+        document.select("input[id=services_7]").hasAttr("checked") mustBe true
         document.select("input[name=details]").`val` must be ("some other service")
       }
     }
@@ -78,8 +80,9 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "successfully navigate to next page when valid data is sent" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "services[]" -> "01"
+        val newRequest = FakeRequest(POST, routes.ProvidedServicesController.post().url)
+          .withFormUrlEncodedBody(
+          "services[0]" -> PhonecallHandling.toString
         )
 
         when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
@@ -94,8 +97,9 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "successfully navigate to summary page when valid data is sent and edit mode is on" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "services[]" -> "01"
+        val newRequest = FakeRequest(POST, routes.ProvidedServicesController.post(true).url)
+          .withFormUrlEncodedBody(
+          "services[0]" -> PhonecallHandling.toString
         )
 
         when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
@@ -110,21 +114,23 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "show an error when no option been selected" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody("" -> "")
+        val newRequest = FakeRequest(POST, routes.ProvidedServicesController.post().url)
+          .withFormUrlEncodedBody("" -> "")
 
         val result = controller.post()(newRequest)
 
         status(result) must be (BAD_REQUEST)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("a[href=#services]").text must include(Messages("error.required.tcsp.provided_services.services"))
+        document.getElementById("services-error").text must include(messages("error.required.tcsp.provided_services.services"))
       }
 
 
       "show an error when other option been selected and not providing the mandatory data" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
-          "services[]" -> "08",
+        val newRequest = FakeRequest(POST, routes.ProvidedServicesController.post(true).url)
+          .withFormUrlEncodedBody(
+          "services[0]" -> Other("").toString,
           "details" -> ""
         )
 
@@ -133,8 +139,7 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
         status(result) must be (BAD_REQUEST)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.select("a[href=#details]").text must include(Messages("error.required.tcsp.provided_services.details"))
-
+        document.getElementById("details-error").text must include(messages("error.required.tcsp.provided_services.details"))
       }
     }
   }

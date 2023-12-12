@@ -18,13 +18,14 @@ package models.businessdetails
 
 import jto.validation.forms._
 import jto.validation.{From, Rule, Write}
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class RegisteredOfficeIsUK(isUK: Boolean)
 
 object RegisteredOfficeIsUK {
 
-  implicit val formats = Json.format[RegisteredOfficeIsUK]
+  implicit val formats: OFormat[RegisteredOfficeIsUK] = Json.format[RegisteredOfficeIsUK]
+
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, RegisteredOfficeIsUK] =

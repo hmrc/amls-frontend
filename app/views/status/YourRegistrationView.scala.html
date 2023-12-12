@@ -1,0 +1,129 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.components.{Anchor, Heading, FeedbackSurveyLink, PrintLink}
+@import views.html.status.components.ApplicationIncomplete
+
+@import config.ApplicationConfig
+
+@this(
+    layout: Layout,
+    heading: Heading,
+    anchor: Anchor,
+    applicationIncomplete: ApplicationIncomplete,
+    feedbackSurveyLink: FeedbackSurveyLink,
+    printLink: PrintLink
+)
+
+@(
+    regNo: String,
+    businessName: Option[String],
+    feeResponse: Option[FeeResponse] = None,
+    displayCheckOrUpdateLink: Boolean = true,
+    yourRegistrationInfo: Option[Html] = None,
+    unreadNotifications: Int = 0,
+    registrationStatus: Html,
+    feeInformation: Option[Html],
+    displayContactLink: Boolean = false,
+    withdrawOrDeregisterInformation: Html = HtmlFormat.empty
+)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@layout(
+    pageTitle = messages("status.title"),
+    showBackLink = false,
+    fullWidthLayout = true
+) {
+
+    @heading("status.title")
+
+    @yourRegistrationInfo.map { regInfo =>
+        <div class="govuk-grid-row">
+            <div id="registration-info" class="govuk-grid-column-two-thirds">
+                @regInfo
+            </div>
+        </div>
+    }
+
+    <div class="govuk-grid-row govuk-!-margin-bottom-8">
+        <div id="your-business" class="govuk-grid-column-one-third">
+        @businessName.map { bn =>
+            <h2 id="status-submitted-business" class="govuk-heading-s">@messages("status.business")</h2>
+            <p class="govuk-body" id="business-name">@bn</p>
+            @if(displayCheckOrUpdateLink) {
+                <p class="govuk-body">
+                    @anchor(
+                        "status.amendment.edit",
+                        controllers.routes.RegistrationProgressController.get.url,
+                        "update-information"
+                    )
+                </p>
+            }
+        }
+        </div>
+        <div id="registration-status" class="govuk-grid-column-one-third">
+            <h2 class="govuk-heading-s">@messages("your.registration.status")</h2>
+            @registrationStatus
+        </div>
+        <div id="messages" class="govuk-grid-column-one-third">
+            <h2 class="govuk-heading-s">@messages("your.registration.messages")</h2>
+            <p class="govuk-body">
+                @anchor(
+                    "notifications.youHaveMessages",
+                    controllers.routes.NotificationController.getMessages().url,
+                    "view-message"
+                )
+                @if(unreadNotifications > 0) {
+                    <span class="hmrc-notification-badge">@unreadNotifications</span>
+                }
+            </p>
+        </div>
+    </div>
+
+    @feeInformation.map { feeInfo =>
+        <div class="govuk-grid-row govuk-!-margin-bottom-8">
+            <div id="fees" class="govuk-grid-column-one-third">
+                @feeInfo
+            </div>
+        </div>
+    }
+
+    @if(displayContactLink) {
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <p class="govuk-body">
+                    @messages("status.submissionreadyforreview.description.5")
+                    @anchor(
+                        s"${messages("status.submissionreadyforreview.description.5.link")}.",
+                        appConfig.contactHmrcLink,
+                        "contact-link"
+                    )
+                </p>
+            </div>
+        </div>
+    }
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            @withdrawOrDeregisterInformation
+        </div>
+    </div>
+
+    <div class="no-print">
+        <p class="govuk-body">@feedbackSurveyLink("survey.satisfaction.beforeyougo")</p>
+    </div>
+
+    @printLink(linkId="status-submitted-print", gaTag=Some("status-submitted:click:print"))
+}

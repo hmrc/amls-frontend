@@ -17,41 +17,43 @@
 package controllers.businessmatching.updateservice.remove
 
 import controllers.actions.SuccessfulAuthAction
+import forms.DateOfChangeFormProvider
 import models.DateOfChange
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatDateRemovedPageId}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.date_of_change
+import views.html.DateOfChangeView
 
-class WhatDateRemovedControllerSpec extends AmlsSpec {
+class WhatDateRemovedControllerSpec extends AmlsSpec with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[date_of_change]
+    lazy val view = inject[DateOfChangeView]
     val controller = new WhatDateRemovedController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[RemoveBusinessTypeFlowModel],
       cc = mockMcc,
-      date_of_change = view
+      formProvider = inject[DateOfChangeFormProvider],
+      view = view
     )
   }
 
   "WhatDateRemovedController" when {
 
     "get is called" must {
-      "return OK with date_of_change view" in new Fixture {
+      "return OK with DateOfChangeView" in new Fixture {
 
         mockCacheFetch[RemoveBusinessTypeFlowModel](Some(RemoveBusinessTypeFlowModel()))
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("dateofchange.title"))
+        Jsoup.parse(contentAsString(result)).title() must include(messages("dateofchange.title"))
       }
 
       "Not display the return link" in new Fixture {
@@ -59,7 +61,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() mustNot include(Messages("link.return.registration.progress"))
+        Jsoup.parse(contentAsString(result)).title() mustNot include(messages("link.return.registration.progress"))
       }
 
       "display the date when it is already in the data cache" in new Fixture {
@@ -71,9 +73,9 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange-day").attr("value") mustBe today.getDayOfMonth.toString
-        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange-month").attr("value") mustBe today.getMonthOfYear.toString
-        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange-year").attr("value") mustBe today.getYear.toString
+        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange.day").attr("value") mustBe today.getDayOfMonth.toString
+        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange.month").attr("value") mustBe today.getMonthOfYear.toString
+        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange.year").attr("value") mustBe today.getYear.toString
       }
     }
 
@@ -83,7 +85,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
         val today = LocalDate.now
         mockCacheUpdate(Some(RemoveBusinessTypeFlowModel.key), RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today))))
 
-        val result = controller.post()(requestWithUrlEncodedBody(
+        val result = controller.post()(FakeRequest(POST, routes.WhatDateRemovedController.post().url).withFormUrlEncodedBody(
           "dateOfChange.day" -> today.getDayOfMonth.toString,
           "dateOfChange.month" -> today.getMonthOfYear.toString,
           "dateOfChange.year" -> today.getYear.toString
@@ -98,7 +100,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
 
 
         val result = await {
-          controller.post()(requestWithUrlEncodedBody(
+          controller.post()(FakeRequest(POST, routes.WhatDateRemovedController.post().url).withFormUrlEncodedBody(
             "dateOfChange.day" -> today.getDayOfMonth.toString,
             "dateOfChange.month" -> today.getMonthOfYear.toString,
             "dateOfChange.year" -> today.getYear.toString

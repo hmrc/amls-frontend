@@ -21,14 +21,14 @@ import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
+import forms.businessdetails.RegisteredOfficeNonUkFormProvider
 import models.businessdetails.{BusinessDetails, RegisteredOffice}
-import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{AuthAction, DateOfChangeHelper}
-import views.html.businessdetails._
+import views.html.businessdetails.RegisteredOfficeNonUKView
 
 import scala.concurrent.Future
 
@@ -40,42 +40,41 @@ class RegisteredOfficeNonUKController @Inject ()(
                                                   val authAction: AuthAction,
                                                   val ds: CommonPlayDependencies,
                                                   val cc: MessagesControllerComponents,
-                                                  registered_office_non_uk: registered_office_non_uk) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                                                  formProvider: RegisteredOfficeNonUkFormProvider,
+                                                  view: RegisteredOfficeNonUKView) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
-          response =>
-            val form: Form2[RegisteredOffice] = (for {
-              businessDetails <- response
-              registeredOffice <- businessDetails.registeredOffice
-            } yield Form2[RegisteredOffice](registeredOffice)) getOrElse EmptyForm
-            Ok(registered_office_non_uk(form, edit, autoCompleteService.getCountries))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
+        businessDetails =>
+          Ok(view(
+            businessDetails.registeredOffice.fold(formProvider())(formProvider().fill), edit, autoCompleteService.formOptions
+          ))
+      }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-        Form2[RegisteredOffice](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(registered_office_non_uk(f, edit, autoCompleteService.getCountries)))
-          case ValidForm(_, data) =>
-            for {
-              businessDetails <- dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key)
-              _ <- dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.registeredOffice(data))
-              status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
-              _ <- auditAddressChange(data, businessDetails flatMap { _.registeredOffice }, edit)
-            } yield {
-              if (redirectToDateOfChange[RegisteredOffice](status, businessDetails.registeredOffice, data)) {
-                Redirect(routes.RegisteredOfficeDateOfChangeController.get)
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
+        data =>
+          for {
+            businessDetails <- dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+            _ <- dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails.registeredOffice(data))
+            status <- statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId)
+            _ <- auditAddressChange(data, businessDetails flatMap { _.registeredOffice }, edit)
+          } yield {
+            if (redirectToDateOfChange[RegisteredOffice](status, businessDetails.registeredOffice, data)) {
+              Redirect(routes.RegisteredOfficeDateOfChangeController.get)
+            } else {
+              if (edit) {
+                Redirect(routes.SummaryController.get)
               } else {
-                edit match {
-                  case true => Redirect(routes.SummaryController.get)
-                  case _ => Redirect(routes.ContactingYouController.get())
-                }
+                Redirect(routes.BusinessEmailAddressController.get())
               }
             }
-        }
+          }
+      )
   }
 
   def auditAddressChange(currentAddress: RegisteredOffice, oldAddress: Option[RegisteredOffice], edit: Boolean)

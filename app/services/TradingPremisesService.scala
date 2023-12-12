@@ -17,7 +17,8 @@
 package services
 
 import javax.inject.Singleton
-import models.businessmatching.{BusinessActivity, MoneyServiceBusiness, BusinessMatchingMsbServices}
+import models.businessmatching.{BusinessActivity, BusinessMatchingMsbServices}
+import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 import models.tradingpremises
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 

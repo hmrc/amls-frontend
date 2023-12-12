@@ -18,33 +18,35 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessactivities.TaxMattersFormProvider
 import models.businessactivities._
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import utils.AmlsSpec
-import play.api.i18n.Messages
 import play.api.libs.json.Json
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import views.html.businessactivities.tax_matters
+import utils.AmlsSpec
+import views.html.businessactivities.TaxMattersView
+
 import scala.concurrent.Future
 
-class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
+class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[tax_matters]
+    lazy val view = inject[TaxMattersView]
     val controller = new TaxMattersController (
       dataCacheConnector = mock[DataCacheConnector],
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      tax_matters = view,
-      errorView)
+      formProvider = inject[TaxMattersFormProvider],
+      view = view,
+      error = errorView)
   }
 
   "TaxMattersController" when {
@@ -64,8 +66,8 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
         val page = Jsoup.parse(contentAsString(result))
 
-        page.getElementById("manageYourTaxAffairs-true").hasAttr("checked") must be(false)
-        page.getElementById("manageYourTaxAffairs-false").hasAttr("checked") must be(false)
+        page.getElementById("manageYourTaxAffairs").hasAttr("checked") must be(false)
+        page.getElementById("manageYourTaxAffairs-2").hasAttr("checked") must be(false)
       }
 
       "display the 'Manage Your Tax Affairs?' page with pre populated data if found in cache" in new Fixture {
@@ -82,14 +84,15 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
         val page = Jsoup.parse(contentAsString(result))
 
-        page.getElementById("manageYourTaxAffairs-true").hasAttr("checked") must be(true)
-        page.getElementById("manageYourTaxAffairs-false").hasAttr("checked") must be(false)
+        page.getElementById("manageYourTaxAffairs").hasAttr("checked") must be(true)
+        page.getElementById("manageYourTaxAffairs-2").hasAttr("checked") must be(false)
       }
     }
 
     "post is called" must {
       "redirect to Check Your Answers on post with valid data" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+
+        val newRequest = FakeRequest(POST, routes.TaxMattersController.post(true).url).withFormUrlEncodedBody(
           "manageYourTaxAffairs" -> "true"
         )
 
@@ -114,19 +117,17 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
                 None,
                 None))))))
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.TaxMattersController.post(false).url).withFormUrlEncodedBody(
           "manageYourTaxAffairs" -> "grrrrr"
         )
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.select("span").html() must include(Messages("error.required.ba.tax.matters", accountantsName))
       }
 
       "redirect to Check Your Answers on post with valid data in edit mode" in new Fixture {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.TaxMattersController.post(true).url).withFormUrlEncodedBody(
           "manageYourTaxAffairs" -> "true"
         )
 

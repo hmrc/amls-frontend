@@ -22,6 +22,8 @@ import controllers.actions.{SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefN
 import generators.PaymentGenerator
 import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService.CurrencyExchange
 import models.businessmatching._
 import models.notifications.{IDType, NotificationRow}
 import models.registrationdetails.RegistrationDetails
@@ -38,23 +40,25 @@ import org.scalatest.PrivateMethodTester
 import play.api.http.Status.OK
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import play.twirl.api.Html
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
-import views.html.status.your_registration
+import views.html.status.YourRegistrationView
+import views.html.status.components._
 
 import scala.concurrent.Future
 
-class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMethodTester {
+class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMethodTester with Injecting {
 
   val cacheMap = mock[CacheMap]
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[your_registration]
+    lazy val view = inject[YourRegistrationView]
     val controller = new StatusController(
       mock[LandingService],
       mock[StatusService],
@@ -70,7 +74,26 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       mock[FeeResponseService],
       mockMcc,
       mock[AmlsNotificationConnector],
-      your_registration = view)
+      inject[FeeInformation],
+      inject[RegistrationStatus],
+      inject[ApplicationIncomplete],
+      inject[ApplicationDeregistered],
+      inject[ApplicationRenewalSubmissionReady],
+      inject[ApplicationRenewalDue],
+      inject[ApplicationSubmissionReady],
+      inject[ApplicationPending],
+      inject[ApplicationRejected],
+      inject[ApplicationRevoked],
+      inject[ApplicationExpired],
+      inject[ApplicationWithdrawn],
+      inject[ApplicationRenewalSubmitted],
+      inject[ApplicationRenewalIncomplete],
+      inject[WithdrawOrDeregisterInformation],
+      inject[TradeInformationNoActivities],
+      inject[TradeInformationOneActivity],
+      inject[TradeInformation],
+      inject[TradeInformationFindOut],
+      view = view)
 
     val controllerNoAmlsNumber = new StatusController(
       mock[LandingService],
@@ -87,7 +110,26 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       mock[FeeResponseService],
       mockMcc,
       mock[AmlsNotificationConnector],
-      your_registration = view)
+      inject[FeeInformation],
+      inject[RegistrationStatus],
+      inject[ApplicationIncomplete],
+      inject[ApplicationDeregistered],
+      inject[ApplicationRenewalSubmissionReady],
+      inject[ApplicationRenewalDue],
+      inject[ApplicationSubmissionReady],
+      inject[ApplicationPending],
+      inject[ApplicationRejected],
+      inject[ApplicationRevoked],
+      inject[ApplicationExpired],
+      inject[ApplicationWithdrawn],
+      inject[ApplicationRenewalSubmitted],
+      inject[ApplicationRenewalIncomplete],
+      inject[WithdrawOrDeregisterInformation],
+      inject[TradeInformationNoActivities],
+      inject[TradeInformationOneActivity],
+      inject[TradeInformation],
+      inject[TradeInformationFindOut],
+      view = view)
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(PositionStartDate(new LocalDate())))
     val rp1 = ResponsiblePerson(
@@ -125,7 +167,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
     when(controllerNoAmlsNumber.enrolmentsService.amlsRegistrationNumber(any(), any())(any(), any()))
       .thenReturn(Future.successful(None))
 
-    when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+    when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
       .thenReturn(Future.successful((NotCompleted, None)))
 
     mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails), None)), Some(BusinessMatching.key))
@@ -166,7 +208,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
     "respond with SEE_OTHER and redirect to the landing page" when {
       "status is rejected and the new submission button is selected" in new Fixture {
 
-        when(controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionRejected))
 
         when(controller.enrolmentsService.deEnrol(any(), any())(any(), any()))
@@ -186,7 +228,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
 
       "status is deregistered and the new submission button is selected" in new Fixture {
 
-        when(controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(DeRegistered))
 
         when(controller.enrolmentsService.deEnrol(any(), any())(any(), any()))
@@ -216,7 +258,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       val statusResponse = mock[ReadStatusResponse]
       when(statusResponse.safeId) thenReturn Some("X12345678")
 
-      when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+      when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful((NotCompleted, Some(statusResponse))))
 
       when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -238,7 +280,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
-        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((NotCompleted, None)))
 
         when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -258,7 +300,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
           when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
-          when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+          when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful((SubmissionReadyForReview, None)))
 
           when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -276,7 +318,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
           when(controllerNoAmlsNumber.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
-          when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+          when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful((SubmissionReadyForReview, None)))
 
           when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -302,7 +344,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
           Some(LocalDate.now.plusDays(30)), false)
 
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionApproved, Some(readStatusResponse))))
 
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -325,7 +367,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionRejected, None)))
 
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -350,7 +392,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionRevoked, None)))
 
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -376,7 +418,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionExpired, None)))
 
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -398,7 +440,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionWithdrawn, None)))
 
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -420,7 +462,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((DeRegistered, None)))
 
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -442,7 +484,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
           .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, None, None, 0, None, 0)))))
 
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((RenewalSubmitted(Some(LocalDate.now)), None)))
 
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -472,10 +514,10 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
           Some(renewalDate), false)
 
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
-        when(controller.renewalService.getRenewal(any[String]())(any(), any()))
+        when(controller.renewalService.getRenewal(any[String]())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -506,10 +548,10 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
           Some(renewalDate), false)
 
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
-        when(controller.renewalService.getRenewal(any[String]())(any(), any()))
+        when(controller.renewalService.getRenewal(any[String]())(any()))
           .thenReturn(Future.successful(Some(Renewal())))
 
         val result = controller.get()(request)
@@ -550,7 +592,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
           Some(renewalDate), false)
 
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -573,7 +615,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
           hasChanged = true
         )
 
-        when(controller.renewalService.getRenewal(any[String]())(any(), any()))
+        when(controller.renewalService.getRenewal(any[String]())(any()))
           .thenReturn(Future.successful(Some(completeRenewal)))
 
         val result = controller.get()(request)
@@ -597,10 +639,10 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionApproved, statusResponse.some)))
 
-        when(controller.landingService.refreshCache(any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
+        when(controller.landingService.refreshCache(any(), any(), any())(any(), any(), any())).thenReturn(Future.successful(cacheMap))
 
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(false))
 
@@ -625,7 +667,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionReadyForReview, statusResponse.some)))
 
         when(controllerNoAmlsNumber.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -633,7 +675,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         val result = controllerNoAmlsNumber.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get.url}]").text mustBe Messages("status.withdraw.link-text")
+        doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get.url}]").text mustBe s"${messages("status.withdraw.link-text")}."
       }
     }
 
@@ -652,7 +694,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any()))
+        when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful((SubmissionDecisionApproved, statusResponse.some)))
 
         when(controller.renewalService.isCachePresent(any())(any(), any())).thenReturn(Future.successful(true))
@@ -660,7 +702,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         val result = controller.get()(request)
         val doc = Jsoup.parse(contentAsString(result))
 
-        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get.url}]").text mustBe Messages("your.registration.deregister.link")
+        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get.url}]").text mustBe s"${messages("your.registration.deregister.link")}."
       }
     }
 

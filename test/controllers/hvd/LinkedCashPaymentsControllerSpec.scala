@@ -17,29 +17,31 @@
 package controllers.hvd
 
 import controllers.actions.SuccessfulAuthAction
+import forms.hvd.LinkedCashPaymentsFormProvider
 import models.hvd.{Hvd, LinkedCashPayments}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.hvd.linked_cash_payments
+import views.html.hvd.LinkedCashPaymentsView
 
 import scala.concurrent.Future
 
-class LinkedCashPaymentsControllerSpec extends AmlsSpec {
+class LinkedCashPaymentsControllerSpec extends AmlsSpec with Injecting {
 
   trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[linked_cash_payments]
+    lazy val view = inject[LinkedCashPaymentsView]
     val controller = new LinkedCashPaymentsController (
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      linked_cash_payments = view)
+      formProvider = inject[LinkedCashPaymentsFormProvider],
+      view = view)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -50,9 +52,9 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
-      val title = Messages("hvd.identify.linked.cash.payment.title") + " - " +
-        Messages("summary.hvd") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov")
+      val title = messages("hvd.identify.linked.cash.payment.title") + " - " +
+        messages("summary.hvd") + " - " +
+        messages("title.amls") + " - " + messages("title.gov")
       val result = controller.get()(request)
       status(result) must be(OK)
 
@@ -65,21 +67,22 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
         .thenReturn(Future.successful(Some(Hvd(linkedCashPayment = Some(LinkedCashPayments(true))))))
 
-      val title = Messages("hvd.identify.linked.cash.payment.title") + " - " +
-        Messages("summary.hvd") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov")
+      val title = messages("hvd.identify.linked.cash.payment.title") + " - " +
+        messages("summary.hvd") + " - " +
+        messages("title.amls") + " - " + messages("title.gov")
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val htmlValue = Jsoup.parse(contentAsString(result))
       htmlValue.title mustBe title
-      htmlValue.getElementById("linkedCashPayments-true").`val`() mustBe "true"
-      htmlValue.getElementById("linkedCashPayments-false").`val`() mustBe "false"
+      htmlValue.getElementById("linkedCashPayments").`val`() mustBe "true"
+      htmlValue.getElementById("linkedCashPayments-2").`val`() mustBe "false"
     }
 
     "successfully redirect to nex page when submitted with valida data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody("linkedCashPayments" -> "true")
+      val newRequest = FakeRequest(POST, routes.LinkedCashPaymentsController.post().url)
+      .withFormUrlEncodedBody("linkedCashPayments" -> "true")
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
@@ -94,7 +97,8 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
 
     "successfully redirect to nex page when submitted with valida data in edit mode" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody("linkedCashPayments" -> "false")
+      val newRequest = FakeRequest(POST, routes.LinkedCashPaymentsController.post().url)
+      .withFormUrlEncodedBody("linkedCashPayments" -> "false")
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
@@ -108,15 +112,14 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
     }
 
     "fail with validation error when mandatory field is missing" in new Fixture {
-      val newRequest = requestWithUrlEncodedBody(
-
-      )
+      val newRequest = FakeRequest(POST, routes.LinkedCashPaymentsController.post().url)
+      .withFormUrlEncodedBody()
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.hvd.linked.cash.payment"))
+      contentAsString(result) must include(messages("error.required.hvd.linked.cash.payment"))
     }
 
   }

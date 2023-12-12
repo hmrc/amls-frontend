@@ -20,6 +20,8 @@ import cats.data.OptionT
 import cats.implicits._
 import models.asp.Asp
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
 import models.businessmatching.updateservice.UpdateService
 import models.eab.Eab
 import models.hvd.Hvd

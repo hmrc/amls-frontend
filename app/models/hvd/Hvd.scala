@@ -17,8 +17,10 @@
 package models.hvd
 
 import models.DateOfChange
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.hvd.Products.{Alcohol, Tobacco}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
 import play.api.Logging
+import play.api.i18n.Messages
 import play.api.libs.json._
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -115,6 +117,44 @@ object Hvd {
           Section(key, Completed, model.hasChanged, controllers.hvd.routes.SummaryController.get)
         } else {
           Section(key, Started, model.hasChanged, controllers.hvd.routes.WhatYouNeedController.get)
+        }
+    }
+  }
+
+  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+    val notStarted = TaskRow(
+      key,
+      controllers.hvd.routes.WhatYouNeedController.get.url,
+      hasChanged = false,
+      NotStarted,
+      TaskRow.notStartedTag
+    )
+    cache.getEntry[Hvd](key).fold(notStarted) {
+      model =>
+        if (model.isComplete && model.hasChanged) {
+          TaskRow(
+            key,
+            controllers.hvd.routes.SummaryController.get.url,
+            hasChanged = true,
+            status = Updated,
+            tag = TaskRow.updatedTag
+          )
+        } else if (model.isComplete) {
+          TaskRow(
+            key,
+            controllers.hvd.routes.SummaryController.get.url,
+            model.hasChanged,
+            Completed,
+            TaskRow.completedTag
+          )
+        } else {
+          TaskRow(
+            key,
+            controllers.hvd.routes.WhatYouNeedController.get.url,
+            model.hasChanged,
+            Started,
+            TaskRow.incompleteTag
+          )
         }
     }
   }

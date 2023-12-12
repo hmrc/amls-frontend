@@ -1,0 +1,65 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.components.forms.{InputText, ErrorSummary}
+@import views.html.components.{SectionSubtitle, Button, ReturnLink}
+@import config.ApplicationConfig
+
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    formHelper: FormWithCSRF,
+    inputText: InputText,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean, index:Int)(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
+
+@layout(pageTitle = messages("bankdetails.bankaccount.iban.title") + " - " + messages("summary.bankdetails")) {
+
+    @errorSummary(form)
+
+    @formHelper(action = controllers.bankdetails.routes.BankAccountIbanController.post(index, edit)) {
+
+        @subtitle("summary.bankdetails")
+
+        @inputText(
+            input = Input(
+                label = Label(
+                    isPageHeading = true,
+                    content = Text(messages("bankdetails.bankaccount.iban.title")),
+                    classes = "govuk-label--xl"
+                ),
+                hint = Some(
+                    Hint(
+                        content = Text(messages("bankdetails.bankaccount.iban.hint"))
+                    )
+                ),
+                name = "IBANNumber",
+                id = "IBANNumber",
+                inputmode = Some("numeric"),
+                classes = "govuk-!-width-two-thirds"
+            ),
+            field = form("IBANNumber")
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

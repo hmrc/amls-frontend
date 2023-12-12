@@ -18,13 +18,13 @@ package models.businessdetails
 
 import jto.validation.forms._
 import jto.validation.{From, Rule, Write}
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class ConfirmRegisteredOffice(isRegOfficeOrMainPlaceOfBusiness: Boolean)
 
 object ConfirmRegisteredOffice {
 
-  implicit val formats = Json.format[ConfirmRegisteredOffice]
+  implicit val formats: OFormat[ConfirmRegisteredOffice] = Json.format[ConfirmRegisteredOffice]
   import utils.MappingUtils.Implicits._
 
   implicit val formRule: Rule[UrlFormEncoded, ConfirmRegisteredOffice] =

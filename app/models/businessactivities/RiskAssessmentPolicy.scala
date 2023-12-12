@@ -36,13 +36,8 @@ object RiskAssessmentPolicy {
       case RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(riskAssessmentTypes)) =>
         Json.obj(
           "hasPolicy" -> true,
-          "riskassessments" -> riskAssessmentTypes.toSeq.map(raType =>
-            raType.toString match {
-              case "PaperBased" => "01"
-              case "Digital" => "02"
-              case _ => ""
-            })
-          )
+          "riskassessments" -> riskAssessmentTypes.toSeq.map(_.value)
+        )
 
       case RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), _) =>
         Json.obj(

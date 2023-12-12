@@ -16,35 +16,53 @@
 
 package models.businessactivities
 
-import cats.data.Validated.Invalid
-import play.api.libs.json.{JsonValidationError => VE}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Path, Rule, ValidationError, Write}
-import models.FormTypes.{basicPunctuationRegex, notEmptyStrip, regexWithMsg}
-import play.api.libs.json._
-import utils.TraversableValidators.minLengthR
+import models.{Enumerable, WithName}
+import play.api.i18n.Messages
+import play.api.libs.json.{JsonValidationError => VE, _}
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.{CheckboxItem, Text}
 
 sealed trait TransactionType {
-  val value: String =
-    this match {
-      case Paper => "01"
-      case DigitalSpreadsheet => "02"
-      case DigitalSoftware(_) => "03"
-    }
+  val value: String
 }
-
-case object Paper extends TransactionType
-
-case object DigitalSpreadsheet extends TransactionType
-
-case class DigitalSoftware(name: String) extends TransactionType
 
 case class TransactionTypes(types: Set[TransactionType])
 
-object TransactionTypes {
+object TransactionTypes extends Enumerable.Implicits {
 
-  import jto.validation.forms.Rules._
-  import utils.MappingUtils.Implicits._
+  case object Paper extends WithName("paper") with TransactionType {
+    override val value: String = "01"
+  }
+
+  case object DigitalSpreadsheet extends WithName("digitalSpreadsheet") with TransactionType {
+    override val value: String = "02"
+  }
+
+  case object DigitalOther extends WithName("digitalOther") with TransactionType {
+    override val value: String = "03"
+  }
+
+  case class DigitalSoftware(name: String) extends WithName("digitalSoftware") with TransactionType {
+    override val value: String = "03"
+  }
+
+  def formValues(conditional: Html)(implicit messages: Messages): Seq[CheckboxItem] = {
+
+    Seq(
+      (1, Paper, None),
+      (2, DigitalSpreadsheet, None),
+      (3, DigitalOther, Some(conditional))
+    ).map( i =>
+      CheckboxItem(
+        content = Text(messages(s"businessactivities.transactiontype.lbl.${i._2.value}")),
+        value = i._2.toString,
+        id = Some(s"types_${i._1}"),
+        name = Some(s"types[${i._1}]"),
+        conditionalHtml = i._3
+      )
+    )
+  }
+
   import utils.MappingUtils.constant
 
   implicit val jsonReads = new Reads[TransactionTypes] {
@@ -57,11 +75,13 @@ object TransactionTypes {
         case (None, _) => JsError(__ \ "types" -> VE("error.missing"))
         case (Some(types), None) if types.contains("03") => JsError(__ \ "software" -> VE("error.missing"))
         case (Some(types), _) if types.diff(validValues).nonEmpty => JsError(__ \ "types" -> VE("error.invalid"))
-        case (Some(types), maybeName) => JsSuccess(TransactionTypes(types map {
-          case "01" => Paper
-          case "02" => DigitalSpreadsheet
-          case "03" => DigitalSoftware(maybeName.getOrElse(""))
-        }))
+        case (Some(types), Some(name)) => JsSuccess(TransactionTypes(
+          types.map { `type` =>
+            val obj = toType(`type`)
+            if (obj == DigitalOther) DigitalSoftware(name) else obj
+          }
+        ))
+        case (Some(types), None) if !types.contains("03") => JsSuccess(TransactionTypes(types.map(toType)))
       }
     }
   }
@@ -86,7 +106,7 @@ object TransactionTypes {
               }
             }
         }
-      } map(t => Some(TransactionTypes(t)))
+      } map(t => Option(TransactionTypes(t)))
       case false => constant(None)
     }
 
@@ -98,43 +118,17 @@ object TransactionTypes {
     } getOrElse Json.obj())
   }
 
-  private val maxSoftwareNameLength = 40
-
-  private val softwareNameType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.ba.software.package.name") andThen
-    maxLength(maxSoftwareNameLength).withMessage("error.max.length.ba.software.package.name") andThen
-    regexWithMsg(basicPunctuationRegex, "error.invalid.characters.ba.software.package.name")
-
-  implicit val formRule: Rule[UrlFormEncoded, TransactionTypes] = From[UrlFormEncoded] { __ =>
-    (__ \ "types").read(minLengthR[Set[String]](1).withMessage("error.required.ba.atleast.one.transaction.record")) flatMap { r =>
-      r.map {
-        case "01" => toSuccessRule(Paper)
-        case "02" => toSuccessRule(DigitalSpreadsheet)
-        case "03" =>
-          (__ \ "name").read(softwareNameType) map DigitalSoftware.apply
-        case _ =>
-          Rule[UrlFormEncoded, TransactionType] { _ =>
-            Invalid(Seq((Path \ "types") -> Seq(ValidationError("error.invalid"))))
-          }
-      }.foldLeft[Rule[UrlFormEncoded, Set[TransactionType]]](
-        Set.empty[TransactionType]
-      ) {
-        case (m, n) =>
-          n flatMap { x =>
-            m map {
-              _ + x
-            }
-          }
-      }
-    } map TransactionTypes.apply
+  private def toType(value: String): TransactionType = value match {
+    case "01" => Paper
+    case "02" => DigitalSpreadsheet
+    case "03" => DigitalOther
   }
 
-  implicit val formWriter = Write[TransactionTypes, UrlFormEncoded] { t =>
-    Map(
-      "types[]" -> t.types.map(_.value).toSeq
-    ) ++ t.types.collectFirst {
-      case DigitalSoftware(name) => name
-    }.fold(Map[String, Seq[String]]())(n => Map("name" -> Seq(n)))
-  }
+  val all: Seq[TransactionType] = Seq(
+    Paper,
+    DigitalSpreadsheet,
+    DigitalOther
+  )
 
+  implicit val enumerable: Enumerable[TransactionType] = Enumerable(all.map(v => v.toString -> v): _*)
 }

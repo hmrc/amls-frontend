@@ -16,74 +16,12 @@
 
 package models.businessactivities
 
+import models.renewal.BusinessTurnover
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
-import models.renewal.BusinessTurnover
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ExpectedBusinessTurnoverSpec extends PlaySpec with MockitoSugar {
-
-  "Form Validation" must {
-
-    "successfully validate given an enum value" in {
-      ExpectedBusinessTurnover.formRule.validate(Map("expectedBusinessTurnover" -> Seq("01"))) must
-        be(Valid(ExpectedBusinessTurnover.First))
-
-      ExpectedBusinessTurnover.formRule.validate(Map("expectedBusinessTurnover" -> Seq("02"))) must
-        be(Valid(ExpectedBusinessTurnover.Second))
-
-      ExpectedBusinessTurnover.formRule.validate(Map("expectedBusinessTurnover" -> Seq("03"))) must
-        be(Valid(ExpectedBusinessTurnover.Third))
-
-      ExpectedBusinessTurnover.formRule.validate(Map("expectedBusinessTurnover" -> Seq("04"))) must
-        be(Valid(ExpectedBusinessTurnover.Fourth))
-
-      ExpectedBusinessTurnover.formRule.validate(Map("expectedBusinessTurnover" -> Seq("05"))) must
-        be(Valid(ExpectedBusinessTurnover.Fifth))
-
-      ExpectedBusinessTurnover.formRule.validate(Map("expectedBusinessTurnover" -> Seq("06"))) must
-        be(Valid(ExpectedBusinessTurnover.Sixth))
-
-      ExpectedBusinessTurnover.formRule.validate(Map("expectedBusinessTurnover" -> Seq("07"))) must
-        be(Valid(ExpectedBusinessTurnover.Seventh))
-    }
-
-    "throw error on missing data" in {
-      ExpectedBusinessTurnover.formRule.validate(Map.empty) must
-        be(Invalid(Seq((Path \ "expectedBusinessTurnover", Seq(ValidationError("error.required.ba.business.turnover"))))))
-    }
-
-    "throw error on invalid data" in {
-      ExpectedBusinessTurnover.formRule.validate(Map("expectedBusinessTurnover" -> Seq("20"))) must
-        be(Invalid(Seq((Path \ "expectedBusinessTurnover", Seq(ValidationError("error.invalid"))))))
-    }
-
-    "write correct data from enum value" in {
-
-      ExpectedBusinessTurnover.formWrites.writes(ExpectedBusinessTurnover.First) must
-        be(Map("expectedBusinessTurnover" -> Seq("01")))
-
-      ExpectedBusinessTurnover.formWrites.writes(ExpectedBusinessTurnover.Second) must
-        be(Map("expectedBusinessTurnover" -> Seq("02")))
-
-      ExpectedBusinessTurnover.formWrites.writes(ExpectedBusinessTurnover.Third) must
-        be(Map("expectedBusinessTurnover" -> Seq("03")))
-
-      ExpectedBusinessTurnover.formWrites.writes(ExpectedBusinessTurnover.Fourth) must
-        be(Map("expectedBusinessTurnover" -> Seq("04")))
-
-      ExpectedBusinessTurnover.formWrites.writes(ExpectedBusinessTurnover.Fifth) must
-        be(Map("expectedBusinessTurnover" -> Seq("05")))
-
-      ExpectedBusinessTurnover.formWrites.writes(ExpectedBusinessTurnover.Sixth) must
-        be(Map("expectedBusinessTurnover" -> Seq("06")))
-
-      ExpectedBusinessTurnover.formWrites.writes(ExpectedBusinessTurnover.Seventh) must
-        be(Map("expectedBusinessTurnover" -> Seq("07")))
-    }
-  }
 
   "JSON validation" must {
 

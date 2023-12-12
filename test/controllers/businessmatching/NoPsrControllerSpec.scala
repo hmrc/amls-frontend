@@ -20,10 +20,9 @@ import controllers.actions.SuccessfulAuthAction
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.{cannot_add_services, cannot_continue_with_the_application}
+import views.html.businessmatching.{CannotAddServicesView, CannotContinueWithApplicationView}
 
 //noinspection ScalaStyle
 class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
@@ -33,15 +32,15 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
-    lazy val view1 = app.injector.instanceOf[cannot_add_services]
-    lazy val view2 = app.injector.instanceOf[cannot_continue_with_the_application]
+    lazy val view1 = app.injector.instanceOf[CannotAddServicesView]
+    lazy val view2 = app.injector.instanceOf[CannotContinueWithApplicationView]
     val controller = new NoPsrController(
       SuccessfulAuthAction,
       ds = commonDependencies,
       mockStatusService,
       cc = mockMcc,
-      cannot_add_services = view1,
-      cannot_continue_with_the_application = view2
+      cannotAddServicesView = view1,
+      cannotContinueView = view2
     )
   }
 
@@ -54,7 +53,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
           val result = controller.get()(request)
 
           status(result) mustBe OK
-          contentAsString(result) must include(Messages("businessmatching.cannotcontinuewiththeapplication.title"))
+          contentAsString(result) must include(messages("businessmatching.cannotcontinuewiththeapplication.title"))
         }
 
         "application status is beyond pre-application" in new Fixture {
@@ -62,7 +61,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
 
           val result = controller.get()(request)
           status(result) mustBe OK
-          contentAsString(result) must include(Messages("businessmatching.cannotchangeservices.title"))
+          contentAsString(result) must include(messages("businessmatching.cannotchangeservices.title"))
         }
       }
     }

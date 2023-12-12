@@ -16,16 +16,14 @@ private object AppDependencies {
 
   val compile = Seq(
     ws,
-    "uk.gov.hmrc"       %% "domain"                     % domain,
-    "uk.gov.hmrc"       %% "play-partials"              % playPartialsVersion,
-    "uk.gov.hmrc"       %% "http-caching-client"        % httpCachingClientVersion,
-    "uk.gov.hmrc"       %% "json-encryption"            % jsonEncryptionVersion,
-    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"         % hmrcMongoVersion,
-    "uk.gov.hmrc"       %% "play-ui"                    % "9.11.0-play-28",
-    "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "5.24.0",
-    "uk.gov.hmrc"       %% "govuk-template"             % "5.78.0-play-28",
-    "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "6.6.0-play-28",
-
+    "uk.gov.hmrc"       %% "domain"                        % domain,
+    "uk.gov.hmrc"       %% "play-partials"                 % playPartialsVersion,
+    "uk.gov.hmrc"       %% "http-caching-client"           % httpCachingClientVersion,
+    "uk.gov.hmrc"       %% "json-encryption"               % jsonEncryptionVersion,
+    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"            % hmrcMongoVersion,
+    "uk.gov.hmrc"       %% "bootstrap-frontend-play-28"    % "5.24.0",
+    "uk.gov.hmrc"       %% "play-frontend-hmrc"            % "6.6.0-play-28",
+    "uk.gov.hmrc"       %% "play-conditional-form-mapping" % "1.12.0-play-28",
 
     "io.github.jto" %% "validation-core"      % validationVersion,
     "io.github.jto" %% "validation-playjson"  % validationVersion,

@@ -19,6 +19,7 @@ package controllers.msb
 import controllers.actions.SuccessfulAuthAction
 import models.Country
 import models.businessmatching._
+import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.moneyservicebusiness.{MoneyServiceBusiness, _}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
@@ -26,19 +27,20 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.Injecting
+import utils.msb.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.msb.summary
+import views.html.msb.CheckYourAnswersView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
+class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-    implicit val ec = app.injector.instanceOf[ExecutionContext]
-    lazy val view = app.injector.instanceOf[summary]
+    implicit val ec = inject[ExecutionContext]
+    lazy val view = inject[CheckYourAnswersView]
     val controller = new SummaryController(
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -46,6 +48,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       mockStatusService,
       mockServiceFlow,
       mockMcc,
+      inject[CheckYourAnswersHelper],
       view
       )
 
@@ -65,7 +68,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     )
 
     when {
-      mockStatusService.isPreSubmission(any(), any(), any())(any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(true)
 
     mockCacheFetch[ServiceChangeRegister](None, None)
@@ -97,7 +100,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("summary.checkyouranswers.title"))
+      contentAsString(result) must include(messages("summary.checkyouranswers.title"))
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
@@ -141,19 +144,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
 
-        document.getElementsByClass("cya-summary-list__actions").get(0).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByClass("cya-summary-list__actions").get(1).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByClass("cya-summary-list__actions").get(2).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByClass("cya-summary-list__actions").get(3).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByClass("cya-summary-list__actions").get(4).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByClass("cya-summary-list__actions").get(5).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByClass("cya-summary-list__actions").get(6).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByClass("cya-summary-list__actions").get(7).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByClass("cya-summary-list__actions").get(8).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByClass("cya-summary-list__actions").get(9).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByClass("cya-summary-list__actions").get(10).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByClass("cya-summary-list__actions").get(11).getElementsByTag("a").hasClass("change-answer") must be(true)
-        document.getElementsByClass("cya-summary-list__actions").get(12).getElementsByTag("a").hasClass("change-answer") must be(true)
+        (0 to 12) foreach { i =>
+          document.getElementsByClass("govuk-summary-list__actions")
+          .get(i).getElementsByTag("a").hasClass("govuk-link") must be(true)
+        }
       }
     }
 
@@ -172,9 +166,9 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.get()(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
-        val elements = document.getElementsByTag("section").iterator
+        val elements = document.getElementsByClass("govuk-summary-list__actions").iterator
         while(elements.hasNext){
-          elements.next().getElementsByTag("a").hasClass("change-answer") must be(true)
+          elements.next().getElementsByTag("a").hasClass("govuk-link") must be(true)
         }
       }
     }

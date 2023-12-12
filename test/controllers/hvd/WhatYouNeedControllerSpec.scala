@@ -22,18 +22,18 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AmlsSpec
-import views.html.hvd.what_you_need
+import views.html.hvd.WhatYouNeedView
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[what_you_need]
+    lazy val view = app.injector.instanceOf[WhatYouNeedView]
     val controller = new WhatYouNeedController (
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      what_you_need = view) {
+      view = view) {
 
     }
   }
@@ -43,8 +43,8 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     "get" must {
 
       "load the page" in new Fixture {
-        val pageTitle = Messages("title.wyn")  + " - " + Messages("summary.hvd") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
+        val pageTitle = messages("title.wyn")  + " - " + messages("summary.hvd") + " - " +
+          messages("title.amls") + " - " + messages("title.gov")
 
         val result = controller.get()(request)
         status(result) must be(OK)

@@ -16,22 +16,47 @@
 
 package generators
 
-import org.joda.time.LocalDate
+import org.joda.time.{LocalDate => JodaLocalDate}
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
+import org.scalacheck.Gen.{alphaChar, alphaNumChar, choose, listOfN, numChar}
+
+import java.time.LocalDate
 
 //noinspection ScalaStyle
 trait BaseGenerator {
 
-  def stringOfLengthGen(maxLength: Int) = {
+  def stringOfLengthGen(maxLength: Int): Gen[String] = {
     Gen.listOfN(maxLength, Gen.alphaNumChar).map(x => x.mkString)
   }
 
-  def alphaNumOfLengthGen(maxLength: Int) = {
-    Gen.listOfN(maxLength, Gen.alphaNumChar).map(x => x.mkString)
-  }
+  def stringsLongerThan(minLength: Int): Gen[String] = for {
+    length    <- Gen.chooseNum(minLength + 1, (minLength * 2).max(100))
+    chars     <- listOfN(length, alphaNumChar)
+  } yield chars.mkString
+
+  def stringsShorterThan(minLength: Int): Gen[String] = for {
+    length    <- Gen.chooseNum(0, minLength - 1)
+    chars     <- listOfN(length, alphaNumChar)
+  } yield chars.mkString
+
+  def alphaStringsShorterThan(minLength: Int): Gen[String] = for {
+    length <- Gen.chooseNum(0, minLength - 1)
+    chars <- listOfN(length, alphaChar)
+  } yield chars.mkString
+
+  def numStringOfLength(length: Int): Gen[String] = for {
+    chars <- listOfN(length, numChar)
+  } yield chars.mkString
 
   def numSequence(maxLength: Int) =
     Gen.listOfN(maxLength, Gen.chooseNum(1, 9)) map {_.mkString}
+
+  def numsLongerThan(length: Int): Gen[Int] =
+    Gen.listOfN(length + 1, Gen.chooseNum(1, 9)).map(_.mkString.toInt)
+  def numsShorterThan(length: Int): Gen[Int] =
+    Gen.listOfN(length - 1, Gen.chooseNum(1, 9)).map(_.mkString.toInt)
+
 
   def numGen = Gen.chooseNum(0,1000)
 
@@ -41,10 +66,16 @@ trait BaseGenerator {
     day <- Gen.chooseNum(1, 27)
     month <- Gen.chooseNum(1, 12)
     year <- Gen.chooseNum(1990, 2016)
-  } yield new LocalDate(year, month, day)
+  } yield LocalDate.of(year, month, day)
+
+  val jodaLocalDateGen: Gen[JodaLocalDate] = for {
+    day <- Gen.chooseNum(1, 27)
+    month <- Gen.chooseNum(1, 12)
+    year <- Gen.chooseNum(1990, 2016)
+  } yield new JodaLocalDate(year, month, day)
 
   def safeIdGen = for {
-    ref <- alphaNumOfLengthGen(9)
+    ref <- stringOfLengthGen(9)
   } yield s"X${ref.toUpperCase}"
 
   val postcodeGen: Gen[String] = for {
@@ -59,4 +90,34 @@ trait BaseGenerator {
     suffix <- stringOfLengthGen(15)
   } yield s"$prefix@$suffix.com"
 
+  val nonBooleans: Gen[String] =
+    arbitrary[String]
+      .suchThat (_.nonEmpty)
+      .suchThat (_ != "true")
+      .suchThat (_ != "false")
+
+  val invalidChar: Gen[String] =
+    Gen.oneOf[String](
+      Seq(
+        "@", "£", "$", "%", "^", "&", "*", "~", ">", "<", "|", "]", "[", "}", "{", "=", "+"
+      )
+    ).suchThat(_.nonEmpty)
+
+  val invalidCharForNames: Gen[String] =
+    Gen.oneOf[String](
+      Seq(
+        "ƒ", "„", "…", "†", "‡", "ˆ", "‰", "‹", "Œ", "•", "™", "œ", "¡", "¢", "¤", "¦", "§", "¨", "©", "ª",
+        "¬", "®", "°", "±", "²", "³", "¶", "¸", "¹", "º", "¼", "½", "¾", "¿"
+      )
+    ).suchThat(_.nonEmpty)
+
+  def jodaDatesBetween(min: JodaLocalDate, max: JodaLocalDate): Gen[JodaLocalDate] = {
+
+    def toMillis(date: JodaLocalDate): Long =
+      date.toDateTimeAtStartOfDay.toInstant.getMillis
+
+    Gen.choose(toMillis(min), toMillis(max)).map {
+      millis => new JodaLocalDate(millis)
+    }
+  }
 }

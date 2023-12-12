@@ -19,25 +19,56 @@ package models.bankdetails
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
+import models.{Enumerable, WithName}
+import play.api.i18n.Messages
 import play.api.libs.json._
+import uk.gov.hmrc.govukfrontend.views.Aliases.{RadioItem, Text}
 
 sealed trait BankAccountType {
-  def getBankAccountTypeID:String = {
+
+  val value: String
+  def getBankAccountTypeID: String = {
+
+    import models.bankdetails.BankAccountType._
+
     this match {
-      case PersonalAccount => "01"
-      case BelongsToBusiness => "02"
-      case BelongsToOtherBusiness => "03"
-      case NoBankAccountUsed => "04"
+      case a @ PersonalAccount => a.value
+      case a @ BelongsToBusiness => a.value
+      case a @ BelongsToOtherBusiness => a.value
+      case a @ NoBankAccountUsed => a.value
     }
   }
 }
 
-case object PersonalAccount extends BankAccountType
-case object BelongsToBusiness extends BankAccountType
-case object BelongsToOtherBusiness extends BankAccountType
-case object NoBankAccountUsed extends BankAccountType
+object BankAccountType extends Enumerable.Implicits {
 
-object BankAccountType {
+  case object PersonalAccount extends WithName("personalAccount") with BankAccountType {
+    override val value: String = "01"
+  }
+
+  case object BelongsToBusiness extends WithName("belongsToBusiness") with BankAccountType {
+    override val value: String = "02"
+  }
+
+  case object BelongsToOtherBusiness extends WithName("belongsToOtherBusiness") with BankAccountType {
+    override val value: String = "03"
+  }
+
+  case object NoBankAccountUsed extends WithName("noBankAccountUsed") with BankAccountType {
+    override val value: String = "04"
+  }
+
+  def formItems(implicit messages: Messages): Seq[RadioItem] = {
+
+    Seq(BelongsToOtherBusiness, BelongsToBusiness, PersonalAccount) map { obj =>
+
+      RadioItem(
+        content = Text(messages(s"bankdetails.accounttype.lbl.${obj.value}")),
+        id = Some(obj.toString),
+        value = Some(obj.toString)
+      )
+    }
+  }
 
   import utils.MappingUtils.Implicits._
 
@@ -82,4 +113,12 @@ object BankAccountType {
     case NoBankAccountUsed => Json.obj("bankAccountType" -> "04")
   }
 
+  val all = Seq(
+    PersonalAccount,
+    BelongsToBusiness,
+    BelongsToOtherBusiness,
+    NoBankAccountUsed
+  )
+
+  implicit val enumerable: Enumerable[BankAccountType] = Enumerable(all.map(v => v.toString -> v): _*)
 }

@@ -19,47 +19,49 @@ package controllers.businessactivities
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
-import models.businessactivities.{BusinessActivities, _}
-import play.api.mvc.MessagesControllerComponents
+import forms.businessactivities.IdentifySuspiciousActivityFormProvider
+import models.businessactivities.BusinessActivities
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
-import views.html.businessactivities._
+import views.html.businessactivities.IdentifySuspiciousActivityView
 
 import scala.concurrent.Future
 
-class IdentifySuspiciousActivityController @Inject() ( val dataCacheConnector: DataCacheConnector,
-                                                       val authAction: AuthAction,
-                                                       val ds: CommonPlayDependencies,
-                                                       val cc: MessagesControllerComponents,
-                                                       identify_suspicious_activity: identify_suspicious_activity) extends AmlsBaseController(ds, cc) {
+class IdentifySuspiciousActivityController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                     val authAction: AuthAction,
+                                                     val ds: CommonPlayDependencies,
+                                                     val cc: MessagesControllerComponents,
+                                                     formProvider: IdentifySuspiciousActivityFormProvider,
+                                                     view: IdentifySuspiciousActivityView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
         response =>
-          val form: Form2[IdentifySuspiciousActivity] = (for {
+          val activity = for {
             businessActivities <- response
             identifySuspiciousActivity <- businessActivities.identifySuspiciousActivity
-          } yield Form2[IdentifySuspiciousActivity](identifySuspiciousActivity)).getOrElse(EmptyForm)
-          Ok(identify_suspicious_activity(form, edit))
+          } yield identifySuspiciousActivity
+          Ok(view(activity.fold(formProvider())(formProvider().fill), edit))
       }
   }
 
-  def post(edit : Boolean = false) = authAction.async {
+  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[IdentifySuspiciousActivity](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(identify_suspicious_activity(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
               businessActivities.identifySuspiciousActivity(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get)
-            case false => Redirect(routes.NCARegisteredController.get())
+          } yield if (edit) {
+            Redirect(routes.SummaryController.get)
+          } else {
+            Redirect(routes.NCARegisteredController.get())
           }
-      }
+      )
   }
 }

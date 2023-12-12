@@ -18,40 +18,40 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
-import javax.inject.Inject
-import models.moneyservicebusiness.{FundsTransfer, MoneyServiceBusiness}
-import play.api.mvc.MessagesControllerComponents
+import forms.msb.FundsTransferFormProvider
+import models.moneyservicebusiness.MoneyServiceBusiness
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
+import views.html.msb.FundsTransferView
 
-import views.html.msb._
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
-class FundsTransferController @Inject() ( val dataCacheConnector: DataCacheConnector,
-                                          authAction: AuthAction,
-                                          val ds: CommonPlayDependencies,
-                                          val cc: MessagesControllerComponents,
-                                          funds_transfer: funds_transfer) extends AmlsBaseController(ds, cc) {
+class FundsTransferController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                         authAction: AuthAction,
+                                         val ds: CommonPlayDependencies,
+                                         val cc: MessagesControllerComponents,
+                                         formProvider: FundsTransferFormProvider,
+                                         view: FundsTransferView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
         response =>
-          val form: Form2[FundsTransfer] = (for {
+          val form = (for {
             moneyServiceBusiness <- response
             fundsTransfer <- moneyServiceBusiness.fundsTransfer
-          } yield Form2[FundsTransfer](fundsTransfer)).getOrElse(EmptyForm)
-          Ok(funds_transfer(form, edit))
+          } yield formProvider().fill(fundsTransfer)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[FundsTransfer](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(funds_transfer(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           for {
             moneyServiceBusiness <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
             _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key,
@@ -61,6 +61,6 @@ class FundsTransferController @Inject() ( val dataCacheConnector: DataCacheConne
               Redirect(routes.SummaryController.get)
             case _ => Redirect(routes.TransactionsInNext12MonthsController.get(edit))
           }
-      }
+      )
   }
 }

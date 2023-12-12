@@ -73,7 +73,6 @@ case class FeeResponse(responseType: ResponseType,
 
 object FeeResponse {
 
-
   implicit val dateTimeRead: Reads[DateTime] =
     (__ \ "$date").read[Long].map { dateTime =>
       new DateTime(dateTime, DateTimeZone.UTC)

@@ -16,57 +16,56 @@
 
 package controllers.deregister
 
-import javax.inject.Inject
-import cats.implicits._
 import cats.data.OptionT
+import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessMatching, HighValueDealing}
+import forms.deregister.DeregistrationReasonFormProvider
+import models.businessmatching.BusinessActivity.HighValueDealing
+import models.businessmatching.BusinessMatching
 import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
 import org.joda.time.LocalDate
-import play.api.mvc.MessagesControllerComponents
-import services.{AuthEnrolmentsService, StatusService}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.AuthEnrolmentsService
 import utils.{AckRefGenerator, AuthAction}
-import views.html.deregister.deregistration_reason
+import views.html.deregister.DeregistrationReasonView
+
+import javax.inject.Inject
 
 class DeregistrationReasonController @Inject()(authAction: AuthAction,
                                                val ds: CommonPlayDependencies,
                                                val dataCacheConnector: DataCacheConnector,
                                                amls: AmlsConnector,
                                                enrolments: AuthEnrolmentsService,
-                                               statusService: StatusService,
                                                val cc: MessagesControllerComponents,
-                                               deregistration_reason: deregistration_reason) extends AmlsBaseController(ds, cc) {
+                                               formProvider: DeregistrationReasonFormProvider,
+                                               view: DeregistrationReasonView) extends AmlsBaseController(ds, cc) {
 
-  def get = {
-    authAction.async {
-        implicit request =>
-          dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
-            (for {
-              bm <- businessMatching
-              activities <- bm.activities
-            } yield {
-              Ok(deregistration_reason(EmptyForm, activities.businessActivities.contains(HighValueDealing)))
-            }) getOrElse Ok(deregistration_reason(EmptyForm))
-          }
-    }
+  def get: Action[AnyContent] = authAction.async {
+    implicit request =>
+      dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
+        (for {
+          bm <- businessMatching
+          activities <- bm.activities
+        } yield {
+          Ok(view(formProvider(), activities.businessActivities.contains(HighValueDealing)))
+        }) getOrElse Ok(view(formProvider()))
+      }
   }
 
-  def post = authAction.async {
+  def post: Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[DeregistrationReason](request.body) match {
-        case f: InvalidForm =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
           dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key) map { businessMatching =>
             (for {
               bm <- businessMatching
               activities <- bm.activities
             } yield {
-              BadRequest(deregistration_reason(f, activities.businessActivities.contains(HighValueDealing)))
-            }) getOrElse BadRequest(deregistration_reason(f))
-          }
-
-        case ValidForm(_, data) => {
+              BadRequest(view(formWithErrors, activities.businessActivities.contains(HighValueDealing)))
+            }) getOrElse BadRequest(view(formWithErrors))
+          },
+        data => {
           val deregistrationReasonOthers = data match {
             case DeregistrationReason.Other(reason) => reason.some
             case _ => None
@@ -82,6 +81,6 @@ class DeregistrationReasonController @Inject()(authAction: AuthAction,
             _ <- OptionT.liftF(amls.deregister(regNumber, deregistration, request.accountTypeId))
           } yield Redirect(controllers.routes.LandingController.get)) getOrElse InternalServerError("Unable to deregister the application")
         }
-      }
+    )
   }
 }

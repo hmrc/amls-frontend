@@ -18,31 +18,30 @@ package controllers.bankdetails
 
 import connectors.DataCacheConnector
 import controllers.CommonPlayDependencies
-import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, StatusConstants}
-import views.html.bankdetails.remove_bank_details
+import views.html.bankdetails.RemoveBankDetailsView
 
 @Singleton
 class RemoveBankDetailsController @Inject()(val authAction: AuthAction,
                                             val ds: CommonPlayDependencies,
                                             val dataCacheConnector: DataCacheConnector,
                                             val mcc: MessagesControllerComponents,
-                                            remove_bank_details: remove_bank_details,
-                                            implicit val error: views.html.error) extends BankDetailsController(ds, mcc) {
+                                            view: RemoveBankDetailsView,
+                                            implicit val error: views.html.ErrorView) extends BankDetailsController(ds, mcc) {
 
-  def get(index: Int) = authAction.async {
+  def get(index: Int): Action[AnyContent] = authAction.async {
       implicit request =>
         getData[BankDetails](request.credId, index) map {
           case Some(BankDetails(_, Some(name), _, _, _, _, _)) =>
-            Ok(remove_bank_details(EmptyForm, index, name))
+            Ok(view(index, name))
           case _ => NotFound(notFoundView)
         }
   }
 
-  def remove(index: Int) = authAction.async {
+  def remove(index: Int): Action[AnyContent] = authAction.async {
       implicit request => {
         for {
           _ <- updateDataStrict[BankDetails](request.credId, index) { ba =>

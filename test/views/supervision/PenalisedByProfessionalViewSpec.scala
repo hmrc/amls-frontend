@@ -1,0 +1,87 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package views.supervision
+
+import forms.supervision.PenalisedByProfessionalFormProvider
+import org.scalatest.MustMatchers
+import play.api.test.FakeRequest
+import utils.AmlsViewSpec
+import views.Fixture
+import views.html.supervision.PenalisedByProfessionalView
+
+class PenalisedByProfessionalViewSpec extends AmlsViewSpec with MustMatchers  {
+
+  lazy val viewUnderTest = inject[PenalisedByProfessionalView]
+  lazy val fp = inject[PenalisedByProfessionalFormProvider]
+
+  implicit val request = FakeRequest()
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addTokenForView()
+  }
+
+  "PenalisedByProfessionalView" must {
+
+    "have the correct title" in new ViewFixture {
+      override def view = viewUnderTest(fp(), false)
+
+      doc.title() mustBe
+        s"${messages("supervision.penalisedbyprofessional.title")} - ${messages("summary.supervision")}" +
+          s" - ${messages("title.amls")} - ${messages("title.gov")}"
+    }
+
+    "have the correct heading" in new ViewFixture {
+      override def view = viewUnderTest(fp(), false)
+
+      doc.getElementsByTag("h1").text() must be(messages("supervision.penalisedbyprofessional.title"))
+    }
+
+    "have the correct content" in new ViewFixture {
+      override def view = viewUnderTest(fp(), false)
+
+      Seq(
+        "supervision.penalisedbyprofessional.subtitle",
+        "supervision.penalisedbyprofessional.line_1",
+        "supervision.penalisedbyprofessional.line_2",
+        "supervision.penalisedbyprofessional.line_3",
+        "supervision.penalisedbyprofessional.line_4",
+        "supervision.penalisedbyprofessional.line_5",
+        "supervision.penalisedbyprofessional.details"
+      ) foreach { msg =>
+        doc.getElementsByClass("govuk-grid-column-two-thirds").text() must include(messages(msg))
+      }
+    }
+
+    behave like pageWithErrors(
+      viewUnderTest(
+        fp().withError("penalised", "error.required.professionalbody.penalised.by.professional.body"), true
+      ),
+      "penalised",
+      "error.required.professionalbody.penalised.by.professional.body"
+    )
+
+    behave like pageWithErrors(
+      viewUnderTest(
+        fp().withError("professionalBody", "error.invalid.professionalbody.info.about.penalty"), true
+      ),
+      "professionalBody",
+      "error.invalid.professionalbody.info.about.penalty"
+    )
+
+    behave like pageWithBackLink(viewUnderTest(fp(), false))
+  }
+}

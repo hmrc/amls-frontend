@@ -1,0 +1,51 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import views.html.components.{SectionSubtitle, Heading, Button}
+
+@this(
+    layout: Layout,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    warningText: GovukWarningText,
+    form: FormWithCSRF,
+    button: Button
+)
+
+@()(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@layout(
+    messages("businessmatching.checkbusiness.title") + " - " + messages("summary.businessmatching"),
+    showBackLink = false
+){
+
+    @subtitle("summary.businessmatching")
+
+    @heading("businessmatching.checkbusiness.title")
+
+    <p class="govuk-hint">@messages("businessmatching.checkbusiness.body")</p>
+
+    @warningText(
+        WarningText(
+            content = Text(messages("businessmatching.checkbusiness.warning"))
+        )
+    )
+
+    @form(controllers.businessmatching.routes.SummaryController.get) {
+        @button("businessmatching.checkbusiness.button", "submit-button")
+    }
+}

@@ -16,67 +16,47 @@
 
 package controllers.businessdetails
 
-import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import models.businessdetails._
-import models.businessmatching.{BusinessMatching, BusinessType}
-import play.api.mvc.{MessagesControllerComponents, Result}
-import utils.{AuthAction, ControllerHelper}
-import views.html.businessdetails._
+import forms.businessdetails.PreviouslyRegisteredFormProvider
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.businessdetails.PreviouslyRegisteredService
+import utils.AuthAction
+import views.html.businessdetails.PreviouslyRegisteredView
 
 import scala.concurrent.Future
 
-class PreviouslyRegisteredController @Inject () (
-                                                  val dataCacheConnector: DataCacheConnector,
-                                                  val authAction: AuthAction,
-                                                  val ds: CommonPlayDependencies,
-                                                  val cc: MessagesControllerComponents,
-                                                  previously_registered: previously_registered) extends AmlsBaseController(ds, cc) {
+class PreviouslyRegisteredController @Inject ()(val authAction: AuthAction,
+                                                val ds: CommonPlayDependencies,
+                                                val cc: MessagesControllerComponents,
+                                                service: PreviouslyRegisteredService,
+                                                formProvider: PreviouslyRegisteredFormProvider,
+                                                view: PreviouslyRegisteredView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
-        response =>
-          val form: Form2[PreviouslyRegistered] = (for {
-            businessDetails <- response
-            prevRegistered <- businessDetails.previouslyRegistered
-          } yield Form2[PreviouslyRegistered](prevRegistered)).getOrElse(EmptyForm)
-          Ok(previously_registered(form, edit))
+      service.getPreviouslyRegistered(request.credId).map { optPreviouslyRegistered =>
+        Ok(view(optPreviouslyRegistered.fold(formProvider())(formProvider().fill), edit))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[PreviouslyRegistered](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(previously_registered(f, edit)))
-        case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll(request.credId) flatMap {
-            optionalCache =>
-              (for {
-                cache <- optionalCache
-                businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
-                saved <- Option(dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
-                  getUpdatedModel(businessType,  cache.getEntry[BusinessDetails](BusinessDetails.key), data))
-                )
-              } yield {
-                saved.map(_ => getRouting(businessType, edit, data))
-              }).getOrElse(Future.successful(Redirect(routes.ConfirmRegisteredOfficeController.get(edit))))
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => service.updatePreviouslyRegistered(request.credId, data).map {
+          _.fold(Redirect(routes.ConfirmRegisteredOfficeController.get(edit))) { _ =>
+            getRouting(edit)
           }
-      }
+        }
+      )
     }
   }
 
-  private def getUpdatedModel(businessType: BusinessType, businessDetails: BusinessDetails, data: PreviouslyRegistered): BusinessDetails = {
-    businessDetails.copy(previouslyRegistered = Some(data), hasChanged = true)
-  }
-
-  private def getRouting(businessType: BusinessType, edit: Boolean, data: PreviouslyRegistered): Result = {
-    (edit) match {
-      case true => Redirect(routes.SummaryController.get)
-      case _    => Redirect (routes.ActivityStartDateController.get(edit))
+  private def getRouting(edit: Boolean): Result =
+    if (edit) {
+      Redirect(routes.SummaryController.get)
+    } else {
+      Redirect(routes.ActivityStartDateController.get(edit))
     }
-  }
 }

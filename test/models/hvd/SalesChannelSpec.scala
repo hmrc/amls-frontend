@@ -16,6 +16,7 @@
 
 package models.hvd
 
+import models.hvd.SalesChannel._
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.mvc.ControllerComponents

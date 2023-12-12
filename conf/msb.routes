@@ -37,8 +37,8 @@ POST        /money-transfers-next-12-months                    @controllers.msb.
 GET         /countries-send-largest-amounts-money              @controllers.msb.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
 POST        /countries-send-largest-amounts-money              @controllers.msb.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
 
-GET         /currency-exchange-transactions                    @controllers.msb.CETransactionsInNext12MonthsController.get(edit: Boolean ?= false)
-POST        /currency-exchange-transactions                    @controllers.msb.CETransactionsInNext12MonthsController.post(edit: Boolean ?= false)
+GET         /currency-exchange-transactions                    @controllers.msb.CurrencyExchangesInNext12MonthsController.get(edit: Boolean ?= false)
+POST        /currency-exchange-transactions                    @controllers.msb.CurrencyExchangesInNext12MonthsController.post(edit: Boolean ?= false)
 
 GET         /foreign-exchange-transactions                     @controllers.msb.FXTransactionsInNext12MonthsController.get(edit: Boolean ?= false)
 POST        /foreign-exchange-transactions                     @controllers.msb.FXTransactionsInNext12MonthsController.post(edit: Boolean ?= false)

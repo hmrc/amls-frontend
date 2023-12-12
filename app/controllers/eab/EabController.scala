@@ -26,7 +26,7 @@ import play.api.libs.json._
 import play.api.mvc.MessagesControllerComponents
 import services.ProxyCacheService
 import utils.AuthAction
-import models.businessmatching.{EstateAgentBusinessService => EAB}
+import models.businessmatching.BusinessActivity.{EstateAgentBusinessService => EAB}
 import services.businessmatching.ServiceFlow
 import utils.DateOfChangeHelper
 

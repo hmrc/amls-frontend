@@ -16,7 +16,11 @@
 
 package models.eab
 
+import models.registrationprogress._
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
 import play.api.libs.json._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 
 class EabSpec extends AmlsSpec {
@@ -340,6 +344,101 @@ class EabSpec extends AmlsSpec {
         "return true for isComplete" in {
           eab.isComplete mustBe true
         }
+      }
+    }
+
+    "taskRow is called" must {
+
+      val mockCache = mock[CacheMap]
+      val msgKey = "eab"
+
+      val completeData = completeServices ++
+        completeDateOfChange ++
+        completeEstateAgencyActPenalty ++
+        completePenalisedProfessionalBody ++
+        completeRedressScheme ++
+        completeMoneyProtectionScheme
+
+      def completeEab(hasChanged: Boolean = false, hasAccepted: Boolean = true) = Json.obj(
+        "data" -> completeData,
+        "hasChanged" -> hasChanged,
+        "hasAccepted" -> hasAccepted
+      )
+
+      "return a Not Started task row when model is empty" in {
+
+        val notStartedTaskRow = TaskRow(
+          msgKey,
+          appConfig.eabWhatYouNeedUrl,
+          false,
+          NotStarted,
+          TaskRow.notStartedTag
+        )
+
+        when(mockCache.getEntry[Eab](eqTo(Eab.key))(any()))
+          .thenReturn(None)
+
+        Eab.taskRow(appConfig)(mockCache, messages) mustBe notStartedTaskRow
+      }
+
+      "return a Completed task row when the model is complete" in {
+
+        val completedTaskRow = TaskRow(
+          msgKey,
+          appConfig.eabSummaryUrl,
+          false,
+          Completed,
+          TaskRow.completedTag
+        )
+
+        when(mockCache.getEntry[Eab](eqTo(Eab.key))(any()))
+          .thenReturn(Some(completeEab().as[Eab]))
+
+        Eab.taskRow(appConfig)(mockCache, messages) mustBe completedTaskRow
+      }
+
+      "return an Updated task row when model has changed and is complete" in {
+
+        val updatedTaskRow = TaskRow(
+          msgKey,
+          appConfig.eabSummaryUrl,
+          true,
+          Updated,
+          TaskRow.updatedTag
+        )
+
+        when(mockCache.getEntry[Eab](eqTo(Eab.key))(any()))
+          .thenReturn(Some(completeEab(true).as[Eab]))
+
+        Eab.taskRow(appConfig)(mockCache, messages) mustBe updatedTaskRow
+      }
+
+      "return an Incomplete task row when model is not complete" in {
+
+        val incompleteTaskRow = TaskRow(
+          msgKey,
+          appConfig.eabWhatYouNeedUrl,
+          false,
+          Started,
+          TaskRow.incompleteTag
+        )
+
+        val incompleteData = completeServices ++
+          completeEstateAgencyActPenalty ++
+          completePenalisedProfessionalBody ++
+          incompleteRedressScheme ++
+          completeMoneyProtectionScheme
+
+        val incompleteEab = Json.obj(
+          "data" -> incompleteData,
+          "hasChanged" -> false,
+          "hasAccepted" -> true
+        )
+
+        when(mockCache.getEntry[Eab](eqTo(Eab.key))(any()))
+          .thenReturn(Some(incompleteEab.as[Eab]))
+
+        Eab.taskRow(appConfig)(mockCache, messages) mustBe incompleteTaskRow
       }
     }
   }

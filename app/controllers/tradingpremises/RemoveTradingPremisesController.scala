@@ -19,14 +19,15 @@ package controllers.tradingpremises
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.tradingpremises.RemoveTradingPremisesFormProvider
 import models.status._
-import models.tradingpremises.{ActivityEndDate, TradingPremises}
+import models.tradingpremises.{TradingPremises, YourTradingPremises}
 import play.api.mvc.MessagesControllerComponents
 import services.StatusService
 import utils.{AuthAction, RepeatingSection, StatusConstants}
-import views.html.tradingpremises.remove_trading_premises
+import views.html.tradingpremises.RemoveTradingPremisesView
 
+import scala.concurrent.Future
 
 class RemoveTradingPremisesController @Inject () (
                                                    val dataCacheConnector: DataCacheConnector,
@@ -34,8 +35,9 @@ class RemoveTradingPremisesController @Inject () (
                                                    val ds: CommonPlayDependencies,
                                                    val statusService: StatusService,
                                                    val cc: MessagesControllerComponents,
-                                                   remove_trading_premises: remove_trading_premises,
-                                                   implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                                   formProvider: RemoveTradingPremisesFormProvider,
+                                                   view: RemoveTradingPremisesView,
+                                                   implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   def get(index: Int, complete: Boolean = false) = authAction.async {
     implicit request =>
@@ -45,8 +47,8 @@ class RemoveTradingPremisesController @Inject () (
       } yield (tp, status) match {
 
         case (Some(_), SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_)) =>
-          Ok (remove_trading_premises (
-              f = EmptyForm,
+          Ok (view (
+              formProvider(),
               index = index,
               complete = complete,
               tradingAddress = tp.yourTradingPremises.fold("")(_.tradingPremisesAddress.toLines.mkString(", ")),
@@ -55,8 +57,8 @@ class RemoveTradingPremisesController @Inject () (
           )
 
         case (Some(_), _) => Ok (
-          remove_trading_premises (
-            f = EmptyForm,
+          view (
+            formProvider(),
             index = index,
             complete = complete,
             tradingAddress = tp.yourTradingPremises.fold("")(_.tradingPremisesAddress.toLines.mkString(",")),
@@ -97,34 +99,55 @@ class RemoveTradingPremisesController @Inject () (
           getData[TradingPremises](request.credId, index) flatMap { premises =>
             premises.lineId match {
               case Some(tp) =>
-                val extraFields = Map(
-                  "premisesStartDate" -> Seq(premises.get.yourTradingPremises.get.startDate.get.toString("yyyy-MM-dd"))
-                )
-                Form2[ActivityEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
-                  case f: InvalidForm =>
-                    for {
-                      tp <- getData[TradingPremises](request.credId, index)
-                    } yield (tp) match {
-                      case (Some(_)) =>
-                        BadRequest(
-                          remove_trading_premises(
-                            f = f,
-                            index = index,
-                            complete = complete,
-                            tradingAddress = tp.yourTradingPremises.fold("")(_.tradingPremisesAddress.toLines.mkString(", ")),
-                            showDateField = true
-                          )
-                        )
-                      case _ => NotFound(notFoundView)
-                    }
-                  case ValidForm(_, data) => {
-                    for {
-                      _ <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
-                        tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
+                premises.yourTradingPremises.map {
+                  case YourTradingPremises(_, tradingPremisesAddress, _, Some(startDate), _) =>
+                    formProvider().bindFromRequest().fold(
+                      formWithErrors =>
+                        for {
+                          tp <- getData[TradingPremises](request.credId, index)
+                        } yield (tp) match {
+                          case (Some(_)) =>
+                            BadRequest(
+                              view(
+                                form = formWithErrors,
+                                index = index,
+                                complete = complete,
+                                tradingAddress = tradingPremisesAddress.toLines.mkString(", "),
+                                showDateField = true
+                              )
+                            )
+                          case _ => NotFound(notFoundView)
+                        },
+                      data => {
+                        if (data.endDate.isBefore(startDate)) {
+
+                          val formWithError = formProvider()
+                            .fill(data)
+                            .withError(
+                              "endDate",
+                              "error.expected.tp.date.after.start",
+                              startDate.toString("dd-MM-yyyy")
+                            )
+
+                          Future.successful(BadRequest(
+                            view(
+                              form = formWithError,
+                              index = index,
+                              complete = complete,
+                              tradingAddress = tradingPremisesAddress.toLines.mkString(", "),
+                              showDateField = true
+                            )
+                          ))
+                        } else {
+                          updateDataStrict[TradingPremises](request.credId, index) { tp =>
+                            tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
+                          }.map { _ =>
+                            Redirect(routes.YourTradingPremisesController.get(complete))
+                          }
+                        }
                       }
-                    } yield Redirect(routes.YourTradingPremisesController.get(complete))
-                  }
-                }
+                    )
+                }.getOrElse(throw new RuntimeException("Could not access trading premises"))
               case _ => removeWithoutDate
             }
           }

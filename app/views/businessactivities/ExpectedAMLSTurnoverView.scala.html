@@ -1,0 +1,90 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import models.businessactivities.ExpectedAMLSTurnover
+@import models.businessmatching._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import views.html.components.forms.ErrorSummary
+@import views.html.components.{Button, Heading, ReturnLink, SectionSubtitle}
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    inputRadio: GovukRadios,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean, businessMatching: BusinessMatching, businessTypes: Option[List[String]])(implicit messages: Messages, request: Request[_], appConfig: ApplicationConfig)
+
+@supportingContent = {
+    @businessMatching.alphabeticalBusinessActivitiesLowerCase(false).map { types =>
+        @if(types.size > 1) {
+            <p class="govuk-body">@messages("businessactivities.confirm-activities.subtitle")</p>
+            <ul class="govuk-list govuk-list--bullet">
+                @types.map { businessType =>
+                    <li>@businessType</li>
+                }
+            </ul>
+        }
+    }
+}
+
+@headingText = @{
+businessTypes.map { types =>
+    if(types.size > 1) {
+            messages("businessactivities.turnover.heading.multiple")
+        } else {
+            messages("businessactivities.turnover.heading", types.head)
+        }
+    }
+}
+
+@radioItems = @{
+    ExpectedAMLSTurnover.all.map { i =>
+        RadioItem(
+            content = Text(messages(s"businessactivities.turnover.lbl.${i.value}")),
+            id = Some(i.toString),
+            value = Some(i.toString)
+        )
+    }
+}
+
+@layout(pageTitle = messages("businessactivities.turnover.title") + " - " + messages("summary.businessactivities")) {
+
+    @formHelper(action = controllers.businessactivities.routes.ExpectedAMLSTurnoverController.post(edit)) {
+
+        @errorSummary(form, Some(Map("expectedAMLSTurnover" -> "zeroPlus")))
+
+        @subtitle("summary.businessactivities")
+
+        @heading(headingText.getOrElse(messages("businessactivities.turnover.heading.multiple")))
+
+        @supportingContent
+
+        @inputRadio(
+            Radios(items = radioItems).withFormField(form("expectedAMLSTurnover"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

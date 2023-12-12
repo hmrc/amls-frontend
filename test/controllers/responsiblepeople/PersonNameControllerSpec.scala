@@ -17,9 +17,9 @@
 package controllers.responsiblepeople
 
 import java.util.UUID
-
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.PersonNameFormProvider
 import models.responsiblepeople._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -27,12 +27,13 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import utils.AmlsSpec
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import views.html.responsiblepeople.person_name
+import views.html.responsiblepeople.PersonNameView
 
 import scala.concurrent.Future
 
-class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
+class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
@@ -40,12 +41,14 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[person_name]
-    val personNameController = new PersonNameController (
+    lazy val view = inject[PersonNameView]
+    val personNameController = new PersonNameController(
       dataCacheConnector = mockDataCacheConnector ,
       authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
-      person_name = view,
-      error = errorView)
+      view = view,
+      formProvider = inject[PersonNameFormProvider],
+      error = errorView
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -108,7 +111,8 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
         "go to LegalNameController" when {
           "edit is false" in new Fixture {
 
-            val requestWithParams = requestWithUrlEncodedBody(
+            val requestWithParams = FakeRequest(POST, routes.PersonNameController.post(1, false).url)
+            .withFormUrlEncodedBody(
               "firstName" -> "first",
               "middleName" -> "middle",
               "lastName" -> "last"
@@ -128,7 +132,8 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
         "go to DetailedAnswersController" when {
           "edit is true" in new Fixture {
 
-            val requestWithParams = requestWithUrlEncodedBody(
+            val requestWithParams = FakeRequest(POST, routes.PersonNameController.post(1, false).url)
+            .withFormUrlEncodedBody(
               "firstName" -> "first",
               "middleName" -> "middle",
               "lastName" -> "last"
@@ -149,7 +154,8 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
       "form is invalid" must {
         "return BAD_REQUEST" in new Fixture {
 
-          val firstNameMissingInRequest = requestWithUrlEncodedBody(
+          val firstNameMissingInRequest = FakeRequest(POST, routes.PersonNameController.post(1, false).url)
+          .withFormUrlEncodedBody(
             "lastName" -> "last"
           )
 
@@ -166,7 +172,8 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
       "model cannot be found with given index" must {
         "return NOT_FOUND" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.PersonNameController.post(1, false).url)
+          .withFormUrlEncodedBody(
             "firstName" -> "first",
             "lastName" -> "last"
           )

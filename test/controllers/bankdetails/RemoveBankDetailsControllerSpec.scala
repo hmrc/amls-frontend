@@ -17,26 +17,26 @@
 package controllers.bankdetails
 
 import controllers.actions.SuccessfulAuthAction
+import models.bankdetails.BankAccountType.PersonalAccount
 import models.bankdetails._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
-import views.html.bankdetails.remove_bank_details
+import views.html.bankdetails.RemoveBankDetailsView
 
 class RemoveBankDetailsControllerSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
-    lazy val removeBankDetails = app.injector.instanceOf[remove_bank_details]
+    lazy val removeBankDetails = app.injector.instanceOf[RemoveBankDetailsView]
     val controller = new RemoveBankDetailsController (
       dataCacheConnector =  mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       mcc = mockMcc,
-      remove_bank_details = removeBankDetails,
+      view = removeBankDetails,
       error = errorView)
   }
 
@@ -60,9 +60,9 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec {
 
       val contentString = contentAsString(result)
 
-      val pageTitle = Messages("bankdetails.remove.bank.account.title") + " - " +
-        Messages("summary.bankdetails") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov")
+      val pageTitle = messages("bankdetails.remove.bank.account.title") + " - " +
+        messages("summary.bankdetails") + " - " +
+        messages("title.amls") + " - " + messages("title.gov")
 
       val document = Jsoup.parse(contentString)
       document.title() mustBe pageTitle

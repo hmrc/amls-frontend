@@ -23,21 +23,18 @@ import jto.validation.ValidationError
 import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
 import jto.validation.forms.Rules.{minLength => _, _}
+import models.tcsp.TcspTypes.all
+import models.{Enumerable, WithName}
 import utils.TraversableValidators.minLengthR
 import play.api.i18n.Messages
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.{CheckboxItem, Text}
 
 sealed trait TcspService {
 
-  val value: String = this match {
-    case PhonecallHandling => "01"
-    case EmailHandling => "02"
-    case EmailServer => "03"
-    case SelfCollectMailboxes => "04"
-    case MailForwarding => "05"
-    case Receptionist => "06"
-    case ConferenceRooms => "07"
-    case Other(_) => "08"
-  }
+  import models.tcsp.ProvidedServices._
+
+  val value: String
 
   def getMessage(implicit messages: Messages): String = {
     val message = "tcsp.provided_services.service.lbl."
@@ -54,18 +51,74 @@ sealed trait TcspService {
   }
 }
 
-case object PhonecallHandling extends TcspService
-case object EmailHandling extends TcspService
-case object EmailServer extends TcspService
-case object SelfCollectMailboxes extends TcspService
-case object MailForwarding extends TcspService
-case object Receptionist extends TcspService
-case object ConferenceRooms extends TcspService
-case class Other(details: String) extends TcspService
-
 case class ProvidedServices(services: Set[TcspService])
 
-object ProvidedServices {
+object ProvidedServices extends Enumerable.Implicits {
+
+  case object PhonecallHandling extends WithName("phonecallHandling") with TcspService {
+    override val value: String = "01"
+  }
+
+  case object EmailHandling extends WithName("emailHandling") with TcspService {
+    override val value: String = "02"
+  }
+
+  case object EmailServer extends WithName("emailServer") with TcspService {
+    override val value: String = "03"
+  }
+
+  case object SelfCollectMailboxes extends WithName("selfCollectMailboxes") with TcspService {
+    override val value: String = "04"
+  }
+
+  case object MailForwarding extends WithName("mailForwarding") with TcspService {
+    override val value: String = "05"
+  }
+
+  case object Receptionist extends WithName("receptionist") with TcspService {
+    override val value: String = "06"
+  }
+
+  case object ConferenceRooms extends WithName("conferenceRooms") with TcspService {
+    override val value: String = "07"
+  }
+
+  case class Other(details: String) extends WithName("other") with TcspService {
+    override val value: String = "08"
+  }
+
+  val all: Seq[TcspService] = Seq(
+    PhonecallHandling,
+    EmailHandling,
+    EmailServer,
+    SelfCollectMailboxes,
+    MailForwarding,
+    Receptionist,
+    ConferenceRooms,
+    Other("")
+  )
+
+  def formValues(conditionalHtml: Html)(implicit messages: Messages): Seq[CheckboxItem] = {
+
+    val checkboxItems = all.zipWithIndex.map { case (service, index) =>
+
+      val conditional = if(service.value == Other("").value) Some(conditionalHtml) else None
+
+      CheckboxItem(
+        content = Text(messages(s"tcsp.provided_services.service.lbl.${service.value}")),
+        value = service.toString,
+        id = Some(s"services_$index"),
+        name = Some(s"services[$index]"),
+        conditionalHtml = conditional
+      )
+    }.sortBy(_.content.asHtml.body)
+
+    val from = checkboxItems.indexWhere(_.value == Other("").toString)
+
+    checkboxItems.patch(checkboxItems.length, Seq(checkboxItems(from)), 0).patch(from, Seq(), 1)
+  }
+
+  implicit val enumerable: Enumerable[TcspService] = Enumerable(all.map(v => v.toString -> v): _*)
 
   import utils.MappingUtils.Implicits._
 

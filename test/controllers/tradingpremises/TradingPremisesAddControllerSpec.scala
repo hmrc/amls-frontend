@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.tradingpremises.TradingPremises
 import org.mockito.Matchers.any
 import org.mockito.Mockito._

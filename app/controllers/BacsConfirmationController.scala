@@ -19,12 +19,13 @@ package controllers
 import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector, _}
+
 import javax.inject.{Inject, Singleton}
 import models.businessdetails.{BusinessDetails, PreviouslyRegisteredYes}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName}
-import views.html.confirmation.{confirmation_bacs, confirmation_bacs_transitional_renewal}
+import views.html.confirmation.ConfirmationBacsView
 
 @Singleton
 class BacsConfirmationController @Inject()(authAction: AuthAction,
@@ -35,21 +36,16 @@ class BacsConfirmationController @Inject()(authAction: AuthAction,
                                            private[controllers] val authenticator: AuthenticatorConnector,
                                            private[controllers] val enrolmentService: AuthEnrolmentsService,
                                            val cc: MessagesControllerComponents,
-                                           confirmation_bacs_transitional_renewal: confirmation_bacs_transitional_renewal,
-                                           confirmation_bacs: confirmation_bacs) extends AmlsBaseController(ds, cc) {
+                                           view: ConfirmationBacsView) extends AmlsBaseController(ds, cc) {
 
-  def bacsConfirmation() = authAction.async {
+  def bacsConfirmation(): Action[AnyContent] = authAction.async {
       implicit request =>
         val okResult = for {
           _ <- OptionT.liftF(authenticator.refreshProfile)
           refNo <- OptionT(enrolmentService.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
           status <- OptionT.liftF(statusService.getReadStatus(refNo, request.accountTypeId))
           name <- BusinessName.getName(request.credId, status.safeId, request.accountTypeId)
-          businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key))
-        } yield businessDetails.previouslyRegistered match {
-          case Some(PreviouslyRegisteredYes(_)) => Ok(confirmation_bacs_transitional_renewal(name))
-          case _ => Ok(confirmation_bacs(name))
-        }
+        } yield Ok(view(name))
 
         okResult getOrElse InternalServerError("Unable to get BACS confirmation")
   }

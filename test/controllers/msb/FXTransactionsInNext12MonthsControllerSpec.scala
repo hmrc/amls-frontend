@@ -17,8 +17,9 @@
 package controllers.msb
 
 import controllers.actions.SuccessfulAuthAction
+import forms.msb.FxTransactionsInNext12MonthsFormProvider
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.BusinessActivity.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness._
 import models.status.NotCompleted
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -26,25 +27,28 @@ import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.msb.fx_transaction_in_next_12_months
+import views.html.msb.FxTransactionInNext12MonthsView
 
 import scala.concurrent.Future
 
-class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar {
+class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     trait Fixture extends DependencyMocks {
         self =>
         val request = addToken(authRequest)
-        lazy val view = app.injector.instanceOf[fx_transaction_in_next_12_months]
+        lazy val view = inject[FxTransactionInNext12MonthsView]
         val controller = new FXTransactionsInNext12MonthsController(
             authAction = SuccessfulAuthAction, ds = commonDependencies,
             dataCacheConnector = mockCacheConnector,
             statusService = mockStatusService,
             serviceFlow = mockServiceFlow,
-          cc = mockMcc,
-          fx_transaction_in_next_12_months = view)
+            cc = mockMcc,
+            formProvider = inject[FxTransactionsInNext12MonthsFormProvider],
+            view = view
+        )
 
         mockIsNewActivityNewAuth(false)
         mockCacheFetch[ServiceChangeRegister](None, None)
@@ -103,7 +107,8 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
         "Show error message when user has not filled the mandatory fields" in new Fixture {
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.FXTransactionsInNext12MonthsController.post().url)
+            .withFormUrlEncodedBody(
                 "fxTransaction" -> ""
             )
 
@@ -120,7 +125,8 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
         }
 
         "Successfully save data in mongoCache and navigate to Summary page" in new Fixture {
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.FXTransactionsInNext12MonthsController.post().url)
+            .withFormUrlEncodedBody(
                 "fxTransaction" -> "12345678963"
             )
 
@@ -147,7 +153,8 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
                 ), hasChanged = true
             )
 
-            val newRequest = requestWithUrlEncodedBody(
+            val newRequest = FakeRequest(POST, routes.FXTransactionsInNext12MonthsController.post().url)
+            .withFormUrlEncodedBody(
                 "fxTransaction" -> "12345678963"
             )
 

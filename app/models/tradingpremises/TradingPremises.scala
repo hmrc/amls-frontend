@@ -16,13 +16,13 @@
 
 package models.tradingpremises
 
-import models.businessmatching.MoneyServiceBusiness
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.businessmatching.BusinessActivity.MoneyServiceBusiness
+import models.registrationprogress._
+import models.tradingpremises.BusinessStructure._
+import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
-
-import scala.collection.Seq
 
 case class TradingPremises(
                             registeringAgentPremises: Option[RegisteringAgentPremises] = None,
@@ -141,31 +141,62 @@ object TradingPremises {
   def filterWithIndex(rp: Seq[TradingPremises]): Seq[(TradingPremises, Int)] =
     rp.zipWithIndex.reverse.filterNot(_._1.status.contains(StatusConstants.Deleted)).filterNot(_._1 == TradingPremises())
 
-  def section(implicit cache: CacheMap): Section = {
+  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
 
     val messageKey = "tradingpremises"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.tradingpremises.routes.TradingPremisesAddController.get())
+    val notStarted = TaskRow(
+      messageKey,
+      controllers.tradingpremises.routes.TradingPremisesAddController.get().url,
+      hasChanged = false,
+      NotStarted,
+      TaskRow.notStartedTag
+    )
 
     cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) { tp =>
 
       if (filter(tp).equals(Nil)) {
-        Section(messageKey, NotStarted, anyChanged(tp), controllers.tradingpremises.routes.TradingPremisesAddController.get())
+        TaskRow(
+          messageKey,
+          controllers.tradingpremises.routes.TradingPremisesAddController.get().url,
+          anyChanged(tp),
+          NotStarted,
+          TaskRow.notStartedTag
+        )
       } else {
-        filter(tp) match {
+        tp match {
+          case premises if premises.nonEmpty && anyChanged(premises) && premises.forall {
+            _.isComplete
+          } => TaskRow(
+            messageKey,
+            controllers.tradingpremises.routes.YourTradingPremisesController.get().url,
+            true,
+            Updated,
+            TaskRow.updatedTag
+          )
           case premises if premises.nonEmpty && premises.forall {
             _.isComplete
-          } => Section(messageKey, Completed, anyChanged(tp), controllers.tradingpremises.routes.YourTradingPremisesController.get())
+          } => TaskRow(
+            messageKey,
+            controllers.tradingpremises.routes.YourTradingPremisesController.get().url,
+            anyChanged(tp),
+            Completed,
+            TaskRow.completedTag
+          )
           case _ =>
             tp.indexWhere {
               case model if !model.isComplete => true
               case _ => false
             }
-            Section(messageKey, Started, anyChanged(tp), controllers.tradingpremises.routes.YourTradingPremisesController.get())
+            TaskRow(
+              messageKey,
+              controllers.tradingpremises.routes.YourTradingPremisesController.get().url,
+              anyChanged(tp),
+              Started,
+              TaskRow.incompleteTag
+            )
         }
       }
-
     }
-
   }
 
   implicit val mongoKey = new MongoKey[TradingPremises] {

@@ -19,6 +19,7 @@ package generators.tradingpremises
 import generators.businessmatching.BusinessActivitiesGenerator
 import generators.BaseGenerator
 import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.tradingpremises._
 
 import org.scalacheck.Gen
@@ -38,7 +39,7 @@ trait TradingPremisesGenerator extends BaseGenerator with BusinessActivitiesGene
     name <- stringOfLengthGen(nameLength)
     address <- tradingPremisesAddressGen
     residential <- Gen.oneOf(Some(true), Some(false), None)
-    startDate <- localDateGen
+    startDate <- jodaLocalDateGen
   } yield YourTradingPremises(name, address, residential, Some(startDate), None)
 
   val whatBusinessActivitiesGen: Gen[WhatDoesYourBusinessDo] = for {
@@ -52,10 +53,10 @@ trait TradingPremisesGenerator extends BaseGenerator with BusinessActivitiesGene
 
   val tpSubSectorGen: Gen[TradingPremisesMsbServices] = for {
     subSectors <- Gen.choose(1, 3).flatMap(Gen.pick(_, Seq(
-      models.tradingpremises.TransmittingMoney,
-      models.tradingpremises.CurrencyExchange,
-      models.tradingpremises.ChequeCashingScrapMetal,
-      models.tradingpremises.ChequeCashingNotScrapMetal)))
+      models.tradingpremises.TradingPremisesMsbService.TransmittingMoney,
+      models.tradingpremises.TradingPremisesMsbService.CurrencyExchange,
+      models.tradingpremises.TradingPremisesMsbService.ChequeCashingScrapMetal,
+      models.tradingpremises.TradingPremisesMsbService.ChequeCashingNotScrapMetal)))
   } yield TradingPremisesMsbServices(subSectors.toSet)
 
   val tradingPremisesGen: Gen[TradingPremises] = for {
@@ -76,6 +77,18 @@ trait TradingPremisesGenerator extends BaseGenerator with BusinessActivitiesGene
     yourTradingPremises = Some(ytp),
     whatDoesYourBusinessDoAtThisAddress = Some(activities),
     msbServices = if(activities.activities.contains(MoneyServiceBusiness)) Some(subSectors) else None,
+    hasAccepted = true,
+    hasChanged = true
+  )
+
+  val fullTradingPremisesGen: Gen[TradingPremises] = for {
+    ytp <- yourTradingPremisesGen.suchThat(_.nonEmpty)
+    activities <- whatBusinessActivitiesGen.suchThat(_.activities.nonEmpty)
+    subSectors <- tpSubSectorGen.suchThat(_.services.nonEmpty)
+  } yield TradingPremises(
+    yourTradingPremises = Some(ytp),
+    whatDoesYourBusinessDoAtThisAddress = Some(activities),
+    msbServices = if (activities.activities.contains(MoneyServiceBusiness)) Some(subSectors) else None,
     hasAccepted = true,
     hasChanged = true
   )

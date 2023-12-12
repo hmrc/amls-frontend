@@ -95,12 +95,12 @@ class MostTransactionsSpec extends PlaySpec {
         MostTransactions.formR.validate(
           Map(
             "mostTransactionsCountries[0]" -> Seq("GB"),
-            "mostTransactionsCountries[1]" -> Seq("MK"),
+            "mostTransactionsCountries[1]" -> Seq("BE"),
             "mostTransactionsCountries[2]" -> Seq("JO")
           )
         ) must be(Valid(MostTransactions(Seq(
           Country("United Kingdom", "GB"),
-          Country("Macedonia, the Former Yugoslav Republic of", "MK"),
+          Country("Belgium", "BE"),
           Country("Jordan", "JO")
         ))))
       }
@@ -112,7 +112,7 @@ class MostTransactionsSpec extends PlaySpec {
           Map(
             "mostTransactionsCountries[0]" -> Seq("GB"),
             "mostTransactionsCountries[1]" -> Seq("hjjkhjkjh"),
-            "mostTransactionsCountries[2]" -> Seq("MK")
+            "mostTransactionsCountries[2]" -> Seq("BE")
           )
         )
         x must be (Invalid(Seq((Path \ "mostTransactionsCountries" \ 1) -> Seq(ValidationError("error.invalid.country")))))

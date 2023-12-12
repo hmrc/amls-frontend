@@ -19,11 +19,11 @@ package controllers.businessdetails
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
+import forms.businessdetails.RegisteredOfficeIsUKFormProvider
 import models.businessdetails._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, DateOfChangeHelper}
-import views.html.businessdetails._
+import views.html.businessdetails.RegisteredOfficeIsUKView
 
 import scala.concurrent.Future
 
@@ -33,38 +33,42 @@ class RegisteredOfficeIsUKController @Inject ()(
                                                 val authAction: AuthAction,
                                                 val ds: CommonPlayDependencies,
                                                 val cc: MessagesControllerComponents,
-                                                registered_office_is_uk: registered_office_is_uk) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
+                                                formProvider: RegisteredOfficeIsUKFormProvider,
+                                                view: RegisteredOfficeIsUKView) extends AmlsBaseController(ds, cc) with DateOfChangeHelper {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
         dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key) map {
           response =>
             response.flatMap(businessDetails =>
               businessDetails.registeredOfficeIsUK.map(isUk => isUk.isUK)
                 .orElse(businessDetails.registeredOffice.flatMap(ro => ro.isUK)))
-              .map(isUk => Ok(registered_office_is_uk(Form2[RegisteredOfficeIsUK](RegisteredOfficeIsUK(isUk)), edit)) )
-              .getOrElse(Ok(registered_office_is_uk(EmptyForm, edit)))
+              .map(isUk => Ok(view(formProvider().fill(RegisteredOfficeIsUK(isUk)), edit)) )
+              .getOrElse(Ok(view(formProvider(), edit)))
         }
   }
 
   def post(edit: Boolean = false) = authAction.async {
     implicit request =>
-        Form2[RegisteredOfficeIsUK](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(registered_office_is_uk(f, edit)))
-          case ValidForm(_, data) =>
-            for {
-              businessDetails: Option[BusinessDetails] <- dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key)
-              _ <- dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails. registeredOfficeIsUK(data))
-              _ <- if (isUkHasChanged(businessDetails.registeredOffice, isUk = data)) { dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
-                businessDetails.copy(registeredOffice = None)) } else { Future.successful(None) }
-            } yield {
-              data match {
-                case RegisteredOfficeIsUK(true) => Redirect(routes.RegisteredOfficeUKController.get(edit))
-                case RegisteredOfficeIsUK(false) => Redirect(routes.RegisteredOfficeNonUKController.get(edit))
-              }
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
+          for {
+            businessDetails: Option[BusinessDetails] <- dataCacheConnector.fetch[BusinessDetails](request.credId, BusinessDetails.key)
+            _ <- dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key, businessDetails. registeredOfficeIsUK(data))
+            _ <- if (isUkHasChanged(businessDetails.registeredOffice, isUk = data)) {
+                   dataCacheConnector.save[BusinessDetails](request.credId, BusinessDetails.key,
+                   businessDetails.copy(registeredOffice = None))
+                 } else {
+                   Future.successful(None)
+                 }
+          } yield {
+            data match {
+              case RegisteredOfficeIsUK(true) => Redirect(routes.RegisteredOfficeUKController.get(edit))
+              case RegisteredOfficeIsUK(false) => Redirect(routes.RegisteredOfficeNonUKController.get(edit))
             }
-        }
+          }
+      )
   }
   def isUkHasChanged(address: Option[RegisteredOffice], isUk: RegisteredOfficeIsUK):Boolean = {
     (address, isUk) match {

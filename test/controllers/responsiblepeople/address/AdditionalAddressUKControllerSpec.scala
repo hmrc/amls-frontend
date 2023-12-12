@@ -18,7 +18,7 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.autocomplete.NameValuePair
+import forms.responsiblepeople.address.AdditionalAddressUKFormProvider
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
@@ -29,20 +29,19 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.AutoCompleteService
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture}
-import views.html.responsiblepeople.address.additional_address_UK
+import views.html.responsiblepeople.address.AdditionalAddressUKView
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
+class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
@@ -51,29 +50,21 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
     self => val request = addToken(authRequest)
 
     val auditConnector = mock[AuditConnector]
-    val autoCompleteService = mock[AutoCompleteService]
-    lazy val view = app.injector.instanceOf[additional_address_UK]
+    lazy val view = inject[AdditionalAddressUKView]
     val additionalAddressUKController = new AdditionalAddressUKController(
       dataCacheConnector = mockDataCacheConnector,
       auditConnector = auditConnector,
       authAction = SuccessfulAuthAction,
-      autoCompleteService = autoCompleteService,
       ds = commonDependencies,
       cc = mockMcc,
-      additional_address_UK = view,
+      formProvider = inject[AdditionalAddressUKFormProvider],
+      view = view,
       error = errorView
     )
 
     when {
       auditConnector.sendEvent(any())(any(), any())
     } thenReturn Future.successful(Success)
-
-    when {
-      autoCompleteService.getCountries
-    } thenReturn Some(Seq(
-      NameValuePair("United Kingdom", "UK"),
-      NameValuePair("Spain", "ES")
-    ))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -81,9 +72,9 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
 
   "AdditionalAddressController" when {
 
-    val pageTitle = Messages("responsiblepeople.additional_address_country.title", "firstname lastname") + " - " +
-      Messages("summary.responsiblepeople") + " - " +
-      Messages("title.amls") + " - " + Messages("title.gov")
+    val pageTitle = messages("responsiblepeople.additional_address_country.title", "firstname lastname") + " - " +
+      messages("summary.responsiblepeople") + " - " +
+      messages("title.amls") + " - " + messages("title.gov")
     val personName = Some(PersonName("firstname", None, "lastname"))
 
 
@@ -106,7 +97,7 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
         document.select("input[name=addressLine2]").`val` must be("")
         document.select("input[name=addressLine3]").`val` must be("")
         document.select("input[name=addressLine4]").`val` must be("")
-        document.select("input[name=postcode]").`val` must be("")
+        document.select("input[name=postCode]").`val` must be("")
       }
 
       "display the previous home address with UK fields populated" in new Fixture {
@@ -128,7 +119,7 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
         document.select("input[name=addressLine2]").`val` must be("Line 2")
         document.select("input[name=addressLine3]").`val` must be("Line 3")
         document.select("input[name=addressLine4]").`val` must be("")
-        document.select("input[name=postcode]").`val` must be("AA1 1AA")
+        document.select("input[name=postCode]").`val` must be("AA1 1AA")
       }
 
       "display 404 NotFound" when {
@@ -152,8 +143,8 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
 
         "all the mandatory UK parameters are supplied" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "true",
+          val requestWithParams = FakeRequest(POST, routes.AdditionalAddressUKController.post(1).url)
+          .withFormUrlEncodedBody(
             "addressLine1" -> "Line 1",
             "postCode" -> "AA1 1AA"
           )
@@ -185,8 +176,8 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
 
         "the default fields for UK are not supplied" in new Fixture {
 
-          val requestWithMissingParams = requestWithUrlEncodedBody(
-            "isUK" -> "true",
+          val requestWithMissingParams = FakeRequest(POST, routes.AdditionalAddressUKController.post(1).url)
+          .withFormUrlEncodedBody(
             "addressLine1" -> "",
             "postCode" -> ""
           )
@@ -198,14 +189,14 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("a[href=#addressLine1]").html() must include(Messages("error.required.address.line1"))
-          document.select("a[href=#postcode]").html() must include(Messages("error.required.postcode"))
+          document.select("a[href=#addressLine1]").html() must include(messages("error.required.address.line1"))
+          document.select("a[href=#postCode]").html() must include(messages("error.required.postcode"))
         }
 
         "given an invalid uk address" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "true",
+          val requestWithParams = FakeRequest(POST, routes.AdditionalAddressUKController.post(1).url)
+          .withFormUrlEncodedBody(
             "addressLine1" -> "Line *1",
             "addressLine2" -> "Line &2",
             "postCode" -> "AA1 1AA"
@@ -226,19 +217,19 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
           val document: Document  = Jsoup.parse(contentAsString(result))
           document.title mustBe s"Error: $pageTitle"
           val errorCount = 2
-          val elementsWithError : Elements = document.getElementsByClass("error-notification")
+          val elementsWithError : Elements = document.getElementsByClass("govuk-error-message")
           elementsWithError.size() must be(errorCount)
           val elements = elementsWithError.asScala.map(_.text())
-          elements(0) must include(Messages("error.required.enter.addresslineone.regex"))
-          elements(1) must include(Messages("error.required.enter.addresslinetwo.regex"))
+          elements(0) must include(messages("error.text.validation.address.line1"))
+          elements(1) must include(messages("error.text.validation.address.line2"))
         }
       }
 
       "go to DetailedAnswers" when {
         "edit is true"  in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "true",
+          val requestWithParams = FakeRequest(POST, routes.AdditionalAddressUKController.post(1).url)
+          .withFormUrlEncodedBody(
             "addressLine1" -> "New line 1",
             "addressLine2" -> "New line 2",
             "postCode" -> "TE1 1ET"
@@ -277,8 +268,8 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
       "go to TimeAtAdditionalAddress page" when {
         "edit is false" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "true",
+          val requestWithParams = FakeRequest(POST, routes.AdditionalAddressUKController.post(1).url)
+          .withFormUrlEncodedBody(
           "addressLine1" -> "Line 1",
           "addressLine2" -> "Line 2",
           "postCode" -> "AA1 1AA"
@@ -300,8 +291,8 @@ class AdditionalAddressUKControllerSpec extends AmlsSpec with MockitoSugar {
         }
 
         "edit is true and time at address does not exist" in new Fixture {
-          val requestWithParams = requestWithUrlEncodedBody(
-            "isUK" -> "true",
+          val requestWithParams = FakeRequest(POST, routes.AdditionalAddressUKController.post(1).url)
+          .withFormUrlEncodedBody(
             "addressLine1" -> "Line 1",
             "addressLine2" -> "Line 2",
             "postCode" -> "AA1 1AA"

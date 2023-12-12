@@ -1,0 +1,84 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.ApplicationConfig
+@import models.businessmatching.BusinessActivity.MoneyServiceBusiness
+@import models.businessmatching.{BusinessActivities, BusinessMatchingMsbServices}
+@import views.html.components.templates.WhatYouNeedPage
+@import views.html.components.Button
+
+@this(
+    whatYouNeedPage: WhatYouNeedPage,
+    button: Button,
+    hmrcNewTabLink: HmrcNewTabLink
+)
+
+@(nextUrl: Call, index: Int, activities: Option[BusinessActivities], msbServices: Option[BusinessMatchingMsbServices])(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@whatYouNeedPage(
+    pageTitleKey = s"${messages("title.wyn")} - ${messages("summary.tradingpremises")}",
+    subtitleKey = "summary.tradingpremises",
+    headingKey = "title.wyn",
+    nextUrl.url
+) {
+    <p class="govuk-body">
+        @messages("tradingpremises.virtualoffice.text_1.1")
+        @hmrcNewTabLink(
+            NewTabLink(
+                classList = Some("govuk-link"),
+                href = Some(appConfig.tradingPremisesVirtualOfficeLink),
+                text = messages("tradingpremises.virtualoffice.text_1.1.link.text")
+            )
+        )
+        @messages("tradingpremises.virtualoffice.text_1.2")
+    </p>
+    <p class="govuk-body">@messages("tradingpremises.virtualoffice.text_2")</p>
+    <p class="govuk-body">@messages("tradingpremises.virtualoffice.text_3")</p>
+    <p class="govuk-body">@messages("tradingpremises.whatyouneed.requiredinfo.heading")</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("tradingpremises.whatyouneed.requiredinfo.text.1")</li>
+        <li>@messages("tradingpremises.whatyouneed.requiredinfo.text.2")</li>
+        <li>@messages("tradingpremises.whatyouneed.requiredinfo.text.3")</li>
+
+
+        @activities.map { ba =>
+            @if(ba.businessActivities.size > 1) {
+                <li>@messages("tradingpremises.whatyouneed.requiredinfo.text.4")</li>
+            }
+            @msbServices.map { msb =>
+                @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness) && msb.msbServices.size > 1) {
+                    <li>@messages("tradingpremises.whatyouneed.requiredinfo.text.5")</li>
+                }
+            }
+        }
+    </ul>
+
+    @activities.map { ba =>
+        @if(ba.hasBusinessOrAdditionalActivity(MoneyServiceBusiness)) {
+            <h2 class="govuk-heading-m">@messages("tradingpremises.whatyouneed.agents.sub.heading")</h2>
+
+            <p class="govuk-body">@messages("tradingpremises.whatyouneed.agents.desc.1")</p>
+
+            <p class="govuk-body">@messages("tradingpremises.whatyouneed.agents.desc.2")</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>@messages("tradingpremises.whatyouneed.requiredinfo.text.6")</li>
+                <li>@messages("tradingpremises.whatyouneed.requiredinfo.text.7")</li>
+                <li>@messages("tradingpremises.whatyouneed.requiredinfo.text.8")</li>
+            </ul>
+        }
+    }
+}

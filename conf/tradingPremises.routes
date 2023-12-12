@@ -17,9 +17,6 @@ POST        /residential-address/:index                              @controller
 GET         /premises/date-of-change/:index                          @controllers.tradingpremises.WhereAreTradingPremisesController.dateOfChange(index: Int)
 POST        /premises/date-of-change/:index                          @controllers.tradingpremises.WhereAreTradingPremisesController.saveDateOfChange(index: Int)
 
-GET         /crn-name/:index                                         @controllers.tradingpremises.AgentCompanyNameController.get(index: Int, edit: Boolean ?= false)
-POST        /crn-name/:index                                         @controllers.tradingpremises.AgentCompanyNameController.post(index: Int, edit: Boolean ?= false)
-
 GET         /agent-company-details/:index                            @controllers.tradingpremises.AgentCompanyDetailsController.get(index: Int, edit: Boolean ?= false)
 POST        /agent-company-details/:index                            @controllers.tradingpremises.AgentCompanyDetailsController.post(index: Int, edit: Boolean ?= false)
 
@@ -57,5 +54,5 @@ POST        /remove/:index/reasons                                   @controller
 
 GET         /your-trading-premises                                   @controllers.tradingpremises.YourTradingPremisesController.get(edit: Boolean ?= false)
 
-GET         /check-your-answers/:index                               @controllers.tradingpremises.DetailedAnswersController.get(index: Int)
-POST        /check-your-answers/:index                               @controllers.tradingpremises.DetailedAnswersController.post(index: Int)
+GET         /check-your-answers/:index                               @controllers.tradingpremises.CheckYourAnswersController.get(index: Int)
+POST        /check-your-answers/:index                               @controllers.tradingpremises.CheckYourAnswersController.post(index: Int)

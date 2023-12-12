@@ -1,0 +1,93 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.charactercount.CharacterCount
+@import uk.gov.hmrc.govukfrontend.views.Implicits.{RichCharacterCount, RichRadios}
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
+@import views.html.components.{SectionSubtitle, Heading, ReturnLink, Button}
+@import views.html.components.forms.{ErrorSummary, InputYesNo}
+@import config.ApplicationConfig
+
+@this(
+    layout: Layout,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    formHelper: FormWithCSRF,
+    inputYesNo: InputYesNo,
+    inputTextArea: GovukCharacterCount,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
+
+@conditionalHtml = {
+    @inputTextArea(
+        CharacterCount(
+            id = "professionalBody",
+            name = "professionalBody",
+            label = Label(
+                content = Text(messages("supervision.penalisedbyprofessional.details.lbl"))
+            ),
+            rows = 8,
+            errorMessage = form("professionalBody").error.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*)))),
+            maxLength = Some(255)
+        ).withFormField(form("professionalBody"))
+    )
+}
+
+@radioItems = @{
+    HmrcYesNoRadioItems().map { x =>
+      if(x.value.contains("true")) {
+          x.copy(conditionalHtml = Some(conditionalHtml))
+      } else x
+    }
+}
+
+@layout(pageTitle = messages("supervision.penalisedbyprofessional.title") + " - " + messages("summary.supervision")) {
+
+    @errorSummary(form)
+
+    @subtitle("summary.supervision")
+
+    @heading("supervision.penalisedbyprofessional.title")
+
+    <p class="govuk-body">@messages("supervision.penalisedbyprofessional.subtitle")</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("supervision.penalisedbyprofessional.line_1")</li>
+        <li>@messages("supervision.penalisedbyprofessional.line_2")</li>
+        <li>@messages("supervision.penalisedbyprofessional.line_3")</li>
+        <li>@messages("supervision.penalisedbyprofessional.line_4")</li>
+        <li>@messages("supervision.penalisedbyprofessional.line_5")</li>
+    </ul>
+    <p class="govuk-body">@messages("supervision.penalisedbyprofessional.details")</p>
+
+    @formHelper(action = controllers.supervision.routes.PenalisedByProfessionalController.post(edit)) {
+
+        @inputYesNo(
+            Radios(
+                name = "penalised",
+                items = radioItems,
+                classes = "govuk-radios"
+            ).withFormField(form("penalised"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

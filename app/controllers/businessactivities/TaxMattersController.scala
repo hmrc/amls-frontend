@@ -20,37 +20,46 @@ import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms._
-import models.businessactivities.{BusinessActivities, _}
-import play.api.mvc.MessagesControllerComponents
+import forms.businessactivities.TaxMattersFormProvider
+import models.businessactivities.BusinessActivities
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper}
-import views.html.businessactivities._
+import views.html.businessactivities.TaxMattersView
 
 class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector,
                                       val authAction: AuthAction,
                                       val ds: CommonPlayDependencies,
                                       val cc: MessagesControllerComponents,
-                                      tax_matters: tax_matters,
-                                      implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+                                      view: TaxMattersView,
+                                      formProvider: TaxMattersFormProvider,
+                                      implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
+
+      def accountantNames(businessActivities: BusinessActivities): Option[String] = {
+        businessActivities.whoIsYourAccountant.head.names.map(name => name.accountantsName)
+      }
+
       dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map {
-          case Some(BusinessActivities(_,_,_,_,_,_,_,_,_,_,_,Some(whoIsYourAccountant), Some(taxMatters),_,_,_))
-          => Ok(tax_matters(Form2[TaxMatters](taxMatters), edit, whoIsYourAccountant.names.map(name => name.accountantsName)))
-          case Some(BusinessActivities(_,_,_,_,_,_,_,_,_,_,_,Some(whoIsYourAccountant), _,_,_,_))
-          => Ok(tax_matters(EmptyForm, edit, whoIsYourAccountant.names.map(name => name.accountantsName)))
-          case _ => NotFound(notFoundView)
+        case Some(x) if x.taxMattersAndHasAccountant =>
+          Ok(view(formProvider().fill(x.taxMatters.head), edit, accountantNames(x)))
+        case Some(y) if y.hasAccountant =>
+          Ok(view(formProvider(), edit, accountantNames(y)))
+        case None =>
+          NotFound(notFoundView)
       }
   }
 
-  def post(edit : Boolean = false) = authAction.async {
+  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[TaxMatters](request.body) match {
-        case f: InvalidForm =>
+      formProvider().bindFromRequest.fold(
+        formWithErrors => {
           dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { ba =>
-          BadRequest(tax_matters(f, edit, ControllerHelper.accountantName(ba)))
+            BadRequest(view(formWithErrors, edit, ControllerHelper.accountantName(ba)))
           }
-        case ValidForm(_, data) =>
+        },
+        data =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](request.credId,
@@ -58,6 +67,6 @@ class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector
               businessActivities.taxMatters(Some(data))
             )
           } yield Redirect(routes.SummaryController.get)
-      }
+      )
   }
 }

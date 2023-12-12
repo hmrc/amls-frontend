@@ -17,13 +17,14 @@
 package models.businessmatching
 
 import cats.data.Validated.{Invalid, Valid}
-import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, ValidationError, _}
-import models.{DateOfChange, FormTypes}
+import models.{CheckYourAnswersField, DateOfChange, Enumerable, WithName}
+import play.api.Logging
 import play.api.i18n.Messages
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{Reads, Writes, _}
-import play.api.Logging
+import play.api.libs.json._
+import uk.gov.hmrc.govukfrontend.views.Aliases.{Hint, Text}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
 case class BusinessActivities(businessActivities: Set[BusinessActivity],
                               additionalActivities: Option[Set[BusinessActivity]] = None,
@@ -34,36 +35,56 @@ case class BusinessActivities(businessActivities: Set[BusinessActivity],
     businessActivities.union(additionalActivities.getOrElse(Set.empty)) contains activity
   }
 
+  def hasOnlyOneBusinessActivity: Boolean = {
+    businessActivities.size == 1
+  }
 }
 
-sealed trait BusinessActivity {
+sealed trait BusinessActivity extends CheckYourAnswersField {
+
+  val value: String
 
   def getMessage(usePhrasedMessage:Boolean = false)(implicit messages: Messages): String = {
     val phrasedString = if(usePhrasedMessage) ".phrased" else ""
     val message = s"businessmatching.registerservices.servicename.lbl."
-    this match {
-      case AccountancyServices => messages(s"${message}01${phrasedString}")
-      case ArtMarketParticipant => messages(s"${message}02${phrasedString}")
-      case BillPaymentServices => messages(s"${message}03${phrasedString}")
-      case EstateAgentBusinessService => messages(s"${message}04${phrasedString}")
-      case HighValueDealing => messages(s"${message}05${phrasedString}")
-      case MoneyServiceBusiness => messages(s"${message}06${phrasedString}")
-      case TrustAndCompanyServices => messages(s"${message}07${phrasedString}")
-      case TelephonePaymentService => messages(s"${message}08${phrasedString}")
-    }
+
+    messages(s"${message}${value}${phrasedString}")
   }
 }
 
-case object AccountancyServices extends BusinessActivity
-case object ArtMarketParticipant extends BusinessActivity
-case object BillPaymentServices extends  BusinessActivity
-case object EstateAgentBusinessService extends BusinessActivity
-case object HighValueDealing extends BusinessActivity
-case object MoneyServiceBusiness extends BusinessActivity
-case object TrustAndCompanyServices extends BusinessActivity
-case object TelephonePaymentService extends BusinessActivity
+object BusinessActivity extends Enumerable.Implicits {
 
-object BusinessActivity {
+  case object AccountancyServices extends WithName("accountancyServices") with BusinessActivity {
+    override val value: String = "01"
+  }
+
+  case object ArtMarketParticipant extends WithName("artMarketParticipant") with BusinessActivity {
+    override val value: String = "02"
+  }
+
+  case object BillPaymentServices extends WithName("billPaymentServices") with BusinessActivity {
+    override val value: String = "03"
+  }
+
+  case object EstateAgentBusinessService extends WithName("estateAgentBusinessService") with BusinessActivity {
+    override val value: String = "04"
+  }
+
+  case object HighValueDealing extends WithName("highValueDealing") with BusinessActivity {
+    override val value: String = "05"
+  }
+
+  case object MoneyServiceBusiness extends WithName("moneyServiceBusiness") with BusinessActivity  {
+    override val value: String = "06"
+  }
+
+  case object TrustAndCompanyServices extends WithName("trustAndCompanyServices") with BusinessActivity {
+    override val value: String = "07"
+  }
+
+  case object TelephonePaymentService extends WithName("telephonePaymentService") with BusinessActivity {
+    override val value: String = "08"
+  }
 
   implicit val activityFormRead = Rule[String, BusinessActivity] {
       case "01" => Valid(AccountancyServices)
@@ -110,10 +131,14 @@ object BusinessActivity {
     case TrustAndCompanyServices => JsString("06")
     case TelephonePaymentService => JsString("07")
   }
+
+  implicit val enumerable: Enumerable[BusinessActivity] =
+    Enumerable(BusinessActivities.all.toSeq.map(v => v.toString -> v): _*)
 }
 
 object BusinessActivities extends Logging {
 
+  import models.businessmatching.BusinessActivity._
   import utils.MappingUtils.Implicits._
 
   val all: Set[BusinessActivity] = Set(
@@ -127,37 +152,66 @@ object BusinessActivities extends Logging {
     TelephonePaymentService
   )
 
-  implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] = {
-    logger.info(s"${p.toString}")
-    FormTypes.businessActivityRule("error.required.bm.register.service")
+  def formValues(filterValues: Option[Seq[BusinessActivity]] = None, hasHints: Boolean = true)(implicit messages: Messages): Seq[CheckboxItem] = {
+
+    val filteredValues = filterValues.fold(all.toSeq)(all.toSeq diff _)
+
+    filteredValues.map { activity =>
+      val hintOpt = if(hasHints) {
+        Some(Hint(
+          id = Some(s"businessActivities-${activity.value}-hint"),
+          content = Text(messages(s"businessmatching.registerservices.servicename.details.${activity.value}"))
+        ))
+      } else {
+        None
+      }
+
+      val id = activity.value.substring(1)
+
+      CheckboxItem(
+        content = Text(messages(s"businessmatching.registerservices.servicename.lbl.${activity.value}")),
+        value = activity.toString,
+        id = Some(s"value_$id"),
+        name = Some(s"value[$id]"),
+        hint = hintOpt
+      )
+    }.sortBy(_.content.mkString)
   }
 
-  implicit def formWrites(implicit w: Write[BusinessActivity, String]) = Write[BusinessActivities, UrlFormEncoded](activitiesWriter _)
-
-  private def activitiesWriter(activities: BusinessActivities)(implicit w: Write[BusinessActivity, String]) =
-    Map("businessActivities[]" -> activities.additionalActivities.fold(activities.businessActivities){act => act}.toSeq.map(w.writes))
-
-  import jto.validation.forms.Rules._
-  import utils.TraversableValidators.minLengthR
-
-  def formReaderMinLengthR(msg: String): Rule[UrlFormEncoded, Set[BusinessActivity]] = From[UrlFormEncoded] { __ =>
-    (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage(msg))
-  }
-
-  def maxLengthValidator(count: Int): Rule[Set[BusinessActivity], Set[BusinessActivity]] = Rule.fromMapping[Set[BusinessActivity], Set[BusinessActivity]] {
-    case s if s.size == 2 && s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.twobusinesses")))
-    case s if s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.one")))
-    case s => Valid(s)
-  }
-
-  def combinedReader(count: Int, msg: String) = formReaderMinLengthR(msg) andThen maxLengthValidator(count).repath(_ => Path \ "businessActivities")
-
-  implicit def activitySetWrites(implicit w: Write[BusinessActivity, String]) = {
-    logger.info(s"${w.toString}")
-    Write[Set[BusinessActivity], UrlFormEncoded] { activities =>
-      Map("businessActivities[]" -> activities.toSeq.map { a => BusinessActivities.getValue(a) })
-    }
-  }
+  //  implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] = {
+//    logger.info(s"${p.toString}")
+//    FormTypes.businessActivityRule("error.required.bm.register.service")
+//  }
+//
+//  implicit def formWrites(implicit w: Write[BusinessActivity, String]): Write[BusinessActivities, UrlFormEncoded] =
+//    Write[BusinessActivities, UrlFormEncoded](activitiesWriter _)
+//
+//  private def activitiesWriter(activities: BusinessActivities)(implicit w: Write[BusinessActivity, String]) =
+//    Map("businessActivities[]" -> activities.additionalActivities.fold(activities.businessActivities){act => act}.toSeq.map(w.writes))
+//
+//  import jto.validation.forms.Rules._
+//  import utils.TraversableValidators.minLengthR
+//
+//  def formReaderMinLengthR(msg: String): Rule[UrlFormEncoded, Set[BusinessActivity]] = From[UrlFormEncoded] { __ =>
+//    (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage(msg))
+//  }
+//
+//  def maxLengthValidator(count: Int): Rule[Set[BusinessActivity], Set[BusinessActivity]] =
+//    Rule.fromMapping[Set[BusinessActivity], Set[BusinessActivity]] {
+//      case s if s.size == 2 && s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.twobusinesses")))
+//      case s if s.size == count => Invalid(Seq(ValidationError("error.required.bm.remove.leave.one")))
+//      case s => Valid(s)
+//    }
+//
+//  def combinedReader(count: Int, msg: String): Rule[UrlFormEncoded, Set[BusinessActivity]] =
+//    formReaderMinLengthR(msg) andThen maxLengthValidator(count).repath(_ => Path \ "businessActivities")
+//
+//  implicit def activitySetWrites(implicit w: Write[BusinessActivity, String]) = {
+//    logger.info(s"${w.toString}")
+//    Write[Set[BusinessActivity], UrlFormEncoded] { activities =>
+//      Map("businessActivities[]" -> activities.toSeq.map(_.value))
+//    }
+//  }
 
   implicit val format = Json.writes[BusinessActivities]
 

@@ -1,0 +1,92 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.components.{Button, Heading, SectionSubtitle, ReturnLink}
+@import views.html.components.forms.{ErrorSummary, InputYesNo, InputCountry}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcYesNoRadioItems
+
+@this(
+    layout: Layout,
+    formHelper: FormWithCSRF,
+    errorSummary: ErrorSummary,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    inputYesNo: InputYesNo,
+    inputCountry: InputCountry,
+    button: Button,
+    returnLink: ReturnLink
+)
+
+@(form: Form[_], edit: Boolean, index: Int, flow: Option[String], personName: String, countryData: Seq[SelectItem])(implicit messages: Messages, request: Request[_])
+
+@preparedErrorSummaryMapping = @{
+
+    if(form.error("country").isDefined) {
+        Some(Map(
+            "country" -> "location-autocomplete",
+            "bornInUk" -> "bornInUk-true"
+        ))
+    } else Some(Map("bornInUk" -> "bornInUk-true"))
+}
+
+@conditionalHtml = {
+    @inputCountry(
+        form,
+        countryData,
+        labelMsg = "responsiblepeople.country.of.birth.txt.lbl",
+        labelMsgArgs = personName
+    )
+}
+
+@radioItems = @{
+    HmrcYesNoRadioItems().map { radioItem =>
+        if (radioItem.value.contains("false")) {
+            radioItem.copy(
+                id = Some("bornInUk-false"),
+                conditionalHtml = Some(conditionalHtml)
+            )
+        } else {
+            radioItem.copy(
+                id = Some("bornInUk-true")
+            )
+        }
+    }
+}
+
+@layout(pageTitle = messages("responsiblepeople.country.of.birth.title") + " - " + messages("summary.responsiblepeople")) {
+
+    @errorSummary(form, preparedErrorSummaryMapping)
+
+    @subtitle("summary.responsiblepeople")
+
+    @heading("responsiblepeople.country.of.birth.heading", personName)
+
+    @formHelper(action = controllers.responsiblepeople.routes.CountryOfBirthController.post(index, edit, flow)) {
+
+        @inputYesNo(
+            Radios(
+                name = "bornInUk",
+                items = radioItems,
+                classes = "govuk-radios"
+            ).withFormField(form("bornInUk"))
+        )
+
+        @button()
+
+        @returnLink(true)
+    }
+}

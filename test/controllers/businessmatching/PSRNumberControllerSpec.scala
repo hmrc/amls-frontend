@@ -20,8 +20,10 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
+import forms.businessmatching.PSRNumberFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
 import models.moneyservicebusiness.MoneyServiceBusiness
@@ -32,13 +34,12 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.psr_number
-
+import views.html.businessmatching.PsrNumberView
 
 import scala.concurrent.Future
 
@@ -50,7 +51,7 @@ class PSRNumberControllerSpec extends AmlsSpec
   trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[psr_number]
+    lazy val view = app.injector.instanceOf[PsrNumberView]
     val controller = new PSRNumberController(
       SuccessfulAuthAction,
       ds = commonDependencies,
@@ -60,11 +61,12 @@ class PSRNumberControllerSpec extends AmlsSpec
       createRouter2[ChangeSubSectorFlowModel],
       mock[ChangeSubSectorHelper],
       cc = mockMcc,
+      formProvider = app.injector.instanceOf[PSRNumberFormProvider],
       psr_number = view
     )
 
     when {
-      mockStatusService.isPreSubmission(Some(any()), any(), any())(any(), any())
+      mockStatusService.isPreSubmission(Some(any()), any(), any())(any(), any(), any())
     } thenReturn Future.successful(true)
 
     when {
@@ -133,10 +135,11 @@ class PSRNumberControllerSpec extends AmlsSpec
           controller.helper.updateSubSectors(any(), any())(any(), any())
         } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
-        val newRequest = requestWithUrlEncodedBody(
-          "appliedFor" -> "true",
-          "regNumber" -> "123789"
-        )
+        val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+          .withFormUrlEncodedBody(
+            "appliedFor" -> "true",
+            "regNumber" -> "123789"
+          )
 
         mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
 
@@ -158,9 +161,8 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)
 
-        val newRequest = requestWithUrlEncodedBody(
-          "appliedFor" -> "false"
-        )
+        val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+          .withFormUrlEncodedBody("appliedFor" -> "false")
 
         val result = controller.post(true)(newRequest)
 
@@ -169,10 +171,11 @@ class PSRNumberControllerSpec extends AmlsSpec
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
-          "appliedFor" -> "true",
-          "regNumber" -> ""
-        )
+        val newRequest = FakeRequest(POST, routes.PSRNumberController.post().url)
+          .withFormUrlEncodedBody(
+            "appliedFor" -> "true",
+            "regNumber" -> ""
+          )
 
         when {
           controller.businessMatchingService.getModel(any())(any())
@@ -182,7 +185,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         status(result) mustBe BAD_REQUEST
 
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.select("span").html() must include(Messages("error.invalid.msb.psr.number"))
+        document.text() must include(messages("error.invalid.msb.psr.number"))
       }
     }
   }

@@ -17,26 +17,28 @@
 package controllers.responsiblepeople
 
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.KnownByFormProvider
 import models.responsiblepeople.{KnownBy, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import utils._
-import views.html.responsiblepeople.known_by
+import views.html.responsiblepeople.KnownByView
 
-
-class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
+class KnownByControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
 
   trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(self.authRequest)
     val RecordId = 1
-    lazy val view = app.injector.instanceOf[known_by]
+    lazy val view = inject[KnownByView]
     lazy val controller = new KnownByController(
       mockCacheConnector,
       SuccessfulAuthAction,
       commonDependencies,
       cc = mockMcc,
-      known_by = view,
+      formProvider = inject[KnownByFormProvider],
+      view = view,
       error = errorView)
   }
 
@@ -95,7 +97,8 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
         "go to DateOfBirthController" when {
           "edit is false" in new TestFixture {
 
-            val requestWithParams = requestWithUrlEncodedBody(
+            val requestWithParams = FakeRequest(POST, routes.KnownByController.post(1).url)
+            .withFormUrlEncodedBody(
               "hasOtherNames" -> "true",
               "otherNames" -> "otherName"
             )
@@ -112,7 +115,8 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
         "go to DetailedAnswersController" when {
           "edit is true" in new TestFixture {
 
-            val requestWithParams = requestWithUrlEncodedBody(
+            val requestWithParams = FakeRequest(POST, routes.KnownByController.post(1).url)
+            .withFormUrlEncodedBody(
               "hasOtherNames" -> "true",
               "otherNames" -> "otherName"
             )
@@ -129,7 +133,8 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
         "go to DetailedAnswersController" when {
           "edit is true and does not have other names" in new TestFixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.KnownByController.post(1).url)
+            .withFormUrlEncodedBody(
           "hasOtherNames" -> "false"
           )
 
@@ -147,7 +152,8 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
       "form is invalid" must {
         "return BAD_REQUEST" in new TestFixture {
 
-          val NameMissingInRequest = requestWithUrlEncodedBody(
+          val NameMissingInRequest = FakeRequest(POST, routes.KnownByController.post(1).url)
+          .withFormUrlEncodedBody(
             "hasOtherNames" -> "true"
           )
 
@@ -164,7 +170,8 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
       "model cannot be found with given index" must {
         "return NOT_FOUND" in new TestFixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.KnownByController.post(1).url)
+          .withFormUrlEncodedBody(
             "hasOtherNames" -> "true",
             "otherNames" -> "otherName"
           )

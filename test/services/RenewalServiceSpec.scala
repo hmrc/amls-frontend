@@ -18,13 +18,15 @@ package services
 
 import connectors.DataCacheConnector
 import models.Country
+import models.businessmatching.BusinessActivity._
+import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching._
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress._
 import models.renewal._
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.mvc.Call
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -80,9 +82,14 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           dataCache.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
         } thenReturn Future.successful(None)
 
-        val section = await(service.getSection(credId))
-        section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get)
-
+        val section = await(service.getTaskRow(credId))
+        section mustBe TaskRow(
+          Renewal.sectionKey,
+          controllers.renewal.routes.WhatYouNeedController.get.url,
+          false,
+          NotStarted,
+          TaskRow.notStartedTag
+        )
       }
 
       "the renewal is complete and has been started" in new Fixture {
@@ -110,9 +117,15 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
         setUpRenewal(completeModel)
 
-        val section = await(service.getSection(credId))
+        val taskRow = await(service.getTaskRow(credId))
         await(service.isRenewalComplete(completeModel, credId)) mustBe true
-        section mustBe Section(Renewal.sectionKey, Completed, hasChanged = true, controllers.renewal.routes.SummaryController.get)
+        taskRow mustBe TaskRow(
+          Renewal.sectionKey,
+          controllers.renewal.routes.SummaryController.get.url,
+          true,
+          Completed,
+          TaskRow.completedTag
+        )
       }
 
       "the renewal model is not complete" in new Fixture {
@@ -121,16 +134,28 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
         setUpRenewal(renewal)
 
-        val section = await(service.getSection(credId))
-        section mustBe Section(Renewal.sectionKey, Started, hasChanged = true, controllers.renewal.routes.WhatYouNeedController.get)
+        val taskRow = await(service.getTaskRow(credId))
+        taskRow mustBe TaskRow(
+          Renewal.sectionKey,
+          controllers.renewal.routes.WhatYouNeedController.get.url,
+          true,
+          Started,
+          TaskRow.incompleteTag
+        )
       }
 
       "the renewal model is not complete and not started" in new Fixture {
         val renewal = Renewal(None)
         setUpRenewal(renewal)
 
-        val section = await(service.getSection(credId))
-        section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get)
+        val taskRow = await(service.getTaskRow(credId))
+        taskRow mustBe TaskRow(
+          Renewal.sectionKey,
+          controllers.renewal.routes.WhatYouNeedController.get.url,
+          false,
+          NotStarted,
+          TaskRow.notStartedTag
+        )
       }
     }
   }
@@ -718,34 +743,39 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
   }
 
   trait CanSubmitFixture extends Fixture {
-      val notStartedRenewal = Section("renewal", NotStarted, false, mock[Call])
-      val startedRenewal = Section("renewal", Started, true, mock[Call])
-      val completedUnchangedRenewal = Section("renewal", Completed, false, mock[Call])
-      val completedChangedRenewal = Section("renewal", Completed, true, mock[Call])
+      val notStartedRenewal = TaskRow("renewal", "/foo", false, NotStarted, TaskRow.notStartedTag)
+      val startedRenewal = TaskRow("renewal", "/foo", true, Started, TaskRow.incompleteTag)
+      val completedUnchangedRenewal = TaskRow("renewal", "/foo", false, Completed, TaskRow.completedTag)
+      val completedChangedRenewal = TaskRow("renewal", "/foo", true, Completed, TaskRow.completedTag)
+      val updatedChangedRenewal = TaskRow("renewal", "/foo", true, Updated, TaskRow.updatedTag)
 
+      val sectionsCompletedAndUpdated = Seq(
+        TaskRow("", "/foo", false, Completed, TaskRow.completedTag),
+        TaskRow("", "/foo", true, Updated, TaskRow.updatedTag)
+      )
       val sectionsCompletedAndChanged = Seq(
-          Section("", Completed, false, mock[Call]),
-          Section("", Completed, true, mock[Call])
+          TaskRow("", "/foo", false, Completed, TaskRow.completedTag),
+          TaskRow("", "/foo", true, Completed, TaskRow.completedTag)
       )
 
       val sectionCompletedAndNotChanged = Seq(
-          Section("", Completed, false, mock[Call]),
-          Section("", Completed, false, mock[Call])
+          TaskRow("", "/foo", false, Completed, TaskRow.completedTag),
+          TaskRow("", "/foo", false, Completed, TaskRow.completedTag)
       )
 
       val sectionsMutuallyIncompleteAndChanged = Seq(
-          Section("", Started, false, mock[Call]),
-          Section("", Completed, true, mock[Call])
+          TaskRow("", "/foo", false, Started, TaskRow.incompleteTag),
+          TaskRow("", "/foo", true, Completed, TaskRow.completedTag)
       )
 
       val sectionIncompleteAndChanged = Seq(
-          Section("", Started, true, mock[Call]),
-          Section("", Completed, false, mock[Call])
+          TaskRow("", "/foo", true, Started, TaskRow.incompleteTag),
+          TaskRow("", "/foo", false, Completed, TaskRow.completedTag)
       )
 
       val sectionsIncompleteAndNotChanged = Seq(
-          Section("", Completed, false, mock[Call]),
-          Section("", Started, false, mock[Call])
+          TaskRow("", "/foo", false, Completed, TaskRow.completedTag),
+          TaskRow("", "/foo", false, Started, TaskRow.incompleteTag)
       )
   }
 
@@ -773,6 +803,13 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         }
       }
 
+      "sections are updated only" in new CanSubmitFixture {
+        service.canSubmit(completedUnchangedRenewal, Seq(updatedChangedRenewal)) must be(true)
+      }
+
+      "sections are a combination of completed and updated" in new CanSubmitFixture {
+        service.canSubmit(completedUnchangedRenewal, sectionsCompletedAndUpdated) must be(true)
+      }
     }
 
     "return false" when {
@@ -850,6 +887,159 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         "sections are incomplete and not changed" in new CanSubmitFixture {
           service.canSubmit(completedChangedRenewal, sectionsIncompleteAndNotChanged) must be(false)
         }
+      }
+    }
+  }
+
+  "getFirstBusinessActivityInLowercase" must {
+
+    "return an activity" when {
+
+      "the length of the activities list is exactly 1" in new Fixture {
+
+        BusinessActivities.all foreach { activity =>
+          when {
+            dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+          } thenReturn Future.successful(
+            Some(BusinessMatching(activities = Some(BusinessActivities(Set(activity)))))
+          )
+
+          service.getFirstBusinessActivityInLowercase(credId).futureValue mustBe Some(
+            messages(s"businessactivities.registerservices.servicename.lbl.${activity.value}")
+          )
+        }
+      }
+    }
+
+    "return none" when {
+
+      "the length of the activities is zero" in new Fixture {
+
+        when {
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+        } thenReturn Future.successful(
+          Some(BusinessMatching(activities = Some(BusinessActivities(Set.empty))))
+        )
+
+        service.getFirstBusinessActivityInLowercase(credId).futureValue mustBe None
+      }
+
+      "the length of the activities is longer than 1" in new Fixture {
+
+        when {
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+        } thenReturn Future.successful(
+          Some(BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices, ArtMarketParticipant)))))
+        )
+
+        service.getFirstBusinessActivityInLowercase(credId).futureValue mustBe None
+      }
+
+      "no activities are returned" in new Fixture {
+
+        when {
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+        } thenReturn Future.successful(None)
+
+        service.getFirstBusinessActivityInLowercase(credId).futureValue mustBe None
+      }
+    }
+  }
+
+  "getBusinessMatching" must {
+
+    "return business matching instance" when {
+
+      "cache connector retrieves an instance successfully" in new Fixture {
+
+        val bm: BusinessMatching = BusinessMatching()
+
+        when {
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+        } thenReturn Future.successful(Some(bm))
+
+        service.getBusinessMatching(credId).futureValue mustBe Some(bm)
+      }
+    }
+
+    "return none" when {
+
+      "cache connector cannot retrieve business matching" in new Fixture {
+
+        when {
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+        } thenReturn Future.successful(None)
+
+        service.getBusinessMatching(credId).futureValue mustBe None
+      }
+    }
+  }
+
+  "fetchAndUpdateRenewal" must {
+
+    "return a right with the cachemap" when {
+
+      "renewal is updated correctly" in new Fixture {
+
+        val model = standardCompleteInvolvedInOtherActivities()
+
+        when {
+          dataCache.fetchAll(eqTo(credId))(any())
+        } thenReturn Future.successful(Some(mockCacheMap))
+
+        when {
+          dataCache.save(eqTo(credId), eqTo(Renewal.sectionKey), any())(any(), any())
+        } thenReturn Future.successful(mockCacheMap)
+
+        when {
+          mockCacheMap.getEntry[Renewal](eqTo(Renewal.sectionKey))(any())
+        } thenReturn Some(model)
+
+        val result = service.fetchAndUpdateRenewal(
+          credId,
+          renewal => renewal.copy(hasAccepted = false)
+        ).futureValue
+
+        val captor = ArgumentCaptor.forClass(classOf[Renewal])
+        verify(dataCache).save(eqTo(credId), eqTo(Renewal.sectionKey), captor.capture())(any(), any())
+
+        result mustBe Right(mockCacheMap)
+        captor.getValue mustBe model.copy(hasAccepted = false)
+      }
+    }
+
+    "return left with an error message" when {
+
+      "renewal is not present in cache" in new Fixture {
+
+        when {
+          dataCache.fetchAll(eqTo(credId))(any())
+        } thenReturn Future.successful(Some(mockCacheMap))
+
+        when {
+          mockCacheMap.getEntry[Renewal](eqTo(Renewal.sectionKey))(any())
+        } thenReturn None
+
+        val result = service.fetchAndUpdateRenewal(
+          credId,
+          renewal => renewal.copy(hasAccepted = false)
+        ).futureValue
+
+        result mustBe Left("Unable to get data from the cache")
+      }
+
+      "fetching the cache fails" in new Fixture {
+
+        when {
+          dataCache.fetchAll(eqTo(credId))(any())
+        } thenReturn Future.successful(None)
+
+        val result = service.fetchAndUpdateRenewal(
+          credId,
+          renewal => renewal.copy(hasAccepted = false)
+        ).futureValue
+
+        result mustBe Left("Unable to get data from the cache")
       }
     }
   }

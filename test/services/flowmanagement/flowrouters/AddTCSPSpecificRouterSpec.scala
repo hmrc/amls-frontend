@@ -17,7 +17,7 @@
 package services.flowmanagement.flowrouters
 
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
-import models.businessmatching._
+import models.businessmatching.BusinessActivity._
 import models.flowmanagement._
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._

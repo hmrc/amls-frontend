@@ -18,19 +18,31 @@ package models.renewal
 
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
 import models.amp.Amp
+import models.{Enumerable, WithName}
 import play.api.libs.json._
 
-sealed trait AMPTurnover
+sealed trait AMPTurnover {
+  val value: String
+}
 
-object AMPTurnover {
+object AMPTurnover extends Enumerable.Implicits {
 
-  case object First extends AMPTurnover
-  case object Second extends AMPTurnover
-  case object Third extends AMPTurnover
-  case object Fourth extends AMPTurnover
-  case object Fifth extends AMPTurnover
+  case object First extends WithName("zeroToTwenty") with AMPTurnover {
+    override val value: String = "01"
+  }
+  case object Second extends WithName("twentyOneToForty") with AMPTurnover {
+    override val value: String = "02"
+  }
+  case object Third extends WithName("fortyOneToSixty") with AMPTurnover {
+    override val value: String = "03"
+  }
+  case object Fourth extends WithName("sixtyOneToEighty") with AMPTurnover {
+    override val value: String = "04"
+  }
+  case object Fifth extends WithName("eightyOneToOneHundred") with AMPTurnover {
+    override val value: String = "05"
+  }
 
   import utils.MappingUtils.Implicits._
 
@@ -94,4 +106,14 @@ object AMPTurnover {
     case _ => throw new Exception("Invalid AMP Turnover")
     }
   }
+
+  val all: Seq[AMPTurnover] = Seq(
+    First,
+    Second,
+    Third,
+    Fourth,
+    Fifth
+  )
+
+  implicit val enumerable: Enumerable[AMPTurnover] = Enumerable(all.map(v => v.toString -> v): _*)
 }

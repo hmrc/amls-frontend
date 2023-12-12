@@ -19,20 +19,40 @@ package models.withdrawal
 import jto.validation.forms.Rules.{maxLength, notEmpty}
 import jto.validation.{From, Path, Rule, ValidationError, Write}
 import jto.validation.forms.UrlFormEncoded
+import models.{Enumerable, WithName}
 import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
 import play.api.libs.json._
 
-sealed trait WithdrawalReason
+sealed trait WithdrawalReason {
+  val value: String
+}
 
-object WithdrawalReason {
+object WithdrawalReason extends Enumerable.Implicits {
 
-  case object OutOfScope extends WithdrawalReason
+  case object OutOfScope extends WithName("outOfScope") with WithdrawalReason {
+    override val value: String = "01"
+  }
 
-  case object NotTradingInOwnRight extends WithdrawalReason
+  case object NotTradingInOwnRight extends WithName("notTradingInOwnRight") with WithdrawalReason {
+    override val value: String = "02"
+  }
 
-  case object UnderAnotherSupervisor extends WithdrawalReason
+  case object UnderAnotherSupervisor extends WithName("underAnotherSupervisor") with WithdrawalReason {
+    override val value: String = "03"
+  }
 
-  case class Other(otherReason: String) extends WithdrawalReason
+  case class Other(otherReason: String) extends WithName("other") with WithdrawalReason {
+    override val value: String = "04"
+  }
+
+  val all: Seq[WithdrawalReason] = Seq(
+    OutOfScope,
+    NotTradingInOwnRight,
+    UnderAnotherSupervisor,
+    Other("")
+  )
+
+  implicit val enumerable: Enumerable[WithdrawalReason] = Enumerable(all.map(v => v.toString -> v): _*)
 
   import utils.MappingUtils.Implicits._
 

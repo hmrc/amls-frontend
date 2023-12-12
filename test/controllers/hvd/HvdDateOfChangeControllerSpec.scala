@@ -18,6 +18,7 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.DateOfChangeFormProvider
 import models.DateOfChange
 import models.businessdetails.{ActivityStartDate, BusinessDetails}
 import models.hvd.Hvd
@@ -25,28 +26,29 @@ import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, DateOfChangeHelper}
-import views.html.date_of_change
+import utils.{AmlsSpec, DateHelper, DateOfChangeHelper}
+import views.html.DateOfChangeView
 
 import scala.concurrent.Future
 
-class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
+class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
 
-    lazy val view = app.injector.instanceOf[date_of_change]
+    lazy val view = inject[DateOfChangeView]
     val dataCacheConnector = mock[DataCacheConnector]
     val controller = new HvdDateOfChangeController(
       dataCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      date_of_change = view)
+      formProvider = inject[DateOfChangeFormProvider],
+      view = view)
 
   }
 
@@ -57,12 +59,13 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
     "on get display date of change view" in new Fixture with DateOfChangeHelper {
       val result = controller.get(DateOfChangeRedirect.checkYourAnswers)(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("summary.hvd"))
+      contentAsString(result) must include(messages("summary.hvd"))
     }
 
     "submit with valid data" in new Fixture with DateOfChangeHelper {
 
-      val newRequest = requestWithUrlEncodedBody(
+      val newRequest = FakeRequest(POST, routes.HvdDateOfChangeController.post(DateOfChangeRedirect.checkYourAnswers).url)
+      .withFormUrlEncodedBody(
         "dateOfChange.day" -> "24",
         "dateOfChange.month" -> "2",
         "dateOfChange.year" -> "1990"
@@ -73,7 +76,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
         .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
       when(mockCacheMap.getEntry[Hvd](Hvd.key))
-        .thenReturn(None)
+        .thenReturn(Some(Hvd()))
 
       when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -92,7 +95,8 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "dateOfChange is earlier than that in S4L" in new Fixture with DateOfChangeHelper {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.HvdDateOfChangeController.post(DateOfChangeRedirect.checkYourAnswers).url)
+        .withFormUrlEncodedBody(
           "dateOfChange.day" -> "24",
           "dateOfChange.month" -> "1",
           "dateOfChange.year" -> "1990"
@@ -123,7 +127,8 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "dateOfChange is later than that in S4L" in new Fixture with DateOfChangeHelper {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.HvdDateOfChangeController.post(DateOfChangeRedirect.checkYourAnswers).url)
+        .withFormUrlEncodedBody(
           "dateOfChange.day" -> "24",
           "dateOfChange.month" -> "1",
           "dateOfChange.year" -> "2001"
@@ -159,7 +164,8 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
       "invalid date is supplied" in new Fixture with DateOfChangeHelper {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.HvdDateOfChangeController.post(DateOfChangeRedirect.checkYourAnswers).url)
+        .withFormUrlEncodedBody(
           "dateOfChange.day" -> "24",
           "dateOfChange.month" -> "2",
           "dateOfChange.year" -> "199000"
@@ -180,20 +186,22 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.expected.jodadate.format"))
       }
 
       "input date is before activity start date" in new Fixture with DateOfChangeHelper {
 
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.HvdDateOfChangeController.post(DateOfChangeRedirect.checkYourAnswers).url)
+        .withFormUrlEncodedBody(
           "dateOfChange.day" -> "24",
           "dateOfChange.month" -> "2",
           "dateOfChange.year" -> "1980"
         )
 
+        val date = new LocalDate(1990, 2, 24)
+
         val mockCacheMap = mock[CacheMap]
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-          .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+          .thenReturn(Some(BusinessDetails(activityStartDate = Some(ActivityStartDate(date)))))
 
         when(mockCacheMap.getEntry[Hvd](Hvd.key))
           .thenReturn(Some(Hvd()))
@@ -206,11 +214,8 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(BAD_REQUEST)
-        contentAsString(result) must include(Messages("error.expected.dateofchange.date.after.activitystartdate", "24-02-1990"))
+        contentAsString(result) must include(messages("error.expected.dateofchange.date.after.activitystartdate", DateHelper.formatDate(date)))
       }
     }
-
-
-
   }
 }

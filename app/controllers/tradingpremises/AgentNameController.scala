@@ -18,22 +18,25 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.tradingpremises.AgentNameFormProvider
 import forms.{Form2, _}
-import javax.inject.{Inject, Singleton}
 import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
 import org.joda.time.LocalDate
+import play.api.data.Form
 import play.api.libs.json.Format
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.twirl.api.Html
 import services.StatusService
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
-import views.html.date_of_change
-import views.html.tradingpremises.agent_name
+import utils.{AuthAction, DateHelper, DateOfChangeHelper, RepeatingSection}
+import views.html.DateOfChangeView
+import views.html.tradingpremises.AgentNameView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -43,32 +46,34 @@ class AgentNameController @Inject()(
                                      val ds: CommonPlayDependencies,
                                      val statusService: StatusService,
                                      val cc: MessagesControllerComponents,
-                                     agent_name: agent_name,
-                                     date_of_change: date_of_change,
-                                     implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                     formProvider: AgentNameFormProvider,
+                                     dateFormProvider: DateOfChangeFormProvider,
+                                     agentView: AgentNameView,
+                                     dateView: DateOfChangeView,
+                                     implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
 
-  def get(index: Int, edit: Boolean = false) = authAction.async {
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
 
         getData[TradingPremises](request.credId, index) map {
 
           case Some(tp) => {
             val form = tp.agentName match {
-              case Some(data) => Form2[AgentName](data)
-              case None => EmptyForm
+              case Some(data) => formProvider().fill(data)
+              case None => formProvider()
             }
-            Ok(agent_name(form, index, edit))
+            Ok(agentView(form, index, edit))
           }
           case None => NotFound(notFoundView)
         }
   }
 
-  def post(index: Int, edit: Boolean = false) = authAction.async {
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request => {
-        Form2[AgentName](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(agent_name(f, index, edit)))
-          case ValidForm(_, data) => {
+        formProvider().bindFromRequest().fold(
+          formWithError =>
+            Future.successful(BadRequest(agentView(formWithError, index, edit))),
+          data => {
             for {
               result <- fetchAllAndUpdateStrict[TradingPremises](request.credId, index) { (_, tp) =>
                 TradingPremises(
@@ -89,7 +94,7 @@ class AgentNameController @Inject()(
                 case SubmissionDecisionApproved if redirectToAgentNameDateOfChange(getTradingPremises(result, index), data) =>
                   Redirect(routes.AgentNameController.dateOfChange(index))
                 case _ => if (edit) {
-                  Redirect(routes.DetailedAnswersController.get(index))
+                  Redirect(routes.CheckYourAnswersController.get(index))
                 } else {
                   TPControllerHelper.redirectToNextPage(result, index, edit)
                 }
@@ -99,9 +104,7 @@ class AgentNameController @Inject()(
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
-
-          case _ => Future.successful(NotFound(notFoundView))
-        }
+        )
       }
 
   }
@@ -111,28 +114,40 @@ class AgentNameController @Inject()(
                                                                key: MongoKey[TradingPremises]) =
     result flatMap { cache => getData(cache, index) }
 
-  def dateOfChange(index: Int) = authAction.async {
-    implicit request =>
-          Future(Ok(date_of_change(EmptyForm,
-            "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
+  def dateOfChange(index: Int): Action[AnyContent] = authAction {
+    implicit request => Ok(getView(dateFormProvider(), index))
   }
 
-  def saveDateOfChange(index: Int) = authAction.async {
-      implicit request =>
-        getData[TradingPremises](request.credId, index) flatMap { tradingPremises =>
-          Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
-            case form: InvalidForm =>
-              Future.successful(BadRequest(date_of_change(
-                form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
-                "summary.tradingpremises", routes.AgentNameController.saveDateOfChange(index))))
-            case ValidForm(_, dateOfChange) =>
-              for {
-                _ <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
-                  tp.agentName(tradingPremises.agentName.get.copy(dateOfChange = Some(dateOfChange)))
-                }
-              } yield Redirect(routes.DetailedAnswersController.get(index))
+  def saveDateOfChange(index: Int): Action[AnyContent] = authAction.async {
+    implicit request =>
+      dateFormProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(getView(formWithErrors, index))),
+        dateOfChange => {
+          getData[TradingPremises](request.credId, index) flatMap { tradingPremises =>
+            tradingPremises.startDate match {
+              case Some(date) if !dateOfChange.dateOfChange.isBefore(date) =>
+                for {
+                  _ <- updateDataStrict[TradingPremises](request.credId, index) { tp =>
+                    tp.agentName(tradingPremises.agentName.get.copy(dateOfChange = Some(dateOfChange)))
+                  }
+                } yield Redirect(routes.CheckYourAnswersController.get(index))
+              case Some(date) =>
+                Future.successful(BadRequest(getView(
+                  dateFormProvider().withError(
+                    "dateOfChange",
+                    messages(
+                      "error.expected.dateofchange.date.after.activitystartdate",
+                      DateHelper.formatDate(date)
+                    )
+                  ),
+                  index
+                )))
+              case None =>
+                Future.failed(new Exception("Could not retrieve start date"))
+            }
           }
         }
+      )
   }
 
   private def redirectToAgentNameDateOfChange(tradingPremises: TradingPremises, agent: AgentName) = {
@@ -147,4 +162,10 @@ class AgentNameController @Inject()(
   private def isAgentDataUnchanged(name: String, dob: Option[LocalDate], agent: AgentName) = {
     name == agent.agentName && dob == agent.agentDateOfBirth
   }
+
+  private def getView(form: Form[DateOfChange], index: Int)(implicit request: Request[_]): Html = dateView(
+    form,
+    "summary.tradingpremises",
+    routes.AgentNameController.saveDateOfChange(index)
+  )
 }

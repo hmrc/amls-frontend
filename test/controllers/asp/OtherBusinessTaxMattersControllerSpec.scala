@@ -17,6 +17,7 @@
 package controllers.asp
 
 import controllers.actions.SuccessfulAuthAction
+import forms.asp.OtherBusinessTaxMattersFormProvider
 import models.asp.{Asp, OtherBusinessTaxMattersYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -24,22 +25,22 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.asp.other_business_tax_matters
+import views.html.asp.OtherBusinessTaxMattersView
 
 import scala.concurrent.Future
 
-class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   val emptyCache = CacheMap("", Map.empty)
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[other_business_tax_matters]
+    lazy val view = inject[OtherBusinessTaxMattersView]
     mockCacheFetch[Asp](None)
 
     mockCacheSave[Asp]
@@ -49,10 +50,12 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      other_business_tax_matters = view
+      formProvider = inject[OtherBusinessTaxMattersFormProvider],
+      view = view
     )
 
-    val newRequest = requestWithUrlEncodedBody(
+    val newRequest = FakeRequest(POST, routes.OtherBusinessTaxMattersController.post().url)
+      .withFormUrlEncodedBody(
       "otherBusinessTaxMatters" -> "true"
     )
   }
@@ -63,7 +66,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
       "display the are you registered with HMRC to handle other business's tax matters page" in new Fixture {
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("asp.other.business.tax.matters.title"))
+        contentAsString(result) must include(messages("asp.other.business.tax.matters.title"))
       }
 
       "display the the Does your business use the services of another Trust or Company Service Provider page with pre populated data" in new Fixture {
@@ -74,7 +77,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("otherBusinessTaxMatters-true").hasAttr("checked") must be(true)
+        document.getElementById("otherBusinessTaxMatters").hasAttr("checked") must be(true)
       }
     }
 
@@ -87,27 +90,37 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
       }
 
       "on post with invalid boolean data" in new Fixture {
-        val newRequestInvalid = requestWithUrlEncodedBody("otherBusinessTaxMatters" -> "invalidBoolean")
+        val newRequestInvalid = FakeRequest(POST, routes.OtherBusinessTaxMattersController.post().url)
+          .withFormUrlEncodedBody("otherBusinessTaxMatters" -> "invalidBoolean")
         val result = controller.post()(newRequestInvalid)
 
         status(result) must be(BAD_REQUEST)
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.select("span").html() must include(Messages("error.required.asp.other.business.tax.matters"))
+        document.getElementsByClass("govuk-error-summary").text() must include(
+          messages("error.required.asp.other.business.tax.matters")
+        )
       }
 
       "On post with missing boolean data" in new Fixture {
-        val newRequestInvalid = requestWithUrlEncodedBody("otherBusinessTaxMatters" -> "")
+        val newRequestInvalid = FakeRequest(POST, routes.OtherBusinessTaxMattersController.post().url)
+          .withFormUrlEncodedBody("otherBusinessTaxMatters" -> "")
         val result = controller.post()(newRequestInvalid)
 
         status(result) must be(BAD_REQUEST)
 
         val document: Document = Jsoup.parse(contentAsString(result))
-        document.select("span").html() must include(Messages("error.required.asp.other.business.tax.matters"))
+        document.getElementsByClass("govuk-error-summary").text() must include(
+          messages("error.required.asp.other.business.tax.matters")
+        )
       }
 
-
       "on post with valid data in edit mode" in new Fixture {
-        val result = controller.post(true)(newRequest)
+        val editRequest = FakeRequest(POST, routes.OtherBusinessTaxMattersController.post(true).url)
+          .withFormUrlEncodedBody(
+            "otherBusinessTaxMatters" -> "true"
+          )
+
+        val result = controller.post(true)(editRequest)
 
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get.url))

@@ -16,7 +16,9 @@
 
 package models.tcsp
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
+import models.tcsp.TcspTypes._
+import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -88,15 +90,40 @@ object Tcsp {
   import play.api.libs.json._
   import utils.MappingUtils._
 
-  def section(implicit cache: CacheMap): Section = {
-    val messageKey = "tcsp"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.tcsp.routes.WhatYouNeedController.get)
+  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+    val notStarted = TaskRow(
+      key,
+      controllers.tcsp.routes.WhatYouNeedController.get.url,
+      hasChanged = false,
+      NotStarted,
+      TaskRow.notStartedTag
+    )
     cache.getEntry[Tcsp](key).fold(notStarted) {
       model =>
-        if (model.isComplete) {
-          Section(messageKey, Completed, model.hasChanged, controllers.tcsp.routes.SummaryController.get)
+        if (model.isComplete && model.hasChanged) {
+          TaskRow(
+            key,
+            controllers.tcsp.routes.SummaryController.get.url,
+            hasChanged = true,
+            status = Updated,
+            tag = TaskRow.updatedTag
+          )
+        } else if (model.isComplete) {
+          TaskRow(
+            key,
+            controllers.tcsp.routes.SummaryController.get.url,
+            model.hasChanged,
+            Completed,
+            TaskRow.completedTag
+          )
         } else {
-          Section(messageKey, Started, model.hasChanged, controllers.tcsp.routes.WhatYouNeedController.get)
+          TaskRow(
+            key,
+            controllers.tcsp.routes.WhatYouNeedController.get.url,
+            model.hasChanged,
+            Started,
+            TaskRow.incompleteTag
+          )
         }
     }
   }

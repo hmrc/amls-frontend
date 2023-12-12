@@ -17,8 +17,10 @@
 package controllers.hvd
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.HighValueDealing
+import models.businessmatching.BusinessActivity.HighValueDealing
 import models.businessmatching.updateservice.ServiceChangeRegister
+import models.hvd.Products._
+import models.hvd.SalesChannel._
 import models.hvd._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.joda.time.LocalDate
@@ -29,23 +31,24 @@ import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.hvd.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.hvd.summary
+import views.html.hvd.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
     implicit val headerCarrier = HeaderCarrier()
-    lazy val view = app.injector.instanceOf[summary]
+    lazy val view = inject[CheckYourAnswersView]
     lazy val controller =
       new SummaryController(
         authAction = SuccessfulAuthAction,
@@ -54,7 +57,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         mockStatusService,
         mockServiceFlow,
         cc = mockMcc,
-        summary = view)
+        cyaHelper = inject[CheckYourAnswersHelper],
+        view = view)
 
     val day = 15
     val month = 2
@@ -74,7 +78,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
 
     when {
-      controller.statusService.isPreSubmission(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())
+      controller.statusService.isPreSubmission(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())
     } thenReturn Future.successful(true)
   }
 
@@ -84,19 +88,19 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
 
       val model = Hvd(None)
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
       when(controller.dataCache.fetch[Hvd](any(), any())
         (any(), any())).thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("summary.checkyouranswers.title"))
+      contentAsString(result) must include(messages("summary.checkyouranswers.title"))
     }
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCache.fetch[Hvd](any(), any())( any(), any()))
@@ -112,18 +116,17 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         when(controller.dataCache.fetch[Hvd](any(), eqTo(Hvd.key))
           (any(), any())).thenReturn(Future.successful(Some(completeModel)))
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get()(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
-
-        val answerRows = document.getElementsByClass("cya-summary-list__row").toArray(Array[Element]())
+        val answerRows = document.getElementsByClass("govuk-summary-list__row").toArray(Array[Element]())
         answerRows.size mustBe 9
 
         for ( el <- answerRows ) {
-          el.getElementsByTag("a").hasClass("change-answer") must be(true)
+          el.getElementsByTag("a").first().text() mustBe messages("button.edit")
         }
       }
     }
@@ -133,7 +136,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         when(controller.dataCache.fetch[Hvd](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(completeModel)))
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         val result = controller.get()(request)
@@ -149,7 +152,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         when(controller.dataCache.fetch[Hvd]( any(), eqTo(Hvd.key))
           (any(), any())).thenReturn(Future.successful(Some(completeModel)))
 
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         mockIsNewActivityNewAuth(true, Some(HighValueDealing))

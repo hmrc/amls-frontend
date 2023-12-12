@@ -16,21 +16,22 @@
 
 package controllers.businessmatching
 
-import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
-import controllers.{AmlsBaseController, CommonPlayDependencies}
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
-import javax.inject.Inject
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
+import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.businessmatching.PSRNumberFormProvider
+import models.businessmatching.BusinessAppliedForPSRNumberYes
 import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router2
 import utils.AuthAction
-import views.html.businessmatching.psr_number
+import views.html.businessmatching.PsrNumberView
+
+import javax.inject.Inject
 
 class PSRNumberController @Inject()(authAction: AuthAction,
                                     val ds: CommonPlayDependencies,
@@ -40,38 +41,40 @@ class PSRNumberController @Inject()(authAction: AuthAction,
                                     val router: Router2[ChangeSubSectorFlowModel],
                                     val helper: ChangeSubSectorHelper,
                                     val cc: MessagesControllerComponents,
-                                    psr_number: psr_number) extends AmlsBaseController(ds, cc) {
+                                    formProvider: PSRNumberFormProvider,
+                                    psr_number: PsrNumberView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>
         (for {
           bm <- businessMatchingService.getModel(request.credId)
           status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
         } yield {
-          val form: Form2[BusinessAppliedForPSRNumber] = bm.businessAppliedForPSRNumber map
-                  Form2[BusinessAppliedForPSRNumber] getOrElse EmptyForm
+          val form = bm.businessAppliedForPSRNumber.fold(formProvider())(formProvider().fill)
+
           Ok(psr_number(form, edit, bm.preAppComplete, statusService.isPreSubmission(status), bm.businessAppliedForPSRNumber.isDefined))
         }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
    }
 
-  def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false, includeCompanyNotRegistered: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request => {
         val route = router.getRoute(request.credId, PsrNumberPageId, _: ChangeSubSectorFlowModel, edit, includeCompanyNotRegistered)
-        Form2[BusinessAppliedForPSRNumber](request.body) match {
-          case f: InvalidForm =>
+
+        formProvider().bindFromRequest().fold(
+          formWithErrors => {
             (for {
               bm <- businessMatchingService.getModel(request.credId)
               status <- OptionT.liftF(statusService.getStatus(request.amlsRefNumber, request.accountTypeId, request.credId))
             } yield {
-              BadRequest(psr_number(f, edit, bm.preAppComplete, statusService.isPreSubmission(status)))
-            }) getOrElse BadRequest(psr_number(f, edit))
-
-          case ValidForm(_, data) =>
+              BadRequest(psr_number(formWithErrors, edit, bm.preAppComplete, statusService.isPreSubmission(status)))
+            }) getOrElse BadRequest(psr_number(formWithErrors, edit))
+          },
+          data => {
             helper.getOrCreateFlowModel(request.credId) flatMap { flowModel =>
               dataCacheConnector.update[ChangeSubSectorFlowModel](request.credId, ChangeSubSectorFlowModel.key) { _ =>
                 flowModel.copy(psrNumber = Some(data))
               } flatMap {
-                case Some(m@ChangeSubSectorFlowModel(_, Some(BusinessAppliedForPSRNumberYes(_)))) =>
+                case Some(m @ ChangeSubSectorFlowModel(_, Some(BusinessAppliedForPSRNumberYes(_)))) =>
                   helper.updateSubSectors(request.credId, m) flatMap { _ =>
                     route(m)
                   }
@@ -80,7 +83,8 @@ class PSRNumberController @Inject()(authAction: AuthAction,
                 case _ => throw new Exception("An Exception has occurred")
               }
             }
-        }
+          }
+        )
       }
   }
 }

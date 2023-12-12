@@ -24,23 +24,26 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.supervision.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.supervision.summary
+import views.html.supervision.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
+class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks with SupervisionValues {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[summary]
+    lazy val view = app.injector.instanceOf[CheckYourAnswersView]
     val controller = new SummaryController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      summary = view,
+      cyaHelper = inject[CheckYourAnswersHelper],
+      view = view,
       error = errorView)
 
     val model = Supervision(None)

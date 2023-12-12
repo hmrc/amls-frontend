@@ -20,7 +20,8 @@ import java.util.UUID
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatching, EstateAgentBusinessService, BusinessActivities => BusinessMatchingActivities, _}
+import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities, _}
+import models.businessmatching.BusinessActivity._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises._
 import org.joda.time.LocalDate
@@ -34,7 +35,7 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.tradingpremises.your_trading_premises
+import views.html.tradingpremises.YourTradingPremisesView
 
 import scala.concurrent.Future
 
@@ -44,22 +45,21 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
   val mockStatusService = mock[StatusService]
-  //val mockCacheMap = mock[CacheMap]
   val mockYtp = mock[TradingPremises]
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[your_trading_premises]
+    lazy val view = app.injector.instanceOf[YourTradingPremisesView]
     val ytpController = new YourTradingPremisesController(
       mockDataCacheConnector,
       mockStatusService,
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      your_trading_premises = view,
+      view = view,
       error = errorView)
 
-    when(ytpController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+    when(ytpController.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
     val model = TradingPremises()
     val models = Seq(TradingPremises())
@@ -118,7 +118,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
       val result = ytpController.getIndividual(1, true)(request)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
+      redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
     }
 
 

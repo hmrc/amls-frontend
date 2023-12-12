@@ -16,8 +16,10 @@
 
 package models
 
-import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
+import models.businessmatching.BusinessActivity.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
+import models.tradingpremises.BusinessStructure.SoleProprietor
+import models.tradingpremises.TradingPremisesMsbService._
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.scalatestplus.mockito.MockitoSugar

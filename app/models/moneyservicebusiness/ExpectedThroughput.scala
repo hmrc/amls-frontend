@@ -19,12 +19,15 @@ package models.moneyservicebusiness
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
+import models.{Enumerable, WithName}
 import models.renewal.TotalThroughput
 import play.api.libs.json._
 
-sealed trait ExpectedThroughput
+sealed trait ExpectedThroughput {
+  val value: String
+}
 
-object ExpectedThroughput {
+object ExpectedThroughput extends Enumerable.Implicits {
 
   def convert(expectedThroughput: ExpectedThroughput): TotalThroughput = {
     expectedThroughput match {
@@ -38,15 +41,39 @@ object ExpectedThroughput {
     }
   }
 
+  case object First extends WithName("first") with ExpectedThroughput {
+    override val value: String = "01"
+  }
+  case object Second extends WithName("second") with ExpectedThroughput {
+    override val value: String = "02"
+  }
+  case object Third extends WithName("third") with ExpectedThroughput {
+    override val value: String = "03"
+  }
+  case object Fourth extends WithName("fourth") with ExpectedThroughput {
+    override val value: String = "04"
+  }
+  case object Fifth extends WithName("fifth") with ExpectedThroughput {
+    override val value: String = "05"
+  }
+  case object Sixth extends WithName("sixth") with ExpectedThroughput {
+    override val value: String = "06"
+  }
+  case object Seventh extends WithName("seventh") with ExpectedThroughput {
+    override val value: String = "07"
+  }
 
-  case object First extends ExpectedThroughput
-  case object Second extends ExpectedThroughput
-  case object Third extends ExpectedThroughput
-  case object Fourth extends ExpectedThroughput
-  case object Fifth extends ExpectedThroughput
-  case object Sixth extends ExpectedThroughput
-  case object Seventh extends ExpectedThroughput
+  val all: Seq[ExpectedThroughput] = Seq(
+    First,
+    Second,
+    Third,
+    Fourth,
+    Fifth,
+    Sixth,
+    Seventh
+  )
 
+  implicit val enumerable: Enumerable[ExpectedThroughput] = Enumerable(all.map(v => v.toString -> v): _*)
 
   import utils.MappingUtils.Implicits._
 

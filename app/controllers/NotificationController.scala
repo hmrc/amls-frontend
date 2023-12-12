@@ -20,7 +20,6 @@ import cats.data.OptionT
 import cats.implicits._
 import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
-import javax.inject.{Inject, Singleton}
 import models.notifications.ContactType._
 import models.notifications._
 import models.status.{SubmissionDecisionRejected, SubmissionStatus}
@@ -29,11 +28,13 @@ import play.api.mvc.{MessagesControllerComponents, Request, Result}
 import play.twirl.api.Template5
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
+import uk.gov.hmrc.govukfrontend.views.Aliases.Table
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AuthAction, BusinessName}
-import views.html.notifications.your_messages
-import views.notifications.{V1M0, V2M0, V3M0, V4M0, V5M0}
+import views.html.notifications.YourMessagesView
+import views.notifications._
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -46,8 +47,8 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
                                        implicit val amlsConnector: AmlsConnector,
                                        implicit val dataCacheConnector: DataCacheConnector,
                                        val cc: MessagesControllerComponents,
-                                       your_messages: your_messages,
-                                       implicit val error: views.html.error,
+                                       view: YourMessagesView,
+                                       implicit val error: views.html.ErrorView,
                                        v1m0: V1M0,
                                        v2m0: V2M0,
                                        v3m0: V3M0,
@@ -68,65 +69,65 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
 
   def version1Notifications(templateName: String) = {
     templateName match {
-      case "message_details" => v1m0.message_details
-      case "minded_to_reject" => v1m0.minded_to_reject
-      case "minded_to_revoke" => v1m0.minded_to_revoke
-      case "no_longer_minded_to_reject" => v1m0.no_longer_minded_to_reject
-      case "no_longer_minded_to_revoke" => v1m0.no_longer_minded_to_revoke
-      case "rejection_reasons" => v1m0.rejection_reasons
-      case "revocation_reasons" => v1m0.revocation_reasons
+      case "message_details" => v1m0.messageDetailsView
+      case "minded_to_reject" => v1m0.mindedToRejectView
+      case "minded_to_revoke" => v1m0.mindedToRevokeView
+      case "no_longer_minded_to_reject" => v1m0.noLongerMindedToRejectView
+      case "no_longer_minded_to_revoke" => v1m0.noLongerMindedToRevokeView
+      case "rejection_reasons" => v1m0.rejectionReasonsView
+      case "revocation_reasons" => v1m0.revocationReasonsView
       case _ => throw new RuntimeException(s"Message template $templateName not found")
     }
   }
 
   def version2Notifications(templateName: String) = {
     templateName match {
-      case "message_details" => v2m0.message_details
-      case "minded_to_reject" => v2m0.minded_to_reject
-      case "minded_to_revoke" => v2m0.minded_to_revoke
-      case "no_longer_minded_to_reject" => v2m0.no_longer_minded_to_reject
-      case "no_longer_minded_to_revoke" => v2m0.no_longer_minded_to_revoke
-      case "rejection_reasons" => v2m0.rejection_reasons
-      case "revocation_reasons" => v2m0.revocation_reasons
+      case "message_details" => v2m0.messageDetailsView
+      case "minded_to_reject" => v2m0.mindedToRejectView
+      case "minded_to_revoke" => v2m0.mindedToRevokeView
+      case "no_longer_minded_to_reject" => v2m0.noLongerMindedToRejectView
+      case "no_longer_minded_to_revoke" => v2m0.noLongerMindedToRevokeView
+      case "rejection_reasons" => v2m0.rejectionReasonsView
+      case "revocation_reasons" => v2m0.revocationReasonsView
       case _ => throw new RuntimeException(s"Message template $templateName not found")
     }
   }
 
   def version3Notifications(templateName: String) = {
     templateName match {
-      case "message_details" => v3m0.message_details
-      case "minded_to_reject" => v3m0.minded_to_reject
-      case "minded_to_revoke" => v3m0.minded_to_revoke
-      case "no_longer_minded_to_reject" => v3m0.no_longer_minded_to_reject
-      case "no_longer_minded_to_revoke" => v3m0.no_longer_minded_to_revoke
-      case "rejection_reasons" => v3m0.rejection_reasons
-      case "revocation_reasons" => v3m0.revocation_reasons
+      case "message_details" => v3m0.messageDetailsView
+      case "minded_to_reject" => v3m0.mindedToRejectView
+      case "minded_to_revoke" => v3m0.mindedToRevokeView
+      case "no_longer_minded_to_reject" => v3m0.noLongerMindedToRejectView
+      case "no_longer_minded_to_revoke" => v3m0.noLongerMindedToRevokeView
+      case "rejection_reasons" => v3m0.rejectionReasonsView
+      case "revocation_reasons" => v3m0.revocationReasonsView
       case _ => throw new RuntimeException(s"Message template $templateName not found")
     }
   }
 
   def version4Notifications(templateName: String) = {
     templateName match {
-      case "message_details" => v4m0.message_details
-      case "minded_to_reject" => v4m0.minded_to_reject
-      case "minded_to_revoke" => v4m0.minded_to_revoke
-      case "no_longer_minded_to_reject" => v4m0.no_longer_minded_to_reject
-      case "no_longer_minded_to_revoke" => v4m0.no_longer_minded_to_revoke
-      case "rejection_reasons" => v4m0.rejection_reasons
-      case "revocation_reasons" => v4m0.revocation_reasons
+      case "message_details" => v4m0.messageDetailsView
+      case "minded_to_reject" => v4m0.mindedToRejectView
+      case "minded_to_revoke" => v4m0.mindedToRevokeView
+      case "no_longer_minded_to_reject" => v4m0.noLongerMindedToRejectView
+      case "no_longer_minded_to_revoke" => v4m0.noLongerMindedToRevokeView
+      case "rejection_reasons" => v4m0.rejectionReasonsView
+      case "revocation_reasons" => v4m0.revocationReasonsView
       case _ => throw new RuntimeException(s"Message template $templateName not found")
     }
   }
 
   def version5Notifications(templateName: String) = {
     templateName match {
-      case "message_details" => v5m0.message_details
-      case "minded_to_reject" => v5m0.minded_to_reject
-      case "minded_to_revoke" => v5m0.minded_to_revoke
-      case "no_longer_minded_to_reject" => v5m0.no_longer_minded_to_reject
-      case "no_longer_minded_to_revoke" => v5m0.no_longer_minded_to_revoke
-      case "rejection_reasons" => v5m0.rejection_reasons
-      case "revocation_reasons" => v5m0.revocation_reasons
+      case "message_details" => v5m0.messageDetailsView
+      case "minded_to_reject" => v5m0.mindedToRejectView
+      case "minded_to_revoke" => v5m0.mindedToRevokeView
+      case "no_longer_minded_to_reject" => v5m0.noLongerMindedToRejectView
+      case "no_longer_minded_to_revoke" => v5m0.noLongerMindedToRevokeView
+      case "rejection_reasons" => v5m0.rejectionReasonsView
+      case "revocation_reasons" => v5m0.revocationReasonsView
       case _ => throw new RuntimeException(s"Message template $templateName not found")
     }
   }
@@ -153,6 +154,9 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
 
   private def generateNotificationView(credId: String, safeId: String, refNumber: Option[String], accountTypeId: (String, String))
                                       (implicit hc: HeaderCarrier, request: Request[_]): Future[Result] = {
+    import models.notifications.{Status => NStatus}
+    import org.joda.time.{DateTime, DateTimeZone}
+
     (for {
       businessName <- BusinessName.getName(credId, Some(safeId), accountTypeId)
       records: Seq[NotificationRow] <- OptionT.liftF(amlsNotificationService.getNotifications(safeId, accountTypeId))
@@ -162,8 +166,18 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
       } yield records.zipWithIndex.filter(_._1.amlsRegistrationNumber == amls)) getOrElse records.zipWithIndex
       val previousRecordsWithIndexes = (for {
         amls <- refNumber
-      } yield records.zipWithIndex.filter(_._1.amlsRegistrationNumber != amls)) getOrElse Seq()
-      Ok(your_messages(businessName, currentRecordsWithIndexes, previousRecordsWithIndexes))
+      } yield records.zipWithIndex.filter(_._1.amlsRegistrationNumber != amls))
+      Ok(view(
+        businessName,
+        toTable(currentRecordsWithIndexes, "current-application-notifications"),
+        previousRecordsWithIndexes.flatMap(recordsWithIndex =>
+          if(recordsWithIndex.nonEmpty) {
+            Some(toTable(recordsWithIndex, "previous-application-notifications"))
+          } else {
+            None
+          }
+        )
+      ))
     }) getOrElse (throw new Exception("Cannot retrieve business name"))
   }
 
@@ -231,5 +245,13 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
         }
     }
     Ok(notification)
+  }
+
+  private def toTable(rowsWithIndex: Seq[(NotificationRow, Int)], id: String): Table = {
+    Table(
+      rowsWithIndex.map { case(row, index) =>
+        row.asTableRows(id, index)
+      }
+    )
   }
 }

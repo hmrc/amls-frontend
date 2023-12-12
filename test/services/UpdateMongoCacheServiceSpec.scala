@@ -20,19 +20,27 @@ import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.amp.Amp
-import models.asp.{Accountancy, Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
-import models.bankdetails.{BankAccount, BankAccountIsUk, BankDetails, PersonalAccount, UKAccount}
+import models.asp.Service.Accountancy
+import models.asp.{Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
+import models.bankdetails.BankAccountType.PersonalAccount
+import models.bankdetails.{BankAccount, BankAccountIsUk, BankDetails, UKAccount}
+import models.businessactivities.TransactionTypes.Paper
 import models.businessactivities._
 import models.businessdetails._
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7.{BeneficialShareholder, RoleWithinBusinessRelease7}
 import models.eab.Eab
+import models.hvd.Products.Cars
+import models.hvd.SalesChannel.Retail
 import models.hvd._
 import models.moneyservicebusiness._
 import models.responsiblepeople.ResponsiblePerson
+import models.supervision.ProfessionalBodies._
 import models.supervision.{ProfessionalBodyYes => SupervisionProfessionalBodyYes, _}
-import models.tcsp.{Other, _}
+import models.tcsp._
+import models.tcsp.TcspTypes._
+import models.tcsp.ProvidedServices.{PhonecallHandling, Other => PSOther}
 import models.tradingpremises.TradingPremises
 import models.{DataImport, _}
 import org.joda.time.LocalDate
@@ -170,7 +178,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
         TrusteeProvider))),
       None,
       None,
-      Some(ProvidedServices(Set(PhonecallHandling, Other("other service")))),
+      Some(ProvidedServices(Set(PhonecallHandling, PSOther("other service")))),
       Some(true),
       None,
       hasAccepted = true

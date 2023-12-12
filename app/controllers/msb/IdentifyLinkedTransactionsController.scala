@@ -18,32 +18,34 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
-import models.businessmatching.{MoneyServiceBusiness => _, _}
+import forms.msb.IdentifyLinkedTransactionsFormProvider
+import models.businessmatching.BusinessActivity.{MoneyServiceBusiness => _}
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
+import models.businessmatching._
 import models.moneyservicebusiness._
-import play.api.mvc.{MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import utils.AuthAction
+import views.html.msb.IdentifyLinkedTransactionsView
 
-import views.html.msb.identify_linked_transactions
-
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: DataCacheConnector,
                                                       authAction: AuthAction,
                                                       val ds: CommonPlayDependencies,
                                                       val cc: MessagesControllerComponents,
-                                                      identify_linked_transactions: identify_linked_transactions) extends AmlsBaseController(ds, cc) {
+                                                      formProvider: IdentifyLinkedTransactionsFormProvider,
+                                                      view: IdentifyLinkedTransactionsView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
         response =>
-          val form: Form2[IdentifyLinkedTransactions] = (for {
+          val form = (for {
             msb <- response
             transactions <- msb.identifyLinkedTransactions
-          } yield Form2[IdentifyLinkedTransactions](transactions)).getOrElse(EmptyForm)
-          Ok(identify_linked_transactions(form, edit))
+          } yield formProvider().fill(transactions)).getOrElse(formProvider())
+          Ok(view(form, edit))
       }
   }
 
@@ -51,19 +53,19 @@ class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: Da
     if (services.contains(TransmittingMoney) && (msb.businessUseAnIPSP.isEmpty || !edit)) {
         Redirect(routes.BusinessUseAnIPSPController.get(edit))
     } else if (services.contains(CurrencyExchange) && (msb.ceTransactionsInNext12Months.isEmpty || !edit)) {
-        Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
+        Redirect(routes.CurrencyExchangesInNext12MonthsController.get(edit))
     } else if (services.contains(ForeignExchange) && (msb.fxTransactionsInNext12Months.isEmpty || !edit)) {
         Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
     } else {
         Redirect(routes.SummaryController.get)
     }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      Form2[IdentifyLinkedTransactions](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(identify_linked_transactions(f, edit)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
           dataCacheConnector.fetchAll(request.credId) flatMap {
             optMap =>
               val result = for {
@@ -80,7 +82,7 @@ class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: Da
               }
               result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
           }
-      }
+      )
     }
   }
 }

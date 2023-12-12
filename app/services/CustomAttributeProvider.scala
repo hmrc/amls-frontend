@@ -17,9 +17,8 @@
 package services
 
 import java.util
-
 import com.vladsch.flexmark.Extension
-import com.vladsch.flexmark.ast.{BulletList, Node}
+import com.vladsch.flexmark.ast.{BulletList, Heading, Node, Paragraph}
 import com.vladsch.flexmark.html.HtmlRenderer.HtmlRendererExtension
 import com.vladsch.flexmark.html.renderer.{AttributablePart, NodeRendererContext}
 import com.vladsch.flexmark.html.{AttributeProvider, AttributeProviderFactory, HtmlRenderer}
@@ -46,7 +45,11 @@ object CustomAttributeProvider {
   object CustomAttributeProvider extends AttributeProvider {
     override def setAttributes(node: Node, part: AttributablePart, attributes: Attributes): Unit = {
       if (node.isInstanceOf[BulletList] ) {
-        attributes.replaceValue("class", "list list-bullet")
+        attributes.replaceValue("class", "govuk-list govuk-list--bullet")
+      } else if (node.isInstanceOf[Paragraph]) {
+        attributes.replaceValue("class", "govuk-body")
+      } else if (node.isInstanceOf[Heading]) {
+        attributes.replaceValue("class", "govuk-heading-l")
       }
     }
 

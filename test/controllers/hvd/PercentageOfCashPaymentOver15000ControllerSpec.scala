@@ -17,8 +17,10 @@
 package controllers.hvd
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.HighValueDealing
+import forms.hvd.PercentagePaymentFormProvider
+import models.businessmatching.BusinessActivity.HighValueDealing
 import models.businessmatching.updateservice.ServiceChangeRegister
+import models.hvd.PercentageOfCashPaymentOver15000.First
 import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
 import models.status.NotCompleted
 import org.jsoup.Jsoup
@@ -28,19 +30,20 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.hvd.percentage
+import views.html.hvd.PercentageView
 
 import scala.concurrent.Future
 
-class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
-    lazy val view = app.injector.instanceOf[percentage]
+    lazy val view = inject[PercentageView]
     val controller =
       new PercentageOfCashPaymentOver15000Controller(SuccessfulAuthAction,
         ds = commonDependencies,
@@ -48,7 +51,8 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
         mockServiceFlow,
         mockStatusService,
         cc = mockMcc,
-        percentage = view)
+        formProvider = inject[PercentagePaymentFormProvider],
+        view = view)
 
     mockIsNewActivityNewAuth(false)
     mockCacheFetch[ServiceChangeRegister](None, None)
@@ -59,7 +63,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
   "PercentageOfCashPaymentOver15000Controller" must {
 
     "on get display the Percentage Of CashPayment Over 15000 page" in new Fixture {
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
@@ -67,11 +71,11 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("hvd.percentage.title"))
+      contentAsString(result) must include(messages("hvd.percentage.title"))
     }
 
     "on get display the Percentage Of CashPayment Over 15000 page with pre populated data" in new Fixture {
-      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+      when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())
@@ -81,12 +85,12 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[value=01]").hasAttr("checked") must be(true)
+      document.select(s"input[value=${First.toString}]").hasAttr("checked") must be(true)
     }
 
     "continue to show the correct view" when {
       "application is in variation mode but the service has just been added" in new Fixture {
-        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any()))
+        when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
         when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
@@ -96,14 +100,14 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("hvd.percentage.title"))
+        contentAsString(result) must include(messages("hvd.percentage.title"))
       }
     }
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-      )
+      val newRequest = FakeRequest(POST, routes.PercentageOfCashPaymentOver15000Controller.post().url)
+      .withFormUrlEncodedBody()
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())
         (any(), any())).thenReturn(Future.successful(None))
@@ -113,13 +117,14 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include(Messages("error.required.hvd.percentage"))
+      contentAsString(result) must include(messages("error.required.hvd.percentage"))
     }
 
     "on post with valid data" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "percentage" -> "01"
+      val newRequest = FakeRequest(POST, routes.PercentageOfCashPaymentOver15000Controller.post().url)
+      .withFormUrlEncodedBody(
+        "percentage" -> PercentageOfCashPaymentOver15000.First.toString
       )
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())
@@ -135,8 +140,9 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
     "on post with valid data in edit mode" in new Fixture {
 
-      val newRequest = requestWithUrlEncodedBody(
-        "percentage" -> "01"
+      val newRequest = FakeRequest(POST, routes.PercentageOfCashPaymentOver15000Controller.post().url)
+      .withFormUrlEncodedBody(
+        "percentage" -> PercentageOfCashPaymentOver15000.First.toString
       )
 
       when(controller.dataCacheConnector.fetch[Hvd](any(), any())

@@ -17,11 +17,11 @@
 package services
 
 import java.time.LocalDate
-
 import connectors._
 import models._
 import models.amp.Amp
-import models.asp.{Accountancy, Asp, BookKeeping, ServicesOfBusiness}
+import models.asp.Service._
+import models.asp.{Asp, ServicesOfBusiness}
 import models.bankdetails.BankDetails
 import models.businessactivities.{CustomersOutsideUK => BACustomersOutsideUK, InvolvedInOtherYes => BAInvolvedInOtherYes, _}
 import models.businesscustomer.{Address, ReviewDetails}
@@ -30,6 +30,7 @@ import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.eab.Eab
+import models.hvd.Products.{Alcohol, Tobacco}
 import models.hvd._
 import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions, SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
 import models.renewal.{CashPayments => RCashPayments, MoneySources => RMoneySources, PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, WhichCurrencies => RenWhichCurrencies, _}
@@ -37,6 +38,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
 import models.tcsp._
+import models.tcsp.TcspTypes._
 import models.tradingpremises.TradingPremises
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -269,7 +271,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     "update all saved sections" in {
       reset(service.cacheConnector)
 
-      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any()))
+      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReadyForReview))
 
       when {
@@ -359,7 +361,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       reset(service.cacheConnector)
 
-      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
       when {
         service.desConnector.view(any[String], any())(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]])
@@ -495,7 +497,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     "update all saved sections" in {
       reset(service.cacheConnector)
 
-      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
+      when(service.statusService.getStatus(any[Option[String]], any(), any())(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
 
       when {
         service.cacheConnector.fetchAllWithDefault(any())(any())

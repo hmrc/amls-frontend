@@ -1,0 +1,74 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.businessmatching.BusinessActivity
+@import models.businessmatching.BusinessActivity._
+@import views.html.components.{SectionSubtitle, Heading, Button}
+
+@this(
+    layout: Layout,
+    subtitle: SectionSubtitle,
+    heading: Heading,
+    formHelper: FormWithCSRF,
+    button: Button
+)
+
+@(activities: Set[BusinessActivity])(implicit request: Request[_], messages: Messages)
+
+@layout(messages("businessmatching.updateservice.updateotherinformation.title") + " - " + messages("summary.updateservice")) {
+
+    @subtitle("summary.updateservice")
+
+    @heading("businessmatching.updateservice.updateotherinformation.heading")
+
+    @activities match {
+        case list if list.contains(AccountancyServices) && (list.size == 1) => {
+            <p class="govuk-body">@messages("businessmatching.updateservice.updateotherinformation.information.1", list.head.getMessage(true))</p>
+            <p class="govuk-body">@messages("businessmatching.updateservice.updateotherinformation.information.2")</p>
+            <p class="govuk-body">@messages("businessmatching.updateservice.updateotherinformation.information.3")</p>
+        }
+
+        case list if list.contains(AccountancyServices) && (list.size > 1) => {
+            <p class="govuk-body">@messages("businessmatching.updateservice.updateotherinformation.information.0")</p>
+                <ul class="govuk-list govuk-list--bullet">
+                     @list.map { ba =>
+                         <li>@ba.getMessage(true)</li>
+                     }
+                </ul>
+            <p class="govuk-body">@messages("businessmatching.updateservice.updateotherinformation.information.2")</p>
+            <p class="govuk-body">@messages("businessmatching.updateservice.updateotherinformation.information.3.multiple.services")</p>
+        }
+
+        case list if !list.contains(AccountancyServices) && (list.size == 1) => {
+            <p class="govuk-body">@messages("businessmatching.updateservice.updateotherinformation.information.1", list.head.getMessage(true))</p>
+            <p class="govuk-body">@messages("businessmatching.updateservice.updateotherinformation.information.3")</p>
+        }
+
+        case list if !list.contains(AccountancyServices) && (list.size > 1) => {
+            <p class="govuk-body">@messages("businessmatching.updateservice.updateotherinformation.information.0")</p>
+                <ul class="govuk-list govuk-list--bullet">
+                    @list.map { ba =>
+                        <li>@ba.getMessage(true)</li>
+                    }
+                </ul>
+            <p class="govuk-body">@messages("businessmatching.updateservice.updateotherinformation.information.3.multiple.services")</p>
+        }
+    }
+
+    @formHelper(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.post()) {
+        @button("button.continue", "removeserviceinfo-submit")
+    }
+}

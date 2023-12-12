@@ -17,7 +17,9 @@
 package controllers
 
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatchingMsbService, CurrencyExchange, ForeignExchange, MoneyServiceBusiness}
+import models.businessmatching.BusinessMatchingMsbService
+import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange}
+import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 
 package object msb {
 

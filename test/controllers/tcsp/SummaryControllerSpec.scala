@@ -18,23 +18,27 @@ package controllers.tcsp
 
 import controllers.actions.SuccessfulAuthAction
 import models.tcsp._
+import models.tcsp.ProvidedServices._
+import models.tcsp.TcspTypes._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.OptionValues
 import play.api.test.Helpers._
+import play.api.test.Injecting
 import services.businessmatching.ServiceFlow
+import utils.tcsp.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.tcsp.summary
+import views.html.tcsp.CheckYourAnswersView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SummaryControllerSpec extends AmlsSpec {
+class SummaryControllerSpec extends AmlsSpec with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
-    implicit val ec = app.injector.instanceOf[ExecutionContext]
+    implicit val ec = inject[ExecutionContext]
 
     val defaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
     val defaultServicesOfAnotherTCSP = ServicesOfAnotherTCSPYes("12345678")
@@ -51,99 +55,21 @@ class SummaryControllerSpec extends AmlsSpec {
       Some(true),
       Some(defaultServicesOfAnotherTCSP)
     )
-    lazy val view = app.injector.instanceOf[summary]
+    lazy val view = app.injector.instanceOf[CheckYourAnswersView]
     val controller = new SummaryController(
       mockCacheConnector,
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       mock[ServiceFlow],
       mockStatusService,
       cc = mockMcc,
-      summary = view,
+      cyaHelper = inject[CheckYourAnswersHelper],
+      view = view,
       error = errorView
     )
 
     when {
-      controller.statusService.isPreSubmission(any(), any(), any())(any(), any())
+      controller.statusService.isPreSubmission(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(false)
-  }
-
-  "sortProviders" must {
-
-    "return Trust or company formation agent as the last item in the sorted list" when {
-
-      "CompanyFormationAgent service provider is included" in new Fixture {
-
-        val modelCopy: Tcsp = model.copy(
-          tcspTypes = Some(
-            TcspTypes(
-              Set(
-                CompanyFormationAgent,
-                TrusteeProvider,
-                RegisteredOfficeEtc,
-                NomineeShareholdersProvider,
-                CompanyDirectorEtc
-              )
-            )
-          )
-        )
-
-        val res = controller.sortProviders(modelCopy)
-
-        res mustEqual List(
-          "Company director, secretary, or partner provider",
-          "Nominee shareholders provider",
-          "Registered office, business address, or virtual office services provider",
-          "Trustee provider",
-          "Trust or company formation agent"
-        )
-      }
-
-    }
-
-    "return empty list" when {
-
-      "no service providers list is given" in new Fixture {
-        val modelCopy: Tcsp = model.copy(
-          tcspTypes = Some(
-            TcspTypes(
-              Set()
-            )
-          )
-        )
-
-        val res = controller.sortProviders(modelCopy)
-
-        res mustEqual List()
-      }
-    }
-
-    "return sorted list" when {
-
-      "normal service provider list is provided" in new Fixture {
-        val modelCopy: Tcsp = model.copy(
-          tcspTypes = Some(
-            TcspTypes(
-              Set(TrusteeProvider,
-                RegisteredOfficeEtc,
-                NomineeShareholdersProvider,
-                CompanyDirectorEtc
-              )
-            )
-          )
-        )
-
-        val res = controller.sortProviders(modelCopy)
-
-        res mustEqual List(
-          "Company director, secretary, or partner provider",
-          "Nominee shareholders provider",
-          "Registered office, business address, or virtual office services provider",
-          "Trustee provider"
-        )
-      }
-
-    }
-
   }
 
   "Get" must {

@@ -27,6 +27,7 @@ import models.responsiblepeople._
 import models.status.SubmissionStatus
 import models.{Country, DateOfChange, ViewResponse}
 import org.joda.time.{LocalDate, Months}
+import play.api.data.Form
 import play.api.i18n.{Lang, Messages}
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -46,7 +47,7 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
                                                           messages: Messages,
                                                           lang: Lang,
                                                           appConfig: ApplicationConfig,
-                                                          error: views.html.error) = {
+                                                          error: views.html.ErrorView) = {
 
     import play.api.mvc.Results._
 
@@ -74,7 +75,7 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
 
   private[address] def updateAdditionalExtraAddressAndRedirect(credId: String, data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
                                                               (implicit request: Request[AnyContent], hc: HeaderCarrier, ec: ExecutionContext,
-                                                               auditConnector: AuditConnector, messages: Messages, lang: Lang, appConfig: ApplicationConfig, error: views.html.error) = {
+                                                               auditConnector: AuditConnector, messages: Messages, lang: Lang, appConfig: ApplicationConfig, error: views.html.ErrorView) = {
 
     import play.api.mvc.Results._
 
@@ -150,8 +151,8 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
     }
   }
 
-  def modelFromForm(f: InvalidForm): PersonAddress = {
-    if (f.data.get("isUK").contains(Seq("true"))) {
+  def modelFromPlayForm(f: Form[_]): PersonAddress = {
+    if (f.data.contains("isUK")) {
       PersonAddressUK("", None, None, None, "")
     } else {
       PersonAddressNonUK("", None, None, None, Country("", ""))

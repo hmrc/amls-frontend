@@ -17,6 +17,8 @@
 package controllers.bankdetails
 
 import controllers.actions.SuccessfulAuthAction
+import forms.bankdetails.BankAccountUKFormProvider
+import models.bankdetails.BankAccountType.PersonalAccount
 import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
@@ -26,25 +28,26 @@ import org.mockito.Mockito._
 import org.mockito.{ArgumentCaptor, Matchers}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import views.html.bankdetails.bank_account_account_uk
+import views.html.bankdetails.BankAccountUKView
 
 import scala.concurrent.Future
 
-class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
+class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
-    val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "11-11-11")))
+    val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12345678", "11-11-11")))
 
     val accountType = PersonalAccount
 
-    val bankAcc = app.injector.instanceOf[bank_account_account_uk]
+    val bankAcc = inject[BankAccountUKView]
 
     val controller = new BankAccountUKController(
       mockCacheConnector,
@@ -53,6 +56,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
       mockStatusService,
       commonDependencies,
       mockMcc,
+      inject[BankAccountUKFormProvider],
       bankAcc,
       errorView
     )
@@ -160,7 +164,8 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
         "given valid data in edit mode" in new Fixture {
 
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountUKController.post(1, true).url)
+            .withFormUrlEncodedBody(
             "accountNumber" -> "12345678",
             "sortCode" -> "123456"
           )
@@ -178,7 +183,8 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountUKController.post(1, false).url)
+            .withFormUrlEncodedBody(
             "accountNumber" -> "12345678",
             "sortCode" -> "123456"
           )
@@ -200,7 +206,8 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with NOT_FOUND" when {
         "given an index out of bounds in edit mode" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountUKController.post(50, true).url)
+            .withFormUrlEncodedBody(
             "accountNumber" -> "12345678",
             "sortCode" -> "123456"
           )
@@ -218,7 +225,8 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          val newRequest = requestWithUrlEncodedBody(
+          val newRequest = FakeRequest(POST, routes.BankAccountUKController.post(1, true).url)
+            .withFormUrlEncodedBody(
             "accountNumber" -> "%!@£%",
             "sortCode" -> "&^%$"
           )
@@ -235,7 +243,8 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar {
 
     "an account is created" must {
       "send an audit event" in new Fixture {
-        val newRequest = requestWithUrlEncodedBody(
+        val newRequest = FakeRequest(POST, routes.BankAccountUKController.post(1, false).url)
+          .withFormUrlEncodedBody(
           "accountNumber" -> "12345678",
           "sortCode" -> "123456"
         )

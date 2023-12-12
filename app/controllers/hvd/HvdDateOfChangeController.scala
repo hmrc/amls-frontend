@@ -18,27 +18,29 @@ package controllers.hvd
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.DateOfChangeFormProvider
 import models.DateOfChange
-import models.businessdetails.BusinessDetails
+import models.businessdetails.{ActivityStartDate, BusinessDetails}
 import models.hvd.Hvd
-import play.api.mvc.MessagesControllerComponents
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.twirl.api.Html
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.AuthAction
-import utils.{DateOfChangeHelper, RepeatingSection}
-import views.html.date_of_change
+import utils.{AuthAction, DateHelper, DateOfChangeHelper, RepeatingSection}
+import views.html.DateOfChangeView
+
+import javax.inject.Inject
 import scala.concurrent.Future
 
-class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheConnector,
-                                            val authAction: AuthAction,
-                                            val ds: CommonPlayDependencies,
-                                            val cc: MessagesControllerComponents,
-                                            date_of_change: date_of_change) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
+class HvdDateOfChangeController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                           val authAction: AuthAction,
+                                           val ds: CommonPlayDependencies,
+                                           val cc: MessagesControllerComponents,
+                                           formProvider: DateOfChangeFormProvider,
+                                           view: DateOfChangeView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
 
-  def get(redirect: String) = authAction.async {
-      implicit request =>
-        Future.successful(Ok(date_of_change(EmptyForm, "summary.hvd", routes.HvdDateOfChangeController.post(redirect))))
+  def get(redirect: String): Action[AnyContent] = authAction {
+    implicit request => Ok(getView(formProvider(), redirect))
   }
 
   def compareAndUpdateDate(hvd: Hvd, newDate: DateOfChange): Hvd = {
@@ -51,24 +53,35 @@ class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheCon
     }
   }
 
-  def post(redirect: String) = authAction.async {
+  def post(redirect: String): Action[AnyContent] = authAction.async {
     implicit request =>
-    getModelWithDateMap(request.credId) flatMap {
-      case (hvd, startDate) =>
-      Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDate) match {
-        case f: InvalidForm =>
-      Future.successful(BadRequest(date_of_change(f, "summary.hvd", routes.HvdDateOfChangeController.post(redirect))))
-        case ValidForm(_, data) =>
-          for {
-          _ <- dataCacheConnector.save[Hvd](request.credId, Hvd.key, compareAndUpdateDate(hvd , data))
-          } yield {
-            Redirect(DateOfChangeRedirect(redirect).call)
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(getView(formWithErrors, redirect))),
+        dateOfChange => {
+          getModelWithDateMap(request.credId).flatMap {
+            case (hvd, Some(activityStartDate)) if !dateOfChange.dateOfChange.isBefore(activityStartDate.startDate) =>
+              dataCacheConnector.save[Hvd](request.credId, Hvd.key, compareAndUpdateDate(hvd, dateOfChange)) map { _ =>
+                Redirect(DateOfChangeRedirect(redirect).call)
+              }
+            case (_, Some(activityStartDate)) =>
+              Future.successful(BadRequest(getView(
+                formProvider().withError(
+                  "dateOfChange",
+                  messages(
+                    "error.expected.dateofchange.date.after.activitystartdate",
+                    DateHelper.formatDate(activityStartDate.startDate)
+                  )
+                ),
+                redirect
+              )))
+            case (_, None) =>
+              Future.failed(new Exception("Could not retrieve start date"))
           }
-      }
-    }
+        }
+      )
   }
 
-  private def getModelWithDateMap(credId: String)(implicit hc: HeaderCarrier): Future[(Hvd, Map[_ <: String, Seq[String]])] = {
+  private def getModelWithDateMap(credId: String)(implicit hc: HeaderCarrier): Future[(Hvd, Option[ActivityStartDate])] = {
     dataCacheConnector.fetchAll(credId) map {
       optionalCache =>
         (for {
@@ -76,11 +89,17 @@ class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheCon
           businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
           hvd <- cache.getEntry[Hvd](Hvd.key)
         } yield (hvd, businessDetails.activityStartDate)) match {
-          case Some((hvd, Some(activityStartDate))) => (hvd, Map("activityStartDate" -> Seq(activityStartDate.startDate.toString("yyyy-MM-dd"))))
-          case Some((hvd, _)) => (hvd, Map())
-          case _ =>(Hvd(), Map())
+          case Some((hvd, Some(activityStartDate))) => (hvd, Some(activityStartDate))
+          case Some((hvd, _)) => (hvd, None)
+          case _ => (Hvd(), None)
         }
     }
   }
+
+  private def getView(form: Form[DateOfChange], redirect: String)(implicit request: Request[_]): Html = view(
+    form,
+    "summary.hvd",
+    routes.HvdDateOfChangeController.post(redirect)
+  )
 }
 

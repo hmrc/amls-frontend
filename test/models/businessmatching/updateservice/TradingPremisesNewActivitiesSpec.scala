@@ -18,7 +18,7 @@ package models.businessmatching.updateservice
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, ValidationError}
-import models.businessmatching.{BillPaymentServices, HighValueDealing}
+import models.businessmatching.BusinessActivity.{BillPaymentServices, HighValueDealing}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}

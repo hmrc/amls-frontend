@@ -18,6 +18,7 @@ package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.businessdetails.CorrespondenceAddressIsUKFormProvider
 import models.Country
 import models.businessdetails._
 import org.jsoup.Jsoup
@@ -27,32 +28,34 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
+import play.api.test
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import utils.AmlsSpec
-import views.html.businessdetails.correspondence_address_is_uk
+import views.html.businessdetails.CorrespondenceAddressIsUKView
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
 
     val mockDataConnector = mock[DataCacheConnector]
 
-    lazy val view = app.injector.instanceOf[correspondence_address_is_uk]
+    lazy val view = inject[CorrespondenceAddressIsUKView]
     val controller = new CorrespondenceAddressIsUkController (
       dataConnector = mock[DataCacheConnector],
       auditConnector = mock[AuditConnector],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      correspondence_address_is_uk = view)
+      formProvider = inject[CorrespondenceAddressIsUKFormProvider],
+      view = view)
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())
@@ -75,7 +78,7 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("businessdetails.correspondenceaddress.isuk.title"))
+        contentAsString(result) must include(messages("businessdetails.correspondenceaddress.isuk.title"))
       }
 
       "load isUk result when there is already an isUK answer in BusinessDetails" in new Fixture {
@@ -88,8 +91,8 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("isUK-true").hasAttr("checked") must be(true)
-        htmlValue.getElementById("isUK-false").hasAttr("checked") must be(false)
+        htmlValue.getElementById("isUk").hasAttr("checked") must be(true)
+        htmlValue.getElementById("isUk-2").hasAttr("checked") must be(false)
       }
 
       "load isUk result when there is already an nonUk answer in BusinessDetails" in new Fixture {
@@ -104,8 +107,8 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
         status(result) must be(OK)
 
         val htmlValue = Jsoup.parse(contentAsString(result))
-        htmlValue.getElementById("isUK-true").hasAttr("checked") must be(false)
-        htmlValue.getElementById("isUK-false").hasAttr("checked") must be(true)
+        htmlValue.getElementById("isUk").hasAttr("checked") must be(false)
+        htmlValue.getElementById("isUk-2").hasAttr("checked") must be(true)
       }
     }
 
@@ -117,7 +120,8 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, None, false, false)))
 
-        val newRequest = requestWithUrlEncodedBody("isUK" -> "true")
+        val newRequest = FakeRequest(POST, routes.CorrespondenceAddressIsUkController.post().url)
+          .withFormUrlEncodedBody("isUk" -> "true")
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(fetchResult)
@@ -134,7 +138,8 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val fetchResult = Future.successful(Some(BusinessDetails(None,None, None, None, None, None, None, None, None, None, false, false)))
 
-        val newRequest = requestWithUrlEncodedBody("isUK" -> "false")
+        val newRequest = test.FakeRequest(POST, routes.CorrespondenceAddressIsUkController.post().url)
+          .withFormUrlEncodedBody("isUk" -> "false")
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
           .thenReturn(fetchResult)
@@ -151,7 +156,8 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val fetchResult = Future.successful(None)
 
-        val newRequest = requestWithUrlEncodedBody( )
+        val newRequest = FakeRequest(POST, routes.CorrespondenceAddressIsUkController.post().url)
+          .withFormUrlEncodedBody("isUk" -> "")
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any()) (any(), any())).thenReturn(fetchResult)
 
@@ -162,10 +168,10 @@ class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar
 
         val document: Document  = Jsoup.parse(contentAsString(result))
         val errorCount = 1
-        val elementsWithError : Elements = document.getElementsByClass("error-notification")
+        val elementsWithError : Elements = document.getElementsByClass("govuk-error-summary__list")
         elementsWithError.size() must be(errorCount)
         for (ele: Element <- elementsWithError.asScala) {
-          ele.html() must include(Messages("businessdetails.correspondenceaddress.isuk.error"))
+          ele.html() must include(messages("businessdetails.correspondenceaddress.isuk.error"))
         }
       }
     }

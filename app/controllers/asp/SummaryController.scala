@@ -18,14 +18,14 @@ package controllers.asp
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
-import javax.inject.Inject
 import models.asp.Asp
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import utils.AuthAction
-import views.html.asp.summary
+import views.html.asp.SummaryView
+
+import javax.inject.Inject
 
 class SummaryController @Inject()(val dataCache: DataCacheConnector,
                                   val serviceFlow: ServiceFlow,
@@ -33,23 +33,23 @@ class SummaryController @Inject()(val dataCache: DataCacheConnector,
                                   authAction: AuthAction,
                                   val ds: CommonPlayDependencies,
                                   val cc: MessagesControllerComponents,
-                                  summary: summary) extends AmlsBaseController(ds, cc) {
+                                  view: SummaryView) extends AmlsBaseController(ds, cc) {
 
-  def get = authAction.async {
-      implicit request =>
-        dataCache.fetch[Asp](request.credId, Asp.key) map {
-          case Some(data) =>
-            Ok(summary(EmptyForm, data))
-          case _ =>
-            Redirect(controllers.routes.RegistrationProgressController.get)
-        }
+  def get: Action[AnyContent] = authAction.async {
+    implicit request =>
+      dataCache.fetch[Asp](request.credId, Asp.key) map {
+        case Some(data) =>
+          Ok(view(data))
+        case _ =>
+          Redirect(controllers.routes.RegistrationProgressController.get)
+      }
   }
 
-  def post = authAction.async {
-      implicit request =>
-        for {
-          asp <- dataCache.fetch[Asp](request.credId, Asp.key)
-          _ <- dataCache.save[Asp](request.credId, Asp.key, asp.copy(hasAccepted = true))
-        } yield Redirect(controllers.routes.RegistrationProgressController.get)
+  def post: Action[AnyContent] = authAction.async {
+    implicit request =>
+      for {
+        asp <- dataCache.fetch[Asp](request.credId, Asp.key)
+        _ <- dataCache.save[Asp](request.credId, Asp.key, asp.copy(hasAccepted = true))
+      } yield Redirect(controllers.routes.RegistrationProgressController.get)
   }
 }

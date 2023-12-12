@@ -40,6 +40,7 @@ trait Fixture extends MustMatchers with ParagraphHelpers with TitleValidator {
   implicit lazy val doc = Jsoup.parse(html)
   lazy val form = doc.getElementsByTag("form").first()
   lazy val heading = doc.getElementsByTag("h1").first()
+  lazy val caption = doc.getElementById("stage-caption")
   lazy val subHeading = doc.getElementsByClass("heading-secondary").first()
   lazy val errorSummary = doc.getElementsByClass("amls-error-summary").first()
 }

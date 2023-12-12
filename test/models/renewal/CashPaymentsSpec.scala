@@ -17,6 +17,7 @@
 package models.renewal
 
 import models.hvd.{PaymentMethods => HvdPaymentMethods}
+import play.api.libs.json.Json
 import utils.AmlsSpec
 
 class CashPaymentsSpec extends AmlsSpec {
@@ -26,12 +27,12 @@ class CashPaymentsSpec extends AmlsSpec {
   "CashPayments" must {
     "roundtrip through json for true" in {
       val data = CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(paymentMethods)))
-      CashPayments.jsonReads.reads(CashPayments.jsonWrites.writes(data)).asOpt.value mustEqual data
+      Json.toJson(data).as[CashPayments] mustBe data
     }
 
     "roundtrip through json for false" in {
       val data = CashPayments(CashPaymentsCustomerNotMet(false), None)
-      CashPayments.jsonReads.reads(CashPayments.jsonWrites.writes(data)).asOpt.value mustEqual data
+      Json.toJson(data).as[CashPayments] mustBe data
     }
   }
 

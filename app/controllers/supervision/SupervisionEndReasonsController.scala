@@ -18,28 +18,32 @@ package controllers.supervision
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.Inject
+import forms.supervision.SupervisionEndReasonsFormProvider
 import models.supervision._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthAction
-import views.html.supervision.supervision_end_reasons
+import views.html.supervision.SupervisionEndReasonsView
+
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCacheConnector,
                                                 val authAction: AuthAction,
                                                 val ds: CommonPlayDependencies,
                                                 val cc: MessagesControllerComponents,
-                                                supervision_end_reasons: supervision_end_reasons) extends AmlsBaseController(ds, cc) {
+                                                formProvider: SupervisionEndReasonsFormProvider,
+                                                view: SupervisionEndReasonsView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
-          case Some(Supervision(anotherBody, _, _, _, _, _)) if getEndReasons(anotherBody).isDefined
-          => Ok(supervision_end_reasons(Form2[SupervisionEndReasons](SupervisionEndReasons(getEndReasons(anotherBody).get)), edit))
-          case _ => Ok(supervision_end_reasons(EmptyForm, edit))
-        }
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      val form = formProvider()
+      dataCacheConnector.fetch[Supervision](request.credId, Supervision.key) map {
+        case Some(Supervision(anotherBody, _, _, _, _, _)) =>
+          val param = getEndReasons(anotherBody).fold(form)(x => form.fill(SupervisionEndReasons(x)))
+          Ok(view(param, edit))
+        case _ => Ok(view(form, edit))
+      }
   }
 
   private def getEndReasons(anotherBody: Option[AnotherBody]): Option[String] = {
@@ -52,20 +56,20 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
     }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request =>
-        Form2[SupervisionEndReasons](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(supervision_end_reasons(f, edit)))
-          case ValidForm(_, data) =>
-            (for {
-              supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
-              maybeCache <- dataCacheConnector.save[Supervision](request.credId, Supervision.key,
-                updateData(supervision, data))
-            } yield maybeCache) map {
-              cache => redirectTo(edit, cache)
-            }
-        }
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data =>
+          (for {
+            supervision <- dataCacheConnector.fetch[Supervision](request.credId, Supervision.key)
+            maybeCache <- dataCacheConnector.save[Supervision](request.credId, Supervision.key,
+              updateData(supervision, data))
+          } yield maybeCache) map {
+            cache => redirectTo(edit, cache)
+          }
+      )
   }
 
   private def updateData(supervision: Supervision, data: SupervisionEndReasons): Supervision = {
@@ -77,12 +81,13 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
     supervision.anotherBody(updatedAnotherBody).copy(hasAccepted = true)
   }
 
-  private def redirectTo(edit: Boolean, cache: CacheMap) = {
-      import utils.ControllerHelper.supervisionComplete
+  private def redirectTo(edit: Boolean, cache: CacheMap): Result = {
+    import utils.ControllerHelper.supervisionComplete
 
-        supervisionComplete(cache) match {
-          case false => Redirect(routes.ProfessionalBodyMemberController.get())
-          case true => Redirect(routes.SummaryController.get)
-        }
-    }
+      if (supervisionComplete(cache)) {
+        Redirect(routes.SummaryController.get)
+      } else {
+        Redirect(routes.ProfessionalBodyMemberController.get())
+      }
+  }
 }

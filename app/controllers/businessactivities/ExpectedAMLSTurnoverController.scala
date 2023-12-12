@@ -16,89 +16,70 @@
 
 package controllers.businessactivities
 
-import cats.data.OptionT
+import cats.implicits._
 import com.google.inject.Inject
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
+import forms.businessactivities.ExpectedAMLSTurnoverFormProvider
+import models.businessactivities.ExpectedAMLSTurnover
 import models.businessmatching._
-import play.api.mvc.MessagesControllerComponents
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.StatusService
+import services.businessactivities.ExpectedAMLSTurnoverService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AuthAction
-import views.html.businessactivities._
-import cats.implicits._
+import views.html.businessactivities.ExpectedAMLSTurnoverView
 
 import scala.concurrent.Future
 
-class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                val authAction: AuthAction,
-                                                val ds: CommonPlayDependencies,
-                                                implicit val statusService: StatusService,
-                                                val cc: MessagesControllerComponents,
-                                                expected_amls_turnover: expected_amls_turnover) extends AmlsBaseController(ds, cc) {
+class ExpectedAMLSTurnoverController @Inject()(val authAction: AuthAction,
+                                               val ds: CommonPlayDependencies,
+                                               implicit val statusService: StatusService,
+                                               val cc: MessagesControllerComponents,
+                                               service: ExpectedAMLSTurnoverService,
+                                               formProvider: ExpectedAMLSTurnoverFormProvider,
+                                               view: ExpectedAMLSTurnoverView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      dataCacheConnector.fetchAll(request.credId) map {
-        optionalCache =>
-          (for {
-            cache <- optionalCache
-            businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-          } yield {
-            (for {
-              businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
-              expectedTurnover <- businessActivities.expectedAMLSTurnover
-            } yield Ok(expected_amls_turnover(
-              Form2[ExpectedAMLSTurnover](expectedTurnover),
-              edit,
-              businessMatching,
-              businessMatching.alphabeticalBusinessActivitiesLowerCase()
-            ))).getOrElse (Ok(expected_amls_turnover(
-              EmptyForm,
-              edit,
-              businessMatching,
-              businessMatching.alphabeticalBusinessActivitiesLowerCase()
-            )))
-          }) getOrElse Ok(expected_amls_turnover(EmptyForm, edit, None, None))
+      service.getBusinessMatchingExpectedTurnover(request.credId) map {
+        case Some((bm, Some(turnover))) =>
+          Ok(view(formProvider().fill(turnover), edit, bm, bm.alphabeticalBusinessActivitiesLowerCase()))
+        case Some((bm, _)) =>
+          Ok(view(formProvider(), edit, bm, bm.alphabeticalBusinessActivitiesLowerCase()))
+        case _ =>
+          Ok(view(formProvider(), edit, None, None))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      getErrorMessage(request.credId) flatMap { errorMsg =>
-      Form2[ExpectedAMLSTurnover](request.body)(ExpectedAMLSTurnover.formRuleWithErrorMsg(errorMsg)) match {
-        case f: InvalidForm =>
-          for {
-            businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-          } yield {
-            BadRequest(expected_amls_turnover(f, edit, businessMatching, businessMatching.alphabeticalBusinessActivitiesLowerCase()))
-          }
+      service.getBusinessMatching(request.credId) flatMap { bm =>
+        getFormWithErrorMessage(bm).bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, edit, bm, bm.alphabeticalBusinessActivitiesLowerCase()))),
+          data =>
+            service.updateBusinessActivities(request.credId, data).map(_ => redirectLogic(edit))
+        )
+      }
+  }
 
-        case ValidForm(_, data) =>
-          for {
-            businessActivities <- dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](request.credId, BusinessActivities.key,
-              businessActivities.expectedAMLSTurnover(data)
-            )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get)
-            case false => Redirect(routes.BusinessFranchiseController.get())
-          }
-      }
-      }
+  private def getFormWithErrorMessage(bm: BusinessMatching)(implicit hc: HeaderCarrier): Form[ExpectedAMLSTurnover] = {
+    bm.activities match {
+      case Some(value) if value.hasOnlyOneBusinessActivity =>
+        formProvider(messages(
+          "error.required.ba.turnover.from.mlr.single",
+          value.businessActivities.head.getMessage(usePhrasedMessage = true)
+        ))
+      case _ => formProvider()
     }
-  private def getErrorMessage(credId: String)(implicit hc: HeaderCarrier) = {
-    (for {
-      businessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key))
-      activities <- OptionT.fromOption[Future](businessMatching.activities)
-    } yield {
-      if (activities.businessActivities.size == 1) {
-        "error.required.ba.turnover.from.mlr.single"
-      } else {
-        "error.required.ba.turnover.from.mlr"
-      }
-    }) getOrElse "error.required.ba.turnover.from.mlr"
+  }
+
+  private def redirectLogic(edit: Boolean): Result = {
+    if (edit) {
+      Redirect(routes.SummaryController.get)
+    } else {
+      Redirect(routes.BusinessFranchiseController.get())
+    }
   }
 }

@@ -17,103 +17,10 @@
 package models.businessdetails
 
 import org.scalatestplus.mockito.MockitoSugar
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class PreviouslyRegisteredSpec extends PlaySpec with MockitoSugar {
-
-  "Form Validation" must {
-
-    "successfully validate" when {
-      "successfully validate given a 'no' value" in {
-
-        PreviouslyRegistered.formRule.validate(Map("previouslyRegistered" -> Seq("false"))) must
-          be(Valid(PreviouslyRegisteredNo))
-      }
-
-      "successfully validate given an `Yes` value with pre-existing MLR reg number" in {
-
-        val data = Map(
-          "previouslyRegistered" -> Seq("true"),
-          "prevMLRRegNo" -> Seq("1" * 8)
-        )
-
-        PreviouslyRegistered.formRule.validate(data) must
-          be(Valid(PreviouslyRegisteredYes(None)))
-      }
-
-      "successfully validate given an `Yes` value with no MLR reg number" in {
-
-        val data = Map(
-          "previouslyRegistered" -> Seq("true")
-        )
-
-        PreviouslyRegistered.formRule.validate(data) must
-          be(Valid(PreviouslyRegisteredYes(None)))
-      }
-
-      "successfully validate given an `Yes` value with an empty MLR reg number" in {
-
-        val data = Map(
-          "previouslyRegistered" -> Seq("true"),
-          "prevMLRRegNo" -> Seq("")
-        )
-
-        PreviouslyRegistered.formRule.validate(data) must
-          be(Valid(PreviouslyRegisteredYes(None)))
-      }
-    }
-
-    "fail validation" when {
-
-      "given a 'yes' value with more than 8 characters" in {
-
-        be(Invalid(Seq(
-          (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
-        )))
-      }
-      "given a 'yes' value with less than 8 characters" in {
-
-        be(Invalid(Seq(
-          (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
-        )))
-      }
-      "given a 'yes' value with between 9 and 14 characters" in {
-
-        be(Invalid(Seq(
-          (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
-        )))
-      }
-      "given a 'yes' value non-numeric characters" in {
-
-        be(Invalid(Seq(
-          (Path \ "prevMLRRegNo") -> Seq(ValidationError("error.invalid.mlr.number"))
-        )))
-      }
-
-      "given an empty map" in {
-
-        PreviouslyRegistered.formRule.validate(Map.empty) must
-          be(Invalid(Seq(
-            (Path \ "previouslyRegistered") -> Seq(ValidationError("error.required.atb.previously.registered"))
-          )))
-      }
-    }
-
-    "write correct data from enum value" in {
-
-      PreviouslyRegistered.formWrites.writes(PreviouslyRegisteredNo) must
-        be(Map("previouslyRegistered" -> Seq("false")))
-
-    }
-
-    "write correct data from `Yes` value" in {
-
-      PreviouslyRegistered.formWrites.writes(PreviouslyRegisteredYes(Some("12345678"))) must
-        be(Map("previouslyRegistered" -> Seq("true"), "prevMLRRegNo" -> Seq("12345678")))
-    }
-  }
 
   "JSON validation" must {
 

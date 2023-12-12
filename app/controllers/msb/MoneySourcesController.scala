@@ -18,16 +18,18 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.msb.MoneySourcesFormProvider
+
 import javax.inject.Inject
-import models.businessmatching.{BusinessMatching, ForeignExchange}
+import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessMatchingMsbService.ForeignExchange
 import models.moneyservicebusiness._
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import services.businessmatching.ServiceFlow
+import services.msb.MoneySourcesService
 import utils.AuthAction
-import views.html.msb.money_sources
-
+import views.html.msb.MoneySourcesView
 
 import scala.concurrent.Future
 
@@ -37,55 +39,43 @@ class MoneySourcesController @Inject()(authAction: AuthAction,
                                        implicit val statusService: StatusService,
                                        implicit val serviceFlow: ServiceFlow,
                                        val cc: MessagesControllerComponents,
-                                       money_sources: money_sources,
-                                       implicit val error: views.html.error) extends AmlsBaseController(ds, cc) {
+                                       service: MoneySourcesService,
+                                       formProvider: MoneySourcesFormProvider,
+                                       view: MoneySourcesView,
+                                       implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
-      implicit request => {
-        dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
-          response =>
-            val form: Form2[MoneySources] = (for {
-              msb <- response
-              currencies <- msb.whichCurrencies
-              moneySources <- currencies.moneySources
-            } yield Form2[MoneySources](moneySources)).getOrElse(EmptyForm)
-
-            Ok(money_sources(form, edit))
-        }
-      }
-  }
-
-  def post(edit: Boolean = false) = authAction.async {
-      implicit request => {
-        Form2[MoneySources](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(money_sources(f, edit)))
-          case ValidForm(_, data: MoneySources) =>
-            for {
-              msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-              _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId,MoneyServiceBusiness.key, updateMoneySources(msb, data))
-              updatedMsb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
-              bm <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
-            } yield redirectToNextPage(updatedMsb, bm, edit).getOrElse(NotFound(notFoundView))
-        }
-      }
-  }
-
-  def redirectToNextPage(maybeMsb: Option[MoneyServiceBusiness], maybeBm: Option[BusinessMatching], edit: Boolean) = {
-    for {
-      msb <- maybeMsb
-      bm <- maybeBm
-      services <- bm.msbServices
-    } yield {
-      services.msbServices.contains(ForeignExchange) match {
-        case true if msb.fxTransactionsInNext12Months.isEmpty || !edit =>
-          Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
-        case _ => Redirect(routes.SummaryController.get)
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request => {
+      dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key) map {
+        response =>
+          val form = (for {
+            msb <- response
+            currencies <- msb.whichCurrencies
+            moneySources <- currencies.moneySources
+          } yield moneySources).fold(formProvider())(formProvider().fill)
+          Ok(view(form, edit))
       }
     }
   }
 
-  def updateMoneySources(oldMsb: Option[MoneyServiceBusiness], moneySources: MoneySources): Option[MoneyServiceBusiness] = {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
+    implicit request => {
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit))),
+        data => {
+          for {
+            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+            _ <- dataCacheConnector.save[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key, updateMoneySources(msb, data))
+            updatedMsb <- dataCacheConnector.fetch[MoneyServiceBusiness](request.credId, MoneyServiceBusiness.key)
+            bm <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)
+          } yield service.redirectToNextPage(updatedMsb, bm, edit).getOrElse(NotFound(notFoundView))
+        }
+      )
+    }
+  }
+
+  private def updateMoneySources(oldMsb: Option[MoneyServiceBusiness], moneySources: MoneySources): Option[MoneyServiceBusiness] = {
     oldMsb match {
       case Some(msb) => {
         msb.whichCurrencies match {

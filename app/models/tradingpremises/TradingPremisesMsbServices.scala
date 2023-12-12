@@ -19,15 +19,23 @@ package models.tradingpremises
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, ValidationError, _}
-import models.DateOfChange
-import models.businessmatching.{ChequeCashingNotScrapMetal => BMChequeCashingNotScrapMetal, ChequeCashingScrapMetal => BMChequeCashingScrapMetal, CurrencyExchange => BMCurrencyExchange, ForeignExchange => BMForeignExchange, TransmittingMoney => BMTransmittingMoney}
+import models.{DateOfChange, Enumerable, WithName}
+import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingNotScrapMetal => BMChequeCashingNotScrapMetal, ChequeCashingScrapMetal => BMChequeCashingScrapMetal, CurrencyExchange => BMCurrencyExchange, ForeignExchange => BMForeignExchange, TransmittingMoney => BMTransmittingMoney}
 import play.api.i18n.Messages
 import play.api.libs.json.{Reads, Writes, _}
+import uk.gov.hmrc.govukfrontend.views.Aliases.CheckboxItem
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import utils.TraversableValidators
 
-sealed trait TradingPremisesMsbService{
+sealed trait TradingPremisesMsbService {
+
+  val value: String
+
   val message = "msb.services.list.lbl."
-  def getMessage(implicit messages: Messages): String =
+  def getMessage(implicit messages: Messages): String = {
+
+    import TradingPremisesMsbService._
+
     this match {
       case TransmittingMoney => messages(s"${message}01")
       case CurrencyExchange => messages(s"${message}02")
@@ -35,17 +43,50 @@ sealed trait TradingPremisesMsbService{
       case ChequeCashingScrapMetal => messages(s"${message}04")
       case ForeignExchange => messages(s"${message}05")
     }
-}
+  }
 
-case object TransmittingMoney extends TradingPremisesMsbService
-case object CurrencyExchange extends TradingPremisesMsbService
-case object ChequeCashingNotScrapMetal extends TradingPremisesMsbService
-case object ChequeCashingScrapMetal extends TradingPremisesMsbService
-case object ForeignExchange extends TradingPremisesMsbService
+  def index = value.substring(1)
+}
 
 case class TradingPremisesMsbServices(services : Set[TradingPremisesMsbService])
 
-object TradingPremisesMsbService {
+object TradingPremisesMsbService extends Enumerable.Implicits {
+
+  case object TransmittingMoney extends WithName("transmittingMoney") with TradingPremisesMsbService {
+    override val value: String = "01"
+  }
+
+  case object CurrencyExchange extends WithName("currencyExchange") with TradingPremisesMsbService {
+    override val value: String = "02"
+  }
+
+  case object ChequeCashingNotScrapMetal extends WithName("chequeCashingNotScrapMetal") with TradingPremisesMsbService {
+    override val value: String = "03"
+  }
+
+  case object ChequeCashingScrapMetal extends WithName("chequeCashingScrapMetal") with TradingPremisesMsbService {
+    override val value: String = "04"
+  }
+
+  case object ForeignExchange extends WithName("foreignExchange") with TradingPremisesMsbService {
+    override val value: String = "05"
+  }
+
+  def formValues(filterValues: Option[Seq[TradingPremisesMsbService]])(implicit messages: Messages): Seq[CheckboxItem] = {
+
+    val filteredValues = filterValues.fold(all)(all diff _)
+
+    filteredValues.map { msbService =>
+
+      CheckboxItem(
+        content = Text(messages(s"msb.services.list.lbl.${msbService.value}")),
+        value = msbService.toString,
+        id = Some(s"value_${msbService.index}"),
+        name = Some(s"value[${msbService.index}]")
+      )
+    }.sortBy(_.value)
+
+  }
 
   implicit val serviceR = Rule[String, TradingPremisesMsbService] {
     case "01" => Valid(TransmittingMoney)
@@ -78,6 +119,15 @@ object TradingPremisesMsbService {
 
   def unapplyWithoutDateOfChange(s: TradingPremisesMsbServices) = Some(s.services)
 
+  val all: Seq[TradingPremisesMsbService] = Seq(
+    TransmittingMoney,
+    CurrencyExchange,
+    ChequeCashingNotScrapMetal,
+    ChequeCashingScrapMetal,
+    ForeignExchange
+  )
+
+  implicit val enumerable: Enumerable[TradingPremisesMsbService] = Enumerable(all.map(v => v.toString -> v): _*)
 }
 
 sealed trait MsbServices0 {
@@ -151,6 +201,9 @@ object TradingPremisesMsbServices {
     msbService map {s => convertSingleService(s)}
 
   implicit def convertSingleService(msbService: models.businessmatching.BusinessMatchingMsbService): models.tradingpremises.TradingPremisesMsbService = {
+
+    import TradingPremisesMsbService._
+
     msbService match {
       case BMTransmittingMoney => TransmittingMoney
       case BMCurrencyExchange => CurrencyExchange

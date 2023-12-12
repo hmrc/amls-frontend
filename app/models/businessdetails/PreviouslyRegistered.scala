@@ -16,10 +16,7 @@
 
 package models.businessdetails
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
-import cats.data.Validated.{Valid}
 
 sealed trait PreviouslyRegistered
 
@@ -28,31 +25,9 @@ case object PreviouslyRegisteredNo extends PreviouslyRegistered
 
 object PreviouslyRegistered {
 
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, PreviouslyRegistered] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-
-    (__ \ "previouslyRegistered").read[Boolean].withMessage("error.required.atb.previously.registered") flatMap {
-      case true => Rule.fromMapping { _ => Valid(PreviouslyRegisteredYes(None)) }
-      case false => Rule.fromMapping { _ => Valid(PreviouslyRegisteredNo) }
-    }
-  }
-
-  implicit val formWrites: Write[PreviouslyRegistered, UrlFormEncoded] = Write {
-    case PreviouslyRegisteredYes(Some(value)) =>
-      Map("previouslyRegistered" -> Seq("true"),
-        "prevMLRRegNo" -> Seq(value)
-      )
-    case PreviouslyRegisteredYes(None) =>
-      Map("previouslyRegistered" -> Seq("true"))
-    case PreviouslyRegisteredNo =>
-      Map("previouslyRegistered" -> Seq("false"))
-  }
-
   implicit val jsonReads: Reads[PreviouslyRegistered] =
     (__ \ "previouslyRegistered").read[Boolean] flatMap {
-      case true => (__ \ "prevMLRRegNo").readNullable[String] map PreviouslyRegisteredYes.apply
+      case true => (__ \ "prevMLRRegNo").readNullable[String].map(PreviouslyRegisteredYes)
       case false => Reads(_ => JsSuccess(PreviouslyRegisteredNo))
     }
 

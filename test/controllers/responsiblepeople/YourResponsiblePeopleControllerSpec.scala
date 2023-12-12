@@ -16,40 +16,41 @@
 
 package controllers.responsiblepeople
 
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import utils.AmlsSpec
-import play.api.i18n.Messages
 import play.api.test.Helpers._
-import views.html.responsiblepeople.your_responsible_people
+import play.api.test.Injecting
+import services.responsiblepeople.YourResponsiblePeopleService
+import utils.AmlsSpec
+import views.html.responsiblepeople.YourResponsiblePeopleView
 
 import scala.concurrent.Future
 
-class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
+class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     trait Fixture {
       self => val request = addToken(authRequest)
-      lazy val view = app.injector.instanceOf[your_responsible_people]
+      val mockService = mock[YourResponsiblePeopleService]
+      lazy val view = app.injector.instanceOf[YourResponsiblePeopleView]
       val controller = new YourResponsiblePeopleController (
-        dataCacheConnector = mock[DataCacheConnector],
         authAction = SuccessfulAuthAction, ds = commonDependencies, cc = mockMcc,
-        your_responsible_people = view)
+        yourResponsiblePeopleService = mockService,
+        view = view)
     }
 
     "Get" must {
 
       "load the your answers page when section data is available" in new Fixture {
         val model = ResponsiblePerson(None, None)
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(model))))
+        when(mockService.completeAndIncompleteRP(any())(any())
+        ).thenReturn(Future.successful(Some((Seq.empty, Seq(model).zipWithIndex.reverse))))
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include (s"${Messages("responsiblepeople.whomustregister.title")} - ${Messages("summary.responsiblepeople")}")
+        contentAsString(result) must include (s"${messages("responsiblepeople.whomustregister.title")} - ${messages("summary.responsiblepeople")}")
       }
 
       "show the 'Add a responsible person' link" in new Fixture {
@@ -57,13 +58,13 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
         val rp1 = ResponsiblePerson(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
         val rp2 = ResponsiblePerson(Some(PersonName("firstName2", None, "lastName2")))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(rp2, rp1))))
+        when(mockService.completeAndIncompleteRP(any())(any())
+        ).thenReturn(Future.successful(Some((Seq(rp1).zipWithIndex, Seq(rp2).zipWithIndex))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include (Messages("responsiblepeople.check_your_answers.add"))
+        contentAsString(result) must include (messages("responsiblepeople.check_your_answers.add"))
 
         val document = Jsoup.parse(contentAsString(result))
         document.getElementById("addResponsiblePerson").attr("href") must be (routes.ResponsiblePeopleAddController.get(false).url)
@@ -75,8 +76,8 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
         val rp1 = ResponsiblePerson(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
         val rp2 = ResponsiblePerson(Some(PersonName("firstName2", None, "lastName2")))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(rp2, rp1))))
+        when(mockService.completeAndIncompleteRP(any())(any())
+        ).thenReturn(Future.successful(Some((Seq(rp1).zipWithIndex, Seq(rp2).zipWithIndex))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -88,8 +89,8 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "redirect to the main AMLS summary page when section data is unavailable" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(None))
+        when(mockService.completeAndIncompleteRP(any())(any())
+        ).thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))

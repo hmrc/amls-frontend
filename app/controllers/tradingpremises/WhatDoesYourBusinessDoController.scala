@@ -19,19 +19,24 @@ package controllers.tradingpremises
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
+import forms.tradingpremises.WhatDoesYourBusinessDoFormProvider
+import forms.{DateOfChangeFormProvider, FormHelpers}
 import models.DateOfChange
+import models.businessmatching.BusinessActivity._
 import models.businessmatching._
 import models.status.SubmissionStatus
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import play.api.Logging
-import play.api.mvc.{MessagesControllerComponents, Result}
+import play.api.data.Form
+import play.api.mvc._
+import play.twirl.api.Html
 import services.StatusService
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthAction, DateOfChangeHelper, RepeatingSection}
-import views.html.date_of_change
-import views.html.tradingpremises._
+import utils.{AuthAction, DateHelper, DateOfChangeHelper, RepeatingSection}
+import views.html.DateOfChangeView
+import views.html.tradingpremises.WhatDoesYourBusinessDoView
 
 import scala.concurrent.Future
 
@@ -41,9 +46,11 @@ class WhatDoesYourBusinessDoController @Inject () (
                                                     val ds: CommonPlayDependencies,
                                                     val statusService: StatusService,
                                                     val cc: MessagesControllerComponents,
-                                                    what_does_your_business_do: what_does_your_business_do,
-                                                    date_of_change: date_of_change,
-                                                    implicit val error: views.html.error) extends AmlsBaseController(ds, cc) with RepeatingSection with FormHelpers with DateOfChangeHelper with Logging {
+                                                    formProvider: WhatDoesYourBusinessDoFormProvider,
+                                                    activitiesView: WhatDoesYourBusinessDoView,
+                                                    dateChangeFormProvider: DateOfChangeFormProvider,
+                                                    dateChangeView: DateOfChangeView,
+                                                    implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with FormHelpers with DateOfChangeHelper with Logging {
 
   private def data(credId: String, index: Int, edit: Boolean)(implicit hc: HeaderCarrier)
   : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {
@@ -68,7 +75,7 @@ class WhatDoesYourBusinessDoController @Inject () (
   }
 
   // scalastyle:off cyclomatic.complexity
-  def get(index: Int, edit: Boolean = false) = authAction.async {
+  def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       data(request.credId, index, edit) flatMap {
         case Right((_, activities)) =>
@@ -80,9 +87,10 @@ class WhatDoesYourBusinessDoController @Inject () (
                 Some(tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities)))
               }.map {
                 _ =>
-                  activities.contains(MoneyServiceBusiness) match {
-                    case true => Redirect(routes.MSBServicesController.get(index))
-                    case false => Redirect(routes.DetailedAnswersController.get(index))
+                  if (activities.contains(MoneyServiceBusiness)) {
+                    Redirect(routes.MSBServicesController.get(index))
+                  } else {
+                    Redirect(routes.CheckYourAnswersController.get(index))
                   }
             }.recover {
                 case _ =>
@@ -90,15 +98,13 @@ class WhatDoesYourBusinessDoController @Inject () (
                 NotFound(notFoundView)
               }
           } else {
-            val ba = BusinessActivities(activities)
-
-              getData[TradingPremises](request.credId, index).map(tp => { tp match {
-                case Some(TradingPremises(_,_, _, _,_,_,Some(wdbd),_,_,_,_,_,_,_,_)) =>
-                  Ok(what_does_your_business_do(Form2[WhatDoesYourBusinessDo](wdbd), ba, edit, index))
-                case Some(TradingPremises(_,_,  _,_,_,_, None, _,_,_,_,_,_,_,_)) =>
-                  Ok(what_does_your_business_do(EmptyForm, ba, edit, index))
-                case _ => NotFound(notFoundView)
-              }})
+            getData[TradingPremises](request.credId, index).map(tp => { tp match {
+              case Some(TradingPremises(_,_, _, _,_,_,Some(wdbd),_,_,_,_,_,_,_,_)) =>
+                Ok(activitiesView(formProvider().fill(wdbd), getFormValues(activities), edit, index))
+              case Some(TradingPremises(_,_,  _,_,_,_, None, _,_,_,_,_,_,_,_)) =>
+                Ok(activitiesView(formProvider(), getFormValues(activities), edit, index))
+              case _ => NotFound(notFoundView)
+            }})
           }
         case Left(result) => Future.successful(result)
       }
@@ -114,22 +120,22 @@ class WhatDoesYourBusinessDoController @Inject () (
       } else {
         data.activities.contains(MoneyServiceBusiness)  match {
           case true => Redirect(routes.MSBServicesController.get(index, edit, modelHasChanged(tradingPremises, data)))
-          case _ => Redirect(routes.DetailedAnswersController.get(index))
+          case _ => Redirect(routes.CheckYourAnswersController.get(index))
         }
       }
   }
 
-  def post(index: Int, edit: Boolean = false) = authAction.async {
+  def post(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       data(request.credId, index, edit) flatMap {
         case Right((_, activities)) =>
-          Form2[WhatDoesYourBusinessDo](request.body) match {
-            case f: InvalidForm =>
-              val ba = BusinessActivities(activities)
+          formProvider().bindFromRequest().fold(
+            formWithErrors => {
               Future.successful {
-                BadRequest(what_does_your_business_do(f, ba, edit, index))
+                BadRequest(activitiesView(formWithErrors, getFormValues(activities), edit, index))
               }
-            case ValidForm(_, data) => {
+            },
+            data => {
               for {
                 tradingPremises <- getData[TradingPremises](request.credId, index)
                 _ <- updateDataStrict[TradingPremises](request.credId, index) {
@@ -156,32 +162,51 @@ class WhatDoesYourBusinessDoController @Inject () (
             }.recoverWith{
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
             }
-          }
+        )
         case Left(result) => Future.successful(result)
       }
   }
 
-  def dateOfChange(index: Int) = authAction.async {
-    implicit request =>
-      Future(Ok(date_of_change(EmptyForm,
-        "summary.tradingpremises", routes.WhatDoesYourBusinessDoController.saveDateOfChange(index))))
+  def dateOfChange(index: Int): Action[AnyContent] = authAction {
+    implicit request => Ok(getDateView(dateChangeFormProvider(), index))
   }
 
-  def saveDateOfChange(index: Int) = authAction.async {
+  def saveDateOfChange(index: Int): Action[AnyContent] = authAction.async {
     implicit request =>
-      getData[TradingPremises](request.credId, index) flatMap { tradingPremises =>
-        Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDateFormFields(tradingPremises.startDate)) match {
-          case form: InvalidForm =>
-            Future.successful(BadRequest(date_of_change(
-              form.withMessageFor(DateOfChange.errorPath, tradingPremises.startDateValidationMessage),
-              "summary.tradingpremises", routes.WhatDoesYourBusinessDoController.saveDateOfChange(index))))
-          case ValidForm(_, dateOfChange) =>
-            for {
-              _ <- updateDataStrict[TradingPremises](request.credId, index) { tradingPremises =>
-                tradingPremises.whatDoesYourBusinessDoAtThisAddress(tradingPremises.whatDoesYourBusinessDoAtThisAddress.get.copy(dateOfChange = Some(dateOfChange)))
-              }
-            } yield Redirect(routes.DetailedAnswersController.get(index))
+      dateChangeFormProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(getDateView(formWithErrors, index))),
+        dateOfChange => {
+          getData[TradingPremises](request.credId, index).flatMap { tradingPremises =>
+            tradingPremises.startDate match {
+              case Some(date) if !dateOfChange.dateOfChange.isBefore(date) =>
+                for {
+                  _ <- updateDataStrict[TradingPremises](request.credId, index) { tradingPremises =>
+                    tradingPremises.whatDoesYourBusinessDoAtThisAddress(tradingPremises.whatDoesYourBusinessDoAtThisAddress.get.copy(dateOfChange = Some(dateOfChange)))
+                  }
+                } yield Redirect(routes.CheckYourAnswersController.get(index))
+              case Some(date) =>
+                Future.successful(BadRequest(getDateView(
+                  dateChangeFormProvider().withError(
+                    "dateOfChange",
+                    messages(
+                      "error.expected.tp.dateofchange.after.startdate",
+                      DateHelper.formatDate(date)
+                    )
+                  ),
+                  index
+                )))
+              case None =>
+                Future.failed(new Exception("Could not retrieve start date"))
+            }
+          }
         }
+      )
+  }
+
+  private def getFormValues(activities: Set[BusinessActivity]): Seq[CheckboxItem] = {
+    BusinessActivities.all.diff(activities).toSeq match {
+      case seq if seq.isEmpty => BusinessActivities.formValues(None, false)
+      case seq => BusinessActivities.formValues(Some(seq), false)
     }
   }
 
@@ -192,4 +217,10 @@ class WhatDoesYourBusinessDoController @Inject () (
     tradingPremises.lineId.isDefined && isEligibleForDateOfChange(status) && modelHasChanged(tradingPremises, model)
 
   // scalastyle:on cyclomatic.complexity
+
+  private def getDateView(form: Form[DateOfChange], index: Int)(implicit request: Request[_]): Html = dateChangeView(
+    form,
+    "summary.tradingpremises",
+    routes.WhatDoesYourBusinessDoController.saveDateOfChange(index)
+  )
 }

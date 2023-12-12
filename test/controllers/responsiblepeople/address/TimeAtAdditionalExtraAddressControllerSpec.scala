@@ -18,6 +18,7 @@ package controllers.responsiblepeople.address
 
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
+import forms.responsiblepeople.address.TimeAtAddressFormProvider
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
@@ -27,13 +28,14 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
-import views.html.responsiblepeople.address.time_at_additional_extra_address
+import views.html.responsiblepeople.address.TimeAtAdditionalExtraAddressView
 
 import scala.concurrent.Future
 
-class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
+class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1
@@ -41,13 +43,14 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
   trait Fixture {
     self =>
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[time_at_additional_extra_address]
+    lazy val view = inject[TimeAtAdditionalExtraAddressView]
     val timeAtAdditionalExtraAddressController = new TimeAtAdditionalExtraAddressController (
       dataCacheConnector = mockDataCacheConnector,
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      time_at_additional_extra_address = view,
+      formProvider = inject[TimeAtAddressFormProvider],
+      view = view,
       error = errorView)
   }
 
@@ -73,10 +76,9 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
 
           val document: Document = Jsoup.parse(contentAsString(result))
 
-          document.select("input[type=radio][name=timeAtAddress][value=01]").hasAttr("checked") must be(false)
-          document.select("input[type=radio][name=timeAtAddress][value=02]").hasAttr("checked") must be(false)
-          document.select("input[type=radio][name=timeAtAddress][value=03]").hasAttr("checked") must be(false)
-          document.select("input[type=radio][name=timeAtAddress][value=04]").hasAttr("checked") must be(false)
+          TimeAtAddress.all.foreach { item =>
+            document.getElementById(item.toString).hasAttr("checked") must be(false)
+          }
         }
 
         "with existing data" in new Fixture {
@@ -96,10 +98,12 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
 
           val document: Document = Jsoup.parse(contentAsString(result))
 
-          document.select("input[type=radio][name=timeAtAddress][value=01]").hasAttr("checked") must be(true)
-          document.select("input[type=radio][name=timeAtAddress][value=02]").hasAttr("checked") must be(false)
-          document.select("input[type=radio][name=timeAtAddress][value=03]").hasAttr("checked") must be(false)
-          document.select("input[type=radio][name=timeAtAddress][value=04]").hasAttr("checked") must be(false)
+          TimeAtAddress.all.foreach { item =>
+
+            val checkboxIsChecked = document.getElementById(item.toString).hasAttr("checked")
+
+            if (item == ZeroToFiveMonths) checkboxIsChecked must be(true) else checkboxIsChecked must be(false)
+          }
         }
       }
 
@@ -122,8 +126,9 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
       "go to DetailedAnswersController" when {
         "edit is true" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
-            "timeAtAddress" -> "02"
+          val requestWithParams = FakeRequest(POST, routes.TimeAtAdditionalExtraAddressController.post(1).url)
+          .withFormUrlEncodedBody(
+            "timeAtAddress" -> ZeroToFiveMonths.toString
           )
 
           val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
@@ -145,8 +150,9 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
       "go to PositionWithinBusinessController" when {
         "edit is false" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
-            "timeAtAddress" -> "02"
+          val requestWithParams = FakeRequest(POST, routes.TimeAtAdditionalExtraAddressController.post(1).url)
+          .withFormUrlEncodedBody(
+            "timeAtAddress" -> ZeroToFiveMonths.toString
           )
 
           val UKAddress = PersonAddressUK("Line 1", Some("Line 2"), Some("Line 3"), None, "AA1 1AA")
@@ -169,7 +175,8 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
 
         "given an invalid form" in new Fixture {
 
-          val requestWithParams = requestWithUrlEncodedBody(
+          val requestWithParams = FakeRequest(POST, routes.TimeAtAdditionalExtraAddressController.post(1).url)
+          .withFormUrlEncodedBody(
             "timeAtAddress" -> ""
           )
 
@@ -190,8 +197,9 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
 
       "respond with NOT_FOUND" when {
         "an addressExtraAddress is not stored for that index" in new Fixture {
-          val requestWithParams = requestWithUrlEncodedBody(
-            "timeAtAddress" -> "03"
+          val requestWithParams = FakeRequest(POST, routes.TimeAtAdditionalExtraAddressController.post(1).url)
+          .withFormUrlEncodedBody(
+            "timeAtAddress" -> ZeroToFiveMonths.toString
           )
 
           when(timeAtAdditionalExtraAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))

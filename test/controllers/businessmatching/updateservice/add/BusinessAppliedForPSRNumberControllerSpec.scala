@@ -18,25 +18,29 @@ package controllers.businessmatching.updateservice.add
 
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
+import forms.businessmatching.PSRNumberFormProvider
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.businessmatching.BusinessActivity.{HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
 import models.status.SubmissionDecisionApproved
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
+import play.api.test.{FakeRequest, Injecting}
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
-import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
+import views.html.businessmatching.updateservice.add.BusinessAppliedForPSRNumberView
 
 class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
   with MockitoSugar
   with ScalaFutures
-  with BusinessMatchingGenerator {
+  with BusinessMatchingGenerator
+  with Injecting {
 
   val emptyCache = CacheMap("", Map.empty)
 
@@ -48,13 +52,14 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
-    lazy val view = app.injector.instanceOf[business_applied_for_psr_number]
+    lazy val view = inject[BusinessAppliedForPSRNumberView]
     val controller = new BusinessAppliedForPSRNumberController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel],
       cc = mockMcc,
-      business_applied_for_psr_number = view
+      formProvider = inject[PSRNumberFormProvider],
+      view = view
     )
 
     mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
@@ -74,7 +79,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
         val result = controller.get()(request)
 
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.psr.number.title"))
+        Jsoup.parse(contentAsString(result)).title() must include(messages("businessmatching.updateservice.psr.number.title"))
       }
 
       "return OK and display psr_number view with pre populated data if there is MSB and TM defined" in new Fixture {
@@ -123,9 +128,10 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
 
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), flowModel)
 
-            val newRequest = requestWithUrlEncodedBody(
-              "appliedFor" -> "false"
-            )
+            val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post().url)
+              .withFormUrlEncodedBody(
+                "appliedFor" -> "false"
+              )
 
             val result = controller.post(false)(newRequest)
 
@@ -140,10 +146,11 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key),
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
 
-            val newRequest = requestWithUrlEncodedBody(
-              "appliedFor" -> "true",
-              "regNumber" -> "123789"
-            )
+            val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post().url)
+              .withFormUrlEncodedBody(
+                "appliedFor" -> "true",
+                "regNumber" -> "123789"
+              )
 
             val result = controller.post(false)(newRequest)
 
@@ -161,9 +168,10 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key),
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)))
 
-            val newRequest = requestWithUrlEncodedBody(
-              "appliedFor" -> "false"
-            )
+            val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post(true).url)
+              .withFormUrlEncodedBody(
+                "appliedFor" -> "false"
+              )
 
             val result = controller.post(true)(newRequest)
 
@@ -179,10 +187,11 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key),
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
 
-            val newRequest = requestWithUrlEncodedBody(
-              "appliedFor" -> "true",
-              "regNumber" -> "123789"
-            )
+            val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post(true).url)
+              .withFormUrlEncodedBody(
+                "appliedFor" -> "true",
+                "regNumber" -> "123789"
+              )
 
             val result = controller.post(true)(newRequest)
 
@@ -198,25 +207,20 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
         "return an error" in new Fixture {
           mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key),
             AddBusinessTypeFlowModel())
-          val newRequest = requestWithUrlEncodedBody(
-            "appliedFor" -> "true",
-            "regNumber" -> ""
-          )
+          val newRequest = FakeRequest(POST, routes.BusinessAppliedForPSRNumberController.post().url)
+            .withFormUrlEncodedBody(
+              "appliedFor" -> "true",
+              "regNumber" -> ""
+            )
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
 
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("span").html() must include(Messages("error.invalid.msb.psr.number"))
+          document.text() must include(messages("error.invalid.msb.psr.number"))
         }
       }
     }
   }
 }
-
-
-
-
-
-
 

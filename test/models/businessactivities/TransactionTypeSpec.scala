@@ -16,98 +16,21 @@
 
 package models.businessactivities
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
+import models.businessactivities.TransactionTypes.{DigitalSoftware, DigitalSpreadsheet, Paper}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
+import play.api.i18n.Messages
 import play.api.libs.json.{JsError, JsPath, Json}
+import play.api.test.FakeRequest
+import play.api.test.Helpers.stubMessagesApi
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 
 class TransactionTypeSpec extends PlaySpec with MustMatchers {
 
+  implicit val messages: Messages = stubMessagesApi().preferred(FakeRequest())
+
   "TransactionType" must {
-    "pass validation" when {
-      "yes is selected and a few check boxes are selected" in {
-        val model = Map(
-          "types[]" -> Seq("01", "02", "03"),
-          "name" -> Seq("test")
-        )
-
-        TransactionTypes.formRule.validate(model) must
-          be(Valid(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test")))))
-      }
-    }
-
-    "fail validation" when {
-      "software is selected but software name is empty, represented by an empty string" in {
-        val model = Map(
-          "types[]" -> Seq("01", "02", "03"),
-          "name" -> Seq("")
-        )
-
-        TransactionTypes.formRule.validate(model) must
-          be(Invalid(List((Path \ "name", Seq(ValidationError("error.required.ba.software.package.name"))))))
-      }
-
-      "software name exceeds max length" in {
-        val model = Map(
-          "types[]" -> Seq("01", "02", "03"),
-          "name" -> Seq("a" * 41)
-        )
-
-        TransactionTypes.formRule.validate(model) must
-          be(Invalid(List((Path \ "name", Seq(ValidationError("error.max.length.ba.software.package.name"))))))
-      }
-
-      "software name contains invalid characters" in {
-        val model = Map(
-          "types[]" -> Seq("01", "02", "03"),
-          "name" -> Seq("abc{}abc")
-        )
-
-        TransactionTypes.formRule.validate(model) must
-          be(Invalid(List((Path \ "name", Seq(ValidationError("error.invalid.characters.ba.software.package.name"))))))
-      }
-
-      "no check boxes are selected in transactions" in {
-        val model = Map(
-          "types[]" -> Seq()
-        )
-
-        TransactionTypes.formRule.validate(model) must
-          be(Invalid(List((Path \ "types", Seq(ValidationError("error.required.ba.atleast.one.transaction.record"))))))
-      }
-
-      "given an empty Map" in {
-        TransactionTypes.formRule.validate(Map.empty) must
-          be(Invalid(Seq((Path \ "types") -> Seq(ValidationError("error.required.ba.atleast.one.transaction.record")))))
-      }
-
-      "given invalid enum value in transactions" in {
-        val model = Map(
-          "types[]" -> Seq("01, 10")
-        )
-
-        TransactionTypes.formRule.validate(model) must
-          be(Invalid(Seq((Path \ "types") -> Seq(ValidationError("error.invalid")))))
-      }
-    }
-
-    "write values to the form " in {
-      val model = TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test")))
-      val output = TransactionTypes.formWriter.writes(model)
-
-      output mustBe Map(
-        "types[]" -> Seq("01", "02", "03"),
-        "name" -> Seq("test")
-      )
-    }
-
-    "write values to the form without the name" in {
-      val model = TransactionTypes(Set(Paper))
-
-      TransactionTypes.formWriter.writes(model) mustBe Map(
-        "types[]" -> Seq("01")
-      )
-    }
 
     "write values to JSON" in {
       val model = TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test")))
@@ -155,6 +78,34 @@ class TransactionTypeSpec extends PlaySpec with MustMatchers {
       val json = Json.obj()
 
       Json.fromJson[TransactionTypes](json) mustBe JsError(JsPath \ "types" -> play.api.libs.json.JsonValidationError("error.missing"))
+    }
+  }
+
+  "formValues" must {
+
+    "provider the correct checkboxes" when {
+
+      "given conditionalHtml" in {
+
+        val html = Html("foo")
+
+        val result = TransactionTypes.formValues(html)
+
+        TransactionTypes.all.foreach { x =>
+          val index = TransactionTypes.all.indexOf(x)
+          val checkbox = result(index)
+
+          checkbox.content mustBe Text(messages(s"businessactivities.transactiontype.lbl.${x.value}"))
+          checkbox.value mustBe x.toString
+          checkbox.id mustBe Some(s"types_${index + 1}")
+          checkbox.name mustBe Some(s"types[${index + 1}]")
+          if(checkbox == result.last){
+            checkbox.conditionalHtml mustBe Some(html)
+          } else {
+            checkbox.conditionalHtml mustBe None
+          }
+        }
+      }
     }
   }
 }

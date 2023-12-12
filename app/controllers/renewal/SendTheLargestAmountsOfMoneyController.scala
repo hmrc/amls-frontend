@@ -18,14 +18,14 @@ package controllers.renewal
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
-import models.renewal.{Renewal, SendTheLargestAmountsOfMoney}
-import play.api.mvc.MessagesControllerComponents
+import forms.renewal.SendLargestAmountsOfMoneyFormProvider
+import models.renewal.Renewal
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{AutoCompleteService, RenewalService}
-import utils.{AuthAction, ControllerHelper}
-import views.html.renewal.send_largest_amounts_of_money
+import utils.AuthAction
+import views.html.renewal.SendLargestAmountsOfMoneyView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 
@@ -36,36 +36,33 @@ class SendTheLargestAmountsOfMoneyController @Inject()(val dataCacheConnector: D
                                                        val renewalService: RenewalService,
                                                        val autoCompleteService: AutoCompleteService,
                                                        val cc: MessagesControllerComponents,
-                                                       send_largest_amounts_of_money: send_largest_amounts_of_money) extends AmlsBaseController(ds, cc) {
+                                                       formProvider: SendLargestAmountsOfMoneyFormProvider,
+                                                       view: SendLargestAmountsOfMoneyView) extends AmlsBaseController(ds, cc) {
 
-  def get(edit: Boolean = false) = authAction.async {
+  def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       dataCacheConnector.fetch[Renewal](request.credId, Renewal.key) map {
         response =>
-          val form: Form2[SendTheLargestAmountsOfMoney] = (for {
+          val form = (for {
             renewal <- response
             amount <- renewal.sendTheLargestAmountsOfMoney
-          } yield Form2[SendTheLargestAmountsOfMoney](amount)).getOrElse(EmptyForm)
-          Ok(send_largest_amounts_of_money(form, edit, autoCompleteService.getCountries))
+          } yield formProvider().fill(amount)).getOrElse(formProvider())
+          Ok(view(form, edit, autoCompleteService.formOptions))
       }
   }
 
-  def post(edit: Boolean = false) = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      Form2[SendTheLargestAmountsOfMoney](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(send_largest_amounts_of_money(alignFormDataWithValidationErrors(f), edit, autoCompleteService.getCountries)))
-        case ValidForm(_, data) =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, edit, autoCompleteService.formOptions))),
+        data =>
           for {
             renewal <- renewalService.getRenewal(request.credId)
             _ <- renewalService.updateRenewal(request.credId, renewal.sendTheLargestAmountsOfMoney(data))
           } yield redirectTo(edit, renewal)
-      }
+      )
   }
-
-  def alignFormDataWithValidationErrors(form: InvalidForm): InvalidForm =
-    ControllerHelper.stripEmptyValuesFromFormWithArray(form, "largestAmountsOfMoney", index => index / 2)
-
 
   def redirectTo(edit:Boolean, renewal: Renewal) = edit match {
     case true if !mostTransactionsDataRequired(renewal)  => Redirect(routes.SummaryController.get)

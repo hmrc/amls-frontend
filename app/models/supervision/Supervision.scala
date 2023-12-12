@@ -16,7 +16,8 @@
 
 package models.supervision
 
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress._
+import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -66,14 +67,38 @@ case class Supervision(
 
 object Supervision {
 
-  def section(implicit cache: CacheMap): Section = {
-    val messageKey = "supervision"
-    val notStarted = Section(messageKey, NotStarted, false, controllers.supervision.routes.WhatYouNeedController.get)
+  def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
+    val notStarted = TaskRow(
+      key,
+      controllers.supervision.routes.WhatYouNeedController.get.url,
+      hasChanged = false,
+      NotStarted,
+      TaskRow.notStartedTag
+    )
 
     cache.getEntry[Supervision](key).fold(notStarted) {
-      case model@m if m.isComplete => Section(messageKey, Completed, model.hasChanged, controllers.supervision.routes.SummaryController.get)
+      case m if m.isComplete && m.hasChanged => TaskRow(
+        key,
+        controllers.supervision.routes.SummaryController.get.url,
+        hasChanged = true,
+        status = Updated,
+        tag = TaskRow.updatedTag
+      )
+      case model @ m if m.isComplete => TaskRow(
+        key,
+        controllers.supervision.routes.SummaryController.get.url,
+        model.hasChanged,
+        Completed,
+        TaskRow.completedTag
+      )
       case m if m.isEmpty => notStarted
-      case model => Section(messageKey, Started, model.hasChanged, controllers.supervision.routes.WhatYouNeedController.get)
+      case model => TaskRow(
+        key,
+        controllers.supervision.routes.WhatYouNeedController.get.url,
+        model.hasChanged,
+        Started,
+        TaskRow.incompleteTag
+      )
     }
   }
 

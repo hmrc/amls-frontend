@@ -17,8 +17,10 @@
 package services.flowmanagement.pagerouters.addflow
 
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
+import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
+
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BusinessMatchingMsbServices, TransmittingMoney}
+import models.businessmatching.BusinessMatchingMsbServices
 import models.flowmanagement.AddBusinessTypeFlowModel
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect

@@ -17,12 +17,12 @@
 package controllers.businessmatching.updateservice.remove
 
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness}
-import play.api.i18n.Messages
+import models.businessmatching.{BusinessActivities, BusinessMatching}
+import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 import play.api.test.Helpers.{contentAsString, status}
 import utils.{AmlsSpec, DependencyMocks}
 import play.api.test.Helpers._
-import views.html.businessmatching.updateservice.remove.unable_to_remove_activity
+import views.html.businessmatching.updateservice.remove.UnableToRemoveActivityView
 
 class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
 
@@ -30,12 +30,12 @@ class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
     self =>
 
     val request = addToken(authRequest)
-    lazy val view = app.injector.instanceOf[unable_to_remove_activity]
+    lazy val view = app.injector.instanceOf[UnableToRemoveActivityView]
     val controller = new UnableToRemoveBusinessTypesController(
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       dataCacheConnector = mockCacheConnector,
       cc = mockMcc,
-      unable_to_remove_activity = view
+      view = view
     )
   }
 
@@ -53,7 +53,11 @@ class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
           val result = controller.get()(request)
 
           status(result) mustBe OK
-          contentAsString(result) must include(Messages("businessmatching.updateservice.removeactivitiesinformation.heading", Messages("businessmatching.registerservices.servicename.lbl.06.phrased")))
+          contentAsString(result) must include(
+            messages("businessmatching.updateservice.removeactivitiesinformation.heading",
+              messages("businessmatching.registerservices.servicename.lbl.06.phrased")
+            )
+          )
         }
       }
     }
@@ -72,8 +76,6 @@ class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
         status(result) mustBe INTERNAL_SERVER_ERROR
 
       }
-
     }
   }
-
 }
