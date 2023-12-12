@@ -239,9 +239,6 @@ object ResponsiblePerson {
   def filter(rp: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
     rp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == ResponsiblePerson())
 
-  def filterWithIndex(rp: Seq[ResponsiblePerson]): Seq[(ResponsiblePerson, Int)] =
-    rp.zipWithIndex.reverse.filterNot(_._1.status.contains(StatusConstants.Deleted)).filterNot(_._1 == ResponsiblePerson())
-
   def taskRow(implicit cache: CacheMap, messages: Messages): TaskRow = {
 
     val messageKey = "responsiblepeople"
@@ -264,7 +261,7 @@ object ResponsiblePerson {
           TaskRow.notStartedTag
         )
       } else {
-        filter(rp) match {
+        rp match {
           case responsiblePeople if responsiblePeople.nonEmpty && anyChanged(responsiblePeople) && responsiblePeople.forall {
             _.isComplete
           } => TaskRow(

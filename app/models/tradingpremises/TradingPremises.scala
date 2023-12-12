@@ -163,7 +163,7 @@ object TradingPremises {
           TaskRow.notStartedTag
         )
       } else {
-        filter(tp) match {
+        tp match {
           case premises if premises.nonEmpty && anyChanged(premises) && premises.forall {
             _.isComplete
           } => TaskRow(

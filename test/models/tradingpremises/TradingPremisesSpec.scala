@@ -251,9 +251,9 @@ class TradingPremisesSpec extends AmlsSpec {
         val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
         taskRow.hasChanged must be(true)
-        taskRow.status must be(Completed)
+        taskRow.status must be(Updated)
         taskRow.href must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
-        taskRow.tag must be(TaskRow.completedTag)
+        taskRow.tag must be(TaskRow.updatedTag)
       }
     }
 
