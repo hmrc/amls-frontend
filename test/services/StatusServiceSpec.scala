@@ -16,8 +16,9 @@
 
 package services
 
-import connectors.AmlsConnector
+import connectors.{AmlsConnector, DataCacheConnector}
 import models.ReadStatusResponse
+import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, NotStarted, TaskRow, Updated}
 import models.status._
 import org.joda.time.{DateTimeUtils, LocalDate, LocalDateTime}
@@ -37,6 +38,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
    val service = new StatusService(
     amlsConnector = mock[AmlsConnector],
+    dataCacheConnector = mock[DataCacheConnector],
     enrolmentsService = mock[AuthEnrolmentsService],
     sectionsProvider = mock[SectionsProvider],
     environment = mock[Environment]
@@ -331,7 +333,10 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(readStatusResponse.copy(safeId = Some(safeId))))
 
-      whenReady(service.getSafeIdFromReadStatus("amlsref", accountTypeId)) {
+      when(service.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+        .thenReturn(Future.successful(Option.empty[BusinessMatching]))
+
+      whenReady(service.getSafeIdFromReadStatus("amlsref", accountTypeId, credId)) {
         _ mustEqual Some(safeId)
       }
     }

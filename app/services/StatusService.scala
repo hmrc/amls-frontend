@@ -19,9 +19,8 @@ package services
 import com.google.inject.Inject
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.ReadStatusResponse
-import models.registrationprogress.{Completed, TaskRow, Updated}
 import models.businessmatching.BusinessMatching
-import models.registrationprogress.{Completed, Section}
+import models.registrationprogress.{Completed, TaskRow, Updated}
 import models.status._
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
