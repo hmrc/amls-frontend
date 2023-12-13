@@ -17,8 +17,9 @@
 package services
 
 import com.google.inject.Inject
-import connectors.AmlsConnector
+import connectors.{AmlsConnector, DataCacheConnector}
 import models.ReadStatusResponse
+import models.businessmatching.BusinessMatching
 import models.registrationprogress.{Completed, TaskRow, Updated}
 import models.status._
 import org.joda.time.LocalDate
@@ -29,6 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 class StatusService @Inject() (val amlsConnector: AmlsConnector,
+                               val dataCacheConnector: DataCacheConnector,
                                val enrolmentsService: AuthEnrolmentsService,
                                val sectionsProvider: SectionsProvider,
                                val environment: Environment) extends Logging {
@@ -69,14 +71,21 @@ class StatusService @Inject() (val amlsConnector: AmlsConnector,
     }
   }
 
-  def getSafeIdFromReadStatus(mlrRegNumber: String, accountTypeId: (String, String))(implicit hc: HeaderCarrier,  ec: ExecutionContext) = {
-    amlsConnector.status(mlrRegNumber, accountTypeId) map {
-      response =>
-        // $COVERAGE-OFF$
-        logger.debug("StatusService:etmpStatusInformation:response:" + response)
-        // $COVERAGE-ON$
-        Option(response.safeId.getOrElse(""))
+  def getSafeIdFromReadStatus(mlrRegNumber: String, accountTypeId: (String, String), credId: String)
+                             (implicit hc: HeaderCarrier,  ec: ExecutionContext): Future[Option[String]] = {
+    dataCacheConnector.fetch[BusinessMatching](credId, BusinessMatching.key).map { optBusinessMatching =>
+      optBusinessMatching.flatMap(businessMatching => businessMatching.reviewDetails.map(reviewDetails => reviewDetails.safeId))
     }
+      .flatMap {
+        case Some(safeId) => Future.successful(Option(safeId))
+        case None =>
+          amlsConnector.status(mlrRegNumber, accountTypeId) map { response =>
+              // $COVERAGE-OFF$
+              logger.debug("StatusService:etmpStatusInformation:response:" + response)
+              // $COVERAGE-ON$
+              Option(response.safeId.getOrElse(""))
+          }
+      }
   }
 
   private def etmpStatusInformation(mlrRegNumber: String, accountTypeId: (String, String))

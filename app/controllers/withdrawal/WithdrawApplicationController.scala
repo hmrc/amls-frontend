@@ -47,7 +47,7 @@ class WithdrawApplicationController @Inject()(authAction: AuthAction,
         (for {
           processingDate <- maybeProcessingDate
           amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-          id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId))
+          id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId, request.credId))
           name <- BusinessName.getName(request.credId, Some(id), request.accountTypeId)
         } yield Ok(view(name, processingDate))) getOrElse InternalServerError("Unable to show the withdrawal page")
   }

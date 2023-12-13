@@ -154,7 +154,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
           } thenReturn Future.successful(RegistrationDetails("Business Name from registration", isIndividual = false))
 
           when {
-            controller.statusService.getSafeIdFromReadStatus(any(), any())(any(), any())
+            controller.statusService.getSafeIdFromReadStatus(any(), any(), any())(any(), any())
           } thenReturn Future.successful(Some(safeId))
 
           val newRequest = FakeRequest(POST, routes.ConfirmAddressController.post(1).url)

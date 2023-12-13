@@ -42,7 +42,7 @@ class DeRegisterApplicationController @Inject()(authAction: AuthAction,
     implicit request =>
       (for {
         amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber(request.amlsRefNumber, request.groupIdentifier))
-        id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId))
+        id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber, request.accountTypeId, request.credId))
         name <- BusinessName.getName(request.credId, Some(id), request.accountTypeId)(
           implicitly[HeaderCarrier], implicitly[ExecutionContext], cache, amls
         )
