@@ -23,6 +23,7 @@ import models.supervision._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthAction
+import utils.CharacterCountParser.cleanData
 import views.html.supervision.SupervisionEndReasonsView
 
 import javax.inject.Inject
@@ -58,7 +59,7 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
+      formProvider().bindFromRequest(cleanData(request.body, "endingReason")).fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>

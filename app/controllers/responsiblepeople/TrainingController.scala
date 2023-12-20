@@ -25,6 +25,7 @@ import javax.inject.Inject
 import models.responsiblepeople.{ResponsiblePerson, Training}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import utils.CharacterCountParser.cleanData
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.TrainingView
 
@@ -57,7 +58,7 @@ class TrainingController @Inject()(
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] =
     authAction.async {
       implicit request => {
-        formProvider().bindFromRequest().fold(
+        formProvider().bindFromRequest(cleanData(request.body, "information")).fold(
           formWithErrors =>
             getData[ResponsiblePerson](request.credId, index) map { rp =>
               BadRequest(view(formWithErrors, edit, index, flow, ControllerHelper.rpTitleName(rp)))

@@ -19,12 +19,14 @@ package controllers.renewal
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.renewal.InvolvedInOtherFormProvider
+
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.renewal.{InvolvedInOther, InvolvedInOtherNo, InvolvedInOtherYes, Renewal}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RenewalService
 import utils.AuthAction
+import utils.CharacterCountParser.cleanData
 import views.html.renewal.InvolvedInOtherView
 
 @Singleton
@@ -56,7 +58,7 @@ class InvolvedInOtherController @Inject()(val dataCacheConnector: DataCacheConne
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
+      formProvider().bindFromRequest(cleanData(request.body, "details")).fold(
         formWithErrors =>
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)

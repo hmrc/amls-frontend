@@ -24,7 +24,9 @@ import models.businessmatching.BusinessMatching
 import models.responsiblepeople.ResponsiblePerson
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.twirl.api.utils.StringEscapeUtils
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.CharacterCountParser.cleanData
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.ExperienceTrainingView
 
@@ -59,7 +61,7 @@ class ExperienceTrainingController @Inject()(val dataCacheConnector: DataCacheCo
       implicit request => {
         businessMatchingData(request.credId) flatMap {
           bm =>
-            formProvider().bindFromRequest().fold(
+            formProvider().bindFromRequest(cleanData(request.body, "experienceInformation")).fold(
               formWithErrors =>
                 getData[ResponsiblePerson](request.credId, index) map { rp =>
                   BadRequest(view(formWithErrors, bm, edit, index, flow, ControllerHelper.rpTitleName(rp)))
