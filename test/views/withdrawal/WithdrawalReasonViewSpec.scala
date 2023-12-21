@@ -60,6 +60,12 @@ class WithdrawalReasonViewSpec extends AmlsViewSpec with MustMatchers {
       doc.getElementsByAttributeValue("name", "specifyOtherReason") must not be empty
     }
 
+    "have a button with the disable-on-submit attribute" in new TestFixture {
+      def view = withdrawal_reason(fp())
+
+      doc.select("button").attr("disable-on-submit") mustBe "true"
+    }
+
     behave like pageWithErrors(
       withdrawal_reason(fp().withError("withdrawalReason", "error.required.withdrawal.reason")),
       "withdrawalReason", "error.required.withdrawal.reason"

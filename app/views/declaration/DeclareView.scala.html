@@ -54,7 +54,7 @@
     </ul>
 
     @formHelper(action = controllers.routes.SubmissionController.post()) {
-        @button(messages("button.acceptandsubmit"), "confirm-continue")
+        @button(messages("button.acceptandsubmit"), "confirm-continue", attributes = Map("disable-on-submit" -> "true"))
     }
 
 }
