@@ -18,10 +18,12 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.tradingpremises.TradingPremises
 import play.api.mvc.{AnyContent, MessagesControllerComponents, Request}
+import services.TradingPremisesService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 
@@ -32,6 +34,7 @@ class TradingPremisesAddController @Inject()(val dataCacheConnector: DataCacheCo
                                              val authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val cc: MessagesControllerComponents,
+                                             val tradingPremisesService: TradingPremisesService,
                                              implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
   private def isMSBSelected(cacheMap: Option[CacheMap]): Boolean = {
@@ -53,7 +56,7 @@ class TradingPremisesAddController @Inject()(val dataCacheConnector: DataCacheCo
 
   def get(displayGuidance: Boolean = true) = authAction.async {
     implicit request =>
-          addData[TradingPremises](request.credId, TradingPremises.default(None)) flatMap { idx =>
+          tradingPremisesService.addTradingPremises(request.credId, TradingPremises.default(None)) flatMap { idx =>
             displayGuidance match {
               case true => Future.successful(Redirect(controllers.tradingpremises.routes.WhatYouNeedController.get(idx)))
               case false => redirectToNextPage(request.credId, idx)

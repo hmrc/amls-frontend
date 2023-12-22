@@ -97,4 +97,5 @@ trait TradingPremisesGenerator extends BaseGenerator with BusinessActivitiesGene
     tp <- tradingPremisesGen
   } yield tp.copy(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(activities.toSet)))
 
+  val emptyTradingPremises = TradingPremises(None, None, None, None, None, None, None, None, false, None, None, None, None, None, false)
 }
