@@ -112,6 +112,13 @@ case class TradingPremises(
     }
   }
 
+  def notEmpty: Boolean = {
+    this match {
+      case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, None, _, None, _) => false
+      case _ => true
+    }
+  }
+
   def label: Option[String] = {
     this.yourTradingPremises.map { tradingpremises =>
       (Seq(tradingpremises.tradingName) ++ tradingpremises.tradingPremisesAddress.toLines).mkString(", ")
