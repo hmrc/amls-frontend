@@ -22,18 +22,13 @@ import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal}
 import models.tradingpremises.TradingPremisesMsbServices._
 import models.businessmatching.{BusinessMatchingMsbServices => BMMsbServices}
-import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo, TradingPremisesMsbServices => TPMsbServices}
+import models.tradingpremises.{WhatDoesYourBusinessDo, TradingPremisesMsbServices => TPMsbServices}
 import org.joda.time.LocalDate
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import services.TradingPremisesService
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks, FutureAssertions, StatusConstants}
-
-import scala.concurrent.Future
 
 class TradingPremisesServiceSpec extends PlaySpec
   with AmlsSpec
@@ -43,7 +38,9 @@ class TradingPremisesServiceSpec extends PlaySpec
   with TradingPremisesGenerator {
 
   trait Fixture extends DependencyMocks {
-    val service = new TradingPremisesService(mockCacheConnector)
+
+    val service = new TradingPremisesService()
+
   }
 
   "addBusinessActivitiesToTradingPremises" must {
@@ -192,25 +189,4 @@ class TradingPremisesServiceSpec extends PlaySpec
     }
   }
 
-  "Add Trading Premises" must {
-    "Add a non-empty trading premises" in new Fixture {
-      val tradingPremises = fullTradingPremisesGen.sample.get
-      when(mockCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any())).thenReturn(Future.successful(Some(Seq.empty[TradingPremises])))
-      when(mockCacheConnector.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-      val index = service.addTradingPremises("123546", tradingPremises)
-
-      index.futureValue mustBe 1
-    }
-
-    "Not add a newly started empty trading premises" in new Fixture {
-      val tradingPremises = fullTradingPremisesGen.sample.get
-      when(mockCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any())).thenReturn(Future.successful(Some(Seq(tradingPremises))))
-      when(mockCacheConnector.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-      val index = service.addTradingPremises("123456", emptyTradingPremises)
-
-      index.futureValue mustBe 1
-    }
-  }
 }

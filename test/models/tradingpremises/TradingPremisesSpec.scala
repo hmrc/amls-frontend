@@ -16,7 +16,6 @@
 
 package models.tradingpremises
 
-import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching.BusinessActivity._
 import models.registrationprogress._
 import models.tradingpremises.BusinessStructure._
@@ -24,12 +23,11 @@ import models.tradingpremises.TradingPremisesMsbService._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalacheck.Gen
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, StatusConstants}
 
-class TradingPremisesSpec extends AmlsSpec with TradingPremisesGenerator {
+class TradingPremisesSpec extends AmlsSpec {
 
   val ytp = YourTradingPremises(
     "foo",
@@ -231,7 +229,7 @@ class TradingPremisesSpec extends AmlsSpec with TradingPremisesGenerator {
             completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
             TradingPremises(Some(RegisteringAgentPremises(true)), None, hasAccepted = true)
           )))
-
+        
         val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
         taskRow.hasChanged must be(true)
@@ -359,23 +357,6 @@ class TradingPremisesSpec extends AmlsSpec with TradingPremisesGenerator {
       "at least one BankDetails within the sequence has changed" in {
         val res = TradingPremises.anyChanged(originalBankDetailsChanged)
         res must be(true)
-      }
-    }
-  }
-
-  "notEmpty" must {
-    "return false" when {
-      "Trading premises only contains a Line ID, Removal Reason & Status" in {
-        val tradingPremises = TradingPremises(None, None, None, None, None, None, None, None, false, Some(1),
-          Some("status"), None, Some("removal reason"), None, false)
-
-        tradingPremises.notEmpty mustBe false
-      }
-    }
-
-    "return true" when {
-      "Trading premises contains data" in {
-        Gen.listOfN(1000, fullTradingPremisesGen).sample.filter(_.nonEmpty)
       }
     }
   }

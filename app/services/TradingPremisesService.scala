@@ -16,21 +16,14 @@
 
 package services
 
-import connectors.DataCacheConnector
-
-import javax.inject.{Inject, Singleton}
+import javax.inject.Singleton
 import models.businessmatching.{BusinessActivity, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessActivity.MoneyServiceBusiness
 import models.tradingpremises
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
-import play.api.libs.json.Format
-import typeclasses.MongoKey
-import uk.gov.hmrc.http.HeaderCarrier
-
-import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TradingPremisesService @Inject()(val cacheConnector: DataCacheConnector) {
+class TradingPremisesService {
 
   def updateTradingPremises(
                              indices: Seq[Int],
@@ -71,7 +64,7 @@ class TradingPremisesService @Inject()(val cacheConnector: DataCacheConnector) {
   def removeBusinessActivitiesFromTradingPremises(
                                                    tradingPremises: Seq[TradingPremises],
                                                    existingActivities: Set[BusinessActivity],
-                                                   removeActivities: Set[BusinessActivity]): Seq[TradingPremises] = {
+                                                   removeActivities: Set[BusinessActivity]): Seq[TradingPremises] =
     patchTradingPremisesBusinessActivities(tradingPremises) { (wdybd, index) =>
       wdybd.copy({
         wdybd.activities diff removeActivities match {
@@ -86,26 +79,6 @@ class TradingPremisesService @Inject()(val cacheConnector: DataCacheConnector) {
         tp
       }
     }
-  }
-
-  def addTradingPremises(credId: String, newTradingPremises: TradingPremises)(implicit hc: HeaderCarrier, formats: Format[TradingPremises],
-                                                                              key: MongoKey[TradingPremises], ec: ExecutionContext): Future[Int] = {
-
-    val futureFetchedTradingPremises =
-      cacheConnector
-        .fetch[Seq[TradingPremises]](credId, key())
-        .map(_.fold(Seq.empty[TradingPremises])(identity))
-
-    futureFetchedTradingPremises.flatMap { fetchedTradingPremises =>
-      if (!fetchedTradingPremises.lastOption.contains(newTradingPremises) && !fetchedTradingPremises.lastOption.exists(_.notEmpty)) {
-        cacheConnector
-          .save[Seq[TradingPremises]](credId, key(), fetchedTradingPremises :+ newTradingPremises)
-          .map(_ => fetchedTradingPremises.size + 1)
-      } else {
-        Future.successful(fetchedTradingPremises.size)
-      }
-    }
-  }
 
   private def patchTradingPremisesBusinessActivities(tradingPremises: Seq[TradingPremises])
                                                     (fn: (WhatDoesYourBusinessDo, Int) => WhatDoesYourBusinessDo): Seq[TradingPremises] = {
