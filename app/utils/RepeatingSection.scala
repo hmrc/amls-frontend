@@ -17,12 +17,10 @@
 package utils
 
 import connectors.DataCacheConnector
-import models.tradingpremises.TradingPremises
 import play.api.libs.json.Format
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-
 import scala.concurrent.{ExecutionContext, Future}
 
 // $COVERAGE-OFF$

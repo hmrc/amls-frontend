@@ -26,7 +26,6 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.Helpers._
-import services.TradingPremisesService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 
@@ -42,7 +41,6 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
       SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
-      tradingPremisesService = mock[TradingPremisesService],
       error = errorView)
   }
 
@@ -50,11 +48,23 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
     val emptyCache = CacheMap("", Map.empty)
 
     "load What You Need successfully when displayGuidance is true" in new Fixture {
-      when(controller.tradingPremisesService.addTradingPremises(any(), any())(any(), any(), any(), any()))
-        .thenReturn(Future.successful(1))
+
+      val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+      val mockCacheMap = mock[CacheMap]
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))
+
+      when(controller.dataCacheConnector.fetchAll(any())(any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        .thenReturn(Future.successful(None))
+
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(),any(), any())( any(), any()))
+        .thenReturn(Future.successful(emptyCache))
 
       val result = controller.get(true)(request)
-
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.WhatYouNeedController.get(1).url))
     }
@@ -63,6 +73,7 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
 
       val BusinessActivitiesModel = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
       val mockCacheMap = mock[CacheMap]
+
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(TradingPremises(), TradingPremises())))
@@ -78,9 +89,6 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
 
       when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
-
-      when(controller.tradingPremisesService.addTradingPremises(any(), any())(any(), any(), any(), any()))
-        .thenReturn(Future.successful(1))
 
       val result = controller.get(false)(request)
       status(result) must be(SEE_OTHER)
@@ -108,9 +116,6 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
       when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      when(controller.tradingPremisesService.addTradingPremises(any(), any())(any(), any(), any(), any()))
-        .thenReturn(Future.successful(1))
-
       val result = controller.get(false)(request)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.ConfirmAddressController.get(1).url))
@@ -132,9 +137,6 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
 
       when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(emptyCache))
-
-      when(controller.tradingPremisesService.addTradingPremises(any(), any())(any(), any(), any(), any()))
-        .thenReturn(Future.successful(1))
 
       val result = controller.get(false)(request)
       status(result) must be(SEE_OTHER)
