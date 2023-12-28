@@ -327,6 +327,17 @@ class TradingPremisesSpec extends AmlsSpec {
       }
     }
 
+    "the taskRow consists of a complete model followed by a totally empty one with no changes or acceptance" must {
+      "return a result indicating completeness" in {
+        val mockCacheMap = mock[CacheMap]
+
+        when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
+          .thenReturn(Some(Seq(completeModel, TradingPremises())))
+
+        TradingPremises.taskRow(mockCacheMap, messages).status must be(models.registrationprogress.Completed)
+      }
+    }
+
     "has a completed model, an empty one and an incomplete one" when {
       "return the correct index" in {
         val mockCacheMap = mock[CacheMap]
