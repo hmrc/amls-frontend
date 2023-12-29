@@ -261,7 +261,7 @@ object ResponsiblePerson {
           TaskRow.notStartedTag
         )
       } else {
-        rp match {
+        rp.filterEmptyNoChanges match {
           case responsiblePeople if responsiblePeople.nonEmpty && anyChanged(responsiblePeople) && responsiblePeople.forall {
             _.isComplete
           } => TaskRow(
@@ -429,6 +429,11 @@ object ResponsiblePerson {
   implicit class FilterUtils(people: Seq[ResponsiblePerson]) {
     def filterEmpty: Seq[ResponsiblePerson] = people.filterNot {
       case _@ResponsiblePerson(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, ApprovalFlags(None, None), _, _, _, _, _, _) => true
+      case _ => false
+    }
+
+    def filterEmptyNoChanges: Seq[ResponsiblePerson] = people.filterNot {
+      case _@ResponsiblePerson(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, ApprovalFlags(None, None), false, false, None, None, None, None) => true
       case _ => false
     }
   }
