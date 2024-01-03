@@ -24,72 +24,72 @@ import play.api.libs.json.{JsSuccess, Json}
 
 class PersonAddressSpec extends PlaySpec {
 
-  val DefaultAddressLine1 = "Default Line 1"
-  val DefaultAddressLine2 = Some("Default Line 2")
-  val DefaultAddressLine3 = Some("Default Line 3")
-  val DefaultAddressLine4 = Some("Default Line 4")
-  val DefaultPostcode = "AA1 1AA"
-  val DefaultCountry = Country("Albania", "AL")
+  val defaultAddressLine1 = "Default Line 1"
+  val defaultAddressLine2 = Some("Default Line 2")
+  val defaultAddressLine3 = Some("Default Line 3")
+  val defaultAddressLine4 = Some("Default Line 4")
+  val defaultPostcode = "AA1 1AA"
+  val defaultCountry = Country("Albania", "AL")
 
-  val NewAddressLine1 = "New Line 1"
-  val NewAddressLine2 = Some("New Line 2")
-  val NewAddressLine3 = Some("New Line 3")
-  val NewAddressLine4 = Some("New Line 4")
-  val NewPostcode = "AA1 1AA"
-  val NewCountry = "AB"
+  val newAddressLine1 = "New Line 1"
+  val newAddressLine2 = Some("New Line 2")
+  val newAddressLine3 = Some("New Line 3")
+  val newAddressLine4 = Some("New Line 4")
+  val newPostcode = "AA1 1AA"
+  val newCountry = "AB"
 
-  val DefaultUKAddress = PersonAddressUK(
-    DefaultAddressLine1,
-    DefaultAddressLine2,
-    DefaultAddressLine3,
-    DefaultAddressLine4,
-    DefaultPostcode)
+  val defaultUKAddress = PersonAddressUK(
+    defaultAddressLine1,
+    defaultAddressLine2,
+    defaultAddressLine3,
+    defaultAddressLine4,
+    defaultPostcode)
 
-  val DefaultNonUKAddress = PersonAddressNonUK(
-    DefaultAddressLine1,
-    DefaultAddressLine2,
-    DefaultAddressLine3,
-    DefaultAddressLine4,
-    DefaultCountry)
+  val defaultNonUKAddress = PersonAddressNonUK(
+    defaultAddressLine1,
+    defaultAddressLine2,
+    defaultAddressLine3,
+    defaultAddressLine4,
+    defaultCountry)
 
-  val DefaultUKModel = Map(
+  val defaultUKModel = Map(
     "isUK" -> Seq("true"),
-    "addressLine1" -> Seq(DefaultAddressLine1),
+    "addressLine1" -> Seq(defaultAddressLine1),
     "addressLine2" -> Seq("Default Line 2"),
     "addressLine3" -> Seq("Default Line 3"),
     "addressLine4" -> Seq("Default Line 4"),
-    "postCode" -> Seq(DefaultPostcode)
+    "postCode" -> Seq(defaultPostcode)
   )
 
-  val DefaultNonUKModel = Map(
+  val defaultNonUKModel = Map(
     "isUK" -> Seq("false"),
-    "addressLineNonUK1" -> Seq(DefaultAddressLine1),
+    "addressLineNonUK1" -> Seq(defaultAddressLine1),
     "addressLineNonUK2" -> Seq("Default Line 2"),
     "addressLineNonUK3" -> Seq("Default Line 3"),
     "addressLineNonUK4" -> Seq("Default Line 4"),
-    "country" -> Seq(DefaultCountry.code)
+    "country" -> Seq(defaultCountry.code)
   )
 
-  val DefaultUKJson = Json.obj(
-    "personAddressLine1" -> DefaultAddressLine1,
-    "personAddressLine2" -> DefaultAddressLine2,
-    "personAddressLine3" -> DefaultAddressLine3,
-    "personAddressLine4" -> DefaultAddressLine4,
-    "personAddressPostCode" -> DefaultPostcode
+  val defaultUKJson = Json.obj(
+    "personAddressLine1" -> defaultAddressLine1,
+    "personAddressLine2" -> defaultAddressLine2,
+    "personAddressLine3" -> defaultAddressLine3,
+    "personAddressLine4" -> defaultAddressLine4,
+    "personAddressPostCode" -> defaultPostcode
   )
 
-  val DefaultNonUKJson = Json.obj(
-    "personAddressLine1" -> DefaultAddressLine1,
-    "personAddressLine2" -> DefaultAddressLine2,
-    "personAddressLine3" -> DefaultAddressLine3,
-    "personAddressLine4" -> DefaultAddressLine4,
-    "personAddressCountry" -> DefaultCountry
+  val defaultNonUKJson = Json.obj(
+    "personAddressLine1" -> defaultAddressLine1,
+    "personAddressLine2" -> defaultAddressLine2,
+    "personAddressLine3" -> defaultAddressLine3,
+    "personAddressLine4" -> defaultAddressLine4,
+    "personAddressCountry" -> defaultCountry
   )
 
   "personAddress" must {
 
     "validate toLines for UK address" in {
-      DefaultUKAddress.toLines must be(Seq("Default Line 1",
+      defaultUKAddress.toLines must be(Seq("Default Line 1",
         "Default Line 2",
         "Default Line 3",
         "Default Line 4",
@@ -98,7 +98,7 @@ class PersonAddressSpec extends PlaySpec {
     }
 
     "validate toLines for Non UK address" in {
-      DefaultNonUKAddress.toLines must be(Seq(
+      defaultNonUKAddress.toLines must be(Seq(
         "Default Line 1",
         "Default Line 2",
         "Default Line 3",
@@ -108,10 +108,10 @@ class PersonAddressSpec extends PlaySpec {
 
     "pass validation" when {
       "Reading UK Address" in {
-        PersonAddress.formRule.validate(DefaultUKModel) must be(Valid(DefaultUKAddress))
+        PersonAddress.formRule.validate(defaultUKModel) must be(Valid(defaultUKAddress))
       }
       "Read Non UK Address" in {
-        PersonAddress.formRule.validate(DefaultNonUKModel) must be(Valid(DefaultNonUKAddress))
+        PersonAddress.formRule.validate(defaultNonUKModel) must be(Valid(defaultNonUKAddress))
       }
     }
 
@@ -119,7 +119,7 @@ class PersonAddressSpec extends PlaySpec {
       "given a non valid non UK address" in {
         val invalidNonUKModel = Map(
           "isUK" -> Seq("false"),
-          "addressLineNonUK1" -> Seq(DefaultAddressLine1),
+          "addressLineNonUK1" -> Seq(defaultAddressLine1),
           "addressLineNonUK2" -> Seq("Default Line 2"),
           "addressLineNonUK3" -> Seq("Default Line 3"),
           "addressLineNonUK4" -> Seq("Default Line 4"),
@@ -134,7 +134,7 @@ class PersonAddressSpec extends PlaySpec {
 
       "mandatory fields are missing" when {
         "isUK has not been selected" in {
-          PersonAddress.formRule.validate(DefaultUKModel) must be
+          PersonAddress.formRule.validate(defaultUKModel) must be
           Invalid(Seq(
             (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
           ))
@@ -207,7 +207,7 @@ class PersonAddressSpec extends PlaySpec {
         }
       }
       "there is invalid data" in {
-        val model = DefaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
+        val model = defaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
         PersonAddress.formRule.validate(model) must be(
           Invalid(Seq(
             (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
@@ -216,11 +216,11 @@ class PersonAddressSpec extends PlaySpec {
     }
 
     "write correct UK Address" in {
-      PersonAddress.formWrites.writes(DefaultUKAddress) must be(DefaultUKModel)
+      PersonAddress.formWrites.writes(defaultUKAddress) must be(defaultUKModel)
     }
 
     "write correct Non UK Address" in {
-      PersonAddress.formWrites.writes(DefaultNonUKAddress) must be(DefaultNonUKModel)
+      PersonAddress.formWrites.writes(defaultNonUKAddress) must be(defaultNonUKModel)
     }
   }
 
@@ -228,32 +228,81 @@ class PersonAddressSpec extends PlaySpec {
 
     "Round trip a UK Address correctly through serialisation" in {
       PersonAddress.jsonReads.reads(
-        PersonAddress.jsonWrites.writes(DefaultUKAddress)
-      ) must be(JsSuccess(DefaultUKAddress))
+        PersonAddress.jsonWrites.writes(defaultUKAddress)
+      ) must be(JsSuccess(defaultUKAddress))
     }
 
     "Round trip a Non UK Address correctly through serialisation" in {
       PersonAddress.jsonReads.reads(
-        PersonAddress.jsonWrites.writes(DefaultNonUKAddress)
-      ) must be(JsSuccess(DefaultNonUKAddress))
+        PersonAddress.jsonWrites.writes(defaultNonUKAddress)
+      ) must be(JsSuccess(defaultNonUKAddress))
     }
 
     "Serialise UK address as expected" in {
-      Json.toJson(DefaultUKAddress.asInstanceOf[PersonAddress]) must be(DefaultUKJson)
+      Json.toJson(defaultUKAddress.asInstanceOf[PersonAddress]) must be(defaultUKJson)
     }
 
     "Serialise non-UK address as expected" in {
-      Json.toJson(DefaultNonUKAddress.asInstanceOf[PersonAddress]) must be(DefaultNonUKJson)
+      Json.toJson(defaultNonUKAddress.asInstanceOf[PersonAddress]) must be(defaultNonUKJson)
     }
 
     "Deserialise UK address as expected" in {
-      DefaultUKJson.as[PersonAddress] must be(DefaultUKAddress)
+      defaultUKJson.as[PersonAddress] must be(defaultUKAddress)
     }
 
     "Deserialise non-UK address as expected" in {
-      DefaultNonUKJson.as[PersonAddress] must be(DefaultNonUKAddress)
+      defaultNonUKJson.as[PersonAddress] must be(defaultNonUKAddress)
     }
-
   }
 
+  "isComplete" must {
+
+    val country = Country("Germany", "DE")
+
+    "return true" when {
+
+      "line 1 and postcode are non-empty for UK address" in {
+
+        assert(PersonAddressUK(defaultAddressLine1, None, None, None, defaultPostcode).isComplete)
+        assert(PersonAddressUK(defaultAddressLine1, defaultAddressLine2, defaultAddressLine3, defaultAddressLine4, defaultPostcode).isComplete)
+      }
+
+      "line 1, country code and country name are non-empty for non-UK address" in {
+
+        assert(PersonAddressNonUK(defaultAddressLine1, None, None, None, country).isComplete)
+        assert(PersonAddressNonUK(defaultAddressLine1, defaultAddressLine2, defaultAddressLine3, defaultAddressLine4, country).isComplete)
+      }
+    }
+
+    "return false" when {
+
+      "line 1 is empty" when {
+
+        "address is UK" in {
+
+          assert(!PersonAddressUK("", defaultAddressLine2, defaultAddressLine3, defaultAddressLine4, defaultPostcode).isComplete)
+        }
+
+        "address is non-UK" in {
+
+          assert(!PersonAddressNonUK("", defaultAddressLine2, defaultAddressLine3, defaultAddressLine4, country).isComplete)
+        }
+      }
+
+      "postcode is empty for UK address" in {
+
+        assert(!PersonAddressUK(defaultAddressLine1, defaultAddressLine2, defaultAddressLine3, defaultAddressLine4, "").isComplete)
+      }
+
+      "country code is empty for non-UK address" in {
+
+        assert(!PersonAddressNonUK(defaultAddressLine1, defaultAddressLine2, defaultAddressLine3, defaultAddressLine4, Country("Germany", "")).isComplete)
+      }
+
+      "country name is empty for non-UK address" in {
+
+        assert(!PersonAddressNonUK(defaultAddressLine1, defaultAddressLine2, defaultAddressLine3, defaultAddressLine4, Country("", "DE")).isComplete)
+      }
+    }
+  }
 }
