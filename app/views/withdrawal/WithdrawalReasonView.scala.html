@@ -81,6 +81,6 @@
             ).withFormField(form("withdrawalReason"))
         )
 
-        @button("withdrawal.reason.lbl.button")
+        @button("withdrawal.reason.lbl.button", attributes = Map("disable-on-submit" -> "true"))
     }
 }

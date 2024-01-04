@@ -92,6 +92,6 @@
             ).withFormField(form("deregistrationReason"))
         )
 
-        @button("status.deregister.button-text")
+        @button("status.deregister.button-text", attributes = Map("disable-on-submit" -> "true"))
     }
 }
