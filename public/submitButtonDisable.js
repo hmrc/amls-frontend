@@ -1,7 +1,10 @@
-let button = document.querySelector('[disable-on-submit="true"]')
-if(button !== null) {
-    button.addEventListener('click', function () {
-        button.setAttribute('disabled', '')
-        button.setAttribute('aria-disabled', 'true')
+let form = document.querySelector('[disable-on-submit="true"]')
+if(form !== null) {
+    form.addEventListener('submit', function () {
+        let button = document.querySelector('form > .govuk-button')
+        if(button != null) {
+            button.setAttribute('disabled', '')
+            button.setAttribute('aria-disabled', 'true')
+        }
     })
 }

@@ -75,7 +75,7 @@
 
     @subtitle("summary.status")
 
-    @formHelper(controllers.deregister.routes.DeregistrationReasonController.post) {
+    @formHelper(controllers.deregister.routes.DeregistrationReasonController.post, Symbol("disable-on-submit") -> "true") {
 
         @radios(
             Radios(
@@ -92,6 +92,6 @@
             ).withFormField(form("deregistrationReason"))
         )
 
-        @button("status.deregister.button-text", attributes = Map("disable-on-submit" -> "true"))
+        @button("status.deregister.button-text")
     }
 }

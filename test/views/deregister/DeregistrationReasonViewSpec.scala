@@ -79,10 +79,10 @@ class DeregistrationReasonViewSpec extends AmlsViewSpec with MustMatchers  {
 
     }
 
-    "have a button with the disable-on-submit attribute" in new TestFixture {
+    "have a form with the disable-on-submit attribute" in new TestFixture {
       def view = deregistration_reason(fp())
 
-      doc.select("button").attr("disable-on-submit") mustBe "true"
+      doc.select("form").attr("disable-on-submit") mustBe "true"
     }
 
     behave like pageWithErrors(
