@@ -50,14 +50,9 @@ sealed trait PersonAddress {
     case _: PersonAddressNonUK => Messages("lbl.no")
   }
 
-  def addressIsInUK: Boolean = this match {
-    case _: PersonAddressUK => true
-    case _: PersonAddressNonUK => false
-  }
-
   def isComplete = this match {
-    case PersonAddressUK(al1, al2, _, _, ap) if al1.nonEmpty & al2.nonEmpty & ap.nonEmpty => true
-    case PersonAddressNonUK(al1, al2, _, _, c) if al1.nonEmpty & al2.nonEmpty & c.name.nonEmpty & c.code.nonEmpty => true
+    case PersonAddressUK(al1, _, _, _, ap) if al1.nonEmpty & ap.nonEmpty => true
+    case PersonAddressNonUK(al1, _, _, _, c) if al1.nonEmpty & c.name.nonEmpty & c.code.nonEmpty => true
     case _ => false
   }
 

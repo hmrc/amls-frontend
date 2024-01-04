@@ -156,5 +156,56 @@ class AccountantsAddressSpec extends PlaySpec {
         testNonUKJson.as[AccountantsAddress] must be(testNonUKAddress)
       }
     }
+
+    "isComplete" must {
+
+      val country = Country("Germany", "DE")
+
+      "return true" when {
+
+        "line 1 and postcode are non-empty for UK address" in {
+
+          assert(UkAccountantsAddress(testAddressLine1, None, None, None, testPostcode).isComplete)
+          assert(UkAccountantsAddress(testAddressLine1, testAddressLine2, testAddressLine3, testAddressLine4, testPostcode).isComplete)
+        }
+
+        "line 1, country code and country name are non-empty for non-UK address" in {
+
+          assert(NonUkAccountantsAddress(testAddressLine1, None, None, None, country).isComplete)
+          assert(NonUkAccountantsAddress(testAddressLine1, testAddressLine2, testAddressLine3, testAddressLine4, country).isComplete)
+        }
+      }
+
+      "return false" when {
+
+        "line 1 is empty" when {
+
+          "address is UK" in {
+
+            assert(!UkAccountantsAddress("", testAddressLine2, testAddressLine3, testAddressLine4, testPostcode).isComplete)
+          }
+
+          "address is non-UK" in {
+
+            assert(!NonUkAccountantsAddress("", testAddressLine2, testAddressLine3, testAddressLine4, country).isComplete)
+          }
+        }
+
+        "postcode is empty for UK address" in {
+
+          assert(!UkAccountantsAddress(testAddressLine1, testAddressLine2, testAddressLine3, testAddressLine4, "").isComplete)
+        }
+
+        "country code is empty for non-UK address" in {
+
+          assert(!NonUkAccountantsAddress(testAddressLine1, testAddressLine2, testAddressLine3, testAddressLine4, Country("Germany", "")).isComplete)
+        }
+
+        "country name is empty for non-UK address" in {
+
+          assert(!NonUkAccountantsAddress(testAddressLine1, testAddressLine2, testAddressLine3, testAddressLine4, Country("", "DE")).isComplete)
+        }
+      }
+    }
   }
 }

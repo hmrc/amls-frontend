@@ -29,9 +29,9 @@ sealed trait AccountantsAddress {
     case _: NonUkAccountantsAddress => false
   }
 
-  def isComplete: Boolean= this match {
-    case UkAccountantsAddress(al1, al2, _, _, ap) if al1.nonEmpty & al2.nonEmpty & ap.nonEmpty => true
-    case NonUkAccountantsAddress(al1, al2, _, _, c) if al1.nonEmpty & al2.nonEmpty & c.name.nonEmpty & c.code.nonEmpty => true
+  def isComplete: Boolean = this match {
+    case UkAccountantsAddress(al1, _, _, _, ap) if al1.nonEmpty & ap.nonEmpty => true
+    case NonUkAccountantsAddress(al1, _, _, _, c) if al1.nonEmpty & c.name.nonEmpty & c.code.nonEmpty => true
     case _ => false
   }
 
