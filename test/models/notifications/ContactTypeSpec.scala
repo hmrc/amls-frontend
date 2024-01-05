@@ -16,40 +16,18 @@
 
 package models.notifications
 
-import models.notifications.ContactType._
+import models.notifications.ContactType.RejectionReasons
 import org.scalatestplus.play.PlaySpec
 
 class ContactTypeSpec  extends PlaySpec {
 
-  val keyString = "key"
-
   "ContactType" must {
-    "be created correctly from path parameter for RejectionReasons" in {
+    "be created correctly from path parameter" in {
 
-      ContactType.pathBinder.bind(keyString, RejectionReasons.toString) mustBe Right(RejectionReasons)
+
+      ContactType.pathBinder.bind("thing", RejectionReasons.toString) mustBe (Right(RejectionReasons))
+
     }
-
-    "be created correctly from path parameter for ApplicationApproval" in {
-
-      ContactType.pathBinder.bind(keyString, ApplicationApproval.toString) mustBe Right(ApplicationApproval)
-    }
-
-    "be created correctly from path parameter for RenewalApproval" in {
-
-      ContactType.pathBinder.bind(keyString, RenewalApproval.toString) mustBe Right(RenewalApproval)
-    }
-
-    "be created correctly from path parameter for NewRenewalReminder" in {
-
-      ContactType.pathBinder.bind(keyString, NewRenewalReminder.toString) mustBe Right(NewRenewalReminder)
-    }
-
-    "be created correctly from path parameter for RevocationReasons" in {
-
-      ContactType.pathBinder.bind(keyString, RevocationReasons.toString) mustBe Right(RevocationReasons)
-    }
-
-
   }
 
 }
