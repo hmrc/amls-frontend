@@ -163,7 +163,7 @@ object TradingPremises {
           TaskRow.notStartedTag
         )
       } else {
-        tp match {
+        tp.filterEmptyNoChanges match {
           case premises if premises.nonEmpty && anyChanged(premises) && premises.forall {
             _.isComplete
           } => TaskRow(
@@ -256,6 +256,11 @@ object TradingPremises {
   implicit class FilterUtils(x: Seq[TradingPremises]) {
     def filterEmpty: Seq[TradingPremises] = x.filterNot {
       case TradingPremises(None, None, None, None, None, None, None, None, _, _, _, None, _, None, _) => true
+      case _ => false
+    }
+
+    def filterEmptyNoChanges: Seq[TradingPremises] = x.filterNot {
+      case TradingPremises(None, None, None, None, None, None, None, None, false, None, None, None, None, None, false) => true
       case _ => false
     }
   }
