@@ -53,8 +53,8 @@
         <li>@messages("declaration.declaration.confirm") <a href="https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs">@messages("declaration.declaration.guidance")</a></li>
     </ul>
 
-    @formHelper(action = controllers.routes.SubmissionController.post()) {
-        @button(messages("button.acceptandsubmit"), "confirm-continue", attributes = Map("disable-on-submit" -> "true"))
+    @formHelper(action = controllers.routes.SubmissionController.post(), Symbol("disable-on-submit") -> "true") {
+        @button(messages("button.acceptandsubmit"), "confirm-continue")
     }
 
 }

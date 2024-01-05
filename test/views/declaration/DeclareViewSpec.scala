@@ -75,10 +75,10 @@ class DeclareViewSpec extends AmlsViewSpec with MustMatchers  {
       doc.select(".govuk-warning-text__text").text() must include(messages("declaration.declaration.fullname", name))
     }
 
-    "have a button with the disable-on-submit attribute" in new ViewFixture {
+    "have a form with the disable-on-submit attribute" in new ViewFixture {
       def view = declare("string1", "string2", "Name", isAmendment = false)
       
-      doc.select("button").attr("disable-on-submit") mustBe "true"
+      doc.select("form").attr("disable-on-submit") mustBe "true"
     }
 
     behave like pageWithBackLink(declare("string1", "string2", "John Smith", isAmendment = false))

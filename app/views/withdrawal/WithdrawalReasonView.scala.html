@@ -64,7 +64,7 @@
 
     @subtitle("summary.status")
 
-    @formHelper(controllers.withdrawal.routes.WithdrawalReasonController.post) {
+    @formHelper(controllers.withdrawal.routes.WithdrawalReasonController.post, Symbol("disable-on-submit") -> "true") {
 
         @radios(
             Radios(
@@ -81,6 +81,6 @@
             ).withFormField(form("withdrawalReason"))
         )
 
-        @button("withdrawal.reason.lbl.button", attributes = Map("disable-on-submit" -> "true"))
+        @button("withdrawal.reason.lbl.button")
     }
 }
