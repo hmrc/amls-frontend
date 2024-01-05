@@ -98,28 +98,28 @@ object ContactType {
 
 
     override def bind(key: String, value: String): Either[String, ContactType] = {
-      stringBinder.bind(key,value).right map {
+      stringBinder.bind(key,value.toLowerCase).right map {
 
-        case "RejectionReasons" => ContactType.RejectionReasons
-        case "RevocationReasons" => ContactType.RevocationReasons
-        case "MindedToReject" => ContactType.MindedToReject
-        case "NoLongerMindedToReject" => ContactType.NoLongerMindedToReject
-        case "MindedToRevoke" => ContactType.MindedToRevoke
-        case "NoLongerMindedToRevoke" => ContactType.NoLongerMindedToRevoke
-        case "Others" => ContactType.Others
-        case "ApplicationApproval" => ContactType.ApplicationApproval
-        case "RenewalApproval" => ContactType.RenewalApproval
-        case "AutoExpiryOfRegistration" => ContactType.AutoExpiryOfRegistration
-        case "RenewalReminder" => ContactType.RenewalReminder
-        case "ReminderToPayForApplication" => ContactType.ReminderToPayForApplication
-        case "ReminderToPayForRenewal" => ContactType.ReminderToPayForRenewal
-        case "ReminderToPayForVariation" => ContactType.ReminderToPayForVariation
-        case "ReminderToPayForManualCharges" => ContactType.ReminderToPayForManualCharges
-        case "RegistrationVariationApproval" => ContactType.RegistrationVariationApproval
-        case "ApplicationAutorejectionForFailureToPay" => ContactType.ApplicationAutorejectionForFailureToPay
-        case "DeRegistrationEffectiveDateChange" => ContactType.DeRegistrationEffectiveDateChange
-        case "NoSubject" => ContactType.NoSubject
-        case "NewRenewalReminder" => ContactType.NewRenewalReminder
+        case "rejectionreasons" => ContactType.RejectionReasons
+        case "revocationreasons" => ContactType.RevocationReasons
+        case "mindedtoreject" => ContactType.MindedToReject
+        case "nolongermindedtoreject" => ContactType.NoLongerMindedToReject
+        case "mindedtorevoke" => ContactType.MindedToRevoke
+        case "nolongermindedtorevoke" => ContactType.NoLongerMindedToRevoke
+        case "others" => ContactType.Others
+        case "applicationapproval" => ContactType.ApplicationApproval
+        case "renewalapproval" => ContactType.RenewalApproval
+        case "autoexpiryofregistration" => ContactType.AutoExpiryOfRegistration
+        case "renewalreminder" => ContactType.RenewalReminder
+        case "remindertopayforapplication" => ContactType.ReminderToPayForApplication
+        case "remindertopayforrenewal" => ContactType.ReminderToPayForRenewal
+        case "remindertopayforvariation" => ContactType.ReminderToPayForVariation
+        case "remindertopayformanualcharges" => ContactType.ReminderToPayForManualCharges
+        case "registrationvariationapproval" => ContactType.RegistrationVariationApproval
+        case "applicationautorejectionforfailuretopay" => ContactType.ApplicationAutorejectionForFailureToPay
+        case "deregistrationeffectivedatechange" => ContactType.DeRegistrationEffectiveDateChange
+        case "nosubject" => ContactType.NoSubject
+        case "newrenewalreminder" => ContactType.NewRenewalReminder
         case _ => throw new RuntimeException("No correct contact type")
       }
     }
