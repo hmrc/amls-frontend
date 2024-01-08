@@ -94,7 +94,7 @@ class WhatDoesYourBusinessDoController @Inject () (
                   }
             }.recover {
                 case _ =>
-                logger.error(s"[WhatDoesYourBusinessDoController][get] WhatDoesYourBusinessDo($activities) can not be persisted for index = $index")
+                logger.warn(s"[WhatDoesYourBusinessDoController][get] WhatDoesYourBusinessDo($activities) can not be persisted for index = $index")
                 NotFound(notFoundView)
               }
           } else {

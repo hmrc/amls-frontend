@@ -93,7 +93,7 @@ class PositionWithinBusinessStartDateController @Inject ()(val dataCacheConnecto
                 case Some(x) => rp.positions(Positions.update(x, data))
                 case _ => {
                   // $COVERAGE-OFF$
-                  logger.error(s"Positions does not exist for ${rp.personName.getOrElse("[NAME MISSING]")}")
+                  logger.warn(s"Positions does not exist for ${rp.personName.getOrElse("[NAME MISSING]")}")
                   // $COVERAGE-ON$
                   throw new IllegalStateException("Positions does not exist, cannot update start date")
                 }

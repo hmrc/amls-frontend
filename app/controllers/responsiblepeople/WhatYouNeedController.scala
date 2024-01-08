@@ -42,7 +42,7 @@ class WhatYouNeedController @Inject () (
           } yield {
             Ok(view(controllers.responsiblepeople.routes.PersonNameController.get(index, false, flow), Some(ba)))
           }).getOrElse {
-              logger.info("Unable to retrieve business activities in [responsiblepeople][WhatYouNeedController]")
+              logger.warn("Unable to retrieve business activities in [responsiblepeople][WhatYouNeedController]")
               throw new Exception("Unable to retrieve business activities in [responsiblepeople][WhatYouNeedController]")
             }
         }

@@ -44,7 +44,7 @@ class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector
           Ok(view(Some(ba)))
         }).getOrElse {
             val errorMessage = "Unable to retrieve business activities in [businessactivities][WhatYouNeedController]"
-            logger.info(errorMessage)
+            logger.warn(errorMessage)
             throw new Exception(errorMessage)
           }
       }
