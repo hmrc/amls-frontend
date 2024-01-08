@@ -25,6 +25,7 @@ import models.businessmatching._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
 import utils.AuthAction
+import utils.CharacterCountParser.cleanData
 import views.html.businessactivities.InvolvedInOtherNameView
 
 
@@ -56,7 +57,7 @@ class InvolvedInOtherController @Inject() (val dataCacheConnector: DataCacheConn
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request => {
-      formProvider().bindFromRequest().fold(
+      formProvider().bindFromRequest(cleanData(request.body, "details")).fold(
         formWithErrors =>
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](request.credId, BusinessMatching.key)

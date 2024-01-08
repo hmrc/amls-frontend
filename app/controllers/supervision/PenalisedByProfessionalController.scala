@@ -22,6 +22,7 @@ import forms.supervision.PenalisedByProfessionalFormProvider
 import models.supervision.Supervision
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
+import utils.CharacterCountParser.cleanData
 import views.html.supervision.PenalisedByProfessionalView
 
 import javax.inject.Inject
@@ -49,7 +50,7 @@ class PenalisedByProfessionalController @Inject()(
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest().fold(
+      formProvider().bindFromRequest(cleanData(request.body, "professionalBody")).fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, edit))),
         data =>
