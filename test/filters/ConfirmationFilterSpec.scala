@@ -117,7 +117,7 @@ class ConfirmationFilterSpec extends PlaySpec with GuiceOneAppPerSuite with Mock
     "excludes anything that isn't a page" in new TestFixture {
 
       val filter = app.injector.instanceOf[ConfirmationFilter]
-      val rh = FakeRequest(GET, "/amls.js").withSession(("sessionId", "SOME_SESSION_ID"))
+      val rh = FakeRequest(GET, "/submitButtonDisable.js").withSession(("sessionId", "SOME_SESSION_ID"))
       val nextFilter = Action(Ok("success"))
 
       val result = filter(nextFilter)(rh).run()
