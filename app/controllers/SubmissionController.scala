@@ -72,19 +72,19 @@ class SubmissionController @Inject()(val subscriptionService: SubmissionService,
             Future.successful(Redirect(controllers.routes.ConfirmationController.get))
         } recoverWith {
           case _: DuplicateEnrolmentException =>
-            logger.info("[SubmissionController][post] handling DuplicateEnrolmentException")
+            logger.warn("[SubmissionController][post] handling DuplicateEnrolmentException")
             Future.successful(Redirect(routes.SubmissionErrorController.duplicateEnrolment()))
           case e: DuplicateSubscriptionException =>
-            logger.info("[SubmissionController][post] handling DuplicateSubscriptionException")
+            logger.warn("[SubmissionController][post] handling DuplicateSubscriptionException")
             Future.successful(Redirect(routes.SubmissionErrorController.duplicateSubmission()))
           case _: InvalidEnrolmentCredentialsException =>
-            logger.info("[SubmissionController][post] handling InvalidEnrolmentCredentialsException")
+            logger.warn("[SubmissionController][post] handling InvalidEnrolmentCredentialsException")
             Future.successful(Redirect(routes.SubmissionErrorController.wrongCredentialType()))
           case _: BadRequestException =>
-            logger.info("[SubmissionController][post] handling BadRequestException")
+            logger.warn("[SubmissionController][post] handling BadRequestException")
             Future.successful(Redirect(routes.SubmissionErrorController.badRequest()))
           case e: Exception =>
-            logger.info("[SubmissionController][post] handling Exception")
+            logger.warn("[SubmissionController][post] handling Exception")
             throw e
         }
         case false =>

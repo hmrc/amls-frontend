@@ -126,9 +126,9 @@ class MongoCacheClient @Inject()(
   // $COVERAGE-OFF$
   private def debug(msg: String) = logger.debug(s"$logPrefix $msg")
 
-  private def error(msg: String, e: Throwable) = logger.error(s"$logPrefix $msg", e)
+  private def error(msg: String, e: Throwable) = logger.warn(s"$logPrefix $msg", e)
 
-  private def error(msg: String) = logger.error(s"$logPrefix $msg")
+  private def error(msg: String) = logger.warn(s"$logPrefix $msg")
   // $COVERAGE-ON$
 
   implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto

@@ -49,7 +49,7 @@ class WhatYouNeedController @Inject()(
         } yield {
           section
         }).getOrElse {
-          logger.info("Unable to retrieve business activities in [renewal][WhatYouNeedController]")
+          logger.warn("Unable to retrieve business activities in [renewal][WhatYouNeedController]")
           throw new Exception("Unable to retrieve business activities in [renewal][WhatYouNeedController]")
         }
 

@@ -36,7 +36,7 @@ class PayApiConnector @Inject()(
 
   // $COVERAGE-OFF$
   private val logDebug = (msg: String) => logger.debug(s"[PayApiConnector] $msg")
-  private val logError = (msg: String) => logger.error(s"[PayApiConnector] $msg")
+  private val logWarn = (msg: String) => logger.warn(s"[PayApiConnector] $msg")
   // $COVERAGE-ON$
 
   def createPayment(request: CreatePaymentRequest)(implicit hc: HeaderCarrier ,ec: ExecutionContext): Future[Option[CreatePaymentResponse]] = {
@@ -53,7 +53,7 @@ class PayApiConnector @Inject()(
       case response: HttpResponse =>
         auditConnector.sendExtendedEvent(CreatePaymentFailureEvent(request.reference, response.status, response.body, request))
         // $COVERAGE-OFF$
-        logError(s"${request.reference}, status: ${response.status}: Failed to create payment using pay-api, reverting to old payments page")
+        logWarn(s"${request.reference}, status: ${response.status}: Failed to create payment using pay-api, reverting to old payments page")
         // $COVERAGE-ON$
         None
     }

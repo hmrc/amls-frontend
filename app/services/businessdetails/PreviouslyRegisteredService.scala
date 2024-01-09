@@ -56,7 +56,7 @@ class PreviouslyRegisteredService @Inject()(val dataCacheConnector: DataCacheCon
       }
     } recover {
       case _: Exception =>
-        logger.error(s"$logPrefix: Failed to update Business details")
+        logger.warn(s"$logPrefix: Failed to update Business details")
         None
     }
   }
