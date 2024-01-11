@@ -17,10 +17,16 @@
 @import config.ApplicationConfig
 @import models.confirmation.Currency
 @import views.html.confirmation.components.ConfirmationDetailsView
+@import views.html.components.FeedbackSurveyLink
 
 
-@this(confirmationDetailsView: ConfirmationDetailsView)
+@this(
+confirmationDetailsView: ConfirmationDetailsView,
+feedbackSurveyLink: FeedbackSurveyLink
+)
 
 @(paymentReference: Option[String], total: Currency, paymentsUrl: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
 @confirmationDetailsView("submit.registration", false, paymentReference, total, paymentsUrl)
+
+@feedbackSurveyLink()

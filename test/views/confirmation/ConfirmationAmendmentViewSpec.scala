@@ -16,18 +16,21 @@
 
 package views.confirmation
 
+import config.ApplicationConfig
 import generators.PaymentGenerator
 import models.confirmation.Currency
+import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.confirmation.ConfirmationAmendmentView
 
-class ConfirmationAmendmentViewSpec extends AmlsViewSpec with MustMatchers  with PaymentGenerator {
+class ConfirmationAmendmentViewSpec extends AmlsViewSpec with MustMatchers with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
     lazy val amendmentView = app.injector.instanceOf[ConfirmationAmendmentView]
     implicit val requestWithToken = addTokenForView()
+    implicit val config = app.injector.instanceOf[ApplicationConfig]
 
     val continueHref = "http://google.co.uk"
 
@@ -35,7 +38,7 @@ class ConfirmationAmendmentViewSpec extends AmlsViewSpec with MustMatchers  with
       Some(paymentReferenceNumber),
       Currency(150),
       continueHref
-    )
+    )(requestWithToken, messages, config)
   }
 
   "The amendment confirmation view" must {
@@ -87,6 +90,13 @@ class ConfirmationAmendmentViewSpec extends AmlsViewSpec with MustMatchers  with
 
       button.text() mustBe messages("button.continuetopayment")
       button.attr("href") mustBe continueHref
+    }
+
+    "display the correct link" in new ViewFixture {
+      val link: Element = doc.getElementsByClass("govuk-link").get(3)
+
+      link.text() mustBe messages("survey.satisfaction.beforeyougo")
+      link.attr("href") mustBe config.feedbackFrontendUrl
     }
   }
 }
