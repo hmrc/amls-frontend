@@ -50,7 +50,7 @@
         }
         <li>@messages("declaration.declaration.tellhmrc")</li>
         <li>@messages("declaration.declaration.noncompliance")</li>
-        <li>@messages("declaration.declaration.confirm") <a href="https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs">@messages("declaration.declaration.guidance")</a></li>
+        <li>@messages("declaration.declaration.confirm") <a class="govuk-link" href="https://www.gov.uk/government/collections/anti-money-laundering-businesses-supervised-by-hm-revenue-and-customs">@messages("declaration.declaration.guidance")</a></li>
     </ul>
 
     @formHelper(action = controllers.routes.SubmissionController.post(), Symbol("disable-on-submit") -> "true") {
