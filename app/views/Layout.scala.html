@@ -44,7 +44,7 @@
     showBackLink: Boolean = true,
     fullWidthLayout: Boolean = false,
     showDeskproLink: Boolean = true
-)(mainContent: Html)(implicit request: Request[_], messages: Messages)
+)(mainContent: Html)(implicit request: RequestHeader, messages: Messages)
 
 @headScripts = {
     @if(timeoutEnabled) {
@@ -73,11 +73,11 @@
 }
 
 @scripts = {
-    <script src='@controllers.routes.Assets.versioned("lib/govuk-frontend/govuk/all.js")'></script>
-    <script src='@controllers.routes.Assets.versioned("lib/hmrc-frontend/hmrc/all.js")'></script>
-    <script>window.GOVUKFrontend.initAll();window.HMRCFrontend.initAll()</script>
+    <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("lib/govuk-frontend/govuk/all.js")'></script>
+    <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("lib/hmrc-frontend/hmrc/all.js")'></script>
+    <script @CSPNonce.attr >window.GOVUKFrontend.initAll();window.HMRCFrontend.initAll()</script>
     @autocompleteJavascript()
-    <script src='@controllers.routes.Assets.versioned("submitButtonDisable.js")'></script>
+    <script @CSPNonce.attr src='@controllers.routes.Assets.versioned("submitButtonDisable.js")'></script>
 }
 
 @mainContentWithGetHelp = {
