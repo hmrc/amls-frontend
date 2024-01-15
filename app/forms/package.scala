@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package object forms { //TODO remove this
+package object forms {
 
   implicit def optStr(s: Option[String]): String =
     s.getOrElse("")
