@@ -17,13 +17,9 @@
 package views.businessactivities
 
 import forms.businessactivities.RiskAssessmentFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.RiskAssessmentHasPolicy
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
-import jto.validation.Path
-import jto.validation.ValidationError
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import views.Fixture
 import views.html.businessactivities.RiskAssessmentPolicyView

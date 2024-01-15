@@ -23,8 +23,8 @@ import cats.implicits._
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.DateOfChangeFormProvider
 import forms.tradingpremises.TradingAddressFormProvider
-import forms.{DateOfChangeFormProvider, FormHelpers}
 import models.DateOfChange
 import models.status.SubmissionStatus
 import models.tradingpremises._
@@ -51,7 +51,7 @@ class WhereAreTradingPremisesController @Inject () (
                                                      dateChangeFormProvider: DateOfChangeFormProvider,
                                                      view: WhereAreTradingPremisesView,
                                                      dateChangeView: DateOfChangeView,
-                                                     implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                                     implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>

@@ -16,7 +16,6 @@
 
 package models.businessactivities
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
@@ -26,25 +25,6 @@ class RiskAssessmentTypesSpec extends PlaySpec with MockitoSugar {
   val formalRiskAssessments: Set[RiskAssessmentType] = Set(PaperBased, Digital)
 
   "RiskAssessment" must {
-
-    "fail validation" when {
-      "given invalid data represented by an empty string" in {
-        RiskAssessmentType.riskAssessmentFormRead.validate("") must
-          be(Invalid(Seq((Path \ "riskassessments") -> Seq(ValidationError("error.invalid")))))
-      }
-
-      "given invalid enum value" in {
-        RiskAssessmentType.riskAssessmentFormRead.validate("99") must
-          be(Invalid(Seq((Path \ "riskassessments") -> Seq(ValidationError("error.invalid")))))
-      }
-    }
-
-    "pass validation" when {
-      "successfully validate given an enum value" in {
-        RiskAssessmentType.riskAssessmentFormRead.validate("01") must
-          be(Valid(PaperBased))
-      }
-    }
     "write form data correctly" when {
       "selecting paper based" in {
         RiskAssessmentType.jsonRiskAssessmentWrites.writes(PaperBased) must be(JsString("01"))

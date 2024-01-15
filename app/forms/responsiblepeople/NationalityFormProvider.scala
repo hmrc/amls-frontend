@@ -18,7 +18,7 @@ package forms.responsiblepeople
 
 import forms.mappings.AddressMappings
 import models.Country
-import models.responsiblepeople.{British, CountryOfBirth, Nationality, OtherCountry}
+import models.responsiblepeople.{British, Nationality, OtherCountry}
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfFalse

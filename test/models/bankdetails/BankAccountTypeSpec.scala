@@ -18,39 +18,10 @@ package models.bankdetails
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import models.bankdetails.BankAccountType._
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
-
-  "Bank account types form" must {
-    "fail to validate" when {
-      "an invalid selection is made for the type of bank account the business uses" in {
-        val urlFormEncoded = Map(
-          "bankAccountType" -> Seq("")
-        )
-
-        BankAccountType.formReads.validate(urlFormEncoded) must
-          be(Invalid(Seq(
-            (Path \ "bankAccountType") -> Seq(ValidationError("error.invalid"))
-          )))
-      }
-
-      "no selection is made for the type of bank account the business uses" in {
-        val urlFormEncoded = Map(
-          "bankAccountType" -> Seq()
-        )
-
-        BankAccountType.formReads.validate(urlFormEncoded) must
-          be(Invalid(Seq(
-            (Path \ "bankAccountType") -> Seq(ValidationError("error.bankdetails.accounttype"))
-          )))
-      }
-
-    }
-  }
 
   "BankAccountType" must {
 
@@ -59,27 +30,6 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
       BelongsToBusiness.getBankAccountTypeID must be("02")
       BelongsToOtherBusiness.getBankAccountTypeID must be("03")
       NoBankAccountUsed.getBankAccountTypeID must be("04")
-    }
-
-    "successfully validate form Read" in {
-      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("01"))) must be (Valid(Some(PersonalAccount)))
-      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("02"))) must be (Valid(Some(BelongsToBusiness)))
-      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("03"))) must be (Valid(Some(BelongsToOtherBusiness)))
-      BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("04"))) must be (Valid(Some(NoBankAccountUsed)))
-
-    }
-
-    "fail on invalid selection" in {
-        BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("05"))) must be(Invalid(Seq(
-            (Path \ "bankAccountType") -> Seq(ValidationError("error.invalid"))
-          )))
-    }
-
-    "successfully write form data" in {
-      BankAccountType.formWrites.writes(Some(PersonalAccount)) must be (Map("bankAccountType" -> Seq("01")))
-      BankAccountType.formWrites.writes(Some(BelongsToBusiness)) must be (Map("bankAccountType" -> Seq("02")))
-      BankAccountType.formWrites.writes(Some(BelongsToOtherBusiness)) must be (Map("bankAccountType" -> Seq("03")))
-      BankAccountType.formWrites.writes(Some(NoBankAccountUsed)) must be (Map("bankAccountType" -> Seq("04")))
     }
 
     "validate Json read" in {
@@ -105,5 +55,4 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
       Json.toJson(NoBankAccountUsed.asInstanceOf[BankAccountType]) must be (Json.obj("bankAccountType" -> "04"))
     }
   }
-
 }

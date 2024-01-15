@@ -155,7 +155,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec with MockitoSugar wit
 
       "save the model data into the renewal object" in new RoutingFixture {
 
-        val result = await(controller.post()(validFormRequest))
+        await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
 
         verify(renewalService).updateRenewal(any(), captor.capture())(any())

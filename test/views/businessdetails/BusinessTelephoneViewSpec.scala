@@ -17,8 +17,6 @@
 package views.businessdetails
 
 import forms.businessdetails.BusinessTelephoneFormProvider
-import forms.{EmptyForm, Form2, InvalidForm}
-import jto.validation.{Path, ValidationError}
 import models.businessdetails.ContactingYouPhone
 import org.scalatest.MustMatchers
 import play.api.data.Form

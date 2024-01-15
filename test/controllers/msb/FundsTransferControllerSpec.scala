@@ -20,7 +20,6 @@ import controllers.actions.SuccessfulAuthAction
 import forms.msb.FundsTransferFormProvider
 import models.moneyservicebusiness._
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures

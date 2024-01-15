@@ -18,14 +18,13 @@ package controllers.responsiblepeople
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.PersonResidentTypeFormProvider
 import models.responsiblepeople._
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.responsiblepeople.PersonResidentTypeService
-import utils.{AuthAction, ControllerHelper, RepeatingSection}
+import utils.{AuthAction, ControllerHelper}
 import views.html.responsiblepeople.PersonResidenceTypeView
 
 import javax.inject.Inject

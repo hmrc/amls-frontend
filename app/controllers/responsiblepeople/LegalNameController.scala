@@ -19,7 +19,6 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.LegalNameFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{PreviousName, ResponsiblePerson}

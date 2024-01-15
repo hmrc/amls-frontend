@@ -59,8 +59,6 @@ class DataCacheServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures 
         DataCacheService.cacheConnector.fetchAll(any())(any())
       } thenReturn Future.successful(None)
 
-      val result = DataCacheService.getCache(credID)
-
       whenReady (DataCacheService.getCache(credID).failed) {
         exception =>
           exception mustBe a[NotFoundException]

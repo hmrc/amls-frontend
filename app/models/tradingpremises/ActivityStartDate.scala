@@ -16,10 +16,7 @@
 
 package models.tradingpremises
 
-import jto.validation.forms._
-import jto.validation.{From, Rule, Write}
-import models.FormTypes._
-import org.joda.time.{DateTimeFieldType, LocalDate}
+import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import play.api.libs.json.JodaWrites._
 import play.api.libs.json.JodaReads._
@@ -27,21 +24,5 @@ import play.api.libs.json.JodaReads._
 case class ActivityStartDate (startDate: LocalDate)
 
 object ActivityStartDate {
-
   implicit val format =  Json.format[ActivityStartDate]
-
-  implicit val formRule: Rule[UrlFormEncoded, ActivityStartDate] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-      (__ \ "startDate").read(newAllowedPastAndFutureDateRule1700("error.required.tp.address.date", "error.invalid.date.tp.after.1700", "error.invalid.date.tp.before.2100")) map ActivityStartDate.apply
-  }
-
-  implicit val formWrites: Write[ActivityStartDate, UrlFormEncoded] =
-    Write {
-      case ActivityStartDate(b) =>Map(
-        "startDate.day" -> Seq(b.get(DateTimeFieldType.dayOfMonth()).toString),
-        "startDate.month" -> Seq(b.get(DateTimeFieldType.monthOfYear()).toString),
-        "startDate.year" -> Seq(b.get(DateTimeFieldType.year()).toString)
-      )
-    }
-
 }

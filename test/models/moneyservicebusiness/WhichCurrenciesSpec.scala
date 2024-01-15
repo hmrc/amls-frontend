@@ -16,13 +16,9 @@
 
 package models.moneyservicebusiness
 
-import jto.validation._
-import models.CharacterSets
+import models.{CharacterSets, renewal => r}
 import play.api.libs.json._
 import utils.AmlsSpec
-import models.{renewal => r}
-
-import scala.collection.mutable.ArrayBuffer
 
 class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
 
@@ -33,55 +29,9 @@ class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
         Seq("USD", "CHF", "EUR"), None, Some(MoneySources(None, None, None))
       )
 
-      val fullFormData = Map(
-        "currencies[0]" -> Seq("USD"),
-        "currencies[1]" -> Seq("CHF"),
-        "currencies[2]" -> Seq("EUR")
-      )
-
-      "Write correctly to a form" in {
-        WhichCurrencies.formWrite.writes(fullModel) must be(fullFormData)
-      }
-
-      "Read correctly from a form" in {
-        WhichCurrencies.formRule.validate(fullFormData) must be(Valid(fullModel.copy(moneySources = None)))
-      }
-
-
       "Round trip through Json correctly" in {
         val js = Json.toJson(fullModel)
         js.as[WhichCurrencies] must be(fullModel)
-      }
-
-      "Fail validation" when {
-        "currencies are sent as blank strings" in {
-          val formData = Map(
-            "currencies[0]" -> Seq(""),
-            "currencies[1]" -> Seq(""),
-            "currencies[2]" -> Seq("")
-          )
-
-          WhichCurrencies.formRule.validate(formData) equals
-            Invalid(Seq(jto.validation.Path \ "currencies" -> ArrayBuffer(ValidationError("error.invalid.msb.wc.currencies"))))
-        }
-
-        "entered currency code is not valid" in {
-          val formData = Map(
-            "currencies[0]" -> Seq("ZZZ"),
-            "currencies[1]" -> Seq(""),
-            "currencies[2]" -> Seq("")
-          )
-
-          WhichCurrencies.formRule.validate(formData) equals
-            Invalid(Seq(jto.validation.Path \ "currencies[0]" -> ArrayBuffer(ValidationError("error.invalid.msb.wc.currencies"))))
-        }
-
-        "data is missing" in {
-          val formData: Map[String, Seq[String]] = Map.empty
-
-          WhichCurrencies.formRule.validate(formData) equals
-            Invalid(Seq(jto.validation.Path \ "currencies" -> ArrayBuffer(ValidationError("error.invalid.msb.wc.currencies"))))
-        }
       }
     }
 

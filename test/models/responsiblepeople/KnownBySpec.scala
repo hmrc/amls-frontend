@@ -16,82 +16,27 @@
 
 package models.responsiblepeople
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.Json
 
-@SuppressWarnings(Array("org.brianmckenna.wartremover.warts.MutableDataStructures"))
 class KnownBySpec extends PlaySpec with MockitoSugar {
 
-  "Form Rules and Writes" must {
+  "KnownBy" must {
 
-    "successfully validate" when {
-      "given all fields" in {
+    val name = "John James Smith"
 
-        val data = Map(
-          "hasOtherNames" -> Seq("true"),
-          "otherNames" -> Seq("otherName")
-        )
+    "display other name correctly" in {
 
-        val validPerson = KnownBy(
-          hasOtherNames = Some(true),
-          otherNames = Some("otherName")
-        )
-
-        KnownBy.formRule.validate(data) must equal(Valid(validPerson))
-      }
-
+      KnownBy(otherNames = None).otherName mustBe ""
+      KnownBy(Some(true), Some(name)).otherName mustBe name
     }
 
-    "fail validation" when {
+    "round trip through JSON" in {
 
-      "required fields are missing" when {
-        "nothing has been selected" in {
+      val model = KnownBy(Some(true), Some(name))
 
-          KnownBy.formRule.validate(Map(
-            "hasOtherNames" -> Seq("")
-          )) must equal(Invalid(Seq(
-            (Path \ "hasOtherNames") -> Seq(ValidationError("error.required.rp.hasOtherNames"))
-          )))
-        }
-
-        "fields have been selected" in {
-
-          KnownBy.formRule.validate(Map(
-            "hasOtherNames" -> Seq("true"),
-            "otherNames" -> Seq("")
-          )) must
-            equal(Invalid(Seq(
-              (Path \ "otherNames") -> Seq(ValidationError("error.required.rp.otherNames"))
-            )))
-        }
-      }
-
-      "input length is too great" in {
-
-        val data = Map(
-          "hasOtherNames" -> Seq("true"),
-          "otherNames" -> Seq("otherName" * 36)
-        )
-
-        KnownBy.formRule.validate(data) must
-          equal(Invalid(Seq(
-            (Path \ "otherNames") -> Seq(ValidationError("error.invalid.rp.maxlength.140"))
-          )))
-      }
-
-      "fields have invalid characters" in {
-
-        KnownBy.formRule.validate(Map(
-          "hasOtherNames" -> Seq("true"),
-          "otherNames" -> Seq("($£*£$:?/{")
-        )) must
-          equal(Invalid(Seq(
-            (Path \ "otherNames") -> Seq(ValidationError("error.invalid.rp.char"))
-          )))
-      }
-
+      Json.toJson(model).as[KnownBy] mustBe model
     }
-
   }
 }

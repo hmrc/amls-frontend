@@ -16,9 +16,6 @@
 
 package models.responsiblepeople
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Invalid, Path, Rule, Valid, ValidationError, Write}
-import models.FormTypes.basicPunctuationPattern
 import models.businessmatching.BusinessType
 import models.businessmatching.BusinessType.{SoleProprietor => BTSoleProprietor, _}
 import models.{Enumerable, WithName}
@@ -27,7 +24,6 @@ import play.api.libs.json._
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import utils.TraversableValidators.minLengthR
 
 sealed trait PositionWithinBusiness {
   val value: String
@@ -70,9 +66,6 @@ case object ExternalAccountant extends WithName("externalAccountant") with Posit
 case class Other(value: String) extends WithName("other") with PositionWithinBusiness
 
 object PositionWithinBusiness extends Enumerable.Implicits {
-
-  import jto.validation.forms.Rules._
-  import utils.MappingUtils.Implicits.RichRule
 
   val all: Seq[PositionWithinBusiness] = Seq(
     BeneficialOwner,
@@ -161,26 +154,6 @@ object PositionWithinBusiness extends Enumerable.Implicits {
     }
   }
 
-  implicit val formWrite = Write[PositionWithinBusiness, String] {
-    case BeneficialOwner => "01"
-    case Director => "02"
-    case InternalAccountant => "03"
-    case NominatedOfficer => "04"
-    case Partner => "05"
-    case SoleProprietor => "06"
-    case DesignatedMember => "07"
-    case Other(_) => "other"
-  }
-
-  implicit def formWrites(implicit w: Write[PositionWithinBusiness, String]) =
-    Write[Set[PositionWithinBusiness], UrlFormEncoded] { data =>
-      Map("positions[]" -> data.toSeq.map(w.writes)) ++ {
-        data.collectFirst {
-          case Other(v) => "otherPosition" -> Seq(v)
-        }
-      }
-    }
-
   private[responsiblepeople] implicit val jsonWrites = Writes[PositionWithinBusiness] {
     case BeneficialOwner => JsString("01")
     case Director => JsString("02")
@@ -204,36 +177,4 @@ object PositionWithinBusiness extends Enumerable.Implicits {
       case JsObject(m) if m.contains("other") => JsSuccess(Other(m("other").as[String]))
       case _ => JsError((JsPath \ "positions") -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
-
-  private[responsiblepeople] val atLeastOneRule = minLengthR[Set[String]](1).withMessage("error.required.positionWithinBusiness")
-  private val otherLength = 255
-  private val maxLengthRule = optionR(
-    maxLength(otherLength).withMessage("error.invalid.rp.position_within_business.other_position.maxlength.255") andThen
-      basicPunctuationPattern().withMessage("error.invalid.rp.position_within_business.other_position")
-  )
-
-  private[responsiblepeople] val fullySpecifiedRule = Rule[(Set[String], Option[String]), Set[PositionWithinBusiness]]  {
-    case (s, None) if s.contains("other") =>
-      Invalid(Seq(Path \ "otherPosition" -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
-    case (s, o) if s.contains("other") && o.get.trim.isEmpty =>
-      Invalid(Seq(Path \ "otherPosition" -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
-    case (s, o) =>
-      Valid(s.map {
-        case "01" => BeneficialOwner
-        case "02" => Director
-        case "03" => InternalAccountant
-        case "04" => NominatedOfficer
-        case "05" => Partner
-        case "06" => SoleProprietor
-        case "07" => DesignatedMember
-        case "other" => Other(o.get)
-        case _ => throw new IllegalArgumentException("!")
-      })
-  }
-
-  implicit val positionsRule:Rule[UrlFormEncoded, Set[PositionWithinBusiness]] = From[UrlFormEncoded] { __ =>
-    ((__ \ "positions").read(atLeastOneRule)  ~
-      (__ \ "otherPosition").read(maxLengthRule)).tupled
-      .andThen(fullySpecifiedRule)
-  }
 }

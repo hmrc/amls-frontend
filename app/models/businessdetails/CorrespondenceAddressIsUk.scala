@@ -16,30 +16,10 @@
 
 package models.businessdetails
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
 case class CorrespondenceAddressIsUk(isUk: Boolean)
 
 object CorrespondenceAddressIsUk {
-
   implicit val formats = Json.format[CorrespondenceAddressIsUk]
-
-  import utils.MappingUtils.Implicits._
-
-
-  implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddressIsUk] =
-    From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-      (__ \ "isUK").read[Boolean].withMessage("businessdetails.correspondenceaddress.isuk.error")
-        .map(x => CorrespondenceAddressIsUk.apply(x))
-    }
-
-  implicit val formWrites = Write[CorrespondenceAddressIsUk, UrlFormEncoded] { a =>
-    a.isUk match {
-      case true => Map("isUK" -> Seq("true"))
-      case false => Map("isUK" -> Seq("false"))
-    }
-  }
 }

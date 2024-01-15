@@ -17,11 +17,8 @@
 package views.msb
 
 import forms.msb.BranchesOrAgentsFormProvider
-import forms.{Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
 import models.moneyservicebusiness.BranchesOrAgentsHasCountries
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture

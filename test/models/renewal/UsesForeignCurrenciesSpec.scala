@@ -16,7 +16,6 @@
 
 package models.renewal
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import models.CharacterSets
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 import utils.AmlsSpec
@@ -24,51 +23,6 @@ import utils.AmlsSpec
 class UsesForeignCurrenciesSpec extends AmlsSpec with CharacterSets {
 
   "UsesForeignCurrencies renewal" must {
-    "pass validation" when {
-      "yes is selected" in {
-        val model = Map("usesForeignCurrencies" -> Seq("true"))
-
-        UsesForeignCurrencies.formRule.validate(model) must be(Valid(UsesForeignCurrenciesYes))
-      }
-
-      "no is selected" in {
-        val model = Map("usesForeignCurrencies" -> Seq("false"))
-
-        UsesForeignCurrencies.formRule.validate(model) must be(Valid(UsesForeignCurrenciesNo))
-      }
-    }
-
-    "fail validation" when {
-      "usesForeignCurrencies field is missing" in {
-        val model = Map[String, Seq[String]]()
-
-        UsesForeignCurrencies.formRule.validate(model) must
-          be(Invalid(List((Path \ "usesForeignCurrencies", Seq(ValidationError("error.required.renewal.wc.foreign.currencies"))))))
-      }
-
-      "given no data represented by an empty Map" in {
-        UsesForeignCurrencies.formRule.validate(Map.empty) must
-          be(Invalid(Seq((Path \ "usesForeignCurrencies") -> Seq(ValidationError("error.required.renewal.wc.foreign.currencies")))))
-      }
-    }
-
-    "validate form write for option No" in {
-      val map = Map("usesForeignCurrencies" -> Seq("false"))
-
-      UsesForeignCurrencies.formWrites.writes(UsesForeignCurrenciesNo) must be (map)
-    }
-
-    "validate form write for option Yes" in {
-      val map = Map("usesForeignCurrencies" -> Seq("true"))
-
-      UsesForeignCurrencies.formWrites.writes(UsesForeignCurrenciesYes) must be (map)
-    }
-
-    "form write test" in {
-      val map = Map("usesForeignCurrencies" -> Seq("false"))
-
-      UsesForeignCurrencies.formWrites.writes(UsesForeignCurrenciesNo) must be(map)
-    }
 
     "JSON validation" must {
       "successfully validate given values" in {

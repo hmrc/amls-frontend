@@ -18,8 +18,8 @@ package forms.hvd
 
 import forms.mappings.Mappings
 import models.hvd.{HowWillYouSellGoods, SalesChannel}
+import play.api.data.Form
 import play.api.data.Forms.seq
-import play.api.data.{Form, Forms}
 
 import javax.inject.Inject
 

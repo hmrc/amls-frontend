@@ -44,7 +44,6 @@ class NeedMoreInformationController @Inject()(authAction: AuthAction,
     implicit request =>
       (for {
         model <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](request.credId, ServiceChangeRegister.key))
-//        model <- OptionT.fromOption[Future](Some(ServiceChangeRegister(Some(BusinessActivities.all), Some(BusinessMatchingMsbServices.all.toSet))))
         activity <- OptionT.fromOption[Future](model.addedActivities)
         cacheMap <- OptionT(dataCacheConnector.fetchAll(request.credId))
       } yield {

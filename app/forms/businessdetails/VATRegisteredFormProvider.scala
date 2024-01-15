@@ -17,7 +17,6 @@
 package forms.businessdetails
 
 import forms.mappings.Mappings
-import models.FormTypes.vrnTypeRegex
 import models.businessdetails.VATRegistered
 import models.businessdetails.{VATRegisteredNo, VATRegisteredYes}
 import play.api.data.Form
@@ -36,7 +35,7 @@ class VATRegisteredFormProvider @Inject()() extends Mappings {
         .verifying(
           firstError(
             correctLength(length, "error.invalid.vat.number.length"),
-            regexp(vrnTypeRegex.regex, "error.invalid.vat.number")
+            regexp(vrnRegex, "error.invalid.vat.number")
           )
         )
       )

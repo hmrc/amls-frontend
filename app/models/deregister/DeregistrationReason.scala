@@ -16,11 +16,7 @@
 
 package models.deregister
 
-import jto.validation.forms.Rules.{maxLength, notEmpty}
-import jto.validation.{From, Path, Rule, ValidationError, Write}
-import jto.validation.forms.UrlFormEncoded
 import models.{Enumerable, WithName}
-import models.FormTypes._
 import play.api.libs.json._
 
 sealed trait DeregistrationReason {
@@ -65,35 +61,6 @@ object DeregistrationReason extends Enumerable.Implicits {
   implicit val enumerable: Enumerable[DeregistrationReason] = Enumerable(all.map(v => v.toString -> v): _*)
 
   import utils.MappingUtils.Implicits._
-
-  private val maxTextLength = 40
-  private val specifyOtherReasonType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.deregistration.reason.input") andThen
-    maxLength(maxTextLength).withMessage("error.required.deregistration.reason.length") andThen
-    basicPunctuationPattern("error.required.deregistration.reason.format")
-
-  implicit val formRule: Rule[UrlFormEncoded, DeregistrationReason] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "deregistrationReason").read[String].withMessage("error.required.deregistration.reason") flatMap {
-      case "01" => OutOfScope
-      case "02" => NotTradingInOwnRight
-      case "03" => UnderAnotherSupervisor
-      case "04" => ChangeOfLegalEntity
-      case "05" => HVDPolicyOfNotAcceptingHighValueCashPayments
-      case "06" => (__ \ "specifyOtherReason").read(specifyOtherReasonType) map Other.apply
-      case _ =>
-        (Path \ "deregistrationReason") -> Seq(ValidationError("error.invalid"))
-    }
-  }
-
-  implicit val formWrites: Write[DeregistrationReason, UrlFormEncoded] = Write {
-    case OutOfScope => Map("deregistrationReason" -> "01")
-    case NotTradingInOwnRight => Map("deregistrationReason" -> "02")
-    case UnderAnotherSupervisor => Map("deregistrationReason" -> "03")
-    case ChangeOfLegalEntity => Map("deregistrationReason" -> "04")
-    case HVDPolicyOfNotAcceptingHighValueCashPayments => Map("deregistrationReason" -> "05")
-    case Other(reason) => Map("deregistrationReason" -> "06", "specifyOtherReason" -> reason)
-  }
 
   implicit val jsonReads: Reads[DeregistrationReason] = {
     import play.api.libs.json.Reads.StringReads

@@ -19,7 +19,7 @@ package models.responsiblepeople
 import org.joda.time.LocalDate
 import play.api.libs.json.JodaReads._
 import play.api.libs.json.JodaWrites._
-import play.api.libs.json.{Json, Writes => _, _}
+import play.api.libs.json.{Json, Writes => _}
 
 case class LegalNameChangeDate(date: LocalDate)
 

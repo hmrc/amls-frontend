@@ -16,8 +16,6 @@
 
 package models.tradingpremises
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
 import models.tradingpremises.TradingPremisesMsbService._
 import play.api.libs.json._
 import utils.AmlsSpec
@@ -31,43 +29,6 @@ class TradingPremisesMsbServicesSpec extends AmlsSpec {
       val js = Json.toJson(data)
 
       js.as[TradingPremisesMsbServices] mustEqual data
-    }
-
-    "round trip through Forms correctly" in {
-
-      val model = TradingPremisesMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, ForeignExchange))
-      val data = implicitly[Write[TradingPremisesMsbServices, UrlFormEncoded]].writes(model)
-
-      implicitly[Rule[UrlFormEncoded, TradingPremisesMsbServices]].validate(data) mustEqual Valid(model)
-    }
-
-    "fail to validate when the set is empty" in {
-
-      val data: UrlFormEncoded = Map(
-        "msbServices" -> Seq.empty[String]
-      )
-
-      implicitly[Rule[UrlFormEncoded, TradingPremisesMsbServices]].validate(data)
-          .mustEqual(Invalid(Seq((Path \ "msbServices") -> Seq(ValidationError("error.required.tp.services")))))
-    }
-
-    "fail to validate when there is an invalid entry in the set" in {
-
-      val data: UrlFormEncoded = Map(
-        "msbServices" -> Seq("invalid")
-      )
-
-      implicitly[Rule[UrlFormEncoded, TradingPremisesMsbServices]].validate(data)
-          .mustEqual(Invalid(Seq((Path \ "msbServices" \ 0) -> Seq(ValidationError("error.invalid")))))
-    }
-
-    "serialize with the expected structure" in {
-
-      val model = TradingPremisesMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, ForeignExchange))
-
-      val serializedModel = TradingPremisesMsbServices.formW.writes(model)
-
-      serializedModel.getOrElse("msbServices[]", Seq()).toSet mustEqual Set("01", "02", "03", "04", "05")
     }
   }
 }

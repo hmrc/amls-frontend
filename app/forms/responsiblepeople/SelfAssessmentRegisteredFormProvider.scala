@@ -18,7 +18,7 @@ package forms.responsiblepeople
 
 import forms.mappings.Mappings
 import models.responsiblepeople
-import models.responsiblepeople.{SaRegistered, SaRegisteredNo, SaRegisteredYes, VATRegistered, VATRegisteredNo, VATRegisteredYes}
+import models.responsiblepeople.{SaRegistered, SaRegisteredNo, SaRegisteredYes}
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue

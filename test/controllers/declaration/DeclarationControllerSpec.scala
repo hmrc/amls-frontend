@@ -20,8 +20,8 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
-import models.registrationprogress.{Completed, Section, Started, TaskRow}
-import models.renewal.{AMLSTurnover, AMPTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
+import models.registrationprogress.{Completed, Started, TaskRow}
+import models.renewal._
 import models.status.{NotCompleted, ReadyForRenewal, SubmissionReadyForReview}
 import models.{Country, ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
 import org.joda.time.{LocalDate, LocalDateTime}
@@ -30,14 +30,13 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
-import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.{RenewalService, SectionsProvider}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.declaration.DeclareView
 
-import scala.language.postfixOps
 import scala.concurrent.Future
+import scala.language.postfixOps
 
 class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 

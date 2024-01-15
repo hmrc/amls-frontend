@@ -16,16 +16,12 @@
 
 package models.tradingpremises
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{Rule, ValidationError, _}
-import models.{DateOfChange, Enumerable, WithName}
 import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingNotScrapMetal => BMChequeCashingNotScrapMetal, ChequeCashingScrapMetal => BMChequeCashingScrapMetal, CurrencyExchange => BMCurrencyExchange, ForeignExchange => BMForeignExchange, TransmittingMoney => BMTransmittingMoney}
+import models.{Enumerable, WithName}
 import play.api.i18n.Messages
-import play.api.libs.json.{Reads, Writes, _}
+import play.api.libs.json._
 import uk.gov.hmrc.govukfrontend.views.Aliases.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import utils.TraversableValidators
 
 sealed trait TradingPremisesMsbService {
 
@@ -88,36 +84,22 @@ object TradingPremisesMsbService extends Enumerable.Implicits {
 
   }
 
-  implicit val serviceR = Rule[String, TradingPremisesMsbService] {
-    case "01" => Valid(TransmittingMoney)
-    case "02" => Valid(CurrencyExchange)
-    case "03" => Valid(ChequeCashingNotScrapMetal)
-    case "04" => Valid(ChequeCashingScrapMetal)
-    case "05" => Valid(ForeignExchange)
-    case _ => Invalid(Seq(Path -> Seq(ValidationError("error.invalid"))))
+  implicit val reads: Reads[TradingPremisesMsbService] = Reads {
+    case JsString("01") => JsSuccess(TransmittingMoney)
+    case JsString("02") => JsSuccess(CurrencyExchange)
+    case JsString("03") => JsSuccess(ChequeCashingNotScrapMetal)
+    case JsString("04") => JsSuccess(ChequeCashingScrapMetal)
+    case JsString("05") => JsSuccess(ForeignExchange)
+    case _ => JsError(play.api.libs.json.JsonValidationError("error.invalid"))
   }
 
-  implicit val serviceW = Write[TradingPremisesMsbService, String] {
-    case TransmittingMoney => "01"
-    case CurrencyExchange => "02"
-    case ChequeCashingNotScrapMetal => "03"
-    case ChequeCashingScrapMetal => "04"
-    case ForeignExchange => "05"
+  implicit val writes = Writes[TradingPremisesMsbService] {
+    case TransmittingMoney => JsString(TransmittingMoney.value)
+    case CurrencyExchange => JsString(CurrencyExchange.value)
+    case ChequeCashingNotScrapMetal => JsString(ChequeCashingNotScrapMetal.value)
+    case ChequeCashingScrapMetal => JsString(ChequeCashingScrapMetal.value)
+    case ForeignExchange => JsString(ForeignExchange.value)
   }
-
-  implicit val jsonR: Rule[JsValue, TradingPremisesMsbService] = {
-    import jto.validation.playjson.Rules._
-    stringR andThen serviceR
-  }
-
-  implicit val jsonW: Write[TradingPremisesMsbService, JsValue] = {
-    import jto.validation.playjson.Writes._
-    serviceW andThen string
-  }
-
-  def applyWithoutDateOfChange(services: Set[TradingPremisesMsbService]) = TradingPremisesMsbServices(services)
-
-  def unapplyWithoutDateOfChange(s: TradingPremisesMsbServices) = Some(s.services)
 
   val all: Seq[TradingPremisesMsbService] = Seq(
     TransmittingMoney,
@@ -130,55 +112,12 @@ object TradingPremisesMsbService extends Enumerable.Implicits {
   implicit val enumerable: Enumerable[TradingPremisesMsbService] = Enumerable(all.map(v => v.toString -> v): _*)
 }
 
-sealed trait MsbServices0 {
-
-  private implicit def rule[A]
-  (implicit
-   p: Path => RuleLike[A, Set[TradingPremisesMsbService]]
-  ): Rule[A, TradingPremisesMsbServices] =
-    From[A] { __ =>
-
-      import utils.MappingUtils.Implicits.RichRule
-
-      val required =
-        TraversableValidators.minLengthR[Set[TradingPremisesMsbService]](1) withMessage "error.required.tp.services"
-
-      (__ \ "msbServices").read(required) map TradingPremisesMsbService.applyWithoutDateOfChange
-    }
-
-  private implicit def write[A]
-  (implicit
-   p: Path => WriteLike[Set[TradingPremisesMsbService], A]
-  ): Write[TradingPremisesMsbServices, A] =
-    To[A] { __ =>
-
-      import play.api.libs.functional.syntax.unlift
-
-      (__ \ "msbServices").write[Set[TradingPremisesMsbService]] contramap unlift(TradingPremisesMsbService.unapplyWithoutDateOfChange)
-    }
-
-  val formR: Rule[UrlFormEncoded, TradingPremisesMsbServices] = {
-    import jto.validation.forms.Rules._
-    implicitly[Rule[UrlFormEncoded, TradingPremisesMsbServices]]
-  }
-
-  val formW: Write[TradingPremisesMsbServices, UrlFormEncoded] = {
-    import jto.validation.forms.Writes._
-    import utils.MappingUtils.writeM
-    implicitly[Write[TradingPremisesMsbServices, UrlFormEncoded]]
-  }
-}
-
 object TradingPremisesMsbServices {
 
-  private object Cache extends MsbServices0
-
-  def addDateOfChange(doc: Option[DateOfChange], obj: JsObject) =
-    doc.fold(obj) { dateOfChange => obj + ("dateOfChange" -> DateOfChange.writes.writes(dateOfChange))}
-
+  //TODO - come back to this
   implicit val jsonWrites = new Writes[TradingPremisesMsbServices] {
     def writes(s: TradingPremisesMsbServices): JsValue = {
-      val values = s.services map { x => JsString(TradingPremisesMsbService.serviceW.writes(x)) }
+      val values = s.services map Json.toJson[TradingPremisesMsbService]
 
       Json.obj(
         "msbServices" -> values
@@ -186,16 +125,9 @@ object TradingPremisesMsbServices {
     }
   }
 
-  implicit val msbServiceReader: Reads[Set[TradingPremisesMsbService]] = {
-    __.read[JsArray].map(a => a.value.map(TradingPremisesMsbService.jsonR.validate(_).toOption.get).toSet)
-  }
-
   implicit val jReads: Reads[TradingPremisesMsbServices] = {
-    (__ \ "msbServices").read[Set[TradingPremisesMsbService]].map(TradingPremisesMsbServices.apply _)
+    (__ \ "msbServices").read[Set[TradingPremisesMsbService]].map(TradingPremisesMsbServices.apply)
   }
-
-  implicit val formR: Rule[UrlFormEncoded, TradingPremisesMsbServices] = Cache.formR
-  implicit val formW: Write[TradingPremisesMsbServices, UrlFormEncoded] = Cache.formW
 
   implicit def convertServices(msbService: Set[models.businessmatching.BusinessMatchingMsbService]): Set[TradingPremisesMsbService] =
     msbService map {s => convertSingleService(s)}

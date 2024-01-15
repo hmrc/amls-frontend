@@ -18,91 +18,9 @@ package models.responsiblepeople
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class VATRegisteredSpec extends PlaySpec with MockitoSugar {
-
-  "Form Validation" must {
-
-    "successfully validate" when {
-      "given an enum value" in {
-
-        VATRegistered.formRule.validate(Map("registeredForVAT" -> Seq("false"))) must
-          be(Valid(VATRegisteredNo))
-      }
-
-      "given a `Yes` value" in {
-
-        val data = Map(
-          "registeredForVAT" -> Seq("true"),
-          "vrnNumber" -> Seq("123456789")
-        )
-
-        VATRegistered.formRule.validate(data) must
-          be(Valid(VATRegisteredYes("123456789")))
-      }
-    }
-
-    "fail to validate" when {
-
-      "registeredForVAT has no value" in {
-
-        VATRegistered.formRule.validate(Map.empty) must
-          be(Invalid(Seq(
-            (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.rp.registered.for.vat"))
-          )))
-      }
-
-      "given an invalid field" in {
-
-        VATRegistered.formRule.validate(Map("registeredForVAT" -> Seq("123456789"))) must
-          be(Invalid(Seq(
-            (Path \ "registeredForVAT") -> Seq(ValidationError("error.required.rp.registered.for.vat"))
-          )))
-      }
-
-      "registeredForVAT is true and vrnNumber has no value" in {
-
-        val data = Map(
-          "registeredForVAT" -> Seq("true"),
-          "vrnNumber" -> Seq("")
-        )
-
-        VATRegistered.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "vrnNumber") -> Seq(ValidationError("error.required.vat.number"))
-          )))
-      }
-
-      "registeredForVAT is true and vrnNumber has invalid data" in {
-
-        val data = Map(
-          "registeredForVAT" -> Seq("true"),
-          "vrnNumber" -> Seq("%^&*(1231")
-        )
-
-        VATRegistered.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "vrnNumber") -> Seq(ValidationError("error.invalid.vat.number"))
-          )))
-      }
-    }
-
-    "write correct data from enum value" in {
-
-      VATRegistered.formWrites.writes(VATRegisteredNo) must
-        be(Map("registeredForVAT" -> Seq("false")))
-
-    }
-
-    "write correct data from `Yes` value" in {
-
-      VATRegistered.formWrites.writes(VATRegisteredYes("12345678")) must
-        be(Map("registeredForVAT" -> Seq("true"), "vrnNumber" -> Seq("12345678")))
-    }
-  }
 
   "JSON validation" must {
 

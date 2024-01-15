@@ -16,9 +16,6 @@
 
 package models.tradingpremises
 
-import jto.validation.{Write, Path, From, Rule}
-import jto.validation.forms._
-import jto.validation.ValidationError
 import play.api.i18n.Messages
 import play.api.libs.json.Writes
 import play.api.libs.json._
@@ -51,22 +48,5 @@ object TaxType {
   implicit val jsonWritesTaxType = Writes[TaxType] {
     case TaxTypeSelfAssesment => Json.obj("taxType" -> "01")
     case TaxTypeCorporationTax => Json.obj("taxType" -> "02")
-  }
-
-  implicit val taxTypeRule: Rule[UrlFormEncoded, TaxType] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "taxType").read[String] flatMap {
-      case "01" => TaxTypeSelfAssesment
-      case "02" => TaxTypeCorporationTax
-      case _ =>
-        (Path \ "taxType") -> Seq(ValidationError("error.invalid"))
-    }
-  }
-
-  implicit val formWritesTaxType: Write[TaxType, UrlFormEncoded] = Write {
-    case TaxTypeSelfAssesment =>
-      Map("taxType" -> Seq("01"))
-    case TaxTypeCorporationTax =>
-      Map("taxType" -> Seq("02"))
   }
 }

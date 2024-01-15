@@ -17,7 +17,6 @@
 package controllers.businessmatching.updateservice.remove
 
 import cats.data.OptionT
-import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import forms.businessmatching.RemoveBusinessActivitiesFormProvider
@@ -63,13 +62,13 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
     when {
       controller.businessMatchingService.getModel(any())(any())
-    } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+    } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
       activities = Some(BusinessActivities(Set(BillPaymentServices)))
-    ))
+    )))
 
     when {
       controller.businessMatchingService.getSubmittedBusinessActivities(any())(any(), any())
-    } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
+    } thenReturn OptionT.liftF[Future, Set[BusinessActivity]](Future.successful(Set(BillPaymentServices)))
 
     mockCacheFetch[RemoveBusinessTypeFlowModel](Some(RemoveBusinessTypeFlowModel(Some(Set(BillPaymentServices)))), Some(RemoveBusinessTypeFlowModel.key))
   }
@@ -102,13 +101,14 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         when {
           controller.businessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
-        ))
+        )))
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel()), Some(RemoveBusinessTypeFlowModel.key))
 
-        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any()))
+          .thenReturn(OptionT.liftF[Future, Boolean](Future.successful(true)))
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
@@ -125,9 +125,9 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       "save the list of business activites to the data cache" in new Fixture {
         when {
           controller.businessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
-        ))
+        )))
 
         val today = LocalDate.now
 
@@ -135,7 +135,8 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
         mockCacheFetch(Some(flowModel), Some(RemoveBusinessTypeFlowModel.key))
 
-        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any()))
+          .thenReturn(OptionT.liftF[Future, Boolean](Future.successful(true)))
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
@@ -152,13 +153,14 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       "wipe the date of change if its not required" in new Fixture {
         when {
           controller.businessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
-        ))
+        )))
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
 
-        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any())).thenReturn(OptionT.some[Future, Boolean](false))
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any()))
+          .thenReturn(OptionT.liftF[Future, Boolean](Future.successful(false)))
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
@@ -175,13 +177,14 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       "wipe the date of change if the services to remove have been edited and changed" in new Fixture {
         when {
           controller.businessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
-        ))
+        )))
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)), dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
 
-        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any()))
+          .thenReturn(OptionT.liftF[Future, Boolean](Future.successful(true)))
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
@@ -198,13 +201,14 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       "leave the date of change if the services to remove have not been changed" in new Fixture {
         when {
           controller.businessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
           activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
-        ))
+        )))
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
 
-        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any(), any())(any(), any()))
+          .thenReturn(OptionT.liftF[Future, Boolean](Future.successful(true)))
 
         mockCacheSave[RemoveBusinessTypeFlowModel]
 
@@ -221,7 +225,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       "throw an error message when trying to select all business types the users has" in new Fixture {
         when {
           controller.businessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
           activities = Some(BusinessActivities(Set(AccountancyServices,
             BillPaymentServices,
             EstateAgentBusinessService,
@@ -229,7 +233,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
             MoneyServiceBusiness,
             TrustAndCompanyServices,
             TelephonePaymentService)))
-        ))
+        )))
 
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel()))

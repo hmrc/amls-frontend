@@ -17,15 +17,11 @@
 package views.businessmatching
 
 import forms.businessmatching.TypeOfBusinessFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.TypeOfBusiness
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
-import jto.validation.Path
-import jto.validation.ValidationError
 import org.jsoup.nodes.Element
 import play.api.data.{Form, FormError}
-import play.api.i18n.Messages
 import views.Fixture
 import views.html.businessmatching.TypeOfBusinessView
 

@@ -16,10 +16,8 @@
 
 package views.bankdetails
 
-import forms.EmptyForm
 import models.bankdetails.BankAccountType._
 import models.bankdetails._
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsSummaryViewSpec
 import views.Fixture

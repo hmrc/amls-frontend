@@ -17,7 +17,6 @@
 package views.applicationstatus
 
 import config.ApplicationConfig
-import forms.{EmptyForm, Form2}
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
@@ -128,7 +127,6 @@ class HowToPayViewSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have a back link" in new ViewFixture {
-      val form2: Form2[_] = EmptyForm
 
       def view = howToPay(None)
 

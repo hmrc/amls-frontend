@@ -28,9 +28,6 @@ trait TcspValues {
 
   object DefaultValues {
 
-    private val offTheShelf = true
-    private val complexStructure = false
-
     val DefaultProvidedServices = ProvidedServices(Set(PhonecallHandling, Other("other service")))
 
     val DefaultCompanyServiceProviders = TcspTypes(Set(
@@ -48,9 +45,6 @@ trait TcspValues {
   }
 
   object NewValues {
-
-    private val offTheShelf = true
-    private val complexStructure = false
 
     val NewProvidedServices = ProvidedServices(Set(EmailHandling))
     val NewCompanyServiceProviders = TcspTypes(Set(NomineeShareholdersProvider,

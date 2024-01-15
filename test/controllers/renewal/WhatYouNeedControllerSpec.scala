@@ -24,7 +24,6 @@ import models.renewal.Renewal
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import play.api.i18n._
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import services.RenewalService

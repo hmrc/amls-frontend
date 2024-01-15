@@ -19,7 +19,7 @@ package forms.hvd
 import forms.behaviours.{CheckboxFieldBehaviours, StringFieldBehaviours}
 import forms.mappings.Constraints
 import models.hvd.PaymentMethods.Other
-import models.hvd.{ItemType, PaymentMethod, PaymentMethods, Products}
+import models.hvd.{PaymentMethod, PaymentMethods}
 import play.api.data.{Form, FormError}
 
 class ExpectToReceiveFormProviderSpec extends CheckboxFieldBehaviours with StringFieldBehaviours with Constraints {

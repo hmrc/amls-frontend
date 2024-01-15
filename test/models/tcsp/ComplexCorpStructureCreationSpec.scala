@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package models.tradingpremises
+package models.tcsp
 
-import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class ConfirmAddressSpec extends PlaySpec with MockitoSugar {
-  
-  "ConfirmAddress" must {
+class ComplexCorpStructureCreationSpec extends PlaySpec with MustMatchers {
+
+  "ComplexCorpStructureCreation" must {
 
     "round trip through JSON" in {
 
-      val trueModel = ConfirmAddress(true)
-      val falseModel = ConfirmAddress(false)
+      Json.toJson[ComplexCorpStructureCreation](ComplexCorpStructureCreationYes)
+        .as[ComplexCorpStructureCreation] mustBe ComplexCorpStructureCreationYes
 
-      Json.toJson(trueModel).as[ConfirmAddress] mustBe trueModel
-      Json.toJson(falseModel).as[ConfirmAddress] mustBe falseModel
+      Json.toJson[ComplexCorpStructureCreation](ComplexCorpStructureCreationNo)
+        .as[ComplexCorpStructureCreation] mustBe ComplexCorpStructureCreationNo
     }
   }
 }

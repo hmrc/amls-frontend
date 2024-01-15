@@ -17,8 +17,6 @@
 package forms.tradingpremises
 
 import forms.behaviours.RadioFieldBehaviours
-import forms.businessmatching.RegisterBusinessActivitiesFormProvider
-import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.tradingpremises.BusinessStructure
 import play.api.data.FormError
 

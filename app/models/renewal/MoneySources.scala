@@ -16,11 +16,7 @@
 
 package models.renewal
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Path, Rule, To, ValidationError, Write}
-import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
-import models.{Enumerable, ValidationRule, WithName}
+import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import play.api.libs.json._
 
@@ -63,74 +59,6 @@ object MoneySources extends Enumerable.Implicits {
   val all: Seq[MoneySource] = Seq(Banks, Wholesalers, Customers)
 
   implicit val enumerable: Enumerable[MoneySource] = Enumerable(all.map(v => v.toString -> v): _*)
-
-  import jto.validation.forms.Rules._
-  import utils.MappingUtils.Implicits._
-
-  private def nameType(fieldName: String) = {
-    notEmptyStrip andThen
-      minLength(1).withMessage(s"error.invalid.renewal.msb.wc.$fieldName") andThen
-      maxLength(140).withMessage(s"error.invalid.maxlength.140.$fieldName") andThen
-      basicPunctuationPattern(s"error.invalid.characters.renewal.msb.wc.$fieldName")
-  }
-
-  type MoneySourceValidation = (Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
-
-  private val validateMoneySources: ValidationRule[MoneySourceValidation] = Rule[MoneySourceValidation, MoneySourceValidation] {
-    case x@(Some(_), _, _) => Valid(x)
-    case x@(_, Some(_), _) => Valid(x)
-    case x@(_, _, Some(true)) => Valid(x)
-    case _ => Invalid(Seq((Path \ "WhoWillSupply") -> Seq(ValidationError("error.invalid.renewal.msb.wc.moneySources"))))
-  }
-
-  implicit def formRule: Rule[UrlFormEncoded, MoneySources] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms._
-
-    val bankMoneySource: Rule[UrlFormEncoded, Option[BankMoneySource]] =
-      (__ \ "bankMoneySource").read[Option[String]] flatMap {
-        case Some("Yes") => (__ \ "bankNames")
-          .read(nameType("bankNames"))
-          .map(names => Some(BankMoneySource(names)))
-        case _ => Rule[UrlFormEncoded, Option[BankMoneySource]](_ => Valid(None))
-      }
-
-    val wholesalerMoneySource: Rule[UrlFormEncoded, Option[WholesalerMoneySource]] =
-      (__ \ "wholesalerMoneySource").read[Option[String]] flatMap {
-        case Some("Yes") => (__ \ "wholesalerNames")
-          .read(nameType("wholesalerNames"))
-          .map(names => Some(WholesalerMoneySource(names)))
-        case _ => Rule[UrlFormEncoded, Option[WholesalerMoneySource]](_ => Valid(None))
-      }
-
-    val customerMoneySource: Rule[UrlFormEncoded, Option[Boolean]] =
-      (__ \ "customerMoneySource").read[Option[String]] map {
-        case Some("Yes") => Some(true)
-        case _ => None
-      }
-
-    val validatedMs = (bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled andThen validateMoneySources
-
-    validatedMs map { msv: MoneySourceValidation =>
-      (msv._1, msv._2, msv._3) match{
-        case (b, w, c) => MoneySources(b,w,c)
-      }
-    }
-  }
-
-  implicit val formWrite: Write[MoneySources, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-
-    ((__ \ "bankMoneySource").write[Option[String]] ~
-      (__ \ "bankNames").write[Option[String]] ~
-      (__ \ "wholesalerMoneySource").write[Option[String]] ~
-      (__ \ "wholesalerNames").write[Option[String]] ~
-      (__ \ "customerMoneySource").write[Option[String]]).apply(ms =>
-      (ms.bankMoneySource.map(_ => "Yes"),
-        ms.bankMoneySource.map(bms => bms.bankNames),
-        ms.wholesalerMoneySource.map(_ => "Yes"),
-        ms.wholesalerMoneySource.map(bms => bms.wholesalerNames),
-        ms.customerMoneySource.map(_ => "Yes")))
-  }
 
   val bankMoneySourceWriter = new Writes[Option[BankMoneySource]] {
     override def writes(o: Option[BankMoneySource]): JsValue = o match {

@@ -16,9 +16,6 @@
 
 package models.hvd
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
 import models.{Enumerable, WithName}
 import play.api.libs.json._
 import models.renewal.{PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000}
@@ -61,28 +58,6 @@ object PercentageOfCashPaymentOver15000 extends Enumerable.Implicits {
   implicit val enumerable: Enumerable[PercentageOfCashPaymentOver15000] = Enumerable(all.map(v => v.toString -> v): _*)
 
   import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, PercentageOfCashPaymentOver15000] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "percentage").read[String].withMessage("error.required.hvd.percentage") flatMap {
-      case "01" => First
-      case "02" => Second
-      case "03" => Third
-      case "04" => Fourth
-      case "05" => Fifth
-      case _ =>
-        (Path \ "percentage") -> Seq(ValidationError("error.invalid"))
-    }
-  }
-
-  implicit val formWrites: Write[PercentageOfCashPaymentOver15000, UrlFormEncoded] = Write {
-    case First => "percentage" -> "01"
-    case Second => "percentage" -> "02"
-    case Third => "percentage" -> "03"
-    case Fourth => "percentage" -> "04"
-    case Fifth => "percentage" -> "05"
-
-  }
 
   implicit val jsonReads = {
     import play.api.libs.json.Reads.StringReads

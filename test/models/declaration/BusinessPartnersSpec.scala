@@ -16,34 +16,10 @@
 
 package models.declaration
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class BusinessPartnersSpec extends PlaySpec {
-
-  "Form Validation" must {
-
-    "successfully validate" when {
-      "successfully validate given a valid person name" in {
-        val data = Map("value" -> Seq("PersonName"))
-        val result = BusinessPartners.formRule.validate(data)
-        result mustBe Valid(BusinessPartners("PersonName"))
-      }
-    }
-
-    "fail validation" when {
-      "fail validation for missing data represented by an empty Map" in {
-        val result = BusinessPartners.formRule.validate(Map.empty)
-        result mustBe Invalid(Seq((Path \ "value", Seq(ValidationError("error.required.declaration.partners")))))
-      }
-    }
-
-    "write correct data from true value" in {
-      val result = BusinessPartners.formWrites.writes(BusinessPartners("PersonName"))
-      result must be(Map("value" -> Seq("PersonName")))
-    }
-  }
 
   "JSON validation" must {
 

@@ -16,9 +16,6 @@
 
 package models.bankdetails
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
 import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import play.api.libs.json._
@@ -71,28 +68,6 @@ object BankAccountType extends Enumerable.Implicits {
   }
 
   import utils.MappingUtils.Implicits._
-
-  implicit val formReads: Rule[UrlFormEncoded, Option[BankAccountType]] =
-    From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-
-      (__ \ "bankAccountType").read[String].withMessage("error.bankdetails.accounttype") flatMap {
-        case "01" => Some(PersonalAccount)
-        case "02" => Some(BelongsToBusiness)
-        case "03" => Some(BelongsToOtherBusiness)
-        case "04" => Some(NoBankAccountUsed)
-        case _ =>
-          (Path \ "bankAccountType") -> Seq(ValidationError("error.invalid"))
-      }
-    }
-
-  implicit val formWrites:Write[Option[BankAccountType], UrlFormEncoded] = Write {
-    case Some(PersonalAccount) => "bankAccountType" -> "01"
-    case Some(BelongsToBusiness) => "bankAccountType" -> "02"
-    case Some(BelongsToOtherBusiness) => "bankAccountType" -> "03"
-    case Some(NoBankAccountUsed) => "bankAccountType" -> "04"
-    case _ => Map.empty
-  }
 
   implicit val jsonReads : Reads[BankAccountType] = {
     import play.api.libs.json.Reads.StringReads

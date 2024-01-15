@@ -21,7 +21,6 @@ import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import cats.data.OptionT
 import cats.implicits._
 import config.ApplicationConfig
-import forms.InvalidForm
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.status.SubmissionStatus
@@ -68,7 +67,7 @@ trait AddressHelper extends RepeatingSection with DateOfChangeHelper {
 
     (for {
       rp <- OptionT(getData[ResponsiblePerson](credId, index))
-      _ <- OptionT.liftF(auditPreviousAddressChange(data.personAddress, rp, edit)) orElse OptionT.some[Future, AuditResult](Success)
+      _ <- OptionT.liftF(auditPreviousAddressChange(data.personAddress, rp, edit)) orElse OptionT.some(Success)
       result <- OptionT.liftF(doUpdate())
     } yield result) getOrElse NotFound(ControllerHelper.notFoundView(request, messages, lang, appConfig, error))
   }

@@ -16,26 +16,10 @@
 
 package models.businessdetails
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
 case class ContactingYouPhone(phoneNumber: String)
 
 object ContactingYouPhone {
-
   implicit val formats = Json.format[ContactingYouPhone]
-
-  implicit val formRule: Rule[UrlFormEncoded, ContactingYouPhone] =
-  From[UrlFormEncoded] { __ =>
-    import models.FormTypes._
-    import jto.validation.forms.Rules._
-      (__ \ "phoneNumber").read(phoneNumberType) map ContactingYouPhone.apply
-  }
-
-  implicit val formWrites: Write[ContactingYouPhone, UrlFormEncoded] =
-    Write {
-      case ContactingYouPhone(b) =>
-        Map("phoneNumber" -> Seq(b.toString))
-    }
 }

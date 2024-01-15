@@ -71,6 +71,7 @@ lazy val microservice = Project(appName, file("."))
     IntegrationTest / parallelExecution := false)
  .settings(
     scalacOptions ++= List(
+      "-Ypartial-unification",
       "-Yrangepos",
       "-Xlint:-missing-interpolator,_",
       "-Yno-adapted-args",

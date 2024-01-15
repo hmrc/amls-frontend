@@ -18,7 +18,6 @@ package forms.businessactivities
 
 import forms.behaviours.StringFieldBehaviours
 import forms.mappings.Constraints
-import models.businessactivities
 import models.businessactivities.{RiskAssessmentType, RiskAssessmentTypes}
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}

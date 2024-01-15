@@ -16,23 +16,6 @@
 
 package models.moneyservicebusiness
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-
 case class BranchesOrAgentsHasCountries(hasCountries: Boolean)
 
-object BranchesOrAgentsHasCountries {
-
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule : Rule[UrlFormEncoded, BranchesOrAgentsHasCountries] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "hasCountries")
-      .read[Boolean]
-      .withMessage("error.required.hasCountries.msb.branchesOrAgents") flatMap { BranchesOrAgentsHasCountries.apply }
-  }
-
-  implicit def formWrites: Write[BranchesOrAgentsHasCountries, UrlFormEncoded] = Write {
-    case BranchesOrAgentsHasCountries(accepted) => Map("hasCountries" -> accepted.toString)
-  }
-}
+object BranchesOrAgentsHasCountries

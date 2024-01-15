@@ -16,16 +16,10 @@
 
 package models.tcsp
 
-import models.FormTypes._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation._
-import jto.validation.ValidationError
+
 import play.api.libs.json._
 import play.api.libs.json.Reads.StringReads
-import jto.validation.forms.Rules.{minLength => _, _}
-import models.tcsp.TcspTypes.all
 import models.{Enumerable, WithName}
-import utils.TraversableValidators.minLengthR
 import play.api.i18n.Messages
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases.{CheckboxItem, Text}
@@ -119,58 +113,6 @@ object ProvidedServices extends Enumerable.Implicits {
   }
 
   implicit val enumerable: Enumerable[TcspService] = Enumerable(all.map(v => v.toString -> v): _*)
-
-  import utils.MappingUtils.Implicits._
-
-  val serviceDetailsMaxLength = 255
-
-  val serviceDetailsType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.tcsp.provided_services.details") andThen
-    maxWithMsg(serviceDetailsMaxLength, "error.required.tcsp.provided_services.details.length") andThen
-    basicPunctuationPattern("error.required.tcsp.provided_services.details.punctuation")
-
-  val serviceType = minLengthR[Set[String]](1).withMessage("error.required.tcsp.provided_services.services")
-
-  implicit val formReads: Rule[UrlFormEncoded, ProvidedServices] =
-    From[UrlFormEncoded] { __ =>
-          (__ \ "services").read(serviceType) flatMap { z =>
-            z.map {
-              case "01" => Rule[UrlFormEncoded, TcspService](_ => Valid(PhonecallHandling))
-              case "02" => Rule[UrlFormEncoded, TcspService](_ => Valid(EmailHandling))
-              case "03" => Rule[UrlFormEncoded, TcspService](_ => Valid(EmailServer))
-              case "04" => Rule[UrlFormEncoded, TcspService](_ => Valid(SelfCollectMailboxes))
-              case "05" => Rule[UrlFormEncoded, TcspService](_ => Valid(MailForwarding))
-              case "06" => Rule[UrlFormEncoded, TcspService](_ => Valid(Receptionist))
-              case "07" => Rule[UrlFormEncoded, TcspService](_ => Valid(ConferenceRooms))
-              case "08" =>
-                (__ \ "details").read(serviceDetailsType) map Other.apply
-              case _ =>
-                Rule[UrlFormEncoded, TcspService] { _ =>
-                  Invalid(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
-                }
-            }.foldLeft[Rule[UrlFormEncoded, Set[TcspService]]](
-              Rule[UrlFormEncoded, Set[TcspService]](_ => Valid(Set.empty))
-            ) {
-              case (m, n) =>
-                  n flatMap { x =>
-                    m map {
-                      _ + x
-                    }
-                  }
-            } map ProvidedServices.apply
-          }
-    }
-
-  implicit def formWrites = Write[ProvidedServices, UrlFormEncoded] { ps =>
-      Map(
-        "services[]" -> (ps.services map { _.value }).toSeq
-      ) ++ ps.services.foldLeft[UrlFormEncoded](Map.empty) {
-        case (m, Other(name)) =>
-          m ++ Map("details" -> Seq(name))
-        case (m, _) =>
-          m
-      }
-  }
 
   implicit val jsonReads: Reads[ProvidedServices] =
       (__ \ "services").read[Set[String]].flatMap { x =>

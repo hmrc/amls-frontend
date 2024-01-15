@@ -98,8 +98,6 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             "riskassessments[2]" -> "digital"
           )
 
-          val mockCacheMap = mock[CacheMap]
-
           when(mockService.updateRiskAssessmentType(any(), any())(any()))
             .thenReturn(Future.successful(
               Some(BusinessMatching(None, Some(BMBusinessActivities(Set(AccountancyServices, MoneyServiceBusiness)))))
@@ -165,8 +163,6 @@ class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSu
             "riskassessments[1]" -> "paperBased",
             "riskassessments[2]" -> "digital"
           )
-
-          val mockCacheMap = mock[CacheMap]
 
           when(mockService.updateRiskAssessmentType(any(), any())(any()))
             .thenReturn(Future.successful(

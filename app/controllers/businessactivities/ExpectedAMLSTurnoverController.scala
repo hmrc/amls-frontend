@@ -16,7 +16,6 @@
 
 package controllers.businessactivities
 
-import cats.implicits._
 import com.google.inject.Inject
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.businessactivities.ExpectedAMLSTurnoverFormProvider

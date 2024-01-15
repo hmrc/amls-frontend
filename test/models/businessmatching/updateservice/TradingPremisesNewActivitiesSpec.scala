@@ -16,9 +16,7 @@
 
 package models.businessmatching.updateservice
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{Path, ValidationError}
-import models.businessmatching.BusinessActivity.{BillPaymentServices, HighValueDealing}
+import models.businessmatching.BusinessActivity.HighValueDealing
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
@@ -27,92 +25,34 @@ class TradingPremisesNewActivitiesSpec extends PlaySpec with MustMatchers {
 
   "The TradingPremisesNewActivities model" when {
 
-    "given a valid form" when {
-      "'yes' is selected" must {
-        "return a valid form model" in {
-          val formData = Map(
-            "tradingPremisesNewActivities" -> Seq("true"),
-            "businessActivities" -> Seq("05")
-          )
-
-          val result = AreNewActivitiesAtTradingPremises.formReads.validate(formData)
-
-          result mustBe Valid(NewActivitiesAtTradingPremisesYes(HighValueDealing))
-        }
-      }
-
-      "'no' is selected" must {
-        "return a valid form model" in {
-          val formData = Map(
-            "tradingPremisesNewActivities" -> Seq("false")
-          )
-
-          val result = AreNewActivitiesAtTradingPremises.formReads.validate(formData)
-
-          result mustBe Valid(NewActivitiesAtTradingPremisesNo)
-        }
-      }
-
-      "nothing is selected" must {
-        "return the validation errors" in {
-          val formData = Map.empty[String, Seq[String]]
-
-          val result = AreNewActivitiesAtTradingPremises.formReads.validate(formData)
-
-          result mustBe Invalid(
-            Seq(
-              Path \ "tradingPremisesNewActivities" ->
-              Seq(ValidationError("error.businessmatching.updateservice.tradingpremisesnewactivities"))
-            ))
-        }
-      }
-    }
-
     "given valid json" must {
 
-        "deserialise to TradingPremisesNewActivitiesNo" in {
+      "deserialise to TradingPremisesNewActivitiesNo" in {
 
-          Json.fromJson[AreNewActivitiesAtTradingPremises](Json.obj("tradingPremisesNewActivities" -> false)) must
-            be(JsSuccess(NewActivitiesAtTradingPremisesNo, JsPath))
-        }
+        Json.fromJson[AreNewActivitiesAtTradingPremises](Json.obj("tradingPremisesNewActivities" -> false)) must
+          be(JsSuccess(NewActivitiesAtTradingPremisesNo, JsPath))
+      }
 
-        "deserialise to TradingPremisesNewActivitiesYes" in {
+      "deserialise to TradingPremisesNewActivitiesYes" in {
 
-          val json = Json.obj("tradingPremisesNewActivities" -> true, "businessActivities" -> "04")
+        val json = Json.obj("tradingPremisesNewActivities" -> true, "businessActivities" -> "04")
 
-          Json.fromJson[AreNewActivitiesAtTradingPremises](json) must
-            be(JsSuccess(NewActivitiesAtTradingPremisesYes(HighValueDealing), JsPath \ "businessActivities"))
-        }
-
+        Json.fromJson[AreNewActivitiesAtTradingPremises](json) must
+          be(JsSuccess(NewActivitiesAtTradingPremisesYes(HighValueDealing), JsPath \ "businessActivities"))
+      }
     }
 
-    "given a valid model" must {
-      "return the form values" when {
-        "TradingPremisesNewActivitiesYes" in {
-          val model = NewActivitiesAtTradingPremisesYes(BillPaymentServices)
-          val result = AreNewActivitiesAtTradingPremises.formWrites.writes(model)
-
-          result mustBe Map("tradingPremisesNewActivities" -> Seq("true"))
-        }
-        "TradingPremisesNewActivitiesNo" in {
-          val model = NewActivitiesAtTradingPremisesNo
-          val result = AreNewActivitiesAtTradingPremises.formWrites.writes(model)
-
-          result mustBe Map("tradingPremisesNewActivities" -> Seq("false"))
-        }
+    "write serialise to json" when {
+      "TradingPremisesNewActivitiesYes" in {
+        Json.toJson(NewActivitiesAtTradingPremisesYes(HighValueDealing).asInstanceOf[AreNewActivitiesAtTradingPremises]) must
+          be(Json.obj(
+            "tradingPremisesNewActivities" -> true,
+            "businessActivities" -> "04"
+          ))
       }
-      "write serialise to json" when {
-        "TradingPremisesNewActivitiesYes" in {
-          Json.toJson(NewActivitiesAtTradingPremisesYes(HighValueDealing).asInstanceOf[AreNewActivitiesAtTradingPremises]) must
-            be(Json.obj(
-              "tradingPremisesNewActivities" -> true,
-              "businessActivities" -> "04"
-            ))
-        }
-        "TradingPremisesNewActivitiesNo" in {
-          Json.toJson(NewActivitiesAtTradingPremisesNo.asInstanceOf[AreNewActivitiesAtTradingPremises]) must
-            be(Json.obj("tradingPremisesNewActivities" -> false))
-        }
+      "TradingPremisesNewActivitiesNo" in {
+        Json.toJson(NewActivitiesAtTradingPremisesNo.asInstanceOf[AreNewActivitiesAtTradingPremises]) must
+          be(Json.obj("tradingPremisesNewActivities" -> false))
       }
     }
   }

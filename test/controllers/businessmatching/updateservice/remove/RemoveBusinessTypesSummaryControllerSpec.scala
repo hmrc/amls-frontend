@@ -17,25 +17,23 @@
 package controllers.businessmatching.updateservice.remove
 
 import cats.data.OptionT
-import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import models.DateOfChange
-import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessActivity.MoneyServiceBusiness
+import models.businessmatching.BusinessMatching
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, RemoveBusinessTypesSummaryPageId}
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.Mockito.when
 import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils._
 import views.TitleValidator
 import views.html.businessmatching.updateservice.remove.RemoveActivitiesSummaryView
-
 
 import scala.concurrent.Future
 
@@ -87,19 +85,19 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
         mockCacheFetch(Some(flowModel), Some(RemoveBusinessTypeFlowModel.key))
 
         when(removeServiceHelper.removeBusinessMatchingBusinessTypes(any(), eqTo(flowModel))(any(), any()))
-          .thenReturn(OptionT.some[Future, BusinessMatching](mock[BusinessMatching]))
+          .thenReturn(OptionT.liftF(Future.successful(mock[BusinessMatching])))
 
         when(removeServiceHelper.removeFitAndProper(any(), eqTo(flowModel))(any(), any()))
-          .thenReturn(OptionT.some[Future, Seq[ResponsiblePerson]](Seq.empty))
+          .thenReturn(OptionT.liftF[Future, Seq[ResponsiblePerson]](Future.successful(Seq.empty)))
 
         when(removeServiceHelper.removeTradingPremisesBusinessTypes(any(), eqTo(flowModel))(any(), any()))
-          .thenReturn(OptionT.some[Future, Seq[TradingPremises]](Seq.empty))
+          .thenReturn(OptionT.liftF[Future, Seq[TradingPremises]](Future.successful(Seq.empty)))
 
         when(removeServiceHelper.removeSectionData(any(), eqTo(flowModel))(any(), any()))
-          .thenReturn(OptionT.some[Future, Seq[CacheMap]](Seq.empty))
+          .thenReturn(OptionT.liftF[Future, Seq[CacheMap]](Future.successful(Seq.empty)))
 
         when(removeServiceHelper.removeFlowData(any())(any(), any()))
-          .thenReturn(OptionT.some[Future, RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel()))
+          .thenReturn(OptionT.liftF[Future, RemoveBusinessTypeFlowModel](Future.successful(RemoveBusinessTypeFlowModel())))
 
         val result = controller.post()(requestWithUrlEncodedBody("" -> ""))
 

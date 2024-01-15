@@ -19,7 +19,7 @@ package forms.supervision
 import forms.mappings.Mappings
 import models.supervision.ProfessionalBodies.Other
 import models.supervision.{BusinessType, ProfessionalBodies}
-import play.api.data.{Form, Forms}
+import play.api.data.Form
 import play.api.data.Forms.{mapping, seq}
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 

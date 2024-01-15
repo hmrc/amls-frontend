@@ -17,19 +17,16 @@
 package services
 
 import cats.data.OptionT
-import cats.data.Validated.Valid
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.businessmatching._
-import models.registrationprogress.{Completed, NotStarted, Started, TaskRow, Updated}
-import models.renewal.Renewal.ValidationRules._
+import models.registrationprogress._
 import models.renewal._
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.MappingUtils._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -101,11 +98,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
         case ArtMarketParticipant => checkCompletionOfAMP(renewal)
       } match {
         case s if s.nonEmpty => s.forall(identity)
-
-        case _ => standardRule.validate(renewal) match {
-          case Valid(_) => true
-          case _ => false
-        }
+        case _ => renewal.standardRule
       }
     }
 
@@ -124,70 +117,35 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     isCache
   }
 
-  private def checkCompletionOfMsb(renewal: Renewal, msbServices: Option[BusinessMatchingMsbServices]) = {
-
-    val validationRule = compileOpt {
-      Seq(
-        Some(msbRule),
-        if (msbServices.exists(_.msbServices.contains(TransmittingMoney))) Some(moneyTransmitterRule) else None,
-        if (msbServices.exists(_.msbServices.contains(CurrencyExchange))) Some(currencyExchangeRule) else None,
-        if (msbServices.exists(_.msbServices.contains(ForeignExchange))) Some(foreignExchangeRule) else None,
-        Some(standardRule)
-      )
-    }
-
-    // Validate the renewal object using the composed chain of validation rules
-    validationRule.validate(renewal) match {
-      case Valid(_) => true
-      case r => false
-    }
+  private def checkCompletionOfMsb(renewal: Renewal, msbServices: Option[BusinessMatchingMsbServices]): Boolean = {
+    Seq(
+      Some(renewal.totalThroughput.isDefined),
+      if (msbServices.exists(_.msbServices.contains(TransmittingMoney))) Some(renewal.moneyTransmitterRule) else None,
+      if (msbServices.exists(_.msbServices.contains(CurrencyExchange))) Some(renewal.currencyExchangeRule) else None,
+      if (msbServices.exists(_.msbServices.contains(ForeignExchange))) Some(renewal.fxTransactionsInLast12Months.isDefined) else None,
+      Some(renewal.standardRule)
+    ).flatten.forall(identity)
   }
 
-  private def checkCompletionOfAMP(renewal: Renewal) = {
-
-    val validationRule = compileOpt {
-      Seq(
-        Some(ampRule),
-        Some(standardRule)
-      )
-    }
-    
-    validationRule.validate(renewal) match {
-      case Valid(_) => true
-      case r => false
-    }
+  private def checkCompletionOfAMP(renewal: Renewal): Boolean = {
+    Seq(
+      renewal.ampTurnover.isDefined,
+      renewal.standardRule
+    ).forall(identity)
   }
 
-  private def checkCompletionOfAsp(renewal: Renewal) = {
-
-    val validationRule = compileOpt {
-      Seq(
-        Some(aspRule),
-        Some(standardRule)
-      )
-    }
-
-    // Validate the renewal object using the composed chain of validation rules
-    validationRule.validate(renewal) match {
-      case Valid(_) => true
-      case r => false
-    }
+  private def checkCompletionOfAsp(renewal: Renewal): Boolean = {
+    Seq(
+      renewal.aspRule,
+      renewal.standardRule
+    ).forall(identity)
   }
 
-  private def checkCompletionOfHvd(renewal: Renewal) = {
-
-    val validationRule = compileOpt {
-      Seq(
-        Some(hvdRule),
-        Some(standardRule)
-      )
-    }
-
-    // Validate the renewal object using the composed chain of validation rules
-    validationRule.validate(renewal) match {
-      case Valid(_) => true
-      case r => false
-    }
+  private def checkCompletionOfHvd(renewal: Renewal): Boolean = {
+    Seq(
+      renewal.hvdRule,
+      renewal.standardRule
+    ).forall(identity)
   }
 
   def canSubmit(renewalSection: TaskRow, variationSections: Seq[TaskRow]) = {

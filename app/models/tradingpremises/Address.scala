@@ -17,9 +17,6 @@
 package models.tradingpremises
 
 import models.{Country, DateOfChange}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, To, Write}
-import models.FormTypes.genericAddressRule
 import play.api.libs.json.{Reads, Writes}
 import models.businesscustomer.{Address => BCAddress}
 
@@ -50,48 +47,6 @@ object Address {
 
   def unapplyWithoutDateOfChange(x: Address) =
     Some((x.addressLine1, x.addressLine2, x.addressLine3, x.addressLine4, x.postcode))
-
-  val addressLine1Rule = genericAddressRule("error.required.address.line1",
-    "error.required.enter.addresslineone.charcount",
-    "error.required.enter.addresslineone.regex")
-
-  val addressLine2Rule = genericAddressRule("error.required.address.line2",
-    "error.required.enter.addresslinetwo.charcount",
-    "error.required.enter.addresslinetwo.regex")
-
-  val addressLine3Rule = genericAddressRule("",
-    "error.required.enter.addresslinethree.charcount",
-    "error.required.enter.addresslinethree.regex")
-
-  val addressLine4Rule = genericAddressRule("",
-    "error.required.enter.addresslinefour.charcount",
-    "error.required.enter.addresslinefour.regex")
-
-  implicit val formR: Rule[UrlFormEncoded, Address] =
-    From[UrlFormEncoded] { __ =>
-      import models.FormTypes._
-      import jto.validation.forms.Rules._
-      (
-        (__ \ "addressLine1").read(addressLine1Rule) ~
-          (__ \ "addressLine2").read(optionR(addressLine2Rule)) ~
-          (__ \ "addressLine3").read(optionR(addressLine3Rule)) ~
-          (__ \ "addressLine4").read(optionR(addressLine4Rule)) ~
-          (__ \ "postcode").read(notEmptyStrip andThen postcodeType)
-        )(Address.applyWithoutDateOfChange)
-    }
-
-  implicit val formW: Write[Address, UrlFormEncoded] =
-    To[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Writes._
-      import play.api.libs.functional.syntax.unlift
-      (
-        (__ \ "addressLine1").write[String] ~
-          (__ \ "addressLine2").write[Option[String]] ~
-          (__ \ "addressLine3").write[Option[String]] ~
-          (__ \ "addressLine4").write[Option[String]] ~
-          (__ \ "postcode").write[String]
-        )(unlift(Address.unapplyWithoutDateOfChange))
-    }
 
   implicit val reads: Reads[Address] = {
     import play.api.libs.functional.syntax._

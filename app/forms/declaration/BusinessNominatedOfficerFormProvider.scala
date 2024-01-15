@@ -17,8 +17,7 @@
 package forms.declaration
 
 import forms.mappings.Mappings
-import models.declaration
-import models.declaration.{BusinessNominatedOfficer, WhoIsRegistering}
+import models.declaration.BusinessNominatedOfficer
 import play.api.data.Form
 
 import javax.inject.Inject

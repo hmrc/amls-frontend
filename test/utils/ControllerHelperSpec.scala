@@ -16,7 +16,6 @@
 
 package utils
 
-import forms.InvalidForm
 import models.businessactivities._
 import models.eab.Eab
 import models.responsiblepeople._
@@ -26,8 +25,6 @@ import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-
-import scala.collection.immutable.ListMap
 
 class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with DependencyMocks {
 
@@ -273,61 +270,6 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
 
       "return false if another body is incomplete AnotherBodyYes" in {
         ControllerHelper.isAbComplete(AnotherBodyYes("Supervisor", None, end, reason)) mustBe false
-      }
-    }
-
-    "stripEmptyValuesFromFormWithArray" must {
-
-      val csrfToken:Seq[String] = Seq("123456789")
-
-      "return only nonEmpty fields where form contains data from one array" in {
-
-
-        val formData: ListMap[String, Seq[String]] =
-          ListMap(("csrfToken", csrfToken),
-            ("currencies[0]", Seq("")),
-            ("currencies[1]", Seq("value1")),
-            ("currencies[2]", Seq("")),
-            ("currencies[3]", Seq("value2")),
-            ("currencies[4]", Seq("value3")))
-
-        val form = InvalidForm(data = formData, Seq())
-        val updatedForm: InvalidForm = ControllerHelper.stripEmptyValuesFromFormWithArray(form, "currencies")
-
-        updatedForm.data.size mustBe 4
-
-        updatedForm.data.get("csrfToken") mustBe Some(csrfToken)
-        updatedForm.data.get("currencies[0]") mustBe Some(Seq("value1"))
-        updatedForm.data.get("currencies[1]") mustBe Some(Seq("value2"))
-        updatedForm.data.get("currencies[2]") mustBe Some(Seq("value3"))
-      }
-
-      "return only nonEmpty fields where form contains data from two interleaved arrays" in {
-        val formData: ListMap[String, Seq[String]] =
-          ListMap(("csrfToken", csrfToken),
-            ("countries[0]", Seq("value1a")),
-            ("""countries\[0\]-autocomp""", Seq("value1b")),
-            ("countries[1]", Seq("")),
-            ("""countries\[1\]-autocomp""", Seq("")),
-            ("countries[2]", Seq("value2a")),
-            ("""countries\[2\]-autocomp""", Seq("value2b")),
-            ("countries[3]", Seq("")),
-            ("""countries\[3\]-autocomp""", Seq("")),
-            ("countries[4]", Seq("value3a")),
-            ("""countries\[4\]-autocomp""", Seq("value3b")))
-
-        val form = InvalidForm(data = formData, Seq())
-        val updatedForm: InvalidForm = ControllerHelper.stripEmptyValuesFromFormWithArray(form, "countries", index => index / 2)
-
-        updatedForm.data.size mustBe 7
-
-        updatedForm.data.get("csrfToken") mustBe Some(csrfToken)
-        updatedForm.data.get("countries[0]") mustBe Some(Seq("value1a"))
-        updatedForm.data.get("""countries\[0\]-autocomp""") mustBe Some(Seq("value1b"))
-        updatedForm.data.get("countries[1]") mustBe Some(Seq("value2a"))
-        updatedForm.data.get("""countries\[1\]-autocomp""") mustBe Some(Seq("value2b"))
-        updatedForm.data.get("countries[2]") mustBe Some(Seq("value3a"))
-        updatedForm.data.get("""countries\[2\]-autocomp""") mustBe Some(Seq("value3b"))
       }
     }
 

@@ -17,8 +17,8 @@
 package forms.hvd
 
 import forms.mappings.Mappings
-import models.hvd.{ItemType, PaymentMethod, PaymentMethods, Products}
 import models.hvd.PaymentMethods.{Courier, Direct, Other}
+import models.hvd.{PaymentMethod, PaymentMethods}
 import play.api.data.Form
 import play.api.data.Forms.{mapping, seq}
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf

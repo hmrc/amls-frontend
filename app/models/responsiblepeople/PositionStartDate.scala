@@ -16,28 +16,8 @@
 
 package models.responsiblepeople
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-import models.FormTypes._
-import org.joda.time.{DateTimeFieldType, LocalDate}
+import org.joda.time.LocalDate
 
 case class PositionStartDate(startDate: LocalDate)
 
-object PositionStartDate {
-
-  implicit val formRule: Rule[UrlFormEncoded, PositionStartDate] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "startDate").read(newAllowedPastAndFutureDateRule("error.rp.position.required.date",
-      "error.rp.position.invalid.date.after.1900",
-      "error.rp.position.invalid.date.future",
-      "error.rp.position.invalid.date.not.real")) map PositionStartDate.apply
-  }
-
-  implicit def formWrites: Write[PositionStartDate, UrlFormEncoded] = Write {
-    case PositionStartDate(date) =>
-      Map(
-        "startDate.day" -> Seq(date.get(DateTimeFieldType.dayOfMonth()).toString),
-        "startDate.month" -> Seq(date.get(DateTimeFieldType.monthOfYear()).toString),
-        "startDate.year" -> Seq(date.get(DateTimeFieldType.year()).toString))
-  }
-}
+object PositionStartDate

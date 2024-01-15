@@ -17,7 +17,7 @@
 package forms.msb
 
 import forms.behaviours.StringFieldBehaviours
-import models.moneyservicebusiness.{FXTransactionsInNext12Months, TransactionsInNext12Months}
+import models.moneyservicebusiness.FXTransactionsInNext12Months
 import play.api.data.{Form, FormError}
 
 class FxTransactionsInNext12MonthsFormProviderSpec extends StringFieldBehaviours {

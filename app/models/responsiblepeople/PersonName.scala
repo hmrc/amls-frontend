@@ -16,12 +16,7 @@
 
 package models.responsiblepeople
 
-import jto.validation._
-import jto.validation.forms.Rules._
-import jto.validation.forms._
-import models.FormTypes._
-import play.api.libs.json.{Writes => _}
-import utils.MappingUtils.Implicits._
+import play.api.libs.json._
 
 case class PersonName(
                        firstName: String,
@@ -36,40 +31,5 @@ case class PersonName(
 }
 
 object PersonName {
-
-  import play.api.libs.json._
-
-  implicit val formRule: Rule[UrlFormEncoded, PersonName] = From[UrlFormEncoded] { __ =>
-
-    (
-      (__ \ "firstName").read(genericNameRule(
-        "error.required.rp.first_name",
-        maxLengthMsg = "error.invalid.rp.first_name.length",
-        regExMessage="error.invalid.rp.first_name.validation"
-      )) ~
-        (__ \ "middleName").read(optionR(genericNameRule(
-          maxLengthMsg = "error.invalid.rp.middle_name.length",
-          regExMessage="error.invalid.rp.middle_name.validation"
-        ))) ~
-        (__ \ "lastName").read(genericNameRule(
-          "error.required.rp.last_name",
-          maxLengthMsg = "error.invalid.rp.last_name.length",
-          regExMessage="error.invalid.rp.last_name.validation"
-        ))
-      )(PersonName.apply _)
-  }
-
-  implicit val formWrite = Write[PersonName, UrlFormEncoded] {
-    model =>
-
-      Map(
-        "firstName" -> Seq(model.firstName),
-        "middleName" -> Seq(model.middleName getOrElse ""),
-        "lastName" -> Seq(model.lastName)
-      )
-  }
-
-
-
   implicit val format = Json.format[PersonName]
 }

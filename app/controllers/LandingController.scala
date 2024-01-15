@@ -16,13 +16,10 @@
 
 package controllers
 
-import java.net.URLEncoder
 import audit.ServiceEntrantEvent
-import cats.data.Validated.{Invalid, Valid}
 import config.ApplicationConfig
 import connectors.DataCacheConnector
-
-import javax.inject.{Inject, Singleton}
+import forms.mappings.Constraints
 import models._
 import models.amp.Amp
 import models.asp.Asp
@@ -51,6 +48,8 @@ import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AuthAction, ControllerHelper}
 import views.html.Start
 
+import java.net.URLEncoder
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -66,7 +65,7 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val config: ApplicationConfig,
                                   parser: BodyParsers.Default,
                                   start: Start,
-                                  headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper with Logging {
+                                  headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper with Logging with Constraints {
 
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(appConfig).absoluteUrl, "utf-8")
 
@@ -212,12 +211,12 @@ class LandingController @Inject()(val landingService: LandingService,
               auditConnector.sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
 
               (rd.businessAddress.postcode, rd.businessAddress.country) match {
-                  case (Some(postcode), Country("United Kingdom", "GB")) => {
-                    FormTypes.postcodeType.validate(postcode) match {
-                      case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
-                      case Invalid(_) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
+                  case (Some(postcode), Country("United Kingdom", "GB")) =>
+                    if (postcode.matches(postcodeRegex)) {
+                      Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
+                    } else {
+                      Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
                     }
-                  }
                   case (_, Country("United Kingdom", "GB")) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
                   case (_, country) if !country.isUK && !country.isEmpty => Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
                   case (_, _) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)

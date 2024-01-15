@@ -16,7 +16,6 @@
 
 package services
 
-import java.time.LocalDate
 import connectors._
 import models._
 import models.amp.Amp
@@ -33,22 +32,23 @@ import models.eab.Eab
 import models.hvd.Products.{Alcohol, Tobacco}
 import models.hvd._
 import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions, SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
-import models.renewal.{CashPayments => RCashPayments, MoneySources => RMoneySources, PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, WhichCurrencies => RenWhichCurrencies, _}
+import models.renewal.{PaymentMethods => RPaymentMethods}
 import models.responsiblepeople.ResponsiblePerson
 import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
-import models.tcsp._
 import models.tcsp.TcspTypes._
+import models.tcsp._
 import models.tradingpremises.TradingPremises
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.{Json, Writes}
-import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
+import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits with DefaultAwaitTimeout {
@@ -150,8 +150,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       val correspondenceAddress = CorrespondenceAddressNonUk("Name Test", "Test", "Test", Some("Test"), Some("test"), None, Country("Albania", "AL"))
       val businessDetails = BusinessDetails(None, None, None, None, None, None, None, None, Some(CorrespondenceAddressIsUk(false)), Some(CorrespondenceAddress(None, Some(correspondenceAddress))))
 
-      implicit val r = FakeRequest()
-
       when(service.cacheConnector.save[BusinessDetails](any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(cacheMap))
 
@@ -163,7 +161,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     }
 
     "return a cachmap with the saved alternative correspondence address - false" in {
-      implicit val r = FakeRequest()
 
       val businessDetails = BusinessDetails(None, None, None, None, None,None, None, None)
 
@@ -445,7 +442,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     )
 
     val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
-    val renewalPaymentMethods = RPaymentMethods(courier = true, direct = true, other = Some("foo"))
 
     val hvdSection  = Hvd(
       products = Some(Products(Set(Alcohol, Tobacco))),
@@ -454,25 +450,6 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       cashPaymentMethods = Some(paymentMethods),
       hasAccepted = true
     )
-
-    val renewalModel = Renewal(
-      Some(InvolvedInOtherYes("test")),
-      Some(BusinessTurnover.First),
-      Some(AMLSTurnover.First),
-      Some(AMPTurnover.First),
-      Some(CustomersOutsideIsUK(true)),
-      Some(CustomersOutsideUK(Some(List(Country("United Kingdom","GB"))))),
-      Some(RPercentageOfCashPaymentOver15000.First),
-      Some(RCashPayments(CashPaymentsCustomerNotMet(true),
-        Some(HowCashPaymentsReceived(RPaymentMethods(true,true,Some("other")))))),
-      Some(TotalThroughput("02")),
-      Some(RenWhichCurrencies(Seq("USD"), None, Some(RMoneySources(None, None, None)))),
-      Some(TransactionsInLast12Months("12345678963")),
-      Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))),
-      Some(MostTransactions(List(Country("United Kingdom", "GB")))),
-      Some(CETransactionsInLast12Months("12345678963")),
-      Some(FXTransactionsInLast12Months("3987654321")),
-      false)
 
     val cacheMap = CacheMap("", Map.empty)
 

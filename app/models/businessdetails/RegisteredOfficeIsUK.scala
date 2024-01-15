@@ -16,27 +16,10 @@
 
 package models.businessdetails
 
-import jto.validation.forms._
-import jto.validation.{From, Rule, Write}
 import play.api.libs.json.{Json, OFormat}
 
 case class RegisteredOfficeIsUK(isUK: Boolean)
 
 object RegisteredOfficeIsUK {
-
   implicit val formats: OFormat[RegisteredOfficeIsUK] = Json.format[RegisteredOfficeIsUK]
-
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, RegisteredOfficeIsUK] =
-    From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-      (__ \ "isUK").read[Boolean].withMessage("error.required.atb.registered.office.uk.or.overseas") map RegisteredOfficeIsUK.apply
-    }
-
-  implicit val formWrites: Write[RegisteredOfficeIsUK, UrlFormEncoded] =
-    Write {
-      case RegisteredOfficeIsUK(b) =>
-        Map("isUK" -> Seq(b.toString))
-    }
 }

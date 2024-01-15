@@ -17,7 +17,6 @@
 package controllers.businessmatching
 
 import cats.data.OptionT
-import cats.implicits._
 import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
@@ -62,7 +61,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       services = view
     )
 
-    val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
+    val cacheMapT = OptionT.liftF[Future, CacheMap](Future.successful(mockCacheMap))
 
     when {
       controller.businessMatchingService.updateModel(any(), any())(any(), any())
@@ -75,7 +74,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
     def setupModel(model: Option[BusinessMatching]): Unit = when {
       controller.businessMatchingService.getModel(any())(any())
     } thenReturn (model match {
-      case Some(bm) => OptionT.pure[Future, BusinessMatching](bm)
+      case Some(bm) => OptionT.liftF[Future, BusinessMatching](Future.successful(bm))
       case _ => OptionT.none[Future, BusinessMatching]
     })
 

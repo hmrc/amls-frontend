@@ -16,11 +16,7 @@
 
 package models.responsiblepeople
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, ValidationError, Write}
 import models.Country
-import models.FormTypes.genericAddressRule
 import play.api.i18n.{Messages, MessagesProvider}
 import play.api.libs.json.{Reads, Writes}
 
@@ -77,114 +73,7 @@ case class PersonAddressNonUK(
                          addressLineNonUK4: Option[String],
                          country: Country) extends PersonAddress
 
-object AddressType extends Enumeration {
-  val Current = Value("current")
-  val Previous = Value("previous")
-  val OtherPrevious = Value("previous.other")
-  val Deafult = Value("default")
-  val NewHome = Value("new.home")
-}
-
 object PersonAddress {
-  val addressLine1Rule = genericAddressRule("error.required.address.line1",
-    "error.required.enter.addresslineone.charcount",
-    "error.required.enter.addresslineone.regex")
-
-  val addressLine2Rule = genericAddressRule("error.required.address.line2",
-    "error.required.enter.addresslinetwo.charcount",
-    "error.required.enter.addresslinetwo.regex")
-
-  val addressLine3Rule = genericAddressRule("",
-    "error.required.enter.addresslinethree.charcount",
-    "error.required.enter.addresslinethree.regex")
-
-  val addressLine4Rule = genericAddressRule("",
-    "error.required.enter.addresslinefour.charcount",
-    "error.required.enter.addresslinefour.regex")
-
-  def formRule(addressType: AddressType.Value = AddressType.Deafult): Rule[UrlFormEncoded, PersonAddress] = From[UrlFormEncoded] { __ =>
-    val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
-      country.code match {
-        case "GB" => Invalid(Seq(ValidationError(List("error.required.select.non.uk"))))
-        case _ => Valid(country)
-      }
-    }
-
-    import jto.validation.forms.Rules._
-    import models.FormTypes._
-    import utils.MappingUtils.Implicits._
-
-    def readUKaddress =
-      (__ \ "addressLine1").read(addressLine1Rule) ~
-        (__ \ "addressLine2").read(optionR(addressLine2Rule)) ~
-        (__ \ "addressLine3").read(optionR(addressLine3Rule)) ~
-        (__ \ "addressLine4").read(optionR(addressLine4Rule)) ~
-        (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
-
-    def readNonUKaddress =
-      (__ \ "addressLineNonUK1").read(addressLine1Rule) ~
-        (__ \ "addressLineNonUK2").read(optionR(addressLine2Rule)) ~
-        (__ \ "addressLineNonUK3").read(optionR(addressLine3Rule)) ~
-        (__ \ "addressLineNonUK4").read(optionR(addressLine4Rule)) ~
-        (__ \ "country").read(validateCountry)
-
-    (__ \ "isUK").read[Boolean].withMessage(s"error.required.uk.or.overseas.address.$addressType") flatMap {
-      case true => readUKaddress(PersonAddressUK.apply _)
-      case false => readNonUKaddress(PersonAddressNonUK.apply _)
-    }
-  }
-
-  implicit val formRule: Rule[UrlFormEncoded, PersonAddress] = From[UrlFormEncoded] { __ =>
-    val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
-      country.code match {
-        case "GB" => Invalid(Seq(ValidationError(List("error.required.select.non.uk"))))
-        case _ => Valid(country)
-      }
-    }
-    import jto.validation.forms.Rules._
-    import models.FormTypes._
-    import utils.MappingUtils.Implicits._
-
-    def readUKaddress =
-      (__ \ "addressLine1").read(addressLine1Rule) ~
-        (__ \ "addressLine2").read(optionR(addressLine2Rule)) ~
-        (__ \ "addressLine3").read(optionR(addressLine3Rule)) ~
-        (__ \ "addressLine4").read(optionR(addressLine4Rule)) ~
-        (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
-
-    def readNonUKaddress =
-      (__ \ "addressLineNonUK1").read(addressLine1Rule) ~
-        (__ \ "addressLineNonUK2").read(optionR(addressLine2Rule)) ~
-        (__ \ "addressLineNonUK3").read(optionR(addressLine3Rule)) ~
-        (__ \ "addressLineNonUK4").read(optionR(addressLine4Rule)) ~
-        (__ \ "country").read(validateCountry)
-
-    (__ \ "isUK").read[Boolean].withMessage("error.required.uk.or.overseas") flatMap {
-      case true => readUKaddress(PersonAddressUK.apply _)
-      case false => readNonUKaddress(PersonAddressNonUK.apply _)
-    }
-  }
-
-  implicit val formWrites = Write[PersonAddress, UrlFormEncoded] {
-    case a: PersonAddressUK =>
-      Map(
-        "isUK" -> Seq("true"),
-        "addressLine1" -> Seq(a.addressLine1),
-        "addressLine2" -> a.addressLine2.toSeq,
-        "addressLine3" -> a.addressLine3.toSeq,
-        "addressLine4" -> a.addressLine4.toSeq,
-        "postCode" -> Seq(a.postCode)
-      )
-    case a: PersonAddressNonUK =>
-      Map(
-        "isUK" -> Seq("false"),
-        "addressLineNonUK1" -> Seq(a.addressLineNonUK1),
-        "addressLineNonUK2" -> a.addressLineNonUK2.toSeq,
-        "addressLineNonUK3" -> a.addressLineNonUK3.toSeq,
-        "addressLineNonUK4" -> a.addressLineNonUK4.toSeq,
-        "country" -> Seq(a.country.code)
-      )
-  }
 
   implicit val jsonReads: Reads[PersonAddress] = {
     import play.api.libs.functional.syntax._

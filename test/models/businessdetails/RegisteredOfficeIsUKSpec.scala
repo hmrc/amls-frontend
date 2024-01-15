@@ -16,66 +16,19 @@
 
 package models.businessdetails
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{Path, ValidationError}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.Json
 
 class RegisteredOfficeIsUKSpec extends PlaySpec with MockitoSugar {
   "RegisteredOfficeIsUK" must {
 
-    "successfully validate" when {
-      "given a 'true' value" in {
+    "round trip through JSON" in {
+      val trueModel = RegisteredOfficeIsUK(true)
+      val falseModel = RegisteredOfficeIsUK(false)
 
-        val data = Map(
-          "isUK" -> Seq("true")
-        )
-
-        RegisteredOfficeIsUK.formRule.validate(data) must
-          be(Valid(RegisteredOfficeIsUK(true)))
-      }
-
-      "given a 'false' value" in {
-
-        val data = Map(
-          "isUK" -> Seq("false")
-        )
-
-        RegisteredOfficeIsUK.formRule.validate(data) must
-          be(Valid(RegisteredOfficeIsUK(false)))
-      }
-    }
-
-    "fail validation" when {
-      "given missing data represented by an empty Map" in {
-
-        RegisteredOfficeIsUK.formRule.validate(Map.empty) must
-          be(Invalid(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.required.atb.registered.office.uk.or.overseas"))
-          )))
-      }
-
-      "given missing data represented by an empty string" in {
-
-        val data = Map(
-          "isUK" -> Seq("")
-        )
-
-        RegisteredOfficeIsUK.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.required.atb.registered.office.uk.or.overseas"))
-          )))
-      }
-    }
-
-    "write correct data" in {
-
-      val model = RegisteredOfficeIsUK(true)
-
-      RegisteredOfficeIsUK.formWrites.writes(model) must
-        be(Map(
-          "isUK" -> Seq("true")
-        ))
+      Json.toJson(trueModel).as[RegisteredOfficeIsUK] mustBe trueModel
+      Json.toJson(falseModel).as[RegisteredOfficeIsUK] mustBe falseModel
     }
   }
 }

@@ -17,7 +17,7 @@
 package forms.responsiblepeople.address
 
 import forms.behaviours.JodaDateBehaviours
-import models.responsiblepeople.{DateOfBirth, NewHomeDateOfChange}
+import models.responsiblepeople.NewHomeDateOfChange
 import org.joda.time.LocalDate
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages

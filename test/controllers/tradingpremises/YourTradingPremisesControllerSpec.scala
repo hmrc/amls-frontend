@@ -16,12 +16,10 @@
 
 package controllers.tradingpremises
 
-import java.util.UUID
-
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities, _}
 import models.businessmatching.BusinessActivity._
+import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises._
 import org.joda.time.LocalDate
@@ -37,6 +35,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.tradingpremises.YourTradingPremisesView
 
+import java.util.UUID
 import scala.concurrent.Future
 
 class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with generators.tradingpremises.TradingPremisesGenerator {

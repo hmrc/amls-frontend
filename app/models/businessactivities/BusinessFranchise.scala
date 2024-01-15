@@ -16,10 +16,6 @@
 
 package models.businessactivities
 
-import jto.validation._
-import jto.validation.forms.Rules._
-import jto.validation.forms.UrlFormEncoded
-import cats.data.Validated.Valid
 import play.api.i18n.Messages
 import play.api.libs.json._
 import play.twirl.api.Html
@@ -46,30 +42,6 @@ object BusinessFranchise {
         id = Some("businessFranchise-false")
       )
     }
-  }
-
-  import models.FormTypes._
-  import utils.MappingUtils.Implicits._
-
-  private val maxFranchiseName = 140
-  private val franchiseNameType =  notEmptyStrip andThen notEmpty.withMessage("error.required.ba.franchise.name") andThen
-    maxLength(maxFranchiseName).withMessage("error.max.length.ba.franchise.name") andThen regexWithMsg(basicPunctuationRegex, "error.invalid.characters.ba.franchise.name")
-
-  implicit val formRule: Rule[UrlFormEncoded, BusinessFranchise] = From[UrlFormEncoded] { __ =>
-  import jto.validation.forms.Rules._
-    (__ \ "businessFranchise").read[Boolean].withMessage("error.required.ba.is.your.franchise") flatMap {
-      case true =>
-        (__ \ "franchiseName").read(franchiseNameType) map BusinessFranchiseYes.apply
-      case false => Rule.fromMapping { _ => Valid(BusinessFranchiseNo) }
-    }
-  }
-
-  implicit val formWrites: Write[BusinessFranchise, UrlFormEncoded] = Write {
-    case BusinessFranchiseYes(value) =>
-      Map("businessFranchise" -> Seq("true"),
-          "franchiseName" -> Seq(value)
-      )
-    case BusinessFranchiseNo => Map("businessFranchise" -> Seq("false"))
   }
 
   implicit val jsonReads: Reads[BusinessFranchise] =

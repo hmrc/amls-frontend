@@ -20,14 +20,13 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import javax.inject.{Inject, Singleton}
-import models.businessmatching.BusinessActivity
 import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.flowmanagement.Router
 import utils.AuthAction
 import views.html.businessmatching.updateservice.remove.NeedMoreInformationView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -42,7 +41,7 @@ class NeedMoreInformationController @Inject()(authAction: AuthAction,
     implicit request =>
       (for {
         model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key))
-        activities <- OptionT.fromOption[Future](model.activitiesToRemove) orElse OptionT.some[Future, Set[BusinessActivity]](Set.empty)
+        activities <- OptionT.fromOption[Future](model.activitiesToRemove) orElse OptionT.some(Set.empty)
       } yield {
         Ok(view(activities))
        }) getOrElse(InternalServerError("Cannot retrieve information from cache"))

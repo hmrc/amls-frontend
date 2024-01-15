@@ -18,10 +18,7 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-
-import javax.inject.Inject
 import models.businessmatching.BusinessMatching
-import models.businessmatching.updateservice.ServiceChangeRegister
 import models.moneyservicebusiness.MoneyServiceBusiness
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
@@ -29,6 +26,8 @@ import services.businessmatching.ServiceFlow
 import utils.AuthAction
 import utils.msb.CheckYourAnswersHelper
 import views.html.msb.CheckYourAnswersView
+
+import javax.inject.Inject
 
 class SummaryController @Inject()(authAction: AuthAction,
                                   val ds: CommonPlayDependencies,

@@ -16,7 +16,6 @@
 
 package generators
 
-import models.FormTypes
 import models.responsiblepeople.TimeAtAddress.ThreeYearsPlus
 import models.responsiblepeople._
 import org.joda.time.LocalDate
@@ -40,9 +39,11 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     positions <- positionInBusinessGen
   } yield Positions(positions.toSet, Some(PositionStartDate(new LocalDate())))
 
+  private val maxNameTypeLength = 35
+
   val personNameGen: Gen[PersonName] = for {
-    firstName <- stringOfLengthGen(FormTypes.maxNameTypeLength)
-    lastName <- stringOfLengthGen(FormTypes.maxNameTypeLength)
+    firstName <- stringOfLengthGen(maxNameTypeLength)
+    lastName <- stringOfLengthGen(maxNameTypeLength)
   } yield PersonName(firstName, None, lastName)
 
   val personAddressGen: Gen[PersonAddress] = for {

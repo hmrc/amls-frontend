@@ -16,67 +16,21 @@
 
 package models.responsiblepeople
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{Path, ValidationError}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.Json
 
 class MovedAddressSpec extends PlaySpec with MockitoSugar {
   
   "MovedAddress" must {
 
-    "successfully validate" when {
-      "given a 'true' value" in {
+    "round trip through JSON" in {
 
-        val data = Map(
-          "movedAddress" -> Seq("true")
-        )
+      val trueModel = MovedAddress(true)
+      val falseModel = MovedAddress(false)
 
-        MovedAddress.formRule.validate(data) must
-          be(Valid(MovedAddress(true)))
-      }
-
-      "given a 'false' value" in {
-
-        val data = Map(
-          "movedAddress" -> Seq("false")
-        )
-
-        MovedAddress.formRule.validate(data) must
-          be(Valid(MovedAddress(false)))
-      }
-    }
-
-    "fail validation" when {
-      "given missing data represented by an empty Map" in {
-
-        MovedAddress.formRule.validate(Map.empty) must
-          be(Invalid(Seq(
-            (Path \ "movedAddress") -> Seq(ValidationError("error.required.rp.moved.address"))
-          )))
-      }
-
-      "given missing data represented by an empty string" in {
-
-        val data = Map(
-          "movedAddress" -> Seq("")
-        )
-
-        MovedAddress.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "movedAddress") -> Seq(ValidationError("error.required.rp.moved.address"))
-          )))
-      }
-    }
-
-    "write correct data" in {
-
-      val model = MovedAddress(true)
-
-      MovedAddress.formWrites.writes(model) must
-        be(Map(
-          "movedAddress" -> Seq("true")
-        ))
+      Json.toJson(trueModel).as[MovedAddress] mustBe trueModel
+      Json.toJson(falseModel).as[MovedAddress] mustBe falseModel
     }
   }
 }

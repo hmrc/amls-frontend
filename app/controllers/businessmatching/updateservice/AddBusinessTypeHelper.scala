@@ -17,7 +17,6 @@
 package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
-import cats.implicits._
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
@@ -66,7 +65,7 @@ class AddBusinessTypeHelper @Inject()(authAction: AuthAction,
       newSupervision <- if (activities.businessActivities.intersect(Set(AccountancyServices, TrustAndCompanyServices)).isEmpty) {
         OptionT.liftF(dataCacheConnector.save[Supervision](credId, Supervision.key, emptyModel)) map { _ => emptyModel }
       } else {
-        OptionT.some[Future, Supervision](supervision)
+        OptionT.liftF(Future.successful(supervision))
       }
     } yield newSupervision
   }

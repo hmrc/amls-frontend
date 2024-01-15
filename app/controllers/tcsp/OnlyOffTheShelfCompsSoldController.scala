@@ -19,7 +19,6 @@ package controllers.tcsp
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.tcsp.OnlyOffTheShelfCompsSoldFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.tcsp.TcspTypes.CompanyFormationAgent
 
 import javax.inject.Inject

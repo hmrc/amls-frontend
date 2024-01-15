@@ -70,7 +70,7 @@ class CorporationTaxRegisteredController @Inject () (val dataCacheConnector: Dat
     OptionT(dataCacheConnector.fetchAll(cacheId)) flatMap { cache =>
       ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key)) match {
         case Some((LPrLLP | LimitedCompany)) => OptionT.liftF(fn(cache))
-        case _ => OptionT.pure[Future, Result](NotFound(notFoundView))
+        case _ => OptionT.pure(NotFound(notFoundView))
       }
     } getOrElse InternalServerError("Could not retrieve business type")
   }

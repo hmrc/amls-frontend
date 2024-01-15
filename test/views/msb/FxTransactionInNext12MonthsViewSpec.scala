@@ -17,8 +17,6 @@
 package views.msb
 
 import forms.msb.FxTransactionsInNext12MonthsFormProvider
-import forms.{Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
 import models.moneyservicebusiness.FXTransactionsInNext12Months
 import org.scalatest.MustMatchers
 import play.api.test.FakeRequest

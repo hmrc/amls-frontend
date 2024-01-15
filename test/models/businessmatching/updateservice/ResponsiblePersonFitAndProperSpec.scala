@@ -16,66 +16,19 @@
 
 package models.businessmatching.updateservice
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.Json
 
 class ResponsiblePersonFitAndProperSpec extends PlaySpec with MustMatchers {
 
   "The ResponsiblePeopleFitAndProper model" when {
-    "given a valid form" when {
-      "return a valid form model" when {
-        "single selection is made" in {
-          val formData = Map(
-            "responsiblePeople[]" -> Seq("1")
-          )
 
-          val result = ResponsiblePeopleFitAndProper.formReads.validate(formData)
+    "round trip through JSON" in {
 
-          result mustBe Valid(ResponsiblePeopleFitAndProper(Set(1)))
-        }
-        "multiple selections are made" in {
-          val formData = Map(
-            "responsiblePeople[]" -> Seq("1", "2")
-          )
+      val model = ResponsiblePeopleFitAndProper(Set(1, 2, 3))
 
-          val result = ResponsiblePeopleFitAndProper.formReads.validate(formData)
-
-          result mustBe Valid(ResponsiblePeopleFitAndProper(Set(1, 2)))
-        }
-      }
-
-      "nothing is selected" must {
-        "return the validation errors" in {
-          val formData = Map.empty[String, Seq[String]]
-
-          val result = ResponsiblePeopleFitAndProper.formReads.validate(formData)
-
-          result mustBe Invalid(
-            Seq(
-              Path \ "responsiblePeople" ->
-                Seq(ValidationError("error.businessmatching.updateservice.responsiblepeople"))
-            ))
-        }
-      }
-    }
-
-    "given a valid model" must {
-      "return the form values" when {
-        "single selection" in {
-
-          val result = ResponsiblePeopleFitAndProper.formWrites.writes(ResponsiblePeopleFitAndProper(Set(2)))
-
-          result mustBe Map("responsiblePeople[]" -> Seq("2"))
-        }
-        "multiple selection" in {
-
-          val result = ResponsiblePeopleFitAndProper.formWrites.writes(ResponsiblePeopleFitAndProper(Set(0, 2)))
-
-          result mustBe Map("responsiblePeople[]" -> Seq("0", "2"))
-        }
-      }
+      Json.toJson(model).as[ResponsiblePeopleFitAndProper] mustBe model
     }
   }
 }

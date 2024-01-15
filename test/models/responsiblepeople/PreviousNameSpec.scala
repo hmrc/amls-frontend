@@ -17,88 +17,22 @@
 package models.responsiblepeople
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
+import play.api.libs.json.Json
 
 class PreviousNameSpec extends PlaySpec {
 
   "PreviousName" must {
 
-    "successfully validate with all fields" in {
+    val fullModel = PreviousName(Some(true), Some("first"), Some("middle"), Some("last"))
 
-      val data: UrlFormEncoded = Map(
-        "hasPreviousName" -> Seq("true"),
-        "firstName" -> Seq("oldFirst"),
-        "middleName" -> Seq("oldMiddle"),
-        "lastName" -> Seq("oldLast")
-      )
+    "display fullName correctly" in {
 
-      implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
-        equal(
-          Valid(PreviousName(
-            hasPreviousName = Some(true),
-            firstName = Some("oldFirst"),
-            middleName = Some("oldMiddle"),
-            lastName = Some("oldLast")
-          )
-        ))
+      fullModel.fullName mustBe "first middle last"
     }
 
-    "successfully validate with firstName and lastname" in {
+    "round trip through JSON" in {
 
-      val data: UrlFormEncoded = Map(
-        "hasPreviousName" -> Seq("true"),
-        "firstName" -> Seq("oldFirst"),
-        "lastName" -> Seq("oldLast")
-      )
-
-      implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
-        equal(
-          Valid(PreviousName(
-            hasPreviousName = Some(true),
-            firstName = Some("oldFirst"),
-            middleName = None,
-            lastName = Some("oldLast")
-          )
-        ))
-    }
-
-    "fail to validate with no names" in {
-
-      val data: UrlFormEncoded = Map(
-        "hasPreviousName" -> Seq("true"),
-        "firstName" -> Seq(""),
-        "middleName" -> Seq(""),
-        "lastName" -> Seq("")
-      )
-
-      implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
-        equal(
-          Invalid(Seq(
-            Path \ "firstName" -> Seq(ValidationError("error.rp.previous.first.invalid")),
-            Path \ "lastName" -> Seq(ValidationError("error.rp.previous.last.invalid")))
-          )
-        )
-    }
-
-    "correctly serialise" in {
-
-      val data: UrlFormEncoded = Map(
-        "hasPreviousName" -> Seq("true"),
-        "firstName" -> Seq("oldFirst"),
-        "middleName" -> Seq("oldMiddle"),
-        "lastName" -> Seq("oldLast")
-      )
-
-      val model = PreviousName(
-        hasPreviousName = Some(true),
-        firstName = Some("oldFirst"),
-        middleName = Some("oldMiddle"),
-        lastName = Some("oldLast")
-      )
-
-      implicitly[Write[PreviousName, UrlFormEncoded]].writes(model) mustEqual data
+      Json.toJson(fullModel).as[PreviousName] mustBe fullModel
     }
   }
 }

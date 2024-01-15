@@ -21,9 +21,9 @@ import cats.implicits.catsStdInstancesForFuture
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.{DateOfChangeFormProvider, FormHelpers}
+import forms.DateOfChangeFormProvider
 import models.DateOfChange
-import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonAddressHistory, ResponsiblePersonCurrentAddress}
+import models.responsiblepeople.ResponsiblePerson
 import play.api.data.Form
 import play.api.mvc._
 import services.StatusService
@@ -39,7 +39,7 @@ class CurrentAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
                                                      statusService: StatusService,
                                                      val cc: MessagesControllerComponents,
                                                      formProvider: DateOfChangeFormProvider,
-                                                     view: DateOfChangeView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                                     view: DateOfChangeView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean): Action[AnyContent] = authAction.async {
     implicit request =>

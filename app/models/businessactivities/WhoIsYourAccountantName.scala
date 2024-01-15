@@ -16,10 +16,6 @@
 
 package models.businessactivities
 
-import jto.validation.{From, Rule, Write}
-import jto.validation.forms.UrlFormEncoded
-import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
-
 case class WhoIsYourAccountantName( accountantsName: String,
                                     accountantsTradingName: Option[String]) {
 
@@ -46,35 +42,6 @@ object WhoIsYourAccountantName {
     ((__ \ "accountantsName").read[String] and
       (__ \ "accountantsTradingName").readNullable[String])(WhoIsYourAccountantName.apply _)
   }
-
-
-  implicit val formWrites = Write[WhoIsYourAccountantName, UrlFormEncoded] {
-    data: WhoIsYourAccountantName => Map(
-      "name" -> Seq(data.accountantsName),
-      "tradingName" -> data.accountantsTradingName.toSeq
-    )
-  }
-
-  implicit val formRule: Rule[UrlFormEncoded, WhoIsYourAccountantName] =
-    From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-      import utils.MappingUtils.Implicits._
-
-      val nameTypeLength = 140
-      val tradingNameTypeLength = 120
-
-      val nameType = notEmptyStrip andThen
-        notEmpty.withMessage("error.required.ba.advisor.name") andThen
-        maxLength(nameTypeLength).withMessage("error.length.ba.advisor.name") andThen
-        basicPunctuationPattern("error.punctuation.ba.advisor.name")
-
-      val tradingNameType = notEmptyStrip andThen
-        maxLength(tradingNameTypeLength).withMessage("error.length.ba.advisor.tradingname") andThen
-        basicPunctuationPattern("error.punctuation.ba.advisor.tradingname")
-
-      ((__ \ "name").read(nameType) ~
-        (__ \ "tradingName").read(optionR(tradingNameType)))(WhoIsYourAccountantName.apply)
-    }
 }
 
 

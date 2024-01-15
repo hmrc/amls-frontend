@@ -16,9 +16,6 @@
 
 package models.moneyservicebusiness
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
 import models.{Enumerable, WithName}
 import models.renewal.TotalThroughput
 import play.api.libs.json._
@@ -76,31 +73,6 @@ object ExpectedThroughput extends Enumerable.Implicits {
   implicit val enumerable: Enumerable[ExpectedThroughput] = Enumerable(all.map(v => v.toString -> v): _*)
 
   import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, ExpectedThroughput] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "throughput").read[String].withMessage("error.required.msb.throughput") flatMap {
-      case "01" => First
-      case "02" => Second
-      case "03" => Third
-      case "04" => Fourth
-      case "05" => Fifth
-      case "06" => Sixth
-      case "07" => Seventh
-      case _ =>
-        (Path \ "throughput") -> Seq(ValidationError("error.invalid"))
-    }
-  }
-
-  implicit val formWrites: Write[ExpectedThroughput, UrlFormEncoded] = Write {
-    case First => "throughput" -> "01"
-    case Second => "throughput" -> "02"
-    case Third => "throughput" -> "03"
-    case Fourth => "throughput" -> "04"
-    case Fifth => "throughput" -> "05"
-    case Sixth => "throughput" -> "06"
-    case Seventh=> "throughput" -> "07"
-  }
 
   implicit val jsonReads = {
     import play.api.libs.json.Reads.StringReads

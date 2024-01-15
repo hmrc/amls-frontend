@@ -16,8 +16,6 @@
 
 package models.renewal
 
-import jto.validation.{ValidationError, _}
-import jto.validation.forms.UrlFormEncoded
 import models.{Enumerable, WithName}
 import models.businessactivities.ExpectedBusinessTurnover
 import play.api.libs.json._
@@ -54,32 +52,7 @@ object BusinessTurnover extends Enumerable.Implicits {
 
   val key = "renewal-business-turnover"
 
-  implicit val formRule: Rule[UrlFormEncoded, BusinessTurnover] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "businessTurnover").read[String].withMessage("error.required.renewal.ba.business.turnover") flatMap {
-      case "01" => First
-      case "02" => Second
-      case "03" => Third
-      case "04" => Fourth
-      case "05" => Fifth
-      case "06" => Sixth
-      case "07" => Seventh
-      case _ =>
-        (Path \ "businessTurnover") -> Seq(ValidationError("error.invalid"))
-    }
-  }
-
-  implicit val formWrites: Write[BusinessTurnover, UrlFormEncoded] = Write {
-    case First => "businessTurnover" -> "01"
-    case Second => "businessTurnover" -> "02"
-    case Third => "businessTurnover" -> "03"
-    case Fourth => "businessTurnover" -> "04"
-    case Fifth => "businessTurnover" -> "05"
-    case Sixth => "businessTurnover" -> "06"
-    case Seventh => "businessTurnover" -> "07"
-  }
-
-  implicit val jsonReads = {
+  implicit val jsonReads: Reads[BusinessTurnover] = {
     import play.api.libs.json.Reads.StringReads
     (__ \ "businessTurnover").read[String].flatMap[BusinessTurnover] {
       case "01" => First

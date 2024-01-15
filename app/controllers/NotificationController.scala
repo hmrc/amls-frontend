@@ -154,8 +154,6 @@ class NotificationController @Inject()(val authEnrolmentsService: AuthEnrolments
 
   private def generateNotificationView(credId: String, safeId: String, refNumber: Option[String], accountTypeId: (String, String))
                                       (implicit hc: HeaderCarrier, request: Request[_]): Future[Result] = {
-    import models.notifications.{Status => NStatus}
-    import org.joda.time.{DateTime, DateTimeZone}
 
     (for {
       businessName <- BusinessName.getName(credId, Some(safeId), accountTypeId)

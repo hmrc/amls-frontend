@@ -16,20 +16,14 @@
 
 package models.declaration.release7
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{ValidationError, _}
-import jto.validation.forms.Rules.{minLength => _, _}
-import jto.validation.forms.UrlFormEncoded
-import models.FormTypes._
 import models.businessmatching.BusinessType
 import models.businessmatching.BusinessType.{SoleProprietor => BtSoleProprietor, _}
 import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import play.api.libs.json.Reads.StringReads
-import play.api.libs.json.{JsError, _}
+import play.api.libs.json._
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases.{CheckboxItem, Text}
-import utils.TraversableValidators.minLengthR
 
 case class RoleWithinBusinessRelease7(items: Set[RoleType])
 
@@ -129,58 +123,6 @@ object RoleWithinBusinessRelease7 extends Enumerable.Implicits {
   }
 
   implicit val enumerable: Enumerable[RoleType] = Enumerable(all.map(v => v.toString -> v): _*)
-
-  val maxDetailsLength = 255
-
-  val otherDetailsType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.declaration.specify.role") andThen
-    maxLength(maxDetailsLength).withMessage("error.invalid.role.in.business.maxlength.255") andThen
-    basicPunctuationPattern("err.text.role.in.business.text.validation")
-
-  implicit val formRule: Rule[UrlFormEncoded, RoleWithinBusinessRelease7] =
-    From[UrlFormEncoded] { readerURLFormEncoded =>
-      (readerURLFormEncoded \ "positions").read(minLengthR[Set[String]](1).withMessage("error.invalid.position.validation")) flatMap { z =>
-        z.map {
-          case "01" => Rule[UrlFormEncoded, RoleType](_ => Valid(BeneficialShareholder))
-          case "02" => Rule[UrlFormEncoded, RoleType](_ => Valid(Director))
-          case "05" => Rule[UrlFormEncoded, RoleType](_ => Valid(Partner))
-          case "03" => Rule[UrlFormEncoded, RoleType](_ => Valid(InternalAccountant))
-          case "08" => Rule[UrlFormEncoded, RoleType](_ => Valid(ExternalAccountant))
-          case "06" => Rule[UrlFormEncoded, RoleType](_ => Valid(SoleProprietor))
-          case "04" => Rule[UrlFormEncoded, RoleType](_ => Valid(NominatedOfficer))
-          case "07" => Rule[UrlFormEncoded, RoleType](_ => Valid(DesignatedMember))
-          case "other" =>
-            (readerURLFormEncoded \ "otherPosition").read(otherDetailsType) map Other.apply
-          case _ =>
-            Rule[UrlFormEncoded, RoleType] { _ =>
-              Invalid(Seq((Path \ "positions") -> Seq(ValidationError("error.invalid"))))
-            }
-        }.foldLeft[Rule[UrlFormEncoded, Set[RoleType]]](
-          Rule[UrlFormEncoded, Set[RoleType]](_ => Valid(Set.empty))
-        ) {
-          case (m, n) =>
-            n flatMap { x =>
-              m map {
-                _ + x
-              }
-            }
-        } map RoleWithinBusinessRelease7.apply
-      }
-    }
-
-  implicit def formWrites = Write[RoleWithinBusinessRelease7, UrlFormEncoded] {
-    case RoleWithinBusinessRelease7(transactions) =>
-      Map(
-        "positions[]" -> (transactions map {
-          _.formValue
-        }).toSeq
-      ) ++ transactions.foldLeft[UrlFormEncoded](Map.empty) {
-        case (m, Other(name)) =>
-          m ++ Map("otherPosition" -> Seq(name))
-        case (m, _) =>
-          m
-      }
-  }
 
   val businessRolePathName = "roleWithinBusiness"
   val businessRolePath = JsPath \ businessRolePathName

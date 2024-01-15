@@ -16,9 +16,6 @@
 
 package models.hvd
 
-import cats.data.Validated.Valid
-import jto.validation._
-import jto.validation.forms._
 import models.renewal.{CashPaymentsCustomerNotMet, HowCashPaymentsReceived, CashPayments => RReceiveCashPayments, PaymentMethods => RPaymentMethods}
 import play.api.libs.json.{Writes, _}
 

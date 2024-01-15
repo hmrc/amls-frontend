@@ -20,87 +20,42 @@ import models.DateOfChange
 import org.joda.time.LocalDate
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import models.asp.Service._
 import play.api.libs.json._
 
 class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
 
-  "Form validation" must {
+  val businessServices: Set[Service] = Set(Accountancy, PayrollServices, BookKeeping, Auditing, FinancialOrTaxAdvice)
 
-    val businessServices: Set[Service] = Set(Accountancy, PayrollServices, BookKeeping, Auditing, FinancialOrTaxAdvice)
+  "JSON validation" must {
 
-    import jto.validation.forms.Rules._
+    "successfully validate and read services and date of change values" in {
 
-    "validate model with few check box selected" in {
+      val json =  Json.obj("services" -> Seq("01","02","03","04","05"),
+        "dateOfChange" -> "2016-02-24")
 
-      val model = Map(
-        "services[]" -> Seq("01", "02", "03", "04", "05")
-      )
-
-      ServicesOfBusiness.formReads.validate(model) must
-        be(Valid(ServicesOfBusiness(businessServices)))
+      Json.fromJson[ServicesOfBusiness](json) must
+        be(JsSuccess(ServicesOfBusiness(businessServices, Some(DateOfChange(new LocalDate("2016-02-24")))), JsPath))
     }
 
-    "fail to validate on empty Map" in {
+    "successfully validate selected services value" in {
 
-      ServicesOfBusiness.formReads.validate(Map.empty) must
-        be(Invalid(Seq((Path \ "services") -> Seq(ValidationError("error.required.asp.business.services")))))
+      val json =  Json.obj("services" -> Seq("01","02","03","04","05"))
 
+      Json.fromJson[ServicesOfBusiness](json) must
+        be(JsSuccess(ServicesOfBusiness(businessServices, None)))
     }
 
-    "fail to validate when given invalid data" in {
-      val model = Map(
-        "services[]" -> Seq("02", "99", "03")
-      )
+    "fail when on invalid data" in {
 
-      ServicesOfBusiness.formReads.validate(model) must
-        be(Invalid(Seq((Path \ "services" \ 1 \ "services", Seq(ValidationError("error.invalid"))))))
+      Json.fromJson[ServicesOfBusiness](Json.obj("services" -> Seq("40"))) must
+        be(JsError(((JsPath \ "services")(0) \ "services") -> play.api.libs.json.JsonValidationError("error.invalid")))
     }
 
-    "write correct data for services value" in {
+    "successfully validate json write" in {
 
-      ServicesOfBusiness.formWrites.writes(ServicesOfBusiness(Set(Accountancy, PayrollServices, BookKeeping))) must
-        be(Map("services[]" -> Seq("01", "02", "03")))
-
-      ServicesOfBusiness.formWrites.writes(ServicesOfBusiness(Set(Auditing, FinancialOrTaxAdvice))) must
-        be(Map("services[]" -> Seq("04", "05")))
-
+      val json = Json.obj("services" -> Seq("04","05","03","02","01"))
+      Json.toJson(ServicesOfBusiness(businessServices)) must be(json)
     }
-
-    "JSON validation" must {
-
-      "successfully validate and read services and date of change values" in {
-
-        val json =  Json.obj("services" -> Seq("01","02","03","04","05"),
-          "dateOfChange" -> "2016-02-24")
-
-        Json.fromJson[ServicesOfBusiness](json) must
-          be(JsSuccess(ServicesOfBusiness(businessServices, Some(DateOfChange(new LocalDate("2016-02-24")))), JsPath))
-      }
-
-      "successfully validate selected services value" in {
-
-        val json =  Json.obj("services" -> Seq("01","02","03","04","05"))
-
-        Json.fromJson[ServicesOfBusiness](json) must
-          be(JsSuccess(ServicesOfBusiness(businessServices, None)))
-      }
-
-      "fail when on invalid data" in {
-
-        Json.fromJson[ServicesOfBusiness](Json.obj("services" -> Seq("40"))) must
-          be(JsError(((JsPath \ "services")(0) \ "services") -> play.api.libs.json.JsonValidationError("error.invalid")))
-      }
-
-      "successfully validate json write" in {
-
-        val json = Json.obj("services" -> Seq("04","05","03","02","01"))
-        Json.toJson(ServicesOfBusiness(businessServices)) must be(json)
-      }
-    }
-
   }
-
 }

@@ -16,23 +16,6 @@
 
 package models.renewal
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
-
 case class CashPaymentsCustomerNotMet(receiveCashPayments: Boolean)
 
-object CashPaymentsCustomerNotMet {
-
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, CashPaymentsCustomerNotMet] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "receiveCashPayments").read[Boolean].withMessage("error.required.renewal.hvd.receive.cash.payments") flatMap {
-      CashPaymentsCustomerNotMet.apply
-    }
-  }
-
-  implicit def formWrites: Write[CashPaymentsCustomerNotMet, UrlFormEncoded] = Write {
-    case CashPaymentsCustomerNotMet(accepted) => Map("receiveCashPayments" -> Seq(accepted.toString))
-  }
-}
+object CashPaymentsCustomerNotMet

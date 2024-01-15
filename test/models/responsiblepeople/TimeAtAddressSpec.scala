@@ -18,45 +18,11 @@ package models.responsiblepeople
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import play.api.libs.json._
 
 class TimeAtAddressSpec extends PlaySpec with MockitoSugar {
 
   val FieldName = "timeAtAddress"
-
-  "Form Validation" must {
-
-    val ZeroToFiveForm = Map(FieldName -> Seq("01"))
-    val SixToElevenForm = Map(FieldName -> Seq("02"))
-    val OneToThreeForm = Map(FieldName -> Seq("03"))
-    val MoreThanThreeForm = Map(FieldName -> Seq("04"))
-
-    "successfully validate given an enum value" in {
-      TimeAtAddress.formRule.validate(ZeroToFiveForm) must be(Valid(TimeAtAddress.ZeroToFiveMonths))
-      TimeAtAddress.formRule.validate(SixToElevenForm) must be(Valid(TimeAtAddress.SixToElevenMonths))
-      TimeAtAddress.formRule.validate(OneToThreeForm) must be(Valid(TimeAtAddress.OneToThreeYears))
-      TimeAtAddress.formRule.validate(MoreThanThreeForm) must be(Valid(TimeAtAddress.ThreeYearsPlus))
-    }
-
-    "write correct data from enum value" in {
-      TimeAtAddress.formWrites.writes(TimeAtAddress.ZeroToFiveMonths) must be(ZeroToFiveForm)
-      TimeAtAddress.formWrites.writes(TimeAtAddress.SixToElevenMonths) must be(SixToElevenForm)
-      TimeAtAddress.formWrites.writes(TimeAtAddress.OneToThreeYears) must be(OneToThreeForm)
-      TimeAtAddress.formWrites.writes(TimeAtAddress.ThreeYearsPlus) must be(MoreThanThreeForm)
-    }
-
-    "throw error on invalid data" in {
-      TimeAtAddress.formRule.validate(Map(FieldName -> Seq("20"))) must
-        be(Invalid(Seq((Path \ FieldName, Seq(ValidationError("error.invalid"))))))
-    }
-
-    "throw error on empty data" in {
-      TimeAtAddress.formRule.validate(Map.empty) must
-        be(Invalid(Seq((Path \ FieldName, Seq(ValidationError("error.required.timeAtAddress"))))))
-    }
-  }
 
   "JSON validation" must {
 

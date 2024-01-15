@@ -16,7 +16,6 @@
 
 package models.businessmatching
 
-import jto.validation.{Rule, ValidationError, _}
 import models.tradingpremises.TradingPremisesMsbService.{
   ChequeCashingNotScrapMetal => TPChequeCashingNotScrapMetal,
   ChequeCashingScrapMetal => TPChequeCashingScrapMetal,
@@ -69,23 +68,6 @@ object BusinessMatchingMsbService extends Enumerable.Implicits {
   }
   case object ForeignExchange extends WithName("foreignExchange") with BusinessMatchingMsbService {
     override val value: String = "05"
-  }
-
-  implicit val serviceR = Rule[String, BusinessMatchingMsbService] {
-    case "01" => Valid(TransmittingMoney)
-    case "02" => Valid(CurrencyExchange)
-    case "03" => Valid(ChequeCashingNotScrapMetal)
-    case "04" => Valid(ChequeCashingScrapMetal)
-    case "05" => Valid(ForeignExchange)
-    case _ => Invalid(Seq(Path -> Seq(ValidationError("error.invalid"))))
-  }
-
-  implicit val serviceW = Write[BusinessMatchingMsbService, String] {
-    case TransmittingMoney => "01"
-    case CurrencyExchange => "02"
-    case ChequeCashingNotScrapMetal => "03"
-    case ChequeCashingScrapMetal => "04"
-    case ForeignExchange => "05"
   }
 
   implicit val jsonR:Reads[BusinessMatchingMsbService] =  Reads {

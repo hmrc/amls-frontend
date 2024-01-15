@@ -18,7 +18,6 @@ package forms.declaration
 
 import forms.behaviours.StringFieldBehaviours
 import models.declaration.BusinessNominatedOfficer
-import org.scalacheck.Gen
 import play.api.data.FormError
 
 class BusinessNominatedOfficerFormProviderSpec extends StringFieldBehaviours {

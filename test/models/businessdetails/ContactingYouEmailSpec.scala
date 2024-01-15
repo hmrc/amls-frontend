@@ -16,63 +16,18 @@
 
 package models.businessdetails
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{Path, ValidationError}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.Json
 
 class ContactingYouEmailSpec extends PlaySpec with MockitoSugar {
   "ContactingYouEmailSpec" must {
 
-    "successfully validate" when {
-      "given a 'matchinig emails" in {
+    "round trip through JSON" in {
+      val email = "person@email.com"
+      val model = ContactingYouEmail(email, email)
 
-        val data = Map(
-          "email" -> Seq("test@test.com"),
-          "confirmEmail" -> Seq("test@test.com")
-
-        )
-
-        ContactingYouEmail.formRule.validate(data) must
-          be(Valid(ContactingYouEmail("test@test.com","test@test.com")))
-      }
-
-    }
-
-    "fail validation" when {
-      "given missing data represented by an empty Map" in {
-
-        ContactingYouEmail.formRule.validate(Map.empty) must
-          be(Invalid(Seq(
-            (Path \ "email") -> Seq(ValidationError("error.required")),
-            (Path \ "confirmEmail") -> Seq(ValidationError("error.required"))
-          )))
-      }
-
-      "given missing data represented by an empty string" in {
-
-        val data = Map(
-          "email" -> Seq(""),
-          "confirmEmail" -> Seq("")
-        )
-
-        ContactingYouEmail.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "email") -> Seq(ValidationError("error.required.email")),
-            (Path \ "confirmEmail") -> Seq(ValidationError("error.required.email.reenter"))
-          )))
-      }
-    }
-
-    "write correct data" in {
-
-      val model = ContactingYouEmail("test@test.com","test@test.com")
-
-      ContactingYouEmail.formWrites.writes(model) must
-        be(Map(
-          "email" -> Seq("test@test.com"),
-          "confirmEmail" -> Seq("test@test.com")
-        ))
+      Json.toJson(model).as[ContactingYouEmail] mustBe model
     }
   }
 }

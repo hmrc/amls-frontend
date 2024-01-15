@@ -16,7 +16,6 @@
 
 package models.businessactivities
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import models.Country
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
@@ -99,31 +98,6 @@ class AccountantsAddressSpec extends PlaySpec {
         "Default Line 3",
         "Default Line 4",
         "United Kingdom"))
-    }
-
-    "Form validation" must {
-      "pass validation" when {
-        "given valid Uk address data" in {
-          AccountantsAddress.ukFormRule.validate(testUKModel) must be(Valid(testUKAddress))
-        }
-
-        "given valid Non-Uk address data" in {
-          AccountantsAddress.nonUkFormRule.validate(testNonUKModel) must be (Valid(testNonUKAddress))
-        }
-      }
-
-      "fail validation" when {
-
-        "country is given invalid data" in {
-          val model = testNonUKModel ++ Map("country" -> Seq("HGHHHH"))
-          AccountantsAddress.nonUkFormRule.validate(model) must be(
-            Invalid(Seq(
-              (Path \ "country") -> Seq(
-                ValidationError("error.invalid.country")
-              )
-            )))
-        }
-      }
     }
 
     "JSON validation" must {

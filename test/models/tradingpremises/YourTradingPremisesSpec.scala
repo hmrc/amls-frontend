@@ -16,26 +16,12 @@
 
 package models.tradingpremises
 
-import cats.data.Validated.Invalid
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
 import models.DateOfChange
 import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json._
 
 class YourTradingPremisesSpec extends WordSpec with MustMatchers with JodaWrites with JodaReads {
-
-  val data = Map(
-    "tradingName" -> Seq("foo"),
-    "addressLine1" -> Seq("1"),
-    "addressLine2" -> Seq("2"),
-    "postcode" -> Seq("AA11 1AA"),
-    "isResidential" -> Seq("true"),
-    "startDate.day" -> Seq("24"),
-    "startDate.month" -> Seq("2"),
-    "startDate.year" -> Seq("1990")
-  )
 
   val model = YourTradingPremises(
     "foo",
@@ -51,102 +37,6 @@ class YourTradingPremisesSpec extends WordSpec with MustMatchers with JodaWrites
   )
 
   "YourTradingPremises" must {
-
-    "return valid response when isResidential and startDate are empty" in {
-      YourTradingPremises.formR.validate(Map("tradingName" -> Seq("foo"),
-        "addressLine1" -> Seq("1"),
-        "addressLine2" -> Seq("2"),
-        "postcode" -> Seq("AA11 1AA")
-      )) must be (Valid(YourTradingPremises("foo",Address("1",Some("2"),None,None,"AA11 1AA",None),None,None,None)))
-
-    }
-
-    "fail validation when trading name is exceeds maxlength" in {
-      YourTradingPremises.formR.validate(Map("tradingName" -> Seq("foooo"*50),
-        "addressLine1" -> Seq("1"),
-        "addressLine2" -> Seq("2"),
-        "postcode" -> Seq("AA11 1AA"),
-        "isResidential" -> Seq("true"),
-        "startDate.day" -> Seq("24"),
-        "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990"))) must be (Invalid(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.invalid.tp.trading.name"))
-      )))
-    }
-
-    "fail validation" when {
-      "given a future date" in {
-
-        val data = YourTradingPremises.formW.writes(model.copy( startDate = Some(LocalDate.now().plusDays(1))))
-        YourTradingPremises.formR.validate(data) must be(Valid(YourTradingPremises("foo",Address("1",Some("2"),None,None,"AA11 1AA",None),Some(true),Some(LocalDate.now().plusDays(1)),None)))
-0
-
-      }
-    }
-
-    "fail validation when trading name is empty" in {
-      YourTradingPremises.formR.validate(Map("tradingName" -> Seq(""),
-        "addressLine1" -> Seq("1"),
-        "addressLine2" -> Seq("2"),
-        "postcode" -> Seq("AA11 1AA"),
-        "isResidential" -> Seq("true"),
-        "startDate.day" -> Seq("24"),
-        "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990"))) must be (Invalid(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.required.tp.trading.name"))
-      )))
-    }
-
-    "fail validation when trading name contains only spaces" in {
-      YourTradingPremises.formR.validate(Map("tradingName" -> Seq("   "),
-        "addressLine1" -> Seq("1"),
-        "addressLine2" -> Seq("2"),
-        "postcode" -> Seq("AA11 1AA"),
-        "isResidential" -> Seq("true"),
-        "startDate.day" -> Seq("24"),
-        "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990"))) must be (Invalid(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.required.tp.trading.name"))
-      )))
-    }
-
-    "fail validation when trading name contains invalid characters" in {
-      YourTradingPremises.formR.validate(Map("tradingName" -> Seq("{}{}}"),
-        "addressLine1" -> Seq("1"),
-        "addressLine2" -> Seq("2"),
-        "postcode" -> Seq("AA11 1AA"),
-        "isResidential" -> Seq("true"),
-        "startDate.day" -> Seq("24"),
-        "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990"))) must be (Invalid(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.invalid.char.tp.agent.company.details"))
-      )))
-    }
-
-    "fail validation when trading name is to long" in {
-      YourTradingPremises.formR.validate(Map("tradingName" -> Seq("11111111111111" * 40),
-        "addressLine1" -> Seq("1"),
-        "addressLine2" -> Seq("2"),
-        "postcode" -> Seq("AA11 1AA"),
-        "isResidential" -> Seq("true"),
-        "startDate.day" -> Seq("24"),
-        "startDate.month" -> Seq("02"),
-        "startDate.year" -> Seq("1990"))) must be (Invalid(Seq(Path \ "tradingName"  -> Seq(ValidationError("error.invalid.tp.trading.name"))
-      )))
-    }
-
-    "Correctly serialise from form data" in {
-
-
-      implicitly[Rule[UrlFormEncoded, YourTradingPremises]].validate(data) must
-        be(Valid(model.copy(tradingNameChangeDate = None)))
-    }
-
-    "Correctly write from model to form" in {
-
-      implicitly[Write[YourTradingPremises, UrlFormEncoded]].writes(model.copy(tradingNameChangeDate = None)) must
-        be(data)
-    }
-
-  }
-
-  "The Json serializer" must {
 
     val json = Json.obj(
       "tradingName" -> "foo",

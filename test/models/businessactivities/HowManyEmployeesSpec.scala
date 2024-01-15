@@ -17,16 +17,16 @@
 package models.businessactivities
 
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.Json
 
 class HowManyEmployeesSpec extends PlaySpec {
 
   "HowManyEmployees" must {
-    "write the model fields to url encoded response" in {
+    "round trip through JSON" in {
 
-      HowManyEmployees.formWrites.writes(HowManyEmployees(Some("123456789"), Some("12345678"))) must
-        be(Map("employeeCount" -> Seq("123456789"),
-          "employeeCountAMLSSupervision" -> Seq("12345678")))
+      val model = HowManyEmployees(Some("123456789"), Some("12345678"))
 
+      Json.toJson(model).as[HowManyEmployees] mustBe model
     }
   }
 }

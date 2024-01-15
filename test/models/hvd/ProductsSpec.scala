@@ -18,8 +18,6 @@ package models.hvd
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import models.hvd.Products._
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
@@ -42,105 +40,6 @@ class ProductsSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerTest {
         products.sorted mustBe Seq(Alcohol, Antiques, Caravans, Cars, Clothing, Gold,
           Jewellery, MobilePhones, OtherMotorVehicles, ScrapMetals, Tobacco)
       }
-    }
-
-    "validate model with few check box selected" in {
-
-      val model = Map(
-        "products[]" -> Seq("01", "02" ,"12"),
-        "otherDetails" -> Seq("test")
-      )
-
-      Products.formRule.validate(model) must
-        be(Valid(Products(Set(Alcohol, Tobacco, Other("test")))))
-
-    }
-
-    "fail validation when 'Other' is selected but no details are provided" when {
-      "represented by an empty string" in {
-        val model = Map("products[]" -> Seq("12"),
-                        "otherDetails" -> Seq(""))
-
-        Products.formRule.validate(model) must
-          be(Invalid(List((Path \ "otherDetails", Seq(ValidationError("error.required.hvd.business.sell.other.details"))))))
-      }
-
-      "represented by a sequence of whitespace" in {
-        val model = Map("products[]" -> Seq("12"),
-          "otherDetails" -> Seq("  \t"))
-
-        Products.formRule.validate(model) must
-          be(Invalid(List((Path \ "otherDetails", Seq(ValidationError("error.required.hvd.business.sell.other.details"))))))
-      }
-
-      "represented by a missing field" in {
-        val model = Map("products[]" -> Seq("12"))
-        Products.formRule.validate(model) must
-          be(Invalid(List((Path \ "otherDetails", Seq(ValidationError("error.required"))))))
-      }
-
-      "contains invalid characters in the 'other details' field" in {
-        val model = Map(
-          "products[]" -> Seq("12"),
-          "otherDetails" -> Seq("¡93u4jk<>{}"))
-
-        Products.formRule.validate(model) must be(
-          Invalid(List((Path \ "otherDetails", Seq(ValidationError("error.invalid.hvd.business.sell.other.format")))))
-        )
-      }
-    }
-
-    "fail validation when field otherDetails exceeds maximum length" in {
-
-      val model = Map(
-        "products[]" -> Seq("01", "02" ,"03", "04", "05", "12"),
-        "otherDetails" -> Seq("t"*256)
-      )
-      Products.formRule.validate(model) must
-        be(Invalid(List(( Path \ "otherDetails", Seq(ValidationError("error.invalid.hvd.business.sell.other.details"))))))
-    }
-
-    "fail validation when none of the check boxes are selected" when {
-      List(
-        "empty list" -> Map("products[]" -> Seq(),"otherDetails" -> Seq("test")),
-        "missing field" -> Map.empty[String, Seq[String]]
-      ).foreach { x =>
-        val (rep, model) = x
-        s"represented by $rep" in {
-          Products.formRule.validate(model) must
-            be(Invalid(List((Path \ "products", List(ValidationError("error.required.hvd.business.sell.atleast"))))))
-        }
-      }
-    }
-
-    "fail to validate  invalid data" in {
-      val model = Map(
-        "products[]" -> Seq("01, 15")
-      )
-      Products.formRule.validate(model) must
-        be(Invalid(Seq((Path \ "products") -> Seq(ValidationError("error.invalid")))))
-
-    }
-
-    "validate form write for valid transaction record" in {
-
-      val map = Map(
-        "products[]" -> Seq("12","08"),
-        "otherDetails" -> Seq("test")
-      )
-
-      val model = Products(Set(Other("test"), Gold))
-      Products.formWrites.writes(model) must be (map)
-    }
-
-    "validate form write for option Yes" in {
-
-      val map = Map(
-        "products[]" -> Seq("08", "11", "10", "02", "01")
-      )
-
-      val model = Products(Set(Clothing, MobilePhones, Gold, Alcohol, Tobacco))
-      Products.formWrites.writes(model) must be (map)
     }
 
     "JSON validation" must {

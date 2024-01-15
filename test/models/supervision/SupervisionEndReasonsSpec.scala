@@ -16,7 +16,6 @@
 
 package models.supervision
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
@@ -27,55 +26,7 @@ class SupervisionEndReasonsSpec extends PlaySpec with MockitoSugar {
     val reason = "Reason"
   }
 
-  "Form Rules and Writes" must {
-    "given 'yes' selected with valid reason " in new Fixture {
-
-      val urlFormEncoded = Map(
-        "anotherBody" -> Seq("true"),
-        "endingReason" -> Seq("Reason")
-      )
-
-      val expected = Valid(SupervisionEndReasons(reason))
-
-      SupervisionEndReasons.formRule.validate(urlFormEncoded) must be(expected)
-    }
-
-    "fail validation" when {
-      "given invalid characters in endingReason" in {
-
-        val urlFormEncoded = Map(
-          "anotherBody" -> Seq("true"),
-          "endingReason" -> Seq("invalid {} <>"))
-
-        val expected = Invalid(Seq((Path \ "endingReason") -> Seq(ValidationError("error.supervision.end.reason.invalid"))))
-
-        SupervisionEndReasons.formRule.validate(urlFormEncoded) must be(expected)
-      }
-
-      "given only spaces in endingReason" in {
-        val urlFormEncoded = Map(
-          "anotherBody" -> Seq("true"),
-          "endingReason" -> Seq("  "))
-
-        val expected = Invalid(Seq((Path \ "endingReason") -> Seq(ValidationError("error.required.supervision.reason"))))
-
-        SupervisionEndReasons.formRule.validate(urlFormEncoded) must be(expected)
-      }
-    }
-  }
-
   "Json read and writes" must {
-    "successfully write reason" in  new Fixture {
-
-      val expected = Map(
-        "anotherBody" -> Seq("true"),
-        "endingReason" -> Seq("Reason")
-      )
-
-      val input = SupervisionEndReasons(reason)
-
-      SupervisionEndReasons.formWrites.writes(input) must be(expected)
-    }
 
     "Serialise SupervisionEndReasons as expected" in new Fixture {
 

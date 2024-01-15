@@ -18,7 +18,7 @@ package forms.responsiblepeople.address
 
 import forms.mappings.Mappings
 import models.Country
-import models.responsiblepeople.{PersonAddress, PersonAddressNonUK, PersonAddressUK, ResponsiblePersonAddress, ResponsiblePersonCurrentAddress}
+import models.responsiblepeople.{PersonAddress, PersonAddressNonUK, PersonAddressUK}
 import play.api.data.Form
 import play.api.data.Forms.mapping
 

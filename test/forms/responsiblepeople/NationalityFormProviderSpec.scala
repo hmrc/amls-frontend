@@ -18,8 +18,7 @@ package forms.responsiblepeople
 
 import forms.behaviours.StringFieldBehaviours
 import forms.mappings.Constraints
-import models.Country
-import models.responsiblepeople.{British, CountryOfBirth, Nationality, OtherCountry}
+import models.responsiblepeople.{British, Nationality, OtherCountry}
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 

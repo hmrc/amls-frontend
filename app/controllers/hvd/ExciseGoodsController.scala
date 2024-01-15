@@ -19,7 +19,6 @@ package controllers.hvd
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.hvd.ExciseGoodsFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 
 import javax.inject.Inject
 import models.businessmatching.BusinessActivity.HighValueDealing

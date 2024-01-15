@@ -18,71 +18,12 @@ package models.supervision
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 
 class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
 
   "ProfessionalBodyMember" must {
-
-    "pass validation" when {
-      "more than one check box is selected" in {
-
-        val model = Map("isAMember" -> Seq("true"))
-
-        ProfessionalBodyMember.formRule.validate(model) must be(Valid(ProfessionalBodyMemberYes))
-
-      }
-
-      "'No' is selected" in {
-
-        val model = Map("isAMember" -> Seq("false"))
-
-        ProfessionalBodyMember.formRule.validate(model) must be(Valid(ProfessionalBodyMemberNo))
-
-      }
-    }
-
-    "fail validation" when {
-      "'isAMember' field field is missing" in {
-
-        val model = Map[String, Seq[String]]()
-
-        ProfessionalBodyMember.formRule.validate(model) must
-          be(Invalid(List((Path \ "isAMember", Seq(ValidationError("error.required.supervision.business.a.member"))))))
-
-      }
-
-      "given no data represented by an empty Map" in {
-
-        ProfessionalBodyMember.formRule.validate(Map.empty) must
-          be(Invalid(Seq((Path \ "isAMember") -> Seq(ValidationError("error.required.supervision.business.a.member")))))
-
-      }
-
-    }
-
-    "validate form write for option No" in {
-
-      val map = Map("isAMember" -> Seq("false"))
-
-      ProfessionalBodyMember.formWrites.writes(ProfessionalBodyMemberNo) must be (map)
-    }
-
-    "validate form write for option Yes" in {
-
-      val map = Map("isAMember" -> Seq("true"))
-
-      ProfessionalBodyMember.formWrites.writes(ProfessionalBodyMemberYes) must be (map)
-    }
-
-    "form write test" in {
-      val map = Map("isAMember" -> Seq("false"))
-
-      ProfessionalBodyMember.formWrites.writes(ProfessionalBodyMemberNo) must be(map)
-    }
 
     "JSON validation" must {
 

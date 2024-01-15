@@ -16,9 +16,6 @@
 
 package models.tradingpremises
 
-import jto.validation.{From, Path, Rule, Write}
-import jto.validation.forms._
-import jto.validation.ValidationError
 import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import play.api.libs.json.Writes
@@ -89,32 +86,6 @@ object BusinessStructure extends Enumerable.Implicits {
     case Partnership => Json.obj("agentsBusinessStructure" -> "03")
     case IncorporatedBody => Json.obj("agentsBusinessStructure" -> "04")
     case UnincorporatedBody => Json.obj("agentsBusinessStructure" -> "05")
-  }
-
-  implicit val agentsBusinessStructureRule: Rule[UrlFormEncoded, BusinessStructure] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-
-    (__ \ "agentsBusinessStructure").read[String].withMessage("error.required.tp.select.business.structure") flatMap {
-      case "01" => SoleProprietor
-      case "02" => LimitedLiabilityPartnership
-      case "03" => Partnership
-      case "04" => IncorporatedBody
-      case "05" => UnincorporatedBody
-      case _ => (Path \ "agentsBusinessStructure") -> Seq(ValidationError("error.invalid"))
-    }
-  }
-
-  implicit val formWritesBusinessStructure: Write[BusinessStructure, UrlFormEncoded] = Write {
-    case SoleProprietor =>
-      Map("agentsBusinessStructure" -> Seq("01"))
-    case LimitedLiabilityPartnership =>
-      Map("agentsBusinessStructure" -> Seq("02"))
-    case Partnership =>
-      Map("agentsBusinessStructure" -> Seq("03"))
-    case IncorporatedBody =>
-      Map("agentsBusinessStructure" -> Seq("04"))
-    case UnincorporatedBody =>
-      Map("agentsBusinessStructure" -> Seq("05"))
   }
 
   def formValues()(implicit messages: Messages): Seq[RadioItem] = all.sortBy(_.toString).map { structure =>

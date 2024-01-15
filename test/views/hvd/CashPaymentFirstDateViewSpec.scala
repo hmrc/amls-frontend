@@ -17,8 +17,6 @@
 package views.hvd
 
 import forms.hvd.CashPaymentFirstDateFormProvider
-import forms.{Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
 import models.hvd.CashPaymentFirstDate
 import org.joda.time.LocalDate
 import org.scalatest.MustMatchers

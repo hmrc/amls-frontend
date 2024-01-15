@@ -18,96 +18,9 @@ package models.supervision
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ProfessionalBodySpec extends PlaySpec with MockitoSugar {
-
-  "Form Validation" must {
-
-
-    "successfully validate given an enum value" in {
-
-      ProfessionalBody.formRule.validate(Map("penalised" -> Seq("false"))) must
-        be(Valid(ProfessionalBodyNo))
-    }
-
-    "successfully validate given an `Yes` value" in {
-
-      val data = Map(
-        "penalised" -> Seq("true"),
-        "professionalBody" -> Seq("details")
-      )
-
-      ProfessionalBody.formRule.validate(data) must
-        be(Valid(ProfessionalBodyYes("details")))
-    }
-
-    "fail to validate missing mandatory value" in {
-
-      ProfessionalBody.formRule.validate(Map.empty) must
-        be(Invalid(Seq(
-          (Path \ "penalised") -> Seq(ValidationError("error.required.professionalbody.penalised.by.professional.body"))
-        )))
-    }
-
-    "fail to validate given an `Yes` with no value" in {
-
-      val data = Map(
-        "penalised" -> Seq("true"),
-        "professionalBody" -> Seq("")
-      )
-
-      ProfessionalBody.formRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "professionalBody") -> Seq(ValidationError("error.required.professionalbody.info.about.penalty"))
-        )))
-    }
-
-    "fail to validate given an `Yes` with max value" in {
-
-      val data = Map(
-        "penalised" -> Seq("true"),
-        "professionalBody" -> Seq("zzxczxczx"*50)
-      )
-
-      ProfessionalBody.formRule.validate(data) must
-        be(Invalid(Seq(
-          (Path \ "professionalBody") -> Seq(ValidationError("error.invalid.professionalbody.info.about.penalty.length.255"))
-        )))
-    }
-
-    "write correct data from enum value" in {
-
-      ProfessionalBody.formWrites.writes(ProfessionalBodyNo) must
-        be(Map("penalised" -> Seq("false")))
-
-    }
-
-    "write correct data from `Yes` value" in {
-
-      ProfessionalBody.formWrites.writes(ProfessionalBodyYes("details")) must
-        be(Map("penalised" -> Seq("true"), "professionalBody" -> Seq("details")))
-    }
-
-    "fail validation" when {
-
-      "invalid characters were given for the reason field" in {
-
-        val formData = Map(
-          "penalised" -> Seq("true"),
-          "professionalBody" -> Seq("¡[]<>948734")
-        )
-
-        ProfessionalBody.formRule.validate(formData) must be(
-          Invalid(Seq((Path \ "professionalBody") -> Seq(ValidationError("error.invalid.professionalbody.info.about.penalty"))))
-        )
-
-      }
-
-    }
-  }
 
   "JSON validation" must {
 
