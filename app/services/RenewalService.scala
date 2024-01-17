@@ -211,13 +211,12 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     - Update controllers usages of updateRenewal with this
     - Make old method private
    */
-  def fetchAndUpdateRenewal(credId: String, updateAction: Renewal => Renewal)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, CacheMap]] = {
-
-    dataCache.fetchAll(credId).flatMap {
-      _.flatMap(_.getEntry[Renewal](Renewal.sectionKey))
-        .map(renewal => updateRenewal(credId, updateAction(renewal)))
-        .toRight("Unable to get data from the cache")
-        .sequence
+  def fetchAndUpdateRenewal(credId: String, updateAction: Renewal => Renewal)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[CacheMap]] = {
+    for {
+      renewal <- OptionT(getRenewal(credId))
+      updatedCache <- OptionT.liftF(updateRenewal(credId, updateAction(renewal)))
+    } yield {
+      updatedCache
     }
-  }
+  }.value
 }

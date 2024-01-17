@@ -76,7 +76,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
 
     when {
       renewalService.fetchAndUpdateRenewal(any(), any())(any(), any())
-    } thenReturn Future.successful(Right(cache))
+    } thenReturn Future.successful(Some(cache))
 
     when {
       cache.getEntry[Renewal](Renewal.key)
@@ -106,10 +106,8 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
       })
 
       when {
-        cache.getEntry[BusinessMatching](BusinessMatching.key)
-      } thenReturn {
-        Some(businessMatching)
-      }
+        renewalService.getBusinessMatching(any())(any())
+      } thenReturn Future.successful(Some(businessMatching))
 
       await(controller.post(edit)(formRequest(data)))
     })
@@ -152,6 +150,18 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     }
 
     "post is called" when {
+
+      "updating the cache with user answer fails" must {
+
+        "return 500" in new FormSubmissionFixture {
+          when {
+            renewalService.fetchAndUpdateRenewal(any(), any())(any(), any())
+          } thenReturn Future.successful(None)
+          post() { res =>
+            status(Future.successful(res)) mustBe INTERNAL_SERVER_ERROR
+          }
+        }
+      }
 
       "given valid data" must {
 
