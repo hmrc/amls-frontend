@@ -22,7 +22,7 @@ import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueD
 import models.businessmatching._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.RenewalService
-import utils.AuthAction
+import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.FXTransactionsInLast12MonthsView
 
 import javax.inject.Inject
@@ -54,12 +54,14 @@ class FXTransactionsInLast12MonthsController @Inject()(val authAction: AuthActio
           renewalService.fetchAndUpdateRenewal(
             request.credId,
             _.fxTransactionsInLast12Months(data)
-          ) map {
-            case Left(error) => InternalServerError(error)
-            case Right(cacheMap) => standardRouting(
-              cacheMap.getEntry[BusinessMatching](BusinessMatching.key).flatMap(_.activities.map(_.businessActivities)),
-              edit
-            )
+          ) flatMap {
+            case Some(_) => renewalService.getBusinessMatching(request.credId) map { bmOpt =>
+                standardRouting(
+                  ControllerHelper.getBusinessActivity(bmOpt).map(_.businessActivities),
+                  edit
+                )
+              }
+            case None => Future.successful(InternalServerError("Failed to update cache"))
           }
       )
     }

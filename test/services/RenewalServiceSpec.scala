@@ -977,23 +977,19 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
   "fetchAndUpdateRenewal" must {
 
-    "return a right with the cachemap" when {
+    "return the updated cachemap" when {
 
       "renewal is updated correctly" in new Fixture {
 
         val model = standardCompleteInvolvedInOtherActivities()
 
         when {
-          dataCache.fetchAll(eqTo(credId))(any())
-        } thenReturn Future.successful(Some(mockCacheMap))
+          dataCache.fetch[Renewal](any(), any())(any(), any())
+        } thenReturn Future.successful(Some(model))
 
         when {
           dataCache.save(eqTo(credId), eqTo(Renewal.sectionKey), any())(any(), any())
         } thenReturn Future.successful(mockCacheMap)
-
-        when {
-          mockCacheMap.getEntry[Renewal](eqTo(Renewal.sectionKey))(any())
-        } thenReturn Some(model)
 
         val result = service.fetchAndUpdateRenewal(
           credId,
@@ -1003,35 +999,17 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
         verify(dataCache).save(eqTo(credId), eqTo(Renewal.sectionKey), captor.capture())(any(), any())
 
-        result mustBe Right(mockCacheMap)
+        result mustBe Some(mockCacheMap)
         captor.getValue mustBe model.copy(hasAccepted = false)
       }
     }
 
-    "return left with an error message" when {
+    "return None" when {
 
       "renewal is not present in cache" in new Fixture {
 
         when {
-          dataCache.fetchAll(eqTo(credId))(any())
-        } thenReturn Future.successful(Some(mockCacheMap))
-
-        when {
-          mockCacheMap.getEntry[Renewal](eqTo(Renewal.sectionKey))(any())
-        } thenReturn None
-
-        val result = service.fetchAndUpdateRenewal(
-          credId,
-          renewal => renewal.copy(hasAccepted = false)
-        ).futureValue
-
-        result mustBe Left("Unable to get data from the cache")
-      }
-
-      "fetching the cache fails" in new Fixture {
-
-        when {
-          dataCache.fetchAll(eqTo(credId))(any())
+          dataCache.fetch[Renewal](any(), any())(any(), any())
         } thenReturn Future.successful(None)
 
         val result = service.fetchAndUpdateRenewal(
@@ -1039,7 +1017,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           renewal => renewal.copy(hasAccepted = false)
         ).futureValue
 
-        result mustBe Left("Unable to get data from the cache")
+        result mustBe None
       }
     }
   }
