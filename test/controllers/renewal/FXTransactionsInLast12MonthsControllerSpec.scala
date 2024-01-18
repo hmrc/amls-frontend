@@ -50,14 +50,14 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
     val cacheMap = mock[CacheMap]
 
     when(mockRenewalService.fetchAndUpdateRenewal(any(), any())(any(), any()))
-      .thenReturn(Future.successful(Right(cacheMap)))
+      .thenReturn(Future.successful(Some(cacheMap)))
 
     when(mockRenewalService.getRenewal(any())(any()))
       .thenReturn(Future.successful(None))
 
     def setupBusinessMatching(activities: Set[BusinessActivity]) = when {
-      cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-    } thenReturn Some(BusinessMatching(activities = Some(BusinessActivities(activities))))
+      mockRenewalService.getBusinessMatching(any())(any())
+    } thenReturn Future.successful(Some(BusinessMatching(activities = Some(BusinessActivities(activities)))))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -100,6 +100,18 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       .withFormUrlEncodedBody(
         "fxTransaction" -> "12345678963"
       )
+    }
+
+    "return 500" when {
+
+      "updating mongoCache fails" in new FlowFixture {
+        when(mockRenewalService.fetchAndUpdateRenewal(any(), any())(any(), any()))
+          .thenReturn(Future.successful(None))
+
+        setupBusinessMatching(activities = Set(MoneyServiceBusiness))
+        val result = controller.post()(newRequest)
+        status(result) must be(INTERNAL_SERVER_ERROR)
+      }
     }
 
     "Successfully save data in mongoCache and navigate to Next page" when {

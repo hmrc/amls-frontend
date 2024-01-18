@@ -18,12 +18,12 @@ package controllers.renewal
 
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.renewal.CustomersOutsideIsUKFormProvider
+import models.businessmatching.BusinessActivity
 import models.businessmatching.BusinessActivity.HighValueDealing
-import models.businessmatching.{BusinessActivity, BusinessMatching}
 import models.renewal.CustomersOutsideIsUK
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{AutoCompleteService, RenewalService}
-import utils.AuthAction
+import utils.{AuthAction, ControllerHelper}
 import views.html.renewal.CustomersOutsideIsUKView
 
 import javax.inject.{Inject, Singleton}
@@ -63,13 +63,15 @@ class CustomersOutsideIsUKController @Inject()(val authAction: AuthAction,
             } else {
               renewal.customersOutsideIsUK(data).copy(customersOutsideUK = None)
             }
-          ) map {
-            case Left(error) => InternalServerError(error)
-            case Right(cacheMap) => redirectTo(
-              data,
-              edit,
-              cacheMap.getEntry[BusinessMatching](BusinessMatching.key).flatMap(_.activities.map(_.businessActivities))
-            )
+          ) flatMap {
+            case Some(_) => renewalService.getBusinessMatching(request.credId) map { bmOpt =>
+                redirectTo(
+                  data,
+                  edit,
+                  ControllerHelper.getBusinessActivity(bmOpt).map(_.businessActivities)
+                )
+              }
+            case None => Future.successful(InternalServerError("Failed to update cache"))
           }
       )
   }
