@@ -16,7 +16,6 @@
 
 package models.businessmatching.updateservice
 
-import jto.validation.forms.UrlFormEncoded
 import models.businessmatching.BusinessActivity
 import play.api.libs.json._
 
@@ -26,24 +25,6 @@ case class NewActivitiesAtTradingPremisesYes(activity: BusinessActivity) extends
 case object NewActivitiesAtTradingPremisesNo extends AreNewActivitiesAtTradingPremises
 
 object AreNewActivitiesAtTradingPremises {
-
-  import jto.validation._
-  import utils.MappingUtils.Implicits._
-
-  implicit val formReads: Rule[UrlFormEncoded, AreNewActivitiesAtTradingPremises] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "tradingPremisesNewActivities").read[Boolean].withMessage("error.businessmatching.updateservice.tradingpremisesnewactivities") flatMap {
-      case true => {
-        (__ \ "businessActivities").read[BusinessActivity] map NewActivitiesAtTradingPremisesYes.apply
-      }
-      case false => NewActivitiesAtTradingPremisesNo
-    }
-  }
-
-  implicit val formWrites: Write[AreNewActivitiesAtTradingPremises, UrlFormEncoded] = Write {
-    case NewActivitiesAtTradingPremisesYes(_) => "tradingPremisesNewActivities" -> "true"
-    case NewActivitiesAtTradingPremisesNo => "tradingPremisesNewActivities" -> "false"
-  }
 
   implicit val jsonReads: Reads[AreNewActivitiesAtTradingPremises] =
     (__ \ "tradingPremisesNewActivities").read[Boolean] flatMap {

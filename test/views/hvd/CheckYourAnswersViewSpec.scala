@@ -16,16 +16,12 @@
 
 package views.hvd
 
-import forms.EmptyForm
 import models.hvd.PercentageOfCashPaymentOver15000.Third
 import models.hvd.Products._
-import models.hvd.SalesChannel._
 import models.hvd._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import play.api.i18n.Messages
 import play.api.test.{FakeRequest, Injecting}
 import utils.AmlsSummaryViewSpec
 import utils.hvd.CheckYourAnswersHelper

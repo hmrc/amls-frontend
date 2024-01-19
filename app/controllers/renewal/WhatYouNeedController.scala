@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessmatching.{BusinessActivities, BusinessMatching, BusinessMatchingMsbServices}
-import models.registrationprogress.{NotStarted, Section, Started, TaskRow}
+import models.registrationprogress.{NotStarted, Started, TaskRow}
 import play.api.Logging
 import play.api.mvc._
 import services.RenewalService

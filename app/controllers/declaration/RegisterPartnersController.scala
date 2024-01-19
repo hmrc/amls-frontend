@@ -22,7 +22,6 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.declaration.BusinessPartnersFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration.BusinessPartners
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{Partner, Positions, ResponsiblePerson}

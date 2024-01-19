@@ -19,7 +19,6 @@ package controllers.responsiblepeople
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
 import forms.responsiblepeople.PositionWithinBusinessFormProvider
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._

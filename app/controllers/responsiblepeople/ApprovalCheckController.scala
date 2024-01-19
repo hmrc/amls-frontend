@@ -19,14 +19,12 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.ApprovalCheckFormProvider
-import forms.{Form2, _}
-
-import javax.inject.Inject
-import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
+import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.ApprovalCheckView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class ApprovalCheckController @Inject()(

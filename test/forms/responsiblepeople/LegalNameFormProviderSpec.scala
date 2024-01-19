@@ -17,7 +17,6 @@
 package forms.responsiblepeople
 
 import forms.behaviours.BooleanFieldBehaviours
-import models.responsiblepeople.PreviousName
 import play.api.data.{Form, FormError}
 
 class LegalNameFormProviderSpec extends BooleanFieldBehaviours[Boolean] {

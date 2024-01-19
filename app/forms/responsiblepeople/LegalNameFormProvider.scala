@@ -17,7 +17,6 @@
 package forms.responsiblepeople
 
 import forms.generic.BooleanFormProvider
-import models.responsiblepeople.PreviousName
 import play.api.data.Form
 
 import javax.inject.Inject

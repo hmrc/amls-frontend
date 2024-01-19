@@ -16,13 +16,7 @@
 
 package models.responsiblepeople
 
-import jto.validation._
-import jto.validation.forms.Rules._
-import models.FormTypes._
 import play.api.libs.json.{Writes => _}
-import utils.MappingUtils.Implicits._
-import jto.validation.forms.UrlFormEncoded
-import cats.data.Validated.Valid
 
 sealed trait ExperienceTraining
 
@@ -33,31 +27,6 @@ case object ExperienceTrainingNo extends ExperienceTraining
 object ExperienceTraining {
 
   import play.api.libs.json._
-
-  val maxInformationTypeLength = 255
-
-  val experienceInformationType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.rp.experiencetraining.information") andThen
-    maxLength(maxInformationTypeLength).withMessage("error.rp.invalid.experiencetraining.information.maxlength.255") andThen
-    basicPunctuationPattern().withMessage("error.rp.invalid.experiencetraining.information")
-
-
-  implicit val formRule: Rule[UrlFormEncoded, ExperienceTraining] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "experienceTraining").read[Boolean].withMessage("error.required.rp.experiencetraining") flatMap {
-      case true =>
-        (__ \ "experienceInformation").read(experienceInformationType) map (ExperienceTrainingYes.apply)
-      case false => Rule.fromMapping { _ => Valid(ExperienceTrainingNo) }
-    }
-  }
-
-  implicit val formWrites: Write[ExperienceTraining, UrlFormEncoded] = Write {
-    case a: ExperienceTrainingYes => Map(
-      "experienceTraining" -> Seq("true"),
-      "experienceInformation" -> Seq(a.experienceInformation)
-    )
-    case ExperienceTrainingNo => Map("experienceTraining" -> Seq("false"))
-  }
 
   implicit val jsonReads: Reads[ExperienceTraining] =
     (__ \ "experienceTraining").read[Boolean] flatMap {

@@ -16,8 +16,6 @@
 
 package views.status
 
-import config.ApplicationConfig
-import forms.EmptyForm
 import generators.AmlsReferenceNumberGenerator
 import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
@@ -25,14 +23,12 @@ import models.status._
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
-import play.api.Configuration
 import play.api.mvc.Call
 import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
-import views.html.status.components._
 import views.html.status.YourRegistrationView
+import views.html.status.components._
 
 class YourRegistrationViewSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator {
 
@@ -74,8 +70,6 @@ class YourRegistrationViewSpec extends AmlsViewSpec with MustMatchers with AmlsR
     val pageTitle = "Your registration - " + messages("title.amls") + " - " + messages("title.gov")
 
     "have correct title, heading and sub heading" in new ViewFixture {
-
-      val form2 = EmptyForm
 
       def view = your_registration(amlsRegistrationNumber,
         Some("business Name"),

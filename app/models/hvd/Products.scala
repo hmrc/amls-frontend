@@ -16,17 +16,10 @@
 
 package models.hvd
 
-import models.FormTypes._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation._
-import jto.validation.ValidationError
-import play.api.libs.json._
-import play.api.libs.json.Reads.StringReads
-import jto.validation.forms.Rules.{minLength => _, _}
-import utils.TraversableValidators.minLengthR
-import cats.data.Validated.{Invalid, Valid}
 import models.{Enumerable, WithName}
 import play.api.i18n.Messages
+import play.api.libs.json.Reads.StringReads
+import play.api.libs.json._
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
@@ -154,62 +147,6 @@ object Products extends Enumerable.Implicits {
   }
 
   implicit val enumerable: Enumerable[ItemType] = Enumerable(all.map(v => v.toString -> v): _*)
-
-  import utils.MappingUtils.Implicits._
-
-  val maxDetailsLength = 255
-  val otherDetailsType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.hvd.business.sell.other.details") andThen
-    maxLength(maxDetailsLength).withMessage("error.invalid.hvd.business.sell.other.details") andThen
-    basicPunctuationPattern("error.invalid.hvd.business.sell.other.format")
-
-  implicit val formRule: Rule[UrlFormEncoded, Products] =
-    From[UrlFormEncoded] { __ =>
-      (__ \ "products").read(minLengthR[Set[String]](1).withMessage("error.required.hvd.business.sell.atleast")) flatMap { z =>
-        z.map {
-          case "01" => Rule[UrlFormEncoded, ItemType](_ => Valid(Alcohol))
-          case "02" => Rule[UrlFormEncoded, ItemType](_ => Valid(Tobacco))
-          case "03" => Rule[UrlFormEncoded, ItemType](_ => Valid(Antiques))
-          case "04" => Rule[UrlFormEncoded, ItemType](_ => Valid(Cars))
-          case "05" => Rule[UrlFormEncoded, ItemType](_ => Valid(OtherMotorVehicles))
-          case "06" => Rule[UrlFormEncoded, ItemType](_ => Valid(Caravans))
-          case "07" => Rule[UrlFormEncoded, ItemType](_ => Valid(Jewellery))
-          case "08" => Rule[UrlFormEncoded, ItemType](_ => Valid(Gold))
-          case "09" => Rule[UrlFormEncoded, ItemType](_ => Valid(ScrapMetals))
-          case "10" => Rule[UrlFormEncoded, ItemType](_ => Valid(MobilePhones))
-          case "11" => Rule[UrlFormEncoded, ItemType](_ => Valid(Clothing))
-          case "12" =>
-            (__ \ "otherDetails").read(otherDetailsType) map Other.apply
-          case _ =>
-            Rule[UrlFormEncoded, ItemType] { _ =>
-              Invalid(Seq((Path \ "products") -> Seq(ValidationError("error.invalid"))))
-            }
-        }.foldLeft[Rule[UrlFormEncoded, Set[ItemType]]](
-          Rule[UrlFormEncoded, Set[ItemType]](_ => Valid(Set.empty))
-        ) {
-          case (m, n) =>
-            n flatMap { x =>
-              m map {
-                _ + x
-              }
-            }
-        } map Products.apply
-      }
-    }
-
-  implicit def formWrites = Write[Products, UrlFormEncoded] {
-    case Products(transactions) =>
-      Map(
-        "products[]" -> (transactions map {
-          _.value
-        }).toSeq
-      ) ++ transactions.foldLeft[UrlFormEncoded](Map.empty) {
-        case (m, Other(name)) =>
-          m ++ Map("otherDetails" -> Seq(name))
-        case (m, _) =>
-          m
-      }
-  }
 
   implicit val jsonReads: Reads[Products] =
     (__ \ "products").read[Set[String]].flatMap { x: Set[String] =>

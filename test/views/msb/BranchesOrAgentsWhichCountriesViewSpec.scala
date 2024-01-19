@@ -17,7 +17,6 @@
 package views.msb
 
 import forms.msb.BranchesOrAgentsWhichCountriesFormProvider
-import forms.{Form2, ValidForm}
 import models.Country
 import models.moneyservicebusiness.BranchesOrAgentsWhichCountries
 import org.scalatest.MustMatchers
@@ -52,8 +51,6 @@ class BranchesOrAgentsWhichCountriesViewSpec extends AmlsViewSpec with MustMatch
     }
 
     "have correct headings" in new ViewFixture {
-
-      val form2: ValidForm[BranchesOrAgentsWhichCountries] = Form2(BranchesOrAgentsWhichCountries(Seq.empty[Country]))
 
       def view = countriesView(
         fp().fill(BranchesOrAgentsWhichCountries(Seq.empty[Country])), edit = true, mockAutoComplete.formOptions

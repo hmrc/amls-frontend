@@ -17,7 +17,7 @@
 package models.bankdetails
 
 import models.bankdetails.BankAccountType.NoBankAccountUsed
-import models.registrationprogress.{Completed, NotStarted, Section, Started, TaskRow, Updated}
+import models.registrationprogress._
 import play.api.i18n.Messages
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap

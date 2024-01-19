@@ -16,49 +16,8 @@
 
 package models.responsiblepeople
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Path, Rule, ValidationError, Write}
-import models.{Country, countries}
+import models.Country
 
 case class CountryOfBirth (bornInUk: Boolean, country: Option[Country])
 
-object CountryOfBirth {
-
-  import utils.MappingUtils.Implicits._
-
-  val validateCountry: Rule[String, Country] = {
-    Rule {
-      case "" => Invalid(Seq(Path -> Seq(ValidationError("error.required.rp.birth.country"))))
-      case "GB" => Invalid(Seq(Path -> Seq(ValidationError("error.required.enter.valid.non.uk"))))
-      case code =>
-        countries.collectFirst {
-          case e @ Country(_, c) if c == code =>
-            Valid(e)
-        } getOrElse {
-          Invalid(Seq(Path -> Seq(ValidationError("error.invalid.rp.birth.country"))))
-        }
-    }
-  }
-
-  implicit val formRule: Rule[UrlFormEncoded, CountryOfBirth] = From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-      (__ \ "bornInUk").read[Boolean].withMessage("error.required.rp.select.country.of.birth") flatMap {
-        case false => (__ \ "country").read(validateCountry) map {
-          c => CountryOfBirth(bornInUk = false, Some(c))
-        }
-        case true => CountryOfBirth(bornInUk = true, None)
-      }
-    }
-
-  implicit val formWrites: Write[CountryOfBirth, UrlFormEncoded] = Write {x =>
-    x.country match {
-      case Some(country) =>  Map(
-        "bornInUk" -> Seq("false"),
-        "country" -> Seq(country.code)
-      )
-      case None =>  Map("bornInUk" -> Seq("true"))
-    }
-  }
-
-}
+object CountryOfBirth

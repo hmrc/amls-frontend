@@ -17,10 +17,7 @@
 package views.tcsp
 
 import forms.tcsp.ComplexCorpStructureCreationFormProvider
-import forms.{EmptyForm, InvalidForm}
-import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture

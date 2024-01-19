@@ -19,7 +19,7 @@ package generators
 import org.joda.time.{LocalDate => JodaLocalDate}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Gen.{alphaChar, alphaNumChar, choose, listOfN, numChar}
+import org.scalacheck.Gen.{alphaChar, alphaNumChar, listOfN, numChar}
 
 import java.time.LocalDate
 

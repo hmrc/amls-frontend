@@ -17,7 +17,6 @@
 package forms.businessmatching
 
 import forms.mappings.Mappings
-import models.FormTypes
 import models.businessmatching.TypeOfBusiness
 import play.api.data.Form
 
@@ -31,7 +30,7 @@ class TypeOfBusinessFormProvider @Inject()() extends Mappings {
       .verifying(
         firstError(
           maxLength(maxLength, "error.max.length.bm.businesstype.type"),
-          regexp(FormTypes.basicPunctuationRegex.toString(), "error.bm.businesstype.type.characters")
+          regexp(basicPunctuationRegex, "error.bm.businesstype.type.characters")
         )
       ).transform[TypeOfBusiness](TypeOfBusiness(_), _.typeOfBusiness)
   )

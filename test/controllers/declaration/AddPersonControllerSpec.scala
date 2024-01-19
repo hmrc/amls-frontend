@@ -16,10 +16,8 @@
 
 package controllers.declaration
 
-import java.util.UUID
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import forms.InvalidForm
 import forms.declaration.AddPersonFormProvider
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
@@ -40,6 +38,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.declaration.AddPersonView
 
+import java.util.UUID
 import scala.concurrent.Future
 
 class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting {

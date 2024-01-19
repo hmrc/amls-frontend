@@ -17,8 +17,6 @@
 package models.responsiblepeople
 
 import models.Country
-import jto.validation._
-import jto.validation.forms._
 import play.api.libs.json.{Reads, Writes}
 
 case class PersonResidenceType (
@@ -28,27 +26,6 @@ case class PersonResidenceType (
                               )
 
 object PersonResidenceType {
-
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, PersonResidenceType] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (
-      __.read[Residency] ~
-      (__ \ "countryOfBirth").read[Option[Country]].withMessage("error.required.rp.birth.country") ~
-      (__ \ "nationality").read[Option[Country]].withMessage("error.required.nationality")
-      )(PersonResidenceType.apply)
-  }
-
-  implicit val formWrites: Write[PersonResidenceType, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    (
-      __.write[Residency] ~
-        (__ \ "countryOfBirth").write[Option[Country]] ~
-        (__ \ "nationality").write[Option[Country]]
-      ) (unlift(PersonResidenceType.unapply))
-  }
 
   implicit val jsonRead: Reads[PersonResidenceType] = {
     import play.api.libs.functional.syntax._

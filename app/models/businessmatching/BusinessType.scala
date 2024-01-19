@@ -16,9 +16,6 @@
 
 package models.businessmatching
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
 import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import play.api.libs.json._
@@ -30,8 +27,6 @@ sealed trait BusinessType {
 }
 
 object BusinessType extends Enumerable.Implicits {
-
-  import jto.validation.forms.Rules._
 
   case object LimitedCompany extends WithName("limitedCompany") with BusinessType {
     override val value: String = "01"
@@ -48,47 +43,6 @@ object BusinessType extends Enumerable.Implicits {
   case object UnincorporatedBody extends WithName("unincorporatedBody") with BusinessType {
     override val value: String = "05"
   }
-
-  def errorMessageFor(businessType: BusinessType)(implicit messages: Messages): String = {
-    val common = "error.required.declaration.add.position.for"
-
-    businessType match {
-      case BusinessType.LimitedCompany => Messages(s"$common.limitedcompany")
-      case BusinessType.SoleProprietor => Messages(s"$common.sole.proprietor")
-      case BusinessType.Partnership => Messages(s"$common.partner.ship")
-      case BusinessType.LPrLLP => Messages(s"$common.lprlpp")
-      case BusinessType.UnincorporatedBody => Messages(s"$common.unicorporated.body")
-    }
-  }
-
-  implicit val formR: Rule[UrlFormEncoded, BusinessType] =
-    From[UrlFormEncoded] { __ =>
-      (__ \ "businessType").read[String] flatMap {
-        case "01" => Rule(_ => Valid(LimitedCompany))
-        case "02" => Rule(_ => Valid(SoleProprietor))
-        case "03" => Rule(_ => Valid(Partnership))
-        case "04" => Rule(_ => Valid(LPrLLP))
-        case "05" => Rule(_ => Valid(UnincorporatedBody))
-        case _ =>
-          Rule { _ =>
-            Invalid(Seq(Path \ "businessType" -> Seq(ValidationError("error.invalid"))))
-          }
-      }
-    }
-
-  implicit val formW: Write[BusinessType, UrlFormEncoded] =
-    Write[BusinessType, UrlFormEncoded] {
-      case LimitedCompany =>
-        Map("businessType" -> Seq("01"))
-      case SoleProprietor =>
-        Map("businessType" -> Seq("02"))
-      case Partnership =>
-        Map("businessType" -> Seq("03"))
-      case LPrLLP =>
-        Map("businessType" -> Seq("04"))
-      case UnincorporatedBody =>
-        Map("businessType" -> Seq("05"))
-    }
 
   implicit val writes: Writes[BusinessType] = Writes[BusinessType] {
     case LimitedCompany => JsString("Corporate Body")

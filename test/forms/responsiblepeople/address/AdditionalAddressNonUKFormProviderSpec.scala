@@ -17,7 +17,7 @@
 package forms.responsiblepeople.address
 
 import forms.behaviours.AddressFieldBehaviours
-import models.responsiblepeople.{ResponsiblePersonAddress, ResponsiblePersonCurrentAddress}
+import models.responsiblepeople.ResponsiblePersonAddress
 import play.api.data.Form
 
 class AdditionalAddressNonUKFormProviderSpec extends AddressFieldBehaviours {

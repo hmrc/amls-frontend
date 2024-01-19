@@ -134,8 +134,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
       when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-      val result = controller.get(1, false)(request)
-
+      status(controller.get(1, false)(request)) mustBe OK
     }
 
     "respond with NOT_FOUND" when {

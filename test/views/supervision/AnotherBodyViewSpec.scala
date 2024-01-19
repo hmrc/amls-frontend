@@ -16,7 +16,6 @@
 
 package views.supervision
 
-import forms.EmptyForm
 import forms.supervision.AnotherBodyFormProvider
 import models.supervision.AnotherBodyYes
 import org.scalatest.MustMatchers

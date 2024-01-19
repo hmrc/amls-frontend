@@ -18,7 +18,7 @@ package forms.responsiblepeople.address
 
 import forms.behaviours.BooleanFieldBehaviours
 import models.Country
-import models.responsiblepeople.{NewHomeAddress, PersonAddressNonUK, PersonAddressUK, ResponsiblePersonCurrentAddress}
+import models.responsiblepeople.{NewHomeAddress, PersonAddressNonUK, PersonAddressUK}
 import play.api.data.Form
 
 class NewHomeAddressFormProviderSpec extends BooleanFieldBehaviours[NewHomeAddress] {

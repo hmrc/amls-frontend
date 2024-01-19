@@ -17,8 +17,6 @@
 package views.responsiblepeople
 
 import forms.responsiblepeople.PositionWithinBusinessFormProvider
-import forms.{EmptyForm, InvalidForm}
-import jto.validation.{Path, ValidationError}
 import models.businessmatching.BusinessType
 import org.scalatest.MustMatchers
 import play.api.test.FakeRequest
@@ -51,7 +49,6 @@ class PositionWithinBusinessViewSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have correct headings" in new ViewFixture {
-      val form2 = EmptyForm
       def view = businessView(fp(), true, 1, BusinessType.SoleProprietor, name, true, None)
       heading.html must be(messages("responsiblepeople.position_within_business.heading", name))
       subHeading.html must include(messages("summary.responsiblepeople"))

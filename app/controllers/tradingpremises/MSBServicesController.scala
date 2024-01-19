@@ -19,7 +19,6 @@ package controllers.tradingpremises
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
 import forms.tradingpremises.MSBServicesFormProvider
 import models.businessmatching.BusinessMatching
 import models.status.SubmissionStatus
@@ -40,7 +39,7 @@ class MSBServicesController @Inject ()(val dataCacheConnector: DataCacheConnecto
                                        val cc: MessagesControllerComponents,
                                        formProvider: MSBServicesFormProvider,
                                        view: MSBServicesView,
-                                       implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                       implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean = false, changed: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>

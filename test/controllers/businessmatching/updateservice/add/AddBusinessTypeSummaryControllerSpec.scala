@@ -18,7 +18,6 @@ package controllers.businessmatching.updateservice.add
 
 
 import cats.data.OptionT
-import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.ResponsiblePersonGenerator
@@ -125,7 +124,7 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
 
         when {
           controller.helper.updateServicesRegister(any(), any())(any(), any())
-        } thenReturn OptionT.some[Future, ServiceChangeRegister](serviceChangeRegister)
+        } thenReturn OptionT.liftF(Future.successful(serviceChangeRegister))
 
         when {
           controller.tradingPremisesService.updateTradingPremises(eqTo(Seq(0)), eqTo(tradingPremises), eqTo(HighValueDealing), eqTo(None), eqTo(false))
@@ -137,15 +136,15 @@ class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
 
         when {
           controller.helper.updateBusinessActivities(any(), any())(any())
-        } thenReturn OptionT.some[Future, models.businessactivities.BusinessActivities](mock[models.businessactivities.BusinessActivities])
+        } thenReturn OptionT.liftF(Future.successful(mock[models.businessactivities.BusinessActivities]))
 
         when {
           controller.helper.updateSupervision(any())(any(), any())
-        } thenReturn OptionT.some[Future, Supervision](Supervision())
+        } thenReturn OptionT.liftF(Future.successful(Supervision()))
 
         when {
           controller.helper.clearFlowModel(any())(any())
-        } thenReturn OptionT.some[Future, AddBusinessTypeFlowModel](AddBusinessTypeFlowModel())
+        } thenReturn OptionT.liftF(Future.successful(AddBusinessTypeFlowModel()))
 
         val result = controller.post()(request)
 

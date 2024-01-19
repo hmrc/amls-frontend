@@ -17,7 +17,6 @@
 package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
-import cats.implicits._
 import config.ApplicationConfig
 import controllers.actions.SuccessfulAuthAction
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
@@ -35,7 +34,6 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.add.MsbSubSectorsView
 
@@ -65,13 +63,13 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
     )
 
 
-    val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
+    val cacheMapT = OptionT.liftF(Future.successful(mockCacheMap))
 
     when {
       controller.businessMatchingService.getModel(any())(any())
-    } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+    } thenReturn OptionT.liftF(Future.successful(BusinessMatching(
       activities = Some(BusinessActivities(Set(AccountancyServices)))
-    ))
+    )))
 
     when {
       controller.businessMatchingService.updateModel(any(), any())(any(), any())

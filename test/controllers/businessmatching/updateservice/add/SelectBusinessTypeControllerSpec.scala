@@ -59,13 +59,13 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec with Injecting {
 
     when {
       controller.businessMatchingService.getModel(any())(any())
-    } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+    } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
       activities = Some(BusinessActivities(Set(BillPaymentServices)))
-    ))
+    )))
 
     when {
       controller.businessMatchingService.getSubmittedBusinessActivities(any())(any(), any())
-    } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
+    } thenReturn OptionT.liftF[Future, Set[BusinessActivity]](Future.successful(Set(BillPaymentServices)))
 
     mockCacheFetch[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel(Some(BillPaymentServices), Some(true))), Some(AddBusinessTypeFlowModel.key))
 

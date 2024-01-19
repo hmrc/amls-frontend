@@ -18,17 +18,15 @@ package models.businessdetails
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.Json
 
 class ContactingYouSpec extends PlaySpec with MockitoSugar {
-  "Contacting You Form Details" must {
+  "ContactingYou" must {
 
-    "write correct data" in {
+    "round trip through JSON" in {
       val model = ContactingYou(Some("1234567890"), Some("test@test.com"))
-      ContactingYou.formWrites.writes(model) must
-        be(Map(
-          "phoneNumber" -> Seq("1234567890"),
-          "email" -> Seq("test@test.com")
-        ))
+
+      Json.toJson(model).as[ContactingYou] mustBe model
     }
 
   }

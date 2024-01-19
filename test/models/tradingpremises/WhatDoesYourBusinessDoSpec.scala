@@ -18,8 +18,7 @@ package models.tradingpremises
 
 import models.businessmatching.BusinessActivity.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import org.scalatest.{MustMatchers, WordSpec}
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
+import play.api.libs.json.Json
 
 class WhatDoesYourBusinessDoSpec extends WordSpec with MustMatchers{
   val model = WhatDoesYourBusinessDo(
@@ -28,27 +27,11 @@ class WhatDoesYourBusinessDoSpec extends WordSpec with MustMatchers{
       EstateAgentBusinessService,
       MoneyServiceBusiness))
 
-  "WhatDoesYourBusinessDo" when {
-    "input data is valid" must {
-      "convert form data correctly" in {
-        val formData = Map("activities[]" -> Seq("03", "04", "06"))
-        WhatDoesYourBusinessDo.formRule.validate(formData) must be (Valid(model))
-      }
-    }
+  "WhatDoesYourBusinessDo" must {
 
-    "no items have been selected" must {
-      "reject with a required message" in {
-        val formData = Map("activities[]" -> Seq())
-        WhatDoesYourBusinessDo.formRule.validate(formData) must be
-        Invalid(List((Path \ "activities") -> List(ValidationError("error.required.tp.activity.your.business.do"))))
-      }
-    }
-  }
+    "round trip through JSON" in {
 
-  it must {
-    "write correctly to a form" in {
-      val formData = Map("activities[]" -> Seq("03", "04", "06"))
-      WhatDoesYourBusinessDo.formWrite.writes(model) must be (formData)
+      Json.toJson(model).as[WhatDoesYourBusinessDo] mustBe model
     }
   }
 }

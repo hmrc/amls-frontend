@@ -19,7 +19,7 @@ package forms.responsiblepeople
 import forms.behaviours.StringFieldBehaviours
 import forms.mappings.Constraints
 import generators.NinoGen
-import models.responsiblepeople.{KnownBy, NonUKResidence, PersonResidenceType, UKResidence}
+import models.responsiblepeople.{NonUKResidence, PersonResidenceType, UKResidence}
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 

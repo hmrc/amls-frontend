@@ -16,69 +16,114 @@
 
 package models.businessmatching.updateservice
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
-import models.tradingpremises.TradingPremises
+import generators.tradingpremises.TradingPremisesGenerator
+import models.tradingpremises.{Address, RegisteringAgentPremises, TradingPremises, YourTradingPremises}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
+import play.api.libs.json.Json
+import utils.StatusConstants
 
-class TradingPremisesSpec extends PlaySpec with MustMatchers {
+class TradingPremisesSpec extends PlaySpec with MustMatchers with TradingPremisesGenerator {
 
   "The TradingPremises model" when {
-    "given a valid form" when {
-      "return a valid form model" when {
-        "single selection is made" in {
-          val formData = Map(
-            "tradingPremises[]" -> Seq("1")
-          )
 
-          val result = TradingPremisesActivities.formReads.validate(formData)
-
-          result mustBe Valid(TradingPremisesActivities(Set(1)))
-        }
-        "multiple selections are made" in {
-          val formData = Map(
-            "tradingPremises[]" -> Seq("1", "2")
-          )
-
-          val result = TradingPremisesActivities.formReads.validate(formData)
-
-          result mustBe Valid(TradingPremisesActivities(Set(1, 2)))
-        }
+    ".anyChanged is called" must {
+      "return true when any premises has changed" in {
+        val models = Seq(
+          TradingPremises(hasChanged = true),
+          TradingPremises()
+        )
+        TradingPremises.anyChanged(models) mustBe true
       }
 
-      "nothing is selected" must {
-        "return the validation errors" in {
-          val formData = Map.empty[String, Seq[String]]
-
-          val result = TradingPremisesActivities.formReads.validate(formData)
-
-          result mustBe Invalid(
-            Seq(
-              Path \ "tradingPremises" ->
-                Seq(ValidationError("error.businessmatching.updateservice.tradingpremises"))
-            ))
-        }
+      "return false when no premises has changed" in {
+        val models = Seq(
+          TradingPremises(),
+          TradingPremises()
+        )
+        TradingPremises.anyChanged(models) mustBe false
       }
     }
 
-    "given a valid model" must {
-      "return the form values" when {
-        "TradingPremises is 'yes'" in {
-
-          val result = TradingPremisesActivities.formWrites.writes(TradingPremisesActivities(Set(2)))
-
-          result mustBe Map("tradingPremises[]" -> Seq("2"))
-        }
-      }
-    }
-
-    "Given a model without a specified address" must {
-      "return false" in {
-
+    ".addressSpecified is called" must {
+      "return true when your trading premises is defined" in {
         val tp = Some(TradingPremises())
 
         TradingPremises.addressSpecified(tp.yourTradingPremises) mustBe false
+      }
+
+      "return false when your trading premises is empty" in {
+
+        val tp = Some(TradingPremises(
+          yourTradingPremises = Some(YourTradingPremises(
+            "name",
+            Address("Line 1", None, None, None, "AA11AA")
+          ))
+        ))
+
+        TradingPremises.addressSpecified(tp.yourTradingPremises) mustBe true
+      }
+    }
+
+    ".filter is called" must {
+
+      "filter out any empty models" in {
+        val nonEmptyModel = TradingPremises(Some(RegisteringAgentPremises(true)))
+
+        val models = Seq(
+          nonEmptyModel,
+          TradingPremises()
+        )
+
+        TradingPremises.filter(models) mustBe Seq(nonEmptyModel)
+      }
+
+      "filter out any deleted models" in {
+        val nonEmptyModel = TradingPremises(Some(RegisteringAgentPremises(true)))
+
+        val models = Seq(
+          nonEmptyModel,
+          TradingPremises(status = Some(StatusConstants.Deleted))
+        )
+
+        TradingPremises.filter(models) mustBe Seq(nonEmptyModel)
+      }
+    }
+
+    ".filterWithIndex is called" must {
+
+      "filter out any empty models" in {
+        val nonEmptyModel = TradingPremises(Some(RegisteringAgentPremises(true)))
+
+        val models = Seq(
+          nonEmptyModel,
+          TradingPremises()
+        )
+
+        TradingPremises.filterWithIndex(models) mustBe Seq((nonEmptyModel, 0))
+      }
+
+      "filter out any deleted models" in {
+        val nonEmptyModel = TradingPremises(Some(RegisteringAgentPremises(true)))
+
+        val models = Seq(
+          TradingPremises(status = Some(StatusConstants.Deleted)),
+          nonEmptyModel
+        )
+
+        TradingPremises.filterWithIndex(models) mustBe Seq((nonEmptyModel, 1))
+      }
+    }
+
+    "reading and writing JSON" must {
+
+      "round trip correctly" in {
+
+        forAll(fullTradingPremisesGen) { model =>
+          Json.toJson(model).as[TradingPremises] mustBe model
         }
+      }
     }
   }
 }

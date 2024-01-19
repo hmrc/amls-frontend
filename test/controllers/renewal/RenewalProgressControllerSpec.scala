@@ -190,7 +190,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
       when(statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
-      val result = controller.get()(request)
+      status(controller.get()(request)) mustBe OK
     }
 
     "respond with InternalServerError when no sections are returned" in new Fixture {

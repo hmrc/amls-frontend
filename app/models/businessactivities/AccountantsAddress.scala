@@ -16,10 +16,7 @@
 
 package models.businessactivities
 
-import jto.validation.forms._
-import jto.validation.{From, Rule, Write}
 import models.Country
-import models.FormTypes._
 import play.api.libs.json.{Reads, Writes}
 
 sealed trait AccountantsAddress {
@@ -72,61 +69,6 @@ case class NonUkAccountantsAddress(
                                   ) extends AccountantsAddress
 
 object AccountantsAddress {
-
-  val addressLine1Rule = genericAddressRule("error.required.address.line1",
-    "error.required.enter.addresslineone.charcount",
-    "error.text.validation.address.line1")
-
-  val addressLine2Rule = genericAddressRule("error.required.address.line2",
-    "error.required.enter.addresslinetwo.charcount",
-    "error.text.validation.address.line2")
-
-  val addressLine3Rule = genericAddressRule("",
-    "error.required.enter.addresslinethree.charcount",
-    "error.text.validation.address.line3")
-
-  val addressLine4Rule = genericAddressRule("",
-    "error.required.enter.addresslinefour.charcount",
-    "error.text.validation.address.line4")
-
-  implicit val ukFormRule: Rule[UrlFormEncoded, UkAccountantsAddress] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-      (
-        (__ \ "addressLine1").read(addressLine1Rule) ~
-        (__ \ "addressLine2").read(optionR(addressLine2Rule)) ~
-        (__ \ "addressLine3").read(optionR(addressLine3Rule)) ~
-        (__ \ "addressLine4").read(optionR(addressLine4Rule)) ~
-        (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
-      ) (UkAccountantsAddress.apply)
-  }
-
-  implicit val nonUkFormRule: Rule[UrlFormEncoded, NonUkAccountantsAddress] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-      (
-        (__ \ "addressLineNonUK1").read(addressLine1Rule) ~
-        (__ \ "addressLineNonUK2").read(optionR(addressLine2Rule)) ~
-        (__ \ "addressLineNonUK3").read(optionR(addressLine3Rule)) ~
-        (__ \ "addressLineNonUK4").read(optionR(addressLine4Rule)) ~
-        (__ \ "country").read[Country]
-      ) (NonUkAccountantsAddress.apply)
-  }
-
-  implicit val formWrites = Write[AccountantsAddress, UrlFormEncoded] {
-        case address: UkAccountantsAddress => Map(
-          "addressLine1" -> Seq(address.addressLine1),
-          "addressLine2" -> address.addressLine2.toSeq,
-          "addressLine3" -> address.addressLine3.toSeq,
-          "addressLine4" -> address.addressLine4.toSeq,
-          "postCode" -> Seq(address.postCode)
-        )
-        case address: NonUkAccountantsAddress => Map(
-          "addressLineNonUK1" -> Seq(address.addressLine1),
-          "addressLineNonUK2" -> address.addressLine2.toSeq,
-          "addressLineNonUK3" -> address.addressLine3.toSeq,
-          "addressLineNonUK4" -> address.addressLine4.toSeq,
-          "country" -> Seq(address.country.code)
-        )
-  }
 
   implicit val jsonReads: Reads[AccountantsAddress] = {
     import play.api.libs.functional.syntax._

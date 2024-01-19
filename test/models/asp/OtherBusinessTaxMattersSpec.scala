@@ -18,56 +18,9 @@ package models.asp
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
-
-  "Form Validation" must {
-
-    "successfully validate given enum value" in {
-      OtherBusinessTaxMatters.formRule.validate(Map("otherBusinessTaxMatters" -> Seq("false"))) must
-        be(Valid(OtherBusinessTaxMattersNo))
-    }
-
-    "successfully validate given an `Yes` value" in {
-      OtherBusinessTaxMatters.formRule.validate(Map("otherBusinessTaxMatters" -> Seq("true"))) must
-        be(Valid(OtherBusinessTaxMattersYes))
-    }
-
-    "Fail validation when an option is not selected" when {
-      "represented by and empty string" in  {
-        OtherBusinessTaxMatters.formRule.validate(Map("otherBusinessTaxMatters" -> Seq(""))) must
-          be(Invalid(Seq((Path \ "otherBusinessTaxMatters") -> Seq(ValidationError("error.required.asp.other.business.tax.matters")))))
-      }
-
-      "represented by a missing field" in {
-        OtherBusinessTaxMatters.formRule.validate(Map.empty[String, Seq[String]]) must
-          be(Invalid(Seq((Path \ "otherBusinessTaxMatters") -> Seq(ValidationError("error.required.asp.other.business.tax.matters")))))
-      }
-    }
-
-    "Fail validation when an unexpected value is provided" in  {
-      OtherBusinessTaxMatters.formRule.validate(Map("otherBusinessTaxMatters" -> Seq("Wheeeeee!!!!"))) must
-        be(Invalid(Seq((Path \ "otherBusinessTaxMatters") -> Seq(ValidationError("error.required.asp.other.business.tax.matters")))))
-    }
-
-    "write correct data from enum value" in {
-
-      OtherBusinessTaxMatters.formWrites.writes(OtherBusinessTaxMattersNo) must
-        be(Map("otherBusinessTaxMatters" -> Seq("false")))
-
-    }
-
-    "write correct data from `yes` value" in {
-
-      OtherBusinessTaxMatters.formWrites.writes(OtherBusinessTaxMattersYes) must
-        be(Map("otherBusinessTaxMatters" -> Seq("true")))
-
-    }
-
-  }
 
   "Json validation" must {
 

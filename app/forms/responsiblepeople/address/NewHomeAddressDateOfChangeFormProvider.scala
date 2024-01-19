@@ -17,7 +17,7 @@
 package forms.responsiblepeople.address
 
 import forms.mappings.Mappings
-import models.responsiblepeople.{DateOfBirth, NewHomeDateOfChange}
+import models.responsiblepeople.NewHomeDateOfChange
 import org.joda.time.LocalDate
 import play.api.data.Form
 import play.api.data.Forms.mapping

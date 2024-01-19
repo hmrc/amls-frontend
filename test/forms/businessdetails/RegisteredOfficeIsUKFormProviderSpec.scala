@@ -18,7 +18,7 @@ package forms.businessdetails
 
 import forms.behaviours.BooleanFieldBehaviours
 import models.businessdetails.RegisteredOfficeIsUK
-import play.api.data.{Form, FormError}
+import play.api.data.Form
 
 class RegisteredOfficeIsUKFormProviderSpec extends BooleanFieldBehaviours[RegisteredOfficeIsUK] {
 

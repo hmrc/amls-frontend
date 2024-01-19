@@ -17,7 +17,7 @@
 package forms.businessdetails
 
 import forms.behaviours.AddressFieldBehaviours
-import models.businessdetails.{CorrespondenceAddressNonUk, CorrespondenceAddressUk}
+import models.businessdetails.CorrespondenceAddressNonUk
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 

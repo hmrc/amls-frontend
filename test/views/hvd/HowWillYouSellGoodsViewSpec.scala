@@ -17,7 +17,6 @@
 package views.hvd
 
 import forms.hvd.SalesChannelFormProvider
-import forms.{Form2, ValidForm}
 import models.hvd.HowWillYouSellGoods
 import models.hvd.SalesChannel.{Retail, Wholesale}
 import org.scalatest.MustMatchers
@@ -40,8 +39,6 @@ class HowWillYouSellGoodsViewSpec extends AmlsViewSpec with MustMatchers  {
   "HowWillYouSellGoodsView view" must {
 
     "have correct title" in new ViewFixture {
-
-      val form2: ValidForm[HowWillYouSellGoods] = Form2(HowWillYouSellGoods(Set(Retail)))
 
       def view = goodsView(fp().fill(HowWillYouSellGoods(Set(Retail))), true)
 

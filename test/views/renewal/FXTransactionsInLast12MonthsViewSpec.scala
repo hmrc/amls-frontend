@@ -17,7 +17,6 @@
 package views.renewal
 
 import forms.renewal.FXTransactionsInLast12MonthsFormProvider
-import forms.{Form2, ValidForm}
 import models.renewal.FXTransactionsInLast12Months
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
@@ -44,8 +43,6 @@ class FXTransactionsInLast12MonthsViewSpec extends AmlsViewSpec with MustMatcher
     }
 
     "have correct headings" in new ViewFixture {
-
-      val form2: ValidForm[FXTransactionsInLast12Months] = Form2(fx)
 
       def view = last12MonthsView(fp().fill(fx), true)
 

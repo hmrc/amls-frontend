@@ -18,112 +18,16 @@ package models.businessactivities
 
 import models.Country
 import org.scalatestplus.play.PlaySpec
-import jto.validation.forms._
-import jto.validation._
-import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class CustomersOutsideUKSpec extends PlaySpec {
 
   "CustomersOutsideUK" must {
-    val rule = implicitly[Rule[UrlFormEncoded, CustomersOutsideUK]]
-    val write = implicitly[Write[CustomersOutsideUK, UrlFormEncoded]]
 
     "round trip through Json correctly" in {
 
       val model: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
       Json.fromJson[CustomersOutsideUK](Json.toJson(model)) mustBe JsSuccess(model, JsPath \ "countries")
-    }
-
-    "round trip through forms correctly" in {
-      val model: CustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"), Country("India", "IN"))))
-
-      rule.validate(write.writes(model)) mustBe Valid(model)
-    }
-
-    "successfully validate when isOutside is false" in {
-
-      val form: UrlFormEncoded = Map(
-        "isOutside" -> Seq("false")
-      )
-
-      val model: CustomersOutsideUK = CustomersOutsideUK(None)
-
-      rule.validate(form) mustBe Valid(model)
-    }
-
-    "successfully validate when isOutside is true and there is at least 1 country selected" in {
-
-      val form: UrlFormEncoded = Map(
-        "isOutside" -> Seq("true"),
-        "countries" -> Seq("GB")
-      )
-
-      val model: CustomersOutsideUK =
-        CustomersOutsideUK(
-          Some(Seq(Country("United Kingdom", "GB")))
-        )
-
-      rule.validate(form) mustBe Valid(model)
-    }
-
-    "fail to validate when isOutside is true and there are no countries selected" in {
-
-      val form: UrlFormEncoded = Map(
-        "isOutside" -> Seq("true"),
-        "countries" -> Seq.empty
-      )
-
-      rule.validate(form) mustBe Invalid(
-        Seq((Path \ "countries") -> Seq(ValidationError("error.invalid.ba.select.country")))
-      )
-    }
-
-    "fail to validate when isOutside is true and there are more than 10 countries" in {
-
-      val form: UrlFormEncoded = Map(
-        "isOutside" -> Seq("true"),
-        "countries[]" -> Seq.fill(11)("GB")
-      )
-
-      rule.validate(form) mustBe Invalid(
-        Seq((Path \ "countries") -> Seq(ValidationError("error.maxLength", 10)))
-      )
-    }
-
-    "fail to validate when isOutside isn't selected" in {
-
-      val form: UrlFormEncoded = Map.empty
-
-      rule.validate(form) mustBe Invalid(
-        Seq((Path \ "isOutside") -> Seq(ValidationError("error.required.ba.select.country")))
-      )
-    }
-
-    "successfully validate when there are empty values in the seq" in {
-
-      val form: UrlFormEncoded = Map(
-        "isOutside" -> Seq("true"),
-        "countries[]" -> Seq("GB", "", "FR", "")
-      )
-
-      rule.validate(form) mustBe Valid(CustomersOutsideUK(Some(Seq(
-        Country("United Kingdom", "GB"),
-        Country("France", "FR")
-      ))))
-    }
-
-    "test" in {
-
-      val form: UrlFormEncoded = Map(
-        "isOutside" -> Seq("true"),
-        "countries[0]" -> Seq("GB"),
-        "countries[1]" -> Seq("")
-      )
-
-      rule.validate(form) mustBe Valid(CustomersOutsideUK(Some(Seq(
-        Country("United Kingdom", "GB")
-      ))))
     }
   }
 }

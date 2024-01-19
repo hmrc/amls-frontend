@@ -16,39 +16,11 @@
 
 package models.supervision
 
-import jto.validation.forms.Rules.{maxLength, notEmpty}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
-import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
 import play.api.libs.json.{Json, Reads, Writes}
 
 case class SupervisionEndReasons(endingReason: String)
 
 object SupervisionEndReasons {
-
-  import utils.MappingUtils.Implicits._
-
-  private val reasonMaxLength = 255
-
-  private val reasonRule = notEmptyStrip andThen notEmpty.withMessage("error.required.supervision.reason") andThen
-    maxLength(reasonMaxLength).withMessage("error.supervision.end.reason.invalid.maxlength.255") andThen
-    basicPunctuationPattern().withMessage("error.supervision.end.reason.invalid")
-
-  implicit val formRule: Rule[UrlFormEncoded, SupervisionEndReasons] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-
-    (__ \ "endingReason").read(reasonRule) map SupervisionEndReasons.apply
-  }
-
-  implicit val formWrites: Write[SupervisionEndReasons, UrlFormEncoded] = Write {
-    case a: SupervisionEndReasons => {
-      Map(
-        "anotherBody" -> Seq("true"),
-        "endingReason" -> Seq(a.endingReason)
-      )
-    }
-  }
-
 
   implicit val jsonReads: Reads[SupervisionEndReasons] = {
 

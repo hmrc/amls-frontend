@@ -16,25 +16,11 @@
 
 package models.businessactivities
 
-import jto.validation.forms._
-import jto.validation.{To, Write}
 import play.api.libs.json.Json
-import utils.MappingUtils.Implicits._
 
 case class HowManyEmployees(employeeCount: Option[String] = None,
                             employeeCountAMLSSupervision: Option[String] = None)
 
 object HowManyEmployees {
-
   implicit val formats = Json.format[HowManyEmployees]
-
-
-  implicit val formWrites: Write[HowManyEmployees, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    (
-      (__ \ "employeeCount").write[Option[String]] ~
-        (__ \ "employeeCountAMLSSupervision").write[Option[String]]
-      ) (unlift(HowManyEmployees.unapply _))
-  }
 }

@@ -17,7 +17,7 @@
 package forms.tradingpremises
 
 import forms.mappings.Mappings
-import models.tradingpremises.AgentRemovalReason.{Other, enumerable}
+import models.tradingpremises.AgentRemovalReason.Other
 import models.tradingpremises.RemovalReasonConstants.Rules
 import models.tradingpremises.{AgentRemovalReason, AgentRemovalReasonAnswer}
 import play.api.data.Form

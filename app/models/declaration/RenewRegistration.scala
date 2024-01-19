@@ -16,8 +16,6 @@
 
 package models.declaration
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
 sealed trait RenewRegistration
@@ -26,22 +24,8 @@ case object RenewRegistrationYes extends RenewRegistration
 case object RenewRegistrationNo extends RenewRegistration
 
 object RenewRegistration {
-  import utils.MappingUtils.Implicits._
 
   val key = "declaration"
-
-  implicit val formRule: Rule[UrlFormEncoded, RenewRegistration] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "renewRegistration").read[Boolean].withMessage("error.required.declaration.renew.registration") flatMap {
-      case true  => Rule.fromMapping { _ => Valid(RenewRegistrationYes) }
-      case false => Rule.fromMapping { _ => Valid(RenewRegistrationNo) }
-    }
-  }
-
-  implicit val formWrites: Write[RenewRegistration, UrlFormEncoded] = Write {
-    case RenewRegistrationYes => Map("renewRegistration" -> Seq("true"))
-    case RenewRegistrationNo  => Map("renewRegistration" -> Seq("false"))
-  }
 
   implicit val jsonReads: Reads[RenewRegistration] =
     (__ \ "renewRegistration").read[Boolean] flatMap {

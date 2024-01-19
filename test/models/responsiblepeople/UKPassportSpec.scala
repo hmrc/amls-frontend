@@ -16,88 +16,14 @@
 
 package models.responsiblepeople
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class UKPassportSpec extends PlaySpec {
 
-  "Uk passport number" must {
-    "pass validation" when {
-      "given the correct number of numbers" in {
-        UKPassport.ukPassportType.validate("123456789") mustBe Valid("123456789")
-      }
-    }
+  "UKPassport" when {
 
-
-    "fail validation" when {
-      "the passport number has too many characters" in {
-        UKPassport.ukPassportType.validate("a" * 10) mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.invalid.uk.passport.length.9")))
-        )
-      }
-      "the passport number has too few characters" in {
-        UKPassport.ukPassportType.validate("a" * 8) mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.invalid.uk.passport.length.9")))
-        )
-      }
-      "the passport number includes invalid characters (letters, punctuation etc)" in {
-        UKPassport.ukPassportType.validate("123abc7{}") mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.invalid.uk.passport")))
-        )
-      }
-      "the passport number is an empty string" in {
-        UKPassport.ukPassportType.validate("") mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.required.uk.passport.number")))
-        )
-      }
-      "the passport number is given a sequence of whitespace" in {
-        UKPassport.ukPassportType.validate("    ") mustBe Invalid(
-          Seq(Path -> Seq(ValidationError("error.required.uk.passport.number")))
-        )
-      }
-    }
-  }
-
-  "UKPassport" must {
-
-    "pass validation for uk passport number" in {
-      val urlFormEncoded = Map(
-        "ukPassport" -> Seq("true"),
-        "ukPassportNumber" -> Seq("000000000")
-      )
-      UKPassport.formRule.validate(urlFormEncoded) must be(Valid(UKPassportYes("000000000")))
-    }
-
-    "pass validation for no uk passport" in {
-      val urlFormEncoded = Map("ukPassport" -> Seq("false"))
-      UKPassport.formRule.validate(urlFormEncoded) must be(Valid(UKPassportNo))
-    }
-
-    "fail to validate given an invalid passport number" in {
-
-      val urlFormEncoded = Map(
-        "ukPassport" -> Seq("true"),
-        "ukPassportNumber" -> Seq("10")
-      )
-
-      UKPassport.formRule.validate(urlFormEncoded) must
-        be(Invalid(Seq(
-          (Path \ "ukPassportNumber") -> Seq(ValidationError("error.invalid.uk.passport.length.9"))
-        )))
-    }
-
-    "fail to validate given an invalid ukPassport value" in {
-
-      val urlFormEncoded = Map("ukPassport" -> Seq("10"))
-
-      UKPassport.formRule.validate(urlFormEncoded) must
-        be(Invalid(Seq(
-          (Path \ "ukPassport") -> Seq(ValidationError("error.required.uk.passport"))
-        )))
-    }
-
-    "JSON" must {
+    "reading and writing JSON" must {
 
       "Read the json and return UKPassportNumber" in {
         val model = UKPassportYes("AA0000000")

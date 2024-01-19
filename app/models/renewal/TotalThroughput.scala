@@ -16,15 +16,9 @@
 
 package models.renewal
 
-import jto.validation._
-import jto.validation.forms.Rules._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.forms.Writes._
-import models.ValidationRule
 import models.moneyservicebusiness.ExpectedThroughput
 import play.api.i18n.Messages
 import play.api.libs.json.Json
-import utils.MappingUtils.Implicits._
 
 case class TotalThroughput(throughput: String)
 
@@ -47,27 +41,9 @@ object TotalThroughput {
 
   implicit val format = Json.format[TotalThroughput]
 
-  private val validSelectionRule: ValidationRule[String] = Rule.fromMapping[String, String] {
-    case input if throughputValues.exists(_.value == input) =>  Valid(input)
-    case _ => Invalid(Seq(ValidationError("renewal.msb.throughput.selection.invalid")))
-  }.repath(_ => Path \ "throughput")
-
-  implicit val formReader: Rule[UrlFormEncoded, TotalThroughput] = From[UrlFormEncoded] { __ =>
-    val fieldReader = (__ \ "throughput").read[String].withMessage("renewal.msb.throughput.selection.required")
-
-    fieldReader andThen validSelectionRule map TotalThroughput.apply
-  }
-
-  implicit val formWriter: Write[TotalThroughput, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    (__ \ "throughput").write[String] contramap(_.throughput)
-  }
-
   implicit def convert(model: TotalThroughput): ExpectedThroughput = {
     throughputValues.collectFirst {
       case x if x.value == model.throughput => x.submissionModel
     }.getOrElse(throw new Exception("Invalid MSB throughput value"))
   }
-
 }
-
-

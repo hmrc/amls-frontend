@@ -16,11 +16,7 @@
 
 package models.withdrawal
 
-import jto.validation.forms.Rules.{maxLength, notEmpty}
-import jto.validation.{From, Path, Rule, ValidationError, Write}
-import jto.validation.forms.UrlFormEncoded
 import models.{Enumerable, WithName}
-import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
 import play.api.libs.json._
 
 sealed trait WithdrawalReason {
@@ -55,31 +51,6 @@ object WithdrawalReason extends Enumerable.Implicits {
   implicit val enumerable: Enumerable[WithdrawalReason] = Enumerable(all.map(v => v.toString -> v): _*)
 
   import utils.MappingUtils.Implicits._
-
-  private val maxTextLength = 40
-  private val specifyOtherReasonType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.withdrawal.reason.input") andThen
-    maxLength(maxTextLength).withMessage("error.required.withdrawal.reason.length") andThen
-    basicPunctuationPattern("error.required.withdrawal.reason.format")
-
-  implicit val formRule: Rule[UrlFormEncoded, WithdrawalReason] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "withdrawalReason").read[String].withMessage("error.required.withdrawal.reason") flatMap {
-      case "01" => OutOfScope
-      case "02" => NotTradingInOwnRight
-      case "03" => UnderAnotherSupervisor
-      case "04" => (__ \ "specifyOtherReason").read(specifyOtherReasonType) map Other.apply
-      case _ =>
-        (Path \ "withdrawalReason") -> Seq(ValidationError("error.invalid"))
-    }
-  }
-
-  implicit val formWrites: Write[WithdrawalReason, UrlFormEncoded] = Write {
-    case OutOfScope => Map("withdrawalReason" -> "01")
-    case NotTradingInOwnRight => Map("withdrawalReason" -> "02")
-    case UnderAnotherSupervisor => Map("withdrawalReason" -> "03")
-    case Other(reason) => Map("withdrawalReason" -> "04", "specifyOtherReason" -> reason)
-  }
 
   implicit val jsonReads: Reads[WithdrawalReason] = {
     import play.api.libs.json.Reads.StringReads

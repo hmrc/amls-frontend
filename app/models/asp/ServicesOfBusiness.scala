@@ -16,15 +16,11 @@
 
 package models.asp
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{Rule, ValidationError, _}
 import models.{DateOfChange, Enumerable, WithName}
 import play.api.i18n.Messages
-import play.api.libs.json.{Reads, Writes, _}
+import play.api.libs.json._
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
-import utils.TraversableValidators._
 
 case class ServicesOfBusiness(services: Set[Service], dateOfChange: Option[DateOfChange] = None)
 
@@ -86,24 +82,6 @@ object Service extends Enumerable.Implicits {
 
   implicit val enumerable: Enumerable[Service] = Enumerable(all.map(v => v.toString -> v): _*)
 
-  implicit val servicesFormRead = Rule[String, Service] {
-      case "01" => Valid(Accountancy)
-      case "02" => Valid(PayrollServices)
-      case "03" => Valid(BookKeeping)
-      case "04" => Valid(Auditing)
-      case "05" => Valid(FinancialOrTaxAdvice)
-      case _ =>
-          Invalid(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
-  }
-
-  implicit val servicesFormWrite = Write[Service, String] {
-      case Accountancy => "01"
-      case PayrollServices => "02"
-      case BookKeeping => "03"
-      case Auditing => "04"
-      case FinancialOrTaxAdvice => "05"
-  }
-
   import play.api.libs.json.JsonValidationError
   implicit val jsonServiceReads: Reads[Service] =
     Reads {
@@ -126,24 +104,6 @@ object Service extends Enumerable.Implicits {
 }
 
 object ServicesOfBusiness {
-
-  import utils.MappingUtils.Implicits._
-
-  implicit def formReads
-  (implicit
-   p: Path => RuleLike[UrlFormEncoded, Set[Service]]
-    ): Rule[UrlFormEncoded, ServicesOfBusiness] =
-    From[UrlFormEncoded] { __ =>
-       (__ \ "services").read(minLengthR[Set[Service]](1).withMessage("error.required.asp.business.services")) .flatMap(ServicesOfBusiness(_, None))
-  }
-
-  implicit def formWrites
-  (implicit
-   w: Write[Service, String]
-    ) = Write[ServicesOfBusiness, UrlFormEncoded] { data =>
-    Map("services[]" -> data.services.toSeq.map(w.writes))
-  }
-
   implicit val formats = Json.format[ServicesOfBusiness]
 }
 

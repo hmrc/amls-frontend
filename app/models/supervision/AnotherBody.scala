@@ -16,11 +16,6 @@
 
 package models.supervision
 
-import cats.data.Validated.Valid
-import jto.validation._
-import jto.validation.forms.Rules._
-import jto.validation.forms._
-import models.FormTypes._
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
 import play.twirl.api.Html
@@ -73,37 +68,6 @@ object AnotherBody {
 
   import utils.MappingUtils.Implicits._
   import play.api.libs.json.JodaReads._
-
-  private val supervisorMaxLength = 140
-
-  private val supervisorRule = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.supervision.supervisor") andThen
-    maxLength(supervisorMaxLength).withMessage("error.invalid.supervision.supervisor.length.140") andThen
-    basicPunctuationPattern().withMessage("error.invalid.supervision.supervisor")
-
-  implicit val formRule: Rule[UrlFormEncoded, AnotherBody] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-
-    (__ \ "anotherBody").read[Boolean].withMessage("error.required.supervision.anotherbody") flatMap {
-      case true =>
-        ((__ \ "supervisorName").read(supervisorRule) ~
-          (__ \ "startDate").read[Option[SupervisionStart]] ~
-          (__ \ "endDate").read[Option[SupervisionEnd]] ~
-          (__ \ "endingReason").read[Option[SupervisionEndReasons]]).apply(AnotherBodyYes.apply _)
-
-      case false => Rule.fromMapping { _ => Valid(AnotherBodyNo) }
-    }
-  }
-
-  implicit val formWrites: Write[AnotherBody, UrlFormEncoded] = Write {
-    case a: AnotherBodyYes =>
-      Map(
-        "anotherBody" -> Seq("true"),
-        "supervisorName" -> Seq(a.supervisorName)
-      )
-    case AnotherBodyNo => Map("anotherBody" -> Seq("false"))
-  }
-
   import play.api.libs.json._
 
   def oldStartDateReader: Reads[Option[SupervisionStart]] =

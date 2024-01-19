@@ -16,8 +16,6 @@
 
 package models.moneyservicebusiness
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
 import models.Country
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
@@ -26,9 +24,6 @@ import play.api.libs.json._
 class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
 
   "MsbServices" must {
-
-    val rule = implicitly[Rule[UrlFormEncoded, BranchesOrAgentsHasCountries]]
-    val write = implicitly[Write[BranchesOrAgentsHasCountries, UrlFormEncoded]]
 
     "round trip through Json correctly" in {
       val model: BranchesOrAgents = BranchesOrAgents(

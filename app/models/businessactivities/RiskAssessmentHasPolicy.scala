@@ -16,23 +16,6 @@
 
 package models.businessactivities
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
-
 case class RiskAssessmentHasPolicy(hasPolicy: Boolean)
 
-object RiskAssessmentHasPolicy {
-
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, RiskAssessmentHasPolicy] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "hasPolicy").read[Boolean].withMessage("error.required.ba.option.risk.assessment") flatMap {
-      RiskAssessmentHasPolicy.apply
-    }
-  }
-
-  implicit def formWrites: Write[RiskAssessmentHasPolicy, UrlFormEncoded] = Write {
-    case RiskAssessmentHasPolicy(hasPolicy) => Map("hasPolicy" -> hasPolicy.toString)
-  }
-}
+object RiskAssessmentHasPolicy

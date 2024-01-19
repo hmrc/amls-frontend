@@ -16,104 +16,29 @@
 
 package models.responsiblepeople
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.Json
 
-@SuppressWarnings(Array("org.brianmckenna.wartremover.warts.MutableDataStructures"))
 class PersonNameSpec extends PlaySpec with MockitoSugar {
 
-  "Form Rules and Writes" must {
+  "PersonName" when {
 
-    "successfully validate" when {
-      "given all fields" in {
+    val fullModel = PersonName("first", Some("middle"), "last")
 
-        val data = Map(
-          "firstName" -> Seq("first"),
-          "middleName" -> Seq("middle"),
-          "lastName" -> Seq("last")
-        )
+    "reading and writing" must {
 
-        val validPerson = PersonName(
-          firstName = "first",
-          middleName = Some("middle"),
-          lastName = "last"
-        )
+      "round trip through JSON" in {
 
-        PersonName.formRule.validate(data) must equal(Valid(validPerson))
-      }
-
-      "the middle name is optional and previous/other names are not required" in {
-
-        val data = Map(
-          "firstName" -> Seq("first"),
-          "lastName" -> Seq("last")
-        )
-
-        val validPerson = PersonName(
-          firstName = "first",
-          middleName = None,
-          lastName = "last"
-        )
-
-        PersonName.formRule.validate(data) must equal(Valid(validPerson))
+        Json.toJson(fullModel).as[PersonName] mustBe fullModel
       }
     }
 
-    "fail validation" when {
-
-      "required fields are missing" when {
-        "nothing has been selected" in {
-
-          PersonName.formRule.validate(Map(
-            "firstName" -> Seq(""),
-            "lastName" -> Seq("")
-          )) must equal(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.required.rp.first_name")),
-            (Path \ "lastName") -> Seq(ValidationError("error.required.rp.last_name"))
-          )))
-        }
+    "fullName" must {
+      "return a correctly formatted name" in {
+        fullModel.fullName must be("first middle last")
+        PersonName("first", None, "last").fullName must be("first last")
       }
-
-      "input length is too great" in {
-
-        val data = Map(
-          "firstName" -> Seq("first" * 36),
-          "middleName" -> Seq("first" * 36),
-          "lastName" -> Seq("last" * 36)
-        )
-
-        PersonName.formRule.validate(data) must
-          equal(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.invalid.rp.first_name.length")),
-            (Path \ "middleName") -> Seq(ValidationError("error.invalid.rp.middle_name.length")),
-            (Path \ "lastName") -> Seq(ValidationError("error.invalid.rp.last_name.length"))
-          )))
-      }
-
-
-      "fields have invalid characters" in {
-
-        PersonName.formRule.validate(Map(
-          "firstName" -> Seq("92)(OELer"),
-          "middleName" -> Seq("£*($*)(ERKLFD "),
-          "lastName" -> Seq("9*£@$")
-        )) must
-          equal(Invalid(Seq(
-            (Path \ "firstName") -> Seq(ValidationError("error.invalid.rp.first_name.validation")),
-            (Path \ "middleName") -> Seq(ValidationError("error.invalid.rp.middle_name.validation")),
-            (Path \ "lastName") -> Seq(ValidationError("error.invalid.rp.last_name.validation"))
-          )))
-      }
-
-    }
-
-  }
-
-  "fullName" must {
-    "return a correctly formatted name" in {
-      PersonName("first", Some("middle"), "last").fullName must be("first middle last")
-      PersonName("first", None, "last").fullName must be("first last")
     }
   }
 }

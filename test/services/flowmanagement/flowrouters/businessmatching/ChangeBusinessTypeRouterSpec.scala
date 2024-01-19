@@ -17,7 +17,6 @@
 package services.flowmanagement.flowrouters.businessmatching
 
 import cats.data.OptionT
-import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
 import models.businessmatching.BusinessActivity._
@@ -43,9 +42,9 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
 
     when {
       mockBusinessMatchingService.getModel(any())(any())
-    } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+    } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
       activities = Some(BusinessActivities(Set(BillPaymentServices, MoneyServiceBusiness)))
-    ))
+    )))
   }
 
   "getRoute" must {
@@ -80,9 +79,9 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
 
         when {
           mockBusinessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+        } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(BusinessMatching(
           activities = Some(BusinessActivities(Set(BillPaymentServices)))
-        ))
+        )))
 
         val result = router.getRoute("internalId", ChangeBusinessTypesPageId, Remove)
 

@@ -16,9 +16,6 @@
 
 package models.supervision
 
-import jto.validation._
-import jto.validation.forms.Rules.{minLength => _, _}
-import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
 sealed trait ProfessionalBodyMember
@@ -28,21 +25,6 @@ case object ProfessionalBodyMemberYes extends ProfessionalBodyMember
 case object ProfessionalBodyMemberNo extends ProfessionalBodyMember
 
 object ProfessionalBodyMember {
-
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, ProfessionalBodyMember] =
-    From[UrlFormEncoded] { __ =>
-      (__ \ "isAMember").read[Boolean].withMessage("error.required.supervision.business.a.member") map {
-        case true => ProfessionalBodyMemberYes
-        case false => ProfessionalBodyMemberNo
-      }
-    }
-
-  implicit def formWrites = Write[ProfessionalBodyMember, UrlFormEncoded] {
-    case ProfessionalBodyMemberYes => Map("isAMember" -> "true")
-    case ProfessionalBodyMemberNo => Map("isAMember" -> "false")
-  }
 
   implicit val jsonReads: Reads[ProfessionalBodyMember] = {
     (__ \ "isAMember").read[Boolean] flatMap {
@@ -54,7 +36,6 @@ object ProfessionalBodyMember {
   implicit val jsonWrites = Writes[ProfessionalBodyMember] {
     case ProfessionalBodyMemberYes => Json.obj("isAMember" -> true)
     case ProfessionalBodyMemberNo => Json.obj("isAMember" -> false)
-
   }
 }
 

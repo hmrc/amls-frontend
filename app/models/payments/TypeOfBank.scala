@@ -16,25 +16,6 @@
 
 package models.payments
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
-
 case class TypeOfBank(isUK: Boolean)
 
-object TypeOfBank {
-
-  val pathName = "typeOfBank"
-
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, TypeOfBank] =
-    From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-      (__ \ pathName).read[Boolean].withMessage("payments.typeofbank.error") map TypeOfBank.apply
-    }
-
-  implicit val formWrites = Write[TypeOfBank, UrlFormEncoded] {
-    case TypeOfBank(value) => Map(pathName -> Seq(value.toString))
-  }
-
-}
+object TypeOfBank

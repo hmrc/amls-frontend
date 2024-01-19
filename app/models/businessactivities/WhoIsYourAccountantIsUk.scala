@@ -16,27 +16,11 @@
 
 package models.businessactivities
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
 import play.api.libs.json.{Json, Reads, Writes}
 
 case class WhoIsYourAccountantIsUk(isUk: Boolean)
 
 object WhoIsYourAccountantIsUk {
-
-  implicit val formRule: Rule[UrlFormEncoded, WhoIsYourAccountantIsUk] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    import utils.MappingUtils.Implicits._
-    (__ \ "isUK").read[Boolean].withMessage("error.required.ba.advisor.isuk") flatMap { bool =>
-      WhoIsYourAccountantIsUk(bool)
-    }
-  }
-
-  implicit val formWrites = Write[WhoIsYourAccountantIsUk, UrlFormEncoded] {
-    data: WhoIsYourAccountantIsUk => Map(
-      "isUK" -> Seq(data.isUk.toString)
-    )
-  }
 
   implicit val jsonReads: Reads[WhoIsYourAccountantIsUk] = {
     import play.api.libs.functional.syntax._

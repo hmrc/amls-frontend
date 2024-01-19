@@ -32,7 +32,6 @@
 
 package models.businessdetails
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import models.Country
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -40,106 +39,14 @@ import play.api.libs.json.{JsSuccess, Json}
 
 class CorrespondenceAddressNonUkSpec extends PlaySpec with MockitoSugar {
 
-  "CorrespondenceAddress" must {
-
-    "validate toLines" when {
-      "given a valid Non UK address" in {
-        CorrespondenceAddressNonUk.formRule.validate(DefaultNonUKModel) must
-          be(Valid(DefaultNonUKAddress))
-      }
-    }
-  }
-
-    "CorrespondenceAddress Form validation" must {
-      "given a non valid non UK address" in {
-        val invalidNonUKModel = Map(
-          "isUK" -> Seq("false"),
-          "yourName" -> Seq(DefaultYourName),
-          "businessName" -> Seq(DefaultBusinessName),
-          "addressLineNonUK1" -> Seq(DefaultAddressLine1),
-          "addressLineNonUK2" -> Seq("Default Line 2"),
-          "addressLineNonUK3" -> Seq("Default Line 3"),
-          "addressLineNonUK4" -> Seq("Default Line 4"),
-          "country" -> Seq("GB")
-        )
-
-        CorrespondenceAddressNonUk.formRule.validate(invalidNonUKModel) must
-          be(Invalid(Seq(
-            (Path \ "country") -> Seq(ValidationError("error.required.atb.letters.address.not.uk"))
-          )))
-      }
-
-      "throw error when mandatory fields are missing" in {
-        CorrespondenceAddressIsUk.formRule.validate(Map.empty) must be
-        Invalid(Seq(
-          (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
-        ))
-      }
-    }
-
-    "Form validation" when {
-      "given a Non UK Address" must {
-        "throw errors when number of characters entered into fields exceed max length" in {
-          val model = Map(
-            "isUK" -> Seq("false"),
-            "yourName" -> Seq("a" * 150),
-            "businessName" -> Seq("b" * 150),
-            "addressLineNonUK1" -> Seq("c" * 41),
-            "addressLineNonUK2" -> Seq("d" * 41),
-            "addressLineNonUK3" -> Seq("e" * 41),
-            "addressLineNonUK4" -> Seq("f" * 41),
-            "country" -> Seq("A" * 10)
-          )
-
-          CorrespondenceAddressNonUk.formRule.validate(model) must be(
-            Invalid(Seq(
-              (Path \ "yourName") -> Seq(ValidationError("error.invalid.yourname")),
-              (Path \ "businessName") -> Seq(ValidationError("error.invalid.name.of.business")),
-              (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.max.length.address.line1")),
-              (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.max.length.address.line2")),
-              (Path \ "addressLineNonUK3") -> Seq(ValidationError("error.max.length.address.line3")),
-              (Path \ "addressLineNonUK4") -> Seq(ValidationError("error.max.length.address.line4")),
-              (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
-            )))
-        }
-
-        "fail validation for not filling non UK mandatory field represented by empty string" in {
-          val data = Map(
-            "isUK" -> Seq("false"),
-            "yourName" -> Seq(""),
-            "businessName" -> Seq(""),
-            "addressLineNonUK1" -> Seq(""),
-            "country" -> Seq("")
-          )
-
-          CorrespondenceAddressNonUk.formRule.validate(data) must
-            be(Invalid(Seq(
-              (Path \ "yourName") -> Seq(ValidationError("error.required.yourname")),
-              (Path \ "businessName") -> Seq(ValidationError("error.required.name.of.business")),
-              (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
-              (Path \ "country") -> Seq(ValidationError("error.required.country"))
-            )))
-        }
-
-        "Read Non UK Address" in {
-          CorrespondenceAddressNonUk.formRule.validate(DefaultNonUKModel) must be(Valid(DefaultNonUKAddress))
-        }
-
-        "write correct Non UK Address" in {
-          CorrespondenceAddressNonUk.formWrites.writes(DefaultNonUKAddress) must be(DefaultNonUKModel)
-        }
-      }
-    }
-
-
-  val DefaultYourName = "Default Your Name"
-  val DefaultBusinessName = "Default Business Name"
-  val DefaultAddressLine1 = "Default Line 1"
-  val DefaultAddressLine2 = Some("Default Line 2")
-  val DefaultAddressLine3 = Some("Default Line 3")
-  val DefaultAddressLine4 = Some("Default Line 4")
-  val DefaultPostcode = "AA1 1AA"
-  val DefaultCountry = Country("Albania", "AL")
+  val defaultYourName = "Default Your Name"
+  val defaultBusinessName = "Default Business Name"
+  val defaultAddressLine1 = "Default Line 1"
+  val defaultAddressLine2 = Some("Default Line 2")
+  val defaultAddressLine3 = Some("Default Line 3")
+  val defaultAddressLine4 = Some("Default Line 4")
+  val defaultPostcode = "AA1 1AA"
+  val defaultCountry = Country("Albania", "AL")
 
   val NewYourName = "New Your Name"
   val NewBusinessName = "New Business Name"
@@ -150,37 +57,37 @@ class CorrespondenceAddressNonUkSpec extends PlaySpec with MockitoSugar {
   val NewPostcode = "AA1 1AA"
   val NewCountry = "AB"
 
-  val DefaultNonUKAddress = CorrespondenceAddressNonUk(DefaultYourName,
-    DefaultBusinessName,
-    DefaultAddressLine1,
-    DefaultAddressLine2,
-    DefaultAddressLine3,
-    DefaultAddressLine4,
-    DefaultCountry)
+  val defaultNonUKAddress = CorrespondenceAddressNonUk(defaultYourName,
+    defaultBusinessName,
+    defaultAddressLine1,
+    defaultAddressLine2,
+    defaultAddressLine3,
+    defaultAddressLine4,
+    defaultCountry)
 
-  val DefaultNonUKModel = Map(
-    "yourName" -> Seq(DefaultYourName),
-    "businessName" -> Seq(DefaultBusinessName),
-    "addressLineNonUK1" -> Seq(DefaultAddressLine1),
+  val defaultNonUKModel = Map(
+    "yourName" -> Seq(defaultYourName),
+    "businessName" -> Seq(defaultBusinessName),
+    "addressLineNonUK1" -> Seq(defaultAddressLine1),
     "addressLineNonUK2" -> Seq("Default Line 2"),
     "addressLineNonUK3" -> Seq("Default Line 3"),
     "addressLineNonUK4" -> Seq("Default Line 4"),
-    "country" -> Seq(DefaultCountry.code)
+    "country" -> Seq(defaultCountry.code)
   )
 
-  val DefaultNonUKJson = Json.obj(
-    "yourName" -> DefaultYourName,
-    "businessName" -> DefaultBusinessName,
-    "correspondenceAddressLine1" -> DefaultAddressLine1,
-    "correspondenceAddressLine2" -> DefaultAddressLine2,
-    "correspondenceAddressLine3" -> DefaultAddressLine3,
-    "correspondenceAddressLine4" -> DefaultAddressLine4,
-    "correspondenceCountry" -> DefaultCountry
+  val defaultNonUKJson = Json.obj(
+    "yourName" -> defaultYourName,
+    "businessName" -> defaultBusinessName,
+    "correspondenceAddressLine1" -> defaultAddressLine1,
+    "correspondenceAddressLine2" -> defaultAddressLine2,
+    "correspondenceAddressLine3" -> defaultAddressLine3,
+    "correspondenceAddressLine4" -> defaultAddressLine4,
+    "correspondenceCountry" -> defaultCountry
   )
 
   "JSON validation" must {
 
-    val nonUkAddress = CorrespondenceAddress(None, Some(DefaultNonUKAddress))
+    val nonUkAddress = CorrespondenceAddress(None, Some(defaultNonUKAddress))
 
     "Round trip a Non UK Address correctly through serialisation" in {
 
@@ -190,11 +97,11 @@ class CorrespondenceAddressNonUkSpec extends PlaySpec with MockitoSugar {
     }
 
     "Serialise non-UK address as expected" in {
-      Json.toJson(nonUkAddress) must be(DefaultNonUKJson)
+      Json.toJson(nonUkAddress) must be(defaultNonUKJson)
     }
 
     "Deserialise non-UK address as expected" in {
-      DefaultNonUKJson.as[CorrespondenceAddress] must be(nonUkAddress)
+      defaultNonUKJson.as[CorrespondenceAddress] must be(nonUkAddress)
     }
   }
 }

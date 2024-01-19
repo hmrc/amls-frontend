@@ -17,8 +17,6 @@
 package forms.supervision
 
 import forms.mappings.Mappings
-import jto.validation.forms.Rules.notEmpty
-import models.FormTypes.{notEmptyStrip, regexWithMsg}
 import models.supervision.SupervisionEndReasons
 import play.api.data.Form
 

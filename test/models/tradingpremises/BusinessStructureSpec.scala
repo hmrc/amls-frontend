@@ -17,41 +17,12 @@
 package models.tradingpremises
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import models.tradingpremises.BusinessStructure._
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class BusinessStructureSpec extends PlaySpec {
 
   "BusinessStructure" should {
-
-    "Read Form data successfully" in {
-
-      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("01"))) must be(Valid(SoleProprietor))
-      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("02"))) must be(Valid(LimitedLiabilityPartnership))
-      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("03"))) must be(Valid(Partnership))
-      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("04"))) must be(Valid(IncorporatedBody))
-      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("05"))) must be(Valid(UnincorporatedBody))
-    }
-
-    "Write Form data successfully" in {
-
-      BusinessStructure.formWritesBusinessStructure.writes(SoleProprietor) must be(Map("agentsBusinessStructure" -> Seq("01")))
-      BusinessStructure.formWritesBusinessStructure.writes(LimitedLiabilityPartnership) must be(Map("agentsBusinessStructure" -> Seq("02")))
-      BusinessStructure.formWritesBusinessStructure.writes(Partnership) must be(Map("agentsBusinessStructure" -> Seq("03")))
-      BusinessStructure.formWritesBusinessStructure.writes(IncorporatedBody) must be(Map("agentsBusinessStructure" -> Seq("04")))
-      BusinessStructure.formWritesBusinessStructure.writes(UnincorporatedBody) must be(Map("agentsBusinessStructure" -> Seq("05")))
-    }
-
-    "Fail on invalid data" in {
-      BusinessStructure.agentsBusinessStructureRule.validate(Map("agentsBusinessStructure" -> Seq("11"))) must be(Invalid(List(
-        (Path \ "agentsBusinessStructure", List(ValidationError("error.invalid"))))))
-    }
-    "Fail on missing mandatory field" in {
-      BusinessStructure.agentsBusinessStructureRule.validate(Map.empty) must be(Invalid(List(
-        (Path \ "agentsBusinessStructure", List(ValidationError("error.required.tp.select.business.structure"))))))
-    }
 
     "Read JSON data successfully" in {
       Json.fromJson[BusinessStructure](Json.obj("agentsBusinessStructure" -> "01")) must be(JsSuccess(SoleProprietor,

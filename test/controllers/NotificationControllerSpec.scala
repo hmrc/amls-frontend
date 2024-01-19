@@ -17,7 +17,6 @@
 package controllers
 
 import cats.data.OptionT
-import cats.implicits._
 import connectors.AmlsConnector
 import controllers.actions.{SuccessfulAuthAction, SuccessfulAuthActionNoAmlsRefNo}
 import generators.AmlsReferenceNumberGenerator
@@ -41,7 +40,7 @@ import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.notifications.YourMessagesView
-import views.notifications.{V1M0, V2M0, V3M0, V4M0, V5M0}
+import views.notifications._
 
 import scala.concurrent.Future
 
@@ -165,7 +164,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       .thenReturn(Future.successful(SubmissionDecisionRejected))
 
     when (mockBusinessMatchingService.getModel(any[String]())(any()))
-      .thenReturn(OptionT.some[Future, BusinessMatching](testBusinessMatch))
+      .thenReturn(OptionT.liftF[Future, BusinessMatching](Future.successful(testBusinessMatch)))
 
     when {
       mockAmlsConnector.registrationDetails(any[(String, String)], any())(any(), any())
@@ -190,7 +189,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         .thenReturn(Future.successful(testList))
 
       when (mockBusinessMatchingService.getModel(any())(any()))
-        .thenReturn(OptionT.some[Future, BusinessMatching](None))
+        .thenReturn(OptionT.liftF[Future, BusinessMatching](Future.successful(None)))
 
       when(mockStatusService.getReadStatus(any[String](), any[(String, String)]())(any(), any()))
         .thenReturn(Future.successful(statusResponseBad))
@@ -220,7 +219,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         .thenReturn(Future.successful(testList))
 
       when (mockBusinessMatchingService.getModel(any[String]())(any()))
-        .thenReturn(OptionT.some[Future, BusinessMatching](None))
+        .thenReturn(OptionT.liftF[Future, BusinessMatching](Future.successful(None)))
 
       when(mockStatusService.getReadStatus(any[Option[String]](), any[(String, String)]())(any(), any()))
         .thenReturn(Future.successful(statusResponseBad))

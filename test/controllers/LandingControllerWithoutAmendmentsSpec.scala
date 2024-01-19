@@ -210,8 +210,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           when(controllerNoAmlsNumber.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controllerNoAmlsNumber.landingService.updateReviewDetails(any(), any[String]())(any(), any())).thenReturn(Future.successful(mock[CacheMap]))
 
-          implicit val hc = headerCarrierForPartialsConverter.fromRequestWithEncryptedCookie(request)
-
           val result = controllerNoAmlsNumber.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.businessmatching.routes.BusinessTypeController.get.url)

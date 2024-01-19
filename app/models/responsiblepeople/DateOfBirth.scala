@@ -16,10 +16,7 @@
 
 package models.responsiblepeople
 
-import jto.validation.forms._
-import jto.validation.{From, Rule, Write}
-import models.FormTypes._
-import org.joda.time.{DateTimeFieldType, LocalDate}
+import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import play.api.libs.json.JodaWrites._
 import play.api.libs.json.JodaReads._
@@ -27,24 +24,5 @@ import play.api.libs.json.JodaReads._
 case class DateOfBirth(dateOfBirth: LocalDate)
 
 object DateOfBirth {
-
-  implicit val formRule: Rule[UrlFormEncoded, DateOfBirth] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "dateOfBirth").read(newAllowedPastAndFutureDateRule("error.rp.dob.required.date",
-      "error.rp.dob.invalid.date.after.1900",
-      "error.rp.dob.invalid.date.future",
-      "error.rp.dob.invalid.date.not.real")) map DateOfBirth.apply
-  }
-
-  implicit def formWrites = Write[DateOfBirth, UrlFormEncoded] { data =>
-    Map(
-      "dateOfBirth.day" -> Seq(data.dateOfBirth.get(DateTimeFieldType.dayOfMonth()).toString),
-      "dateOfBirth.month" -> Seq(data.dateOfBirth.get(DateTimeFieldType.monthOfYear()).toString),
-      "dateOfBirth.year" -> Seq(data.dateOfBirth.get(DateTimeFieldType.year()).toString)
-    )
-  }
-
   implicit val format = Json.format[DateOfBirth]
-
-
 }

@@ -102,10 +102,10 @@ class RemoveBusinessTypesController @Inject()(
     (for {
       model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](request.credId, RemoveBusinessTypeFlowModel.key)) orElse OptionT.some(RemoveBusinessTypeFlowModel())
       dateApplicable <- removeBusinessTypeHelper.dateOfChangeApplicable(request.credId, formValue.toSet)
-      servicesChanged <- OptionT.some[Future, Boolean](model.activitiesToRemove.getOrElse(Set.empty) != formValue.toSet)
-      newModel <- OptionT.some[Future, RemoveBusinessTypeFlowModel](
+      servicesChanged <- OptionT.liftF(Future.successful(model.activitiesToRemove.getOrElse(Set.empty) != formValue.toSet))
+      newModel <- OptionT.liftF(Future.successful(
         model.copy(activitiesToRemove = Some(formValue.toSet), dateOfChange = if (!dateApplicable || servicesChanged) None else model.dateOfChange)
-      )
+      ))
       _ <- OptionT.liftF(dataCacheConnector.save(request.credId, RemoveBusinessTypeFlowModel.key, newModel))
       route <- OptionT.liftF(router.getRoute(request.credId, WhatBusinessTypesToRemovePageId, newModel, edit))
     } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: RemoveActivitiesController")

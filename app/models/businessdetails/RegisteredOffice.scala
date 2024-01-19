@@ -16,12 +16,8 @@
 
 package models.businessdetails
 
-import cats.data.Validated.{Invalid, Valid}
 import models.{Country, DateOfChange}
-import models.FormTypes._
 import models.businesscustomer.Address
-import jto.validation._
-import jto.validation.forms._
 import play.api.libs.json.{Json, Reads, Writes}
 
 sealed trait RegisteredOffice {
@@ -75,60 +71,6 @@ case class RegisteredOfficeNonUK(
                                 ) extends RegisteredOffice
 
 object RegisteredOffice {
-
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, RegisteredOffice] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
-      country.code match {
-        case "GB" => Invalid(Seq(ValidationError(List("error.required.atb.registered.office.not.uk"))))
-        case _ => Valid(country)
-      }
-    }
-    (__ \ "isUK").read[Boolean].withMessage("error.required.atb.registered.office.uk.or.overseas") flatMap {
-      case true =>
-        (
-          (__ \ "addressLine1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress("line1")) ~
-            (__ \ "addressLine2").read(optionR(validateAddress("line2"))) ~
-            (__ \ "addressLine3").read(optionR(validateAddress("line3"))) ~
-            (__ \ "addressLine4").read(optionR(validateAddress("line4"))) ~
-            (__ \ "postCode").read(notEmptyStrip andThen postcodeType)
-          ) ((addr1: String, addr2: Option[String], addr3: Option[String], addr4: Option[String], postCode: String) =>
-            RegisteredOfficeUK(addr1, addr2, addr3, addr4, postCode, None))
-
-      case false =>
-        (
-          (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress("line1")) ~
-            (__ \ "addressLineNonUK2").read(optionR(validateAddress("line2"))) ~
-            (__ \ "addressLineNonUK3").read(optionR(validateAddress("line3"))) ~
-            (__ \ "addressLineNonUK4").read(optionR(validateAddress("line4"))) ~
-            (__ \ "country").read(validateCountry)
-          ) ((addr1: String, addr2: Option[String], addr3: Option[String], addr4: Option[String], country: Country) =>
-          RegisteredOfficeNonUK(addr1, addr2, addr3, addr4, country, None))
-    }
-  }
-
-  implicit val formWrites: Write[RegisteredOffice, UrlFormEncoded] = Write {
-    case f: RegisteredOfficeUK =>
-      Map(
-        "isUK" -> Seq("true"),
-        "addressLine1" -> f.addressLine1,
-        "addressLine2" -> Seq(f.addressLine2.getOrElse("")),
-        "addressLine3" -> Seq(f.addressLine3.getOrElse("")),
-        "addressLine4" -> Seq(f.addressLine4.getOrElse("")),
-        "postCode" -> f.postCode
-      )
-    case f: RegisteredOfficeNonUK =>
-      Map(
-        "isUK" -> Seq("false"),
-        "addressLineNonUK1" -> f.addressLine1,
-        "addressLineNonUK2" -> Seq(f.addressLine2.getOrElse("")),
-        "addressLineNonUK3" -> Seq(f.addressLine3.getOrElse("")),
-        "addressLineNonUK4" -> Seq(f.addressLine4.getOrElse("")),
-        "country" -> f.country.code
-      )
-  }
 
   implicit val jsonReads: Reads[RegisteredOffice] = {
     import play.api.libs.functional.syntax._

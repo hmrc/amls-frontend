@@ -16,18 +16,21 @@
 
 package models.businessdetails
 
-import jto.validation.{Invalid, Path, ValidationError}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.Json
 
 class CorrespondenceAddressIsUkSpec extends PlaySpec with MockitoSugar {
 
   "CorrespondenceAddressIsUk" must {
-      "throw error when mandatory fields are missing" in {
-        CorrespondenceAddressIsUk.formRule.validate(Map.empty) must be
-        Invalid(Seq(
-          (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
-        ))
-      }
+
+    "round trip through JSON" in {
+
+      val trueModel = CorrespondenceAddressIsUk(true)
+      val falseModel = CorrespondenceAddressIsUk(false)
+
+      Json.toJson(trueModel).as[CorrespondenceAddressIsUk] mustBe trueModel
+      Json.toJson(falseModel).as[CorrespondenceAddressIsUk] mustBe falseModel
     }
+  }
 }

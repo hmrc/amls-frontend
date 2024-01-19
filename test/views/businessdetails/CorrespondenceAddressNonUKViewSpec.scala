@@ -17,13 +17,9 @@
 package views.businessdetails
 
 import forms.businessdetails.CorrespondenceAddressNonUKFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
 import models.Country
-import models.autocomplete.NameValuePair
 import models.businessdetails.CorrespondenceAddressNonUk
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 import utils.AmlsViewSpec

@@ -16,35 +16,6 @@
 
 package models.businessactivities
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
-import play.api.libs.json.Json
-import models.FormTypes.notEmptyStrip
-import utils.MappingUtils.Implicits._
-import jto.validation.forms.Rules.{notEmpty, _}
-
 case class EmployeeCount(employeeCount: String)
 
-object EmployeeCount {
-
-  val employeeCountRegex = "^[0-9]+$".r
-  val maxEmployeeCount = 11
-  val employeeCountType = notEmptyStrip andThen notEmpty.withMessage("error.empty.ba.employee.count") andThen
-    maxLength(maxEmployeeCount).withMessage("error.max.length.ba.employee.count") andThen
-    pattern(employeeCountRegex).withMessage("error.invalid.ba.employee.count")
-
-  implicit val formats = Json.format[EmployeeCount]
-
-  implicit val formRule: Rule[UrlFormEncoded, EmployeeCount] =
-    From[UrlFormEncoded] { __ =>
-        (__ \ "employeeCount").read(employeeCountType) map EmployeeCount.apply
-    }
-
-  implicit val formWrites: Write[EmployeeCount, UrlFormEncoded] =
-    Write {
-      case EmployeeCount(employeeCount) =>
-        Map(
-          "employeeCount" -> Seq(employeeCount)
-        )
-    }
-}
+object EmployeeCount

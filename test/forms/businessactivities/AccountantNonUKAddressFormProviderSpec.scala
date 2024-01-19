@@ -18,7 +18,6 @@ package forms.businessactivities
 
 import forms.behaviours.AddressFieldBehaviours
 import models.businessactivities.AccountantsAddress
-import models.businessdetails.RegisteredOffice
 import play.api.data.Form
 
 class AccountantNonUKAddressFormProviderSpec extends AddressFieldBehaviours {

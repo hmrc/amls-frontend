@@ -16,29 +16,8 @@
 
 package models.hvd
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-import models.FormTypes._
-import org.joda.time.{DateTimeFieldType, LocalDate}
+import org.joda.time.LocalDate
 
 case class CashPaymentFirstDate(paymentDate: LocalDate)
 
-object CashPaymentFirstDate {
-
-  implicit val formRule: Rule[UrlFormEncoded, CashPaymentFirstDate] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-        (__ \ "paymentDate").read(newAllowedPastAndFutureDateRule("error.date.hvd",
-          "error.date.hvd.past",
-          "error.date.hvd.future",
-          "error.date.hvd.real")) map CashPaymentFirstDate.apply
-  }
-
-  implicit def formWrites: Write[CashPaymentFirstDate, UrlFormEncoded] = Write {
-    case CashPaymentFirstDate(date) =>
-      Map(
-        "paymentDate.day" -> Seq(date.get(DateTimeFieldType.dayOfMonth()).toString),
-        "paymentDate.month" -> Seq(date.get(DateTimeFieldType.monthOfYear()).toString),
-        "paymentDate.year" -> Seq(date.get(DateTimeFieldType.year()).toString))
-
-  }
-}
+object CashPaymentFirstDate

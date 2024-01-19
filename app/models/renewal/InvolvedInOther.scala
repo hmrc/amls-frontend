@@ -16,11 +16,7 @@
 
 package models.renewal
 
-import jto.validation._
-import jto.validation.forms.Rules._
-import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
-import cats.data.Validated.Valid
 
 sealed trait InvolvedInOther
 
@@ -30,34 +26,7 @@ case object InvolvedInOtherNo extends InvolvedInOther
 
 object InvolvedInOther {
 
-  import models.FormTypes._
-  import utils.MappingUtils.Implicits._
-
   val key = "renewal-involved-in-other"
-
-  val maxOtherBusinessActivityTypeLength = 255
-  val OtherBusinessActivityType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.renewal.ba.involved.in.other.text") andThen
-    maxWithMsg(maxOtherBusinessActivityTypeLength, "error.invalid.maxlength.255.renewal.ba.involved.in.other") andThen
-    basicPunctuationPattern("error.text.validation.renewal.ba.involved.in.other")
-
-
-  implicit val formRule: Rule[UrlFormEncoded, InvolvedInOther] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "involvedInOther").read[Boolean].withMessage("error.required.renewal.ba.involved.in.other") flatMap {
-      case true =>
-        (__ \ "details").read(OtherBusinessActivityType) map InvolvedInOtherYes.apply
-      case false => Rule.fromMapping { _ => Valid(InvolvedInOtherNo) }
-    }
-  }
-
-  implicit val formWrites: Write[InvolvedInOther, UrlFormEncoded] = Write {
-    case InvolvedInOtherYes(value) =>
-      Map("involvedInOther" -> Seq("true"),
-        "details" -> Seq(value)
-      )
-    case involvedInOtherNo => Map("involvedInOther" -> Seq("false"))
-  }
 
   implicit val jsonReads: Reads[InvolvedInOther] =
     (__ \ "involvedInOther").read[Boolean] flatMap {

@@ -108,7 +108,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
           "removalReasonOther" -> "Some reason"
         )
 
-        val result = await(controller.post(1)(formRequest))
+        await(controller.post(1)(formRequest))
 
         val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
         verify(controller.dataCacheConnector).save( any(), eqTo(TradingPremises.key), captor.capture())(any(), any())

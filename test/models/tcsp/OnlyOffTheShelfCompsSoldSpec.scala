@@ -16,81 +16,20 @@
 
 package models.tcsp
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.Json
 
 class OnlyOffTheShelfCompsSoldSpec extends PlaySpec with MustMatchers {
 
-  "The OnlyOffTheShelfCompsSold model" when {
-    "given a valid form" when {
-      "'yes' is selected" must {
-        "return a valid form model" in {
-          val formData = Map(
-            "onlyOffTheShelfCompsSold" -> Seq("true")
-          )
+  "OnlyOffTheShelfCompsSold" must {
 
-          val result = OnlyOffTheShelfCompsSold.formReads.validate(formData)
-          result mustBe Valid(OnlyOffTheShelfCompsSoldYes)
-        }
-      }
+    "round trip through JSON" in {
 
-      "'no' is selected" must {
-        "return a valid form model" in {
-          val formData = Map(
-            "onlyOffTheShelfCompsSold" -> Seq("false")
-          )
-
-          val result = OnlyOffTheShelfCompsSold.formReads.validate(formData)
-
-          result mustBe Valid(OnlyOffTheShelfCompsSoldNo)
-        }
-      }
-
-      "nothing is selected" must {
-        "return the validation errors" in {
-          val formData = Map.empty[String, Seq[String]]
-
-          val result = OnlyOffTheShelfCompsSold.formReads.validate(formData)
-
-          result mustBe Invalid(Seq(Path \ "onlyOffTheShelfCompsSold" -> Seq(ValidationError("error.required.tcsp.off.the.shelf.companies"))))
-        }
-      }
-    }
-
-    "given a valid model" must {
-      "return the form values" when {
-        "onlyOffTheShelfCompsSold is 'yes'" in {
-          val model = OnlyOffTheShelfCompsSoldYes
-          val result = OnlyOffTheShelfCompsSold.formWrites.writes(model)
-
-          result mustBe Map("onlyOffTheShelfCompsSold" -> Seq("true"))
-        }
-        "onlyOffTheShelfCompsSold is 'no'" in {
-          val model = OnlyOffTheShelfCompsSoldNo
-          val result = OnlyOffTheShelfCompsSold.formWrites.writes(model)
-
-          result mustBe Map("onlyOffTheShelfCompsSold" -> Seq("false"))
-        }
-
-        "for json" when {
-          "onlyOffTheShelfCompsSold is 'yes'" in {
-            val model = OnlyOffTheShelfCompsSoldYes
-            val result = OnlyOffTheShelfCompsSold.jsonWrite.writes(model).toString()
-            val expected = "{\"onlyOffTheShelfCompsSold\":true}"
-
-            result mustBe expected
-          }
-          "onlyOffTheShelfCompsSold is 'no'" in {
-            val model = OnlyOffTheShelfCompsSoldNo
-            val result = OnlyOffTheShelfCompsSold.jsonWrite.writes(model).toString()
-            val expected = "{\"onlyOffTheShelfCompsSold\":false}"
-
-            result mustBe expected
-          }
-        }
-      }
+      Json.toJson[OnlyOffTheShelfCompsSold](OnlyOffTheShelfCompsSoldYes)
+        .as[OnlyOffTheShelfCompsSold] mustBe OnlyOffTheShelfCompsSoldYes
+      Json.toJson[OnlyOffTheShelfCompsSold](OnlyOffTheShelfCompsSoldNo)
+        .as[OnlyOffTheShelfCompsSold] mustBe OnlyOffTheShelfCompsSoldNo
     }
   }
 }

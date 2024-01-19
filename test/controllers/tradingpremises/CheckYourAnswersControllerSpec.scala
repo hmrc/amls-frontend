@@ -16,21 +16,19 @@
 
 package controllers.tradingpremises
 
-import java.util.UUID
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
-import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities, _}
 import models.businessmatching.BusinessActivity.{AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
+import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities, _}
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n.Messages
-import play.api.test.{FakeRequest, Injecting}
 import play.api.test.Helpers.{OK, contentAsString, status, _}
+import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -38,6 +36,7 @@ import utils.AmlsSpec
 import utils.tradingpremises.CheckYourAnswersHelper
 import views.html.tradingpremises.CheckYourAnswersView
 
+import java.util.UUID
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Injecting {

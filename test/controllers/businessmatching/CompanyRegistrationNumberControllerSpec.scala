@@ -65,7 +65,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
     when {
       controller.businessMatchingService.getModel(any())(any())
-    } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
+    } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(businessMatching))
 
     val emptyCache = CacheMap("", Map.empty)
   }
@@ -75,7 +75,7 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
     "on get() display company registration number page" in new Fixture {
       when {
         controller.businessMatchingService.getModel(any())(any())
-      } thenReturn OptionT.some[Future, BusinessMatching](None)
+      } thenReturn OptionT.liftF[Future, BusinessMatching](Future.successful(None))
 
 
       val result = controller.get()(request)

@@ -19,7 +19,7 @@ package services.msb
 import models.businessmatching.BusinessMatchingMsbService.{ForeignExchange, TransmittingMoney}
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices}
 import models.moneyservicebusiness.{FXTransactionsInNext12Months, MoneyServiceBusiness}
-import play.api.mvc.{Result, Results}
+import play.api.mvc.Results
 import utils.AmlsSpec
 
 class MoneySourcesServiceSpec extends AmlsSpec with Results {

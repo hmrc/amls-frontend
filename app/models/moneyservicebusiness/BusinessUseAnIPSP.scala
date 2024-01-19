@@ -16,11 +16,7 @@
 
 package models.moneyservicebusiness
 
-import jto.validation._
-import jto.validation.forms.Rules._
-import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
-import cats.data.Validated.Valid
 import play.api.i18n.Messages
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
@@ -42,37 +38,6 @@ object BusinessUseAnIPSP {
         input
       }
     }
-  }
-
-  import models.FormTypes._
-  import utils.MappingUtils.Implicits._
-
-  private val maxNameTypeLength = 140
-  private val nameType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.msb.ipsp.name") andThen
-    maxLength(maxNameTypeLength).withMessage("error.invalid.msb.ipsp.name") andThen
-    basicPunctuationPattern("error.invalid.msb.ipsp.format")
-
-  private val referenceType = notEmptyStrip andThen
-    notEmpty.withMessage("error.invalid.mlr.number") andThen referenceNumberRule()
-
-  implicit val formRule: Rule[UrlFormEncoded, BusinessUseAnIPSP] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "useAnIPSP").read[Boolean].withMessage("error.required.msb.ipsp") flatMap {
-      case true =>
-        ((__ \ "name").read(nameType) ~
-          (__ \ "referenceNumber").read(referenceType)) (BusinessUseAnIPSPYes.apply)
-      case false => Rule.fromMapping { _ => Valid(BusinessUseAnIPSPNo) }
-    }
-  }
-
-  implicit val formWrites: Write[BusinessUseAnIPSP, UrlFormEncoded] = Write {
-    case BusinessUseAnIPSPYes(name, number) =>
-      Map("useAnIPSP" -> Seq("true"),
-        "name" -> Seq(name),
-        "referenceNumber" -> Seq(number)
-      )
-    case BusinessUseAnIPSPNo => Map("useAnIPSP" -> Seq("false"))
   }
 
   implicit val jsonReads: Reads[BusinessUseAnIPSP] = {

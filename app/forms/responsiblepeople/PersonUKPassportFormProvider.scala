@@ -17,10 +17,9 @@
 package forms.responsiblepeople
 
 import forms.mappings.Mappings
-import models.responsiblepeople.{NonUKResidence, PersonResidenceType, UKPassport, UKPassportNo, UKPassportYes, UKResidence}
+import models.responsiblepeople.{UKPassport, UKPassportNo, UKPassportYes}
 import play.api.data.Form
 import play.api.data.Forms.mapping
-import uk.gov.hmrc.domain.Nino
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 import javax.inject.Inject

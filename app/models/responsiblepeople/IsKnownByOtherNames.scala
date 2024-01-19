@@ -16,13 +16,8 @@
 
 package models.responsiblepeople
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
-import jto.validation.forms.Rules._
 import play.api.libs.functional.syntax._
-import utils.MappingUtils.Implicits._
-import cats.data.Validated.Valid
 
 sealed trait IsKnownByOtherNames
 
@@ -33,39 +28,6 @@ case class IsKnownByOtherNamesYes(otherfirstnames: String,
 case object IsKnownByOtherNamesNo extends IsKnownByOtherNames
 
 object IsKnownByOtherNames {
-
-  val maxNameTypeLength = 35
-
-  val otherFirstNameType  = notEmpty.withMessage("error.required.otherfirstnames") andThen
-    maxLength(maxNameTypeLength).withMessage("error.invalid.length.firstname")
-
-  val otherMiddleNameType  = maxLength(maxNameTypeLength).withMessage("error.invalid.length.middlename")
-
-  val otherLastNameType  = notEmpty.withMessage("error.required.otherlastnames") andThen
-    maxLength(maxNameTypeLength).withMessage("error.invalid.length.lastname")
-
-  implicit val formRule: Rule[UrlFormEncoded, IsKnownByOtherNames] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    import utils.MappingUtils.Implicits._
-    (__ \ "isKnownByOtherNames").read[Boolean].withMessage("error.required.rp.isknownbyothernames") flatMap {
-      case true => (
-        (__ \ "otherfirstnames").read(otherFirstNameType) ~
-        (__ \ "othermiddlenames").read(optionR(otherMiddleNameType)) ~
-        (__ \ "otherlastnames").read(otherLastNameType)
-        )(IsKnownByOtherNamesYes.apply _)
-      case false => Rule.fromMapping { _ => Valid(IsKnownByOtherNamesNo) }
-    }
-  }
-
-  implicit val formWrites: Write[IsKnownByOtherNames, UrlFormEncoded] = Write {
-    case a: IsKnownByOtherNamesYes => Map(
-      "isKnownByOtherNames" -> Seq("true"),
-      "otherfirstnames" -> Seq(a.otherfirstnames),
-      "othermiddlenames" -> Seq(a.othermiddlenames.getOrElse("")),
-      "otherlastnames" -> Seq(a.otherlastnames)
-    )
-    case IsKnownByOtherNamesNo => Map("isKnownByOtherNames" -> Seq("false"))
-  }
 
   implicit val jsonReads: Reads[IsKnownByOtherNames] =
     (__ \ "isKnownByOtherNames").read[Boolean] flatMap {
@@ -86,7 +48,4 @@ object IsKnownByOtherNames {
     )
     case IsKnownByOtherNamesNo => Json.obj("isKnownByOtherNames" -> false)
   }
-
 }
-
-

@@ -16,8 +16,6 @@
 
 package models.businessdetails
 
-import jto.validation.forms._
-import jto.validation.{To, Write}
 import play.api.libs.json.Json
 
 case class ContactingYou(
@@ -26,15 +24,5 @@ case class ContactingYou(
                         )
 
 object ContactingYou {
-
   implicit val formats = Json.format[ContactingYou]
-
-  implicit val formWrites: Write[ContactingYou, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-    import scala.Function.unlift
-    (
-      (__ \ "phoneNumber").write[Option[String]] ~
-        (__ \ "email").write[Option[String]]
-      ) (unlift(ContactingYou.unapply _))
-  }
 }

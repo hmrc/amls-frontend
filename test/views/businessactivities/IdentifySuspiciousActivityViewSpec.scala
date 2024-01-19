@@ -17,10 +17,7 @@
 package views.businessactivities
 
 import forms.businessactivities.IdentifySuspiciousActivityFormProvider
-import forms.{EmptyForm, InvalidForm}
-import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec

@@ -17,14 +17,12 @@
 package views.bankdetails
 
 import forms.bankdetails.BankAccountHasIBANFormProvider
-import forms.{Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
 import models.bankdetails.{BankAccountHasIban, NonUKIBANNumber}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import utils.{AmlsSpec, AmlsViewSpec}
+import utils.AmlsViewSpec
 import views.Fixture
 import views.html.bankdetails.BankAccountHasIBANView
 

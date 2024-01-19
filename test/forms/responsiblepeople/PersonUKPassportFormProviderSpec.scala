@@ -18,7 +18,7 @@ package forms.responsiblepeople
 
 import forms.behaviours.StringFieldBehaviours
 import forms.mappings.Constraints
-import models.responsiblepeople.{NonUKResidence, PersonResidenceType, UKPassport, UKPassportNo, UKPassportYes, UKResidence}
+import models.responsiblepeople.{UKPassport, UKPassportNo, UKPassportYes}
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 

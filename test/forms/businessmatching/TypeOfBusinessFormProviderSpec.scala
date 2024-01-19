@@ -17,17 +17,15 @@
 package forms.businessmatching
 
 import forms.behaviours.StringFieldBehaviours
-import models.FormTypes
+import forms.mappings.Constraints
 import models.businessmatching.TypeOfBusiness
 import play.api.data.FormError
 
-class TypeOfBusinessFormProviderSpec extends StringFieldBehaviours {
+class TypeOfBusinessFormProviderSpec extends StringFieldBehaviours with Constraints {
 
   lazy val formProvider = new TypeOfBusinessFormProvider()
 
   val fieldName = "typeOfBusiness"
-
-  val formRegex: String = FormTypes.basicPunctuationRegex.toString()
 
   ".typeOfBusiness" must {
 
@@ -56,7 +54,7 @@ class TypeOfBusinessFormProviderSpec extends StringFieldBehaviours {
       "value violates regex" in {
 
         formProvider().bind(Map(fieldName -> "⌧")).errors shouldBe Seq(
-          FormError(fieldName, "error.bm.businesstype.type.characters", Seq(formRegex))
+          FormError(fieldName, "error.bm.businesstype.type.characters", Seq(basicPunctuationRegex))
         )
       }
     }

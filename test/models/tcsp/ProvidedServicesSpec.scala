@@ -18,88 +18,10 @@ package models.tcsp
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import models.tcsp.ProvidedServices._
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
-
-  "Provided services" must {
-
-    "pass validation" when {
-
-      "successfully validate given one option selected" in {
-        val urlFormEncoded = Map("services[]" -> Seq("01"))
-        val expected = Valid(ProvidedServices(Set(PhonecallHandling)))
-        ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
-      }
-
-      "successfully validate given multiple options selected without other option" in {
-        val urlFormEncoded = Map("services[]" -> Seq("01", "02", "03", "04", "05", "06", "07"))
-        val allServices = Set[TcspService](PhonecallHandling, EmailHandling, EmailServer,
-          SelfCollectMailboxes, MailForwarding, Receptionist, ConferenceRooms)
-        val expected = Valid(ProvidedServices(allServices))
-        ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
-      }
-
-      "successfully validate given other value when other option selected" in {
-        val urlFormEncoded = Map("services[]" -> Seq("08"), "details" -> Seq("other service"))
-        val expected = Valid(ProvidedServices(Set(Other("other service"))))
-        ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
-      }
-    }
-
-    "form validation" when {
-
-      "successfully write given one values" in {
-        val services = ProvidedServices(Set(PhonecallHandling))
-        val expected = Map("services[]" -> Seq("01"))
-        ProvidedServices.formWrites.writes(services) must be(expected)
-      }
-
-      "successfully write given multiple values" in {
-        val services = ProvidedServices(Set(EmailServer, MailForwarding))
-        val expected = Map("services[]" -> Seq("03", "05"))
-        ProvidedServices.formWrites.writes(services) must be(expected)
-      }
-
-      "successfully write given 'other' value" in {
-        val services = ProvidedServices(Set(Other("other service")))
-        val expected = Map("services[]" -> Seq("08"), "details" -> Seq("other service"))
-        ProvidedServices.formWrites.writes(services) must be(expected)
-      }
-    }
-
-    "fail validation" when {
-
-      "show an error with an invalid value" in {
-        val urlFormEncoded = Map("services[]" -> Seq("1738"))
-        val expected = Invalid(Seq((Path \ "services") -> Seq(ValidationError("error.invalid"))))
-        ProvidedServices.formReads.validate(urlFormEncoded) must be(expected)
-      }
-
-      "show an error with empty value" in {
-        val expected = Invalid(Seq((Path \ "services") -> Seq(ValidationError("error.required.tcsp.provided_services.services"))))
-        ProvidedServices.formReads.validate(Map.empty) must be(expected)
-      }
-
-      "show an error with a missing details value" in {
-        val form = Map("services[]" -> Seq("08"), "details" -> Seq(""))
-        val expectedResult = Invalid(Seq(Path \ "details" -> Seq(ValidationError("error.required.tcsp.provided_services.details"))))
-
-        ProvidedServices.formReads.validate(form) must be(expectedResult)
-      }
-
-      "show an error with an invalid details value" in {
-        val form = Map("services[]" -> Seq("08"), "details" -> Seq("$3<>7485/45"))
-        val expectedResult = Invalid(Seq(Path \ "details" -> Seq(ValidationError("error.required.tcsp.provided_services.details.punctuation"))))
-
-        ProvidedServices.formReads.validate(form) must be(expectedResult)
-      }
-    }
-
-  }
 
   "Json read and writes" must {
     import play.api.libs.json.JsonValidationError
@@ -108,7 +30,6 @@ class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
     }
 
     "Serialise multiple services as expected" in {
-      val json = Json.obj("services" -> Seq("01", "02", "03", "04", "05", "06", "07"))
       val allServices = Set[TcspService](PhonecallHandling, EmailHandling, EmailServer,
         SelfCollectMailboxes, MailForwarding, Receptionist, ConferenceRooms)
       val result = Json.toJson(ProvidedServices(allServices)).\("services").as[Seq[String]]

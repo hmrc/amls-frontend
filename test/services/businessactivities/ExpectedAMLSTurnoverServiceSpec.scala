@@ -140,8 +140,6 @@ class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach w
 
       "return None if business matching is not present in the cache" in {
 
-        val bm = BusinessMatching().copy(hasAccepted = true)
-
         when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
           .thenReturn(Future.successful(None))
 
@@ -169,8 +167,6 @@ class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach w
       }
       
       "not save model if business activities cannot be retrieved from cache" in {
-
-        val ba = BusinessActivities()
 
         when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
           .thenReturn(Future.successful(None))

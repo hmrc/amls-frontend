@@ -16,15 +16,12 @@
 
 package views.businessactivities
 
-import forms.EmptyForm
 import models.businessactivities.TransactionTypes.{DigitalSoftware, DigitalSpreadsheet, Paper}
 import models.businessactivities._
-import models.businessmatching.{BusinessMatching, BusinessActivities => BMBusinessActivities}
 import models.businessmatching.BusinessActivity.MoneyServiceBusiness
+import models.businessmatching.{BusinessMatching, BusinessActivities => BMBusinessActivities}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.AmlsSummaryViewSpec

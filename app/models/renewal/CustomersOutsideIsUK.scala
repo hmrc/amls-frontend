@@ -16,26 +16,10 @@
 
 package models.renewal
 
-import jto.validation.forms._
-import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
 case class CustomersOutsideIsUK(isOutside: Boolean)
 
 object CustomersOutsideIsUK {
-
   implicit val formats = Json.format[CustomersOutsideIsUK]
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, CustomersOutsideIsUK] =
-    From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-      (__ \ "isOutside").read[Boolean].withMessage("error.required.ba.renewal.select.yes") map CustomersOutsideIsUK.apply
-    }
-
-  implicit val formWrites: Write[CustomersOutsideIsUK, UrlFormEncoded] =
-    Write {
-      case CustomersOutsideIsUK(b) =>
-        Map("isOutside" -> Seq(b.toString))
-    }
 }

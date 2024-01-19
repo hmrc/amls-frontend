@@ -17,11 +17,8 @@
 package views.businessactivities
 
 import forms.businessactivities.EmployeeCountAMLSSupervisionFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
-import models.businessactivities.{EmployeeCountAMLSSupervision, HowManyEmployees}
+import models.businessactivities.EmployeeCountAMLSSupervision
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture

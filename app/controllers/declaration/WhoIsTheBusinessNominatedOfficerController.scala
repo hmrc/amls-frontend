@@ -16,7 +16,7 @@
 
 package controllers.declaration
 
-import connectors.{AmlsConnector, DataCacheConnector}
+import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.declaration.BusinessNominatedOfficerFormProvider
 import models.declaration.BusinessNominatedOfficer

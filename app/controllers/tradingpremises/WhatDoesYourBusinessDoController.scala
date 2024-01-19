@@ -19,8 +19,8 @@ package controllers.tradingpremises
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.DateOfChangeFormProvider
 import forms.tradingpremises.WhatDoesYourBusinessDoFormProvider
-import forms.{DateOfChangeFormProvider, FormHelpers}
 import models.DateOfChange
 import models.businessmatching.BusinessActivity._
 import models.businessmatching._
@@ -50,7 +50,7 @@ class WhatDoesYourBusinessDoController @Inject () (
                                                     activitiesView: WhatDoesYourBusinessDoView,
                                                     dateChangeFormProvider: DateOfChangeFormProvider,
                                                     dateChangeView: DateOfChangeView,
-                                                    implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with FormHelpers with DateOfChangeHelper with Logging {
+                                                    implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with Logging {
 
   private def data(credId: String, index: Int, edit: Boolean)(implicit hc: HeaderCarrier)
   : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {

@@ -16,7 +16,6 @@
 
 package models.responsiblepeople
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
@@ -24,81 +23,6 @@ import play.api.libs.json._
 class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
 
   "PositionInBusiness" must {
-
-    "validate position and 'other' text from tuple" in {
-      PositionWithinBusiness.fullySpecifiedRule.validate((Set("01"), None)) mustBe Valid(Set(BeneficialOwner))
-      PositionWithinBusiness.fullySpecifiedRule.validate((Set("02"), None)) mustBe Valid(Set(Director))
-      PositionWithinBusiness.fullySpecifiedRule.validate((Set("03"), None)) mustBe Valid(Set(InternalAccountant))
-      PositionWithinBusiness.fullySpecifiedRule.validate((Set("04"), None)) mustBe Valid(Set(NominatedOfficer))
-      PositionWithinBusiness.fullySpecifiedRule.validate((Set("05"), None)) mustBe Valid(Set(Partner))
-      PositionWithinBusiness.fullySpecifiedRule.validate((Set("06"), None)) mustBe Valid(Set(SoleProprietor))
-      PositionWithinBusiness.fullySpecifiedRule.validate((Set("07"), None)) mustBe Valid(Set(DesignatedMember))
-      PositionWithinBusiness.fullySpecifiedRule.validate((Set("other"), Some("some other role"))) mustBe Valid(Set(Other("some other role")))
-    }
-
-    "successfully validate form" in {
-      val form = Map(
-        "positions[0]" -> Seq("01"),
-        "positions[1]" -> Seq("other"),
-        "otherPosition" -> Seq("some other position"))
-
-      PositionWithinBusiness.positionsRule.validate(form) mustBe
-        Valid( Set(BeneficialOwner, Other("some other position")))
-    }
-
-    "fail to validate when 'other' is selected but no 'other' value is given" in {
-      val form = Map(
-        "positions[0]" -> Seq("01"),
-        "positions[1]" -> Seq("other"))
-
-      PositionWithinBusiness.positionsRule.validate(form) mustBe
-        Invalid(Seq((Path \ "otherPosition") -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
-    }
-
-    "fail to validate when 'other' is selected but white space 'other' value is given" in {
-      val form = Map(
-        "positions[0]" -> Seq("01"),
-        "positions[1]" -> Seq("other"),
-        "otherPosition" -> Seq(" "))
-
-      PositionWithinBusiness.positionsRule.validate(form) mustBe
-        Invalid(Seq((Path \ "otherPosition") -> Seq(ValidationError("responsiblepeople.position_within_business.other_position.othermissing"))))
-    }
-
-    "fail to validate when an invalid valid was given" in {
-      val form = Map(
-        "positions[0]" -> Seq("10")
-      )
-
-      intercept[Exception] {
-        PositionWithinBusiness.positionsRule.validate(form)
-      }
-    }
-
-    "fail to validate an empty position list" in {
-      PositionWithinBusiness.atLeastOneRule.validate(Set.empty[String]) must
-        be(Invalid(Seq(
-          Path -> Seq(ValidationError("error.required.positionWithinBusiness"))
-        )))
-    }
-
-    "write correct position id" in {
-      PositionWithinBusiness.formWrite.writes(BeneficialOwner) must be("01")
-      PositionWithinBusiness.formWrite.writes(Director) must be("02")
-      PositionWithinBusiness.formWrite.writes(InternalAccountant) must be("03")
-      PositionWithinBusiness.formWrite.writes(NominatedOfficer) must be("04")
-      PositionWithinBusiness.formWrite.writes(Partner) must be("05")
-      PositionWithinBusiness.formWrite.writes(SoleProprietor) must be("06")
-      PositionWithinBusiness.formWrite.writes(DesignatedMember) must be("07")
-      PositionWithinBusiness.formWrite.writes(Other("")) must be("other")
-    }
-
-    "successfully write form from a set of PositionWithinBusiness" in {
-      val model = Set(InternalAccountant, Other("some other position")).asInstanceOf[Set[PositionWithinBusiness]]
-      PositionWithinBusiness.formWrites.writes(model) mustBe Map(
-        "positions[]" -> Seq("03", "other"),
-        "otherPosition" -> Seq("some other position"))
-    }
 
     "JSON validation" must {
 

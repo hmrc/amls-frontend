@@ -17,14 +17,11 @@
 package views.businessmatching
 
 import forms.businessmatching.MsbSubSectorsFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessMatchingMsbService, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import play.api.data.{Form, FormError}
-import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.MsbServicesView

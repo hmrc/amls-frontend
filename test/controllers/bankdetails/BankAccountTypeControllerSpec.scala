@@ -22,7 +22,7 @@ import models.bankdetails.BankAccountType.{BelongsToBusiness, BelongsToOtherBusi
 import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{any, anyObject, anyString}
+import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages

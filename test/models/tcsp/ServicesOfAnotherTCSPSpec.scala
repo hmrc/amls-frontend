@@ -18,99 +18,11 @@ package models.tcsp
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
 
   "services of another Tcsp" must {
-
-    "pass validation" must {
-
-      "successfully validate if no option selected" in {
-        ServicesOfAnotherTCSP.formRule.validate(Map("servicesOfAnotherTCSP" -> Seq("false"))) must
-          be(Valid(ServicesOfAnotherTCSPNo))
-      }
-
-      "successfully validate if `Yes` option selected and mandatory mlr number given" in {
-
-        val data = Map(
-          "servicesOfAnotherTCSP" -> Seq("true"),
-          "mlrRefNumber" -> Seq("12345678")
-        )
-
-        ServicesOfAnotherTCSP.formRule.validate(data) must
-          be(Valid(ServicesOfAnotherTCSPYes("12345678")))
-      }
-
-      "successfully validate if `Yes` option selected and mandatory mlr number given with alphanumeric value" in {
-
-        val data = Map(
-          "servicesOfAnotherTCSP" -> Seq("true"),
-          "mlrRefNumber" -> Seq("i9w9834ubkid89n")
-        )
-
-        ServicesOfAnotherTCSP.formRule.validate(data) must be {
-          Valid(ServicesOfAnotherTCSPYes("i9w9834ubkid89n"))
-        }
-
-      }
-    }
-
-    "fail validation" when {
-
-      "fail when no option selected" in {
-        ServicesOfAnotherTCSP.formRule.validate(Map.empty) must
-          be(Invalid(Seq(
-            (Path \ "servicesOfAnotherTCSP") -> Seq(ValidationError("error.required.tcsp.services.another.tcsp.registered"))
-          )))
-
-      }
-
-      "fail to validate when `Yes` option selected with no value for the mlr number" in {
-
-        val data = Map(
-          "servicesOfAnotherTCSP" -> Seq("true"),
-          "mlrRefNumber" -> Seq("")
-        )
-
-        ServicesOfAnotherTCSP.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "mlrRefNumber") -> Seq(ValidationError("error.required.tcsp.services.another.tcsp.number"))
-          )))
-      }
-
-
-      "fail to when `Yes` option selected with invalid value for the mlr number" in {
-
-        val data = Map(
-          "servicesOfAnotherTCSP" -> Seq("true"),
-          "mlrRefNumber" -> Seq("123qed")
-        )
-
-        ServicesOfAnotherTCSP.formRule.validate(data) must be(
-          Invalid(Seq((Path \ "mlrRefNumber") -> Seq(ValidationError("error.tcsp.services.another.tcsp.number.length"))
-          )))
-      }
-    }
-
-    "form validation" when {
-
-      "write correct data from enum value" in {
-
-        ServicesOfAnotherTCSP.formWrites.writes(ServicesOfAnotherTCSPNo) must
-          be(Map("servicesOfAnotherTCSP" -> Seq("false")))
-
-      }
-
-      "write correct data from `yes` value" in {
-
-        ServicesOfAnotherTCSP.formWrites.writes(ServicesOfAnotherTCSPYes("12345678")) must
-          be(Map("servicesOfAnotherTCSP" -> Seq("true"), "mlrRefNumber" -> Seq("12345678")))
-
-      }
-    }
 
     "JSON validation" when {
       import play.api.libs.json.JsonValidationError
@@ -146,10 +58,6 @@ class ServicesOfAnotherTCSPSpec extends PlaySpec with MockitoSugar {
             "mlrRefNumber" -> "12345678"
           ))
       }
-
     }
-
-
   }
-
 }

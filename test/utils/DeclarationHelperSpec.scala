@@ -22,7 +22,7 @@ import models.renewal._
 import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
-import org.mockito.Matchers.{any, eq => eqTo, _}
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatestplus.mockito.MockitoSugar

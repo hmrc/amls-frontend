@@ -7,7 +7,6 @@ private object AppDependencies {
 
   private val playPartialsVersion = "8.3.0-play-28"
   private val httpCachingClientVersion = "9.5.0-play-28"
-  private val validationVersion = "2.1.0"
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
   private val jsonEncryptionVersion = "5.1.0-play-28"
@@ -25,15 +24,12 @@ private object AppDependencies {
     "uk.gov.hmrc"       %% "play-frontend-hmrc"            % "6.6.0-play-28",
     "uk.gov.hmrc"       %% "play-conditional-form-mapping" % "1.12.0-play-28",
 
-    "io.github.jto" %% "validation-core"      % validationVersion,
-    "io.github.jto" %% "validation-playjson"  % validationVersion,
-    "io.github.jto" %% "validation-form"      % validationVersion,
-
     "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion,
     "com.beachape" %% "enumeratum-play" % "1.5.15",
     "com.squareup.okhttp3" % "mockwebserver" % okHttpVersion,
     "com.typesafe.play" %% "play-json" % "2.8.1",
     "com.typesafe.play" %% "play-json-joda" % "2.8.1",
+    "org.typelevel"     %% "cats-core"      % "2.10.0",
 
     compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.5" cross CrossVersion.full),
     "com.github.ghik" % "silencer-lib" % "1.7.5" % Provided cross CrossVersion.full

@@ -18,14 +18,13 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.{AmlsConnector, DataCacheConnector, _}
-
-import javax.inject.{Inject, Singleton}
-import models.businessdetails.{BusinessDetails, PreviouslyRegisteredYes}
+import connectors._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthAction, BusinessName}
 import views.html.confirmation.ConfirmationBacsView
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class BacsConfirmationController @Inject()(authAction: AuthAction,

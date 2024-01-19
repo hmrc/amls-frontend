@@ -16,12 +16,10 @@
 
 package controllers
 
-import controllers.routes.SubmissionErrorController
 import play.api.mvc._
 import utils.AuthAction
 import views.html.submission._
 
-import java.net.URLEncoder
 import javax.inject.Inject
 
 class SubmissionErrorController @Inject()(authAction: AuthAction,

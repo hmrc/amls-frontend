@@ -17,7 +17,7 @@
 package forms.hvd
 
 import forms.behaviours.BooleanFieldBehaviours
-import models.hvd.{CashPaymentOverTenThousandEuros, ExciseGoods}
+import models.hvd.CashPaymentOverTenThousandEuros
 import play.api.data.Form
 
 class CashPaymentFormProviderSpec extends BooleanFieldBehaviours[CashPaymentOverTenThousandEuros] {

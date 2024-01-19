@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.responsiblepeople.address.TimeAtAddressFormProvider
 import models.responsiblepeople.ResponsiblePerson._
-import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths, formValues}
+import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.status.SubmissionReadyForReview
 import org.jsoup.Jsoup

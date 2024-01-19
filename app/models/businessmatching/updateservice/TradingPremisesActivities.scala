@@ -16,29 +16,10 @@
 
 package models.businessmatching.updateservice
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
-import utils.TraversableValidators.minLengthR
-
 
 case class TradingPremisesActivities(index: Set[Int])
 
 object TradingPremisesActivities {
-
-  import jto.validation.forms.Rules._
-  import utils.MappingUtils.Implicits._
-
-  implicit def formReads: Rule[UrlFormEncoded, TradingPremisesActivities] = From[UrlFormEncoded] { __ =>
-      (__ \ "tradingPremises")
-        .read(minLengthR[Set[Int]](1).withMessage("error.businessmatching.updateservice.tradingpremises"))
-        .flatMap(TradingPremisesActivities.apply)
-    }
-
-  implicit def formWrites(implicit w: Write[String, String]) = Write[TradingPremisesActivities, UrlFormEncoded] { data =>
-    Map("tradingPremises[]" -> data.index.toSeq.map(x => w.writes(x.toString)))
-  }
-
   implicit def format = Json.format[TradingPremisesActivities]
-
 }
