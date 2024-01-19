@@ -2787,7 +2787,7 @@ error.required.renewal.largest.amounts.country = Enter the countries you sent th
 
 renewal.customers.outside.uk.hint.lbl = Where did these customers live or work?
 
-survey.satisfaction.beforeyougo = Give feedback on the service
+survey.satisfaction.beforeyougo = What did you think of this service?
 
 ############################### Banners ###############################
 urr.title = Help improve GOV.UK

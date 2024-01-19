@@ -15,17 +15,11 @@
  *@
 
 @import config.ApplicationConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 
-@this(hmrcNewTabLinkHelper: HmrcNewTabLinkHelper)
+@this()
 
-@(linkText: String)(implicit messages: Messages, appConfig: ApplicationConfig)
+@()(implicit messages: Messages, appConfig: ApplicationConfig)
 
-@hmrcNewTabLinkHelper(
-    NewTabLinkHelper(
-        classList = Some("feedback-link"),
-        href = Some(appConfig.feedbackFrontendUrl),
-        text = messages(linkText)
-    )
-)
+<p class="govuk-body">
+    <a href="@appConfig.feedbackFrontendUrl" class="govuk-link">@messages("survey.satisfaction.beforeyougo")</a> (takes 30 seconds)
+</p>

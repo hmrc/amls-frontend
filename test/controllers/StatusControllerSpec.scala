@@ -449,6 +449,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         status(result) must be(OK)
 
         contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
+        contentAsString(result) must include(Messages("survey.satisfaction.beforeyougo"))
       }
 
       "application status is DeRegistered" in new Fixture {
@@ -471,6 +472,8 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
         status(result) must be(OK)
 
         contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
+        contentAsString(result) must include(Messages("survey.satisfaction.beforeyougo"))
+
       }
 
       "application status is RenewalSubmitted" in new Fixture {

@@ -38,7 +38,8 @@
     registrationStatus: Html,
     feeInformation: Option[Html],
     displayContactLink: Boolean = false,
-    withdrawOrDeregisterInformation: Html = HtmlFormat.empty
+    withdrawOrDeregisterInformation: Html = HtmlFormat.empty,
+    showFeedbackLink: Boolean = false
 )(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
 @layout(
@@ -121,9 +122,9 @@
         </div>
     </div>
 
-    <div class="no-print">
-        <p class="govuk-body">@feedbackSurveyLink("survey.satisfaction.beforeyougo")</p>
-    </div>
+    @if(showFeedbackLink) {
+        @feedbackSurveyLink()
+    }
 
     @printLink(linkId="status-submitted-print", gaTag=Some("status-submitted:click:print"))
 }

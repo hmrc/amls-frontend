@@ -16,6 +16,8 @@
 
 package views.confirmation
 
+import config.ApplicationConfig
+import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
@@ -27,10 +29,11 @@ class ConfirmationNoFeeViewSpec extends AmlsViewSpec with MustMatchers {
   trait ViewFixture extends Fixture {
     lazy val confirmation_no_fee = inject[ConfirmationNoFeeView]
     implicit val requestWithToken = addTokenForView()
+    implicit val config = app.injector.instanceOf[ApplicationConfig]
 
     val businessName = "Test Business Ltd"
 
-    override def view = confirmation_no_fee(Some(businessName))
+    override def view = confirmation_no_fee(Some(businessName))(requestWithToken, messages, config)
   }
 
   "The no fee confirmation view" must {
@@ -52,7 +55,7 @@ class ConfirmationNoFeeViewSpec extends AmlsViewSpec with MustMatchers {
 
     "not show the company name in the panel body if empty" in new ViewFixture {
 
-      override def view = confirmation_no_fee(None)
+      override def view = confirmation_no_fee(None)(requestWithToken, messages, config)
       assert(doc.select(".govuk-panel__body").text.isEmpty)
     }
 
@@ -78,6 +81,14 @@ class ConfirmationNoFeeViewSpec extends AmlsViewSpec with MustMatchers {
 
       button.text() mustBe messages("confirmation.payment.status_button.text")
       button.attr("href") mustBe controllers.routes.LandingController.get.url
+    }
+
+
+    "display the correct link" in new ViewFixture {
+      val link: Element = doc.getElementsByClass("govuk-link").get(2)
+
+      link.text() mustBe messages("survey.satisfaction.beforeyougo")
+      link.attr("href") mustBe config.feedbackFrontendUrl
     }
   }
 }
