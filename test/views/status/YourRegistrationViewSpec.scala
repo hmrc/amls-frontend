@@ -21,6 +21,7 @@ import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
 import models.status._
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
+import org.jsoup.nodes.Element
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import play.api.mvc.Call
@@ -120,7 +121,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with MustMatchers with AmlsR
         showFeedbackLink = true)
 
       val feedbackUrl = "/foo"
-      when(appConfig.feedbackFrontendUrl) thenReturn feedbackUrl
+      when(appConfig.logoutUrl) thenReturn feedbackUrl
 
       doc.getElementById("application-withdrawn-description-1").text() must be("You have withdrawn your application to register with HMRC.")
       doc.getElementById("application-withdrawn-description-2").text() must be("If the Money Laundering Regulations apply to your business, you need to be registered with an appropriate supervisory body.")
@@ -191,7 +192,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with MustMatchers with AmlsR
         showFeedbackLink = true)
 
       val feedbackUrl = "/foo"
-      when(appConfig.feedbackFrontendUrl) thenReturn feedbackUrl
+      when(appConfig.logoutUrl) thenReturn feedbackUrl
 
       doc.getElementById("application-deregistered-description-1").text() must be("You have deregistered your business.")
       doc.getElementById("application-deregistered-description-2").text() must be("If the Money Laundering Regulations apply to your business, you need to be registered with an appropriate supervisory body.")
@@ -200,7 +201,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with MustMatchers with AmlsR
       doc.getElementById("registration-status").html() must include("Not supervised. Deregistered on " + DateHelper.formatDate(deregistrationDate.value) + ".")
       doc.getElementById("new.application.button").html() must include("Start a new application")
       doc.getElementsMatchingOwnText("What did you think of this service?").attr("href") must be(feedbackUrl)
-    }
+      }
 
     "contain registration information for status SubmissionReady" in new ViewFixture {
 
@@ -441,7 +442,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with MustMatchers with AmlsR
       val feedbackUrl = "/foo"
 
       when(appConfig.contactHmrcLink) thenReturn contactUrl
-      when(appConfig.feedbackFrontendUrl) thenReturn feedbackUrl
+      when(appConfig.logoutUrl) thenReturn feedbackUrl
 
       val messagesCell = doc.getElementById("messages")
       messagesCell.getElementsByClass("hmrc-notification-badge").isEmpty must be(false)
