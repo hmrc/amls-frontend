@@ -67,7 +67,7 @@ class ConfirmationBacsViewSpec extends AmlsViewSpec with MustMatchers {
       val link: Element = doc.getElementsByClass("govuk-link").get(2)
 
       link.text() mustBe messages("survey.satisfaction.beforeyougo")
-      link.attr("href") mustBe config.feedbackFrontendUrl
+      link.attr("href") mustBe config.logoutUrl
     }
   }
 }
