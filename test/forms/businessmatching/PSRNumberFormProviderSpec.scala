@@ -88,7 +88,7 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours[BusinessAppliedFo
           forAll(numsLongerThan(formProvider.length + 1)) { longPsrNum =>
             val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> longPsrNum.toString))
             boundForm.errors.headOption shouldBe Some(
-              FormError(inputFieldName, "error.max.length.msb.psr.number", Seq(formProvider.length))
+              FormError(inputFieldName, "error.required.msb.psr.length", Seq(formProvider.length))
             )
           }
         }
@@ -98,7 +98,7 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours[BusinessAppliedFo
           forAll(numsShorterThan(formProvider.length - 1)) { shortPsrNum =>
             val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> shortPsrNum.toString))
             boundForm.errors.headOption shouldBe Some(
-              FormError(inputFieldName, "error.max.length.msb.psr.number", Seq(formProvider.length))
+              FormError(inputFieldName, "error.required.msb.psr.length", Seq(formProvider.length))
             )
           }
         }
