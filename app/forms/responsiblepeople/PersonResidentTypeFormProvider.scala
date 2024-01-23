@@ -17,7 +17,7 @@
 package forms.responsiblepeople
 
 import forms.mappings.Mappings
-import models.responsiblepeople.{KnownBy, NonUKResidence, PersonResidenceType, UKResidence}
+import models.responsiblepeople.{NonUKResidence, PersonResidenceType, UKResidence}
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import uk.gov.hmrc.domain.Nino

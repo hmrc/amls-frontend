@@ -307,7 +307,7 @@ class SubmissionServiceSpec extends AmlsSpec
         fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("10"))
       )
 
-      val result = await(submissionService.renewal("12345678", Some(amlsRegistrationNumber), ("accType", "id"), renewal))
+      await(submissionService.renewal("12345678", Some(amlsRegistrationNumber), ("accType", "id"), renewal))
 
       val captor = ArgumentCaptor.forClass(classOf[SubscriptionRequest])
       verify(submissionService.amlsConnector).renewal(captor.capture(), any(), any())(any(), any())
@@ -359,7 +359,7 @@ class SubmissionServiceSpec extends AmlsSpec
         receiveCashPayments = Some(CashPayments(CashPaymentsCustomerNotMet(true), Some(HowCashPaymentsReceived(PaymentMethods(true,true,Some("other"))))))
       )
 
-      val result = await(submissionService.renewalAmendment("12345678", Some(amlsRegistrationNumber), ("accType", "id"), renewal))
+      await(submissionService.renewalAmendment("12345678", Some(amlsRegistrationNumber), ("accType", "id"), renewal))
 
       val captor = ArgumentCaptor.forClass(classOf[SubscriptionRequest])
       verify(submissionService.amlsConnector).renewalAmendment(captor.capture(), any(), any())(any(), any())

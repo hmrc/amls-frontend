@@ -16,7 +16,6 @@
 
 package controllers.responsiblepeople.address
 
-import cats.implicits.catsSyntaxUFunctor
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.address.NewHomeAddressFormProvider

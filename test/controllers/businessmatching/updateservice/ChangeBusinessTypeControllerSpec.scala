@@ -17,7 +17,6 @@
 package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
-import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import forms.businessmatching.updateservice.ChangeBusinessTypesFormProvider
 import models.businessmatching._
@@ -69,11 +68,11 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with I
 
     when {
       bmService.getRemainingBusinessActivities(any())(any(), any())
-    } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+    } thenReturn OptionT.liftF[Future, Set[BusinessActivity]](Future.successful(Set(HighValueDealing)))
 
     when {
       controller.helper.removeFlowData(any())(any(), any())
-    } thenReturn OptionT.some[Future, RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel())
+    } thenReturn OptionT.liftF[Future, RemoveBusinessTypeFlowModel](Future.successful(RemoveBusinessTypeFlowModel()))
   }
 
   "ChangeServicesController" when {
@@ -99,7 +98,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with I
 
         when {
           bmService.getRemainingBusinessActivities(any())(any(), any())
-        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
+        } thenReturn OptionT.liftF[Future, Set[BusinessActivity]](Future.successful(Set.empty))
 
         val result = controller.get()(request)
 

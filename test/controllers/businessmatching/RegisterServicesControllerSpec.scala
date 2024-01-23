@@ -17,7 +17,6 @@
 package controllers.businessmatching
 
 import cats.data.OptionT
-import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import generators.ResponsiblePersonGenerator
@@ -39,7 +38,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils._
 
 import scala.concurrent.Future
@@ -91,7 +89,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
     when {
       controller.businessMatchingService.updateModel(any(), any())(any(), any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+    } thenReturn OptionT.liftF(Future.successful(mockCacheMap))
 
     when {
       controller.businessMatchingService.clearSection(any(), any())(any())
@@ -121,7 +119,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
         "shows empty fields" in new Fixture {
 
           when(controller.businessMatchingService.getModel(any())(any()))
-            .thenReturn(OptionT.some[Future, BusinessMatching](BusinessMatching()))
+            .thenReturn(OptionT.liftF(Future.successful(BusinessMatching())))
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -134,7 +132,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
           when {
             controller.businessMatchingService.getModel(any())(any())
-          } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
+          } thenReturn OptionT.liftF(Future.successful(businessMatching1))
 
           val result = controller.get()(request)
           status(result) must be(OK)
@@ -166,7 +164,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               )
 
             when(controller.businessMatchingService.getModel(any())(any()))
-              .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+              .thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
@@ -186,7 +184,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               )
 
             when(controller.businessMatchingService.getModel(any())(any()))
-              .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+              .thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -207,7 +205,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               )
 
             when(controller.businessMatchingService.getModel(any())(any()))
-              .thenReturn(OptionT.some[Future, BusinessMatching](bm))
+              .thenReturn(OptionT.liftF(Future.successful(bm)))
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -229,7 +227,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             )
 
           when(controller.businessMatchingService.getModel(any())(any()))
-            .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+            .thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -254,7 +252,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             )
 
           when(controller.businessMatchingService.getModel(any())(any()))
-            .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+            .thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           mockCacheFetch(Some(businessActivities), Some(BusinessActivities.key))
 
@@ -282,7 +280,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             )
 
           when(controller.businessMatchingService.getModel(any())(any()))
-            .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+            .thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           mockCacheFetch[BusinessActivities](None, Some(BusinessActivities.key))
 
@@ -327,7 +325,6 @@ class RegisterServicesControllerSpec extends AmlsSpec
             s"$act is contained in existing activities" in new Fixture {
 
               val activityData: Set[BusinessActivity] = Set(act)
-              val businessActivities = businessActivities1.copy(businessActivities = activityData, removeActivities = None, dateOfChange = None)
 
               val getActivityValues = PrivateMethod[Seq[BusinessActivity]]('getActivityValues)
 
@@ -351,7 +348,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[1]" -> "billPaymentServices"
             )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -366,7 +363,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[1]" -> "accountancyServices"
             )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -380,7 +377,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "trustAndCompanyServices"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -396,7 +393,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[2]" -> "trustAndCompanyServices"
             )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -413,7 +410,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[1]" -> "billPaymentServices"
             )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -428,7 +425,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[1]" -> "billPaymentServices"
             )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -444,7 +441,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[1]" -> "billPaymentServices"
             )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -463,7 +460,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[2]" -> "billPaymentServices"
             )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -480,7 +477,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[2]" -> "billPaymentServices"
             )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -497,7 +494,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[2]" -> "trustAndCompanyServices"
           )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -514,7 +511,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[2]" -> "trustAndCompanyServices"
             )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -531,7 +528,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[3]" -> "trustAndCompanyServices"
             )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -548,7 +545,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[2]" -> "trustAndCompanyServices"
             )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
@@ -564,7 +561,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[2]" -> "billPaymentServices"
             )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -583,7 +580,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
               "value[1]" -> "billPaymentServices"
             )
 
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -597,7 +594,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "billPaymentServices"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -611,7 +608,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "billPaymentServices"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -625,7 +622,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "billPaymentServices"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -639,7 +636,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "billPaymentServices"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -655,7 +652,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "billPaymentServices"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -669,7 +666,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "artMarketParticipant"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -683,7 +680,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "billPaymentServices"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -697,7 +694,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "billPaymentServices"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -711,7 +708,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "billPaymentServices"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -727,7 +724,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "accountancyServices"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -741,7 +738,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "estateAgentBusinessService"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -755,7 +752,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "highValueDealing"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -769,7 +766,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "moneyServiceBusiness"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -783,7 +780,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             .withFormUrlEncodedBody(
               "value[1]" -> "trustAndCompanyServices"
             )
-          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          when(controller.businessMatchingService.getModel(any())(any())).thenReturn(OptionT.liftF(Future.successful(businessMatchingWithData)))
 
           val result = controller.post()(newRequest)
 
@@ -825,7 +822,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         when {
           controller.businessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
+        } thenReturn OptionT.liftF(Future.successful(businessMatching1))
 
         when {
           controller.statusService.isPreSubmission(Some(any()), any(), any())(any(), any(), any())
@@ -852,7 +849,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         when {
           controller.businessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
+        } thenReturn OptionT.liftF(Future.successful(businessMatching1))
 
         when {
           controller.statusService.isPreSubmission(Some(any()), any(), any())(any(), any(), any())
@@ -881,7 +878,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         when {
           controller.businessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BMBusinessActivities(Set(HighValueDealing)))))
+        } thenReturn OptionT.liftF(Future.successful(BusinessMatching(None, Some(BMBusinessActivities(Set(HighValueDealing))))))
 
         mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePerson, responsiblePerson)), Some(ResponsiblePerson.key))
 
@@ -907,7 +904,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         when {
           controller.businessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness)))))
+        } thenReturn OptionT.liftF(Future.successful(BusinessMatching(None, Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))))))
 
         val postRequest = FakeRequest(POST, routes.RegisterServicesController.post().url)
           .withFormUrlEncodedBody(

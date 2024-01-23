@@ -16,10 +16,7 @@
 
 package models.responsiblepeople
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Path, Rule, Write}
-import models.FormTypes._
-import org.joda.time.{DateTimeFieldType, LocalDate}
+import org.joda.time.LocalDate
 import play.api.libs.json._
 import play.api.libs.json.JodaWrites._
 import play.api.libs.json.JodaReads._
@@ -28,28 +25,7 @@ case class NewHomeDateOfChange(dateOfChange: Option[LocalDate])
 
 object NewHomeDateOfChange {
 
-  val errorPath = Path \ "dateOfChange"
-
   val key = "new-home-date-of-change"
 
   implicit val format = Json.format[NewHomeDateOfChange]
-
-  val dateRule = newAllowedPastAndFutureDateRule("new.home.error.required.date",
-    "new.home.error.required.date.1900",
-    "new.home.error.required.date.future",
-    "new.home.error.required.date.fake")
-
-  implicit val formRule: Rule[UrlFormEncoded, NewHomeDateOfChange] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "dateOfChange").read(dateRule).map(date =>Some(date)) map NewHomeDateOfChange.apply
-  }
-
-  implicit val formWrites: Write[NewHomeDateOfChange, UrlFormEncoded] =
-    Write {
-      case NewHomeDateOfChange(b) => Map(
-        "dateOfChange.day" -> Seq(b.fold("")(_.get(DateTimeFieldType.dayOfMonth()).toString)),
-        "dateOfChange.month" -> Seq(b.fold("")(_.get(DateTimeFieldType.monthOfYear()).toString)),
-        "dateOfChange.year" -> Seq(b.fold("")(_.get(DateTimeFieldType.year()).toString))
-      )
-    }
 }

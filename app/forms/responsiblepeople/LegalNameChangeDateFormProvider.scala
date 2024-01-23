@@ -18,7 +18,6 @@ package forms.responsiblepeople
 
 import forms.mappings.Mappings
 import models.responsiblepeople.LegalNameChangeDate
-import models.supervision.SupervisionEnd
 import org.joda.time.LocalDate
 import play.api.data.Form
 

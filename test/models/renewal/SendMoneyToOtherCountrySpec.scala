@@ -16,41 +16,12 @@
 
 package models.renewal
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess}
 
 class SendMoneyToOtherCountrySpec extends PlaySpec {
 
   "SendMoneyToOtherCountry" should {
-
-    "Form Validation" must {
-
-      "Successfully read form data for option yes" in {
-
-        val map = Map("money" -> Seq("true"))
-
-        SendMoneyToOtherCountry.formRule.validate(map) must be(Valid(SendMoneyToOtherCountry(true)))
-      }
-
-      "Successfully read form data for option no" in {
-
-        val map = Map("money" -> Seq("false"))
-
-        SendMoneyToOtherCountry.formRule.validate(map) must be(Valid(SendMoneyToOtherCountry(false)))
-      }
-
-      "fail validation on missing field" in {
-
-        SendMoneyToOtherCountry.formRule.validate(Map.empty) must be(Invalid(
-          Seq( Path \ "money" -> Seq(ValidationError("error.required.renewal.send.money")))))
-      }
-
-      "successfully write form data" in {
-
-        SendMoneyToOtherCountry.formWrites.writes(SendMoneyToOtherCountry(false)) must be(Map("money" -> Seq("false")))
-      }
-    }
 
     "Json Validation" must {
 

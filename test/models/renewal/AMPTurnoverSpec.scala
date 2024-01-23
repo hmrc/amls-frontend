@@ -16,68 +16,14 @@
 
 package models.renewal
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import models.amp.Amp
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-import scala.collection.Seq
-
 class AMPTurnoverSpec extends PlaySpec {
 
   "AMPTurnover" should {
-    "Form Validation" must {
-
-      "successfully validate given an enum value" in {
-
-        AMPTurnover.formRule.validate(Map("percentageExpectedTurnover" -> Seq("01"))) must
-          be(Valid(AMPTurnover.First))
-
-        AMPTurnover.formRule.validate(Map("percentageExpectedTurnover" -> Seq("02"))) must
-          be(Valid(AMPTurnover.Second))
-
-        AMPTurnover.formRule.validate(Map("percentageExpectedTurnover" -> Seq("03"))) must
-          be(Valid(AMPTurnover.Third))
-
-        AMPTurnover.formRule.validate(Map("percentageExpectedTurnover" -> Seq("04"))) must
-          be(Valid(AMPTurnover.Fourth))
-
-        AMPTurnover.formRule.validate(Map("percentageExpectedTurnover" -> Seq("05"))) must
-          be(Valid(AMPTurnover.Fifth))
-
-      }
-
-      "write correct data from enum value" in {
-
-        AMPTurnover.formWrites.writes(AMPTurnover.First) must
-          be(Map("percentageExpectedTurnover" -> Seq("01")))
-
-        AMPTurnover.formWrites.writes(AMPTurnover.Second) must
-          be(Map("percentageExpectedTurnover" -> Seq("02")))
-
-        AMPTurnover.formWrites.writes(AMPTurnover.Third) must
-          be(Map("percentageExpectedTurnover" -> Seq("03")))
-
-        AMPTurnover.formWrites.writes(AMPTurnover.Fourth) must
-          be(Map("percentageExpectedTurnover" -> Seq("04")))
-
-        AMPTurnover.formWrites.writes(AMPTurnover.Fifth) must
-          be(Map("percentageExpectedTurnover" -> Seq("05")))
-
-      }
-
-
-      "throw error on invalid data" in {
-        AMPTurnover.formRule.validate(Map("percentageExpectedTurnover" -> Seq("20"))) must
-          be(Invalid(Seq((Path \ "percentageExpectedTurnover", Seq(ValidationError("error.invalid"))))))
-      }
-
-      "throw error on empty data" in {
-        AMPTurnover.formRule.validate(Map.empty) must
-          be(Invalid(Seq((Path \ "percentageExpectedTurnover", Seq(ValidationError("error.required.renewal.amp.percentage"))))))
-      }
-    }
 
     "JSON validation" must {
 

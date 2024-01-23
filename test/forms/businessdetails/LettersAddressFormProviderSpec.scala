@@ -18,7 +18,7 @@ package forms.businessdetails
 
 import forms.behaviours.BooleanFieldBehaviours
 import models.businessdetails.LettersAddress
-import play.api.data.{Form, FormError}
+import play.api.data.Form
 
 class LettersAddressFormProviderSpec extends BooleanFieldBehaviours[LettersAddress] {
 

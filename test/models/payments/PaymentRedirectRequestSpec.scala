@@ -19,8 +19,6 @@ package models.payments
 import config.ApplicationConfig
 import models.ReturnLocation
 import play.api.libs.json.Json
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
 import utils.AmlsSpec
 
 class PaymentRedirectRequestSpec extends AmlsSpec {
@@ -28,8 +26,6 @@ class PaymentRedirectRequestSpec extends AmlsSpec {
   "The PaymentRedirectRequest type" must {
 
     "serialize to the correct JSON format" in {
-
-      implicit val request = FakeRequest(GET, "http://localhost:9222/anti-money-laundering")
 
       val expectedJson = Json.obj(
         "reference" -> "some_reference",

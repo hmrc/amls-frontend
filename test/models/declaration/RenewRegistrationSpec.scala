@@ -16,44 +16,11 @@
 
 package models.declaration
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class RenewRegistrationSpec extends PlaySpec with MockitoSugar {
-  "Form Validation" must {
-    "successfully validate given an enum value" in {
-      val data = Map("renewRegistration" -> Seq("false"))
-
-      RenewRegistration.formRule.validate(data) must
-        be(Valid(RenewRegistrationNo))
-    }
-
-    "successfully validate given an `Yes` value" in {
-      val data = Map("renewRegistration" -> Seq("true"))
-
-      RenewRegistration.formRule.validate(data) must
-        be(Valid(RenewRegistrationYes))
-    }
-
-    "fail to validate mandatory field" in {
-      RenewRegistration.formRule.validate(Map.empty) must
-        be(Invalid(Seq(
-          (Path \ "renewRegistration") -> Seq(ValidationError("error.required.declaration.renew.registration"))
-        )))
-    }
-
-    "write correct data from enum value" in {
-      RenewRegistration.formWrites.writes(RenewRegistrationNo) must
-        be(Map("renewRegistration" -> Seq("false")))
-    }
-
-    "write correct data from `Yes` value" in {
-      RenewRegistration.formWrites.writes(RenewRegistrationYes) must
-        be(Map("renewRegistration" -> Seq("true")))
-    }
-  }
 
   "JSON validation" must {
     "successfully validate given an enum value" in {

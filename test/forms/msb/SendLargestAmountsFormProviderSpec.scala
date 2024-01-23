@@ -17,7 +17,7 @@
 package forms.msb
 
 import forms.behaviours.FieldBehaviours
-import models.moneyservicebusiness.{BranchesOrAgentsWhichCountries, SendTheLargestAmountsOfMoney}
+import models.moneyservicebusiness.SendTheLargestAmountsOfMoney
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 

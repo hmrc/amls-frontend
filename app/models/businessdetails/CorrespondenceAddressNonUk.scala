@@ -16,9 +16,6 @@
 
 package models.businessdetails
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, ValidationError, Write}
 import models.Country
 
 case class CorrespondenceAddressNonUk(
@@ -43,53 +40,5 @@ case class CorrespondenceAddressNonUk(
     ).flatten
 }
 
-object CorrespondenceAddressNonUk {
-  implicit val formRule: Rule[UrlFormEncoded, CorrespondenceAddressNonUk] = From[UrlFormEncoded] { __ =>
-
-      val validateCountry: Rule[Country, Country] = Rule.fromMapping[Country, Country] { country =>
-        country.code match {
-          case "GB" => Invalid(Seq(ValidationError(List("error.required.atb.letters.address.not.uk"))))
-          case _ => Valid(country)
-        }
-      }
-      import jto.validation.forms.Rules._
-      import models.FormTypes._
-      import utils.MappingUtils.Implicits._
-
-      val nameMaxLength = 140
-      val businessNameMaxLength = 120
-
-      val alternativeAddressNameType = notEmptyStrip andThen
-        nameRequired andThen
-        maxLength(nameMaxLength).withMessage("error.invalid.yourname") andThen
-        basicPunctuationPattern("error.invalid.yourname.validation")
-
-      val alternativeAddressTradingNameType = notEmptyStrip andThen
-        required("error.required.name.of.business") andThen
-        maxLength(businessNameMaxLength).withMessage("error.invalid.name.of.business") andThen
-        basicPunctuationPattern("error.invalid.name.of.business.validation")
-     (
-            (__ \ "yourName").read(alternativeAddressNameType) ~
-            (__ \ "businessName").read(alternativeAddressTradingNameType) ~
-            (__ \ "addressLineNonUK1").read(notEmpty.withMessage("error.required.address.line1") andThen validateAddress("line1")) ~
-            (__ \ "addressLineNonUK2").read(optionR(validateAddress("line2"))) ~
-            (__ \ "addressLineNonUK3").read(optionR(validateAddress("line3"))) ~
-            (__ \ "addressLineNonUK4").read(optionR(validateAddress("line4"))) ~
-            (__ \ "country").read(validateCountry)
-          )(CorrespondenceAddressNonUk.apply _)
-    }
-
-  implicit val formWrites = Write[CorrespondenceAddressNonUk, UrlFormEncoded] {
-    a: CorrespondenceAddressNonUk =>
-      Map(
-        "yourName" -> Seq(a.yourName),
-        "businessName" -> Seq(a.businessName),
-        "addressLineNonUK1" -> Seq(a.addressLineNonUK1),
-        "addressLineNonUK2" -> a.addressLineNonUK2.toSeq,
-        "addressLineNonUK3" -> a.addressLineNonUK3.toSeq,
-        "addressLineNonUK4" -> a.addressLineNonUK4.toSeq,
-        "country" -> Seq(a.country.code)
-      )
-  }
-}
+object CorrespondenceAddressNonUk
 

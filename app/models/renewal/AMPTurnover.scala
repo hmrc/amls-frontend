@@ -16,8 +16,6 @@
 
 package models.renewal
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
 import models.amp.Amp
 import models.{Enumerable, WithName}
 import play.api.libs.json._
@@ -45,28 +43,6 @@ object AMPTurnover extends Enumerable.Implicits {
   }
 
   import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, AMPTurnover] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "percentageExpectedTurnover").read[String].withMessage("error.required.renewal.amp.percentage") flatMap {
-      case "01" => First
-      case "02" => Second
-      case "03" => Third
-      case "04" => Fourth
-      case "05" => Fifth
-      case _ =>
-        (Path \ "percentageExpectedTurnover") -> Seq(ValidationError("error.invalid"))
-    }
-  }
-
-  implicit val formWrites: Write[AMPTurnover, UrlFormEncoded] = Write {
-    case First => "percentageExpectedTurnover" -> "01"
-    case Second => "percentageExpectedTurnover" -> "02"
-    case Third => "percentageExpectedTurnover" -> "03"
-    case Fourth => "percentageExpectedTurnover" -> "04"
-    case Fifth => "percentageExpectedTurnover" -> "05"
-
-  }
 
   implicit val jsonReads = {
     import play.api.libs.json.Reads.StringReads

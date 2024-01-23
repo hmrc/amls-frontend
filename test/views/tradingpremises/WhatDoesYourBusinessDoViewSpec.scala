@@ -16,7 +16,6 @@
 
 package views.tradingpremises
 
-import forms.EmptyForm
 import forms.tradingpremises.WhatDoesYourBusinessDoFormProvider
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities}
 import org.scalatest.MustMatchers
@@ -41,8 +40,6 @@ class WhatDoesYourBusinessDoViewSpec extends AmlsViewSpec with MustMatchers {
     val formValues = BusinessMatchingActivities.formValues()
 
     "have correct title, heading and load UI with empty form" in new ViewFixture {
-
-      val form2 = EmptyForm
 
       val pageTitle = messages("tradingpremises.whatdoesyourbusinessdo.title") + " - " +
         messages("summary.tradingpremises") + " - " +

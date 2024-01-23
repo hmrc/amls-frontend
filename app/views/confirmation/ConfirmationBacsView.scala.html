@@ -17,12 +17,14 @@
 @import config.ApplicationConfig
 @import views.html.components.Button
 @import views.html.confirmation.components.InformationNoticeView
+@import views.html.components.FeedbackSurveyLink
 
 @this(
     layout: Layout,
     govukPanel: GovukPanel,
     informationNotice: InformationNoticeView,
-    button: Button
+    button: Button,
+    feedbackSurveyLink: FeedbackSurveyLink
 )
 
 @(businessName: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
@@ -48,4 +50,7 @@
     @button(
         "confirmation.payment.continue_button.text", "payment-continue", Some(controllers.routes.LandingController.get.url)
     )
+
+    @feedbackSurveyLink()
+
 }

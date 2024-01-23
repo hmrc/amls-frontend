@@ -17,13 +17,9 @@
 package views.tradingpremises
 
 import forms.tradingpremises.AgentCompanyDetailsFormProvider
-import forms.{Form2, InvalidForm, ValidForm}
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
-import jto.validation.Path
-import jto.validation.ValidationError
 import models.tradingpremises.AgentCompanyDetails
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import views.Fixture
 import views.html.tradingpremises.AgentCompanyDetailsView

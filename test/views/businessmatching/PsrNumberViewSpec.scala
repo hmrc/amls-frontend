@@ -17,8 +17,6 @@
 package views.businessmatching
 
 import forms.businessmatching.PSRNumberFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
 import org.jsoup.nodes.Element
 import play.api.data.{Form, FormError}

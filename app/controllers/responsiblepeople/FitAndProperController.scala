@@ -19,14 +19,13 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.FitAndProperFormProvider
-import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
-import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
+import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.FitAndProperView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton

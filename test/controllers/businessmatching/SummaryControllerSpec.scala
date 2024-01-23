@@ -17,7 +17,6 @@
 package controllers.businessmatching
 
 import cats.data.OptionT
-import cats.implicits._
 import controllers.actions.SuccessfulAuthAction
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessActivity.EstateAgentBusinessService
@@ -69,7 +68,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
       controller.businessMatchingService.getModel(any())(any())
     } thenReturn {
       if (model.isDefined) {
-        OptionT.some[Future, BusinessMatching](model)
+        OptionT.liftF[Future, BusinessMatching](Future.successful(model))
       } else {
         OptionT.none[Future, BusinessMatching]
       }
@@ -77,7 +76,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
     def mockUpdateModel = when {
       controller.businessMatchingService.updateModel(any(), any())(any(), any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+    } thenReturn OptionT.liftF[Future, CacheMap](Future.successful(mockCacheMap))
   }
 
   "Get" must {

@@ -17,7 +17,7 @@
 package forms.declaration
 
 import forms.behaviours.StringFieldBehaviours
-import models.declaration.{BusinessNominatedOfficer, BusinessPartners}
+import models.declaration.BusinessPartners
 import play.api.data.FormError
 
 class BusinessPartnersFormProviderSpec extends StringFieldBehaviours {

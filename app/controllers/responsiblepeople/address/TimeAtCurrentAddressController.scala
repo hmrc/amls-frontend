@@ -22,7 +22,6 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.address.TimeAtAddressFormProvider
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
-import models.status.SubmissionStatus
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import services.StatusService
 import utils.{AuthAction, ControllerHelper, RepeatingSection}

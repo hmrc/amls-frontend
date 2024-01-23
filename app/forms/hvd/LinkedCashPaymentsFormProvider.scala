@@ -17,7 +17,7 @@
 package forms.hvd
 
 import forms.generic.BooleanFormProvider
-import models.hvd.{CashPaymentOverTenThousandEuros, LinkedCashPayments}
+import models.hvd.LinkedCashPayments
 import play.api.data.Form
 
 class LinkedCashPaymentsFormProvider extends BooleanFormProvider {

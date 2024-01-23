@@ -17,66 +17,20 @@
 package models.moneyservicebusiness
 
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess}
 
 class FXTransactionInNext12MonthsSpec extends PlaySpec {
 
-    "FXTransactionInNext12Months" should {
+  "FXTransactionInNext12Months" should {
 
-        "Form Validation" must {
+    "Json Validation" must {
 
-            "Successfully read form data for option yes" in {
+      "Successfully read/write Json data" in {
 
-                val map = Map("fxTransaction" -> Seq("12345678963"))
+        FXTransactionsInNext12Months.format.reads(FXTransactionsInNext12Months.format.writes(
+          FXTransactionsInNext12Months("12345678963"))) must be(JsSuccess(FXTransactionsInNext12Months("12345678963"), JsPath))
 
-                FXTransactionsInNext12Months.formRule.validate(map) must be(Valid(FXTransactionsInNext12Months("12345678963")))
-            }
-
-            "fail validation on missing field" in {
-
-                val map = Map("fxTransaction" -> Seq(""))
-
-                FXTransactionsInNext12Months.formRule.validate(map) must be(Invalid(
-                    Seq( Path \ "fxTransaction" -> Seq(ValidationError("error.required.msb.fx.transactions.in.12months")))))
-            }
-
-            "fail validation on invalid field" in {
-
-                val map = Map("fxTransaction" -> Seq("asas"))
-                FXTransactionsInNext12Months.formRule.validate(map) must be(Invalid(
-                    Seq( Path \ "fxTransaction" -> Seq(ValidationError("error.invalid.msb.fx.transactions.in.12months.number")))))
-            }
-
-            "fail validation on invalid field when it exceeds the max length" in {
-
-                val map = Map("fxTransaction" -> Seq("123"*10))
-                FXTransactionsInNext12Months.formRule.validate(map) must be(Invalid(
-                    Seq( Path \ "fxTransaction" -> Seq(ValidationError("error.invalid.msb.fx.transactions.in.12months")))))
-            }
-
-            "fail validation on invalid field1" in {
-
-                val map = Map("fxTransaction" -> Seq("123456"))
-                FXTransactionsInNext12Months.formRule.validate(map) must be(Valid(FXTransactionsInNext12Months("123456")))
-            }
-
-
-            "successfully write form data" in {
-
-                FXTransactionsInNext12Months.formWrites.writes(FXTransactionsInNext12Months("12345678963")) must be(Map("fxTransaction" -> Seq("12345678963")))
-            }
-        }
-
-        "Json Validation" must {
-
-            "Successfully read/write Json data" in {
-
-                FXTransactionsInNext12Months.format.reads(FXTransactionsInNext12Months.format.writes(
-                    FXTransactionsInNext12Months("12345678963"))) must be(JsSuccess(FXTransactionsInNext12Months("12345678963"), JsPath))
-
-            }
-        }
+      }
     }
+  }
 }

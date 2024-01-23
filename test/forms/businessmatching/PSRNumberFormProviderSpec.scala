@@ -17,13 +17,13 @@
 package forms.businessmatching
 
 import forms.behaviours.BooleanFieldBehaviours
+import forms.mappings.Constraints
 import generators.BaseGenerator
-import models.FormTypes.numbersOnlyRegex
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
-class PSRNumberFormProviderSpec extends BooleanFieldBehaviours[BusinessAppliedForPSRNumber] with BaseGenerator {
+class PSRNumberFormProviderSpec extends BooleanFieldBehaviours[BusinessAppliedForPSRNumber] with BaseGenerator with Constraints {
 
   val formProvider: PSRNumberFormProvider = new PSRNumberFormProvider()
   override val form: Form[BusinessAppliedForPSRNumber] = formProvider()
@@ -108,7 +108,7 @@ class PSRNumberFormProviderSpec extends BooleanFieldBehaviours[BusinessAppliedFo
           forAll(numSequence(formProvider.length).suchThat(_.length == formProvider.length), Gen.alphaChar) { (psrNum, char) =>
             val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> s"${psrNum.dropRight(1)}$char"))
             boundForm.errors.headOption shouldBe Some(
-              FormError(inputFieldName, "error.max.msb.psr.number.format", Seq(numbersOnlyRegex.regex))
+              FormError(inputFieldName, "error.max.msb.psr.number.format", Seq(numbersOnlyRegex))
             )
           }
         }

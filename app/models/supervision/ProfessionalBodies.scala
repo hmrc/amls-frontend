@@ -16,11 +16,6 @@
 
 package models.supervision
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.forms.Rules.{maxLength, notEmpty, minLength => _, _}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Path, Rule, ValidationError, Write}
-import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
 import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import play.api.libs.json.Reads.StringReads
@@ -28,7 +23,6 @@ import play.api.libs.json._
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
-import utils.TraversableValidators.minLengthR
 
 sealed trait BusinessType {
   val value: String
@@ -138,63 +132,6 @@ object ProfessionalBodies extends Enumerable.Implicits {
   }
 
   implicit val enumerable: Enumerable[BusinessType] = Enumerable(all.map(v => v.toString -> v): _*)
-
-  import utils.MappingUtils.Implicits._
-
-  val maxSpecifyDetailsLength = 255
-  val specifyOtherType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.supervision.business.details") andThen
-    maxLength(maxSpecifyDetailsLength).withMessage("error.invalid.supervision.business.details.length.255") andThen
-    basicPunctuationPattern().withMessage("error.invalid.supervision.business.details")
-
-  def stringToRule(businessType: BusinessType): Rule[UrlFormEncoded, BusinessType] =
-    Rule[UrlFormEncoded, BusinessType](_ => Valid(businessType))
-
-  implicit val formRule: Rule[UrlFormEncoded, ProfessionalBodies] = From[UrlFormEncoded] { __ =>
-    (__ \ "businessType").read(minLengthR[Set[String]](1).withMessage("error.required.supervision.one.professional.body")) flatMap { setOfStrings =>
-      setOfStrings.map {
-        case "01" => stringToRule(AccountingTechnicians)
-        case "02" => stringToRule(CharteredCertifiedAccountants)
-        case "03" => stringToRule(InternationalAccountants)
-        case "04" => stringToRule(TaxationTechnicians)
-        case "05" => stringToRule(ManagementAccountants)
-        case "06" => stringToRule(InstituteOfTaxation)
-        case "07" => stringToRule(Bookkeepers)
-        case "08" => stringToRule(AccountantsIreland)
-        case "09" => stringToRule(AccountantsScotland)
-        case "10" => stringToRule(AccountantsEnglandandWales)
-        case "11" => stringToRule(FinancialAccountants)
-        case "12" => stringToRule(AssociationOfBookkeepers)
-        case "13" => stringToRule(LawSociety)
-        case "14" =>
-          (__ \ "specifyOtherBusiness").read(specifyOtherType) map Other.apply
-        case _ =>
-          Rule[UrlFormEncoded, BusinessType] { _ =>
-            Invalid(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid"))))
-          }
-      }.foldLeft[Rule[UrlFormEncoded, Set[BusinessType]]](
-        Rule[UrlFormEncoded, Set[BusinessType]](_ => Valid(Set.empty))
-      ) {
-        case (start, businessTypeRule) =>
-          businessTypeRule flatMap { businessType =>
-            start map { businessTypes =>
-              businessTypes + businessType
-            }
-          }
-      } map ProfessionalBodies.apply
-    }
-  }
-
-  implicit def formWrites = Write[ProfessionalBodies, UrlFormEncoded] { businessTypes =>
-    Map(
-      "businessType[]" -> (businessTypes.businessTypes map {
-        _.value
-      }).toSeq
-    ) ++ businessTypes.businessTypes.foldLeft[UrlFormEncoded](Map.empty) {
-      case (form, Other(name)) => form ++ Map("specifyOtherBusiness" -> Seq(name))
-      case (form, _) => form
-    }
-  }
 
   def stringToReader(businessType: BusinessType): Reads[BusinessType] =
     Reads(_ => JsSuccess(businessType)) map identity[BusinessType]

@@ -16,7 +16,6 @@
 
 package views.businessactivities
 
-import forms.EmptyForm
 import forms.businessactivities.InvolvedInOtherFormProvider
 import org.scalatest.MustMatchers
 import play.api.data.FormError
@@ -40,8 +39,6 @@ class InvolvedInOtherNameViewSpec extends AmlsViewSpec with MustMatchers {
 
   "involved_in_other_name view" must {
     "have correct title" in new ViewFixture {
-
-      val form2 = EmptyForm
 
       def view = name(formProvider(), true, None, formProvider.length)
 

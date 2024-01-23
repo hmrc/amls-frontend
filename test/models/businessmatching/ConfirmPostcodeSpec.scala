@@ -16,7 +16,6 @@
 
 package models.businessmatching
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
@@ -24,33 +23,6 @@ import play.api.libs.json.{JsPath, JsSuccess, Json}
 class ConfirmPostcodeSpec extends PlaySpec with MockitoSugar {
 
   "ConfirmPostcode" must {
-
-    "Form Validation" must {
-
-      "successfully validate" when {
-        "given a correct numeric value with 8 digits" in {
-          val data = Map("postCode" -> Seq("AA11AA"))
-          val result = ConfirmPostcode.formReads.validate(data)
-          result mustBe Valid(ConfirmPostcode("AA11AA"))
-        }
-      }
-
-      "fail validation" when {
-        "missing a mandatory field represented by an empty string" in {
-          val result = ConfirmPostcode.formReads.validate(Map("postCode" -> Seq("")))
-          result mustBe Invalid(Seq((Path \ "postCode") -> Seq(ValidationError("businessmatching.confirm.postcode.error.empty"))))
-        }
-        "missing a mandatory field represented by an empty Map" in {
-          val result = ConfirmPostcode.formReads.validate(Map.empty)
-          result mustBe Invalid(Seq((Path \ "postCode") -> Seq(ValidationError("error.required"))))
-        }
-      }
-
-      "write correct data from correct value" in {
-        val result = ConfirmPostcode.formWrites.writes(ConfirmPostcode("AA11AA"))
-        result must be(Map("postCode" -> Seq("AA11AA")))
-      }
-    }
 
     "Json validation" must {
       "READ the JSON successfully and return the domain Object" in {
@@ -65,7 +37,6 @@ class ConfirmPostcodeSpec extends PlaySpec with MockitoSugar {
         ConfirmPostcode.format.reads(ConfirmPostcode.format.writes(postCode)) must
           be(JsSuccess(postCode, JsPath))
       }
-
     }
   }
 }

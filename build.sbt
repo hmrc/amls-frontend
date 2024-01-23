@@ -38,7 +38,6 @@ lazy val microservice = Project(appName, file("."))
   .settings(majorVersion := 4)
   .settings(playSettings ++ scoverageSettings : _*)
   .settings(scalaSettings: _*)
-  .settings(publishingSettings: _*)
   .settings(defaultSettings(): _*)
   .settings(scalaVersion := "2.12.13")
   .settings(routesImport += "models.notifications.ContactType._")
@@ -71,6 +70,7 @@ lazy val microservice = Project(appName, file("."))
     IntegrationTest / parallelExecution := false)
  .settings(
     scalacOptions ++= List(
+      "-Ypartial-unification",
       "-Yrangepos",
       "-Xlint:-missing-interpolator,_",
       "-Yno-adapted-args",

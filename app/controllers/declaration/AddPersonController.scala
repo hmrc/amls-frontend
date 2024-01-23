@@ -19,15 +19,12 @@ package controllers.declaration
 import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms.InvalidForm
 import forms.declaration.AddPersonFormProvider
-import jto.validation.{Path, ValidationError}
-import models.businessmatching.{BusinessMatching, BusinessType}
+import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7._
 import models.status._
 import play.api.data.Form
-import play.api.i18n.Messages
 import play.api.mvc._
 import services.StatusService
 import utils.{AuthAction, ControllerHelper}

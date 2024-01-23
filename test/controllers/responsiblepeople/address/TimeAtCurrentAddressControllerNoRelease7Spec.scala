@@ -24,7 +24,6 @@ import models.responsiblepeople._
 import models.status.SubmissionDecisionApproved
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import play.api.test
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService

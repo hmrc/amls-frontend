@@ -16,66 +16,19 @@
 
 package models.businessdetails
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{Path, ValidationError}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.libs.json.Json
 
 class LettersAddressSpec extends PlaySpec with MockitoSugar {
   "LettersAddressSpec" must {
 
-    "successfully validate" when {
-      "given a 'true' value" in {
+    "round trip through JSON" in {
+      val trueModel = LettersAddress(true)
+      val falseModel = LettersAddress(false)
 
-        val data = Map(
-          "lettersAddress" -> Seq("true")
-        )
-
-        LettersAddress.formRule.validate(data) must
-          be(Valid(LettersAddress(true)))
-      }
-
-      "given a 'false' value" in {
-
-        val data = Map(
-          "lettersAddress" -> Seq("false")
-        )
-
-        LettersAddress.formRule.validate(data) must
-          be(Valid(LettersAddress(false)))
-      }
-    }
-
-    "fail validation" when {
-      "given missing data represented by an empty Map" in {
-
-        LettersAddress.formRule.validate(Map.empty) must
-          be(Invalid(Seq(
-            (Path \ "lettersAddress") -> Seq(ValidationError("error.required.atb.lettersaddress"))
-          )))
-      }
-
-      "given missing data represented by an empty string" in {
-
-        val data = Map(
-          "lettersAddress" -> Seq("")
-        )
-
-        LettersAddress.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "lettersAddress") -> Seq(ValidationError("error.required.atb.lettersaddress"))
-          )))
-      }
-    }
-
-    "write correct data" in {
-
-      val model = LettersAddress(true)
-
-      LettersAddress.formWrites.writes(model) must
-        be(Map(
-          "lettersAddress" -> Seq("true")
-        ))
+      Json.toJson(trueModel).as[LettersAddress] mustBe trueModel
+      Json.toJson(falseModel).as[LettersAddress] mustBe falseModel
     }
   }
 }

@@ -17,9 +17,6 @@
 package views.responsiblepeople.address
 
 import forms.responsiblepeople.address.AdditionalAddressNonUKFormProvider
-import forms.{EmptyForm, InvalidForm}
-import jto.validation.{Path, ValidationError}
-import models.autocomplete.NameValuePair
 import org.scalatest.MustMatchers
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem

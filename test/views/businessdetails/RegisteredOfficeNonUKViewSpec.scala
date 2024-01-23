@@ -17,12 +17,9 @@
 package views.businessdetails
 
 import forms.businessdetails.RegisteredOfficeNonUkFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
 import models.businessdetails.{RegisteredOffice, RegisteredOfficeUK}
 import org.scalatest.MustMatchers
 import play.api.data.Form
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture

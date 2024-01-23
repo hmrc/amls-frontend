@@ -16,8 +16,8 @@
 
 package forms.responsiblepeople
 
-import forms.mappings.{AddressMappings, Mappings}
-import models.responsiblepeople.{CountryOfBirth, NoPassport, NonUKPassport, NonUKPassportYes}
+import forms.mappings.Mappings
+import models.responsiblepeople.{NoPassport, NonUKPassport, NonUKPassportYes}
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue

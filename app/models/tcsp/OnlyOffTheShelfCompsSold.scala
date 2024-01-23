@@ -16,28 +16,11 @@
 
 package models.tcsp
 
-import jto.validation.forms.UrlFormEncoded
-
 sealed trait OnlyOffTheShelfCompsSold
 case object OnlyOffTheShelfCompsSoldYes extends OnlyOffTheShelfCompsSold
 case object OnlyOffTheShelfCompsSoldNo extends OnlyOffTheShelfCompsSold
 
 object OnlyOffTheShelfCompsSold {
-  import jto.validation._
-  import utils.MappingUtils.Implicits._
-
-  implicit val formReads: Rule[UrlFormEncoded, OnlyOffTheShelfCompsSold] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "onlyOffTheShelfCompsSold").read[Boolean].withMessage("error.required.tcsp.off.the.shelf.companies") map {
-      case true => OnlyOffTheShelfCompsSoldYes
-      case false  => OnlyOffTheShelfCompsSoldNo
-    }
-  }
-
-  implicit val formWrites: Write[OnlyOffTheShelfCompsSold, UrlFormEncoded] = Write {
-    case OnlyOffTheShelfCompsSoldYes => "onlyOffTheShelfCompsSold" -> "true"
-    case OnlyOffTheShelfCompsSoldNo => "onlyOffTheShelfCompsSold" -> "false"
-  }
 
   import play.api.libs.json._
   import play.api.libs.json.Reads._

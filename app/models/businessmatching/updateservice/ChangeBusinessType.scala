@@ -16,8 +16,6 @@
 
 package models.businessmatching.updateservice
 
-import jto.validation.forms.Rules._
-import jto.validation.forms.UrlFormEncoded
 import models.{Enumerable, WithName}
 
 sealed trait ChangeBusinessType
@@ -30,15 +28,4 @@ object ChangeBusinessType extends Enumerable.Implicits {
   val all: Seq[ChangeBusinessType] = Seq(Add, Remove)
 
   implicit val enumerable: Enumerable[ChangeBusinessType] = Enumerable(all.map(v => v.toString -> v): _*)
-
-  import jto.validation._
-  import utils.MappingUtils.Implicits._
-
-  implicit val formReads: Rule[UrlFormEncoded, ChangeBusinessType] = From[UrlFormEncoded] { __ =>
-    (__ \ "changeServices").read[String].withMessage("error.businessmatching.updateservice.changeservices") map {
-      case "add" => Add
-      case "remove" => Remove
-    }
-  }
-
 }

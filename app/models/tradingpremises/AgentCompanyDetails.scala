@@ -16,10 +16,6 @@
 
 package models.tradingpremises
 
-import models.FormTypes._
-import jto.validation._
-import jto.validation.forms.Rules._
-import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 import typeclasses.MongoKey
 
@@ -30,36 +26,8 @@ object AgentCompanyDetails {
   def apply(agentCompanyName: String, companyRegistrationNumber: String): AgentCompanyDetails =
     new AgentCompanyDetails(agentCompanyName, Some(companyRegistrationNumber))
 
-  import utils.MappingUtils.Implicits._
-
-  val maxAgentRegisteredCompanyNameLength = 140
-  val maxAgentRegisteredCompanyNumberLength = 8
-  val agentsCompanyDetailsType: Rule[String, String] =
-    notEmptyStrip andThen notEmpty.withMessage("error.required.tp.agent.company.details") andThen
-      maxLength(maxAgentRegisteredCompanyNameLength).withMessage("error.invalid.tp.agent.company.details") andThen
-      regexWithMsg(basicPunctuationRegex, "error.invalid.char.tp.agent.company.details")
-
-  val agentsRegisteredCompanyCRNType: Rule[String, String] =
-    notEmpty.withMessage("error.required.to.agent.company.reg.number") andThen
-      maxLength(maxAgentRegisteredCompanyNumberLength).withMessage("error.size.to.agent.company.reg.number") andThen
-      minLength(maxAgentRegisteredCompanyNumberLength).withMessage("error.size.to.agent.company.reg.number") andThen
-      regexWithMsg(crnNumberRegex, "error.char.to.agent.company.reg.number")
-
   implicit val mongoKey = new MongoKey[AgentCompanyDetails] {
     override def apply(): String = "agent-company-name"
-  }
-
-  implicit val formReads: Rule[UrlFormEncoded, AgentCompanyDetails] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (
-      (__ \ "agentCompanyName").read(agentsCompanyDetailsType) ~
-        (__ \ "companyRegistrationNumber").read(agentsRegisteredCompanyCRNType)
-      ) (AgentCompanyDetails(_, _))
-  }
-
-  implicit val formWrites: Write[AgentCompanyDetails, UrlFormEncoded] = Write {
-    case AgentCompanyDetails(name, Some(crn)) => Map("agentCompanyName" -> Seq(name), "companyRegistrationNumber" -> Seq(crn))
-    case AgentCompanyDetails(name, _) => Map("agentCompanyName" -> Seq(name))
   }
 
   implicit val reads: Reads[AgentCompanyDetails] = {

@@ -17,16 +17,15 @@
 package controllers.responsiblepeople
 
 import controllers.actions.SuccessfulAuthAction
-import forms.responsiblepeople.PersonNameFormProvider
-import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import utils.{AmlsSpec, DependencyMocks}
 import play.api.test.Helpers._
 import play.api.test.Injecting
+import utils.{AmlsSpec, DependencyMocks}
 import views.html.responsiblepeople.WhatYouNeedView
 
 import scala.concurrent.Future

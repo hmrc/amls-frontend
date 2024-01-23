@@ -18,15 +18,18 @@ package views.confirmation
 
 import generators.PaymentGenerator
 import models.confirmation.Currency
+import org.jsoup.nodes.Element
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.confirmation.ConfirmationRenewalView
+import config.ApplicationConfig
 
 class ConfirmationRenewalViewSpec extends AmlsViewSpec with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
     lazy val confirm_renewal = inject[ConfirmationRenewalView]
     implicit val requestWithToken = addTokenForView()
+    implicit val config = app.injector.instanceOf[ApplicationConfig]
 
     val continueHref = "http://google.co.uk"
 
@@ -34,7 +37,7 @@ class ConfirmationRenewalViewSpec extends AmlsViewSpec with PaymentGenerator {
       Some(paymentReferenceNumber),
       Currency(150),
       continueHref
-    )
+    )(requestWithToken, messages, config)
   }
 
   "The renewal confirmation view" must {

@@ -24,7 +24,6 @@ import models.businessmatching.BusinessMatching
 import models.responsiblepeople.ResponsiblePerson
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.twirl.api.utils.StringEscapeUtils
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.CharacterCountParser.cleanData
 import utils.{AuthAction, ControllerHelper, RepeatingSection}

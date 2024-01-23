@@ -19,14 +19,13 @@ package controllers.tcsp
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.tcsp.OnlyOffTheShelfCompsSoldFormProvider
-import models.tcsp._
 import models.tcsp.ProvidedServices._
 import models.tcsp.TcspTypes._
+import models.tcsp._
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.test
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap

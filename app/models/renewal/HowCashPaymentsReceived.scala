@@ -16,8 +16,6 @@
 
 package models.renewal
 
-import play.api.libs.json._
-
 case class HowCashPaymentsReceived(paymentMethods: PaymentMethods)
 
 object HowCashPaymentsReceived

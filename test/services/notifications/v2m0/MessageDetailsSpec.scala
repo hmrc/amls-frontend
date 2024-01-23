@@ -317,7 +317,6 @@ class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
         "content message is ETMP markdown" in new Fixture {
 
           val message = "<P># Test Heading</P><P>* bullet 1</P><P>* bullet 2</P><P>* bullet 3</P>"
-          val messageResult = """<P class="govuk-body"># Test Heading</P><P class="govuk-body">* bullet 1</P><P class="govuk-body">* bullet 2</P><P class="govuk-body">* bullet 3</P>"""
 
           when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(NotificationDetails(

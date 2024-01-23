@@ -64,10 +64,6 @@ trait ResponsiblePeopleValues extends NinoUtil {
 
   object NewValues {
 
-    private val residenceYear = 1990
-    private val residenceMonth = 2
-    private val residenceDay = 24
-    private val residenceDate = new LocalDate(residenceYear, residenceMonth, residenceDay)
     private val residence = UKResidence(Nino(nino))
     private val residenceCountry = Country("United Kingdom", "GB")
     private val residenceNationality = Country("United Kingdom", "GB")

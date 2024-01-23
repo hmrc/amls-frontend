@@ -21,9 +21,6 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.CommonPlayDependencies
 import forms.bankdetails.BankAccountIBANNumberFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import javax.inject.{Inject, Singleton}
-import models.bankdetails.Account._
 import models.bankdetails.{BankAccount, BankDetails, NonUKIBANNumber}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
@@ -31,6 +28,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{AuthAction, StatusConstants}
 import views.html.bankdetails.BankAccountIBANNumberView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton

@@ -16,9 +16,6 @@
 
 package models
 
-import jto.validation._
-import jto.validation.ValidationError
-import cats.data.Validated.{Invalid, Valid}
 import play.api.libs.json._
 
 case class Country(name: String, code: String) {
@@ -50,30 +47,5 @@ object Country {
       }
     case _ =>
       JsError(JsPath -> play.api.libs.json.JsonValidationError("error.invalid"))
-  }
-
-  implicit val formWrites: Write[Country, String] =
-    Write { _.code }
-
-  implicit val formRule: Rule[String, Country] =
-    Rule {
-      case "" => Invalid(Seq(Path -> Seq(ValidationError("error.required.country"))))
-      case code =>
-        countries.collectFirst {
-          case e @ Country(_, c) if c == code =>
-            Valid(e)
-        } getOrElse {
-          Invalid(Seq(Path -> Seq(ValidationError("error.invalid.country"))))
-        }
-    }
-
-  implicit val jsonW: Write[Country, JsValue] = {
-    import jto.validation.playjson.Writes.string
-    formWrites andThen string
-  }
-
-  implicit val jsonR: Rule[JsValue, Country] = {
-    import jto.validation.playjson.Rules.stringR
-    stringR andThen formRule
   }
 }

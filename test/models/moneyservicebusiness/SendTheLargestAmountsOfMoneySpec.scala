@@ -16,8 +16,6 @@
 
 package models.moneyservicebusiness
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{Invalid, Path, Rule, VA, Valid, ValidationError, Write}
 import models.Country
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
@@ -26,9 +24,6 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
 
 
   "SendTheLargestAmountsOfMoney" must {
-
-    val rule: Rule[UrlFormEncoded, SendTheLargestAmountsOfMoney] = implicitly
-    val write: Write[SendTheLargestAmountsOfMoney, UrlFormEncoded] = implicitly
 
     "roundtrip through json" in {
 
@@ -43,88 +38,6 @@ class SendTheLargestAmountsOfMoneySpec extends PlaySpec {
       val expected = SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB"), Country("India", "IN")))
 
       Json.fromJson[SendTheLargestAmountsOfMoney](json) mustEqual JsSuccess(expected)
-    }
-
-    "roundtrip through forms" in {
-
-      val model: SendTheLargestAmountsOfMoney =
-        SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))
-
-      rule.validate(write.writes(model)) mustEqual Valid(model)
-    }
-
-    "fail to validate when there are no countries" in {
-
-      val form: UrlFormEncoded = Map(
-        "largestAmountsOfMoney" -> Seq.empty
-      )
-
-      rule.validate(form) mustEqual Invalid(
-        Seq((Path \ "largestAmountsOfMoney") -> Seq(ValidationError("error.invalid.countries.msb.sendlargestamount.country")))
-      )
-    }
-
-    "fail to validate when there are more than 3 countries" in {
-
-      // scalastyle:off magic.number
-      val form: UrlFormEncoded = Map(
-        "largestAmountsOfMoney[]" -> Seq.fill(4)("GB")
-      )
-
-      rule.validate(form) mustEqual Invalid(
-        Seq((Path \ "largestAmountsOfMoney") -> Seq(ValidationError("error.maxLength", 3)))
-      )
-    }
-  }
-
-  "SendTheLargestAmountsOfMoney Form Writes" when {
-    "an item is repeated" must {
-      "serialise all items correctly" in {
-        SendTheLargestAmountsOfMoney.formW.writes(SendTheLargestAmountsOfMoney(List(
-          Country("Country2", "BB"),
-          Country("Country1", "AA"),
-          Country("Country1", "AA")
-        ))) must be (
-          Map(
-            "largestAmountsOfMoney[0]" -> List("BB"),
-            "largestAmountsOfMoney[1]" -> List("AA"),
-            "largestAmountsOfMoney[2]" -> List("AA")
-          )
-        )
-      }
-    }
-  }
-
-  "SendTheLargestAmountsOfMoney Form Reads" when {
-    "all countries are valid" must {
-      "Successfully read from the form" in {
-
-        SendTheLargestAmountsOfMoney.formR.validate(
-          Map(
-            "largestAmountsOfMoney[0]" -> Seq("GB"),
-            "largestAmountsOfMoney[1]" -> Seq("FR"),
-            "largestAmountsOfMoney[2]" -> Seq("JO")
-          )
-        ) must be(Valid(SendTheLargestAmountsOfMoney(Seq(
-          Country("United Kingdom", "GB"),
-          Country("France", "FR"),
-          Country("Jordan", "JO")
-        ))))
-      }
-    }
-
-    "the second country is invalid" must {
-      "fail validation" in {
-
-        val x: VA[SendTheLargestAmountsOfMoney] = SendTheLargestAmountsOfMoney.formR.validate(
-          Map(
-            "largestAmountsOfMoney[0]" -> Seq("GB"),
-            "largestAmountsOfMoney[1]" -> Seq("hjjkhjkjh"),
-            "largestAmountsOfMoney[2]" -> Seq("FR")
-          )
-        )
-        x must be (Invalid(Seq((Path \ "largestAmountsOfMoney" \ 1) -> Seq(ValidationError("error.invalid.country")))))
-      }
     }
   }
 }

@@ -16,13 +16,9 @@
 
 package models.tcsp
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation._
-import jto.validation.forms.Rules.{minLength => _, _}
 import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.{CheckboxItem, Text}
-import utils.TraversableValidators.minLengthR
 
 case class TcspTypes(serviceProviders: Set[ServiceProvider])
 
@@ -71,47 +67,6 @@ object TcspTypes extends Enumerable.Implicits {
 
   implicit val enumerable: Enumerable[ServiceProvider] = Enumerable(all.map(v => v.toString -> v): _*)
 
-  import utils.MappingUtils.Implicits._
-  import cats.data.Validated.{Invalid, Valid}
-
-  implicit val formReads: Rule[UrlFormEncoded, TcspTypes] = {
-    From[UrlFormEncoded] { __ =>
-      (__ \ "serviceProviders").read(minLengthR[Set[String]](1).withMessage("error.required.tcsp.service.providers")) flatMap { service =>
-        service.map {
-          case "01" => Rule[UrlFormEncoded, ServiceProvider](_ => Valid(NomineeShareholdersProvider))
-          case "02" => Rule[UrlFormEncoded, ServiceProvider](_ => Valid(TrusteeProvider))
-          case "03" => Rule[UrlFormEncoded, ServiceProvider](_ => Valid(RegisteredOfficeEtc))
-          case "04" => Rule[UrlFormEncoded, ServiceProvider](_ => Valid(CompanyDirectorEtc))
-          case "05" => Rule[UrlFormEncoded, ServiceProvider](_ => Valid(CompanyFormationAgent))
-          case _ =>
-            Rule[UrlFormEncoded, ServiceProvider] { _ =>
-              Invalid(Seq((Path \ "serviceProviders") -> Seq(jto.validation.ValidationError("error.invalid"))))
-            }
-        }.foldLeft[Rule[UrlFormEncoded, Set[ServiceProvider]]](
-          Rule[UrlFormEncoded, Set[ServiceProvider]](_ => Valid(Set.empty))
-        ) {
-          case (m, n) =>
-            n flatMap { x =>
-              m map {
-                _ + x
-              }
-            }
-        } map TcspTypes.apply
-      }
-    }
-  }
-
-  implicit def formWrites = Write[TcspTypes, UrlFormEncoded] {
-    case TcspTypes(services) =>
-      Map(
-        "serviceProviders[]" -> (services map { _.value }).toSeq
-      ) ++ services.foldLeft[UrlFormEncoded](Map.empty) {
-        case (m, _) =>
-          m
-      }
-  }
-
-  import play.api.libs.json.JsonValidationError
   import play.api.libs.json._
 
   implicit val jsonReads: Reads[TcspTypes] = {

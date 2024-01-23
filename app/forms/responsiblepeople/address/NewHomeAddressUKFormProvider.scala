@@ -17,7 +17,7 @@
 package forms.responsiblepeople.address
 
 import forms.generic.AddressFormProvider
-import models.responsiblepeople.{NewHomeAddress, PersonAddressUK, ResponsiblePersonCurrentAddress}
+import models.responsiblepeople.{NewHomeAddress, PersonAddressUK}
 import play.api.data.Form
 
 import javax.inject.Inject

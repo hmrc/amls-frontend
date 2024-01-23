@@ -16,14 +16,9 @@
 
 package models.tradingpremises
 
-import models.{DateOfChange, FormTypes}
+import models.DateOfChange
 import org.joda.time.LocalDate
-import jto.validation.forms.Rules._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation._
-import models.FormTypes.{basicPunctuationRegex, regexWithMsg}
 import play.api.libs.json.{Reads, Writes}
-import utils.MappingUtils.Implicits._
 
 case class YourTradingPremises(
                                 tradingName: String,
@@ -35,14 +30,8 @@ case class YourTradingPremises(
 
 object YourTradingPremises {
   
-  import play.api.libs.json.JodaWrites._
   import play.api.libs.json.JodaReads._
-
-  val maxLengthPremisesTradingName = 120
-  val premisesTradingNameType = FormTypes.notEmptyStrip andThen
-    notEmpty.withMessage("error.required.tp.trading.name") andThen
-    maxLength(maxLengthPremisesTradingName).withMessage("error.invalid.tp.trading.name") andThen
-    regexWithMsg(basicPunctuationRegex, "error.invalid.char.tp.agent.company.details")
+  import play.api.libs.json.JodaWrites._
 
   implicit val reads: Reads[YourTradingPremises] = {
     import play.api.libs.functional.syntax._
@@ -67,33 +56,6 @@ object YourTradingPremises {
         (__ \ "tradingNameChangeDate").writeNullable[DateOfChange]
       ) (unlift(YourTradingPremises.unapply))
   }
-
-  implicit val formR: Rule[UrlFormEncoded, YourTradingPremises] =
-    From[UrlFormEncoded] { __ =>
-      import models.FormTypes._
-      import jto.validation.forms.Rules._
-      (
-        (__ \ "tradingName").read(premisesTradingNameType) ~
-          __.read[Address] ~
-          (__ \ "isResidential").read[Option[Boolean]] ~
-          (__ \ "startDate").read(optionR(localDateRuleWithPattern)) ~
-          (__ \ "tradingNameChangeDate").read[Option[DateOfChange]]
-        ) (YourTradingPremises.apply)
-    }
-
-  implicit val formW: Write[YourTradingPremises, UrlFormEncoded] =
-    To[UrlFormEncoded] { __ =>
-      import models.FormTypes.localDateWrite
-      import jto.validation.forms.Writes._
-      import play.api.libs.functional.syntax.unlift
-      (
-        (__ \ "tradingName").write[String] ~
-          __.write[Address] ~
-          (__ \ "isResidential").write[Option[Boolean]] ~
-          (__ \ "startDate").write(optionW(localDateWrite)) ~
-          (__ \ "tradingNameChangeDate").write[Option[DateOfChange]]
-        ) (unlift(YourTradingPremises.unapply))
-    }
 
   implicit def convert(data: YourTradingPremises): Option[TradingPremises] = {
     Some(TradingPremises(yourTradingPremises = Some(data)))

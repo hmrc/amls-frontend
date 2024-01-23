@@ -16,26 +16,10 @@
 
 package models.responsiblepeople
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
 case class MovedAddress(movedAddress: Boolean)
 
 object MovedAddress {
-
   implicit val formats = Json.format[MovedAddress]
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, MovedAddress] =
-    From[UrlFormEncoded] { __ =>
-      import jto.validation.forms.Rules._
-      (__ \ "movedAddress").read[Boolean].withMessage("error.required.rp.moved.address") map MovedAddress.apply
-    }
-
-  implicit val formWrites: Write[MovedAddress, UrlFormEncoded] =
-    Write {
-      case MovedAddress(b) =>
-        Map("movedAddress" -> Seq(b.toString))
-    }
 }

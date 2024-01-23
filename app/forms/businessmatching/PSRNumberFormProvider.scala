@@ -17,7 +17,6 @@
 package forms.businessmatching
 
 import forms.mappings.Mappings
-import models.FormTypes.numbersOnlyRegex
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
 import play.api.data.Form
 import play.api.data.Forms.mapping

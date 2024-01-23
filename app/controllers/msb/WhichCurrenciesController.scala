@@ -19,14 +19,12 @@ package controllers.msb
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.msb.WhichCurrenciesFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 
 import javax.inject.Inject
 import models.moneyservicebusiness._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{CurrencyAutocompleteService, StatusService}
 import services.businessmatching.ServiceFlow
-import utils.ControllerHelper
 import utils.AuthAction
 import views.html.msb.WhichCurrenciesView
 

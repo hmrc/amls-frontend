@@ -16,13 +16,7 @@
 
 package models.responsiblepeople
 
-import cats.data.Validated.Valid
-import jto.validation._
-import jto.validation.forms.Rules._
-import jto.validation.forms.UrlFormEncoded
-import models.FormTypes._
-import play.api.libs.json.{Writes => _}
-import utils.MappingUtils.Implicits._
+import play.api.libs.json._
 
 case class KnownBy(
                     hasOtherNames: Option[Boolean] = None,
@@ -33,36 +27,6 @@ case class KnownBy(
 }
 
 object KnownBy {
-
-  import play.api.libs.json._
-
-  val otherNamesLength = 140
-  val otherNamesRule = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.rp.otherNames") andThen
-    maxLength(otherNamesLength).withMessage("error.invalid.rp.maxlength.140") andThen
-    basicPunctuationPattern("error.invalid.rp.char")
-
-  implicit val formRule: Rule[UrlFormEncoded, KnownBy] =
-    From[UrlFormEncoded] { __ =>
-      (__ \ "hasOtherNames").read[Boolean].withMessage("error.required.rp.hasOtherNames") flatMap  {
-        case true => (__ \ "otherNames").read(otherNamesRule) map { x => KnownBy(Some(true), Some(x))}
-        case false => Rule.fromMapping { _ => Valid(KnownBy(Some(false), None)) }
-      }
-    }
-
-  implicit val formWrite = Write[KnownBy, UrlFormEncoded] {
-    model =>
-      model.hasOtherNames match {
-        case Some(true) =>
-          Map(
-            "hasOtherNames" -> Seq("true"),
-            "otherNames" -> Seq(model.otherNames getOrElse "")
-          )
-        case _ =>
-          Map("hasOtherNames" -> Seq("false"))
-
-      }
-  }
 
   implicit val jsonReads : Reads[KnownBy] = {
     import play.api.libs.functional.syntax._

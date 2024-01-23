@@ -19,7 +19,7 @@ package forms.responsiblepeople
 import forms.behaviours.StringFieldBehaviours
 import forms.mappings.Constraints
 import generators.NinoGen
-import models.responsiblepeople.{SaRegistered, SaRegisteredNo, SaRegisteredYes, VATRegistered, VATRegisteredNo, VATRegisteredYes}
+import models.responsiblepeople.{SaRegistered, SaRegisteredNo, SaRegisteredYes}
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 

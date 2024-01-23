@@ -49,7 +49,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
   val betaFeedbackUnauthenticatedUrl = getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 
   lazy val loginUrl = getConfigString("login.url")
-  def logoutUrl = getConfigString("logout.url")
+  def logoutUrl = getConfigString("logout.url") + URLEncoder.encode(feedbackFrontendUrl, "utf-8")
   lazy val loginContinue = getConfigString("login.continue")
 
   lazy val paymentsUrl:String = getConfigString("paymentsUrl")

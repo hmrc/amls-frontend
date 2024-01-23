@@ -16,30 +16,10 @@
 
 package models.businessdetails
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
 import play.api.libs.json.Json
 
 case class ContactingYouEmail(email: String, confirmEmail: String)
 
 object ContactingYouEmail {
-
   implicit val formats = Json.format[ContactingYouEmail]
-
-  implicit val formRule: Rule[UrlFormEncoded, ContactingYouEmail] =
-    From[UrlFormEncoded] { __ =>
-      import models.FormTypes._
-      import jto.validation.forms.Rules._
-
-      __.read(confirmEmailMatchRule).map (x => ContactingYouEmail(x._1, x._2))
-    }
-
-  implicit val formWrites: Write[ContactingYouEmail, UrlFormEncoded] =
-    Write {
-      case ContactingYouEmail(email, confirmEmail) =>
-        Map(
-          "email" -> Seq(email),
-          "confirmEmail" -> Seq(confirmEmail)
-        )
-    }
 }

@@ -14,28 +14,8 @@
  * limitations under the License.
  */
 
-import jto.validation.forms.PM
-import jto.validation.{ValidationError, Path}
-import play.api.i18n.Messages
-
 package object forms {
 
   implicit def optStr(s: Option[String]): String =
     s.getOrElse("")
-
-  implicit class richError(e: ValidationError) {
-
-    def toMessage(implicit messages: Messages): String =
-      messages(e.message, e.args: _*)
-  }
-
-  implicit class richErrorList(seq: Seq[ValidationError]) {
-
-    def toMessage(implicit messages: Messages): String =
-      seq.headOption map { _.toMessage }
-  }
-
-  implicit class richPath(p: Path) {
-    def key = PM.asKey(p)
-  }
 }

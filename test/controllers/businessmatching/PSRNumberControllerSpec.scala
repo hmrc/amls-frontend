@@ -96,7 +96,7 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         when {
           controller.businessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](model)
+        } thenReturn OptionT.liftF(Future.successful(model))
 
         val result = controller.get()(request)
         status(result) mustBe OK
@@ -112,7 +112,7 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         when {
           controller.businessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
+        } thenReturn OptionT.liftF(Future.successful(businessMatching))
 
         val result = controller.get()(request)
         status(result) mustBe OK
@@ -179,7 +179,7 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         when {
           controller.businessMatchingService.getModel(any())(any())
-        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
+        } thenReturn OptionT.liftF(Future.successful(businessMatching))
 
         val result = controller.post()(newRequest)
         status(result) mustBe BAD_REQUEST

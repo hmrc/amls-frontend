@@ -17,9 +17,6 @@
 package views.responsiblepeople.address
 
 import forms.responsiblepeople.address.TimeAtAddressFormProvider
-import forms.{Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
-import models.responsiblepeople.TimeAtAddress
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages

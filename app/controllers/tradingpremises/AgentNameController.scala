@@ -18,8 +18,8 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
+import forms.DateOfChangeFormProvider
 import forms.tradingpremises.AgentNameFormProvider
-import forms.{Form2, _}
 import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
@@ -50,7 +50,7 @@ class AgentNameController @Inject()(
                                      dateFormProvider: DateOfChangeFormProvider,
                                      agentView: AgentNameView,
                                      dateView: DateOfChangeView,
-                                     implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper with FormHelpers {
+                                     implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection with DateOfChangeHelper {
 
   def get(index: Int, edit: Boolean = false): Action[AnyContent] = authAction.async {
       implicit request =>

@@ -16,6 +16,8 @@
 
 package views.confirmation
 
+import config.ApplicationConfig
+import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import utils.AmlsViewSpec
 import views.Fixture
@@ -26,8 +28,9 @@ class ConfirmationBacsViewSpec extends AmlsViewSpec with MustMatchers {
   trait ViewFixture extends Fixture {
     lazy val confirmationBacsView = inject[ConfirmationBacsView]
     implicit val requestWithToken = addTokenForView()
+    implicit val config = app.injector.instanceOf[ApplicationConfig]
 
-    override def view = confirmationBacsView("businessName")
+    override def view = confirmationBacsView("businessName")(requestWithToken, messages, config)
   }
 
   "The bacs confirmation view" must {
@@ -58,6 +61,13 @@ class ConfirmationBacsViewSpec extends AmlsViewSpec with MustMatchers {
       doc.html() must include(messages("confirmation.payment.info.keep_up_to_date.item3"))
       doc.getElementsByClass("print-link").first().text() mustBe messages("link.print")
       doc.getElementById("payment-continue").text() mustBe messages("confirmation.payment.continue_button.text")
+    }
+
+    "display the correct link" in new ViewFixture {
+      val link: Element = doc.getElementsByClass("govuk-link").get(2)
+
+      link.text() mustBe messages("survey.satisfaction.beforeyougo")
+      link.attr("href") mustBe config.logoutUrl
     }
   }
 }

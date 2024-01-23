@@ -16,8 +16,6 @@
 
 package models.tradingpremises
 
-import cats.data.Validated.{Invalid, Valid}
-import jto.validation.{Path, ValidationError}
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
@@ -25,96 +23,6 @@ import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 class ActivityStartDateSpec extends PlaySpec {
   // scalastyle:off
-
-  "Form validation" must {
-    "pass validation" when {
-      "given a valid date" in {
-
-        val model = Map(
-          "startDate.day" -> Seq("24"),
-          "startDate.month" -> Seq("2"),
-          "startDate.year" -> Seq("1990")
-        )
-
-        ActivityStartDate.formRule.validate(model) must be(Valid(ActivityStartDate(new LocalDate(1990, 2, 24))))
-      }
-    }
-
-    "fail validation" when {
-      "given a day value with too many numerical characters" in {
-
-        val model = Map(
-          "startDate.day" -> Seq("2466"),
-          "startDate.month" -> Seq("2"),
-          "startDate.year" -> Seq("1990")
-        )
-
-        ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(Path \ "startDate" -> Seq(
-          ValidationError("error.invalid.date.tp.not.real")))))
-      }
-
-      "fail validation" when {
-        "given a day in future beyond end of 2099" in {
-          val model = Map(
-            "startDate.day" -> Seq("1"),
-            "startDate.month" -> Seq("1"),
-            "startDate.year" -> Seq("2100")
-          )
-          ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-            Path \ "startDate" -> Seq(ValidationError("error.invalid.date.tp.before.2100"))
-          )))
-        }
-      }
-
-      "fail validation" when {
-        "given a day in the past before start of 1700" in {
-          val model = Map(
-            "startDate.day" -> Seq("31"),
-            "startDate.month" -> Seq("12"),
-            "startDate.year" -> Seq("1699")
-          )
-          ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-            Path \ "startDate" -> Seq(ValidationError("error.invalid.date.tp.after.1700"))
-          )))
-        }
-      }
-
-      "fail validation" when {
-        "given a future date" in {
-
-          val model = Map(
-            "startDate.day" -> Seq("1"),
-            "startDate.month" -> Seq("1"),
-            "startDate.year" -> Seq("2150")
-          )
-          ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-            Path \ "startDate" -> Seq(ValidationError("error.invalid.date.tp.before.2100"))
-          )))
-        }
-      }
-
-      "given missing data represented by an empty string" in {
-
-        val model = Map(
-          "startDate.day" -> Seq(""),
-          "startDate.month" -> Seq(""),
-          "startDate.year" -> Seq("")
-        )
-        ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
-          Path \ "startDate" -> Seq(ValidationError("error.required.tp.address.date.year.month.day"))
-        )))
-      }
-    }
-
-    "successfully write the model" in {
-
-      ActivityStartDate.formWrites.writes(ActivityStartDate(new LocalDate(1990, 2, 24))) mustBe Map(
-        "startDate.day" -> Seq("24"),
-        "startDate.month" -> Seq("2"),
-        "startDate.year" -> Seq("1990")
-      )
-    }
-  }
 
   "Json validation" must {
 

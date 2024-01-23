@@ -19,10 +19,7 @@ package controllers.msb
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.msb.MoneySourcesFormProvider
-
-import javax.inject.Inject
 import models.businessmatching.BusinessMatching
-import models.businessmatching.BusinessMatchingMsbService.ForeignExchange
 import models.moneyservicebusiness._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
@@ -31,6 +28,7 @@ import services.msb.MoneySourcesService
 import utils.AuthAction
 import views.html.msb.MoneySourcesView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class MoneySourcesController @Inject()(authAction: AuthAction,

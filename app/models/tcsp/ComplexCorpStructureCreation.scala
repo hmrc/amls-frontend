@@ -16,28 +16,11 @@
 
 package models.tcsp
 
-import jto.validation.forms.UrlFormEncoded
-
 sealed trait ComplexCorpStructureCreation
 case object ComplexCorpStructureCreationYes extends ComplexCorpStructureCreation
 case object ComplexCorpStructureCreationNo extends ComplexCorpStructureCreation
 
 object ComplexCorpStructureCreation {
-  import jto.validation._
-  import utils.MappingUtils.Implicits._
-
-  implicit val formReads: Rule[UrlFormEncoded, ComplexCorpStructureCreation] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "complexCorpStructureCreation").read[Boolean].withMessage("error.required.tcsp.complex.corporate.structures") map {
-      case true => ComplexCorpStructureCreationYes
-      case false  => ComplexCorpStructureCreationNo
-    }
-  }
-
-  implicit val formWrites: Write[ComplexCorpStructureCreation, UrlFormEncoded] = Write {
-    case ComplexCorpStructureCreationYes => "complexCorpStructureCreation" -> "true"
-    case ComplexCorpStructureCreationNo => "complexCorpStructureCreation" -> "false"
-  }
 
   import play.api.libs.json._
   import play.api.libs.json.Reads._

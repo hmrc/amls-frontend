@@ -17,13 +17,13 @@
 package forms.businessdetails
 
 import forms.behaviours.BooleanFieldBehaviours
+import forms.mappings.Constraints
 import generators.BaseGenerator
-import models.FormTypes.vrnTypeRegex
 import models.businessdetails.{VATRegistered, VATRegisteredNo, VATRegisteredYes}
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
-class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours[VATRegistered] with BaseGenerator {
+class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours[VATRegistered] with BaseGenerator with Constraints {
 
   val formProvider: VATRegisteredFormProvider = new VATRegisteredFormProvider()
 
@@ -109,7 +109,7 @@ class VATRegisteredFormProviderSpec extends BooleanFieldBehaviours[VATRegistered
           forAll(numStringOfLength(formProvider.length), Gen.alphaChar) { (vatNum, char) =>
             val boundForm = form.bind(Map(fieldName -> "true", inputFieldName -> s"${vatNum.dropRight(1)}$char"))
             boundForm.errors.headOption shouldBe Some(
-              FormError(inputFieldName, "error.invalid.vat.number", Seq(vrnTypeRegex.regex))
+              FormError(inputFieldName, "error.invalid.vat.number", Seq(vrnRegex))
             )
           }
         }

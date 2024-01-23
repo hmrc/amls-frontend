@@ -18,7 +18,6 @@ package controllers.responsiblepeople
 
 import cats.data.OptionT
 import config.ApplicationConfig
-import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.responsiblepeople.PersonResidentTypeFormProvider
 import generators.NinoGen
@@ -27,8 +26,7 @@ import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._

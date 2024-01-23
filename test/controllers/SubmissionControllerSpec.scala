@@ -25,7 +25,6 @@ import models.renewal.Renewal
 import models.status._
 import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionFees, SubscriptionResponse}
 import org.joda.time.LocalDate
-import org.jsoup._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures

@@ -16,11 +16,7 @@
 
 package models.responsiblepeople
 
-import cats.data.Validated.{Invalid, Valid}
-import models.{Country, countries}
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
+import models.Country
 import play.api.libs.json._
 
 sealed trait Nationality
@@ -32,37 +28,6 @@ case class OtherCountry(name: Country) extends Nationality
 object Nationality {
 
   import utils.MappingUtils.Implicits._
-
-  val validateCountry: Rule[String, Country] = {
-    Rule {
-      case "" => Invalid(Seq(Path -> Seq(ValidationError("error.required.rp.nationality.country"))))
-      case code =>
-        countries.collectFirst {
-          case e @ Country(_, c) if c == code =>
-            Valid(e)
-        } getOrElse {
-          Invalid(Seq(Path -> Seq(ValidationError("error.invalid.rp.nationality.country"))))
-        }
-    }
-  }
-
-  implicit val formRule: Rule[UrlFormEncoded, Nationality] =
-    From[UrlFormEncoded] { readerURLFormEncoded =>
-      import jto.validation.forms.Rules._
-      (readerURLFormEncoded \ "nationality").read[String].withMessage("error.required.nationality") flatMap {
-        case "01" => British
-        case "02" =>
-          (readerURLFormEncoded \ "otherCountry").read(validateCountry) map OtherCountry.apply
-        case _ =>
-          (Path \ "nationality") -> Seq(ValidationError("error.invalid"))
-      }
-    }
-
-  implicit val formWrite: Write[Nationality, UrlFormEncoded] = Write {
-    case British => "nationality" -> "01"
-    case OtherCountry(value) => Map("nationality" -> "02",
-      "otherCountry" -> value.code)
-  }
 
   implicit val jsonReads: Reads[Nationality] = {
     import play.api.libs.json._

@@ -17,12 +17,9 @@
 package views.businessactivities
 
 import forms.businessactivities.TransactionTypesFormProvider
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import jto.validation.{Path, ValidationError}
 import models.businessactivities.TransactionTypes.{DigitalSoftware, Paper}
 import models.businessactivities.{TransactionType, TransactionTypes}
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.html.businessactivities.TransactionTypesView

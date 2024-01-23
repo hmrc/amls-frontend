@@ -16,8 +16,6 @@
 
 package models.declaration
 
-import jto.validation.forms._
-import jto.validation.{From, Rule, To, Write}
 import models.declaration.release7.{RoleType, RoleWithinBusinessRelease7}
 
 case class AddPerson(firstName: String,
@@ -43,33 +41,6 @@ object AddPerson {
       case NominatedOfficer => models.declaration.release7.NominatedOfficer
       case Other(x) => models.declaration.release7.Other(x)
     }
-  }
-
-  implicit def formRule: Rule[UrlFormEncoded, AddPerson] = From[UrlFormEncoded] { __ =>
-    import models.FormTypes._
-    import jto.validation.forms.Rules._
-
-    val roleReader: Rule[UrlFormEncoded, RoleWithinBusinessRelease7] = {
-        __.read[RoleWithinBusinessRelease7]
-    }
-
-    (
-      (__ \ "firstName").read(genericNameRule("error.required.declaration.first_name", maxLengthMsg = "error.invalid.firstname.length", regExMessage="error.invalid.firstname.validation")) ~
-        (__ \ "middleName").read(optionR(genericNameRule(maxLengthMsg="error.invalid.middlename.length", regExMessage="error.invalid.middlename.validation"))) ~
-        (__ \ "lastName").read(genericNameRule("error.required.declaration.last_name", maxLengthMsg="error.invalid.lastname.length", regExMessage="error.invalid.lastname.validation")) ~
-        roleReader
-      ) (AddPerson.apply)
-  }
-
-  implicit val formWrites: Write[AddPerson, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    (
-      (__ \ "firstName").write[String] ~
-        (__ \ "middleName").write[Option[String]] ~
-        (__ \ "lastName").write[String] ~
-        __.write[RoleWithinBusinessRelease7]
-      ) (unlift(AddPerson.unapply))
   }
 
   implicit val jsonReads: Reads[AddPerson] = {

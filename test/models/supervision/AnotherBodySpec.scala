@@ -16,7 +16,6 @@
 
 package models.supervision
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.joda.time.LocalDate
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -31,82 +30,8 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
     val reason = Some(SupervisionEndReasons("Reason"))
   }
 
-  "Form Rules and Writes" must {
-
-    "successfully validate" when {
-      "given 'no' selected" in {
-        val urlFormEncoded = Map("anotherBody" -> Seq("false"))
-        val expected = Valid(AnotherBodyNo)
-        AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
-      }
-
-      "given 'yes' selected with valid Name" in new Fixture {
-
-        val urlFormEncoded = Map(
-          "anotherBody" -> Seq("true"),
-          "supervisorName" -> Seq("Name"),
-          "startDate" -> Seq(""),
-          "endDate" -> Seq(""),
-          "endingReason" -> Seq("")
-        )
-
-        val expected = Valid(AnotherBodyYes("Name", None, None, None))
-
-        AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
-      }
-    }
-
-
-
-    "fail validation" when {
-      "missing values when Yes selected" in {
-        val urlFormEncoded = Map("anotherBody" -> Seq("true"))
-        val expected = Invalid(
-          Seq((Path \ "supervisorName") -> Seq(ValidationError("error.required")))
-        )
-        AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
-      }
-
-      "given invalid characters in endingReason and supervisorName" in {
-        val urlFormEncoded = Map(
-          "anotherBody" -> Seq("true"),
-          "supervisorName" -> Seq("invalid {} <>"))
-
-        val expected = Invalid(Seq((Path \ "supervisorName") -> Seq(ValidationError("error.invalid.supervision.supervisor"))))
-
-        AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
-      }
-
-      "given only spaces in endingReason and supervisorName" in {
-        val urlFormEncoded = Map(
-          "anotherBody" -> Seq("true"),
-          "supervisorName" -> Seq("  "))
-
-        val expected = Invalid(Seq((Path \ "supervisorName") -> Seq(ValidationError("error.required.supervision.supervisor"))))
-
-        AnotherBody.formRule.validate(urlFormEncoded) must be(expected)
-      }
-    }
-  }
-
-
   "Json read and writes" must {
-    "successfully write No" in {
-      val expected = Map("anotherBody" -> Seq("false"))
-      AnotherBody.formWrites.writes(AnotherBodyNo) must be(expected)
-    }
 
-    "successfully write Yes" in  new Fixture {
-
-      val expected = Map(
-        "anotherBody" -> Seq("true"),
-        "supervisorName" -> Seq("Name")
-      )
-
-      val input = AnotherBodyYes("Name", None, None, None)
-
-      AnotherBody.formWrites.writes(input) must be(expected)
-    }
     "Serialise AnotherBodyNo as expected" in {
       Json.toJson(AnotherBodyNo.asInstanceOf[AnotherBody]) must be(Json.obj("anotherBody" -> false))
     }

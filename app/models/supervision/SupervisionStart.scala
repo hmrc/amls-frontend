@@ -16,9 +16,6 @@
 
 package models.supervision
 
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, Write}
-import models.FormTypes._
 import org.joda.time.LocalDate
 import play.api.libs.json.{Json, Reads, Writes}
 import play.api.libs.json.JodaWrites._
@@ -26,24 +23,6 @@ import play.api.libs.json.JodaWrites._
 case class SupervisionStart(startDate: LocalDate)
 
 object SupervisionStart {
-  implicit val formRule: Rule[UrlFormEncoded, SupervisionStart] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-
-    __.read(supervisionStartDateRule) map SupervisionStart.apply
-  }
-
-  implicit val formWrites: Write[SupervisionStart, UrlFormEncoded] = Write {
-    case a: SupervisionStart => {
-            Map(
-              "anotherBody" -> Seq("true")
-            ) ++ (
-        localDateWrite.writes(a.startDate) map {
-          case (key, value) =>
-            s"startDate.$key" -> value
-        })
-    }
-  }
-
 
   implicit val jsonReads: Reads[SupervisionStart] = {
 

@@ -18,74 +18,10 @@ package models.businessactivities
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import models.renewal.AMLSTurnover
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
-
-  "Form Validation" must {
-
-    "successfully validate given an enum value" in {
-
-      ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("01"))) must
-        be(Valid(ExpectedAMLSTurnover.First))
-
-      ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("02"))) must
-        be(Valid(ExpectedAMLSTurnover.Second))
-
-      ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("03"))) must
-        be(Valid(ExpectedAMLSTurnover.Third))
-
-      ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("04"))) must
-        be(Valid(ExpectedAMLSTurnover.Fourth))
-
-      ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("05"))) must
-        be(Valid(ExpectedAMLSTurnover.Fifth))
-
-      ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("06"))) must
-        be(Valid(ExpectedAMLSTurnover.Sixth))
-
-      ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("07"))) must
-        be(Valid(ExpectedAMLSTurnover.Seventh))
-    }
-
-    "write correct data from enum value" in {
-
-      ExpectedAMLSTurnover.formWrites.writes(ExpectedAMLSTurnover.First) must
-        be(Map("expectedAMLSTurnover" -> Seq("01")))
-
-      ExpectedAMLSTurnover.formWrites.writes(ExpectedAMLSTurnover.Second) must
-        be(Map("expectedAMLSTurnover" -> Seq("02")))
-
-      ExpectedAMLSTurnover.formWrites.writes(ExpectedAMLSTurnover.Third) must
-        be(Map("expectedAMLSTurnover" -> Seq("03")))
-
-      ExpectedAMLSTurnover.formWrites.writes(ExpectedAMLSTurnover.Fourth) must
-        be(Map("expectedAMLSTurnover" -> Seq("04")))
-
-      ExpectedAMLSTurnover.formWrites.writes(ExpectedAMLSTurnover.Fifth) must
-        be(Map("expectedAMLSTurnover" -> Seq("05")))
-
-      ExpectedAMLSTurnover.formWrites.writes(ExpectedAMLSTurnover.Sixth) must
-        be(Map("expectedAMLSTurnover" -> Seq("06")))
-
-      ExpectedAMLSTurnover.formWrites.writes(ExpectedAMLSTurnover.Seventh) must
-        be(Map("expectedAMLSTurnover" -> Seq("07")))
-    }
-
-
-    "throw error on invalid data" in {
-      ExpectedAMLSTurnover.formRule.validate(Map("expectedAMLSTurnover" -> Seq("20"))) must
-        be(Invalid(Seq((Path \ "expectedAMLSTurnover", Seq(ValidationError("error.invalid"))))))
-    }
-
-    "throw error on empty data" in {
-      ExpectedAMLSTurnover.formRule.validate(Map.empty) must
-        be(Invalid(Seq((Path \ "expectedAMLSTurnover", Seq(ValidationError("error.required.ba.turnover.from.mlr"))))))
-    }
-  }
 
   "JSON validation" must {
 

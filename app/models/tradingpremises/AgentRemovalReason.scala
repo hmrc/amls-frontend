@@ -16,10 +16,6 @@
 
 package models.tradingpremises
 
-import cats.data.Validated.Valid
-import jto.validation.forms.Rules._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, To, Write}
 import models.tradingpremises.AgentRemovalReason.{CeasedTrading, LackOfProfit, MajorComplianceIssues, MinorComplianceIssues, Other, RequestedByAgent}
 import models.tradingpremises.RemovalReasonConstants.Schema
 import models.{Enumerable, WithName}
@@ -95,41 +91,7 @@ object AgentRemovalReason extends Enumerable.Implicits {
     }
   }
 
-
-  import RemovalReasonConstants._
-            import utils.MappingUtils.Implicits._
-            import models.FormTypes._
-
   implicit val formats = Json.format[AgentRemovalReason]
-
-  private val otherDetailsLength = 255
-
-
-  private val otherDetailsRule = notEmptyStrip andThen
-    notEmpty.withMessage("tradingpremises.remove_reasons.agent.other.missing") andThen maxLength(otherDetailsLength).
-    withMessage("error.invalid.maxlength.255") andThen basicPunctuationPattern()
-
-  private def toSchemaReasonR = Rule.fromMapping[String, String] { v => Valid(Rules.toSchemaReason(v)) }
-
-  implicit val formReader: Rule[UrlFormEncoded, AgentRemovalReason] = From[UrlFormEncoded] { __ =>
-    (__ \ "removalReason").read[String].withMessage("tradingpremises.remove_reasons.missing") andThen toSchemaReasonR flatMap {
-      case reason@Schema.OTHER =>
-        (__ \ "removalReasonOther").read(otherDetailsRule) map { o =>
-          AgentRemovalReason(reason, Some(o))
-        }
-      case reason =>
-        AgentRemovalReason(reason)
-    }
-  }
-
-  implicit val formWriter: Write[AgentRemovalReason, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-    (
-      (__ \ "removalReason").write[String] ~
-        (__ \ "removalReasonOther").write[Option[String]]
-      ) (x => (Rules.fromSchemaReason(x.removalReason), x.removalReasonOther))
-  }
-
 }
 
 object RemovalReasonConstants {

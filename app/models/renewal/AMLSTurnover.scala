@@ -16,9 +16,6 @@
 
 package models.renewal
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
 import models.{Enumerable, WithName}
 import models.businessactivities.ExpectedAMLSTurnover
 import play.api.libs.json._
@@ -52,48 +49,6 @@ object AMLSTurnover extends Enumerable.Implicits {
   }
 
   import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, AMLSTurnover] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-
-    (__ \ "turnover").read[String].withMessage("error.required.renewal.ba.turnover.from.mlr") flatMap {
-      case "01" => First
-      case "02" => Second
-      case "03" => Third
-      case "04" => Fourth
-      case "05" => Fifth
-      case "06" => Sixth
-      case "07" => Seventh
-      case _ =>
-        (Path \ "turnover") -> Seq(ValidationError("error.invalid"))
-    }
-  }
-
-  def formRuleWithErrorMsg(message: String = ""): Rule[UrlFormEncoded, AMLSTurnover] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-
-    (__ \ "turnover").read[String].withMessage(message) flatMap {
-      case "01" => First
-      case "02" => Second
-      case "03" => Third
-      case "04" => Fourth
-      case "05" => Fifth
-      case "06" => Sixth
-      case "07" => Seventh
-      case _ =>
-        (Path \ "turnover") -> Seq(ValidationError("error.invalid"))
-    }
-  }
-
-  implicit val formWrites: Write[AMLSTurnover, UrlFormEncoded] = Write {
-    case First => "turnover" -> "01"
-    case Second => "turnover" -> "02"
-    case Third => "turnover" -> "03"
-    case Fourth => "turnover" -> "04"
-    case Fifth => "turnover" -> "05"
-    case Sixth => "turnover" -> "06"
-    case Seventh=> "turnover" -> "07"
-  }
 
   implicit val jsonReads = {
     import play.api.libs.json.Reads.StringReads

@@ -16,125 +16,12 @@
 
 package models.supervision
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import models.supervision.ProfessionalBodies._
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 import utils.AmlsSpec
 
 class ProfessionalBodiesSpec extends PlaySpec with AmlsSpec {
-
-  "Form validation" must {
-
-    "return success" when {
-      "more than one check box is selected" in {
-
-        val model = Map(
-          "businessType[]" -> Seq("01", "02", "04","05","06","07","08","09","10","11","12","13","14"),
-          "specifyOtherBusiness" -> Seq("test")
-        )
-
-        ProfessionalBodies.formRule.validate(model) must
-          be(Valid(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants, TaxationTechnicians, ManagementAccountants,
-            InstituteOfTaxation, Bookkeepers, AccountantsIreland, AccountantsScotland, AccountantsEnglandandWales, FinancialAccountants,
-            AssociationOfBookkeepers, LawSociety, Other("test")
-          ))))
-
-      }
-    }
-
-    "return error" when {
-
-      "'Other' is selected, but specifyOtherBusiness is an empty string" in {
-
-        val model = Map(
-          "businessType[]" -> Seq("01", "02", "14"),
-          "specifyOtherBusiness" -> Seq("")
-        )
-
-        ProfessionalBodies.formRule.validate(model) must
-          be(Invalid(List((Path \ "specifyOtherBusiness", Seq(ValidationError("error.required.supervision.business.details"))))))
-      }
-
-      "specifyOtherBusiness exceeds max length" in {
-
-        val model = Map(
-          "businessType[]" -> Seq("01", "02", "14"),
-          "specifyOtherBusiness" -> Seq("test" * 200)
-        )
-
-        ProfessionalBodies.formRule.validate(model) must
-          be(Invalid(List((Path \ "specifyOtherBusiness", Seq(ValidationError("error.invalid.supervision.business.details.length.255"))))))
-      }
-
-      "businessType[] is empty" in {
-
-        val model = Map(
-          "businessType[]" -> Seq()
-        )
-
-        ProfessionalBodies.formRule.validate(model) must
-          be(Invalid(List((Path \ "businessType", Seq(ValidationError("error.required.supervision.one.professional.body"))))))
-      }
-
-      "given no data represented by an empty Map" in {
-
-        ProfessionalBodies.formRule.validate(Map.empty) must
-          be(Invalid(Seq((Path \ "businessType") -> Seq(ValidationError("error.required.supervision.one.professional.body")))))
-
-      }
-
-      "given invalid businessType[] selection" in {
-
-        val model = Map(
-          "businessType[]" -> Seq("01", "20")
-        )
-
-        ProfessionalBodies.formRule.validate(model) must
-          be(Invalid(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid")))))
-
-      }
-
-      "given invalid characters in specifyOther" in {
-
-        val model = Map(
-          "businessType[]" -> Seq("14"),
-          "specifyOtherBusiness" -> Seq("{}{}")
-        )
-
-        ProfessionalBodies.formRule.validate(model) must
-          be(Invalid(Seq((Path \ "specifyOtherBusiness", Seq(ValidationError("error.invalid.supervision.business.details"))))))
-      }
-
-    }
-
-  }
-
-  "Form writers" must {
-    "write to form with businessTypes" when {
-      "without other option" in {
-
-        val map = Map(
-          "businessType[]" -> Seq("03","04", "05", "06")
-        )
-
-        val model = ProfessionalBodies(Set(InternationalAccountants, TaxationTechnicians, ManagementAccountants, InstituteOfTaxation))
-
-        ProfessionalBodies.formWrites.writes(model) must be (map)
-      }
-
-      "with Other option" in {
-
-        val map = Map(
-          "businessType[]" -> Seq("14","13"),
-          "specifyOtherBusiness" -> Seq("otherBusiness")
-        )
-
-        val model = ProfessionalBodies(Set(Other("otherBusiness"), LawSociety))
-        ProfessionalBodies.formWrites.writes(model) must be (map)
-      }
-    }
-  }
 
   "JSON validation" must {
 

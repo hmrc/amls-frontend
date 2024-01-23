@@ -16,9 +16,6 @@
 
 package models.businessactivities
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
 import models.{Enumerable, WithName}
 import models.renewal.AMLSTurnover
 import play.api.libs.json._
@@ -51,48 +48,7 @@ object ExpectedAMLSTurnover extends Enumerable.Implicits {
     override val value: String = "07"
   }
 
-
   import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, ExpectedAMLSTurnover] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "expectedAMLSTurnover").read[String].withMessage("error.required.ba.turnover.from.mlr") flatMap {
-      case "01" => First
-      case "02" => Second
-      case "03" => Third
-      case "04" => Fourth
-      case "05" => Fifth
-      case "06" => Sixth
-      case "07" => Seventh
-      case _ =>
-        (Path \ "expectedAMLSTurnover") -> Seq(ValidationError("error.invalid"))
-    }
-  }
-
-  def formRuleWithErrorMsg(message: String = ""): Rule[UrlFormEncoded, ExpectedAMLSTurnover] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "expectedAMLSTurnover").read[String].withMessage(message) flatMap {
-      case "01" => First
-      case "02" => Second
-      case "03" => Third
-      case "04" => Fourth
-      case "05" => Fifth
-      case "06" => Sixth
-      case "07" => Seventh
-      case _ =>
-        (Path \ "expectedAMLSTurnover") -> Seq(ValidationError("error.invalid"))
-    }
-  }
-
-  implicit val formWrites: Write[ExpectedAMLSTurnover, UrlFormEncoded] = Write {
-    case First => "expectedAMLSTurnover" -> "01"
-    case Second => "expectedAMLSTurnover" -> "02"
-    case Third => "expectedAMLSTurnover" -> "03"
-    case Fourth => "expectedAMLSTurnover" -> "04"
-    case Fifth => "expectedAMLSTurnover" -> "05"
-    case Sixth => "expectedAMLSTurnover" -> "06"
-    case Seventh=> "expectedAMLSTurnover" -> "07"
-  }
 
   implicit val jsonReads = {
     import play.api.libs.json.Reads.StringReads

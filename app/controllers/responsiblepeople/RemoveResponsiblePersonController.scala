@@ -22,7 +22,6 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.responsiblepeople.RemoveResponsiblePersonFormProvider
 import models.responsiblepeople.ResponsiblePerson
 import models.status._
-import org.joda.time.LocalDate
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.StatusService
 import utils.{AuthAction, RepeatingSection, StatusConstants}

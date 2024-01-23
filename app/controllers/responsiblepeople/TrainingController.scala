@@ -18,17 +18,15 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
-import forms._
 import forms.responsiblepeople.TrainingFormProvider
-
-import javax.inject.Inject
-import models.responsiblepeople.{ResponsiblePerson, Training}
+import models.responsiblepeople.ResponsiblePerson
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import utils.CharacterCountParser.cleanData
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.TrainingView
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class TrainingController @Inject()(

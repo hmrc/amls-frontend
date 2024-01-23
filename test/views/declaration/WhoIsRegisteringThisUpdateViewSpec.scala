@@ -17,14 +17,11 @@
 package views.declaration
 
 import forms.declaration.WhoIsRegisteringFormProvider
-import forms.{Form2, InvalidForm, ValidForm}
 import generators.ResponsiblePersonGenerator
-import jto.validation.{Path, ValidationError}
 import models.declaration.WhoIsRegistering
-import models.responsiblepeople.{PersonName, ResponsiblePerson}
+import models.responsiblepeople.ResponsiblePerson
 import org.scalacheck.Gen
 import org.scalatest.MustMatchers
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture

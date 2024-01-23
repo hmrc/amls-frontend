@@ -17,7 +17,6 @@
 package forms.tradingpremises
 
 import forms.generic.BooleanFormProvider
-import models.tradingpremises
 import models.tradingpremises.RegisteringAgentPremises
 import play.api.data.Form
 

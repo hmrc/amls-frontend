@@ -98,8 +98,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec with Injecting {
         val today = LocalDate.now
         mockCacheUpdate(Some(RemoveBusinessTypeFlowModel.key), RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today.minusDays(10)))))
 
-
-        val result = await {
+        await {
           controller.post()(FakeRequest(POST, routes.WhatDateRemovedController.post().url).withFormUrlEncodedBody(
             "dateOfChange.day" -> today.getDayOfMonth.toString,
             "dateOfChange.month" -> today.getMonthOfYear.toString,

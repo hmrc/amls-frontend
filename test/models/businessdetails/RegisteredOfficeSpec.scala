@@ -16,174 +16,16 @@
 
 package models.businessdetails
 
-import models.{Country, DateOfChange}
 import models.businesscustomer.Address
+import models.{Country, DateOfChange}
 import org.joda.time.LocalDate
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import play.api.libs.json.{JsNull, JsPath, JsSuccess, Json}
 
 class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
   "RegisteredOffice" must {
-
-    "successfully validate" when {
-      "given a valid UK address" in {
-        val ukModel = Map(
-          "isUK" -> Seq("true"),
-          "addressLine1" -> Seq("38B"),
-          "addressLine2" -> Seq("building"),
-          "addressLine3" -> Seq("street"),
-          "addressLine4" -> Seq("area"),
-          "postCode" -> Seq("AA1 1AA")
-        )
-
-        RegisteredOffice.formRule.validate(ukModel) must
-          be(Valid(RegisteredOfficeUK(
-            "38B",
-            Some("building"),
-            Some("street"),
-            Some("area"),
-            "AA1 1AA",
-            None
-          )))
-      }
-
-      "given a valid non UK address" in {
-        val nonUKModel = Map(
-          "isUK" -> Seq("false"),
-          "addressLineNonUK1" -> Seq("38B"),
-          "addressLineNonUK2" -> Seq("building"),
-          "addressLineNonUK3" -> Seq("street"),
-          "addressLineNonUK4" -> Seq("Area"),
-          "country" -> Seq("AL")
-        )
-
-        RegisteredOffice.formRule.validate(nonUKModel) must
-          be(Valid(
-            RegisteredOfficeNonUK(
-              "38B",
-              Some("building"),
-              Some("street"),
-              Some("Area"),
-              Country("Albania", "AL"),
-              None)))
-      }
-    }
-
-    "fail validation" when {
-      "given a non valid non UK address" in {
-        val nonUKModel = Map(
-          "isUK" -> Seq("false"),
-          "addressLineNonUK1" -> Seq("38B"),
-          "addressLineNonUK2" -> Seq("building"),
-          "addressLineNonUK3" -> Seq("street"),
-          "addressLineNonUK4" -> Seq("Area"),
-          "country" -> Seq("GB")
-        )
-
-        RegisteredOffice.formRule.validate(nonUKModel) must
-          be(Invalid(Seq(
-            (Path \ "country") -> Seq(ValidationError("error.required.atb.registered.office.not.uk"))
-          )))
-      }
-
-      "given missing data represented by an empty Map" in {
-
-        RegisteredOffice.formRule.validate(Map.empty) must
-          be(Invalid(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.required.atb.registered.office.uk.or.overseas"))
-          )))
-      }
-
-      "given missing data represented by an empty string" in {
-        val data = Map(
-          "isUK" -> Seq("")
-        )
-
-        RegisteredOffice.formRule.validate(data) must
-          be(Invalid(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.required.atb.registered.office.uk.or.overseas"))
-          )))
-      }
-
-      "given an isUK value of 'false' and" when {
-        "given missing data represented by an empty String" in {
-          val data = Map(
-            "isUK" -> Seq("false"),
-            "addressLineNonUK1" -> Seq(""),
-            "country" -> Seq("")
-          )
-
-          RegisteredOffice.formRule.validate(data) must
-            be(Invalid(Seq(
-              (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
-              (Path \ "country") -> Seq(ValidationError("error.required.country"))
-            )))
-        }
-
-        "given invalid data containing too many characters" in {
-          val data = Map(
-            "isUK" -> Seq("false"),
-            "addressLineNonUK1" -> Seq("a" * 36),
-            "addressLineNonUK2" -> Seq("a" * 36),
-            "addressLineNonUK3" -> Seq("a" * 36),
-            "addressLineNonUK4" -> Seq("a" * 36),
-            "country" -> Seq("UK" * 12)
-          )
-
-          RegisteredOffice.formRule.validate(data) must
-            be(Invalid(Seq(
-              (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.max.length.address.line1")),
-              (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.max.length.address.line2")),
-              (Path \ "addressLineNonUK3") -> Seq(ValidationError("error.max.length.address.line3")),
-              (Path \ "addressLineNonUK4") -> Seq(ValidationError("error.max.length.address.line4")),
-              (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
-            )))
-        }
-
-      }
-
-      "given an isUK value of 'true' and" when {
-        "given missing data represented by an empty String" in {
-          val data = Map(
-            "isUK" -> Seq("true"),
-            "addressLine1" -> Seq(""),
-            "postCode" -> Seq("")
-          )
-
-          RegisteredOffice.formRule.validate(data) must
-            be(Invalid(Seq(
-              (Path \ "addressLine1") -> Seq(ValidationError("error.required.address.line1")),
-              (Path \ "postCode") -> Seq(ValidationError("error.required.postcode"))
-            )))
-        }
-
-        "given invalid data containing too many characters" in {
-          val data = Map(
-            "isUK" -> Seq("true"),
-            "addressLine1" -> Seq("38B"),
-            "addressLine2" -> Seq("a" * 36),
-            "addressLine3" -> Seq("a" * 36),
-            "addressLine4" -> Seq("a" * 36),
-            "postCode" -> Seq("UK" * 12)
-          )
-
-          RegisteredOffice.formRule.validate(data) must
-            be(Invalid(Seq(
-              (Path \ "addressLine2") -> Seq(ValidationError("error.max.length.address.line2")),
-              (Path \ "addressLine3") -> Seq(ValidationError("error.max.length.address.line3")),
-              (Path \ "addressLine4") -> Seq(ValidationError("error.max.length.address.line4")),
-              (Path \ "postCode") -> Seq(ValidationError("error.invalid.postcode"))
-            )))
-        }
-
-      }
-
-    }
-
 
     "validate toLines for UK address" in {
       RegisteredOfficeUK("38B", Some("some street"), None, None, "AA1 1AA").toLines must be(Seq("38B",
@@ -197,30 +39,6 @@ class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
         "some street",
         "United Kingdom"))
 
-    }
-
-    "write correct UK address to the model" in {
-
-      val data = RegisteredOfficeUK("38B", Some("Some building"), Some("street"), Some("area"), "AA1 1AA")
-
-      RegisteredOffice.formWrites.writes(data) mustBe Map("isUK" -> Seq("true"),
-        "addressLine1" -> Seq("38B"),
-        "addressLine2" -> Seq("Some building"),
-        "addressLine3" -> Seq("street"),
-        "addressLine4" -> Seq("area"),
-        "postCode" -> Seq("AA1 1AA"))
-    }
-
-    "write correct Non UK address to the model" in {
-
-      val data = RegisteredOfficeNonUK("38B", Some("Some Street"), None, None, Country("United Kingdom", "GB"))
-
-      RegisteredOffice.formWrites.writes(data) mustBe Map("isUK" -> Seq("false"),
-        "addressLineNonUK1" -> Seq("38B"),
-        "addressLineNonUK2" -> Seq("Some Street"),
-        "addressLineNonUK3" -> Seq(""),
-        "addressLineNonUK4" -> Seq(""),
-        "country" -> Seq("GB"))
     }
 
     "json read the given non UK address" in {

@@ -16,13 +16,7 @@
 
 package models.responsiblepeople
 
-import jto.validation._
-import jto.validation.forms.Rules._
-import play.api.libs.json.{Writes => _}
-import utils.MappingUtils.Implicits._
-import jto.validation.forms.UrlFormEncoded
-import cats.data.Validated.Valid
-import models.FormTypes._
+import play.api.libs.json._
 
 sealed trait Training
 
@@ -31,31 +25,6 @@ case class TrainingYes(information: String) extends Training
 case object TrainingNo extends Training
 
 object Training {
-
-  import play.api.libs.json._
-
-  val maxInformationTypeLength = 255
-  val informationType = notEmptyStrip andThen
-    notEmpty.withMessage("error.required.rp.training.information") andThen
-    maxLength(maxInformationTypeLength).withMessage("error.rp.invalid.training.information.maxlength.255") andThen
-    basicPunctuationPattern().withMessage("error.rp.invalid.training.information")
-
-  implicit val formRule: Rule[UrlFormEncoded, Training] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    (__ \ "training").read[Boolean].withMessage("error.required.rp.training") flatMap {
-      case true =>
-        (__ \ "information").read(informationType) map (TrainingYes.apply)
-      case false => Rule.fromMapping { _ => Valid(TrainingNo) }
-    }
-  }
-
-  implicit val formWrites: Write[Training, UrlFormEncoded] = Write {
-    case a: TrainingYes => Map(
-      "training" -> Seq("true"),
-      "information" -> Seq(a.information)
-    )
-    case TrainingNo => Map("training" -> Seq("false"))
-  }
 
   implicit val jsonReads: Reads[Training] =
     (__ \ "training").read[Boolean] flatMap {

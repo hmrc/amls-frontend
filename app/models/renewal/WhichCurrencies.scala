@@ -16,13 +16,9 @@
 
 package models.renewal
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-import models.{currencies => currenciesSeq, moneyservicebusiness => msb}
+import models.{moneyservicebusiness => msb}
 import play.api.libs.json._
-import utils.MappingUtils.Implicits._
 import utils.MappingUtils.constant
-import utils.{GenericValidators, TraversableValidators}
 
 case class WhichCurrencies(currencies: Seq[String],
                            usesForeignCurrencies: Option[UsesForeignCurrencies] = None,
@@ -39,30 +35,6 @@ case class WhichCurrencies(currencies: Seq[String],
 }
 
 object WhichCurrencies {
-
-  private val emptyToNone: String => Option[String] = { x =>
-    x.trim() match {
-      case "" => None
-      case s => Some(s)
-    }
-  }
-
-  private val currencyListType = TraversableValidators.seqToOptionSeq(emptyToNone) andThen
-    TraversableValidators.flattenR[String] andThen
-    TraversableValidators.minLengthR[Seq[String]](1).withMessage("error.required.renewal.wc.currencies") andThen
-    GenericRules.traversableR(GenericValidators.inList(currenciesSeq)).withMessage("error.invalid.renewal.wc.currencies")
-
-
-  implicit def formRule: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-
-    (__ \ "currencies").read(currencyListType).flatMap(r => WhichCurrencies(r.toSeq))
-  }
-
-  implicit val formWrite: Write[WhichCurrencies, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-    (__ \ "currencies").write[Seq[String]] contramap {x =>x.currencies}
-  }
 
   def oldUsesForeignCurrenciesReader: Reads[Option[UsesForeignCurrencies]] =
     (__ \ "usesForeignCurrencies").readNullable[Boolean] map { ed =>
@@ -150,6 +122,3 @@ object WhichCurrencies {
     )
   }
 }
-
-
-

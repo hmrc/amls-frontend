@@ -16,9 +16,6 @@
 
 package models.renewal
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.forms.Rules.{minLength => _, _}
 import play.api.libs.json._
 
 sealed trait UsesForeignCurrencies
@@ -28,21 +25,6 @@ case object UsesForeignCurrenciesYes extends UsesForeignCurrencies
 case object UsesForeignCurrenciesNo extends UsesForeignCurrencies
 
 object UsesForeignCurrencies {
-
-  import utils.MappingUtils.Implicits._
-
-  implicit val formRule: Rule[UrlFormEncoded, UsesForeignCurrencies] =
-    From[UrlFormEncoded] { __ =>
-      (__ \ "usesForeignCurrencies").read[Boolean].withMessage("error.required.renewal.wc.foreign.currencies") map {
-        case true => UsesForeignCurrenciesYes
-        case false => UsesForeignCurrenciesNo
-      }
-    }
-
-  implicit def formWrites = Write[UsesForeignCurrencies, UrlFormEncoded] {
-    case UsesForeignCurrenciesYes => Map("usesForeignCurrencies" -> "true")
-    case UsesForeignCurrenciesNo => Map("usesForeignCurrencies" -> "false")
-  }
 
   implicit val jsonReads: Reads[UsesForeignCurrencies] = {
     (__ \ "foreignCurrencies").read[Boolean] flatMap {

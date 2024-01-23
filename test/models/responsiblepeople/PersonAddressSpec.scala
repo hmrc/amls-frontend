@@ -18,8 +18,6 @@ package models.responsiblepeople
 
 import models.Country
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
 import play.api.libs.json.{JsSuccess, Json}
 
 class PersonAddressSpec extends PlaySpec {
@@ -104,123 +102,6 @@ class PersonAddressSpec extends PlaySpec {
         "Default Line 3",
         "Default Line 4",
         "Albania"))
-    }
-
-    "pass validation" when {
-      "Reading UK Address" in {
-        PersonAddress.formRule.validate(defaultUKModel) must be(Valid(defaultUKAddress))
-      }
-      "Read Non UK Address" in {
-        PersonAddress.formRule.validate(defaultNonUKModel) must be(Valid(defaultNonUKAddress))
-      }
-    }
-
-    "throw error" when {
-      "given a non valid non UK address" in {
-        val invalidNonUKModel = Map(
-          "isUK" -> Seq("false"),
-          "addressLineNonUK1" -> Seq(defaultAddressLine1),
-          "addressLineNonUK2" -> Seq("Default Line 2"),
-          "addressLineNonUK3" -> Seq("Default Line 3"),
-          "addressLineNonUK4" -> Seq("Default Line 4"),
-          "country" -> Seq("GB")
-        )
-
-        PersonAddress.formRule.validate(invalidNonUKModel) must
-          be(Invalid(Seq(
-            (Path \ "country") -> Seq(ValidationError("error.required.select.non.uk"))
-          )))
-      }
-
-      "mandatory fields are missing" when {
-        "isUK has not been selected" in {
-          PersonAddress.formRule.validate(defaultUKModel) must be
-          Invalid(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
-          ))
-        }
-        "address lines are missing" when {
-          "UK" in {
-            val data = Map(
-              "isUK" -> Seq("true"),
-              "addressLine1" -> Seq(""),
-              "postCode" -> Seq("")
-            )
-
-            PersonAddress.formRule.validate(data) must
-              be(Invalid(Seq(
-                (Path \ "addressLine1") -> Seq(ValidationError("error.required.address.line1")),
-                (Path \ "postCode") -> Seq(ValidationError("error.required.postcode"))
-              )))
-          }
-          "non UK" in {
-            val data = Map(
-              "isUK" -> Seq("false"),
-              "addressLineNonUK1" -> Seq(""),
-              "country" -> Seq("")
-            )
-
-            PersonAddress.formRule.validate(data) must
-              be(Invalid(Seq(
-                (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.address.line1")),
-                (Path \ "country") -> Seq(ValidationError("error.required.country"))
-              )))
-          }
-        }
-      }
-      "values given are too long" when {
-        "UK" in {
-          val data = Map(
-            "isUK" -> Seq("true"),
-            "addressLine1" -> Seq("abc" * 35),
-            "addressLine2" -> Seq("abc" * 35),
-            "addressLine3" -> Seq("abc" * 35),
-            "addressLine4" -> Seq("abc" * 35),
-            "postCode" -> Seq("abc" * 35)
-          )
-          PersonAddress.formRule.validate(data) must be(
-            Invalid(Seq(
-              (Path \ "addressLine1") -> Seq(ValidationError("error.required.enter.addresslineone.charcount")),
-              (Path \ "addressLine2") -> Seq(ValidationError("error.required.enter.addresslinetwo.charcount")),
-              (Path \ "addressLine3") -> Seq(ValidationError("error.required.enter.addresslinethree.charcount")),
-              (Path \ "addressLine4") -> Seq(ValidationError("error.required.enter.addresslinefour.charcount")),
-              (Path \ "postCode") -> Seq(ValidationError("error.invalid.postcode"))
-            )))
-        }
-        "non UK" in {
-          val data = Map(
-            "isUK" -> Seq("false"),
-            "addressLineNonUK1" -> Seq("abc" * 35),
-            "addressLineNonUK2" -> Seq("abc" * 35),
-            "addressLineNonUK3" -> Seq("abc" * 35),
-            "addressLineNonUK4" -> Seq("abc" * 35),
-            "country" -> Seq("abc" * 35)
-          )
-          PersonAddress.formRule.validate(data) must be(
-            Invalid(Seq(
-              (Path \ "addressLineNonUK1") -> Seq(ValidationError("error.required.enter.addresslineone.charcount")),
-              (Path \ "addressLineNonUK2") -> Seq(ValidationError("error.required.enter.addresslinetwo.charcount")),
-              (Path \ "addressLineNonUK3") -> Seq(ValidationError("error.required.enter.addresslinethree.charcount")),
-              (Path \ "addressLineNonUK4") -> Seq(ValidationError("error.required.enter.addresslinefour.charcount")),
-              (Path \ "country") -> Seq(ValidationError("error.invalid.country"))
-            )))
-        }
-      }
-      "there is invalid data" in {
-        val model = defaultNonUKModel ++ Map("isUK" -> Seq("HGHHHH"))
-        PersonAddress.formRule.validate(model) must be(
-          Invalid(Seq(
-            (Path \ "isUK") -> Seq(ValidationError("error.required.uk.or.overseas"))
-          )))
-      }
-    }
-
-    "write correct UK Address" in {
-      PersonAddress.formWrites.writes(defaultUKAddress) must be(defaultUKModel)
-    }
-
-    "write correct Non UK Address" in {
-      PersonAddress.formWrites.writes(defaultNonUKAddress) must be(defaultNonUKModel)
     }
   }
 

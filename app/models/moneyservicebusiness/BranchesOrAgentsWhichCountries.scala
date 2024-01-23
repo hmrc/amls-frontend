@@ -16,49 +16,8 @@
 
 package models.moneyservicebusiness
 
-import jto.validation._
-import jto.validation.forms.UrlFormEncoded
 import models.Country
-import utils.TraversableValidators
 
 case class BranchesOrAgentsWhichCountries(branches: Seq[Country])
 
-object BranchesOrAgentsWhichCountries {
-
-  val minLength = 1
-  val maxLength = 10
-
-  import jto.validation.forms.Rules._
-
-  implicit val formWrite: Write[BranchesOrAgentsWhichCountries, UrlFormEncoded] = write
-
-  implicit val formRule: Rule[UrlFormEncoded, BranchesOrAgentsWhichCountries] = rule
-
-  private implicit def rule
-  (implicit
-   a: Path => RuleLike[UrlFormEncoded, Seq[String]],
-   cR: Rule[Seq[String], Seq[Country]]
-  ): Rule[UrlFormEncoded, BranchesOrAgentsWhichCountries] =
-    From[UrlFormEncoded] { __ =>
-
-      import TraversableValidators._
-      import utils.MappingUtils.Implicits.RichRule
-
-      implicit val emptyToNone: String => Option[String] = {
-        case "" => None
-        case s => Some(s)
-      }
-
-      val countrySeqR = {
-        (seqToOptionSeq[String] andThen flattenR[String] andThen cR)
-          .andThen(minLengthR[Seq[Country]](minLength) withMessage "error.invalid.countries.msb.branchesOrAgents.country")
-      }
-
-      (__ \ "countries").read(countrySeqR) map BranchesOrAgentsWhichCountries.apply
-    }
-
-  private  def write: Write[BranchesOrAgentsWhichCountries, UrlFormEncoded] = Write {
-    case BranchesOrAgentsWhichCountries(countries) => countries.zipWithIndex.map(i => s"countries[${i._2}]" -> Seq(i._1.code)).toMap
-    case _ => throw new IllegalArgumentException("Eep")
-  }
-}
+object BranchesOrAgentsWhichCountries

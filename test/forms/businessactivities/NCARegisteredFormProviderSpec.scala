@@ -18,7 +18,7 @@ package forms.businessactivities
 
 import forms.behaviours.BooleanFieldBehaviours
 import models.businessactivities.NCARegistered
-import play.api.data.{Form, FormError}
+import play.api.data.Form
 
 class NCARegisteredFormProviderSpec extends BooleanFieldBehaviours[NCARegistered] {
 

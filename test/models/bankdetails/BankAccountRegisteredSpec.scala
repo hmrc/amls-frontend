@@ -19,58 +19,19 @@ package models.bankdetails
 import models.responsiblepeople.BankAccountRegistered
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
+import play.api.libs.json.Json
 
 class BankAccountRegisteredSpec extends PlaySpec with MockitoSugar {
 
   "BankAccountRegistered" must {
 
-    "validate the given model" in {
-      val data = Map(
-        "registerAnotherBank" -> Seq("true")
-      )
+    "round trip through JSON" in {
 
-      BankAccountRegistered.formRule.validate(data) must
-        be(Valid(BankAccountRegistered(true)))
-    }
+      val trueModel = BankAccountRegistered(true)
+      val falseModel = BankAccountRegistered(false)
 
-    "successfully validate given a data model containing true" in {
-
-      val data = Map(
-        "registerAnotherBank" -> Seq("true")
-      )
-
-      BankAccountRegistered.formRule.validate(data) must
-        be(Valid(BankAccountRegistered(true)))
-    }
-
-    "successfully validate given a data model containing false" in {
-
-      val data = Map(
-        "registerAnotherBank" -> Seq("false")
-      )
-
-      BankAccountRegistered.formRule.validate(data) must
-        be(Valid(BankAccountRegistered(false)))
-    }
-
-    "fail to validate when given invalid data" in {
-
-      BankAccountRegistered.formRule.validate(Map.empty) must
-        be(Invalid(Seq(
-          (Path \ "registerAnotherBank") -> Seq(ValidationError("error.required.bankdetails.register.another.bank"))
-        )))
-    }
-
-    "write correct data" in {
-
-      val model = BankAccountRegistered(true)
-
-      BankAccountRegistered.formWrites.writes(model) must
-        be(Map(
-          "registerAnotherBank" -> Seq("true")
-        ))
+      Json.toJson(trueModel).as[BankAccountRegistered] mustBe trueModel
+      Json.toJson(falseModel).as[BankAccountRegistered] mustBe falseModel
     }
   }
 }

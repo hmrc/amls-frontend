@@ -16,11 +16,9 @@
 
 package utils.supervision
 
-import models.supervision.{AnotherBodyNo, AnotherBodyYes, ProfessionalBodies, ProfessionalBodyMemberNo, ProfessionalBodyMemberYes, ProfessionalBodyNo, ProfessionalBodyYes, Supervision}
-import play.api.Logging
+import models.supervision._
 import play.api.i18n.Messages
-import play.twirl.api.Html
-import uk.gov.hmrc.govukfrontend.views.Aliases.{ActionItem, Actions, HtmlContent, SummaryList, SummaryListRow, Value}
+import uk.gov.hmrc.govukfrontend.views.Aliases.{SummaryList, SummaryListRow, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Key
 import utils.{CheckYourAnswersHelperFunctions, DateHelper}
