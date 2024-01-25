@@ -57,7 +57,7 @@ class WhatYouNeedViewSpec extends AmlsViewSpec with MustMatchers {
     "have a back link" in new ViewFixture {
       def view = what_you_need()
 
-      doc.getElementById("back-link").isInstanceOf[Element] mustBe true
+      assertRenderedByClass(doc, "govuk-back-link")
     }
   }
 }

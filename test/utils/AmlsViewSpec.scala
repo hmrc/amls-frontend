@@ -72,7 +72,7 @@ trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar w
 
     "have a back link" in {
       def doc: Document = Jsoup.parse(html.body)
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
+      assertRenderedByClass(doc, "govuk-back-link")
     }
   }
 
@@ -87,6 +87,10 @@ trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar w
       doc.getElementById(s"$idSelectorPrefix-error").text() must include(messages(errorMessage))
 
     }
+  }
+
+  def assertRenderedByClass(doc: Document, className: String) = {
+    assert(doc.getElementsByClass(className) != null, "\n\nElement " + className + " was not rendered on the page.\n")
   }
 
 }

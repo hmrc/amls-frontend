@@ -89,7 +89,7 @@ class VATRegisteredViewSpec extends AmlsViewSpec with MustMatchers  {
 
       def view = vat_registered(formProvider(), true)
 
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
+      assertRenderedByClass(doc, "govuk-back-link")
     }
   }
 }

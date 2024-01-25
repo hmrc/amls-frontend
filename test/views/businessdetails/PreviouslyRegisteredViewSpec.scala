@@ -73,7 +73,7 @@ class PreviouslyRegisteredViewSpec extends AmlsViewSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       def view = previously_registered(formProvider(), true)
 
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
+      assertRenderedByClass(doc, "govuk-back-link")
     }
   }
 }

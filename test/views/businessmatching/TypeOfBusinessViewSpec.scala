@@ -72,7 +72,7 @@ class TypeOfBusinessViewSpec extends AmlsViewSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       def view = type_of_business(formProvider(), edit = true)
 
-      doc.getElementById("back-link").isInstanceOf[Element] mustBe true
+      assertRenderedByClass(doc, "govuk-back-link")
     }
   }
 }

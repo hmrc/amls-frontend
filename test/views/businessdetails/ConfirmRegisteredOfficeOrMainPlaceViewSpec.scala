@@ -82,7 +82,7 @@ class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with MustM
       val address = RegisteredOfficeUK("line1",None,None,None,"AB12CD")
       def view = place(formProvider(), address, true)
 
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
+      assertRenderedByClass(doc, "govuk-back-link")
     }
   }
 }

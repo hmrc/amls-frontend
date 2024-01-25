@@ -129,13 +129,13 @@ class PsrNumberViewSpec extends AmlsViewSpec {
         "have a back link in pre-submission mode" in new ViewFixture {
             def view = psr_number(formProvider(), edit = false, isPreSubmission = true)
 
-            doc.getElementById("back-link").isInstanceOf[Element] mustBe true
+            assertRenderedByClass(doc, "govuk-back-link")
         }
 
         "have a back link in non pre-submission mode" in new ViewFixture {
             def view = psr_number(formProvider(), edit = true, isPreSubmission = false)
 
-            doc.getElementById("back-link").isInstanceOf[Element] mustBe true
+            assertRenderedByClass(doc, "govuk-back-link")
         }
     }
 }

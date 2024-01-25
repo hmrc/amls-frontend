@@ -130,7 +130,7 @@ class HowToPayViewSpec extends AmlsViewSpec with MustMatchers {
 
       def view = howToPay(None)
 
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
+      assertRenderedByClass(doc, "govuk-back-link")
     }
   }
 }

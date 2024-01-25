@@ -46,7 +46,7 @@ class NeedMoreInformationViewSpec extends AmlsViewSpec with MustMatchers {
     }
 
     "have the back link button" in new ViewFixture {
-      assert(doc.getElementById("back-link").isInstanceOf[Element])
+      assertRenderedByClass(doc, "govuk-back-link")
     }
 
     "show the correct content when asp is selected" in new ViewFixture {
