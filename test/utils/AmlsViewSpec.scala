@@ -16,7 +16,7 @@
 
 package utils
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import config.ApplicationConfig
 import connectors.KeystoreConnector
 import controllers.CommonPlayDependencies

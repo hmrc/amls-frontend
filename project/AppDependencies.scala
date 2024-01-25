@@ -1,38 +1,36 @@
-import sbt._
+import sbt.Keys.dependencyOverrides
+import sbt.{Def, _}
 
 private object AppDependencies {
 
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  private val playPartialsVersion = "8.3.0-play-28"
-  private val httpCachingClientVersion = "9.5.0-play-28"
+  private val playPartialsVersion = "9.1.0"
+  private val httpCachingClientVersion = "11.1.0"
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
-  private val jsonEncryptionVersion = "5.1.0-play-28"
-  private val hmrcMongoVersion = "0.71.0"
-  private val domain = "8.1.0-play-28"
+  private val jsonEncryptionVersion = "5.1.0-play-28" // there is no play 3 version for this ...
+  private val hmrcMongoVersion = "1.4.0"
+  private val domain = "9.0.0"
 
-  val compile = Seq(
+  val compile: Seq[ModuleID] = Seq(
     ws,
-    "uk.gov.hmrc"       %% "domain"                        % domain,
-    "uk.gov.hmrc"       %% "play-partials"                 % playPartialsVersion,
-    "uk.gov.hmrc"       %% "http-caching-client"           % httpCachingClientVersion,
-    "uk.gov.hmrc"       %% "json-encryption"               % jsonEncryptionVersion,
-    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"            % hmrcMongoVersion,
-    "uk.gov.hmrc"       %% "bootstrap-frontend-play-28"    % "5.24.0",
-    "uk.gov.hmrc"       %% "play-frontend-hmrc"            % "6.6.0-play-28",
-    "uk.gov.hmrc"       %% "play-conditional-form-mapping" % "1.12.0-play-28",
+    "uk.gov.hmrc"       %% "domain-play-30"                        % domain,
+    "uk.gov.hmrc"       %% "play-partials-play-30"                 % playPartialsVersion,
+    "uk.gov.hmrc"       %% "http-caching-client-play-30"           % httpCachingClientVersion,
+    "uk.gov.hmrc"       %% "json-encryption"                       % jsonEncryptionVersion, // as above there is no play 3 version for this
+    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"                    % hmrcMongoVersion,
+    "uk.gov.hmrc"       %% "bootstrap-frontend-play-30"            % "8.0.0",
+    "uk.gov.hmrc"       %% "play-frontend-hmrc-play-30"            % "8.0.0",
+    "uk.gov.hmrc"       %% "play-conditional-form-mapping-play-30" % "2.0.0",
 
     "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion,
-    "com.beachape" %% "enumeratum-play" % "1.5.15",
+    "com.beachape" %% "enumeratum-play" % "1.5.16",
     "com.squareup.okhttp3" % "mockwebserver" % okHttpVersion,
-    "com.typesafe.play" %% "play-json" % "2.8.1",
-    "com.typesafe.play" %% "play-json-joda" % "2.8.1",
+    "org.playframework" %% "play-json" % "3.0.2",
+    "org.playframework" %% "play-json-joda" % "3.0.2",
     "org.typelevel"     %% "cats-core"      % "2.10.0",
-
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.5" cross CrossVersion.full),
-    "com.github.ghik" % "silencer-lib" % "1.7.5" % Provided cross CrossVersion.full
   )
 
   trait ScopeDependencies {
@@ -50,7 +48,7 @@ private object AppDependencies {
         "org.scalacheck" %% "scalacheck" % "1.14.3" % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "org.jsoup" % "jsoup" % jsoupVersion % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+        "org.playframework" %% "play-test" % "3.0.1" % scope,
         "org.mockito" % "mockito-all" % "1.10.19" % scope,
         "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % scope
       )
