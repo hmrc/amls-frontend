@@ -54,7 +54,7 @@
 
             @if(displayLink) {
                 <p class="govuk-body sidebar-top-spacing">
-                    <a id="view-details" href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp">
+                    <a id="view-details" href="@controllers.businessmatching.routes.SummaryController.get.url" class="edit-preapp govuk-link">
                         @(if(canEditPreApplication) messages("progress.preapplication.canedit") else messages("progress.preapplication.readonly"))
                     </a>
                 </p>
