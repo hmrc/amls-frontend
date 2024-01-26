@@ -8,7 +8,7 @@ private object AppDependencies {
 
   private val playPartialsVersion = "9.1.0"
   private val httpCachingClientVersion = "11.1.0"
-  private val flexmarkVersion = "0.19.1"
+  private val flexmarkVersion = "0.64.8"
   private val okHttpVersion = "3.9.1"
   private val jsonEncryptionVersion = "5.1.0-play-28" // there is no play 3 version for this ...
   private val hmrcMongoVersion = "1.4.0"
@@ -31,6 +31,7 @@ private object AppDependencies {
     "org.playframework" %% "play-json" % "3.0.2",
     "org.playframework" %% "play-json-joda" % "3.0.2",
     "org.typelevel"     %% "cats-core"      % "2.10.0",
+    "commons-codec" % "commons-codec" % "1.15"
   )
 
   trait ScopeDependencies {

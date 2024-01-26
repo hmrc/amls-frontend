@@ -37,7 +37,7 @@ class LocationGraphJsonLoader @Inject()(env: Environment) {
 class LocationGraphTransformer @Inject()(jsonLoader: LocationGraphJsonLoader) {
 
   def transform(allowList: Set[String]): Option[JsObject] = {
-    val filtered = jsonLoader.load.map {
+    val filtered: Option[collection.Seq[(String, Json.JsValueWrapper)]] = jsonLoader.load.map {
       _.fields filter {
         case (code, _) => code.split(':')(1) match {
           case c if allowList.contains(c) => true
@@ -49,6 +49,6 @@ class LocationGraphTransformer @Inject()(jsonLoader: LocationGraphJsonLoader) {
       }
     }
 
-    filtered map { f => Json.obj(f:_*) }
+    filtered map { f => Json.obj(f.toSeq:_*) }
   }
 }

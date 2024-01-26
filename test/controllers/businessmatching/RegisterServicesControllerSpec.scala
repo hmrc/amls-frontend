@@ -74,7 +74,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
     val businessMatching1 = BusinessMatching(None, Some(businessActivities1))
 
     lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
+      .configure("metrics.enabled" -> false)
       .overrides(bind[BusinessMatchingService].to(businessMatchingService))
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))

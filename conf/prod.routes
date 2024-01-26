@@ -3,4 +3,3 @@
 ->          /                           health.Routes
 ->          /amp                        amp.Routes
 ->          /eab                        eab.Routes
-GET         /admin/metrics              @com.kenshoo.play.metrics.MetricsController.metrics

@@ -112,7 +112,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
     val mockServiceFlow = mock[ServiceFlow]
 
     lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
+      .configure("metrics.enabled" -> false)
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[ProxyCacheService].to(proxyCacheService))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))

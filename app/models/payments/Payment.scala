@@ -20,7 +20,7 @@ import enumeratum.{Enum, EnumEntry}
 import models.EnumFormat
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import play.custom.JsPathSupport.RichJsPath
+import play.custom.MongoDateTimeSupport.RichJsPath
 
 import java.time.LocalDateTime
 
@@ -62,7 +62,7 @@ object Payment {
         (__ \ "description").readNullable[String] and
         (__ \ "amountInPence").read[Int] and
         (__ \ "status").read[PaymentStatus] and
-        (__ \ "createdAt").readLocalDateTime and
+        (__ \ "createdAt").localDateTimeReads and
         (__ \ "isBacs").readNullable[Boolean] and
         (__ \ "updatedAt").readNullable[LocalDateTime]
       ) (Payment(_, _, _, _, _, _, _, _, _, _))

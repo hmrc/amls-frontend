@@ -269,7 +269,7 @@ class BankAccountUKControllerSpec extends AmlsSpec with MockitoSugar with Inject
         verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
 
         captor.getValue match {
-          case DataEvent(_, _, _, _, detail, _) =>
+          case DataEvent(_, _, _, _, detail, _, _, _) =>
             detail("accountName") mustBe "Test account"
         }
 

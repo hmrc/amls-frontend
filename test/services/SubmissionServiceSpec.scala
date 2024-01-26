@@ -47,7 +47,6 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 import utils.{AmlsSpec, DependencyMocks}
 
-import scala.collection.Seq
 import scala.concurrent.Future
 
 class SubmissionServiceSpec extends AmlsSpec

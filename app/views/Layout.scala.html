@@ -105,7 +105,6 @@
             signOutUrl = if(canSignOut) Some(appConfig.logoutUrl) else None,
         )
     ),
-    cspNonce = CSPNonce.get,
     beforeContentBlock = Some(beforeContentBlock),
     scriptsBlock = Some(scripts),
     mainContentLayout = if(fullWidthLayout) None else Some(defaultMainContentLayout(_)),

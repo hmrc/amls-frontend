@@ -48,7 +48,7 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
 
     val fn: DataEvent => Unit = d => {}
 
-    when(audit.sendDataEvent) thenReturn fn
+    when(audit.sendDataEvent(any())) thenReturn {}
 
     def mockHttpCall(response: Future[HttpResponse]) = when {
       connector.http.POST[EnrolmentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
