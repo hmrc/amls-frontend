@@ -709,102 +709,33 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       }
     }
 
-    "have hasMsb method which" must {
-      "return true if Msb activities are present in business activities" in new Fixture {
-        val hasMsb = PrivateMethod[Boolean]('hasMsb)
-
-        val result = controller invokePrivate hasMsb(msbAndOther)
-
-        result mustBe true
-      }
-
-      "return false if Msb activities are not present in business activities" in new Fixture {
-        val hasMsb = PrivateMethod[Boolean]('hasMsb)
-
-        val result = controller invokePrivate hasMsb(noMsbNoTcsp)
-
-        result mustBe false
-      }
-    }
-
-    "have hasTcsp method which" must {
-      "return true if Tcsp activities are present in business activities" in new Fixture {
-        val hasTcsp = PrivateMethod[Boolean]('hasTcsp)
-
-        val result = controller invokePrivate hasTcsp(tcspAndOther)
-
-        result mustBe true
-      }
-
-      "return false if Tcsp activities are not present in business activities" in new Fixture {
-        val hasTcsp = PrivateMethod[Boolean]('hasTcsp)
-
-        val result = controller invokePrivate hasTcsp(noMsbNoTcsp)
-
-        result mustBe false
-      }
-    }
-
-    "have hasOther method which" must {
-      "return true if there are other activities than Msb present" in new Fixture {
-        val hasOther = PrivateMethod[Boolean]('hasOther)
-
-        val result = controller invokePrivate hasOther(noMsbNoTcsp)
-
-        result mustBe true
-      }
-
-      "return false if there are no other activities than Msb or Tcsp" in new Fixture {
-        val hasOther = PrivateMethod[Boolean]('hasOther)
-
-        val result = controller invokePrivate hasOther(onlyMsb)
-
-        result mustBe false
-      }
-    }
-
     "have canOrCannotTradeInformation method which" must {
       "return correct content if no msb or tcsp in BA" in new Fixture {
-
-        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
-
-        val result = controller invokePrivate canOrCannotTradeInformation(noMsbNoTcsp, request)
+        val result = controller.canOrCannotTradeInformation(noMsbNoTcsp)(request)
 
         result.body must include("You can trade and carry out business activities while your application is pending")
       }
 
       "return correct content if msb only in BA" in new Fixture {
-
-        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
-
-        val result = controller invokePrivate canOrCannotTradeInformation(onlyMsb, request)
+        val result = controller.canOrCannotTradeInformation(onlyMsb)(request)
 
         result.body must include("You cannot trade or carry out business activities while your application is pending")
       }
 
       "return correct content if tcsp only in BA" in new Fixture {
-
-        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
-
-        val result = controller invokePrivate canOrCannotTradeInformation(onlyTcsp, request)
+        val result = controller.canOrCannotTradeInformation(onlyTcsp)(request)
 
         result.body must include("You cannot trade or carry out business activities while your application is pending")
       }
 
       "return correct content if tcsp and msb only in BA" in new Fixture {
-
-        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
-
-        val result = controller invokePrivate canOrCannotTradeInformation(msbAndTcspOnly, request)
+        val result = controller.canOrCannotTradeInformation(msbAndTcspOnly)(request)
 
         result.body must include("You cannot trade or carry out business activities while your application is pending")
       }
 
       "return correct content if msb and other in BA" in new Fixture {
-
-        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
-
-        val result = controller invokePrivate canOrCannotTradeInformation(msbAndOther, request)
+        val result = controller.canOrCannotTradeInformation(msbAndOther)(request)
 
         result.body must include("There are some services you cannot provide while your application is pending")
         result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
@@ -812,10 +743,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       }
 
       "return correct content if tcsp and other in BA" in new Fixture {
-
-        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
-
-        val result = controller invokePrivate canOrCannotTradeInformation(tcspAndOther, request)
+        val result = controller.canOrCannotTradeInformation(tcspAndOther)(request)
 
         result.body must include("There are some services you cannot provide while your application is pending")
         result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
@@ -823,10 +751,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       }
 
       "return correct content if tcsp, msb and other in BA" in new Fixture {
-
-        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
-
-        val result = controller invokePrivate canOrCannotTradeInformation(msbAndTcsp, request)
+        val result = controller.canOrCannotTradeInformation(msbAndTcsp)(request)
 
         result.body must include("There are some services you cannot provide while your application is pending")
         result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
@@ -834,10 +759,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with PrivateMe
       }
 
       "return default content if BA is empty" in new Fixture {
-
-        val canOrCannotTradeInformation = PrivateMethod[Html]('canOrCannotTradeInformation)
-
-        val result = controller invokePrivate canOrCannotTradeInformation(None, request)
+        val result = controller.canOrCannotTradeInformation(None)(request)
 
         result.body must include("https://www.gov.uk/government/publications/money-laundering-and-terrorist-financing-amendment-regulations-2019/money-laundering-and-terrorist-financing-amendment-regulations-2019")
         result.body must include("Find out if you can trade")

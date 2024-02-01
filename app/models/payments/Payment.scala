@@ -62,7 +62,7 @@ object Payment {
         (__ \ "description").readNullable[String] and
         (__ \ "amountInPence").read[Int] and
         (__ \ "status").read[PaymentStatus] and
-        (__ \ "createdAt").localDateTimeReads and
+        (__ \ "createdAt").read[LocalDateTime] and
         (__ \ "isBacs").readNullable[Boolean] and
         (__ \ "updatedAt").readNullable[LocalDateTime]
       ) (Payment(_, _, _, _, _, _, _, _, _, _))

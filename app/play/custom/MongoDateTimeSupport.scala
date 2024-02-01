@@ -16,7 +16,7 @@
 
 package play.custom
 
-import play.api.libs.json.{Format, JsPath, Reads, Writes, __}
+import play.api.libs.json._
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 

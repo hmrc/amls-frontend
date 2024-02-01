@@ -34,11 +34,11 @@ object CustomAttributeProvider {
     override def rendererOptions(mutableDataHolder: MutableDataHolder): Unit = {}
 
     override def extend(builder: HtmlRenderer.Builder, s: String): Unit = builder.attributeProviderFactory(new AttributeProviderFactory{
-      override def getAfterDependents = ???
+      override def getAfterDependents = null
 
-      override def getBeforeDependents = ???
+      override def getBeforeDependents = null
 
-      override def affectsGlobalScope(): Boolean = ???
+      override def affectsGlobalScope(): Boolean = true
 
       override def apply(context: LinkResolverContext): AttributeProvider = CustomAttributeProvider
     })
