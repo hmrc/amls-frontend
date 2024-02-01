@@ -246,7 +246,7 @@ class TradingPremisesSpec extends AmlsSpec {
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
           .thenReturn(Some(Seq(
             completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
-            completeModel)))
+            completeModel.copy(hasChanged = true))))
 
         val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
@@ -369,6 +369,20 @@ class TradingPremisesSpec extends AmlsSpec {
         val res = TradingPremises.anyChanged(originalBankDetailsChanged)
         res must be(true)
       }
+    }
+  }
+
+  "TradingPremises.filter" must {
+    "filter out any TradingPremises() instances which have the 'Deleted' status" in {
+
+      val completeModelDeletedStatus = completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true)
+      val emptyTradingPremises = TradingPremises()
+      val tradingPremisesSeq: Seq[TradingPremises] = Seq(completeModel, completeModelDeletedStatus, completeModel, emptyTradingPremises)
+
+
+      val result = TradingPremises.filter(tradingPremisesSeq)
+
+      result must be(Seq(completeModel, completeModel))
     }
   }
 
