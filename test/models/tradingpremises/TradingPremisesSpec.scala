@@ -376,7 +376,9 @@ class TradingPremisesSpec extends AmlsSpec {
     "filter out any TradingPremises() instances which have the 'Deleted' status" in {
 
       val completeModelDeletedStatus = completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true)
-      val tradingPremisesSeq: Seq[TradingPremises] = Seq(completeModel, completeModelDeletedStatus, completeModel)
+      val emptyTradingPremises = TradingPremises()
+      val tradingPremisesSeq: Seq[TradingPremises] = Seq(completeModel, completeModelDeletedStatus, completeModel, emptyTradingPremises)
+
 
       val result = TradingPremises.filter(tradingPremisesSeq)
 
