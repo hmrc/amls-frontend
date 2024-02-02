@@ -10,7 +10,7 @@ private object AppDependencies {
   private val httpCachingClientVersion = "11.1.0"
   private val flexmarkVersion = "0.64.8"
   private val okHttpVersion = "3.9.1"
-  private val jsonEncryptionVersion = "5.1.0-play-28" // there is no play 3 version for this ...
+  private val jsonEncryptionVersion = "5.1.0-play-28"
   private val hmrcMongoVersion = "1.4.0"
   private val domain = "9.0.0"
 
@@ -19,14 +19,14 @@ private object AppDependencies {
     "uk.gov.hmrc"       %% "domain-play-30"                        % domain,
     "uk.gov.hmrc"       %% "play-partials-play-30"                 % playPartialsVersion,
     "uk.gov.hmrc"       %% "http-caching-client-play-30"           % httpCachingClientVersion,
-    "uk.gov.hmrc"       %% "json-encryption"                       % jsonEncryptionVersion, // as above there is no play 3 version for this
+    "uk.gov.hmrc"       %% "json-encryption"                       % jsonEncryptionVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"                    % hmrcMongoVersion,
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-30"            % "8.0.0",
     "uk.gov.hmrc"       %% "play-frontend-hmrc-play-30"            % "8.0.0",
     "uk.gov.hmrc"       %% "play-conditional-form-mapping-play-30" % "2.0.0",
 
     "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion,
-    "com.beachape" %% "enumeratum-play" % "1.5.16",
+    "com.beachape" %% "enumeratum-play" % "1.8.0",
     "com.squareup.okhttp3" % "mockwebserver" % okHttpVersion,
     "org.playframework" %% "play-json" % "3.0.2",
     "org.playframework" %% "play-json-joda" % "3.0.2",
