@@ -35,21 +35,16 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   private def getConfigString(key: String) = servicesConfig.getConfString(key, throw new Exception(s"Could not find config '$key'"))
 
-  lazy val contactHost = baseUrl("contact-frontend")
-  lazy val authHost = baseUrl("auth")
   lazy val feedbackFrontendUrl = getConfigString("feedback-frontend.url")
-  lazy val assetsPrefix = getConfigString(s"assets.url") + getConfigString(s"assets.version")
 
   lazy val contactFrontendReportUrl = baseUrl("contact-frontend") + getConfigString("contact-frontend.report-url")
   def reportAProblemNonJSUrl(implicit request: Request[_]): String = {
     getConfigString("contact-frontend.report-problem-url.non-js") +
     "&referrerUrl=" + URLEncoder.encode(frontendBaseUrl + request.uri, "utf-8")
   }
-  val betaFeedbackUrl = getConfigString("contact-frontend.beta-feedback-url.authenticated")
-  val betaFeedbackUnauthenticatedUrl = getConfigString("contact-frontend.beta-feedback-url.unauthenticated")
 
-  lazy val loginUrl = getConfigString("login.url")
-  def logoutUrl = getConfigString("logout.url") + URLEncoder.encode(feedbackFrontendUrl, "utf-8")
+  def logoutUrl = getConfigString("logout.url")
+  def logoutUrlWithFeedback = s"$logoutUrl?continue=${URLEncoder.encode(feedbackFrontendUrl, "utf-8")}"
   lazy val loginContinue = getConfigString("login.continue")
 
   lazy val paymentsUrl:String = getConfigString("paymentsUrl")
@@ -76,8 +71,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   def fxEnabledToggle = servicesConfig.getConfBool("feature-toggle.fx-enabled", false)
 
-  lazy val authUrl = baseUrl("auth")
-
   def enrolmentStoreUrl = baseUrl("tax-enrolments")
 
   def enrolmentStubsEnabled: Boolean = servicesConfig.getConfBool("enrolment-stubs.enabled", false)
@@ -97,7 +90,6 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
   lazy val ggAuthUrl = baseUrl("government-gateway-authentication")
 
   val mongoEncryptionEnabled = configuration.getOptional[Boolean]("appCache.mongo.encryptionEnabled").getOrElse(true)
-  val mongoAppCacheEnabled = configuration.getOptional[Boolean]("appCache.mongo.enabled").getOrElse(false)
   val cacheExpiryInSeconds = configuration.getOptional[Int]("appCache.expiryInSeconds").getOrElse(60)
 
   def refreshProfileToggle: Boolean = configuration.getOptional[Boolean]("feature-toggle.refresh-profile").getOrElse(false)
