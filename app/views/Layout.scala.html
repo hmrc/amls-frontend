@@ -102,7 +102,7 @@
     headerBlock = Some(
         hmrcStandardHeader(
             serviceName = Some(messages("site.service_name")),
-            signOutUrl = if(canSignOut) Some(appConfig.logoutUrl) else None,
+            signOutUrl = if(canSignOut) Some(appConfig.logoutUrlWithFeedback) else None,
         )
     ),
     beforeContentBlock = Some(beforeContentBlock),
