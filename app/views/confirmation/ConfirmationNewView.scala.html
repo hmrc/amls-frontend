@@ -21,12 +21,9 @@
 
 
 @this(
-confirmationDetailsView: ConfirmationDetailsView,
-feedbackSurveyLink: FeedbackSurveyLink
+confirmationDetailsView: ConfirmationDetailsView
 )
 
 @(paymentReference: Option[String], total: Currency, paymentsUrl: String)(implicit request: Request[_], messages: Messages, appConfig: ApplicationConfig)
 
 @confirmationDetailsView("submit.registration", false, paymentReference, total, paymentsUrl)
-
-@feedbackSurveyLink()

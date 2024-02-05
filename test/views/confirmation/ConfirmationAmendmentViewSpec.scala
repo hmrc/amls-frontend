@@ -91,12 +91,5 @@ class ConfirmationAmendmentViewSpec extends AmlsViewSpec with MustMatchers with 
       button.text() mustBe messages("button.continuetopayment")
       button.attr("href") mustBe continueHref
     }
-
-    "display the correct link" in new ViewFixture {
-      val link: Element = doc.getElementsByClass("govuk-link").get(3)
-
-      link.text() mustBe messages("survey.satisfaction.beforeyougo")
-      link.attr("href") mustBe config.feedbackFrontendUrl
-    }
   }
 }

@@ -35,8 +35,8 @@ class PSRNumberFormProvider @Inject()() extends Mappings {
           "regNumber" -> mandatoryIfTrue("appliedFor", text("error.invalid.msb.psr.number")
             .verifying(
               firstError(
-                correctLength(length, "error.max.length.msb.psr.number"),
-                regexp(numbersOnlyRegex, "error.max.msb.psr.number.format")
+                correctLength(length, "error.required.msb.psr.length"),
+                regexp("^[0-9]*$", "error.max.msb.psr.number.format")
               )
             )
           )

@@ -55,8 +55,8 @@ class StartViewSpec extends AmlsViewSpec with MustMatchers {
       doc.getElementById("button").text() mustBe "Sign in"
       doc.getElementsByClass("govuk-heading-m").text() mustBe "Before you start"
 
-      html must include("Check our <a href=\"https://www.gov.uk/topic/business-tax/money-laundering-regulations\">Money Laundering Regulations guidance</a> before applying to register.")
-      html must include("Check <a href=\"https://www.gov.uk/guidance/money-laundering-regulations-registration-fees\">fees for anti-money laundering supervision</a>.")
+      html must include("Check our <a class=\"govuk-link\" href=\"https://www.gov.uk/topic/business-tax/money-laundering-regulations\">Money Laundering Regulations guidance</a> before applying to register.")
+      html must include("Check <a class=\"govuk-link\" href=\"https://www.gov.uk/guidance/money-laundering-regulations-registration-fees\">fees for anti-money laundering supervision</a>.")
       html must include("You should sign out when leaving the service.")
     }
 

@@ -83,12 +83,11 @@ class ConfirmationNoFeeViewSpec extends AmlsViewSpec with MustMatchers {
       button.attr("href") mustBe controllers.routes.LandingController.get.url
     }
 
-
     "display the correct link" in new ViewFixture {
       val link: Element = doc.getElementsByClass("govuk-link").get(2)
 
       link.text() mustBe messages("survey.satisfaction.beforeyougo")
-      link.attr("href") mustBe config.feedbackFrontendUrl
+      link.attr("href") mustBe config.logoutUrl
     }
   }
 }

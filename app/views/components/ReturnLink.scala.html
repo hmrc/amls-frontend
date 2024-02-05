@@ -21,9 +21,9 @@
 @if(returnLink) {
     <p class="govuk-body">
         @if(returnLocation == Some("renewal")) {
-        <a id="return-to-application" href="@controllers.renewal.routes.RenewalProgressController.get.url">@messages("link.return.renewal.progress")</a>
+        <a id="return-to-application" class="govuk-link" href="@controllers.renewal.routes.RenewalProgressController.get.url">@messages("link.return.renewal.progress")</a>
         } else {
-        <a id="return-to-application" href="@controllers.routes.RegistrationProgressController.get.url">@messages("link.return.registration.progress")</a>
+        <a id="return-to-application" class="govuk-link" href="@controllers.routes.RegistrationProgressController.get.url">@messages("link.return.registration.progress")</a>
         }
     </p>
 }

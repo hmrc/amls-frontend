@@ -48,7 +48,7 @@
     <h2 class="govuk-heading-m">Reason for refusal</h2>
     <p class="govuk-body">@HtmlFormat.raw(notificationParams.msgContent)</p>
 
-    <p class="govuk-body">You can view the regulations at <a href="@appConfig.legislationLink">www.legislation.gov.uk</a>.</p>
+    <p class="govuk-body">You can view the regulations at <a class="govuk-link" href="@appConfig.legislationLink">www.legislation.gov.uk</a>.</p>
 
     <h2 class="govuk-heading-m">If you disagree with this decision</h2>
     <p class="govuk-body">You can ask for a review of this decision by writing to:</p>
@@ -64,7 +64,7 @@
 
     <p class="govuk-body">You should explain why you disagree with the decision, with reference to the regulations.</p>
 
-    <p class="govuk-body">You can also <a href="@appConfig.tribunalLink">appeal to an independent tribunal</a>.</p>
+    <p class="govuk-body">You can also <a class="govuk-link" href="@appConfig.tribunalLink">appeal to an independent tribunal</a>.</p>
 
     @backLink()
 }

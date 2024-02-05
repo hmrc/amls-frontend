@@ -6,7 +6,7 @@ resolvers += Resolver.url("HMRC-open-artefacts-ivy", url("https://open.artefacts
 resolvers += Resolver.jcenterRepo
 
 ThisBuild / libraryDependencySchemes ++= Seq(
-  "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always,
+  "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 )
 
 addSbtPlugin("uk.gov.hmrc"        %  "sbt-auto-build"         % "3.9.0")

@@ -18,4 +18,4 @@
 
 @(text: String, href: String, id: String, attributes: Map[String, String] = Map.empty)(implicit messages: Messages)
 
-<a href="@href" id="@id" @attributes.map(set => s"${set._1}=${set._2}").mkString(" ")>@messages(text)</a>
+<a href="@href" class="govuk-link" id="@id" @attributes.map(set => s"${set._1}=${set._2}").mkString(" ")>@messages(text)</a>

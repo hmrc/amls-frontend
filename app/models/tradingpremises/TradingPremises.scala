@@ -259,7 +259,7 @@ object TradingPremises {
       case _ => false
     }
 
-    def filterEmptyNoChanges: Seq[TradingPremises] = x.filterNot {
+    def filterEmptyNoChanges: Seq[TradingPremises] = filter(x).filterNot {
       case TradingPremises(None, None, None, None, None, None, None, None, false, None, None, None, None, None, false) => true
       case _ => false
     }

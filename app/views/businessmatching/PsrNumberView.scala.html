@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import config.ApplicationConfig
 @import models.businessmatching.BusinessAppliedForPSRNumber
-@import components.{Button, ReturnLink, SectionSubtitle}
+@import components.{Button, ReturnLink, SectionSubtitle, Heading}
 @import components.forms.{InputText, InputYesNo, ErrorSummary}
 
 @this(
@@ -27,6 +27,8 @@
     inputText: InputText,
     inputYesNo: InputYesNo,
     errorSummary: ErrorSummary,
+    heading: Heading,
+    warningText: GovukWarningText,
     button: Button,
     returnLink: ReturnLink
 )
@@ -81,31 +83,40 @@
     )
 }
 
+@supportingContent = {
+<div>
+    <p class="govuk-hint">@messages("businessmatching.psr.number.hint")</p>
+    <p class="govuk-hint">@messages("businessmatching.psr.number.hint2")</p>
+</div>
+}
+
 @layout(pageTitle = messages(title) + " - " + messages(section)) {
 
     @formHelper(action = controllers.businessmatching.routes.PSRNumberController.post(edit)) {
 
-        @(edit, isPreSubmission, isPsrDefined) match {
+            @(edit, isPreSubmission, isPsrDefined) match {
             case (true, false, true) | (false, false, true) => {
 
                 @errorSummary(form)
 
                 @subtitle(section)
 
+                @heading("businessmatching.psr.number.title.post.submission")
+
+                @warningText(
+                    WarningText(
+                        content = Text(messages("businessmatching.psr.warning"))
+                        )
+                )
+
                 <input type="hidden" name="appliedFor" value=true />
 
                 @inputText(
                     input = Input(
-                        label = Label(
-                            isPageHeading = true,
-                            content = Text(messages("businessmatching.psr.number.title.post.submission")),
-                            classes = "govuk-label--xl"
-                        ),
                         hint = Some(
                             Hint(
-                                content = Text(messages("businessmatching.psr.number.hint"))
-                            )
-                        ),
+                                content = HtmlContent(supportingContent))
+                            ),
                        name = "regNumber",
                        id = "regNumber",
                        inputmode = Some("numeric"),
@@ -121,16 +132,20 @@
 
                 @subtitle(section)
 
+                @heading("businessmatching.psr.number.title")
+
+                @warningText(
+                    WarningText(
+                        content = Text(messages("businessmatching.psr.warning"))
+                    )
+                )
+
                 @inputYesNo(
                     Radios(
-                        fieldset = Some(Fieldset(
-                          legend = Some(Legend(
-                            content = Text(messages("businessmatching.psr.number.title")),
-                            classes = "govuk-fieldset__legend--xl",
-                            isPageHeading = true
-                          ))
-                        )),
-                        hint = Some(Hint(content = Text(messages("businessmatching.psr.number.hint")))),
+                        hint = Some(
+                            Hint(
+                                content = HtmlContent(supportingContent))
+                            ),
                         name = "appliedFor",
                         items = BusinessAppliedForPSRNumber.formValues(conditionalInput)
                       )
