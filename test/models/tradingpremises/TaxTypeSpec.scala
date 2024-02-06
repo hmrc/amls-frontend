@@ -16,10 +16,10 @@
 
 package models.tradingpremises
 
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsSuccess, Json, JsonValidationError}
-import utils.AmlsSpec
 
-class TaxTypeSpec extends AmlsSpec {
+class TaxTypeSpec extends PlaySpec {
 
   "jsonWritesTaxType" must {
     "convert TaxTypeSelfAssesment to JSON" in {

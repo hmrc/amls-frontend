@@ -17,10 +17,10 @@
 package models.moneyservicebusiness
 
 import models.{CharacterSets, renewal => r}
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
-import utils.AmlsSpec
 
-class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
+class WhichCurrenciesSpec extends PlaySpec with CharacterSets {
 
   "Which Currencies" when {
     "data is complete" should {

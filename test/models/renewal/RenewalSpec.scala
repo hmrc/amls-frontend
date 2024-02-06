@@ -17,10 +17,10 @@
 package models.renewal
 
 import models.Country
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
-import utils.AmlsSpec
 
-class RenewalSpec extends AmlsSpec {
+class RenewalSpec extends PlaySpec {
 
   val completeRenewal = Renewal(
     Some(InvolvedInOtherYes("test")),

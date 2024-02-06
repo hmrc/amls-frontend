@@ -16,10 +16,10 @@
 
 package models.renewal
 
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
-import utils.AmlsSpec
 
-class MoneySourcesSpec extends AmlsSpec {
+class MoneySourcesSpec extends PlaySpec {
 
   trait Fixture {
     val completeModel = MoneySources(

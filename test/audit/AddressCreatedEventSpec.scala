@@ -22,15 +22,16 @@ import models.Country
 import models.businessdetails.{CorrespondenceAddressNonUk, CorrespondenceAddressUk, RegisteredOfficeNonUK, RegisteredOfficeUK}
 import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK}
 import models.tradingpremises.{Address => TradingPremisesAddress}
+import org.scalatest.{MustMatchers, WordSpec}
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
-import utils.AmlsSpec
 
-class AddressCreatedEventSpec extends AmlsSpec {
+class AddressCreatedEventSpec extends WordSpec with MustMatchers {
 
-  implicit val request = FakeRequest("GET", "/test-path")
-  implicit override val headerCarrier: HeaderCarrier = HeaderCarrier()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/test-path")
+  implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
   "The AddressCreatedAuditEvent" must {
     "create the proper detail" when {

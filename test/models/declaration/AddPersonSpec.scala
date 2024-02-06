@@ -17,10 +17,10 @@
 package models.declaration
 
 import models.declaration.release7.RoleWithinBusinessRelease7
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
-import utils.AmlsSpec
 
-class AddPersonRelease7Spec extends AmlsSpec {
+class AddPersonRelease7Spec extends PlaySpec {
 
   "JSON" must {
 

@@ -17,10 +17,10 @@
 package models.tradingpremises
 
 import models.tradingpremises.TradingPremisesMsbService._
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
-import utils.AmlsSpec
 
-class TradingPremisesMsbServicesSpec extends AmlsSpec {
+class TradingPremisesMsbServicesSpec extends PlaySpec {
 
   "MsbServices" must {
 

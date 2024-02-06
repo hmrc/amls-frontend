@@ -17,10 +17,10 @@
 package models.payments
 
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
-import utils.AmlsSpec
 
-class PaymentSpec extends AmlsSpec with ScalaFutures {
+class PaymentSpec extends PlaySpec with ScalaFutures {
 
   "Payment" must {
     "round trip through JSON formatting" in {
