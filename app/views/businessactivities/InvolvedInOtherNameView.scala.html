@@ -81,20 +81,6 @@
 
     @heading("businessactivities.involved.other.title")
 
-    @businessTypes.map { types =>
-        @if(types.size > 1) {
-            <p class="govuk-body">@messages("businessactivities.confirm-activities.subtitle_4"):</p>
-
-            <ul class="govuk-list govuk-list--bullet">
-            @types.map { businessType =>
-                <li>@businessType</li>
-            }
-            </ul>
-        } else {
-            <p class="govuk-body">@messages("businessactivities.confirm-activities.subtitle_4") @(types.head)</p>
-        }
-    }
-
     <p class="govuk-body">@messages("businessactivities.involved.other.hint")</p>
     <ul class="govuk-list govuk-list--bullet">
         <li>@messages("businessactivities.involved.listline1")</li>

@@ -85,14 +85,6 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Priv
 
         val html = contentAsString(result)
 
-        html must include("an " + messages("businessactivities.registerservices.servicename.lbl.01"))
-        html must include("a " + messages("businessactivities.registerservices.servicename.lbl.03"))
-        html must include("an " + messages("businessactivities.registerservices.servicename.lbl.04"))
-        html must include("a " + messages("businessactivities.registerservices.servicename.lbl.05"))
-        html must include("a " + messages("businessactivities.registerservices.servicename.lbl.06"))
-        html must include("a " + messages("businessactivities.registerservices.servicename.lbl.07"))
-        html must include("a " + messages("businessactivities.registerservices.servicename.lbl.08"))
-
         val page = Jsoup.parse(html)
 
         page.select("input[type=radio][name=involvedInOther][value=true]").hasAttr("checked") must be(false)
