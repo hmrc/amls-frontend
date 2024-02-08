@@ -24,7 +24,8 @@ import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import utils.AmlsSpec
 
-import scala.concurrent.{ExecutionContext, Future}
+import java.util.concurrent.Executors
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
 class DataCacheConnectorSpec
   extends AmlsSpec
@@ -45,7 +46,7 @@ class DataCacheConnectorSpec
     val credId = "12345678"
     val cache = Cache(oId, referenceMap())
     val newCache = cache.copy(id = credId)
-    implicit val ec = mock[ExecutionContext]
+    implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
 
     val factory = mock[MongoCacheClientFactory]
     val client = mock[MongoCacheClient]
