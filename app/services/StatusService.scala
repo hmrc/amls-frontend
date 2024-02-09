@@ -19,7 +19,7 @@ package services
 import com.google.inject.Inject
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.ReadStatusResponse
-import models.businessmatching.BusinessMatching
+import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
 import models.registrationprogress.{Completed, TaskRow, Updated}
 import models.status._
 import org.joda.time.LocalDate

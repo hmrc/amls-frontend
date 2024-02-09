@@ -27,7 +27,7 @@ import models.businessmatching.{BusinessActivities => BusinessMatchingActivities
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.StatusService
+import services.{ActivityService, StatusService}
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -41,6 +41,7 @@ import scala.concurrent.Future
 class RegisterServicesController @Inject()(authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
                                            val statusService: StatusService,
+                                           val activityService: ActivityService,
                                            val dataCacheConnector: DataCacheConnector,
                                            val businessMatchingService: BusinessMatchingService,
                                            val cc: MessagesControllerComponents,
@@ -54,12 +55,12 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
           (for {
             businessMatching <- businessMatchingService.getModel(request.credId)
             businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
-            existing = getActivityValues(isPreSubmission, Some(businessActivities.businessActivities))
+            existing = activityService.getActivityValues(isPreSubmission, Some(businessActivities.businessActivities))
             form = formProvider().fill(businessActivities.businessActivities.toSeq)
           } yield {
             Ok(view(form, edit, existing, isPreSubmission, businessMatching.preAppComplete))
           }) getOrElse {
-            Ok(view(formProvider(), edit, getActivityValues(isPreSubmission, None), isPreSubmission, showReturnLink = false))
+            Ok(view(formProvider(), edit, activityService.getActivityValues(isPreSubmission, None), isPreSubmission, showReturnLink = false))
           }
         }
   }
@@ -80,7 +81,7 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
                   view(
                     formWithErrors,
                     edit,
-                    getActivityValues(isPreSubmission, activities),
+                    activityService.getActivityValues(isPreSubmission, activities),
                     isPreSubmission
                   )
                 )
@@ -203,15 +204,6 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
       }
   }
 
-  private def getActivityValues(isPreSubmission: Boolean, existingActivities: Option[Set[BusinessActivity]]): Seq[BusinessActivity] =
-    existingActivities.fold[Seq[BusinessActivity]](Seq.empty) { ea =>
-      if (isPreSubmission) {
-        Seq.empty
-      } else {
-        (BusinessMatchingActivities.all intersect ea).toSeq
-      }
-    }
-
   private def newModel(existingActivities: Option[BusinessMatchingActivities],
                        added: BusinessMatchingActivities,
                        isPreSubmission: Boolean) = existingActivities.fold[BusinessMatchingActivities](added) { existing =>
@@ -251,9 +243,6 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
 
   private def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
 
-  private def promptFitAndProper(rp: ResponsiblePerson) =
-    rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
-
   private def resetHasAccepted(rp: ResponsiblePerson): ResponsiblePerson =
     rp.approvalFlags.hasAlreadyPassedFitAndProper match {
       case None => rp.copy(hasAccepted = false)
@@ -265,7 +254,7 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
 
   val shouldPromptForFitAndProper: (ResponsiblePerson, BusinessMatchingActivities) => ResponsiblePerson =
     (rp, activities) => {
-        if(promptFitAndProper(rp)) {
+        if(rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty) {
           resetHasAccepted(rp)
         } else {
           rp

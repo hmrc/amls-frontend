@@ -17,10 +17,10 @@
 package models.renewal
 
 import models.hvd.{PaymentMethods => HvdPaymentMethods}
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
-import utils.AmlsSpec
 
-class CashPaymentsSpec extends AmlsSpec {
+class CashPaymentsSpec extends PlaySpec {
 
   val paymentMethods = PaymentMethods(courier = true, direct = true, other = Some("foo"))
 

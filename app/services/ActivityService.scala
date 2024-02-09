@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package play.custom
+package services
 
-import play.api.libs.json.{JsPath, Reads}
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import models.businessmatching.{BusinessActivities, BusinessActivity}
 
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+import javax.inject.Singleton
 
-object JsPathSupport {
-  implicit class RichJsPath(path: JsPath) {
-    val readLocalDateTime: Reads[LocalDateTime] = {
-      Reads.at[LocalDateTime](path)(MongoJavatimeFormats.localDateTimeReads)
-        .orElse(Reads.at[String](path).map(dateTimeStr => LocalDateTime.parse(dateTimeStr, ISO_LOCAL_DATE_TIME)))
+@Singleton
+class ActivityService {
+
+  def getActivityValues(isPreSubmission: Boolean, existingActivities: Option[Set[BusinessActivity]]): Seq[BusinessActivity] = {
+    existingActivities.fold[Seq[BusinessActivity]](Seq.empty) { ea =>
+      if (isPreSubmission) {
+        Seq.empty
+      } else {
+        (BusinessActivities.all intersect ea).toSeq
+      }
     }
   }
 }

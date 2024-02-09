@@ -74,7 +74,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
     val businessMatching1 = BusinessMatching(None, Some(businessActivities1))
 
     lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
+      .configure("metrics.enabled" -> false)
       .overrides(bind[BusinessMatchingService].to(businessMatchingService))
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
@@ -290,50 +290,6 @@ class RegisterServicesControllerSpec extends AmlsSpec
           verify(controller.dataCacheConnector, times(0))
             .save(any(), eqTo(BusinessActivities.key), any())(any(), any())
 
-        }
-      }
-    }
-
-    "getActivityValues is called" must {
-      "have no existing services" when {
-        "status is pre-submission" when {
-          "activities have not yet been selected" in new Fixture {
-
-            val getActivityValues = PrivateMethod[Seq[BusinessActivity]]('getActivityValues)
-
-            val existing = controller invokePrivate getActivityValues(true, None)
-
-            existing must be(empty)
-          }
-
-          "activities have already been selected" in new Fixture {
-
-            val getActivityValues = PrivateMethod[Seq[BusinessActivity]]('getActivityValues)
-
-            val existing = controller invokePrivate getActivityValues(true, Some(activityData1))
-
-            existing must be(empty)
-          }
-        }
-      }
-
-      "return values for services excluding those provided" when {
-        "status is post-submission" when {
-
-          activities.foreach { act =>
-
-            s"$act is contained in existing activities" in new Fixture {
-
-              val activityData: Set[BusinessActivity] = Set(act)
-
-              val getActivityValues = PrivateMethod[Seq[BusinessActivity]]('getActivityValues)
-
-              val existing =
-                controller invokePrivate getActivityValues(false, Some(activityData))
-
-              existing must be(Seq(act))
-            }
-          }
         }
       }
     }
@@ -786,31 +742,6 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
           status(result) must be(SEE_OTHER)
           verify(controller.businessMatchingService, times(0)).clearSection(any(), eqTo(TrustAndCompanyServices))(any())
-        }
-      }
-    }
-
-    "promptFitAndProper" must {
-      "return true" when {
-        "a responsible person has fitAndProper not defined" in new Fixture {
-
-          val promptFitAndProper = PrivateMethod[Boolean]('promptFitAndProper)
-
-          val result = controller invokePrivate promptFitAndProper(responsiblePerson)
-
-          result must be(true)
-
-        }
-      }
-      "return false" when {
-        "all responsible people have fitAndProper defined" in new Fixture {
-
-          val promptFitAndProper = PrivateMethod[Boolean]('promptFitAndProper)
-
-          val result = controller invokePrivate promptFitAndProper(responsiblePerson.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))))
-
-          result must be(false)
-
         }
       }
     }

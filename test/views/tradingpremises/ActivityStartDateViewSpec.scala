@@ -48,9 +48,7 @@ class ActivityStartDateViewSpec extends AmlsViewSpec with MustMatchers {
         activity_start_date(fp(), 1, false, address)
       }
 
-      val expectedAddressInHtml = """<p class="govuk-body"> line 1<br> Line 2<br> postcode<br> </p>"""
-
-      doc.html must include(expectedAddressInHtml)
+      doc.getElementsByClass("govuk-body").first().html().replace("\n", "") must include("line 1<br> Line 2<br> postcode<br>")
       doc.title must be(pageTitle)
       heading.html must be(messages("tradingpremises.startDate.title"))
       subHeading.html must include(messages("summary.tradingpremises"))

@@ -25,6 +25,8 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import utils.AmlsSpec
 
+import scala.collection.immutable.ListSet
+
 class CheckYourAnswersHelperSpec extends AmlsSpec {
 
   lazy val cyaHelper: CheckYourAnswersHelper = app.injector.instanceOf[CheckYourAnswersHelper]
@@ -36,7 +38,7 @@ class CheckYourAnswersHelperSpec extends AmlsSpec {
   )
 
   val providedServices: ProvidedServices = ProvidedServices(
-    Set(
+    ListSet(
       PhonecallHandling,
       EmailHandling,
       EmailServer,

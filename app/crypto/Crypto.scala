@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package models.renewal
+package crypto
 
-import cats.implicits._
-import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import uk.gov.hmrc.crypto.Sensitive
 
-class TransactionsInLast12MonthsSpec extends PlaySpec {
+object Crypto {
 
-  "The json serialiser" must {
-    "round-trip through json serialisation" in {
-      val model = TransactionsInLast12Months("1200")
-      Json.fromJson[TransactionsInLast12Months](Json.toJson(model)).asOpt mustBe model.some
-    }
-  }
+  case class SensitiveT[T](override val decryptedValue: T) extends Sensitive[T]
 }

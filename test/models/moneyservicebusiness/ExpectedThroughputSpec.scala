@@ -21,7 +21,7 @@ import models.renewal.TotalThroughput
 import org.scalatest.MustMatchers
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class ExpectedThroughputSpec extends PlaySpec with MustMatchers{
+class ExpectedThroughputSpec extends PlaySpec with MustMatchers {
 
     "JSON validation" must {
 

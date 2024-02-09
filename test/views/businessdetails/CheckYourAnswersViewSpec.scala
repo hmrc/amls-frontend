@@ -19,16 +19,15 @@ package views.businessdetails
 import models.businessdetails._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
-import play.api.test.{FakeRequest, Injecting}
+import play.api.test.Injecting
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.AmlsSummaryViewSpec
 import utils.businessdetails.CheckYourAnswersHelper
 import views.Fixture
 import views.html.businessdetails.CheckYourAnswersView
 
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters._
 
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks with Injecting {
 
@@ -77,8 +76,8 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
       def view = summary(list)
 
-      doc.getElementsByClass("govuk-summary-list__key").toSeq.zip(
-        doc.getElementsByClass("govuk-summary-list__value").toSeq
+      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
+        doc.getElementsByClass("govuk-summary-list__value").asScala
       ).foreach { case (key, value) =>
 
         val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value

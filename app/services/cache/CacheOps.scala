@@ -16,9 +16,10 @@
 
 package services.cache
 
-import play.api.libs.json.Reads
-import uk.gov.hmrc.crypto.Protected
-import uk.gov.hmrc.crypto.json.JsonDecryptor
+import crypto.Crypto.SensitiveT
+import play.api.libs.json.{JsResult, Reads}
+import uk.gov.hmrc.crypto.Decrypter
+import uk.gov.hmrc.crypto.json.JsonEncryption
 
 trait CacheOps {
 
@@ -28,14 +29,19 @@ trait CacheOps {
     * @param key The cache key
     * @return The decrypted item from the cache as T, or None if the value wasn't present
     */
-  def decryptValue[T](cache: Cache, key: String)(implicit decryptor: JsonDecryptor[T]): Option[T] =
-    cache.data.get(key) flatMap { json =>
-      if (json.validate[Protected[T]](decryptor).isSuccess) {
-        Some(json.as[Protected[T]](decryptor).decryptedValue)
+  def decryptValue[T](cache: Cache, key: String)(implicit crypto: Decrypter, reads: Reads[T]): Option[T] = {
+    val sensitiveDecrypter = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
+
+    cache.data.get(key) flatMap { encryptedJson =>
+      val decryptionResult: JsResult[SensitiveT[T]] = sensitiveDecrypter.reads(encryptedJson)
+
+      if (decryptionResult.isSuccess) {
+        Some(decryptionResult.get.decryptedValue)
       } else {
         None
       }
     }
+  }
 
   /**
     * Gets an unencrypted value from the cache
