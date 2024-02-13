@@ -18,11 +18,10 @@ package models.tradingpremises
 
 import models.DateOfChange
 import org.joda.time.LocalDate
-import org.scalatestplus.play.PlaySpec
+import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json.JsSuccess
-import utils.AmlsSpec
 
-class AgentNameSpec extends PlaySpec {
+class AgentNameSpec extends WordSpec with MustMatchers {
 
   "Json Validation" must {
     "Successfully read/write Json data" in {

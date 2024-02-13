@@ -16,11 +16,11 @@
 
 package models.tradingpremises
 
-import org.scalatestplus.play.PlaySpec
 import models.tradingpremises.BusinessStructure._
+import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class BusinessStructureSpec extends PlaySpec {
+class BusinessStructureSpec extends WordSpec with MustMatchers {
 
   "BusinessStructure" should {
 

@@ -17,16 +17,16 @@
 package models
 
 import models.businesscustomer.{Address, ReviewDetails}
-import models.businessdetails.{ActivityStartDate, BusinessDetails, ContactingYou, CorporationTaxRegisteredYes, CorrespondenceAddress, CorrespondenceAddressUk, PreviouslyRegisteredYes, RegisteredOfficeUK, VATRegisteredYes}
-import models.businessmatching.{BusinessActivities, BusinessAppliedForPSRNumberYes, BusinessMatching, BusinessMatchingMsbServices, CompanyRegistrationNumber, TypeOfBusiness}
+import models.businessdetails._
 import models.businessmatching.BusinessActivity.{MoneyServiceBusiness, TelephonePaymentService, TrustAndCompanyServices}
 import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, TransmittingMoney}
 import models.businessmatching.BusinessType.SoleProprietor
+import models.businessmatching._
 import org.joda.time.LocalDate
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsNull, JsSuccess, Json}
-import utils.AmlsSpec
 
-class UpdateMongoCacheResponseSpec extends AmlsSpec {
+class UpdateMongoCacheResponseSpec extends PlaySpec {
 
   val response = UpdateMongoCacheResponse(None,
     view = None,

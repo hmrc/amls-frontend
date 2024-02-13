@@ -16,11 +16,11 @@
 
 package models.tradingpremises
 
-import org.scalatestplus.play.PlaySpec
+import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 
-class IsResidentialSpec extends PlaySpec {
+class IsResidentialSpec extends WordSpec with MustMatchers {
 
   "Json validation" must {
 

@@ -16,10 +16,10 @@
 
 package models.tradingpremises
 
-import org.scalatestplus.play.PlaySpec
+import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json.{JsError, JsSuccess, Json, JsonValidationError}
 
-class TaxTypeSpec extends PlaySpec {
+class TaxTypeSpec extends WordSpec with MustMatchers {
 
   "jsonWritesTaxType" must {
     "convert TaxTypeSelfAssesment to JSON" in {

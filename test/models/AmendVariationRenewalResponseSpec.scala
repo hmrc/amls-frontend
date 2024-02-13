@@ -17,10 +17,10 @@
 package models
 
 
-import org.scalatestplus.play.PlaySpec
+import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json.{JsSuccess, Json}
 
-class AmendVariationRenewalResponseSpec extends PlaySpec {
+class AmendVariationRenewalResponseSpec extends WordSpec with MustMatchers {
 
   val response = AmendVariationRenewalResponse("pdate", "12345", 115.0, Some(125.0), Some(115.0), None, None, 0, None, 240.0, Some("ref"), None)
 

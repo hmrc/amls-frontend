@@ -20,10 +20,16 @@ import controllers.businessmatching.routes
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
 import models.flowmanagement.ChangeSubSectorFlowModel
-import utils.AmlsSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 
-class PSRNumberPageRouterSpec extends AmlsSpec {
+import scala.concurrent.ExecutionContext.Implicits.global
+
+class PSRNumberPageRouterSpec extends PlaySpec with MockitoSugar {
+
+  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
   trait Fixture {
     val router = new PSRNumberPageRouter

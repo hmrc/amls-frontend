@@ -19,15 +19,21 @@ package services.flowmanagement.flowrouters
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import models.businessmatching.BusinessActivity._
 import models.flowmanagement._
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.flowrouters.businessmatching.AddBusinessTypeRouter
 import services.flowmanagement.pagerouters.addflow._
+import uk.gov.hmrc.http.HeaderCarrier
+import utils.DependencyMocks
 
-import utils.{AmlsSpec, DependencyMocks}
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class AddTCSPSpecificRouterSpec extends AmlsSpec {
+class AddTCSPSpecificRouterSpec extends PlaySpec with MockitoSugar {
+
+  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
   val model = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices))
 

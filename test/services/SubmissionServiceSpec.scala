@@ -41,25 +41,29 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalacheck.Gen
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import play.api.inject.guice.GuiceApplicationBuilder
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+import play.api.mvc.{AnyContentAsEmpty, Request}
+import play.api.test.CSRFTokenHelper._
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
-import utils.{AmlsSpec, DependencyMocks}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
+import utils.DependencyMocks
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SubmissionServiceSpec extends AmlsSpec
+class SubmissionServiceSpec extends PlaySpec
   with ScalaFutures
   with IntegrationPatience
   with ResponsiblePersonGenerator
   with TradingPremisesGenerator {
 
-  override lazy val app = GuiceApplicationBuilder().build()
-
   trait Fixture extends DependencyMocks {
 
-    val config = mock[ApplicationConfig]
+    val config: ApplicationConfig = mock[ApplicationConfig]
+    implicit val requestWithToken: Request[AnyContentAsEmpty.type] = CSRFRequest(FakeRequest()).withCSRFToken
+    implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
     val submissionService = new SubmissionService (
       mockCacheConnector,
