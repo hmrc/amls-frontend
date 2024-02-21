@@ -16,9 +16,11 @@
 
 package services
 
+import config.ApplicationConfig
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
+import models._
 import models.amp.Amp
 import models.asp.Service.Accountancy
 import models.asp.{Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
@@ -38,20 +40,22 @@ import models.moneyservicebusiness._
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision.ProfessionalBodies._
 import models.supervision.{ProfessionalBodyYes => SupervisionProfessionalBodyYes, _}
-import models.tcsp._
-import models.tcsp.TcspTypes._
 import models.tcsp.ProvidedServices.{PhonecallHandling, Other => PSOther}
+import models.tcsp.TcspTypes._
+import models.tcsp._
 import models.tradingpremises.TradingPremises
-import models.{DataImport, _}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.verify
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HttpClient
-import utils.{AmlsSpec, DependencyMocks}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import utils.DependencyMocks
 
-class UpdateMongoCacheServiceSpec extends AmlsSpec
+import scala.concurrent.ExecutionContext.Implicits.global
+
+class UpdateMongoCacheServiceSpec extends PlaySpec
   with BusinessMatchingGenerator
   with TradingPremisesGenerator
   with ResponsiblePersonGenerator {
@@ -59,6 +63,9 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
   trait Fixture extends DependencyMocks {
 
     val http = mock[HttpClient]
+    val appConfig = mock[ApplicationConfig]
+    implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
+
     val updateMongoCacheService = new UpdateMongoCacheService(http, mockCacheConnector, appConfig)
 
     val credId = "12341234"

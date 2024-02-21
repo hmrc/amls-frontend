@@ -16,14 +16,20 @@
 
 package services.flowmanagement.pagerouters.businessmatching.subsectors
 
+import controllers.businessmatching.routes
 import models.businessmatching.BusinessMatchingMsbService._
 import models.flowmanagement.ChangeSubSectorFlowModel
 import org.scalatest.concurrent.ScalaFutures
-import utils.AmlsSpec
-import controllers.businessmatching.routes
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 
-class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
+import scala.concurrent.ExecutionContext.Implicits.global
+
+class MsbSubSectorsPageRouterSpec extends PlaySpec with ScalaFutures with MockitoSugar {
+
+  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
   trait Fixture {
     val router = new MsbSubSectorsPageRouter

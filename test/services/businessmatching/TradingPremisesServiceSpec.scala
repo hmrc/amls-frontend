@@ -20,18 +20,17 @@ import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal}
-import models.tradingpremises.TradingPremisesMsbServices._
 import models.businessmatching.{BusinessMatchingMsbServices => BMMsbServices}
+import models.tradingpremises.TradingPremisesMsbServices._
 import models.tradingpremises.{WhatDoesYourBusinessDo, TradingPremisesMsbServices => TPMsbServices}
 import org.joda.time.LocalDate
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import services.TradingPremisesService
-import utils.{AmlsSpec, DependencyMocks, FutureAssertions, StatusConstants}
+import utils.{DependencyMocks, FutureAssertions, StatusConstants}
 
 class TradingPremisesServiceSpec extends PlaySpec
-  with AmlsSpec
   with MockitoSugar
   with ScalaFutures
   with FutureAssertions

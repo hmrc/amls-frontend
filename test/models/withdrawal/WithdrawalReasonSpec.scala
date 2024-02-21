@@ -16,12 +16,11 @@
 
 package models.withdrawal
 
-import org.scalatest.MustMatchers
+import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
-class WithdrawalReasonSpec extends PlaySpec with MustMatchers with MockitoSugar {
+class WithdrawalReasonSpec extends WordSpec with MustMatchers with MockitoSugar {
 
   "JSON validation" must {
 

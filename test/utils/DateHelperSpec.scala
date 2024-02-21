@@ -17,8 +17,9 @@
 package utils
 
 import org.joda.time.LocalDate
+import org.scalatest.{MustMatchers, WordSpec}
 
-class DateHelperSpec extends AmlsSpec  {
+class DateHelperSpec extends WordSpec with MustMatchers  {
   "DateHelper" should {
     "isNotFutureDate" when {
       "return false if the date is later than current date" in {

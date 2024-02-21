@@ -16,11 +16,11 @@
 
 package models.tradingpremises
 
+import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class ConfirmAddressSpec extends PlaySpec with MockitoSugar {
+class ConfirmAddressSpec extends WordSpec with MustMatchers with MockitoSugar {
   
   "ConfirmAddress" must {
 

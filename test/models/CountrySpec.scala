@@ -17,11 +17,11 @@
 package models
 
 import org.scalacheck.Gen
+import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.libs.json.JsString
-import utils.AmlsSpec
 
-class CountrySpec extends AmlsSpec with ScalaCheckDrivenPropertyChecks {
+class CountrySpec extends WordSpec with MustMatchers with ScalaCheckDrivenPropertyChecks {
 
   "Country" when {
 

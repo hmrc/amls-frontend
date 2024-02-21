@@ -16,7 +16,9 @@
 
 package utils
 
-class FeeRateHelperSpec extends AmlsSpec {
+import org.scalatest.{MustMatchers, WordSpec}
+
+class FeeRateHelperSpec extends WordSpec with MustMatchers {
   "fetch" must {
     "translate a specified value" in {
       FeeRateHelper.fetch(Some(115.00)) mustBe 115.00
