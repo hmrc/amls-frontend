@@ -51,6 +51,10 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
 
   lazy val mockMcc = app.injector.instanceOf[MessagesControllerComponents]
 
+  // ================================== Encryption/Decryption ==================================
+  val applicationCrypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
+  implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+  // ===========================================================================================
 
   implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 

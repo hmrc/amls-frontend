@@ -139,11 +139,17 @@ class MongoCacheClient @Inject()(
     */
   def createOrUpdate[T](credId: String, data: T, key: String)(implicit writes: Writes[T]): Future[Cache] = {
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
+      println(s"\n\n======== encryption enabled, encrypting data ========\n\n")
+      println(s"\n\n======== encrypting data for credId: $credId ========\n\n")
+      println(s"\n\n======== encrypting data for key: $key========\n\n")
+      println(s"\n\n======== data to be encrypted is: ${data.toString}========\n\n")
       val jsonEncryptor = new JsonEncryptor[T]()
       Json.toJson(Protected(data))(jsonEncryptor)
     } else {
       Json.toJson(data)
     }
+
+    println(s"\n\n======== json data is: $jsonData ========\n\n")
 
     fetchAll(Some(credId)) flatMap { maybeNewCache =>
       val cache: Cache = maybeNewCache.getOrElse(Cache(credId, Map.empty))
