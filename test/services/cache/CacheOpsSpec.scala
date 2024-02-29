@@ -18,10 +18,12 @@ package services.cache
 
 import models.amp.Amp
 import models.tradingpremises.TradingPremises
-import play.api.libs.json.JsString
+import play.api.libs.json.{JsResultException, JsString}
 import uk.gov.hmrc.crypto.Crypted
 import uk.gov.hmrc.crypto.json.JsonDecryptor
 import utils.AmlsSpec
+
+import scala.util.{Failure, Success, Try}
 
 class CacheOpsSpec extends AmlsSpec {
 
@@ -42,7 +44,18 @@ class CacheOpsSpec extends AmlsSpec {
       val optTradingPremises = TestDataClient.decryptValue(cache, "trading-premises")(new JsonDecryptor[TradingPremises]())
       optTradingPremises mustBe Some(TradingPremises())
 
-      val optAmp = TestDataClient.decryptValue(cache, "amp")(new JsonDecryptor[String]())
+      Try(TestDataClient.decryptValue(cache, "amp")(new JsonDecryptor[Amp]())) match {
+        case f@Failure(ex) => f match {
+          case jsrex: JsResultException => ???
+        }{
+          // log with user id ...
+          // call des
+          // replace value in mongo
+        }
+        case Success(value) => ??? // whatever
+      }
+
+
       val decryptedValue = compositeSymmetricCrypto.decrypt(Crypted(optAmp.get)).value
       println(decryptedValue) // this is the actual decrypted value.
       decryptedValue mustBe ""
