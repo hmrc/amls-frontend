@@ -30,8 +30,10 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
+import services.businessmatching.RecoverActivitiesService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
@@ -53,6 +55,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
     lazy val view = inject[ExperienceTrainingView]
     val controller = new ExperienceTrainingController (
       dataCacheConnector = dataCacheConnector,
+      recoverActivitiesService = mock[RecoverActivitiesService],
       authAction = SuccessfulAuthAction,
       ds = commonDependencies,
       cc = mockMcc,
@@ -61,7 +64,8 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       error = errorView)
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val emptyCache: CacheMap = CacheMap("", Map.empty)
+  val mockCacheMap: CacheMap = mock[CacheMap]
 
   "ExperienceTrainingController" must {
 
@@ -73,13 +77,15 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on get load the page with the business activities" in new Fixture {
 
-        val mockCacheMap = mock[CacheMap]
-
         when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training")))))))
+          (any(), any())).thenReturn(Future.successful(Some(
+            Seq(ResponsiblePerson(
+              personName = personName,
+              experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training"))
+          )))))
 
         val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
         when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
@@ -101,8 +107,6 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on get display the page with pre populated data for the Yes Option" in new Fixture {
 
-      val mockCacheMap = mock[CacheMap]
-
       when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
@@ -119,10 +123,7 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       contentAsString(result) must include ("I do not remember when I did the training")
     }
 
-
     "on get display the page with pre populated data with No Data for the information" in new Fixture {
-
-      val mockCacheMap = mock[CacheMap]
 
       when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -141,6 +142,50 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       document.select("input[name=experienceTraining][value=false]").hasAttr("checked") must be(true)
     }
 
+    "on get redirect to itself after performing a successful recovery of missing business types" in new Fixture {
+      val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessMatchingActivities(Set())))
+
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(businessMatching))
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(
+          Seq(ResponsiblePerson(
+            personName = personName,
+            experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training"))
+        )))))
+
+      when(controller.recoverActivitiesService.recover(any())(any(), any(), any()))
+        .thenReturn(Future.successful(true))
+
+      val result: Future[Result] = controller.get(RecordId)(request)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) mustBe Some(routes.ExperienceTrainingController.get(RecordId).url)
+    }
+
+    "on get return an internal server error after failing to recover missing business types" in new Fixture {
+      val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessMatchingActivities(Set())))
+
+      when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(businessMatching))
+
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
+        (any(), any())).thenReturn(Future.successful(Some(
+          Seq(ResponsiblePerson(
+            personName = personName,
+            experienceTraining = Some(ExperienceTrainingYes("I do not remember when I did the training"))
+        )))))
+
+      when(controller.recoverActivitiesService.recover(any())(any(), any(), any()))
+        .thenReturn(Future.successful(false))
+
+      val result: Future[Result] = controller.get(RecordId)(request)
+      status(result) must be(INTERNAL_SERVER_ERROR)
+    }
 
     "on post with valid data and training selected yes" in new Fixture {
       val newRequest = FakeRequest(POST, routes.ExperienceTrainingController.post(1).url)

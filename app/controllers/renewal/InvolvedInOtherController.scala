@@ -23,20 +23,23 @@ import forms.renewal.InvolvedInOtherFormProvider
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.renewal.{InvolvedInOther, InvolvedInOtherNo, InvolvedInOtherYes, Renewal}
+import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.RenewalService
+import services.businessmatching.RecoverActivitiesService
 import utils.AuthAction
 import utils.CharacterCountParser.cleanData
 import views.html.renewal.InvolvedInOtherView
 
 @Singleton
 class InvolvedInOtherController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                          val recoverActivitiesService: RecoverActivitiesService,
                                           val authAction: AuthAction,
                                           val ds: CommonPlayDependencies,
                                           val renewalService: RenewalService,
                                           val cc: MessagesControllerComponents,
                                           formProvider: InvolvedInOtherFormProvider,
-                                          view: InvolvedInOtherView) extends AmlsBaseController(ds, cc) {
+                                          view: InvolvedInOtherView) extends AmlsBaseController(ds, cc) with Logging {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
@@ -53,6 +56,13 @@ class InvolvedInOtherController @Inject()(val dataCacheConnector: DataCacheConne
                 Ok(view(formProvider().fill(involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
               }) getOrElse Ok(view(formProvider(), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false)))
             }) getOrElse Ok(view(formProvider(), edit, None))
+        } recoverWith {
+          case _: NoSuchElementException =>
+            logger.warn("[InvolvedInOtherController][get] - Business activities list was empty, attempting to recover")
+            recoverActivitiesService.recover(request).map {
+              case true => Redirect(routes.InvolvedInOtherController.get())
+              case false => InternalServerError("Unable to determine business types")
+            }
         }
   }
 
