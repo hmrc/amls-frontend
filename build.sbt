@@ -34,19 +34,16 @@ lazy val scoverageSettings = {
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(Seq(play.sbt.PlayScala, SbtDistributablesPlugin) ++ plugins : _*)
+  .settings(libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always))
   .settings(majorVersion := 4)
   .settings(playSettings ++ scoverageSettings : _*)
   .settings(scalaSettings: _*)
   .settings(defaultSettings(): _*)
-  .settings(scalaVersion := "2.13.12")
+  .settings(scalaVersion := "2.12.13")
   .settings(routesImport += "models.notifications.ContactType._")
   .settings(routesImport += "utils.Binders._")
   .settings(Global / lintUnusedKeysOnLoad := false)
   .settings(
-    libraryDependencySchemes ++= Seq(
-      "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always,
-      "org.scala-lang.modules" %% "scala-java8-compat" % VersionScheme.Always
-    ),
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     PlayKeys.playDefaultPort := 9222,
@@ -73,13 +70,14 @@ lazy val microservice = Project(appName, file("."))
     IntegrationTest / parallelExecution := false)
  .settings(
     scalacOptions ++= List(
+      "-Ypartial-unification",
       "-Yrangepos",
       "-Xlint:-missing-interpolator,_",
+      "-Yno-adapted-args",
       "-feature",
       "-unchecked",
       "-language:implicitConversions",
-      "-Wconf:cat=unused-imports&src=html/.*:s",
-      "-Wconf:cat=unused-imports&src=routes/.*:s"
+      "-P:silencer:pathFilters=views;routes;TestStorage"
     )
   )
   .disablePlugins(JUnitXmlReportPlugin)

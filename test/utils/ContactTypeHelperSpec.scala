@@ -21,7 +21,7 @@ import models.notifications._
 import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatestplus.play.PlaySpec
 
-class ContactTypeHelperSpec extends PlaySpec {
+class ContactTypeHelperSpec extends PlaySpec with AmlsSpec {
 
   "ContactTypeHelper " must {
     "return correct ContactType" when {

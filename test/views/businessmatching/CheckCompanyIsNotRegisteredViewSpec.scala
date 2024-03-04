@@ -47,7 +47,7 @@ class CheckCompanyIsNotRegisteredViewSpec extends AmlsViewSpec {
       override def view = checkView()
 
       doc.getElementsByClass("govuk-warning-text__text")
-        .first().text() mustBe s"Warning ${messages("businessmatching.checkbusiness.warning")}"
+        .first().text() mustBe "Warning " + messages("businessmatching.checkbusiness.warning")
     }
 
     "render the correct button" in new Fixture {

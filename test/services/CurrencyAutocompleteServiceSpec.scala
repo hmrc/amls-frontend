@@ -16,9 +16,9 @@
 
 package services
 
-import org.scalatest.{MustMatchers, WordSpec}
+import utils.AmlsSpec
 
-class CurrencyAutocompleteServiceSpec extends WordSpec with MustMatchers {
+class CurrencyAutocompleteServiceSpec extends AmlsSpec {
 
   val service = new CurrencyAutocompleteService()
 

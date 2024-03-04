@@ -23,7 +23,7 @@ import utils.AmlsSummaryViewSpec
 import views.Fixture
 import views.html.asp.SummaryView
 
-import scala.jdk.CollectionConverters._
+import scala.collection.JavaConversions._
 
 class SummaryViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks {
 
@@ -63,8 +63,8 @@ class SummaryViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks
         summary(testdata)
       }
 
-      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
-        doc.getElementsByClass("govuk-summary-list__value").asScala
+      doc.getElementsByClass("govuk-summary-list__key").toSeq.zip(
+        doc.getElementsByClass("govuk-summary-list__value").toSeq
       ).foreach { case (key, value) =>
 
         val maybeRow = list.find(_._1 == key.text())

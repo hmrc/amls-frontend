@@ -21,7 +21,7 @@ import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import utils.AmlsSpec
 
-class NotificationRowSpec extends PlaySpec {
+class NotificationRowSpec extends PlaySpec with AmlsSpec {
 
   val testNotifications = NotificationRow(
     Some(

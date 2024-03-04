@@ -18,13 +18,11 @@ package models.payments
 
 import config.ApplicationConfig
 import models.ReturnLocation
-import org.mockito.Mockito.when
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
+import utils.AmlsSpec
 
-class CreatePaymentRequestSpec extends WordSpec with MustMatchers with MockitoSugar {
+class CreatePaymentRequestSpec extends AmlsSpec {
 
   implicit val request = FakeRequest("GET", "http://localhost:9222")
 
@@ -44,11 +42,9 @@ class CreatePaymentRequestSpec extends WordSpec with MustMatchers with MockitoSu
 
       //noinspection ScalaStyle
 
-      val applicationConfig = mock[ApplicationConfig]
+      val applicationConfig = app.injector.instanceOf[ApplicationConfig]
 
-      when(applicationConfig.frontendBaseUrl).thenReturn("http://localhost:9222/")
-
-      val model = CreatePaymentRequest("other", "XA2345678901232", "A description", 100, ReturnLocation("confirmation")(applicationConfig))
+      val model = CreatePaymentRequest("other", "XA2345678901232", "A description", 100, ReturnLocation("/confirmation")(applicationConfig))
 
       Json.toJson(model) mustBe Json.parse(expectedJson)
     }

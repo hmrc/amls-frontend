@@ -20,18 +20,13 @@ import generators.ResponsiblePersonGenerator
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
-import services.ResponsiblePeopleService._
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.{DependencyMocks, StatusConstants}
+import utils.{AmlsSpec, DependencyMocks, StatusConstants}
+import ResponsiblePeopleService._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 
-class ResponsiblePersonServiceSpec extends PlaySpec with ResponsiblePersonGenerator with ScalaFutures with MockitoSugar {
 
-  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
+class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenerator with ScalaFutures {
 
   trait Fixture extends DependencyMocks {
 

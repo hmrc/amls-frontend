@@ -17,7 +17,7 @@
 package filters
 
 import javax.inject.Inject
-import org.apache.pekko.stream.Materializer
+import akka.stream.Materializer
 import connectors.{AuthenticatorConnector, KeystoreConnector}
 import models.status.ConfirmationStatus
 import play.api.Logging

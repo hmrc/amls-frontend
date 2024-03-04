@@ -23,26 +23,20 @@ import models.businessmatching._
 import models.flowmanagement._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.flowrouters.businessmatching.AddBusinessTypeRouter
 import services.flowmanagement.pagerouters.addflow._
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.DependencyMocks
+import utils.{AmlsSpec, DependencyMocks}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AddBusinessTypeRouterSpec extends PlaySpec with MockitoSugar {
+class AddBusinessTypeRouterSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks {
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
-
 
     val router = new AddBusinessTypeRouter(
       businessMatchingService = mockBusinessMatchingService,

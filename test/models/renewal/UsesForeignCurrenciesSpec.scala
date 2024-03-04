@@ -17,11 +17,10 @@
 package models.renewal
 
 import models.CharacterSets
-import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 import utils.AmlsSpec
 
-class UsesForeignCurrenciesSpec extends PlaySpec with CharacterSets {
+class UsesForeignCurrenciesSpec extends AmlsSpec with CharacterSets {
 
   "UsesForeignCurrencies renewal" must {
 

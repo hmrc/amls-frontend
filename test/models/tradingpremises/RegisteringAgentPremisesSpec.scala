@@ -16,10 +16,10 @@
 
 package models.tradingpremises
 
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess}
 
-class RegisteringAgentPremisesSpec extends WordSpec with MustMatchers {
+class RegisteringAgentPremisesSpec extends PlaySpec {
 
   "JSON" should {
     "Read and write successfully" in {

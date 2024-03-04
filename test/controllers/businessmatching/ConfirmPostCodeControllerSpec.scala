@@ -42,7 +42,7 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
     val dataCacheConnector = mock[DataCacheConnector]
 
     lazy val app = new GuiceApplicationBuilder()
-      .configure("metrics.enabled" -> false)
+      .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .build()

@@ -229,7 +229,7 @@ class TradingPremisesSpec extends AmlsSpec {
             completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true),
             TradingPremises(Some(RegisteringAgentPremises(true)), None, hasAccepted = true)
           )))
-        
+
         val taskRow = TradingPremises.taskRow(mockCacheMap, messages)
 
         taskRow.hasChanged must be(true)

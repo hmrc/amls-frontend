@@ -17,11 +17,11 @@
 package models.tradingpremises
 
 import org.scalacheck.Gen
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-class AgentRemovalReasonSpec extends WordSpec with MustMatchers with ScalaCheckDrivenPropertyChecks {
+class AgentRemovalReasonSpec extends PlaySpec with ScalaCheckDrivenPropertyChecks {
 
   import models.tradingpremises.RemovalReasonConstants._
 

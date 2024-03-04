@@ -24,20 +24,15 @@ import models.businessmatching.BusinessMatching
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.AmlsSpec
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ConfirmRegisteredOfficeServiceSpec extends PlaySpec with BeforeAndAfterEach with MockitoSugar with ScalaFutures {
+class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
   val mockCacheConnector = mock[DataCacheConnector]
   val mockCacheMap = mock[CacheMap]
-  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
   val service = new ConfirmRegisteredOfficeService(mockCacheConnector)
 

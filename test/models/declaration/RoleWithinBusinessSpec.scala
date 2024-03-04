@@ -17,12 +17,11 @@
 package models.declaration
 
 import models.CharacterSets
-import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 import utils.AmlsSpec
 
 
-class RoleWithinBusinessSpec extends PlaySpec with CharacterSets {
+class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
 
   "JSON" must {
 

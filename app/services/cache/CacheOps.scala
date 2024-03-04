@@ -16,7 +16,7 @@
 
 package services.cache
 
-import play.api.libs.json.{JsValue, Reads}
+import play.api.libs.json.Reads
 import uk.gov.hmrc.crypto.Protected
 import uk.gov.hmrc.crypto.json.JsonDecryptor
 
@@ -29,7 +29,7 @@ trait CacheOps {
     * @return The decrypted item from the cache as T, or None if the value wasn't present
     */
   def decryptValue[T](cache: Cache, key: String)(implicit decryptor: JsonDecryptor[T]): Option[T] =
-    cache.data.get(key) flatMap { json: JsValue =>
+    cache.data.get(key) flatMap { json =>
       if (json.validate[Protected[T]](decryptor).isSuccess) {
         Some(json.as[Protected[T]](decryptor).decryptedValue)
       } else {

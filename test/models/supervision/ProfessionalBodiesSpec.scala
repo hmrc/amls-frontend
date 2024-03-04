@@ -21,7 +21,7 @@ import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 import utils.AmlsSpec
 
-class ProfessionalBodiesSpec extends PlaySpec {
+class ProfessionalBodiesSpec extends PlaySpec with AmlsSpec {
 
   "JSON validation" must {
 

@@ -33,7 +33,7 @@ class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
   trait Fixture extends DependencyMocks with AutoCompleteServiceMocks { self =>
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
-      .configure("metrics.enabled" -> false)
+      .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[StatusService].to(mockStatusService))

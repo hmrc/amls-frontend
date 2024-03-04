@@ -25,23 +25,18 @@ import models.businessmatching.updateservice.{Add, Remove}
 import models.flowmanagement.ChangeBusinessTypesPageId
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.DependencyMocks
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
-class ChangeBusinessTypeRouterSpec extends PlaySpec with MockitoSugar {
+class ChangeBusinessTypeRouterSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks {
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
     val router = new ChangeBusinessTypeRouter(mockBusinessMatchingService)
 

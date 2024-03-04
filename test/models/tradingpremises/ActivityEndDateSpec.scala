@@ -17,11 +17,11 @@
 package models.tradingpremises
 
 import org.joda.time.LocalDate
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 
-class ActivityEndDateSpec extends WordSpec with MustMatchers {
+class ActivityEndDateSpec extends PlaySpec {
 
   val startDateField = Map("premisesStartDate" -> Seq("1989-01-01"))
 

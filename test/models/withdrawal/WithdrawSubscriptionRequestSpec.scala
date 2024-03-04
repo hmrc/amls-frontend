@@ -17,10 +17,11 @@
 package models.withdrawal
 
 import org.joda.time.LocalDate
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.MustMatchers
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class WithdrawSubscriptionRequestSpec extends WordSpec with MustMatchers {
+class WithdrawSubscriptionRequestSpec extends PlaySpec with MustMatchers {
 
   "The withdrawal subscription request object" when {
     "serialised" must {

@@ -18,16 +18,10 @@ package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
 import models.flowmanagement.ChangeSubSectorFlowModel
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import utils.AmlsSpec
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
-class NoPsrNumberPageRouterSpec extends PlaySpec with MockitoSugar {
-
-  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
+class NoPsrNumberPageRouterSpec extends AmlsSpec {
 
   trait Fixture {
     val router = new NoPsrNumberPageRouter

@@ -16,7 +16,7 @@
 
 package utils
 
-import org.apache.pekko.stream.Materializer
+import akka.stream.Materializer
 import config.ApplicationConfig
 import controllers.CommonPlayDependencies
 import org.scalatest.MustMatchers
@@ -28,10 +28,10 @@ import play.api.i18n.{Lang, MessagesApi, MessagesImpl, MessagesProvider}
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 import scala.concurrent.ExecutionContext
+
 
 trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with MustMatchers with AuthorisedFixture {
 

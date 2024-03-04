@@ -18,13 +18,10 @@ package models.payments
 
 import config.ApplicationConfig
 import models.ReturnLocation
-import org.mockito.Mockito.when
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import utils.AmlsSpec
 
-class PaymentRedirectRequestSpec extends WordSpec with MustMatchers with MockitoSugar {
+class PaymentRedirectRequestSpec extends AmlsSpec {
 
   "The PaymentRedirectRequest type" must {
 
@@ -38,11 +35,9 @@ class PaymentRedirectRequestSpec extends WordSpec with MustMatchers with Mockito
 
       //noinspection ScalaStyle
 
-      val applicationConfig = mock[ApplicationConfig]
+      val applicationConfig = app.injector.instanceOf[ApplicationConfig]
 
-      when(applicationConfig.frontendBaseUrl).thenReturn("http://localhost:9222/")
-
-      val model = PaymentRedirectRequest("some_reference", 100, ReturnLocation("anti-money-laundering/start")(applicationConfig))
+      val model = PaymentRedirectRequest("some_reference", 100, ReturnLocation("/anti-money-laundering/start")(applicationConfig))
 
       Json.toJson(model) mustBe expectedJson
 

@@ -19,10 +19,10 @@ package services.msb
 import models.businessmatching.BusinessMatchingMsbService.{ForeignExchange, TransmittingMoney}
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices}
 import models.moneyservicebusiness.{FXTransactionsInNext12Months, MoneyServiceBusiness}
-import org.scalatest.{MustMatchers, WordSpec}
 import play.api.mvc.Results
+import utils.AmlsSpec
 
-class MoneySourcesServiceSpec extends WordSpec with MustMatchers with Results {
+class MoneySourcesServiceSpec extends AmlsSpec with Results {
 
   val service = new MoneySourcesService()
 

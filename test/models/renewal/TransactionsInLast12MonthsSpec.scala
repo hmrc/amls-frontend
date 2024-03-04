@@ -17,10 +17,10 @@
 package models.renewal
 
 import cats.implicits._
-import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+import utils.AmlsSpec
 
-class TransactionsInLast12MonthsSpec extends PlaySpec {
+class TransactionsInLast12MonthsSpec extends AmlsSpec {
 
   "The json serialiser" must {
     "round-trip through json serialisation" in {

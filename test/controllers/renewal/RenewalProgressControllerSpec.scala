@@ -60,7 +60,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     val authAction = SuccessfulAuthAction
 
     lazy val app = new GuiceApplicationBuilder()
-      .configure("metrics.enabled" -> false)
+      .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[ProgressService].to(progressService))
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .bindings(bind[RenewalService].to(renewalService))

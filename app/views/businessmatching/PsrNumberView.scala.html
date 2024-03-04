@@ -21,66 +21,66 @@
 @import components.forms.{InputText, InputYesNo, ErrorSummary}
 
 @this(
-    formHelper: FormWithCSRF,
-    layout: Layout,
-    subtitle: SectionSubtitle,
-    inputText: InputText,
-    inputYesNo: InputYesNo,
-    errorSummary: ErrorSummary,
-    heading: Heading,
-    warningText: GovukWarningText,
-    button: Button,
-    returnLink: ReturnLink
+formHelper: FormWithCSRF,
+layout: Layout,
+subtitle: SectionSubtitle,
+inputText: InputText,
+inputYesNo: InputYesNo,
+errorSummary: ErrorSummary,
+heading: Heading,
+warningText: GovukWarningText,
+button: Button,
+returnLink: ReturnLink
 )
 
 @(form: Form[_], edit: Boolean, showReturnLink: Boolean = true, isPreSubmission: Boolean = true, isPsrDefined: Boolean = false)(implicit request: Request[_], messages: Messages, lang: Lang, appConfig: ApplicationConfig)
 
 @section = @{
-   if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation"
+if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation"
 }
 
 @title = @{
-    if(isPreSubmission || !isPsrDefined) "businessmatching.psr.number.title" else "businessmatching.psr.number.title.post.submission"
+if(isPreSubmission || !isPsrDefined) "businessmatching.psr.number.title" else "businessmatching.psr.number.title.post.submission"
 }
 
 @hasPsrNumberError = @{
-    form.errors match {
-        case Nil => false
-        case x if x.head.key == "regNumber" => true
-        case _ => false
-    }
+form.errors match {
+case Nil => false
+case x if x.head.key == "regNumber" => true
+case _ => false
+}
 }
 
 @preparedErrorSummary = @{
-    if(hasPsrNumberError) {
-        errorSummary(form, Some(Map("regNumber" -> "regNumber")))
-    } else {
-        errorSummary(form, Some(Map("appliedFor" -> "appliedFor-true")))
-    }
+if(hasPsrNumberError) {
+errorSummary(form, Some(Map("regNumber" -> "regNumber")))
+} else {
+errorSummary(form, Some(Map("appliedFor" -> "appliedFor-true")))
+}
 }
 
 @maybeReturnLink = {
-    @if(showReturnLink) {
-        @returnLink(true)
-    }
+@if(showReturnLink) {
+@returnLink(true)
+}
 }
 
 @conditionalInput = @{
-    inputText(
-        input = Input(
-            label = Label(
-                isPageHeading = false,
-                content = Text(messages("businessmatching.updateservice.psr.number.lbl")),
-                classes = "govuk-label"
-            ),
-            hint = None,
-           name = "regNumber",
-           id = "regNumber",
-           inputmode = Some("numeric"),
-           classes = "govuk-!-width-one-quarter"
-        ),
-        field = form("regNumber")
-    )
+inputText(
+input = Input(
+label = Label(
+isPageHeading = false,
+content = Text(messages("businessmatching.updateservice.psr.number.lbl")),
+classes = "govuk-label"
+),
+hint = None,
+name = "regNumber",
+id = "regNumber",
+inputmode = Some("numeric"),
+classes = "govuk-!-width-one-quarter"
+),
+field = form("regNumber")
+)
 }
 
 @supportingContent = {
@@ -92,71 +92,71 @@
 
 @layout(pageTitle = messages(title) + " - " + messages(section)) {
 
-    @formHelper(action = controllers.businessmatching.routes.PSRNumberController.post(edit)) {
+@formHelper(action = controllers.businessmatching.routes.PSRNumberController.post(edit)) {
 
-            @(edit, isPreSubmission, isPsrDefined) match {
-            case (true, false, true) | (false, false, true) => {
+@(edit, isPreSubmission, isPsrDefined) match {
+case (true, false, true) | (false, false, true) => {
 
-                @errorSummary(form)
+@errorSummary(form)
 
-                @subtitle(section)
+@subtitle(section)
 
-                @heading("businessmatching.psr.number.title.post.submission")
+@heading("businessmatching.psr.number.title.post.submission")
 
-                @warningText(
-                    WarningText(
-                        content = Text(messages("businessmatching.psr.warning"))
-                        )
-                )
+@warningText(
+WarningText(
+content = Text(messages("businessmatching.psr.warning"))
+)
+)
 
-                <input type="hidden" name="appliedFor" value=true />
+<input type="hidden" name="appliedFor" value=true />
 
-                @inputText(
-                    input = Input(
-                        hint = Some(
-                            Hint(
-                                content = HtmlContent(supportingContent))
-                            ),
-                       name = "regNumber",
-                       id = "regNumber",
-                       inputmode = Some("numeric"),
-                       classes = "govuk-!-width-one-quarter"
-                    ),
-                    field = form("regNumber")
-                )
-            }
-            case (false, true, true) | (true, true, true) | (_, _, false) => {
+@inputText(
+input = Input(
+hint = Some(
+Hint(
+content = HtmlContent(supportingContent))
+),
+name = "regNumber",
+id = "regNumber",
+inputmode = Some("numeric"),
+classes = "govuk-!-width-one-quarter"
+),
+field = form("regNumber")
+)
+}
+case (false, true, true) | (true, true, true) | (_, _, false) => {
 
 
-                @preparedErrorSummary
+@preparedErrorSummary
 
-                @subtitle(section)
+@subtitle(section)
 
-                @heading("businessmatching.psr.number.title")
+@heading("businessmatching.psr.number.title")
 
-                @warningText(
-                    WarningText(
-                        content = Text(messages("businessmatching.psr.warning"))
-                    )
-                )
+@warningText(
+WarningText(
+content = Text(messages("businessmatching.psr.warning"))
+)
+)
 
-                @inputYesNo(
-                    Radios(
-                        hint = Some(
-                            Hint(
-                                content = HtmlContent(supportingContent))
-                            ),
-                        name = "appliedFor",
-                        items = BusinessAppliedForPSRNumber.formValues(conditionalInput)
-                      )
-                    .withFormField(form("appliedFor"))
+@inputYesNo(
+Radios(
+hint = Some(
+Hint(
+content = HtmlContent(supportingContent))
+),
+name = "appliedFor",
+items = BusinessAppliedForPSRNumber.formValues(conditionalInput)
+)
+.withFormField(form("appliedFor"))
 
-                )
-            }
-        }
+)
+}
+}
 
-        @button()
+@button()
 
-        @maybeReturnLink
-   }
+@maybeReturnLink
+}
 }

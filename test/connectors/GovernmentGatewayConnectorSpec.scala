@@ -16,7 +16,6 @@
 
 package connectors
 
-import audit.EnrolEvent
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator, GovernmentGatewayGenerator}
 import models.governmentgateway.EnrolmentRequest
@@ -25,7 +24,7 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, HttpClient}
 import uk.gov.hmrc.play.audit.model.{Audit, DataEvent}
 import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
 import utils.{AmlsSpec, DependencyMocks}
@@ -49,6 +48,8 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
 
     val fn: DataEvent => Unit = d => {}
 
+    when(audit.sendDataEvent) thenReturn fn
+
     def mockHttpCall(response: Future[HttpResponse]) = when {
       connector.http.POST[EnrolmentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
     } thenReturn response
@@ -58,12 +59,10 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
     "called" must {
       "enrol the user via an HTTP call" in new Fixture {
         implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
-        val request: EnrolmentRequest = enrolmentRequestGen.sample.get
-        val response: HttpResponse = HttpResponse(OK, "")
-        doNothing().when(audit).sendDataEvent(EnrolEvent(request, response))
-        mockHttpCall(Future.successful(response))
 
-        whenReady(connector.enrol(request)) { result =>
+        mockHttpCall(Future.successful(HttpResponse(OK, "")))
+
+        whenReady(connector.enrol(enrolmentRequestGen.sample.get)) { result =>
           result.status mustBe OK
         }
       }

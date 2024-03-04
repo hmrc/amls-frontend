@@ -17,10 +17,10 @@
 package models.tradingpremises
 
 import models.tradingpremises.TradingPremisesMsbService._
-import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json._
+import utils.AmlsSpec
 
-class TradingPremisesMsbServicesSpec extends WordSpec with MustMatchers {
+class TradingPremisesMsbServicesSpec extends AmlsSpec {
 
   "MsbServices" must {
 

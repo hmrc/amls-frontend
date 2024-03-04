@@ -28,21 +28,14 @@ import models.flowmanagement._
 import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import org.scalacheck.Gen
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.flowrouters.businessmatching.RemoveBusinessTypeRouter
 import services.flowmanagement.pagerouters.removeflow._
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.{AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
-class RemoveBusinessTypeRouterSpec extends PlaySpec with TradingPremisesGenerator with MockitoSugar {
-
-  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
+class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerator {
 
   trait Fixture extends DependencyMocks with AuthorisedFixture {
     self =>

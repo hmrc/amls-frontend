@@ -16,11 +16,11 @@
 
 package models.declaration.release7
 
-import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import utils.AmlsSpec
 
 
-class RoleWithinBusinessRelease7Spec extends PlaySpec {
+class RoleWithinBusinessRelease7Spec extends AmlsSpec {
 
   "JSON validation" must {
 

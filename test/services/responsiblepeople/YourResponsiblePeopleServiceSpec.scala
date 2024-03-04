@@ -20,23 +20,16 @@ import connectors.DataCacheConnector
 import models.responsiblepeople.{PersonName, ResponsiblePeopleValues, ResponsiblePerson}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.StatusConstants
+import utils.{AmlsSpec, StatusConstants}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class YourResponsiblePeopleServiceSpec extends PlaySpec with ResponsiblePeopleValues with MockitoSugar with ScalaFutures {
+class YourResponsiblePeopleServiceSpec extends AmlsSpec with ResponsiblePeopleValues {
 
   val mockCacheConnector: DataCacheConnector = mock[DataCacheConnector]
   val service = new YourResponsiblePeopleService(mockCacheConnector)
 
   val credId = "1234567890"
-
-  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
   "YourResponsiblePeopleService" when {
 

@@ -20,7 +20,7 @@ import models.businessmatching.BusinessActivity.{BillPaymentServices, EstateAgen
 import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json.Json
 
-class WhatDoesYourBusinessDoSpec extends WordSpec with MustMatchers {
+class WhatDoesYourBusinessDoSpec extends WordSpec with MustMatchers{
   val model = WhatDoesYourBusinessDo(
     Set(
       BillPaymentServices,
