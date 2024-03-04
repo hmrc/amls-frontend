@@ -22,18 +22,14 @@ import models.FeeResponse
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito.when
+import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.http.UpstreamErrorResponse
+import utils.AmlsSpec
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class FeeResponseServiceSpec extends PlaySpec with ScalaFutures with MockitoSugar {
-
-  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
+class FeeResponseServiceSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture {
     self =>

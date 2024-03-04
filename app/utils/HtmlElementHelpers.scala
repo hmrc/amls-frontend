@@ -16,12 +16,10 @@
 
 package utils
 
-import scala.collection.immutable
-
 object HtmlElementHelpers {
 
   implicit class MapHelpers(map: Map[String, _]) {
-    def toDataAttributes: immutable.Iterable[String] = map.map(t => s"data-${t._1}=${t._2}")
+    def toDataAttributes = map.map(t => s"data-${t._1}=${t._2}")
   }
 
   case class AttrMinMax(attrMin: String = "", attrMax: String = "")

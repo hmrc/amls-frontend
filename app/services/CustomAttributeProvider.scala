@@ -16,17 +16,15 @@
 
 package services
 
-import com.vladsch.flexmark.ast.{BulletList, Heading, Paragraph}
+import java.util
+import com.vladsch.flexmark.Extension
+import com.vladsch.flexmark.ast.{BulletList, Heading, Node, Paragraph}
 import com.vladsch.flexmark.html.HtmlRenderer.HtmlRendererExtension
-import com.vladsch.flexmark.html.renderer.{AttributablePart, LinkResolverContext}
+import com.vladsch.flexmark.html.renderer.{AttributablePart, NodeRendererContext}
 import com.vladsch.flexmark.html.{AttributeProvider, AttributeProviderFactory, HtmlRenderer}
 import com.vladsch.flexmark.parser.Parser
-import com.vladsch.flexmark.util.ast.Node
-import com.vladsch.flexmark.util.data.{MutableDataHolder, MutableDataSet}
-import com.vladsch.flexmark.util.html.MutableAttributes
-import com.vladsch.flexmark.util.misc.Extension
-
-import java.util
+import com.vladsch.flexmark.util.html.Attributes
+import com.vladsch.flexmark.util.options.{MutableDataHolder, MutableDataSet}
 
 object CustomAttributeProvider {
 
@@ -34,24 +32,24 @@ object CustomAttributeProvider {
     override def rendererOptions(mutableDataHolder: MutableDataHolder): Unit = {}
 
     override def extend(builder: HtmlRenderer.Builder, s: String): Unit = builder.attributeProviderFactory(new AttributeProviderFactory{
-      override def getAfterDependents = null
+      override def getAfterDependents: util.Set[Class[_ <: AttributeProviderFactory]] = ???
 
-      override def getBeforeDependents = null
+      override def getBeforeDependents: util.Set[Class[_ <: AttributeProviderFactory]] = ???
 
-      override def affectsGlobalScope(): Boolean = true
+      override def affectsGlobalScope(): Boolean = ???
 
-      override def apply(context: LinkResolverContext): AttributeProvider = CustomAttributeProvider
+      override def create(nodeRendererContext: NodeRendererContext): AttributeProvider = CustomAttributeProvider
     })
   }
 
   object CustomAttributeProvider extends AttributeProvider {
-    override def setAttributes(node: Node, part: AttributablePart, attributes: MutableAttributes): Unit = {
+    override def setAttributes(node: Node, part: AttributablePart, attributes: Attributes): Unit = {
       if (node.isInstanceOf[BulletList] ) {
-        attributes.toMutable.replaceValue("class", "govuk-list govuk-list--bullet")
+        attributes.replaceValue("class", "govuk-list govuk-list--bullet")
       } else if (node.isInstanceOf[Paragraph]) {
-        attributes.toMutable.replaceValue("class", "govuk-body")
+        attributes.replaceValue("class", "govuk-body")
       } else if (node.isInstanceOf[Heading]) {
-        attributes.toMutable.replaceValue("class", "govuk-heading-l")
+        attributes.replaceValue("class", "govuk-heading-l")
       }
     }
 
@@ -61,7 +59,7 @@ object CustomAttributeProvider {
   def commonMark(rawEtmp: String): String = {
     val markdown = rawEtmp.replace("<P>","\n").replace("</P>","\n\n").replace("<tab> "," ")
     val options = new MutableDataSet
-    options.set[util.Collection[Extension]](Parser.EXTENSIONS, util.Arrays.asList({CustomExtension}))
+    options.set[java.lang.Iterable[Extension]](Parser.EXTENSIONS, util.Arrays.asList({CustomExtension}))
     options.set(HtmlRenderer.SOFT_BREAK, "<br/>")
     val parser = Parser.builder(options).build
     val document = parser.parse(markdown)

@@ -21,19 +21,14 @@ import models.Country
 import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountries, BranchesOrAgentsWhichCountries, MoneyServiceBusiness}
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.{reset, verify, when}
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfterEach, MustMatchers, WordSpec}
-import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.BeforeAndAfterEach
 import play.api.mvc.Results.Redirect
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.AmlsSpec
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class BranchesOrAgentsWhichCountriesServiceSpec extends WordSpec with MustMatchers with BeforeAndAfterEach with MockitoSugar with ScalaFutures {
-
-  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
+class BranchesOrAgentsWhichCountriesServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
   val mockCacheConnector: DataCacheConnector = mock[DataCacheConnector]
   val service = new BranchesOrAgentsWhichCountriesService(mockCacheConnector)
@@ -109,7 +104,7 @@ class BranchesOrAgentsWhichCountriesServiceSpec extends WordSpec with MustMatche
         ) thenReturn Future.successful(CacheMap("id", Map.empty))
 
         val redirect = Redirect("/foo")
-        service.fetchAndSaveBranchesOrAgents(credId, data, redirect).futureValue mustBe (redirect)
+        service.fetchAndSaveBranchesOrAgents(credId, data, redirect).futureValue mustBe(redirect)
 
         verify(mockCacheConnector).fetch(meq(credId), any())(any(), any())
         verify(mockCacheConnector).save(meq(credId), any(), meq(updatedMsb))(any(), any())

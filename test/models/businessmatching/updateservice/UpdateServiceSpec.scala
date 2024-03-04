@@ -17,10 +17,10 @@
 package models.businessmatching.updateservice
 
 import models.businessmatching.BusinessActivity.HighValueDealing
-import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
+import utils.AmlsSpec
 
-class UpdateServiceSpec extends PlaySpec {
+class UpdateServiceSpec extends AmlsSpec{
 
   val json = Json.obj(
     "areNewActivitiesAtTradingPremises" -> Json.toJson(NewActivitiesAtTradingPremisesNo.asInstanceOf[AreNewActivitiesAtTradingPremises]),

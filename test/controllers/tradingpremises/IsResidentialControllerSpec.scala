@@ -181,7 +181,9 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
             TradingPremises()
           )
 
-          val result = controller.isFirstTradingPremises(tp, 3)
+          val isFirstTradingPremises = PrivateMethod[Boolean]('isFirstTradingPremises)
+
+          val result = controller invokePrivate isFirstTradingPremises(tp, 3)
 
           result must be(true)
 
@@ -194,7 +196,9 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
             TradingPremises()
           )
 
-          val result = controller.isFirstTradingPremises(tp, 1)
+          val isFirstTradingPremises = PrivateMethod[Boolean]('isFirstTradingPremises)
+
+          val result = controller invokePrivate isFirstTradingPremises(tp, 1)
 
           result must be(true)
 
@@ -210,7 +214,9 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
             TradingPremises()
           )
 
-          val result = controller.isFirstTradingPremises(tp, 3)
+          val isFirstTradingPremises = PrivateMethod[Boolean]('isFirstTradingPremises)
+
+          val result = controller invokePrivate isFirstTradingPremises(tp, 3)
 
           result must be(false)
 
@@ -223,7 +229,9 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
             TradingPremises()
           )
 
-          val result = controller.isFirstTradingPremises(tp, 1)
+          val isFirstTradingPremises = PrivateMethod[Boolean]('isFirstTradingPremises)
+
+          val result = controller invokePrivate isFirstTradingPremises(tp, 1)
 
           result must be(false)
 

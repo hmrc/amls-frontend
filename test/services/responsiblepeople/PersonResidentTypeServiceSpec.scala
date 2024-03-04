@@ -21,30 +21,23 @@ import models.Country
 import models.responsiblepeople._
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.any
-import org.mockito.Mockito.{times, verify, verifyZeroInteractions, when, reset}
+import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.{Enrolments, User}
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedRequest
+import utils.{AmlsSpec, AuthorisedRequest}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class PersonResidentTypeServiceSpec extends PlaySpec with ResponsiblePeopleValues with BeforeAndAfterEach with ScalaFutures with MockitoSugar {
+class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValues with BeforeAndAfterEach {
 
   lazy val mockDataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
   lazy val mockCacheMap: CacheMap = mock[CacheMap]
   lazy val service = new PersonResidentTypeService(mockDataCacheConnector)
-  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
-
 
   implicit val authorisedRequest: AuthorisedRequest[AnyContentAsEmpty.type] = AuthorisedRequest(
     FakeRequest(), Some("REF"), "CREDID", Organisation, Enrolments(Set()), ("TYPE", "ID"), Some("GROUPID"), Some(User)

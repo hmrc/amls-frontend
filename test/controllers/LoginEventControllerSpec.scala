@@ -36,7 +36,7 @@ class LoginEventControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
     val request = addToken(authRequest)
 
     lazy val defaultBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder()
-      .configure("metrics.enabled" -> false)
+      .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
 

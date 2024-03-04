@@ -34,21 +34,16 @@ package services
 import connectors.DataCacheConnector
 import models.renewal.Renewal
 import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito.when
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.http.HeaderCarrier
+import org.mockito.Mockito._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.AmlsSpec
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ConfirmationServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
+class ConfirmationServiceSpec extends AmlsSpec {
 
   val mockCacheConnector = mock[DataCacheConnector]
   val cache = mock[CacheMap]
-  implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
   val service = new ConfirmationService(mockCacheConnector)
 

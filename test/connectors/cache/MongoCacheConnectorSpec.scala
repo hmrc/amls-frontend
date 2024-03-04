@@ -28,8 +28,7 @@ import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-import java.util.concurrent.Executors
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 class MongoCacheConnectorSpec extends FreeSpec
   with MustMatchers
@@ -48,7 +47,7 @@ class MongoCacheConnectorSpec extends FreeSpec
 
   trait Fixture {
     implicit val hc = HeaderCarrier()
-    implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
+    implicit val ec = mock[ExecutionContext]
 
     val factory = mock[MongoCacheClientFactory]
     val client = mock[MongoCacheClient]
@@ -153,7 +152,7 @@ class MongoCacheConnectorSpec extends FreeSpec
       val f: Option[Model] => Model = { _ => updatedModel }
 
       when(client.find[Model](any(), meq(key))(any())) thenReturn Future.successful(Some(model))
-      when(client.createOrUpdate(any(), meq(updatedModel), meq(key))(any())) thenReturn Future.successful(Cache("", Map()))
+      when(client.createOrUpdate(any(), meq(updatedModel), meq(key))(any())) thenReturn Future.successful(Cache.empty)
 
       whenReady(connector.update[Model](credId, key)(f)) { _ mustBe Some(updatedModel) }
     }

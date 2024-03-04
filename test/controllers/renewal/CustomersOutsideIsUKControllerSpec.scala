@@ -48,7 +48,7 @@ class CustomersOutsideIsUKControllerSpec extends AmlsSpec {
     val mockCacheMap = mock[CacheMap]
 
     lazy val app = new GuiceApplicationBuilder()
-      .configure("metrics.enabled" -> false)
+      .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[RenewalService].to(renewalService))
       .overrides(bind[AuthAction].to(authAction))
       .build()

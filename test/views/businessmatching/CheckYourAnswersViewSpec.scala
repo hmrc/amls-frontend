@@ -30,7 +30,7 @@ import utils.businessmatching.CheckYourAnswersHelper
 import views.Fixture
 import views.html.businessmatching.CheckYourAnswersView
 
-import scala.jdk.CollectionConverters._
+import scala.collection.JavaConversions._
 
 class CheckYourAnswersViewSpec extends AmlsViewSpec with MustMatchers with TableDrivenPropertyChecks {
 
@@ -71,7 +71,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with MustMatchers with Table
     }
 
     def checkListContainsItems(parent:Element, keysToFind:Set[String]) = {
-      val texts = parent.select("li").asScala.map((el:Element) => el.text())
+      val texts = parent.select("li").toSet.map((el:Element) => el.text())
       texts must be (keysToFind.map(k => messages(k)))
       true
     }
@@ -131,7 +131,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with MustMatchers with Table
       html must not include messages("button.logout")
       html must include(messages("businessmatching.button.confirm.start"))
 
-      val sections = doc.getElementsByTag("section").asScala.zipWithIndex
+      val sections = doc.getElementsByTag("section").zipWithIndex
 
       for((section, index) <- sections) {
         val (key, check, editLink) = sectionChecks(index)
@@ -181,7 +181,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with MustMatchers with Table
 
       html must include(messages("button.logout"))
       html must not include messages("businessmatching.button.confirm.start")
-      val sections = doc.getElementsByTag("section").asScala.zipWithIndex
+      val sections = doc.getElementsByTag("section").zipWithIndex
 
       for((section, index) <- sections) {
         val (key, check, editLink) = sectionChecks(index)

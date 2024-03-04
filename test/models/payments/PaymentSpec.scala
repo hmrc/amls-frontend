@@ -16,34 +16,32 @@
 
 package models.payments
 
+import models.payments.PaymentStatuses.Created
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+import utils.AmlsSpec
 
-class PaymentSpec extends PlaySpec with ScalaFutures {
+import java.time.LocalDateTime
+
+class PaymentSpec extends AmlsSpec with ScalaFutures {
 
   "Payment" must {
     "round trip through JSON formatting" in {
-      val amlsBackendPaymentJson =
-        """
-          |{
-          |  "_id": "123456789",
-          |  "amlsRefNo": "X12345678",
-          |  "safeId": "X73289473",
-          |  "reference": "X987654321",
-          |  "amountInPence": 10000,
-          |  "status": "Successful",
-          |  "isBacs": true,
-          |  "createdAt": {
-          |    "$date": {
-          |      "$numberLong": "1577836805555"
-          |    }
-          |  },
-          |  "updatedAt": "2020-01-02T00:00:05.555"
-          |}
-          |""".stripMargin
 
-      Json.toJson(amlsBackendPaymentJson)
+      val payment = Payment(
+        "59b1204b2e000028005c0442",
+        "XSML00000200738",
+        "",
+        "XH002610109496",
+        Some("BACS Payment"),
+        31500,
+        Created,
+        LocalDateTime.of(2017, 9, 7, 10, 32, 43, 526),
+        Some(true)
+      )
+
+      val json = Json.toJson(payment)
+      json.as[Payment] mustBe payment
     }
   }
 }

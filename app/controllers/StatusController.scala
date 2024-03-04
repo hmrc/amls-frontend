@@ -411,18 +411,25 @@ class StatusController @Inject()(val landingService: LandingService,
   private def getBusinessName(credId: String, safeId: Option[String], accountTypeId: (String, String))(implicit hc: HeaderCarrier, ec: ExecutionContext) =
     BusinessName.getName(credId, safeId, accountTypeId)(hc, ec, dataCache, amlsConnector)
 
-  def canOrCannotTradeInformation(activities: Option[BusinessActivities])(implicit request: Request[AnyContent]) = {
-    val hasMsb = activities.exists(_.businessActivities.contains(MoneyServiceBusiness))
-    val hasTcsp = activities.exists(_.businessActivities.contains(TrustAndCompanyServices))
-    val hasOther = activities.exists(ba => (ba.businessActivities -- Set(MoneyServiceBusiness, TrustAndCompanyServices)).nonEmpty)
+  private def hasMsb(activities: Option[BusinessActivities]) = {
+    activities.fold(false)(_.businessActivities.contains(MoneyServiceBusiness))
+  }
 
-    (hasMsb, hasTcsp, hasOther) match {
+  private def hasTcsp(activities: Option[BusinessActivities]) = {
+    activities.fold(false)(_.businessActivities.contains(TrustAndCompanyServices))
+  }
+
+  private def hasOther(activities: Option[BusinessActivities]) = {
+    activities.fold(false)(ba => (ba.businessActivities -- Set(MoneyServiceBusiness, TrustAndCompanyServices)).nonEmpty)
+  }
+
+  private def canOrCannotTradeInformation(activities: Option[BusinessActivities])(implicit request: Request[AnyContent]) =
+    (hasMsb(activities), hasTcsp(activities), hasOther(activities)) match {
       case (false, false, true) => tradeInformationNoActivities()
       case (true, _, false) | (_, true, false) => tradeInformationOneActivity()
       case (true, _, true) | (_, true, true) => tradeInformation()
       case (_, _, _) => tradeInformationFindOut()
     }
-  }
 
   def countUnreadNotifications(amlsRefNo: Option[String], safeId: Option[String], accountTypeId: (String, String))(implicit headerCarrier: HeaderCarrier) = {
     val notifications = (amlsRefNo, safeId) match {

@@ -26,7 +26,8 @@ import play.api.libs.json._
 import uk.gov.hmrc.govukfrontend.views.Aliases.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
-import utils.{ContactTypeHelper, DateTimeFormats}
+import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
+import utils.ContactTypeHelper
 
 case class NotificationRow (
                              status: Option[Status],
@@ -126,14 +127,14 @@ case class NotificationRow (
 }
 
 object NotificationRow {
-  implicit val dateTimeFormat: Format[DateTime] = DateTimeFormats.dateTimeFormat
+  implicit val dateTimeFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat
   val reads: Reads[NotificationRow] =
     (
       (JsPath \ "status").readNullable[Status] and
         (JsPath \ "contactType").readNullable[ContactType] and
         (JsPath \ "contactNumber").readNullable[String] and
         (JsPath \ "variation").read[Boolean] and
-        (JsPath \ "receivedAt").read[DateTime](DateTimeFormats.dateTimeReads) and
+        (JsPath \ "receivedAt").read[DateTime](MongoJodaFormats.dateTimeReads) and
         (JsPath \ "isRead").read[Boolean] and
         (JsPath \ "amlsRegistrationNumber").read[String] and
         (JsPath \ "templatePackageVersion").read[String] and
@@ -146,7 +147,7 @@ object NotificationRow {
         (JsPath \ "contactType").writeNullable[ContactType] and
         (JsPath \ "contactNumber").writeNullable[String] and
         (JsPath \ "variation").write[Boolean] and
-        (JsPath \ "receivedAt").write[DateTime](DateTimeFormats.dateTimeWrites) and
+        (JsPath \ "receivedAt").write[DateTime](MongoJodaFormats.dateTimeWrites) and
         (JsPath \ "isRead").write[Boolean] and
         (JsPath \ "amlsRegistrationNumber").write[String] and
         (JsPath \ "templatePackageVersion").write[String] and

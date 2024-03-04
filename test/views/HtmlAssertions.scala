@@ -21,13 +21,13 @@ import org.scalatest.MustMatchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 
-import scala.jdk.CollectionConverters._
+import scala.collection.JavaConversions._
 
 trait HtmlAssertions extends MockitoSugar {
   self:MustMatchers =>
 
   def checkListContainsItems(parent:Element, keysToFind:Set[String])(implicit messages: Messages) = {
-    val texts = parent.select("li").asScala.map((el:Element) => el.text())
+    val texts = parent.select("li").toSet.map((el:Element) => el.text())
     texts must be (keysToFind.map(k => Messages(k)))
     true
   }

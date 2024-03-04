@@ -27,7 +27,7 @@ import utils.supervision.CheckYourAnswersHelper
 import views.Fixture
 import views.html.supervision.CheckYourAnswersView
 
-import scala.jdk.CollectionConverters._
+import scala.collection.JavaConversions._
 
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks{
 
@@ -67,8 +67,8 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
       def view = checkYourAnswersView(list)
 
-      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
-        doc.getElementsByClass("govuk-summary-list__value").asScala
+      doc.getElementsByClass("govuk-summary-list__key").toSeq.zip(
+        doc.getElementsByClass("govuk-summary-list__value").toSeq
       ).foreach { case (key, value) =>
 
         val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value
@@ -97,8 +97,8 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
       def view = checkYourAnswersView(list)
 
-      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
-        doc.getElementsByClass("govuk-summary-list__value").asScala
+      doc.getElementsByClass("govuk-summary-list__key").toSeq.zip(
+        doc.getElementsByClass("govuk-summary-list__value").toSeq
       ).foreach { case (key, value) =>
 
         val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value

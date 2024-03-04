@@ -23,9 +23,8 @@ import org.mongodb.scala.model._
 import play.api.Logging
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json._
-import play.custom.MongoDateTimeSupport
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
-import uk.gov.hmrc.crypto._
+import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
@@ -63,7 +62,7 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: LocalDateT
 }
 
 object Cache {
-  implicit val dateFormat = MongoDateTimeSupport.localDateTimeFormat
+  implicit val dateFormat = MongoJavatimeFormats.localDateTimeFormat
   implicit val format = Json.format[Cache]
 
   def apply(cacheMap: CacheMap): Cache = Cache(cacheMap.id, cacheMap.data)
@@ -78,7 +77,7 @@ object Cache {
   * @param cache  The cache to wrap.
   * @param crypto The cryptography instance to use to decrypt values
   */
-class CryptoCache(cache: Cache, crypto: Encrypter with Decrypter) extends Cache(cache.id, cache.data) with CacheOps {
+class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(cache.id, cache.data) with CacheOps {
   def getEncryptedEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] =
     decryptValue(cache, key)(new JsonDecryptor[T]()(crypto, fmt))
 }
@@ -87,10 +86,10 @@ class CryptoCache(cache: Cache, crypto: Encrypter with Decrypter) extends Cache(
   * An injectible factory for creating new MongoCacheClients
   */
 class MongoCacheClientFactory @Inject()(
-                                         config: ApplicationConfig,
-                                         applicationCrypto: ApplicationCrypto,
-                                         timestampSupport: TimestampSupport,
-                                         mongo: MongoComponent) {
+  config: ApplicationConfig,
+  applicationCrypto: ApplicationCrypto,
+  timestampSupport: TimestampSupport,
+  mongo: MongoComponent) {
   def createClient: MongoCacheClient = new MongoCacheClient(
     config, applicationCrypto,
     timestampSupport: TimestampSupport,
@@ -105,10 +104,10 @@ class MongoCacheClientFactory @Inject()(
 
 @Singleton
 class MongoCacheClient @Inject()(
-                                  appConfig: ApplicationConfig,
-                                  applicationCrypto: ApplicationCrypto,
-                                  timestampSupport: TimestampSupport,
-                                  mongo: MongoComponent)
+   appConfig: ApplicationConfig,
+   applicationCrypto: ApplicationCrypto,
+   timestampSupport: TimestampSupport,
+   mongo: MongoComponent)
   extends PlayMongoRepository[Cache](
     mongoComponent = mongo,
     collectionName = "app-cache",
@@ -132,7 +131,7 @@ class MongoCacheClient @Inject()(
   private def error(msg: String) = logger.warn(s"$logPrefix $msg")
   // $COVERAGE-ON$
 
-  implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+  implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto
 
   /**
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.
@@ -154,11 +153,11 @@ class MongoCacheClient @Inject()(
         lastUpdated = LocalDateTime.now(ZoneOffset.UTC)
       )
 
-      collection.replaceOne(
-        filter = Filters.equal("_id", credId),
-        replacement = updatedCache,
-        ReplaceOptions().upsert(true)
-      ).toFuture().map { _ => updatedCache}
+        collection.replaceOne(
+          filter = Filters.equal("_id", credId),
+          replacement = updatedCache,
+          ReplaceOptions().upsert(true)
+        ).toFuture().map { _ => updatedCache}
     }
   }
 

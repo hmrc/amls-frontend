@@ -21,10 +21,10 @@ import play.api.libs.json.Format
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-import scala.concurrent.{ExecutionContext, Future}
-
-class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)(implicit ec: ExecutionContext) extends Conversions {
+class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory) extends Conversions {
 
   lazy val mongoCache: MongoCacheClient = cacheClientFactory.createClient
 

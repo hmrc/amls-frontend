@@ -91,10 +91,10 @@ class IsResidentialController @Inject()(
         }
   }
 
-  def getAddress(businessMatching: BusinessMatching): Option[Address] =
+  private def getAddress(businessMatching: BusinessMatching): Option[Address] =
     businessMatching.reviewDetails.fold[Option[Address]](None)(r => Some(r.businessAddress))
 
-  def isFirstTradingPremises(tradingPremises: Seq[TradingPremises], index: Int): Boolean = {
+  private def isFirstTradingPremises(tradingPremises: Seq[TradingPremises], index: Int): Boolean = {
 
     val tpWithoutDeleted =  tradingPremises.zipWithIndex.filterNot { case (tp, _) =>
       tp.status.contains(StatusConstants.Deleted)

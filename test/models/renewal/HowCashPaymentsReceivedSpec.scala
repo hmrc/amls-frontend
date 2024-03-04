@@ -16,9 +16,9 @@
 
 package models.renewal
 
-import org.scalatestplus.play.PlaySpec
+import utils.AmlsSpec
 
-class HowCashPaymentsReceivedSpec extends PlaySpec {
+class HowCashPaymentsReceivedSpec extends AmlsSpec {
 
   val model = HowCashPaymentsReceived(PaymentMethods(courier = true, direct = true, other = Some("foo")))
 

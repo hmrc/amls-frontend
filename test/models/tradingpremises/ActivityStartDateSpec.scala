@@ -17,11 +17,11 @@
 package models.tradingpremises
 
 import org.joda.time.LocalDate
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
 
-class ActivityStartDateSpec extends WordSpec with MustMatchers {
+class ActivityStartDateSpec extends PlaySpec {
   // scalastyle:off
 
   "Json validation" must {

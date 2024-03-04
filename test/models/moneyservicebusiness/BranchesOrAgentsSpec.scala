@@ -21,7 +21,7 @@ import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
-class BranchesOrAgentsSpec extends PlaySpec with MustMatchers {
+class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
 
   "MsbServices" must {
 

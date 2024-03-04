@@ -21,18 +21,16 @@ import connectors.{EnrolmentStubConnector, TaxEnrolmentsConnector}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentIdentifier, GovernmentGatewayEnrolment, TaxEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.HttpResponse
+import utils.AmlsSpec
 
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
-class AuthEnrolmentsServiceSpec extends PlaySpec
-  with MockitoSugar
+class AuthEnrolmentsServiceSpec extends AmlsSpec
   with ScalaFutures
   with IntegrationPatience
   with AmlsReferenceNumberGenerator
@@ -43,7 +41,6 @@ class AuthEnrolmentsServiceSpec extends PlaySpec
     val enrolmentStore = mock[TaxEnrolmentsConnector]
     val enrolmentStubConnector = mock[EnrolmentStubConnector]
     val config = mock[ApplicationConfig]
-    implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]
 
     val groupId = stringOfLengthGen(10).sample.get
 

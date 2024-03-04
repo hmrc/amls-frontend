@@ -16,7 +16,7 @@
 
 package utils
 
-import org.apache.pekko.stream.Materializer
+import akka.stream.Materializer
 import config.ApplicationConfig
 import connectors.KeystoreConnector
 import controllers.CommonPlayDependencies
@@ -41,7 +41,7 @@ trait AmlsViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar w
   protected val bindModules: Seq[GuiceableModule] = Seq(bind[KeystoreConnector].to(mock[KeystoreConnector]))
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
-    .configure("metrics.enabled" -> false)
+    .disable[com.kenshoo.play.metrics.PlayModule]
     .bindings(bindModules:_*).in(Mode.Test)
     .build()
 

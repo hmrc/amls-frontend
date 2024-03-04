@@ -22,7 +22,8 @@ import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import org.joda.time.{DateTime, LocalDate}
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import utils.{ContactTypeHelper, DateTimeFormats}
+import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
+import utils.ContactTypeHelper
 
 case class NotificationDetails(contactType: Option[ContactType],
                                status: Option[Status],
@@ -54,7 +55,7 @@ object NotificationDetails {
         (JsPath \ "status").readNullable[Status] and
         (JsPath \ "messageText").readNullable[String] and
         (JsPath \ "variation").read[Boolean] and
-        (JsPath \ "receivedAt").read[DateTime]((DateTimeFormats.dateTimeFormat))
+        (JsPath \ "receivedAt").read[DateTime]((MongoJodaFormats.dateTimeFormat))
       )(NotificationDetails.apply _)
 
   val writes : OWrites[NotificationDetails ] =
@@ -63,7 +64,7 @@ object NotificationDetails {
         (JsPath \ "status").writeNullable[Status] and
         (JsPath \ "messageText").writeNullable[String] and
         (JsPath \ "variation").write[Boolean] and
-        (JsPath \ "receivedAt").write[DateTime]((DateTimeFormats.dateTimeFormat))
+        (JsPath \ "receivedAt").write[DateTime]((MongoJodaFormats.dateTimeFormat))
       )(unlift(NotificationDetails.unapply))
 
   implicit val format: OFormat[NotificationDetails] = OFormat(reads, writes)
