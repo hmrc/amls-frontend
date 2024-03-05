@@ -27,8 +27,10 @@ import models.businessmatching.BusinessType.Partnership
 import models.responsiblepeople.ResponsiblePerson
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved}
+import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.StatusService
+import services.businessmatching.RecoverActivitiesService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.responsiblepeople.CheckYourAnswersHelper
@@ -39,6 +41,7 @@ import scala.concurrent.Future
 
 class DetailedAnswersController @Inject () (
                                              val dataCacheConnector: DataCacheConnector,
+                                             val recoverActivitiesService: RecoverActivitiesService,
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val statusService: StatusService,
@@ -46,7 +49,8 @@ class DetailedAnswersController @Inject () (
                                              val cc: MessagesControllerComponents,
                                              cyaHelper: CheckYourAnswersHelper,
                                              view: CheckYourAnswersView,
-                                             implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
+                                             implicit val error: views.html.ErrorView)
+  extends AmlsBaseController(ds, cc) with RepeatingSection with Logging {
 
   private def showHideAddressMove(amlsRegistrationNo: Option[String], accountTypeId: (String, String), credId: String, lineId: Option[Int])
                                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] = {
@@ -66,6 +70,13 @@ class DetailedAnswersController @Inject () (
           } yield {
             redirect(request.amlsRefNumber, request.accountTypeId, request.credId, cache, index, flow, businessMatching)
           }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get))
+      } recoverWith {
+        case _: NoSuchElementException =>
+          logger.warn("[DetailedAnswersController][get] - Business activities list was empty, attempting to recover")
+          recoverActivitiesService.recover(request).map {
+            case true => Redirect(routes.DetailedAnswersController.get(index, flow))
+            case false => InternalServerError("Unable to determine business types")
+          }
       }
   }
 
