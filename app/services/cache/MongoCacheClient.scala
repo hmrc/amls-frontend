@@ -77,7 +77,7 @@ object Cache {
   * @param cache  The cache to wrap.
   * @param crypto The cryptography instance to use to decrypt values
   */
-class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(cache.id, cache.data) with CacheOps {
+class CryptoCache(cache: Cache, crypto: Encrypter with Decrypter) extends Cache(cache.id, cache.data) with CacheOps {
   def getEncryptedEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] =
     decryptValue(cache, key)(new JsonDecryptor[T]()(crypto, fmt))
 }
@@ -131,7 +131,7 @@ class MongoCacheClient @Inject()(
   private def error(msg: String) = logger.warn(s"$logPrefix $msg")
   // $COVERAGE-ON$
 
-  implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto
+  implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
 
   /**
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.

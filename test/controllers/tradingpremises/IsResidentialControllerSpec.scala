@@ -24,7 +24,6 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
@@ -32,7 +31,7 @@ import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.html.tradingpremises.IsResidentialView
 
-class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with PrivateMethodTester with Injecting {
+class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
 
@@ -181,12 +180,9 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
             TradingPremises()
           )
 
-          val isFirstTradingPremises = PrivateMethod[Boolean]('isFirstTradingPremises)
-
-          val result = controller invokePrivate isFirstTradingPremises(tp, 3)
+          val result = controller.isFirstTradingPremises(tp, 3)
 
           result must be(true)
-
         }
 
         "trading premises have not been deleted" in new Fixture {
@@ -196,14 +192,12 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
             TradingPremises()
           )
 
-          val isFirstTradingPremises = PrivateMethod[Boolean]('isFirstTradingPremises)
-
-          val result = controller invokePrivate isFirstTradingPremises(tp, 1)
+          val result = controller.isFirstTradingPremises(tp, 1)
 
           result must be(true)
-
         }
       }
+
       "return false" when {
         "trading premises have been deleted" in new Fixture {
 
@@ -214,9 +208,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
             TradingPremises()
           )
 
-          val isFirstTradingPremises = PrivateMethod[Boolean]('isFirstTradingPremises)
-
-          val result = controller invokePrivate isFirstTradingPremises(tp, 3)
+          val result = controller.isFirstTradingPremises(tp, 3)
 
           result must be(false)
 
@@ -229,12 +221,9 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
             TradingPremises()
           )
 
-          val isFirstTradingPremises = PrivateMethod[Boolean]('isFirstTradingPremises)
-
-          val result = controller invokePrivate isFirstTradingPremises(tp, 1)
+          val result = controller.isFirstTradingPremises(tp, 1)
 
           result must be(false)
-
         }
       }
     }

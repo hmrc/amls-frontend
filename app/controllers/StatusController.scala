@@ -411,19 +411,19 @@ class StatusController @Inject()(val landingService: LandingService,
   private def getBusinessName(credId: String, safeId: Option[String], accountTypeId: (String, String))(implicit hc: HeaderCarrier, ec: ExecutionContext) =
     BusinessName.getName(credId, safeId, accountTypeId)(hc, ec, dataCache, amlsConnector)
 
-  private def hasMsb(activities: Option[BusinessActivities]) = {
+  def hasMsb(activities: Option[BusinessActivities]) = {
     activities.fold(false)(_.businessActivities.contains(MoneyServiceBusiness))
   }
 
-  private def hasTcsp(activities: Option[BusinessActivities]) = {
+  def hasTcsp(activities: Option[BusinessActivities]) = {
     activities.fold(false)(_.businessActivities.contains(TrustAndCompanyServices))
   }
 
-  private def hasOther(activities: Option[BusinessActivities]) = {
+  def hasOther(activities: Option[BusinessActivities]) = {
     activities.fold(false)(ba => (ba.businessActivities -- Set(MoneyServiceBusiness, TrustAndCompanyServices)).nonEmpty)
   }
 
-  private def canOrCannotTradeInformation(activities: Option[BusinessActivities])(implicit request: Request[AnyContent]) =
+  def canOrCannotTradeInformation(activities: Option[BusinessActivities])(implicit request: Request[AnyContent]) =
     (hasMsb(activities), hasTcsp(activities), hasOther(activities)) match {
       case (false, false, true) => tradeInformationNoActivities()
       case (true, _, false) | (_, true, false) => tradeInformationOneActivity()

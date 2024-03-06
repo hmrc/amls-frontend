@@ -42,6 +42,9 @@ class ConfirmationFilterSpec extends PlaySpec with GuiceOneAppPerSuite with Mock
 
   override lazy val app = new GuiceApplicationBuilder()
     .overrides(bind[KeystoreConnector].to(keystore))
+    .configure(
+      "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+    )
     .bindings(bind[AuthenticatorConnector].to(authenticator))
     .build()
 

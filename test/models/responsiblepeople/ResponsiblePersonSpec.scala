@@ -29,6 +29,9 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with GuiceOneAppPerSuite {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
+    .configure(
+      "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+    )
     .build()
 
   "ResponsiblePeople" must {

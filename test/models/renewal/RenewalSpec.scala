@@ -20,8 +20,6 @@ import models.Country
 import play.api.libs.json.{JsSuccess, Json}
 import utils.AmlsSpec
 
-import scala.collection.Seq
-
 class RenewalSpec extends AmlsSpec {
 
   val completeRenewal = Renewal(

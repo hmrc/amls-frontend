@@ -51,9 +51,6 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpClient
 import utils.{AmlsSpec, DependencyMocks}
 
-import scala.collection.Seq
-
-
 class UpdateMongoCacheServiceSpec extends AmlsSpec
   with BusinessMatchingGenerator
   with TradingPremisesGenerator

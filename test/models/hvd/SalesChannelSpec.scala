@@ -19,11 +19,21 @@ package models.hvd
 import models.hvd.SalesChannel._
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.ControllerComponents
 
 class SalesChannelSpec extends WordSpec with MustMatchers with GuiceOneAppPerTest {
   import play.api.i18n._
   implicit val lang = Lang("en-US")
+
+  override def fakeApplication(): Application = {
+    new GuiceApplicationBuilder()
+      .configure(
+        "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+      )
+      .build()
+  }
 
   "getMessage" must {
     "return correct text for Retail" in {

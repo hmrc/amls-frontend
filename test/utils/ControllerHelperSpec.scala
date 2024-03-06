@@ -29,6 +29,9 @@ import play.api.libs.json.Json
 class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with DependencyMocks {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
+    .configure(
+      "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+    )
     .build()
 
   def createCompleteResponsiblePersonSeq: Option[Seq[ResponsiblePerson]] = Some(Seq(completeResponsiblePerson))

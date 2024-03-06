@@ -29,7 +29,7 @@ import utils.tradingpremises.CheckYourAnswersHelper
 import views.Fixture
 import views.html.tradingpremises.CheckYourAnswersView
 
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters._
 
 sealed trait TestHelper extends AmlsSummaryViewSpec {
 
@@ -87,8 +87,8 @@ class CheckYourAnswersViewSpec extends TestHelper with TableDrivenPropertyChecks
       val summaryList = cyaHelper.createSummaryList(tradingPremises, 1, isMsb, false, false)
       def view = cyaView(summaryList, 1)
 
-      doc.getElementsByClass("govuk-summary-list__key").toSeq.zip(
-        doc.getElementsByClass("govuk-summary-list__value").toSeq
+      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
+        doc.getElementsByClass("govuk-summary-list__value").asScala
       ).foreach { case (key, value) =>
 
         val maybeRow = summaryList.rows.find(_.key.content.asHtml.body == key.text()).value
@@ -131,7 +131,7 @@ class CheckYourAnswersViewSpec extends TestHelper with TableDrivenPropertyChecks
       val rows = cyaHelper.createSummaryList(tradingPremises.copy(whatDoesYourBusinessDoAtThisAddress = Some(testData)), 1, isMsb, true, false)
       def view = cyaView(rows, 1)
 
-      val maybeElement = doc.select(".govuk-summary-list__row").toList.find(e => e.text().contains(messages("tradingpremises.whatdoesyourbusinessdo.title")))
+      val maybeElement = doc.select(".govuk-summary-list__row").asScala.find(e => e.text().contains(messages("tradingpremises.whatdoesyourbusinessdo.title")))
       val servicesSection = maybeElement.get.toString
 
       servicesSection mustNot include(messages("button.edit"))

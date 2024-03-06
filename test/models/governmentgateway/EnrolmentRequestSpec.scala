@@ -24,7 +24,11 @@ import play.api.libs.json.Json
 
 class EnrolmentRequestSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar {
 
-  override implicit lazy val app = new GuiceApplicationBuilder().build()
+  override implicit lazy val app = new GuiceApplicationBuilder()
+    .configure(
+      "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+    )
+    .build()
 
   "EnrolmentRequest" must {
 

@@ -24,7 +24,6 @@ import models.businessactivities._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.PrivateMethodTester
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -33,7 +32,7 @@ import views.html.businessactivities.AccountantIsUKAddressView
 
 import scala.concurrent.Future
 
-class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with PrivateMethodTester with Injecting {
+class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with Injecting {
 
   trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks{
     self =>

@@ -113,6 +113,9 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
+      .configure(
+        "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+      )
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[ProxyCacheService].to(proxyCacheService))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))

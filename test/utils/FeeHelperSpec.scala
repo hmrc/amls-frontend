@@ -19,6 +19,7 @@ package utils
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+
 import scala.concurrent.{Await, Future}
 import generators.AmlsReferenceNumberGenerator
 import generators.submission.SubscriptionResponseGenerator
@@ -28,8 +29,11 @@ import org.joda.time.DateTime
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 import services.{AuthEnrolmentsService, FeeResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,7 +42,15 @@ class FeeHelperSpec extends PlaySpec with MockitoSugar
   with ScalaFutures
   with GuiceOneAppPerSuite
   with AmlsReferenceNumberGenerator
-  with SubscriptionResponseGenerator{
+  with SubscriptionResponseGenerator {
+
+  override def fakeApplication(): Application = {
+    new GuiceApplicationBuilder()
+      .configure(
+        "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+      )
+      .build()
+  }
 
   "FeeHelper" when {
     implicit val hc = HeaderCarrier()

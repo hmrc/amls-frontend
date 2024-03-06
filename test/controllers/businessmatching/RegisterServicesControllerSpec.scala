@@ -29,7 +29,6 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
@@ -45,7 +44,6 @@ import scala.concurrent.Future
 class RegisterServicesControllerSpec extends AmlsSpec
   with MockitoSugar
   with ScalaFutures
-  with PrivateMethodTester
   with ResponsiblePersonGenerator {
 
   val activities: Set[BusinessActivity] = Set(
@@ -75,6 +73,9 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
+      .configure(
+        "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+      )
       .overrides(bind[BusinessMatchingService].to(businessMatchingService))
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
@@ -298,21 +299,11 @@ class RegisterServicesControllerSpec extends AmlsSpec
       "have no existing services" when {
         "status is pre-submission" when {
           "activities have not yet been selected" in new Fixture {
-
-            val getActivityValues = PrivateMethod[Seq[BusinessActivity]]('getActivityValues)
-
-            val existing = controller invokePrivate getActivityValues(true, None)
-
-            existing must be(empty)
+            controller.getActivityValues(true, None) must be(empty)
           }
 
           "activities have already been selected" in new Fixture {
-
-            val getActivityValues = PrivateMethod[Seq[BusinessActivity]]('getActivityValues)
-
-            val existing = controller invokePrivate getActivityValues(true, Some(activityData1))
-
-            existing must be(empty)
+            controller.getActivityValues(true, Some(activityData1)) must be(empty)
           }
         }
       }
@@ -325,13 +316,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
             s"$act is contained in existing activities" in new Fixture {
 
               val activityData: Set[BusinessActivity] = Set(act)
-
-              val getActivityValues = PrivateMethod[Seq[BusinessActivity]]('getActivityValues)
-
-              val existing =
-                controller invokePrivate getActivityValues(false, Some(activityData))
-
-              existing must be(Seq(act))
+              controller.getActivityValues(false, Some(activityData)) must be(Seq(act))
             }
           }
         }
@@ -793,23 +778,13 @@ class RegisterServicesControllerSpec extends AmlsSpec
     "promptFitAndProper" must {
       "return true" when {
         "a responsible person has fitAndProper not defined" in new Fixture {
-
-          val promptFitAndProper = PrivateMethod[Boolean]('promptFitAndProper)
-
-          val result = controller invokePrivate promptFitAndProper(responsiblePerson)
-
-          result must be(true)
+          controller.promptFitAndProper(responsiblePerson) must be(true)
 
         }
       }
       "return false" when {
         "all responsible people have fitAndProper defined" in new Fixture {
-
-          val promptFitAndProper = PrivateMethod[Boolean]('promptFitAndProper)
-
-          val result = controller invokePrivate promptFitAndProper(responsiblePerson.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))))
-
-          result must be(false)
+          controller.promptFitAndProper(responsiblePerson.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))) must be(false)
 
         }
       }

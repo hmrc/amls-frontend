@@ -55,6 +55,9 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
+      .configure(
+        "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+      )
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[RenewalService].to(renewalService))
       .overrides(bind[AuthAction].to(authAction))

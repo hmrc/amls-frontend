@@ -203,7 +203,7 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
       }
   }
 
-  private def getActivityValues(isPreSubmission: Boolean, existingActivities: Option[Set[BusinessActivity]]): Seq[BusinessActivity] =
+  def getActivityValues(isPreSubmission: Boolean, existingActivities: Option[Set[BusinessActivity]]): Seq[BusinessActivity] =
     existingActivities.fold[Seq[BusinessActivity]](Seq.empty) { ea =>
       if (isPreSubmission) {
         Seq.empty
@@ -251,7 +251,7 @@ class RegisterServicesController @Inject()(authAction: AuthAction,
 
   private def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
 
-  private def promptFitAndProper(rp: ResponsiblePerson) =
+  def promptFitAndProper(rp: ResponsiblePerson) =
     rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
 
   private def resetHasAccepted(rp: ResponsiblePerson): ResponsiblePerson =

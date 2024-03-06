@@ -26,7 +26,6 @@ import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -38,7 +37,7 @@ import views.html.businessactivities.InvolvedInOtherNameView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with PrivateMethodTester with Injecting {
+class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)
