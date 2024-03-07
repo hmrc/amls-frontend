@@ -193,13 +193,29 @@ class MongoCacheClient @Inject()(
     toCacheMap(Cache(targetCache).upsert[T](key, jsonData, data != None))
   }
 
+  private def catchDoubleEncryption[T](cache: Cache, key: String)(implicit reads: Reads[T], writes: Writes[T]): Option[T] = {
+    Try(decryptValue[T](cache, key)(new JsonDecryptor[T]())) match {
+      case Failure(_: JsResultException) => {
+        decryptValue[String](cache, key)(new JsonDecryptor[String]())
+          .map(hashedStr => new JsonDecryptor[T]().reads(JsString(hashedStr)))
+          .map(result => result.map(protectedObj => protectedObj.decryptedValue))
+          .map {
+            case JsSuccess(value, _) => Option(value)
+            case JsError(errors) => throw new Exception("") // todo
+          }
+          .getOrElse(throw new Exception("decrypt failed ...")) // todo
+      }
+      case Success(value) => value
+    }
+  }
+
   /**
     * Finds an item in the cache with the specified key. If the item cannot be found, None is returned.
     */
-  def find[T](credId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
+  def find[T](credId: String, key: String)(implicit reads: Reads[T], writes: Writes[T]): Future[Option[T]] = {
     fetchAll(credId) map {
       case Some(cache) => if (appConfig.mongoEncryptionEnabled) {
-        decryptValue[T](cache, key)(new JsonDecryptor[T]())
+        catchDoubleEncryption(cache, key)
       } else {
         getValue[T](cache, key)
       }
