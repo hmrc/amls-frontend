@@ -194,31 +194,13 @@ class MongoCacheClient @Inject()(
     toCacheMap(Cache(targetCache).upsert[T](key, jsonData, data != None))
   }
 
-  private def catchDoubleEncryption[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] = {
-    Try(decryptValue[T](cache, key)(new JsonDecryptor[T]())) match {
-      case Failure(_: JsResultException) => {
-        decryptValue[String](cache, key)(new JsonDecryptor[String]())
-          .map(hashedStr => new JsonDecryptor[T]().reads(JsString(hashedStr)))
-          .map(result => result.map(protectedObj => protectedObj.decryptedValue))
-          .map {
-            case JsSuccess(value, _) => Option(value)
-            case JsError(errors) =>
-              logger.error(s"Error trying to double decrypt: $key")
-              throw new Exception(s"Error trying to double decrypt: $errors")
-          }
-          .getOrElse(throw new Exception(s"Result of decryption returned nothing $key"))
-      }
-      case Success(value) => value
-    }
-  }
-
   /**
     * Finds an item in the cache with the specified key. If the item cannot be found, None is returned.
     */
   def find[T](credId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
     fetchAll(credId) map {
       case Some(cache) => if (appConfig.mongoEncryptionEnabled) {
-        catchDoubleEncryption(cache, key)(reads)
+        catchDoubleEncryption(cache, key)(reads, compositeSymmetricCrypto, new JsonDecryptor[T]()(compositeSymmetricCrypto, reads))
       } else {
         getValue[T](cache, key)
       }
@@ -229,7 +211,6 @@ class MongoCacheClient @Inject()(
   /**
     * Fetches the whole cache
     */
-
   def fetchAll(credId: String): Future[Option[Cache]] = {
     collection.find(bsonIdQuery(credId)).headOption().map {
       case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))

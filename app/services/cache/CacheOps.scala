@@ -52,6 +52,7 @@ trait CacheOps {
           }
           .getOrElse(throw new Exception(s"Result of decryption returned nothing $key"))
       }
+      case Failure(exception) => throw exception
       case Success(value) => value
     }
   }
