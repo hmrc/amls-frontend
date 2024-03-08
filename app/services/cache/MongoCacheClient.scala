@@ -78,8 +78,9 @@ object Cache {
   * @param crypto The cryptography instance to use to decrypt values
   */
 class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(cache.id, cache.data) with CacheOps {
-  def getEncryptedEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] =
-    decryptValue(cache, key)(new JsonDecryptor[T]()(crypto, fmt))
+  def getEncryptedEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] = {
+    catchDoubleEncryption(cache, key)(fmt, crypto, new JsonDecryptor[T]()(crypto, fmt))
+  }
 }
 
 /**
@@ -193,7 +194,7 @@ class MongoCacheClient @Inject()(
     toCacheMap(Cache(targetCache).upsert[T](key, jsonData, data != None))
   }
 
-  private def catchDoubleEncryption[T](cache: Cache, key: String)(implicit reads: Reads[T], writes: Writes[T]): Option[T] = {
+  private def catchDoubleEncryption[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] = {
     Try(decryptValue[T](cache, key)(new JsonDecryptor[T]())) match {
       case Failure(_: JsResultException) => {
         decryptValue[String](cache, key)(new JsonDecryptor[String]())
@@ -201,9 +202,11 @@ class MongoCacheClient @Inject()(
           .map(result => result.map(protectedObj => protectedObj.decryptedValue))
           .map {
             case JsSuccess(value, _) => Option(value)
-            case JsError(errors) => throw new Exception("") // todo
+            case JsError(errors) =>
+              logger.error(s"Error trying to double decrypt: $key")
+              throw new Exception(s"Error trying to double decrypt: $errors")
           }
-          .getOrElse(throw new Exception("decrypt failed ...")) // todo
+          .getOrElse(throw new Exception(s"Result of decryption returned nothing $key"))
       }
       case Success(value) => value
     }
@@ -212,10 +215,10 @@ class MongoCacheClient @Inject()(
   /**
     * Finds an item in the cache with the specified key. If the item cannot be found, None is returned.
     */
-  def find[T](credId: String, key: String)(implicit reads: Reads[T], writes: Writes[T]): Future[Option[T]] = {
+  def find[T](credId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
     fetchAll(credId) map {
       case Some(cache) => if (appConfig.mongoEncryptionEnabled) {
-        catchDoubleEncryption(cache, key)
+        catchDoubleEncryption(cache, key)(reads)
       } else {
         getValue[T](cache, key)
       }
