@@ -31,7 +31,10 @@ class ActivityStartDateViewSpec extends AmlsViewSpec with MustMatchers {
 
   implicit val request = FakeRequest()
 
-  val address = Address("line 1", Some("Line 2"), None, None, "postcode")
+  val addrLine1 = "Line 1"
+  val addrLine2 = "Line 2"
+  val postcode = "PO5 1CD"
+  val address = Address(addrLine1, Some(addrLine2), None, None, postcode)
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addTokenForView()
@@ -44,13 +47,9 @@ class ActivityStartDateViewSpec extends AmlsViewSpec with MustMatchers {
         messages("summary.tradingpremises") + " - " +
         messages("title.amls") + " - " + messages("title.gov")
 
-      def view = {
-        activity_start_date(fp(), 1, false, address)
-      }
+      def view = activity_start_date(fp(), 1, false, address)
 
-      val expectedAddressInHtml = """<p class="govuk-body"> line 1<br> Line 2<br> postcode<br> </p>"""
-
-      doc.html must include(expectedAddressInHtml)
+      doc.html must (include(addrLine1) and include(addrLine2) and include(postcode))
       doc.title must be(pageTitle)
       heading.html must be(messages("tradingpremises.startDate.title"))
       subHeading.html must include(messages("summary.tradingpremises"))

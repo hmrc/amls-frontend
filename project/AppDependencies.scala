@@ -41,7 +41,7 @@ private object AppDependencies {
   }
 
   private val pegdownVersion = "1.6.0"
-  private val jsoupVersion = "1.13.1"
+  private val jsoupVersion = "1.17.2"
 
   object Test {
     def apply() = new ScopeDependencies {
