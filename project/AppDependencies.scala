@@ -8,7 +8,7 @@ private object AppDependencies {
   private val playPartialsVersion = "8.3.0-play-28"
   private val httpCachingClientVersion = "9.5.0-play-28"
   private val flexmarkVersion = "0.19.1"
-  private val okHttpVersion = "3.9.1"
+  private val okHttpVersion = "4.12.0"
   private val jsonEncryptionVersion = "5.1.0-play-28"
   private val hmrcMongoVersion = "0.71.0"
   private val domain = "8.1.0-play-28"
