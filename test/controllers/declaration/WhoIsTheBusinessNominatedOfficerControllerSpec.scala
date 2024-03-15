@@ -26,7 +26,7 @@ import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionRea
 import org.joda.time.LocalDate
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.SectionsProvider
@@ -35,7 +35,7 @@ import views.html.declaration.SelectBusinessNominatedOfficerView
 
 import scala.concurrent.Future
 
-class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec  with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
 

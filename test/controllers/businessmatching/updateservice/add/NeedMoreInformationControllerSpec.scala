@@ -23,13 +23,13 @@ import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import utils._
 import views.html.businessmatching.updateservice.add.NewServiceInformationView
 
-class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with FutureAssertions with ScalaFutures {
+class NeedMoreInformationControllerSpec extends AmlsSpec  with FutureAssertions with ScalaFutures {
 
   sealed trait Fixture extends DependencyMocks {
     self =>

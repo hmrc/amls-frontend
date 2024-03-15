@@ -18,14 +18,14 @@ package views.registrationprogress
 
 import generators.businesscustomer.AddressGenerator
 import models.registrationprogress._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.registrationamendment.RegistrationAmendmentView
 
-class RegistrationAmendmentViewSpec extends AmlsViewSpec with MockitoSugar with AddressGenerator {
+class RegistrationAmendmentViewSpec extends AmlsViewSpec  with AddressGenerator {
 
   lazy val amendmentView = inject[RegistrationAmendmentView]
 

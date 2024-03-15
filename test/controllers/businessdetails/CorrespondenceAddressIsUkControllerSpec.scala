@@ -27,7 +27,7 @@ import org.jsoup.select.Elements
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -40,7 +40,7 @@ import views.html.businessdetails.CorrespondenceAddressIsUKView
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
+class CorrespondenceAddressIsUkControllerSpec extends AmlsSpec  with ScalaFutures with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)

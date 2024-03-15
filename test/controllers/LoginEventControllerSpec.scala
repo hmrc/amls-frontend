@@ -19,7 +19,7 @@ package controllers
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -29,7 +29,7 @@ import utils.{AmlsSpec, AuthAction, DependencyMocks}
 
 import scala.concurrent.Future
 
-class LoginEventControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class LoginEventControllerSpec extends AmlsSpec  with ScalaFutures {
 
   trait Fixture extends DependencyMocks { self =>
 

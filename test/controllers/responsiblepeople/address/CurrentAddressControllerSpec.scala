@@ -28,7 +28,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.{BeforeAndAfter, OptionValues}
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -38,7 +38,7 @@ import views.html.responsiblepeople.address.CurrentAddressView
 
 import scala.concurrent.Future
 
-class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with OptionValues with BeforeAndAfter with Injecting {
+class CurrentAddressControllerSpec extends AmlsSpec  with OptionValues with BeforeAndAfter with Injecting {
 
   implicit val hc = HeaderCarrier()
   val mockDataCacheConnector = mock[DataCacheConnector]

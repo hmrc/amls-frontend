@@ -26,7 +26,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -35,7 +35,7 @@ import views.html.responsiblepeople.address.TimeAtAdditionalAddressView
 
 import scala.concurrent.Future
 
-class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class TimeAtAdditionalAddressControllerSpec extends AmlsSpec  with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1

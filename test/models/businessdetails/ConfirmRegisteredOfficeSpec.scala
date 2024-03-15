@@ -16,11 +16,11 @@
 
 package models.businessdetails
 
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class ConfirmRegisteredOfficeSpec extends PlaySpec with MockitoSugar {
+class ConfirmRegisteredOfficeSpec extends PlaySpec  {
 
   "ConfirmRegisteredOffice" must {
 

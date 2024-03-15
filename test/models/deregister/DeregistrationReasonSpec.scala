@@ -17,11 +17,11 @@
 package models.deregister
 
 import org.scalatest.MustMatchers
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class DeregistrationReasonSpec extends PlaySpec with MustMatchers with MockitoSugar {
+class DeregistrationReasonSpec extends PlaySpec with MustMatchers  {
 
   "JSON validation" must {
 

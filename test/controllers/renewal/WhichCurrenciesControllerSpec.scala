@@ -28,7 +28,7 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.{CurrencyAutocompleteService, RenewalService}
@@ -38,7 +38,7 @@ import views.html.renewal.WhichCurrenciesView
 
 import scala.concurrent.Future
 
-class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class WhichCurrenciesControllerSpec extends AmlsSpec  with Injecting {
 
   trait Fixture {
     self =>

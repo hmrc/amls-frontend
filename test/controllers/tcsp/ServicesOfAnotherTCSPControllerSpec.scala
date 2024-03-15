@@ -23,13 +23,13 @@ import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.tcsp.ServicesOfAnotherTCSPView
 
-class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator with Injecting {
+class ServicesOfAnotherTCSPControllerSpec extends AmlsSpec  with ScalaFutures with AmlsReferenceNumberGenerator with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)

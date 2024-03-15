@@ -28,7 +28,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -37,7 +37,7 @@ import views.html.msb.SendMoneyToOtherCountryView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class SendMoneyToOtherCountryControllerSpec extends AmlsSpec  with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>

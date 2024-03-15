@@ -23,7 +23,7 @@ import models.businessdetails.ActivityStartDate
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.asp.ServicesOfBusinessDateOfChangeService
@@ -33,7 +33,7 @@ import views.html.DateOfChangeView
 
 import scala.concurrent.Future
 
-class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec  with Injecting {
 
   val emptyCache = CacheMap("", Map.empty)
 

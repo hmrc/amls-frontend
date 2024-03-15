@@ -26,7 +26,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import utils.AmlsSpec
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -35,7 +35,7 @@ import views.html.responsiblepeople.SelfAssessmentRegisteredView
 
 import scala.concurrent.Future
 
-class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
+class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec  with ScalaFutures with Injecting {
 
   val recordId = 1
 

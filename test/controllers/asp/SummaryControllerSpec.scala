@@ -20,7 +20,7 @@ import controllers.actions.SuccessfulAuthAction
 import models.asp.Asp
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
@@ -28,7 +28,7 @@ import views.html.asp.SummaryView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
+class SummaryControllerSpec extends AmlsSpec  {
 
   trait Fixture extends DependencyMocks {
     self =>

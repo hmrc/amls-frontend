@@ -18,7 +18,7 @@ package services
 
 import connectors.GovernmentGatewayConnector
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -28,7 +28,7 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
-class GovernmentGatewayServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
+class GovernmentGatewayServiceSpec extends PlaySpec  with ScalaFutures {
 
   val service: GovernmentGatewayService = new GovernmentGatewayService(
     ggConnector = mock[GovernmentGatewayConnector]

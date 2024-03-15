@@ -33,7 +33,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
@@ -44,7 +44,7 @@ import views.html.businessmatching.PsrNumberView
 import scala.concurrent.Future
 
 class PSRNumberControllerSpec extends AmlsSpec
-  with MockitoSugar
+
   with ScalaFutures
   with BusinessMatchingGenerator {
 

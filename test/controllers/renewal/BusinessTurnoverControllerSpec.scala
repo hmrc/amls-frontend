@@ -25,7 +25,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
@@ -35,7 +35,7 @@ import views.html.renewal.BusinessTurnoverView
 
 import scala.concurrent.Future
 
-class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach with Injecting {
+class BusinessTurnoverControllerSpec extends AmlsSpec  with ScalaFutures with BeforeAndAfterEach with Injecting {
 
   lazy val mockDataCacheConnector = mock[DataCacheConnector]
   lazy val mockRenewalService = mock[RenewalService]

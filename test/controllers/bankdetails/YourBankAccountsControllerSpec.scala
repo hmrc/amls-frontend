@@ -20,13 +20,13 @@ import controllers.actions.SuccessfulAuthAction
 import models.bankdetails.BankAccountType._
 import models.bankdetails._
 import models.status.SubmissionReady
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.html.bankdetails.YourBankAccountsView
 
-class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
+class YourBankAccountsControllerSpec extends AmlsSpec  {
 
   trait Fixture extends DependencyMocks {
     self =>

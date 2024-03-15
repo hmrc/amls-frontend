@@ -16,11 +16,11 @@
 
 package models.businessmatching
 
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
-class ConfirmPostcodeSpec extends PlaySpec with MockitoSugar {
+class ConfirmPostcodeSpec extends PlaySpec  {
 
   "ConfirmPostcode" must {
 

@@ -24,13 +24,13 @@ import models.hvd.{Hvd, PaymentMethods}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.hvd.ReceiveCashView
 
-class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class ReceiveCashPaymentsControllerSpec extends AmlsSpec  with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
 

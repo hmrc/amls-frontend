@@ -34,7 +34,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
@@ -48,7 +48,7 @@ import views.html.tradingpremises.WhatDoesYourBusinessDoView
 
 import scala.concurrent.Future
 
-class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with Injecting {
+class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec  with BeforeAndAfter with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val mockCacheMap = mock[CacheMap]

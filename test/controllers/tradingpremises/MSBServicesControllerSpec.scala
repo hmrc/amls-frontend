@@ -35,7 +35,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
@@ -46,7 +46,7 @@ import views.html.tradingpremises.MSBServicesView
 
 import scala.concurrent.Future
 
-class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with Injecting {
+class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures  with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)

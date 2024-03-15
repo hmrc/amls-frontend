@@ -28,7 +28,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
@@ -38,7 +38,7 @@ import views.html.tradingpremises.RemoveTradingPremisesView
 
 import scala.concurrent.Future
 
-class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class RemoveTradingPremisesControllerSpec extends AmlsSpec  with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)

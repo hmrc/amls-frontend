@@ -24,14 +24,14 @@ import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionRea
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.html.bankdetails.BankAccountTypesView
 
-class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class BankAccountTypeControllerSpec extends AmlsSpec  with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
 

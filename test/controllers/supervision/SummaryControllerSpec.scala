@@ -22,7 +22,7 @@ import models.supervision.{Supervision, SupervisionValues}
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -32,7 +32,7 @@ import views.html.supervision.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class SummaryControllerSpec extends AmlsSpec  with Injecting {
 
   trait Fixture extends DependencyMocks with SupervisionValues {
     self => val request = addToken(authRequest)

@@ -16,12 +16,12 @@
 
 package models.supervision
 
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 
-class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
+class ProfessionalBodyMemberSpec extends PlaySpec  {
 
   "ProfessionalBodyMember" must {
 

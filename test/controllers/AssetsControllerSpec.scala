@@ -19,7 +19,7 @@ package controllers
 import models.autocomplete.LocationGraphTransformer
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.Environment
 import play.api.http.HttpErrorHandler
@@ -27,7 +27,7 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class AssetsControllerSpec extends PlaySpec with MockitoSugar {
+class AssetsControllerSpec extends PlaySpec  {
 
   trait Fixture {
     val environment = mock[Environment]

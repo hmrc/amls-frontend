@@ -18,12 +18,12 @@ package controllers.tcsp
 
 import controllers.actions.SuccessfulAuthAction
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.tcsp.WhatYouNeedView
 
-class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class WhatYouNeedControllerSpec extends AmlsSpec  with ScalaFutures {
 
   trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)

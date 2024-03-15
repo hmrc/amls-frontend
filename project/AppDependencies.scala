@@ -12,6 +12,7 @@ private object AppDependencies {
   private val jsonEncryptionVersion = "5.3.0-play-28"
   private val hmrcMongoVersion = "0.71.0"
   private val domain = "8.1.0-play-28"
+  private val bootstrapV = "7.23.0"
 
   val compile = Seq(
     ws,
@@ -20,7 +21,7 @@ private object AppDependencies {
     "uk.gov.hmrc"       %% "http-caching-client-play-28"   % httpCachingClientVersion,
     "uk.gov.hmrc"       %% "json-encryption"               % jsonEncryptionVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"            % hmrcMongoVersion,
-    "uk.gov.hmrc"       %% "bootstrap-frontend-play-28"    % "7.23.0",
+    "uk.gov.hmrc"       %% "bootstrap-frontend-play-28"    % bootstrapV,
     "uk.gov.hmrc"       %% "play-frontend-hmrc-play-28"    % "8.4.0",
     "uk.gov.hmrc"       %% "play-conditional-form-mapping" % "1.13.0-play-28",
 
@@ -48,12 +49,13 @@ private object AppDependencies {
     def apply() = new ScopeDependencies {
       override val scope = "test"
       override lazy val dependencies = Seq(
-        "org.scalacheck" %% "scalacheck" % "1.14.3" % scope,
-        "org.pegdown" % "pegdown" % pegdownVersion % scope,
-        "org.jsoup" % "jsoup" % jsoupVersion % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "org.mockito" % "mockito-all" % "1.10.19" % scope,
-        "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % scope
+        "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % bootstrapV          % scope,
+        "org.scalatestplus.play" %% "scalatestplus-play"      % "5.0.0"             % scope,
+        "org.scalacheck"         %% "scalacheck"              % "1.14.3"            % scope,
+        "org.pegdown"             % "pegdown"                 % pegdownVersion      % scope,
+        "org.jsoup"               % "jsoup"                   % jsoupVersion        % scope,
+        "com.typesafe.play"      %% "play-test"               % PlayVersion.current % scope,
+        "org.mockito"             % "mockito-all"             % "1.10.19"           % scope,
       )
     }.dependencies
   }

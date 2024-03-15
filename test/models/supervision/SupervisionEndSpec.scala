@@ -17,11 +17,11 @@
 package models.supervision
 
 import org.joda.time.LocalDate
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class SupervisionEndSpec extends PlaySpec with MockitoSugar {
+class SupervisionEndSpec extends PlaySpec  {
   trait Fixture {
 
     val startDateField = Map("extraStartDate" -> Seq("2000-01-01"))

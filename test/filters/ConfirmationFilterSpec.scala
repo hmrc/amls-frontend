@@ -20,7 +20,7 @@ import connectors.{AuthenticatorConnector, KeystoreConnector}
 import models.status.ConfirmationStatus
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.bind
@@ -32,7 +32,7 @@ import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.Future
 
-class ConfirmationFilterSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with Results with BaseController {
+class ConfirmationFilterSpec extends PlaySpec with GuiceOneAppPerSuite  with Results with BaseController {
 
   val keystore = mock[KeystoreConnector]
   val authenticator = mock[AuthenticatorConnector]

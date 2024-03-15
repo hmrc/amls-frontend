@@ -16,11 +16,11 @@
 
 package models.bankdetails
 
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class BankAccountSpec extends PlaySpec with MockitoSugar {
+class BankAccountSpec extends PlaySpec  {
 
 
   val ukAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("12341234", "000000")))

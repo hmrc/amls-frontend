@@ -29,7 +29,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers.{status => hstatus, _}
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
@@ -43,7 +43,7 @@ import views.html.tradingpremises.WhereAreTradingPremisesView
 
 import scala.concurrent.Future
 
-class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with Injecting {
+class WhereAreTradingPremisesControllerSpec extends AmlsSpec  with BeforeAndAfter with Injecting {
 
   private val mockDataCacheConnector = mock[DataCacheConnector]
 

@@ -25,7 +25,7 @@ import models.tcsp.TcspTypes._
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -34,7 +34,7 @@ import views.html.tcsp.ComplexCorpStructureCreationView
 
 import scala.concurrent.Future
 
-class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
+class ComplexCorpStructureCreationControllerSpec extends AmlsSpec  with ScalaFutures with Injecting {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)

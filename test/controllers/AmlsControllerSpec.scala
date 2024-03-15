@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions.SuccessfulAuthAction
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers._

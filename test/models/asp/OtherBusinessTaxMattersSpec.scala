@@ -16,11 +16,11 @@
 
 package models.asp
 
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
-class OtherBusinessTaxMattersSpec extends PlaySpec with MockitoSugar {
+class OtherBusinessTaxMattersSpec extends PlaySpec  {
 
   "Json validation" must {
 

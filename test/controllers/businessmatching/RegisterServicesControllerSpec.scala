@@ -30,7 +30,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
@@ -42,7 +42,7 @@ import utils._
 import scala.concurrent.Future
 
 class RegisterServicesControllerSpec extends AmlsSpec
-  with MockitoSugar
+
   with ScalaFutures
   with ResponsiblePersonGenerator {
 

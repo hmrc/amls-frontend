@@ -26,14 +26,13 @@ import play.api.libs.json._
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
-import uk.gov.hmrc.mongo.{MongoComponent, TimestampSupport}
 
 import java.time.{LocalDateTime, ZoneOffset}
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.SECONDS
 import scala.util.{Failure, Success, Try}
 
@@ -86,15 +85,9 @@ class CryptoCache(cache: Cache, crypto: Encrypter with Decrypter) extends Cache(
 /**
   * An injectible factory for creating new MongoCacheClients
   */
-class MongoCacheClientFactory @Inject()(
-  config: ApplicationConfig,
-  applicationCrypto: ApplicationCrypto,
-  timestampSupport: TimestampSupport,
-  mongo: MongoComponent) {
-  def createClient: MongoCacheClient = new MongoCacheClient(
-    config, applicationCrypto,
-    timestampSupport: TimestampSupport,
-    mongo: MongoComponent)
+class MongoCacheClientFactory @Inject()(config: ApplicationConfig, applicationCrypto: ApplicationCrypto, mongo: MongoComponent)
+                                       (implicit val ec: ExecutionContext) {
+  def createClient: MongoCacheClient = new MongoCacheClient(config, applicationCrypto, mongo: MongoComponent)
 }
 
 /**
@@ -104,11 +97,7 @@ class MongoCacheClientFactory @Inject()(
   */
 
 @Singleton
-class MongoCacheClient @Inject()(
-   appConfig: ApplicationConfig,
-   applicationCrypto: ApplicationCrypto,
-   timestampSupport: TimestampSupport,
-   mongo: MongoComponent)
+class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto: ApplicationCrypto, mongo: MongoComponent)(implicit val ec: ExecutionContext)
   extends PlayMongoRepository[Cache](
     mongoComponent = mongo,
     collectionName = "app-cache",

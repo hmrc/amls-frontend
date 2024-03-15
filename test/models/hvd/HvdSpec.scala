@@ -22,7 +22,7 @@ import models.hvd.SalesChannel._
 import models.registrationprogress._
 import org.joda.time.LocalDate
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JodaReads, JodaWrites, JsUndefined, Json}
 import play.api.test.Helpers
@@ -46,7 +46,7 @@ sealed trait HvdTestFixture {
     Some(DateOfChange(new LocalDate("2016-02-24"))))
 }
 
-class HvdSpec extends PlaySpec with MockitoSugar with JodaReads with JodaWrites {
+class HvdSpec extends PlaySpec  with JodaReads with JodaWrites {
 
   "hvd" must {
 

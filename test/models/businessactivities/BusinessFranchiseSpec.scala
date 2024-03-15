@@ -16,11 +16,11 @@
 
 package models.businessactivities
 
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class BusinessFranchiseSpec extends PlaySpec with MockitoSugar {
+class BusinessFranchiseSpec extends PlaySpec  {
 
   "JSON validation" must {
     "successfully validate given an enum value" in {

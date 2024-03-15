@@ -22,7 +22,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessdetails.BusinessEmailAddressService
@@ -33,7 +33,7 @@ import views.html.businessdetails.BusinessEmailAddressView
 import java.util.UUID
 import scala.concurrent.Future
 
-class BusinessEmailAddressControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
+class BusinessEmailAddressControllerSpec extends AmlsSpec  with ScalaFutures with BeforeAndAfterEach {
 
   val userId = s"user-${UUID.randomUUID}"
   val email = "test@test.com"

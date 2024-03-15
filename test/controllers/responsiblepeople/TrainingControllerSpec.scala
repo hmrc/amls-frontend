@@ -26,7 +26,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -35,7 +35,7 @@ import views.html.responsiblepeople.TrainingView
 
 import scala.concurrent.Future
 
-class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
+class TrainingControllerSpec extends AmlsSpec  with ScalaFutures with Injecting {
 
   val recordId = 1
 

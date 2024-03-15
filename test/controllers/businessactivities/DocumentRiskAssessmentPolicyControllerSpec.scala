@@ -25,7 +25,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.businessactivities.DocumentRiskAssessmentService
@@ -35,7 +35,7 @@ import views.html.businessactivities.DocumentRiskAssessmentPolicyView
 
 import scala.concurrent.Future
 
-class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with Injecting with BeforeAndAfterEach {
+class DocumentRiskAssessmentPolicyControllerSpec extends AmlsSpec  with Injecting with BeforeAndAfterEach {
 
   val mockService = mock[DocumentRiskAssessmentService]
 

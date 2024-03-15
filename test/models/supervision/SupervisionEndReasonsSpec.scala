@@ -16,11 +16,11 @@
 
 package models.supervision
 
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class SupervisionEndReasonsSpec extends PlaySpec with MockitoSugar {
+class SupervisionEndReasonsSpec extends PlaySpec  {
   trait Fixture {
 
     val reason = "Reason"

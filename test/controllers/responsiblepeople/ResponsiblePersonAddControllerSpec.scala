@@ -30,14 +30,14 @@ import org.scalacheck.Gen
 import uk.gov.hmrc.http.cache.client.CacheMap
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import org.scalactic.anyvals.PosInt
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
 
 class ResponsiblePersonAddControllerSpec extends AmlsSpec
-  with MustMatchers with MockitoSugar with ScalaFutures with ScalaCheckPropertyChecks {
+  with MustMatchers  with ScalaFutures with ScalaCheckPropertyChecks {
 
   trait Fixture {
     self => val request = addToken(authRequest)

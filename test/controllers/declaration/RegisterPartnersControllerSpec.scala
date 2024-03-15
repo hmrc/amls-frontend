@@ -25,7 +25,7 @@ import models.status._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.{ProgressService, SectionsProvider}
@@ -36,7 +36,7 @@ import views.html.declaration.RegisterPartnersView
 import scala.concurrent.Future
 
 
-class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class RegisterPartnersControllerSpec extends AmlsSpec  with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>

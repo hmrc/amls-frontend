@@ -30,7 +30,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -40,7 +40,7 @@ import views.html.responsiblepeople.PositionWithinBusinessStartDateView
 
 import scala.concurrent.Future
 
-class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with Injecting {
+class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec  with ResponsiblePersonGenerator with Injecting {
 
   trait Fixture {
     self =>

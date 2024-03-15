@@ -16,11 +16,11 @@
 
 package models.businessactivities
 
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class EmployeeCountAMLSSupervisionSpec extends PlaySpec with MockitoSugar {
+class EmployeeCountAMLSSupervisionSpec extends PlaySpec  {
   "EmployeeCountAMLSSupervisionSpec" must {
 
     "round trip through JSON" in {

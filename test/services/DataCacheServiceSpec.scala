@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
 
-class DataCacheServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
+class DataCacheServiceSpec extends PlaySpec  with ScalaFutures {
 
   object DataCacheService extends DataCacheService {
     override private[services] val cacheConnector = mock[DataCacheConnector]

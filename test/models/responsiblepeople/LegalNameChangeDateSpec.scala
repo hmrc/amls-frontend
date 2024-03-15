@@ -17,11 +17,11 @@
 package models.responsiblepeople
 
 import org.joda.time.LocalDate
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class LegalNameChangeDateSpec extends PlaySpec with MockitoSugar {
+class LegalNameChangeDateSpec extends PlaySpec  {
 
   "LegalNameChangeDate" must {
 

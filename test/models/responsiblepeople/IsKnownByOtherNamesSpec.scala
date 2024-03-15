@@ -16,11 +16,11 @@
 
 package models.responsiblepeople
 
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
-class IsKnownByOtherNamesSpec extends PlaySpec with MockitoSugar {
+class IsKnownByOtherNamesSpec extends PlaySpec  {
 
   "JSON Read/Write " must {
 

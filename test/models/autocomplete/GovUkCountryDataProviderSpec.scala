@@ -19,12 +19,12 @@ package models.autocomplete
 import java.io.ByteArrayInputStream
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.Environment
 import play.api.libs.json.Json
 
-class GovUkCountryDataProviderSpec extends PlaySpec with MockitoSugar {
+class GovUkCountryDataProviderSpec extends PlaySpec  {
 
   trait Fixture {
 

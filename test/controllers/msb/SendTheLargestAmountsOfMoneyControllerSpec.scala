@@ -25,7 +25,7 @@ import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions, Send
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -33,7 +33,7 @@ import utils.{AmlsSpec, DependencyMocks}
 import views.html.msb.SendLargestAmountsOfMoneyView
 
 class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
-  with MockitoSugar with PatienceConfiguration with IntegrationPatience with Injecting {
+   with PatienceConfiguration with IntegrationPatience with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)

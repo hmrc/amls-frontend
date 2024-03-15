@@ -36,7 +36,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
@@ -51,7 +51,7 @@ import views.html.responsiblepeople.address.CurrentAddressUKView
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with Injecting {
+class CurrentAddressUKControllerSpec extends AmlsSpec with ScalaFutures  with Injecting {
 
   implicit val hc = HeaderCarrier()
   val mockDataCacheConnector = mock[DataCacheConnector]

@@ -27,7 +27,7 @@ import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.Injecting
@@ -39,7 +39,7 @@ import views.html.businessactivities.CheckYourAnswersView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class SummaryControllerSpec extends AmlsSpec  with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)

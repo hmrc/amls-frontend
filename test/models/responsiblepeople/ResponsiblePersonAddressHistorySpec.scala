@@ -18,11 +18,11 @@ package models.responsiblepeople
 
 import models.Country
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class ResponsiblePersonAddressHistorySpec extends PlaySpec with MockitoSugar {
+class ResponsiblePersonAddressHistorySpec extends PlaySpec  {
 
   val DefaultCurrentAddress = ResponsiblePersonCurrentAddress(PersonAddressUK("Line 1", Some("Line 2"), None, None, "AA111AA"), Some(ZeroToFiveMonths))
   val DefaultAdditionalAddress = ResponsiblePersonAddress(PersonAddressNonUK("Line 1", Some("Line 2"), None, None, Country("Spain", "ES")), Some(SixToElevenMonths))

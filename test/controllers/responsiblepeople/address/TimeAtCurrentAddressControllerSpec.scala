@@ -27,7 +27,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
@@ -37,7 +37,7 @@ import views.html.responsiblepeople.address.TimeAtAddressView
 
 import scala.concurrent.Future
 
-class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class TimeAtCurrentAddressControllerSpec extends AmlsSpec  with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val mockStatusService = mock[StatusService]

@@ -31,7 +31,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.OptionValues
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.Injecting
@@ -44,7 +44,7 @@ import views.html.responsiblepeople.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePeopleValues
+class DetailedAnswersControllerSpec extends AmlsSpec  with ResponsiblePeopleValues
   with BusinessMatchingGenerator with OptionValues with Injecting {
 
   trait Fixture extends DependencyMocks {

@@ -17,10 +17,10 @@
 package models.businessdetails
 
 import models.Country
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 
-class CorrespondenceAddressSpec extends PlaySpec with MockitoSugar {
+class CorrespondenceAddressSpec extends PlaySpec  {
 
   "CorrespondenceAddress" must {
 

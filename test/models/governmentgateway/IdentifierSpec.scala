@@ -16,11 +16,11 @@
 
 package models.governmentgateway
 
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
 
-class IdentifierSpec extends PlaySpec with MockitoSugar {
+class IdentifierSpec extends PlaySpec  {
 
   val model = Identifier("foo", "bar")
 

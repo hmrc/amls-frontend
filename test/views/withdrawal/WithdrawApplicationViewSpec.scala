@@ -17,12 +17,12 @@
 package views.withdrawal
 
 import org.joda.time.LocalDateTime
-import org.scalatestplus.mockito.MockitoSugar
+
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.withdrawal.WithdrawApplicationView
 
-class WithdrawApplicationViewSpec extends AmlsViewSpec with MockitoSugar {
+class WithdrawApplicationViewSpec extends AmlsViewSpec  {
 
   trait ViewFixture extends Fixture {
     lazy val withdraw_application = inject[WithdrawApplicationView]

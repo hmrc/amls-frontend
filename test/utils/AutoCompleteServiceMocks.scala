@@ -18,7 +18,7 @@ package utils
 
 import models.autocomplete.NameValuePair
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
+
 import services.AutoCompleteService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 

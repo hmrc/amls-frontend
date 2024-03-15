@@ -31,7 +31,7 @@ import org.joda.time.LocalDateTime
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.{RenewalService, SectionsProvider, StatusService}
@@ -41,7 +41,7 @@ import views.html.declaration.{WhoIsRegisteringThisRegistrationView, WhoIsRegist
 
 import scala.concurrent.Future
 
-class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with Injecting {
+class WhoIsRegisteringControllerSpec extends AmlsSpec  with ResponsiblePersonGenerator with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>

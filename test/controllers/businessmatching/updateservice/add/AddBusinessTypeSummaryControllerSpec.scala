@@ -33,7 +33,7 @@ import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalacheck.Gen
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.TradingPremisesService
@@ -45,7 +45,7 @@ import views.html.businessmatching.updateservice.add.UpdateServicesSummaryView
 import scala.concurrent.Future
 
 class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
-  with MockitoSugar
+
   with TradingPremisesGenerator
   with BusinessMatchingGenerator with ResponsiblePersonGenerator {
 

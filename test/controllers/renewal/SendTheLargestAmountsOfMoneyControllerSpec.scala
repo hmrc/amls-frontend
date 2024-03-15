@@ -26,7 +26,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -38,7 +38,7 @@ import views.html.renewal.SendLargestAmountsOfMoneyView
 import scala.concurrent.Future
 
 class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
-  with MockitoSugar with PatienceConfiguration with IntegrationPatience with Injecting {
+   with PatienceConfiguration with IntegrationPatience with Injecting {
 
   trait Fixture extends AutoCompleteServiceMocks {
     self =>

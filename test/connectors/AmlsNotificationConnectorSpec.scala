@@ -22,7 +22,7 @@ import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.HttpClient
@@ -30,7 +30,7 @@ import uk.gov.hmrc.http.HttpClient
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
+class AmlsNotificationConnectorSpec extends PlaySpec  with ScalaFutures {
 
   val safeId = "SAFEID"
   val accountTypeId = ("org","id")

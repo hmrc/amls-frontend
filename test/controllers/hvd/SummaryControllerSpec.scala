@@ -30,7 +30,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import uk.gov.hmrc.http.HeaderCarrier
@@ -41,7 +41,7 @@ import views.html.hvd.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
+class SummaryControllerSpec extends AmlsSpec  with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>

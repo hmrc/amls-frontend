@@ -20,7 +20,7 @@ import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.{reset, when}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatest.{FreeSpec, MustMatchers}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
@@ -34,7 +34,7 @@ class MongoCacheConnectorSpec extends FreeSpec
   with MustMatchers
   with ScalaCheckPropertyChecks
   with ScalaFutures
-  with MockitoSugar
+
   with IntegrationPatience with Conversions {
 
   case class Model(tmp: String)

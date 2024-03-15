@@ -28,7 +28,7 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
@@ -40,7 +40,7 @@ import views.html.renewal.TotalThroughputView
 
 import scala.concurrent.Future
 
-class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class TotalThroughputControllerSpec extends AmlsSpec  with Injecting {
 
   trait Fixture {
     self =>

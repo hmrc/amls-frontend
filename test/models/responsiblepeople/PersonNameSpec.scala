@@ -16,11 +16,11 @@
 
 package models.responsiblepeople
 
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class PersonNameSpec extends PlaySpec with MockitoSugar {
+class PersonNameSpec extends PlaySpec  {
 
   "PersonName" when {
 

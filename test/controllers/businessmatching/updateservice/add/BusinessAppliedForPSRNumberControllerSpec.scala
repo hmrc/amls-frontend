@@ -28,7 +28,7 @@ import models.status.SubmissionDecisionApproved
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.{FakeRequest, Injecting}
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
@@ -37,7 +37,7 @@ import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessmatching.updateservice.add.BusinessAppliedForPSRNumberView
 
 class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
-  with MockitoSugar
+
   with ScalaFutures
   with BusinessMatchingGenerator
   with Injecting {

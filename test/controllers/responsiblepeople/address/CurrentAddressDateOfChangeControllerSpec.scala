@@ -25,7 +25,7 @@ import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
@@ -35,7 +35,7 @@ import views.html.DateOfChangeView
 
 import scala.concurrent.Future
 
-class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec  with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)

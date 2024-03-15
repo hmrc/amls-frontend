@@ -26,7 +26,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito.{verify, when}
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -35,7 +35,7 @@ import views.html.responsiblepeople.PersonUKPassportView
 
 import scala.concurrent.Future
 
-class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class PersonUKPassportControllerSpec extends AmlsSpec  with Injecting {
 
   trait Fixture {
     self =>

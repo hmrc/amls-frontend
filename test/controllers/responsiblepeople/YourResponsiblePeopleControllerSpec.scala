@@ -21,7 +21,7 @@ import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import services.responsiblepeople.YourResponsiblePeopleService
@@ -30,7 +30,7 @@ import views.html.responsiblepeople.YourResponsiblePeopleView
 
 import scala.concurrent.Future
 
-class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
+class YourResponsiblePeopleControllerSpec extends AmlsSpec  with Injecting {
 
     trait Fixture {
       self => val request = addToken(authRequest)

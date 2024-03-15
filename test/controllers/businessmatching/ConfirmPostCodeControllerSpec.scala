@@ -24,7 +24,7 @@ import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => meq, _}
 import models.businesscustomer.{ReviewDetails, Address => BusinessCustomerAddress}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
@@ -34,7 +34,7 @@ import utils.{AmlsSpec, AuthAction}
 
 import scala.concurrent.Future
 
-class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class ConfirmPostCodeControllerSpec extends AmlsSpec  with ScalaFutures {
 
   trait Fixture {
     self => val request = addToken(authRequest)

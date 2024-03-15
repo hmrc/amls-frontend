@@ -16,11 +16,11 @@
 
 package models.renewal
 
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class AMLSTurnoverSpec extends PlaySpec with MockitoSugar {
+class AMLSTurnoverSpec extends PlaySpec  {
 
   "JSON validation" must {
 

@@ -33,11 +33,11 @@
 package models.businessdetails
 
 import models.Country
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
 
-class CorrespondenceAddressUkSpec extends PlaySpec with MockitoSugar {
+class CorrespondenceAddressUkSpec extends PlaySpec  {
 
   val defaultYourName = "Default Your Name"
   val defaultBusinessName = "Default Business Name"

@@ -25,7 +25,7 @@ import models.businessmatching.{BusinessMatching, BusinessType}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessdetails.ConfirmRegisteredOfficeService
@@ -35,7 +35,7 @@ import views.html.businessdetails.ConfirmRegisteredOfficeOrMainPlaceView
 
 import scala.concurrent.Future
 
-class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfterEach {
+class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec  with BeforeAndAfterEach {
 
   val mockService = mock[ConfirmRegisteredOfficeService]
 

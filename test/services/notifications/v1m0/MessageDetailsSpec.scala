@@ -22,7 +22,7 @@ import models.notifications.{ContactType, IDType, NotificationDetails, Notificat
 import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.i18n.MessagesApi
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
@@ -33,7 +33,7 @@ import utils.AmlsSpec
 
 import scala.concurrent.Future
 
-class MessageDetailsSpec extends AmlsSpec with MockitoSugar {
+class MessageDetailsSpec extends AmlsSpec  {
 
   implicit val hc = HeaderCarrier()
 

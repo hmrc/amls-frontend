@@ -22,7 +22,7 @@ import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import org.scalatestplus.mockito.MockitoSugar
+
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 

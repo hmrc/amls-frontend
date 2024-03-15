@@ -25,7 +25,7 @@ import org.joda.time.{DateTimeUtils, LocalDate, LocalDateTime}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -35,7 +35,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with GuiceOneAppPerSuite {
+class StatusServiceSpec extends PlaySpec  with ScalaFutures with GuiceOneAppPerSuite {
 
   override def fakeApplication(): Application = {
     new GuiceApplicationBuilder()

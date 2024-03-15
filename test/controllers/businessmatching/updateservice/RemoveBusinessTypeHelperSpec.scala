@@ -30,13 +30,13 @@ import models.tcsp.Tcsp
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import utils._
 
 
 import scala.concurrent.Future
 
-class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with MockitoSugar with ScalaFutures {
+class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions  with ScalaFutures {
 
   val MSBOnlyModel = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
 

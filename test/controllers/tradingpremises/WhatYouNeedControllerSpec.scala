@@ -24,14 +24,14 @@ import models.businessmatching._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.test.Helpers._
 import utils.AmlsSpec
 import views.html.tradingpremises.WhatYouNeedView
 
 import scala.concurrent.Future
 
-class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
+class WhatYouNeedControllerSpec extends AmlsSpec  {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
 

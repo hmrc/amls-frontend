@@ -26,7 +26,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -39,7 +39,7 @@ import views.html.renewal.InvolvedInOtherView
 
 import scala.concurrent.Future
 
-class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
+class InvolvedInOtherControllerSpec extends AmlsSpec  with ScalaFutures with Injecting {
 
   trait Fixture {
     self =>

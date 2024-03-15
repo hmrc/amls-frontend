@@ -22,11 +22,11 @@ import models.tradingpremises.BusinessStructure.SoleProprietor
 import models.tradingpremises.TradingPremisesMsbService._
 import models.tradingpremises._
 import org.joda.time.LocalDate
-import org.scalatestplus.mockito.MockitoSugar
+
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class SubscriptionRequestSpec extends PlaySpec with MockitoSugar {
+class SubscriptionRequestSpec extends PlaySpec  {
 
   val ytp = YourTradingPremises(
     "foo",
