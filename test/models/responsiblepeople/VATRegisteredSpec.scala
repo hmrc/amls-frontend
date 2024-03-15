@@ -16,11 +16,11 @@
 
 package models.responsiblepeople
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class VATRegisteredSpec extends PlaySpec  {
+class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
   "JSON validation" must {
 

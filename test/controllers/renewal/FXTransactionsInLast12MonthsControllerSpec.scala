@@ -23,7 +23,7 @@ import models.businessmatching._
 import models.renewal.{FXTransactionsInLast12Months, Renewal}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.RenewalService
@@ -33,7 +33,7 @@ import views.html.renewal.FXTransactionsInLast12MonthsView
 
 import scala.concurrent.Future
 
-class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec  with Injecting {
+class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)

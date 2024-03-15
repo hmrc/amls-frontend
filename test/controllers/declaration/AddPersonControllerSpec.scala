@@ -31,7 +31,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -41,7 +41,7 @@ import views.html.declaration.AddPersonView
 import java.util.UUID
 import scala.concurrent.Future
 
-class AddPersonControllerSpec extends AmlsSpec  with Injecting {
+class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>
@@ -324,7 +324,7 @@ class AddPersonControllerSpec extends AmlsSpec  with Injecting {
   }
 }
 
-class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec  with Injecting {
+class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]

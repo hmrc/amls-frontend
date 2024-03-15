@@ -16,11 +16,11 @@
 
 package models.responsiblepeople
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
-class PositionInBusinessSpec extends PlaySpec  {
+class PositionInBusinessSpec extends PlaySpec with MockitoSugar {
 
   "PositionInBusiness" must {
 

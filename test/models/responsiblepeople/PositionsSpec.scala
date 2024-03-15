@@ -17,11 +17,11 @@
 package models.responsiblepeople
 
 import org.joda.time.LocalDate
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
-class PositionsSpec extends PlaySpec  {
+class PositionsSpec extends PlaySpec with MockitoSugar {
 
   "hasNominatedOfficer" must {
     "return true when there is a nominated officer RP" in {

@@ -24,7 +24,7 @@ import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.AnyContentAsEmpty
 import uk.gov.hmrc.auth.core.AffinityGroup.Individual
 import uk.gov.hmrc.auth.core.{Enrolments, User}
@@ -33,7 +33,7 @@ import utils.{AmlsSpec, AuthorisedRequest}
 
 import scala.concurrent.Future
 
-class RecoverActivitiesServiceSpec extends AmlsSpec  {
+class RecoverActivitiesServiceSpec extends AmlsSpec with MockitoSugar {
 
   val mockAmlsConnector: AmlsConnector = mock[AmlsConnector]
   val mockDataCacheConnector: DataCacheConnector = mock[DataCacheConnector]

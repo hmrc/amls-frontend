@@ -18,12 +18,12 @@ package models.asp
 
 import models.DateOfChange
 import org.joda.time.LocalDate
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import models.asp.Service._
 import play.api.libs.json._
 
-class ServicesOfBusinessSpec extends PlaySpec  {
+class ServicesOfBusinessSpec extends PlaySpec with MockitoSugar {
 
   val businessServices: Set[Service] = Set(Accountancy, PayrollServices, BookKeeping, Auditing, FinancialOrTaxAdvice)
 

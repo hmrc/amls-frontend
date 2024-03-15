@@ -22,7 +22,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -33,7 +33,7 @@ import views.html.businessactivities.BusinessEmployeesCountView
 
 import scala.concurrent.Future
 
-class HowManyEmployeesControllerSpec extends AmlsSpec  with ScalaFutures with Injecting {
+class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   val mockService = mock[HowManyEmployeesService]
 

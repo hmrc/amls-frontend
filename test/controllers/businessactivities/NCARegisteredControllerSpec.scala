@@ -23,7 +23,7 @@ import models.businessactivities.{BusinessActivities, NCARegistered}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -34,7 +34,7 @@ import views.html.businessactivities.NCARegisteredView
 import scala.concurrent.Future
 
 
-class NCARegisteredControllerSpec extends AmlsSpec  with Injecting {
+class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)

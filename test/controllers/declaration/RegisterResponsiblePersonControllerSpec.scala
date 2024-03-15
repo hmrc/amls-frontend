@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -28,7 +28,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import utils.{AmlsSpec, AuthAction, DependencyMocks}
 
-class RegisterResponsiblePersonControllerSpec extends AmlsSpec  with ScalaFutures {
+class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends DependencyMocks {
     self =>

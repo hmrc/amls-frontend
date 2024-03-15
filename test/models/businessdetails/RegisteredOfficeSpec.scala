@@ -19,11 +19,11 @@ package models.businessdetails
 import models.businesscustomer.Address
 import models.{Country, DateOfChange}
 import org.joda.time.LocalDate
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsNull, JsPath, JsSuccess, Json}
 
-class RegisteredOfficeSpec extends PlaySpec  {
+class RegisteredOfficeSpec extends PlaySpec with MockitoSugar {
 
   "RegisteredOffice" must {
 

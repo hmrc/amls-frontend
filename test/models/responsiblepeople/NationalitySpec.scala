@@ -17,12 +17,12 @@
 package models.responsiblepeople
 
 import models.Country
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 
-class NationalitySpec extends PlaySpec  {
+class NationalitySpec extends PlaySpec with MockitoSugar {
 
   "JSON" must {
 

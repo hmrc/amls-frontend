@@ -17,11 +17,11 @@
 package services
 
 import models.autocomplete.{CountryDataProvider, NameValuePair}
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 
-class AutoCompleteServiceSpec extends PlaySpec  {
+class AutoCompleteServiceSpec extends PlaySpec with MockitoSugar {
 
   trait Fixture {
 

@@ -17,11 +17,11 @@
 package models.businessmatching
 
 import models.businessmatching.BusinessType._
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsString, JsSuccess, Json}
 
-class BusinessTypeSpec extends PlaySpec  {
+class BusinessTypeSpec extends PlaySpec with MockitoSugar {
 
   "BusinessType" when {
 

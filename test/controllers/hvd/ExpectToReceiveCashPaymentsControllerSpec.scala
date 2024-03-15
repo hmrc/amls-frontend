@@ -24,13 +24,13 @@ import models.hvd.Hvd
 import models.hvd.PaymentMethods.Courier
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.hvd.ExpectToReceiveView
 
-class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec  with Injecting {
+class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>

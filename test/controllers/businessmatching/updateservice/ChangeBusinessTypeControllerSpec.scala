@@ -27,7 +27,7 @@ import models.flowmanagement.{ChangeBusinessTypesPageId, RemoveBusinessTypeFlowM
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -38,7 +38,7 @@ import views.html.businessmatching.updateservice.ChangeServicesView
 import scala.concurrent.Future
 
 
-class ChangeBusinessTypeControllerSpec extends AmlsSpec  with Injecting {
+class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   sealed trait Fixture extends DependencyMocks {
     self =>

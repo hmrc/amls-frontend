@@ -16,7 +16,7 @@
 
 package models.businessdetails
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
@@ -24,7 +24,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesApi
 import play.twirl.api.Html
 
-class VATRegisteredSpec extends PlaySpec  {
+class VATRegisteredSpec extends PlaySpec with MockitoSugar {
 
   implicit val messages: Messages = stubMessagesApi().preferred(FakeRequest())
 

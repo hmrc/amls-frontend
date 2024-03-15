@@ -16,12 +16,12 @@
 
 package models.autocomplete
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import org.mockito.Mockito.when
 
-class LocationGraphTransformerSpec extends PlaySpec  {
+class LocationGraphTransformerSpec extends PlaySpec with MockitoSugar {
 
   val json =
     """

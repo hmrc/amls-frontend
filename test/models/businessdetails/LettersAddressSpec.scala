@@ -16,11 +16,11 @@
 
 package models.businessdetails
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class LettersAddressSpec extends PlaySpec  {
+class LettersAddressSpec extends PlaySpec with MockitoSugar {
   "LettersAddressSpec" must {
 
     "round trip through JSON" in {

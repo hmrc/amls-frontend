@@ -29,7 +29,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -40,7 +40,7 @@ import views.html.renewal.MostTransactionsView
 
 import scala.concurrent.Future
 
-class MostTransactionsControllerSpec extends AmlsSpec  with Injecting {
+class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends AutoCompleteServiceMocks {
     self =>

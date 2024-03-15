@@ -17,11 +17,11 @@
 package models.hvd
 
 import org.joda.time.LocalDate
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JodaReads, JodaWrites, JsPath, JsSuccess, Json}
 
-class CashPaymentSpec extends PlaySpec  with JodaReads with JodaWrites {
+class CashPaymentSpec extends PlaySpec with MockitoSugar with JodaReads with JodaWrites {
 
   "CashPayment" should {
 

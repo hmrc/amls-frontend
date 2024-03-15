@@ -16,12 +16,12 @@
 
 package utils
 
-import org.mockito.Mockito.mock
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.SessionKeys
 
-trait AuthorisedFixture {
+trait AuthorisedFixture extends MockitoSugar {
 
   var authConnector = mock[AuthConnector]
 

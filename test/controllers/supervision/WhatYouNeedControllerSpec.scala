@@ -17,12 +17,12 @@
 package controllers.supervision
 
 import controllers.actions.SuccessfulAuthAction
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.supervision.WhatYouNeedView
 
-class WhatYouNeedControllerSpec extends AmlsSpec  {
+class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks{
     self => val request = addToken(authRequest)

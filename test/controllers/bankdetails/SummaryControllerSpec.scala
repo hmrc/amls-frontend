@@ -22,14 +22,14 @@ import models.bankdetails._
 import models.status.SubmissionReady
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import utils.bankdetails.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.bankdetails.CheckYourAnswersView
 
-class SummaryControllerSpec extends AmlsSpec  with Injecting {
+class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>

@@ -19,11 +19,11 @@ package models
 import java.sql.Timestamp
 
 import org.joda.time.{LocalDate, LocalDateTime}
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsObject, JsResult, JsSuccess, Json}
 
-class ReadStatusResponseSpec extends PlaySpec  {
+class ReadStatusResponseSpec extends PlaySpec with MockitoSugar {
 
 val mandatoryJson: JsObject = Json.obj (
     "processingDate" -> "2019-12-30T00:00:00Z",

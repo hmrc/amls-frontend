@@ -17,11 +17,11 @@
 package models.supervision
 
 import org.joda.time.LocalDate
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class AnotherBodySpec extends PlaySpec  {
+class AnotherBodySpec extends PlaySpec with MockitoSugar {
 
   trait Fixture {
 

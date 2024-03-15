@@ -25,7 +25,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -34,7 +34,7 @@ import views.html.responsiblepeople.ContactDetailsView
 
 import scala.concurrent.Future
 
-class ContactDetailsControllerSpec extends AmlsSpec  with ScalaFutures with Injecting {
+class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture {
     self =>

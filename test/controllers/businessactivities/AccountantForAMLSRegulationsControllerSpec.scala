@@ -24,7 +24,7 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -33,7 +33,7 @@ import views.html.businessactivities.AccountantForAMLSRegulationsView
 
 import scala.concurrent.Future
 
-class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec  with Injecting {
+class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)

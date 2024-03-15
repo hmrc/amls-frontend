@@ -16,11 +16,11 @@
 
 package models.declaration
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
-class RenewRegistrationSpec extends PlaySpec  {
+class RenewRegistrationSpec extends PlaySpec with MockitoSugar {
 
   "JSON validation" must {
     "successfully validate given an enum value" in {

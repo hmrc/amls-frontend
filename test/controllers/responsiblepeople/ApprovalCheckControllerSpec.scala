@@ -22,13 +22,13 @@ package controllers.responsiblepeople
  import org.jsoup.Jsoup
  import org.jsoup.nodes.Document
  import org.scalatest.concurrent.ScalaFutures
-
+ import org.scalatestplus.mockito.MockitoSugar
  import play.api.test.Helpers._
  import play.api.test.{FakeRequest, Injecting}
  import utils.{AmlsSpec, DependencyMocks}
  import views.html.responsiblepeople.ApprovalCheckView
 
- class ApprovalCheckControllerSpec extends AmlsSpec  with ScalaFutures with Injecting {
+ class ApprovalCheckControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
    trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)
 

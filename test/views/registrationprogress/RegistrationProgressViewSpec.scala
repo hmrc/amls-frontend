@@ -18,14 +18,14 @@ package views.registrationprogress
 
 import generators.businesscustomer.AddressGenerator
 import models.registrationprogress.{Completed, Section, TaskList, TaskRow}
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.registrationprogress._
 
-class RegistrationProgressViewSpec extends AmlsViewSpec  with AddressGenerator {
+class RegistrationProgressViewSpec extends AmlsViewSpec with MockitoSugar with AddressGenerator {
 
   lazy val registration_progress = app.injector.instanceOf[RegistrationProgressView]
   val businessName = "BusinessName"

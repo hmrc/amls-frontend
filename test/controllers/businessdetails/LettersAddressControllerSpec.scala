@@ -25,7 +25,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -35,7 +35,7 @@ import views.html.businessdetails.LettersAddressView
 
 import scala.concurrent.Future
 
-class LettersAddressControllerSpec extends AmlsSpec  with ScalaFutures with BeforeAndAfter with Injecting {
+class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfter with Injecting {
 
   val dataCacheConnector = mock[DataCacheConnector]
 

@@ -22,7 +22,7 @@ import models.businessmatching.{BusinessActivities, BusinessMatching}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import utils.{AmlsSpec, DependencyMocks}
@@ -30,7 +30,7 @@ import views.html.responsiblepeople.WhatYouNeedView
 
 import scala.concurrent.Future
 
-class WhatYouNeedControllerSpec extends AmlsSpec  with ScalaFutures with Injecting {
+class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)

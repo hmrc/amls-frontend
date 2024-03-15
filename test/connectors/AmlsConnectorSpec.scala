@@ -24,20 +24,22 @@ import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionR
 import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.withdrawal._
-import models._
+import models.{AmendVariationRenewalResponse, _}
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.mockito.Matchers
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HttpClient, _}
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AmlsConnectorSpec extends PlaySpec with ScalaFutures with IntegrationPatience with AmlsReferenceNumberGenerator with PaymentGenerator {
+class AmlsConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   val amlsConnector = new AmlsConnector(http = mock[HttpClient],
                                         appConfig = mock[ApplicationConfig])

@@ -23,7 +23,7 @@ import models.moneyservicebusiness.{BranchesOrAgents, BranchesOrAgentsHasCountri
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -33,7 +33,7 @@ import views.html.msb.BranchesOrAgentsWhichCountriesView
 
 import scala.concurrent.Future
 
-class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec  with Injecting {
+class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)

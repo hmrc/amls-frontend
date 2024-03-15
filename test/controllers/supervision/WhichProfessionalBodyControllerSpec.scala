@@ -21,7 +21,7 @@ import forms.supervision.WhichProfessionalBodyFormProvider
 import models.supervision.ProfessionalBodies._
 import models.supervision._
 import org.jsoup.Jsoup
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatestplus.play.PlaySpec
@@ -30,7 +30,7 @@ import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.supervision.WhichProfessionalBodyView
 
-class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec  with Injecting {
+class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks with AuthorisedFixture { self =>
 

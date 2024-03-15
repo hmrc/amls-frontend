@@ -26,7 +26,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.AutoCompleteService
@@ -38,7 +38,7 @@ import views.html.responsiblepeople.NationalityView
 
 import scala.concurrent.Future
 
-class NationalityControllerSpec extends AmlsSpec  with NinoUtil with Injecting {
+class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil with Injecting {
 
   trait Fixture {
     //self =>

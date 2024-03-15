@@ -16,12 +16,12 @@
 
 package models.businessactivities
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import models.renewal.AMLSTurnover
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class ExpectedAMLSTurnoverSpec extends PlaySpec  {
+class ExpectedAMLSTurnoverSpec extends PlaySpec with MockitoSugar {
 
   "JSON validation" must {
 

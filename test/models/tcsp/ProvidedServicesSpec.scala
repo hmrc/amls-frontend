@@ -16,12 +16,12 @@
 
 package models.tcsp
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import models.tcsp.ProvidedServices._
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class ProvidedServicesSpec extends PlaySpec  {
+class ProvidedServicesSpec extends PlaySpec with MockitoSugar {
 
   "Json read and writes" must {
     import play.api.libs.json.JsonValidationError

@@ -25,13 +25,13 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.html.tradingpremises.IsResidentialView
 
-class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures  with Injecting {
+class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
 

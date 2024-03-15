@@ -23,7 +23,7 @@ import forms.responsiblepeople.address.MovedAddressFormProvider
 import models.responsiblepeople._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -33,7 +33,7 @@ import views.html.responsiblepeople.address.MovedAddressView
 
 import scala.concurrent.Future
 
-class MovedAddressControllerSpec extends AmlsSpec  with Injecting {
+class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self =>

@@ -26,7 +26,7 @@ import models.renewal._
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -35,7 +35,7 @@ import utils.AmlsSpec
 import scala.concurrent.Future
 
 
-class RenewalServiceSpec extends AmlsSpec  {
+class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
   implicit val hc = HeaderCarrier()
 

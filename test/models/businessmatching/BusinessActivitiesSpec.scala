@@ -19,13 +19,13 @@ package models.businessmatching
 import models.DateOfChange
 import models.businessmatching.BusinessActivity._
 import org.joda.time.LocalDate
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.libs.json._
 import utils.AmlsSpec
 
 
-class BusinessActivitiesSpec extends AmlsSpec  {
+class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
 
   "The BusinessActivities model" must {
 

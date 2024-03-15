@@ -16,13 +16,13 @@
 
 package models.governmentgateway
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 
-class EnrolmentRequestSpec extends PlaySpec with GuiceOneAppPerSuite  {
+class EnrolmentRequestSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar {
 
   override implicit lazy val app = new GuiceApplicationBuilder()
     .configure(

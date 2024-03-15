@@ -29,7 +29,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -41,7 +41,7 @@ import views.html.responsiblepeople.ExperienceTrainingView
 
 import scala.concurrent.Future
 
-class ExperienceTrainingControllerSpec extends AmlsSpec  with ScalaFutures with Injecting {
+class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   val RecordId = 1
 

@@ -27,7 +27,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -36,7 +36,7 @@ import views.html.businessdetails.VATRegisteredView
 
 import scala.concurrent.Future
 
-class VATRegisteredControllerSpec extends AmlsSpec  with ScalaFutures {
+class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)

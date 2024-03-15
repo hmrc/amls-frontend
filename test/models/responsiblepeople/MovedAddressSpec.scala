@@ -16,11 +16,11 @@
 
 package models.responsiblepeople
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class MovedAddressSpec extends PlaySpec  {
+class MovedAddressSpec extends PlaySpec with MockitoSugar {
   
   "MovedAddress" must {
 

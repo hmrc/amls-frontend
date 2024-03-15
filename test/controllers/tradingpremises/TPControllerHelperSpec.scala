@@ -16,7 +16,7 @@
 
 package controllers.tradingpremises
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.http.cache.client.CacheMap
 import org.mockito.Mockito._
@@ -30,7 +30,7 @@ import play.api.test.FakeRequest
 import utils.StatusConstants
 import views.html.ErrorView
 
-class TPControllerHelperSpec extends PlaySpec  {
+class TPControllerHelperSpec extends PlaySpec with MockitoSugar {
 
   trait TestFixture {
     implicit val request = FakeRequest()

@@ -28,7 +28,7 @@ import models.registrationdetails.RegistrationDetails
 import models.tradingpremises.{TradingPremises, YourTradingPremises}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -38,7 +38,7 @@ import views.html.tradingpremises.ConfirmAddressView
 
 import scala.concurrent.Future
 
-class ConfirmAddressControllerSpec extends AmlsSpec  with TradingPremisesGenerator with BusinessMatchingGenerator {
+class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with TradingPremisesGenerator with BusinessMatchingGenerator {
 
   trait Fixture extends DependencyMocks {
     self =>

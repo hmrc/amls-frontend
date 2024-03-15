@@ -27,7 +27,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.businessdetails.PreviouslyRegisteredService
@@ -37,7 +37,7 @@ import views.html.businessdetails.PreviouslyRegisteredView
 
 import scala.concurrent.Future
 
-class PreviouslyRegisteredControllerSpec extends AmlsSpec  with ScalaFutures with BeforeAndAfterEach {
+class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val mockService = mock[PreviouslyRegisteredService]
   val mockCacheMap = mock[CacheMap]

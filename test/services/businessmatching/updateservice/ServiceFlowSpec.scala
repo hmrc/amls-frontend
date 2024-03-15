@@ -31,7 +31,7 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -40,7 +40,7 @@ import utils.{DependencyMocks, FutureAssertions}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ServiceFlowSpec extends PlaySpec with MustMatchers  with ScalaFutures with FutureAssertions {
+class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with ScalaFutures with FutureAssertions {
 
   trait Fixture extends DependencyMocks {
 

@@ -27,7 +27,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,7 +37,7 @@ import views.html.businessdetails.ActivityStartDateView
 
 import scala.concurrent.Future
 
-class ActivityStartDateControllerSpec extends AmlsSpec  {
+class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)

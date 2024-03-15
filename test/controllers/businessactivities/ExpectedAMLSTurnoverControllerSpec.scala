@@ -29,7 +29,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -41,7 +41,7 @@ import views.html.businessactivities.ExpectedAMLSTurnoverView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec  with ScalaFutures with Injecting with BeforeAndAfterEach {
+class ExpectedAMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting with BeforeAndAfterEach {
 
   val mockService = mock[ExpectedAMLSTurnoverService]
 

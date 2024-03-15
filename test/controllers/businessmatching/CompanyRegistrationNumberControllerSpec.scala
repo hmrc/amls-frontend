@@ -26,7 +26,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -38,7 +38,7 @@ import views.html.businessmatching.CompanyRegistrationNumberView
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class CompanyRegistrationNumberControllerSpec extends AmlsSpec  with ScalaFutures with StatusMocks with CacheMocks {
+class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with StatusMocks with CacheMocks {
 
   trait Fixture {
     self => val request = addToken(authRequest)

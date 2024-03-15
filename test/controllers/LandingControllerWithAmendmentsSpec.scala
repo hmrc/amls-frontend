@@ -43,7 +43,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{JsResultException, Json}
 import play.api.mvc.{BodyParsers, Request}
 import play.api.test.FakeRequest
@@ -58,7 +58,7 @@ import views.html.Start
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LandingControllerWithAmendmentsSpec extends AmlsSpec  with MustMatchers with StatusGenerator {
+class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar with MustMatchers with StatusGenerator {
 
   val businessCustomerUrl = "TestUrl"
 

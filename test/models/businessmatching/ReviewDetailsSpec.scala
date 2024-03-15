@@ -20,11 +20,11 @@ import connectors.BusinessMatchingAddress
 import models.Country
 import models.businesscustomer.ReviewDetails
 import models.businesscustomer.Address
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
 
-class ReviewDetailsSpec extends PlaySpec  {
+class ReviewDetailsSpec extends PlaySpec with MockitoSugar {
   suite =>
 
   val model = ReviewDetails(

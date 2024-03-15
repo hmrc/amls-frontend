@@ -26,7 +26,7 @@ import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import utils._
@@ -34,7 +34,7 @@ import views.html.responsiblepeople.FitAndProperView
 
 import scala.concurrent.Future
 
-class FitAndProperControllerSpec extends AmlsSpec  with ScalaFutures with Injecting {
+class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
     val request = addToken(authRequest)

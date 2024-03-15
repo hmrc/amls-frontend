@@ -18,7 +18,7 @@ package utils
 
 import config.ApplicationConfig
 import org.scalatest.MustMatchers
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
@@ -29,7 +29,7 @@ import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.auth.core.AuthConnector
 import views.HtmlAssertions
 
-trait AmlsSummaryViewSpec extends PlaySpec with GuiceOneAppPerSuite  with MustMatchers with HtmlAssertions with Injecting {
+trait AmlsSummaryViewSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with MustMatchers with HtmlAssertions with Injecting {
 
   override def fakeApplication(): Application = {
     new GuiceApplicationBuilder()

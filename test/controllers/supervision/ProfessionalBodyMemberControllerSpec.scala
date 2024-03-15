@@ -21,7 +21,7 @@ import forms.supervision.MemberOfProfessionalBodyFormProvider
 import models.supervision.ProfessionalBodies._
 import models.supervision._
 import org.jsoup.Jsoup
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.i18n.Messages
@@ -35,7 +35,7 @@ import scala.language.postfixOps
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
-class ProfessionalBodyMemberControllerSpec extends AmlsSpec  with Injecting {
+class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {self =>
     val request = addToken(authRequest)

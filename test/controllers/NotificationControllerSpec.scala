@@ -32,7 +32,7 @@ import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.{AnyContentAsEmpty, Request, Result}
 import play.api.test.Helpers._
@@ -44,7 +44,7 @@ import views.notifications._
 
 import scala.concurrent.Future
 
-class NotificationControllerSpec extends AmlsSpec  with ScalaFutures with AmlsReferenceNumberGenerator {
+class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator {
 
   val dateTime = new DateTime(1479730062573L, DateTimeZone.UTC)
 

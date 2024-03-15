@@ -25,7 +25,7 @@ import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers
 import play.api.test.Helpers._
@@ -37,7 +37,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-class DeclarationHelperSpec extends PlaySpec with MustMatchers  {
+class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar {
 
   implicit val statusService = mock[StatusService]
   implicit val renewalService = mock[RenewalService]

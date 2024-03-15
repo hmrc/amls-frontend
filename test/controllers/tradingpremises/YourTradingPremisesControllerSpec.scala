@@ -25,7 +25,7 @@ import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -38,7 +38,7 @@ import views.html.tradingpremises.YourTradingPremisesView
 import java.util.UUID
 import scala.concurrent.Future
 
-class YourTradingPremisesControllerSpec extends AmlsSpec  with generators.tradingpremises.TradingPremisesGenerator {
+class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with generators.tradingpremises.TradingPremisesGenerator {
 
   implicit val request = FakeRequest
   val userId = s"user-${UUID.randomUUID()}"

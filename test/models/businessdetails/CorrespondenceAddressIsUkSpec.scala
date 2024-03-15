@@ -16,11 +16,11 @@
 
 package models.businessdetails
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class CorrespondenceAddressIsUkSpec extends PlaySpec  {
+class CorrespondenceAddressIsUkSpec extends PlaySpec with MockitoSugar {
 
   "CorrespondenceAddressIsUk" must {
 

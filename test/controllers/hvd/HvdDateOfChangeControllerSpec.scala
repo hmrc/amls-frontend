@@ -25,7 +25,7 @@ import models.hvd.Hvd
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -35,7 +35,7 @@ import views.html.DateOfChangeView
 
 import scala.concurrent.Future
 
-class HvdDateOfChangeControllerSpec extends AmlsSpec  with Injecting {
+class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture {
     self => val request = addToken(authRequest)

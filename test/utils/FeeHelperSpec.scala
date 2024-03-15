@@ -16,7 +16,7 @@
 
 package utils
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
@@ -38,7 +38,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class FeeHelperSpec extends PlaySpec
+class FeeHelperSpec extends PlaySpec with MockitoSugar
   with ScalaFutures
   with GuiceOneAppPerSuite
   with AmlsReferenceNumberGenerator

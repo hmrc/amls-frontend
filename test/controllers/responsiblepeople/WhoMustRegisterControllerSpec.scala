@@ -18,12 +18,12 @@ package controllers.responsiblepeople
 
 import controllers.actions.SuccessfulAuthAction
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import utils.AmlsSpec
 import views.html.responsiblepeople.WhoMustRegisterView
 
-class WhoMustRegisterControllerSpec extends AmlsSpec  with ScalaFutures {
+class WhoMustRegisterControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture {
     self => val request = addToken(authRequest)

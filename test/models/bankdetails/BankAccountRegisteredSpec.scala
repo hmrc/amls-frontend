@@ -17,11 +17,11 @@
 package models.bankdetails
 
 import models.responsiblepeople.BankAccountRegistered
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class BankAccountRegisteredSpec extends PlaySpec  {
+class BankAccountRegisteredSpec extends PlaySpec with MockitoSugar {
 
   "BankAccountRegistered" must {
 

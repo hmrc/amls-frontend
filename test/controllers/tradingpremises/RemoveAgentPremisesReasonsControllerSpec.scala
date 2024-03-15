@@ -24,7 +24,7 @@ import models.tradingpremises.TradingPremises
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -34,7 +34,7 @@ import views.html.tradingpremises.RemoveAgentPremisesReasonsView
 
 import scala.concurrent.Future
 
-class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec  with Injecting {
+class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   import models.tradingpremises.RemovalReasonConstants._
 

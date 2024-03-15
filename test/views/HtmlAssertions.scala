@@ -18,7 +18,7 @@ package views
 
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 
 import scala.jdk.CollectionConverters._

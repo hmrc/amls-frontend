@@ -23,7 +23,7 @@ import models.hvd.Products.{Alcohol, Antiques, Cars, Other, Tobacco}
 import models.hvd._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -31,7 +31,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DateOfChangeHelper, DependencyMocks}
 import views.html.hvd.ProductsView
 
-class ProductsControllerSpec extends AmlsSpec  with Injecting {
+class ProductsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   val emptyCache = CacheMap("", Map.empty)
 

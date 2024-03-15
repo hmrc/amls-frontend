@@ -17,10 +17,10 @@
 package services
 
 import org.jsoup.Jsoup
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
-class CustomAttributeProviderSpec extends PlaySpec {
+class CustomAttributeProviderSpec extends PlaySpec with MockitoSugar{
 
   "CustomAttributeProvider" must {
 

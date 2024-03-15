@@ -20,13 +20,13 @@ import controllers.actions.SuccessfulAuthAction
 import forms.tcsp.AnotherTCSPSupervisionFormProvider
 import models.tcsp.{ServicesOfAnotherTCSPYes, Tcsp}
 import org.jsoup.Jsoup
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.tcsp.AnotherTCSPSupervisionView
 
-class AnotherTCSPSupervisionControllerSpec extends AmlsSpec  with Injecting {
+class AnotherTCSPSupervisionControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)

@@ -27,7 +27,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.{BeforeAndAfter, OptionValues}
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -36,7 +36,7 @@ import views.html.responsiblepeople.address.AdditionalExtraAddressView
 
 import scala.concurrent.Future
 
-class AdditionalExtraAddressControllerSpec extends AmlsSpec  with BeforeAndAfter with OptionValues with Injecting {
+class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter with OptionValues with Injecting {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1

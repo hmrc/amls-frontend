@@ -21,13 +21,13 @@ import controllers.actions.SuccessfulAuthAction
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.responsiblepeople.FitAndProperNoticeView
 
-class FitAndProperNoticeControllerSpec extends AmlsSpec  with ScalaFutures with Injecting {
+class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
 
   val recordId = 1
 

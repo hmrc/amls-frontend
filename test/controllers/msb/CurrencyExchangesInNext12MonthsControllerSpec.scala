@@ -24,7 +24,7 @@ import models.moneyservicebusiness._
 import models.status.NotCompleted
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -33,7 +33,7 @@ import views.html.msb.CurrencyExchangesInNext12MonthsView
 
 import scala.concurrent.Future
 
-class CurrencyExchangesInNext12MonthsControllerSpec extends AmlsSpec  with Injecting {
+class CurrencyExchangesInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks {
     self =>

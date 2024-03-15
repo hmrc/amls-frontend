@@ -28,7 +28,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
@@ -40,7 +40,7 @@ import views.html.msb.WhichCurrenciesView
 import scala.concurrent.Future
 
 class WhichCurrenciesControllerSpec extends AmlsSpec
-
+                                    with MockitoSugar
                                     with MustMatchers
                                     with PatienceConfiguration
                                     with IntegrationPatience

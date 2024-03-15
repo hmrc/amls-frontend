@@ -28,7 +28,7 @@ import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.responsiblepeople.PersonResidentTypeService
@@ -39,7 +39,7 @@ import views.html.responsiblepeople.PersonResidenceTypeView
 
 import scala.concurrent.Future
 
-class PersonResidentTypeControllerSpec extends AmlsSpec  with NinoGen with Injecting {
+class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with NinoGen with Injecting {
 
   def nextNino = ninoGen.sample.value.value
   trait Fixture {

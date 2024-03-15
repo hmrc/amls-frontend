@@ -28,7 +28,7 @@ import org.joda.time.{LocalDate, LocalDateTime}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{RenewalService, SectionsProvider}
@@ -38,7 +38,7 @@ import views.html.declaration.DeclareView
 import scala.concurrent.Future
 import scala.language.postfixOps
 
-class DeclarationControllerSpec extends AmlsSpec  with ScalaFutures {
+class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends DependencyMocks {
     self =>

@@ -16,11 +16,11 @@
 
 package models.businessactivities
 
-
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
-class RiskAssessmentPolicySpec extends PlaySpec  {
+class RiskAssessmentPolicySpec extends PlaySpec with MockitoSugar {
 
   val formalRiskAssessments: Set[RiskAssessmentType] = Set(PaperBased, Digital)
 

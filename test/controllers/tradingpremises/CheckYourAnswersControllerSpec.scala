@@ -26,7 +26,7 @@ import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
-
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers.{OK, contentAsString, status, _}
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
@@ -39,7 +39,7 @@ import views.html.tradingpremises.CheckYourAnswersView
 import java.util.UUID
 import scala.concurrent.Future
 
-class CheckYourAnswersControllerSpec extends AmlsSpec  with Injecting {
+class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
   implicit val request = FakeRequest
   val userId = s"user-${UUID.randomUUID()}"
