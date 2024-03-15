@@ -19,14 +19,14 @@ package views.businessmatching
 import forms.businessmatching.RegisterBusinessActivitiesFormProvider
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessActivities, BusinessActivity}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.RegisterServicesView
 
-class RegisterServicesViewSpec extends AmlsViewSpec with MustMatchers  {
+class RegisterServicesViewSpec extends AmlsViewSpec with Matchers  {
 
   trait ViewFixture extends Fixture {
     lazy val formProvider = app.injector.instanceOf[RegisterBusinessActivitiesFormProvider]

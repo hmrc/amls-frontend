@@ -17,13 +17,13 @@
 package views.tradingpremises
 
 import forms.tradingpremises.BusinessStructureFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tradingpremises.BusinessStructureView
 
-class BusinessStructureViewSpec extends AmlsViewSpec with MustMatchers {
+class BusinessStructureViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val business_structure = app.injector.instanceOf[BusinessStructureView]
   lazy val fp = inject[BusinessStructureFormProvider]

@@ -21,13 +21,13 @@ import generators.ResponsiblePersonGenerator
 import models.declaration.WhoIsRegistering
 import models.responsiblepeople.ResponsiblePerson
 import org.scalacheck.Gen
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.WhoIsRegisteringThisUpdateView
 
-class WhoIsRegisteringThisUpdateViewSpec extends AmlsViewSpec with MustMatchers with ResponsiblePersonGenerator {
+class WhoIsRegisteringThisUpdateViewSpec extends AmlsViewSpec with Matchers with ResponsiblePersonGenerator {
 
   lazy val updateView = inject[WhoIsRegisteringThisUpdateView]
   lazy val fp = inject[WhoIsRegisteringFormProvider]

@@ -18,13 +18,13 @@ package views.tcsp
 
 import forms.tcsp.ProvidedServicesFormProvider
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.{FakeRequest, Injecting}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tcsp.ProvidedServicesView
 
-class ProvidedServicesViewSpec extends AmlsViewSpec with MustMatchers with Injecting {
+class ProvidedServicesViewSpec extends AmlsViewSpec with Matchers with Injecting {
 
   lazy val provided_services: ProvidedServicesView = inject[ProvidedServicesView]
   lazy val fp: ProvidedServicesFormProvider = inject[ProvidedServicesFormProvider]

@@ -19,12 +19,12 @@ package views.renewal
 import forms.renewal.TotalThroughputFormProvider
 import models.moneyservicebusiness.ExpectedThroughput
 import org.jsoup.nodes.Document
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.TotalThroughputView
 
-class TotalThroughputViewSpec extends AmlsViewSpec with MustMatchers {
+class TotalThroughputViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val total_throughput = inject[TotalThroughputView]
   lazy val fp = inject[TotalThroughputFormProvider]

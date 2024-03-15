@@ -17,14 +17,14 @@
 package views.businessactivities
 
 import forms.businessactivities.NCARegisteredFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessactivities.NCARegisteredView
 
 
-class NCARegisteredViewSpec extends AmlsViewSpec with MustMatchers {
+class NCARegisteredViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val registered: NCARegisteredView = inject[NCARegisteredView]
   lazy val formProvider: NCARegisteredFormProvider = inject[NCARegisteredFormProvider]

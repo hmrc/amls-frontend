@@ -18,7 +18,7 @@ package views.businessdetails
 
 import forms.businessdetails.RegisteredOfficeUKFormProvider
 import models.businessdetails.RegisteredOfficeUK
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.Html
@@ -27,7 +27,7 @@ import views.Fixture
 import views.html.businessdetails.RegisteredOfficeUKView
 
 
-class RegisteredOfficeUKViewSpec extends AmlsViewSpec with MustMatchers  {
+class RegisteredOfficeUKViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val registered_office_uk: RegisteredOfficeUKView = app.injector.instanceOf[RegisteredOfficeUKView]
   lazy val formProvider: RegisteredOfficeUKFormProvider = app.injector.instanceOf[RegisteredOfficeUKFormProvider]

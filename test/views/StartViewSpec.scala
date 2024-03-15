@@ -16,11 +16,11 @@
 
 package views
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.html.Start
 
-class StartViewSpec extends AmlsViewSpec with MustMatchers {
+class StartViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val start = app.injector.instanceOf[Start]

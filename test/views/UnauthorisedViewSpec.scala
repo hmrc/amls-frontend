@@ -17,11 +17,11 @@
 package views
 
 import config.ApplicationConfig
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.html.UnauthorisedView
 
-class UnauthorisedViewSpec extends AmlsViewSpec with MustMatchers {
+class UnauthorisedViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val unauthorisedView = app.injector.instanceOf[UnauthorisedView]

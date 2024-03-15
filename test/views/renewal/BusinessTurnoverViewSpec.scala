@@ -17,12 +17,12 @@
 package views.renewal
 
 import forms.renewal.BusinessTurnoverFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.BusinessTurnoverView
 
-class BusinessTurnoverViewSpec extends AmlsViewSpec with MustMatchers  {
+class BusinessTurnoverViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val business_turnover = inject[BusinessTurnoverView]
   lazy val fp = inject[BusinessTurnoverFormProvider]

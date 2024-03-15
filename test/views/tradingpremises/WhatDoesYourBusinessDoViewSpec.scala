@@ -18,13 +18,13 @@ package views.tradingpremises
 
 import forms.tradingpremises.WhatDoesYourBusinessDoFormProvider
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tradingpremises.WhatDoesYourBusinessDoView
 
-class WhatDoesYourBusinessDoViewSpec extends AmlsViewSpec with MustMatchers {
+class WhatDoesYourBusinessDoViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val what_does_your_business_do = inject[WhatDoesYourBusinessDoView]
   lazy val fp = inject[WhatDoesYourBusinessDoFormProvider]

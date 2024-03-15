@@ -18,13 +18,13 @@ package views.hvd
 
 import forms.hvd.CashPaymentFormProvider
 import models.hvd.CashPaymentOverTenThousandEuros
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.hvd.CashPaymentView
 
-class CashPaymentViewSpec extends AmlsViewSpec with MustMatchers {
+class CashPaymentViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val cash_payment = inject[CashPaymentView]
   lazy val fp = inject[CashPaymentFormProvider]

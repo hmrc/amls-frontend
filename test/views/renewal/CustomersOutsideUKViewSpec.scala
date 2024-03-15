@@ -17,12 +17,12 @@
 package views.renewal
 
 import forms.renewal.CustomersOutsideUKFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.renewal.CustomersOutsideUKView
 
-class CustomersOutsideUKViewSpec extends AmlsViewSpec with MustMatchers with AutoCompleteServiceMocks {
+class CustomersOutsideUKViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
   trait ViewFixture extends Fixture
 

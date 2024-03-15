@@ -18,12 +18,12 @@ package views.renewal
 
 import forms.renewal.CETransactionsInLast12MonthsFormProvider
 import models.renewal.CETransactionsInLast12Months
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.CETransactionsInLast12MonthsView
 
-class CETransactionsInLast12MonthsViewSpec extends AmlsViewSpec with MustMatchers {
+class CETransactionsInLast12MonthsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val last12MonthsView = inject[CETransactionsInLast12MonthsView]
   lazy val fp = inject[CETransactionsInLast12MonthsFormProvider]

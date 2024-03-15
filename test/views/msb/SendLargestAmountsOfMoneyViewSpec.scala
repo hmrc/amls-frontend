@@ -19,13 +19,13 @@ package views.msb
 import forms.msb.SendLargestAmountsFormProvider
 import models.Country
 import models.moneyservicebusiness.SendTheLargestAmountsOfMoney
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.msb.SendLargestAmountsOfMoneyView
 
-class SendLargestAmountsOfMoneyViewSpec extends AmlsViewSpec with MustMatchers with AutoCompleteServiceMocks {
+class SendLargestAmountsOfMoneyViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
   lazy val moneyView = inject[SendLargestAmountsOfMoneyView]
   lazy val fp = inject[SendLargestAmountsFormProvider]

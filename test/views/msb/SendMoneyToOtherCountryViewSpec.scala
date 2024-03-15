@@ -18,13 +18,13 @@ package views.msb
 
 import forms.msb.SendMoneyToOtherCountryFormProvider
 import models.moneyservicebusiness.SendMoneyToOtherCountry
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.msb.SendMoneyToOtherCountryView
 
-class SendMoneyToOtherCountryViewSpec extends AmlsViewSpec with MustMatchers {
+class SendMoneyToOtherCountryViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val countryView = inject[SendMoneyToOtherCountryView]
   lazy val fp = inject[SendMoneyToOtherCountryFormProvider]

@@ -16,14 +16,14 @@
 
 package views.supervision
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.WhatYouNeedView
 
-class WhatYouNeedViewSpec extends AmlsViewSpec with MustMatchers  {
+class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val what_you_need = inject[WhatYouNeedView]
 

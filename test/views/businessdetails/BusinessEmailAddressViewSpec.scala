@@ -18,7 +18,7 @@ package views.businessdetails
 
 import forms.businessdetails.BusinessEmailAddressFormProvider
 import models.businessdetails.ContactingYouEmail
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.data.Form
 import play.api.mvc.Request
 import play.api.test.FakeRequest
@@ -28,7 +28,7 @@ import views.Fixture
 import views.html.businessdetails.BusinessEmailAddressView
 
 
-class BusinessEmailAddressViewSpec extends AmlsViewSpec with MustMatchers  {
+class BusinessEmailAddressViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val you = app.injector.instanceOf[BusinessEmailAddressView]
   lazy val formProvider = app.injector.instanceOf[BusinessEmailAddressFormProvider]

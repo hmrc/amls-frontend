@@ -17,13 +17,13 @@
 package views.responsiblepeople.address
 
 import forms.responsiblepeople.address.NewHomeAddressDateOfChangeFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.address.NewHomeDateOfChangeView
 
-class NewHomeDateOfChangeViewSpec extends AmlsViewSpec with MustMatchers {
+class NewHomeDateOfChangeViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val dateView = inject[NewHomeDateOfChangeView]
   lazy val fp = inject[NewHomeAddressDateOfChangeFormProvider]

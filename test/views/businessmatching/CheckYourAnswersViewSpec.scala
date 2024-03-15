@@ -22,7 +22,7 @@ import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching._
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.AmlsViewSpec
@@ -32,7 +32,7 @@ import views.html.businessmatching.CheckYourAnswersView
 
 import scala.jdk.CollectionConverters._
 
-class CheckYourAnswersViewSpec extends AmlsViewSpec with MustMatchers with TableDrivenPropertyChecks {
+class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
     lazy val checkYourAnswersView = app.injector.instanceOf[CheckYourAnswersView]

@@ -19,7 +19,7 @@ package views.businessdetails
 import forms.businessdetails.PreviouslyRegisteredFormProvider
 import models.businessdetails.{PreviouslyRegistered, PreviouslyRegisteredYes}
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
@@ -27,7 +27,7 @@ import views.Fixture
 import views.html.businessdetails.PreviouslyRegisteredView
 
 
-class PreviouslyRegisteredViewSpec extends AmlsViewSpec with MustMatchers  {
+class PreviouslyRegisteredViewSpec extends AmlsViewSpec with Matchers  {
 
   trait ViewFixture extends Fixture {
     lazy val previously_registered = app.injector.instanceOf[PreviouslyRegisteredView]

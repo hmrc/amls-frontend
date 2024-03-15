@@ -17,13 +17,13 @@
 package views.supervision
 
 import forms.supervision.SupervisionStartFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.{FakeRequest, Injecting}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.SupervisionStartView
 
-class SupervisionStartViewSpec extends AmlsViewSpec with MustMatchers with Injecting {
+class SupervisionStartViewSpec extends AmlsViewSpec with Matchers with Injecting {
 
   lazy val supervision_start = inject[SupervisionStartView]
   lazy val fp = inject[SupervisionStartFormProvider]

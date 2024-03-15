@@ -18,13 +18,13 @@ package views.msb
 
 import forms.msb.BusinessUseAnIPSPFormProvider
 import models.moneyservicebusiness.BusinessUseAnIPSPNo
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.msb.BusinessUseAnIPSPView
 
-class BusinessUseAnIPSPViewSpec extends AmlsViewSpec with MustMatchers {
+class BusinessUseAnIPSPViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val businessView = inject[BusinessUseAnIPSPView]
   lazy val fp = inject[BusinessUseAnIPSPFormProvider]

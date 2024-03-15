@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
+import org.scalatest.matchers.must.Matchers
+
 import java.math.BigInteger
 import java.security.MessageDigest
-import org.scalatest.MustMatchers
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.io.Source
 
-class NotificationsCheckSumSpec extends AmlsSpec with MustMatchers {
+class NotificationsCheckSumSpec extends AmlsSpec with Matchers {
 
     trait NotificationsCheckSumFixture extends AuthorisedFixture {
         val versionNumbers: Seq[String] = Seq(

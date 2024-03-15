@@ -19,13 +19,13 @@ package views.hvd
 import forms.hvd.SalesChannelFormProvider
 import models.hvd.HowWillYouSellGoods
 import models.hvd.SalesChannel.{Retail, Wholesale}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.hvd.HowWillYouSellGoodsView
 
-class HowWillYouSellGoodsViewSpec extends AmlsViewSpec with MustMatchers  {
+class HowWillYouSellGoodsViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val goodsView = inject[HowWillYouSellGoodsView]
   lazy val fp = inject[SalesChannelFormProvider]

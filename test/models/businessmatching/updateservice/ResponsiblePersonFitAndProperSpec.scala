@@ -16,11 +16,11 @@
 
 package models.businessmatching.updateservice
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class ResponsiblePersonFitAndProperSpec extends PlaySpec with MustMatchers {
+class ResponsiblePersonFitAndProperSpec extends PlaySpec with Matchers {
 
   "The ResponsiblePeopleFitAndProper model" when {
 

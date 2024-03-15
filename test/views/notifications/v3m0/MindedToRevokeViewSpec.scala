@@ -18,12 +18,12 @@ package views.notifications.v3m0
 
 import models.notifications.NotificationParams
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.notifications.v3m0.MindedToRevokeView
 
-class MindedToRevokeViewSpec extends AmlsViewSpec with MustMatchers {
+class MindedToRevokeViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val minded_to_revoke = app.injector.instanceOf[MindedToRevokeView]

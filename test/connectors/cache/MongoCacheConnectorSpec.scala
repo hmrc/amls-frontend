@@ -20,18 +20,20 @@ import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.{reset, when}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatest.{FreeSpec, MustMatchers}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-class MongoCacheConnectorSpec extends FreeSpec
-  with MustMatchers
+class MongoCacheConnectorSpec extends AnyFreeSpec
+  with Matchers
   with ScalaCheckPropertyChecks
   with ScalaFutures
   with MockitoSugar
@@ -47,7 +49,6 @@ class MongoCacheConnectorSpec extends FreeSpec
 
   trait Fixture {
     implicit val hc = HeaderCarrier()
-    implicit val ec = mock[ExecutionContext]
 
     val factory = mock[MongoCacheClientFactory]
     val client = mock[MongoCacheClient]

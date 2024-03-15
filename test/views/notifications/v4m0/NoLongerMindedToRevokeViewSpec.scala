@@ -18,12 +18,12 @@ package views.notifications.v4m0
 
 import models.notifications.NotificationParams
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.notifications.v4m0.NoLongerMindedToRevokeView
 
-class NoLongerMindedToRevokeViewSpec extends AmlsViewSpec with MustMatchers {
+class NoLongerMindedToRevokeViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val no_longer_minded_to_revoke = app.injector.instanceOf[NoLongerMindedToRevokeView]

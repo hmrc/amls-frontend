@@ -18,13 +18,13 @@ package models.businessmatching.updateservice
 
 import generators.tradingpremises.TradingPremisesGenerator
 import models.tradingpremises.{Address, RegisteringAgentPremises, TradingPremises, YourTradingPremises}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import play.api.libs.json.Json
 import utils.StatusConstants
 
-class TradingPremisesSpec extends PlaySpec with MustMatchers with TradingPremisesGenerator {
+class TradingPremisesSpec extends PlaySpec with Matchers with TradingPremisesGenerator {
 
   "The TradingPremises model" when {
 

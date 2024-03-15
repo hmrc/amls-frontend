@@ -16,14 +16,14 @@
 
 package views.responsiblepeople
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.WhoMustRegisterView
 
-class WhoMustRegisterViewSpec extends AmlsViewSpec with MustMatchers {
+class WhoMustRegisterViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val who_must_register = inject[WhoMustRegisterView]
 

@@ -18,12 +18,12 @@ package views.renewal
 
 import forms.renewal.InvolvedInOtherFormProvider
 import models.renewal.InvolvedInOtherNo
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.InvolvedInOtherView
 
-class InvolvedInOtherViewSpec extends AmlsViewSpec with MustMatchers {
+class InvolvedInOtherViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val involved_in_other = inject[InvolvedInOtherView]
   lazy val fp = inject[InvolvedInOtherFormProvider]

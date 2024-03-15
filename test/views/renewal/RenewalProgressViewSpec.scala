@@ -19,12 +19,12 @@ package views.renewal
 import models.registrationprogress.TaskList
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import org.joda.time.LocalDate
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.RenewalProgressView
 
-class RenewalProgressViewSpec extends AmlsViewSpec with MustMatchers {
+class RenewalProgressViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture
 

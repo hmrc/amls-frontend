@@ -18,7 +18,7 @@ package views.businessdetails
 
 import forms.businessdetails.BusinessTelephoneFormProvider
 import models.businessdetails.ContactingYouPhone
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.data.Form
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
@@ -26,7 +26,7 @@ import views.Fixture
 import views.html.businessdetails.BusinessTelephoneView
 
 
-class BusinessTelephoneViewSpec extends AmlsViewSpec with MustMatchers  {
+class BusinessTelephoneViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val phone: BusinessTelephoneView = app.injector.instanceOf[BusinessTelephoneView]
   lazy val formProvider: BusinessTelephoneFormProvider = app.injector.instanceOf[BusinessTelephoneFormProvider]

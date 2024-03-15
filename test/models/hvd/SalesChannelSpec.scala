@@ -17,13 +17,14 @@
 package models.hvd
 
 import models.hvd.SalesChannel._
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.ControllerComponents
 
-class SalesChannelSpec extends WordSpec with MustMatchers with GuiceOneAppPerTest {
+class SalesChannelSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
   import play.api.i18n._
   implicit val lang = Lang("en-US")
 

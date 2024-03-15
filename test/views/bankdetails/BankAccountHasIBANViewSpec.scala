@@ -17,8 +17,8 @@
 package views.bankdetails
 
 import forms.bankdetails.BankAccountHasIBANFormProvider
-import models.bankdetails.{BankAccountHasIban, NonUKIBANNumber}
-import org.scalatest.MustMatchers
+import models.bankdetails.BankAccountHasIban
+import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
@@ -26,7 +26,7 @@ import utils.AmlsViewSpec
 import views.Fixture
 import views.html.bankdetails.BankAccountHasIBANView
 
-class BankAccountHasIBANViewSpec extends AmlsViewSpec with MustMatchers {
+class BankAccountHasIBANViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val bankAccountHasIban: BankAccountHasIBANView = inject[BankAccountHasIBANView]
   lazy val fp: BankAccountHasIBANFormProvider = inject[BankAccountHasIBANFormProvider]

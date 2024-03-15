@@ -22,7 +22,7 @@ import scala.concurrent.Future
 
 // Borrowed from https://gist.github.com/PeterPerhac/9a388f1d10945a2d6a29414ad79a8268
 trait FutureAssertions {
-  import org.scalatest.MustMatchers._
+  import org.scalatest.matchers.must.Matchers._
   import org.scalatest.concurrent.ScalaFutures._
 
   implicit class FutureReturns(f: Future[_]) {

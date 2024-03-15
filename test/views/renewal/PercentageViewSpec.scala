@@ -18,12 +18,12 @@ package views.renewal
 
 import forms.renewal.PercentageFormProvider
 import models.renewal.PercentageOfCashPaymentOver15000.{Second, Third}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.PercentageView
 
-class PercentageViewSpec extends AmlsViewSpec with MustMatchers  {
+class PercentageViewSpec extends AmlsViewSpec with Matchers  {
 
   trait ViewFixture extends Fixture
 

@@ -19,13 +19,13 @@ package views.declaration
 import forms.declaration.WhoIsRegisteringFormProvider
 import models.declaration.WhoIsRegistering
 import models.responsiblepeople.ResponsiblePerson
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.WhoIsRegisteringThisRenewalView
 
-class WhoIsRegisteringThisRenewalViewSpec extends AmlsViewSpec with MustMatchers  {
+class WhoIsRegisteringThisRenewalViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val renewalView = inject[WhoIsRegisteringThisRenewalView]
   lazy val fp = inject[WhoIsRegisteringFormProvider]

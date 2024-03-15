@@ -19,12 +19,12 @@ package views.renewal
 import forms.renewal.SendLargestAmountsOfMoneyFormProvider
 import models.Country
 import models.renewal.SendTheLargestAmountsOfMoney
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.renewal.SendLargestAmountsOfMoneyView
 
-class SendLargestAmountsOfMoneyViewSpec extends AmlsViewSpec with MustMatchers with AutoCompleteServiceMocks {
+class SendLargestAmountsOfMoneyViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
   lazy val send_largest_amounts_of_money = inject[SendLargestAmountsOfMoneyView]
   lazy val fp = inject[SendLargestAmountsOfMoneyFormProvider]

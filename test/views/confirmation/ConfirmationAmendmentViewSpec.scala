@@ -20,12 +20,12 @@ import config.ApplicationConfig
 import generators.PaymentGenerator
 import models.confirmation.Currency
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.confirmation.ConfirmationAmendmentView
 
-class ConfirmationAmendmentViewSpec extends AmlsViewSpec with MustMatchers with PaymentGenerator {
+class ConfirmationAmendmentViewSpec extends AmlsViewSpec with Matchers with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
     lazy val amendmentView = app.injector.instanceOf[ConfirmationAmendmentView]

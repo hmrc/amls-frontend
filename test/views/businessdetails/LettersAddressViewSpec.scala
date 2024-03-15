@@ -18,14 +18,14 @@ package views.businessdetails
 
 import forms.businessdetails.LettersAddressFormProvider
 import models.businessdetails.{LettersAddress, RegisteredOfficeUK}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.LettersAddressView
 
 
-class LettersAddressViewSpec extends AmlsViewSpec with MustMatchers {
+class LettersAddressViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val viewUnderTest = inject[LettersAddressView]
   lazy val formProvider = inject[LettersAddressFormProvider]

@@ -17,13 +17,13 @@
 package views.tcsp
 
 import forms.tcsp.AnotherTCSPSupervisionFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tcsp.AnotherTCSPSupervisionView
 
-class AnotherTCSPSupervisionViewSpec extends AmlsViewSpec with MustMatchers {
+class AnotherTCSPSupervisionViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val another_tcsp_supervision = inject[AnotherTCSPSupervisionView]
   lazy val fp = inject[AnotherTCSPSupervisionFormProvider]

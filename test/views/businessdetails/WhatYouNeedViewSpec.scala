@@ -17,13 +17,13 @@
 package views.businessdetails
 
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.WhatYouNeedView
 
 
-class WhatYouNeedViewSpec extends AmlsViewSpec with MustMatchers {
+class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val what_you_need = app.injector.instanceOf[WhatYouNeedView]

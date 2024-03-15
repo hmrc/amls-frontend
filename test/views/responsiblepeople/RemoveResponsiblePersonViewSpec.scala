@@ -19,13 +19,13 @@ package views.responsiblepeople
 import forms.responsiblepeople.RemoveResponsiblePersonFormProvider
 import models.responsiblepeople.ResponsiblePersonEndDate
 import org.joda.time.LocalDate
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.RemoveResponsiblePersonView
 
-class RemoveResponsiblePersonViewSpec extends AmlsViewSpec with MustMatchers {
+class RemoveResponsiblePersonViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val personView = inject[RemoveResponsiblePersonView]
   lazy val fp = inject[RemoveResponsiblePersonFormProvider]

@@ -18,13 +18,13 @@ package views.asp
 
 import forms.asp.ServicesOfBusinessFormProvider
 import models.asp._
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.asp.ServicesOfBusinessView
 
-class ServicesOfBusinessViewSpec extends AmlsViewSpec with MustMatchers  {
+class ServicesOfBusinessViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val servicesOfBusiness = inject[ServicesOfBusinessView]
   lazy val fp = inject[ServicesOfBusinessFormProvider]

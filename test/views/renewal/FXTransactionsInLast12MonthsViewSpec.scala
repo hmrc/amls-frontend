@@ -18,12 +18,12 @@ package views.renewal
 
 import forms.renewal.FXTransactionsInLast12MonthsFormProvider
 import models.renewal.FXTransactionsInLast12Months
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.FXTransactionsInLast12MonthsView
 
-class FXTransactionsInLast12MonthsViewSpec extends AmlsViewSpec with MustMatchers  {
+class FXTransactionsInLast12MonthsViewSpec extends AmlsViewSpec with Matchers  {
 
   trait ViewFixture extends Fixture
 

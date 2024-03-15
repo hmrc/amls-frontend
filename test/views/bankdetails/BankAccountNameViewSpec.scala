@@ -17,14 +17,14 @@
 package views.bankdetails
 
 import forms.bankdetails.BankAccountNameFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.bankdetails.BankAccountNameView
 
-class BankAccountNameViewSpec extends AmlsViewSpec with MustMatchers {
+class BankAccountNameViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val bankAccountName = inject[BankAccountNameView]
   lazy val fp = inject[BankAccountNameFormProvider]

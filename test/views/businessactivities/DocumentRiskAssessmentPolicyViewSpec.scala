@@ -18,13 +18,13 @@ package views.businessactivities
 
 import forms.businessactivities.DocumentRiskAssessmentPolicyFormProvider
 import models.businessactivities.{PaperBased, RiskAssessmentTypes}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessactivities.DocumentRiskAssessmentPolicyView
 
-class DocumentRiskAssessmentPolicyViewSpec extends AmlsViewSpec with MustMatchers {
+class DocumentRiskAssessmentPolicyViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val risk = inject[DocumentRiskAssessmentPolicyView]
   lazy val fp = inject[DocumentRiskAssessmentPolicyFormProvider]

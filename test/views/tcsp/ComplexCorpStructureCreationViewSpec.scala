@@ -17,13 +17,13 @@
 package views.tcsp
 
 import forms.tcsp.ComplexCorpStructureCreationFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tcsp.ComplexCorpStructureCreationView
 
-class ComplexCorpStructureCreationViewSpec extends AmlsViewSpec with MustMatchers {
+class ComplexCorpStructureCreationViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val complex_corp_structure_creation = inject[ComplexCorpStructureCreationView]
   lazy val fp = inject[ComplexCorpStructureCreationFormProvider]

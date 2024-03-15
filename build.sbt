@@ -45,6 +45,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(Global / lintUnusedKeysOnLoad := false)
   .settings(
     libraryDependencies ++= appDependencies,
+    dependencyOverrides ++= Seq("ch.qos.logback" % "logback-classic" % "1.3.0"),
     retrieveManaged := true,
     PlayKeys.playDefaultPort := 9222,
     update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
@@ -55,8 +56,6 @@ lazy val microservice = Project(appName, file("."))
       "play.twirl.api.HtmlFormat._",
       "uk.gov.hmrc.govukfrontend.views.html.components._",
       "uk.gov.hmrc.hmrcfrontend.views.html.components._",
-//      "views.ViewUtils._",
-//      "models.Mode",
       "controllers.routes._"
     )
   )

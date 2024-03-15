@@ -19,7 +19,7 @@ package views.businessdetails
 import forms.businessdetails.VATRegisteredFormProvider
 import models.businessdetails.VATRegisteredYes
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.data.FormError
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
@@ -27,7 +27,7 @@ import views.Fixture
 import views.html.businessdetails.VATRegisteredView
 
 
-class VATRegisteredViewSpec extends AmlsViewSpec with MustMatchers  {
+class VATRegisteredViewSpec extends AmlsViewSpec with Matchers  {
 
   trait ViewFixture extends Fixture {
     lazy val vat_registered = app.injector.instanceOf[VATRegisteredView]

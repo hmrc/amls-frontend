@@ -17,11 +17,11 @@
 package models.enrolment
 
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class TaxEnrolmentSpec extends PlaySpec with MustMatchers with BaseGenerator with AmlsReferenceNumberGenerator {
+class TaxEnrolmentSpec extends PlaySpec with Matchers with BaseGenerator with AmlsReferenceNumberGenerator {
 
   trait Fixture {
     //noinspection ScalaStyle

@@ -17,10 +17,10 @@
 package views
 
 import org.jsoup.nodes.Document
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 
-trait TitleValidator extends MustMatchers {
+trait TitleValidator extends Matchers {
   def validateTitle(title: String)(implicit m: Messages, doc: Document) =
     doc.title mustBe s"${m(title)} - ${m("title.amls")} - ${m("title.gov")}"
 }

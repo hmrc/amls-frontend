@@ -18,14 +18,14 @@ package views
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import utils.Strings.TextHelpers
 
 import scala.collection.JavaConverters._
 
-trait ParagraphHelpers extends MustMatchers {
+trait ParagraphHelpers extends Matchers {
   def validateParagraphizedContent(messageKey: String)(implicit messages: Messages, doc: Document): Unit = {
     for(p <- Jsoup.parse(messages(messageKey).paragraphize).getElementsByTag("p").asScala) {
       doc.body().toString must include(p.text())
@@ -33,7 +33,7 @@ trait ParagraphHelpers extends MustMatchers {
   }
 }
 
-trait Fixture extends MustMatchers with ParagraphHelpers with TitleValidator {
+trait Fixture extends Matchers with ParagraphHelpers with TitleValidator {
 
   def view: HtmlFormat.Appendable
   lazy val html = view.body

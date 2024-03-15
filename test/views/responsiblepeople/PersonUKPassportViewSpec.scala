@@ -17,13 +17,13 @@
 package views.responsiblepeople
 
 import forms.responsiblepeople.PersonUKPassportFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.PersonUKPassportView
 
-class PersonUKPassportViewSpec extends AmlsViewSpec with MustMatchers {
+class PersonUKPassportViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val passportView = inject[PersonUKPassportView]
   lazy val fp = inject[PersonUKPassportFormProvider]

@@ -17,13 +17,13 @@
 package views.supervision
 
 import forms.supervision.PenalisedByProfessionalFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.PenalisedByProfessionalView
 
-class PenalisedByProfessionalViewSpec extends AmlsViewSpec with MustMatchers  {
+class PenalisedByProfessionalViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val viewUnderTest = inject[PenalisedByProfessionalView]
   lazy val fp = inject[PenalisedByProfessionalFormProvider]

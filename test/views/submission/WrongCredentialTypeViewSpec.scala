@@ -16,12 +16,12 @@
 
 package views.submission
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.submission.WrongCredentialTypeView
 
-class WrongCredentialTypeViewSpec extends AmlsViewSpec with MustMatchers {
+class WrongCredentialTypeViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val wrongCredentialTypeView = app.injector.instanceOf[WrongCredentialTypeView]

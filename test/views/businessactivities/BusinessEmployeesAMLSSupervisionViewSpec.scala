@@ -18,13 +18,13 @@ package views.businessactivities
 
 import forms.businessactivities.EmployeeCountAMLSSupervisionFormProvider
 import models.businessactivities.EmployeeCountAMLSSupervision
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessactivities.BusinessEmployeesAMLSSupervisionView
 
-class BusinessEmployeesAMLSSupervisionViewSpec extends AmlsViewSpec with MustMatchers {
+class BusinessEmployeesAMLSSupervisionViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val business: BusinessEmployeesAMLSSupervisionView = inject[BusinessEmployeesAMLSSupervisionView]
   lazy val formProvider: EmployeeCountAMLSSupervisionFormProvider = inject[EmployeeCountAMLSSupervisionFormProvider]

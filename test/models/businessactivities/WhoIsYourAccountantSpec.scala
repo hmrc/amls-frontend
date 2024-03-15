@@ -17,10 +17,11 @@
 package models.businessactivities
 
 import models.Country
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsSuccess, Json}
 
-class WhoIsYourAccountantSpec extends WordSpec with Matchers {
+class WhoIsYourAccountantSpec extends AnyWordSpec with Matchers {
 
   val testName = "Default Name"
   val testTradingName = Some("Default Trading Name")

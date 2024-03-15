@@ -17,13 +17,13 @@
 package views.responsiblepeople
 
 import forms.responsiblepeople.SelfAssessmentRegisteredFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.SelfAssessmentRegisteredView
 
-class SelfAssessmentRegisteredViewSpec extends AmlsViewSpec with MustMatchers {
+class SelfAssessmentRegisteredViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val registeredView = inject[SelfAssessmentRegisteredView]
   lazy val fp = inject[SelfAssessmentRegisteredFormProvider]

@@ -17,13 +17,13 @@
 package views.supervision
 
 import forms.supervision.MemberOfProfessionalBodyFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.MemberOfProfessionalBodyView
 
-class MemberOfProfessionalBodyViewSpec extends AmlsViewSpec with MustMatchers {
+class MemberOfProfessionalBodyViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val member_of_professional_body = inject[MemberOfProfessionalBodyView]
   lazy val fp = app.injector.instanceOf[MemberOfProfessionalBodyFormProvider]

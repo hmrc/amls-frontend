@@ -20,14 +20,14 @@ import forms.businessmatching.MsbSubSectorsFormProvider
 import models.businessmatching.{BusinessMatchingMsbService, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.data.{Form, FormError}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.MsbServicesView
 
 
-class MsbServicesViewSpec extends AmlsViewSpec with MustMatchers  {
+class MsbServicesViewSpec extends AmlsViewSpec with Matchers  {
 
   trait ViewFixture extends Fixture {
     lazy val services = app.injector.instanceOf[MsbServicesView]

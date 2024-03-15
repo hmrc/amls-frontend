@@ -17,14 +17,14 @@
 package views.businessactivities
 
 import forms.businessactivities.ExpectedAMLSTurnoverFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.data.FormError
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessactivities.ExpectedAMLSTurnoverView
 
-class ExpectedAMLSTurnoverViewSpec extends AmlsViewSpec with MustMatchers {
+class ExpectedAMLSTurnoverViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val turnover = inject[ExpectedAMLSTurnoverView]
   lazy val formProvider = inject[ExpectedAMLSTurnoverFormProvider]

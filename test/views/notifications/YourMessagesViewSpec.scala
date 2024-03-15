@@ -20,13 +20,13 @@ import models.notifications.ContactType.RenewalApproval
 import models.notifications.StatusType.{Approved, Rejected}
 import models.notifications._
 import org.joda.time.DateTime
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import uk.gov.hmrc.govukfrontend.views.Aliases.Table
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.notifications.YourMessagesView
 
-class YourMessagesViewSpec extends AmlsViewSpec with MustMatchers  {
+class YourMessagesViewSpec extends AmlsViewSpec with Matchers  {
 
     lazy val your_messages = app.injector.instanceOf[YourMessagesView]
     implicit val requestWithToken = addTokenForView()

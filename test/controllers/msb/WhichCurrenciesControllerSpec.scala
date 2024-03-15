@@ -26,8 +26,8 @@ import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.MustMatchers
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.test.Helpers._
@@ -41,7 +41,7 @@ import scala.concurrent.Future
 
 class WhichCurrenciesControllerSpec extends AmlsSpec
                                     with MockitoSugar
-                                    with MustMatchers
+                                    with Matchers
                                     with PatienceConfiguration
                                     with IntegrationPatience
                                     with ScalaFutures

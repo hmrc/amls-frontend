@@ -19,13 +19,13 @@ package views.declaration
 import cats.implicits._
 import forms.declaration.BusinessPartnersFormProvider
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.RegisterPartnersView
 
-class RegisterPartnersViewSpec extends AmlsViewSpec with MustMatchers {
+class RegisterPartnersViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val partnersView: RegisterPartnersView = inject[RegisterPartnersView]
   lazy val fp: BusinessPartnersFormProvider = inject[BusinessPartnersFormProvider]

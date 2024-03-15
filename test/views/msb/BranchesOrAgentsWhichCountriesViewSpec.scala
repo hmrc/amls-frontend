@@ -19,13 +19,13 @@ package views.msb
 import forms.msb.BranchesOrAgentsWhichCountriesFormProvider
 import models.Country
 import models.moneyservicebusiness.BranchesOrAgentsWhichCountries
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.msb.BranchesOrAgentsWhichCountriesView
 
-class BranchesOrAgentsWhichCountriesViewSpec extends AmlsViewSpec with MustMatchers with AutoCompleteServiceMocks {
+class BranchesOrAgentsWhichCountriesViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
   lazy val countriesView = inject[BranchesOrAgentsWhichCountriesView]
   lazy val fp = inject[BranchesOrAgentsWhichCountriesFormProvider]

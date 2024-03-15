@@ -17,13 +17,13 @@
 package views.responsiblepeople
 
 import forms.responsiblepeople.FitAndProperFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.FitAndProperView
 
-class FitAndProperViewSpec extends AmlsViewSpec with MustMatchers {
+class FitAndProperViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val fit_and_proper = inject[FitAndProperView]
   lazy val fp = inject[FitAndProperFormProvider]

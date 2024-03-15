@@ -18,13 +18,13 @@ package views.tradingpremises
 
 import forms.tradingpremises.ActivityStartDateFormProvider
 import models.tradingpremises.Address
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tradingpremises.ActivityStartDateView
 
-class ActivityStartDateViewSpec extends AmlsViewSpec with MustMatchers {
+class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val activity_start_date = inject[ActivityStartDateView]
   lazy val fp = inject[ActivityStartDateFormProvider]

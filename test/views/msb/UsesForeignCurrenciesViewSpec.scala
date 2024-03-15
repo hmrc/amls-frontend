@@ -18,13 +18,13 @@ package views.msb
 
 import forms.msb.UsesForeignCurrenciesFormProvider
 import models.moneyservicebusiness.{UsesForeignCurrenciesNo, UsesForeignCurrenciesYes}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.msb.UsesForeignCurrenciesView
 
-class UsesForeignCurrenciesViewSpec extends AmlsViewSpec with MustMatchers {
+class UsesForeignCurrenciesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val currenciesView = inject[UsesForeignCurrenciesView]
   lazy val fp = inject[UsesForeignCurrenciesFormProvider]

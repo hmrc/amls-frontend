@@ -23,7 +23,7 @@ import models.status._
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.jsoup.nodes.Element
 import org.mockito.Mockito.when
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.mvc.Call
 import play.twirl.api.{Html, HtmlFormat}
 import utils.{AmlsViewSpec, DateHelper}
@@ -31,7 +31,7 @@ import views.Fixture
 import views.html.status.YourRegistrationView
 import views.html.status.components._
 
-class YourRegistrationViewSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator {
+class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsReferenceNumberGenerator {
 
   trait ViewFixture extends Fixture {
     lazy val your_registration = inject[YourRegistrationView]

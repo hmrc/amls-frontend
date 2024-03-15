@@ -20,13 +20,13 @@ import forms.responsiblepeople.ExperienceTrainingFormProvider
 import models.businessmatching.BusinessActivity.AccountancyServices
 import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.responsiblepeople.{ExperienceTrainingNo, ExperienceTrainingYes}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.ExperienceTrainingView
 
-class ExperienceTrainingViewSpec extends AmlsViewSpec with MustMatchers  {
+class ExperienceTrainingViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val trainingView = inject[ExperienceTrainingView]
   lazy val fp = inject[ExperienceTrainingFormProvider]

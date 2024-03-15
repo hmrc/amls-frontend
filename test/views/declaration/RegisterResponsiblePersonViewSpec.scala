@@ -16,13 +16,13 @@
 
 package views.declaration
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.RegisterResponsiblePersonView
 
-class RegisterResponsiblePersonViewSpec extends AmlsViewSpec with MustMatchers {
+class RegisterResponsiblePersonViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val personView = app.injector.instanceOf[RegisterResponsiblePersonView]
 

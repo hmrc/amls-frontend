@@ -19,7 +19,7 @@ package views.businessdetails
 import forms.businessdetails.CorrespondenceAddressUKFormProvider
 import models.autocomplete.NameValuePair
 import models.businessdetails.CorrespondenceAddressUk
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.data.Form
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
@@ -27,7 +27,7 @@ import views.Fixture
 import views.html.businessdetails.CorrespondenceAddressUKView
 
 
-class CorrespondenceAddressUKViewSpec extends AmlsViewSpec with MustMatchers {
+class CorrespondenceAddressUKViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val correspondence_address_uk: CorrespondenceAddressUKView = inject[CorrespondenceAddressUKView]
   lazy val formProvider: CorrespondenceAddressUKFormProvider = inject[CorrespondenceAddressUKFormProvider]

@@ -17,13 +17,13 @@
 package views.businessactivities
 
 import forms.businessactivities.TransactionRecordFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessactivities.CustomerTransactionRecordsView
 
-class CustomerTransactionRecordsViewSpec extends AmlsViewSpec with MustMatchers {
+class CustomerTransactionRecordsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val customer: CustomerTransactionRecordsView = inject[CustomerTransactionRecordsView]
   lazy val formProvider: TransactionRecordFormProvider = inject[TransactionRecordFormProvider]

@@ -19,12 +19,12 @@ package views.renewal
 import forms.renewal.MostTransactionsFormProvider
 import models.Country
 import models.renewal.MostTransactions
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.renewal.MostTransactionsView
 
-class MostTransactionsViewSpec extends AmlsViewSpec with MustMatchers with AutoCompleteServiceMocks {
+class MostTransactionsViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
   lazy val most_transactions = inject[MostTransactionsView]
   lazy val fp = inject[MostTransactionsFormProvider]
