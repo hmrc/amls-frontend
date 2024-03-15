@@ -77,9 +77,10 @@ object Cache {
   * @param cache  The cache to wrap.
   * @param crypto The cryptography instance to use to decrypt values
   */
-class CryptoCache(cache: Cache, crypto: Encrypter with Decrypter) extends Cache(cache.id, cache.data) with CacheOps {
-  def getEncryptedEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] =
-    decryptValue(cache, key)(new JsonDecryptor[T]()(crypto, fmt))
+class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(cache.id, cache.data) with CacheOps {
+  def getEncryptedEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] = {
+    catchDoubleEncryption(cache, key)(fmt, crypto, new JsonDecryptor[T]()(crypto, fmt))
+  }
 }
 
 /**
@@ -131,7 +132,7 @@ class MongoCacheClient @Inject()(
   private def error(msg: String) = logger.warn(s"$logPrefix $msg")
   // $COVERAGE-ON$
 
-  implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+  implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto
 
   /**
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.
@@ -199,7 +200,7 @@ class MongoCacheClient @Inject()(
   def find[T](credId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
     fetchAll(credId) map {
       case Some(cache) => if (appConfig.mongoEncryptionEnabled) {
-        decryptValue[T](cache, key)(new JsonDecryptor[T]())
+        catchDoubleEncryption(cache, key)(reads, compositeSymmetricCrypto, new JsonDecryptor[T]()(compositeSymmetricCrypto, reads))
       } else {
         getValue[T](cache, key)
       }
@@ -210,7 +211,6 @@ class MongoCacheClient @Inject()(
   /**
     * Fetches the whole cache
     */
-
   def fetchAll(credId: String): Future[Option[Cache]] = {
     collection.find(bsonIdQuery(credId)).headOption().map {
       case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))

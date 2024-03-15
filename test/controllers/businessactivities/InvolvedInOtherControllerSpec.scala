@@ -27,9 +27,11 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
+import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import services.StatusService
+import services.businessmatching.RecoverActivitiesService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
@@ -41,12 +43,13 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
 
   trait Fixture {
     self => val request = addToken(authRequest)
-    implicit val ec = app.injector.instanceOf[ExecutionContext]
+    implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
     lazy val view = inject[InvolvedInOtherNameView]
     val controller = new InvolvedInOtherController (
-       dataCacheConnector = mock[DataCacheConnector],
-       authAction = SuccessfulAuthAction, ds = commonDependencies,
-       statusService = mock[StatusService],
+      dataCacheConnector = mock[DataCacheConnector],
+      recoverActivitiesService = mock[RecoverActivitiesService],
+      authAction = SuccessfulAuthAction, ds = commonDependencies,
+      statusService = mock[StatusService],
       cc = mockMcc,
       formProvider = inject[InvolvedInOtherFormProvider],
       view = view
@@ -134,6 +137,45 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
         page.select("input[type=radio][name=involvedInOther][value=true]").hasAttr("checked") must be(true)
         page.select("input[type=radio][name=involvedInOther][value=false]").hasAttr("checked") must be(false)
         page.select("textarea[name=details]").`val` must be("test")
+      }
+
+      "redirect to itself after performing a successful recovery of missing business types" in new Fixture {
+        val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BMActivities(Set())))
+
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(businessMatching))
+
+        when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+          .thenReturn(None)
+
+        when(controller.recoverActivitiesService.recover(any())(any(), any(), any()))
+          .thenReturn(Future.successful(true))
+
+        val result: Future[Result] = controller.get()(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.InvolvedInOtherController.get().url)
+      }
+
+      "return an internal server error after failing to recover missing business types" in new Fixture {
+        val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BMActivities(Set())))
+
+        when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(businessMatching))
+
+        when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
+          .thenReturn(None)
+
+        when(controller.recoverActivitiesService.recover(any())(any(), any(), any()))
+          .thenReturn(Future.successful(false))
+
+        val result: Future[Result] = controller.get()(request)
+        status(result) must be(INTERNAL_SERVER_ERROR)
       }
     }
 

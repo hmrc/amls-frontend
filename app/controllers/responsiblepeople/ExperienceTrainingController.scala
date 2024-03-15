@@ -24,6 +24,7 @@ import models.businessmatching.BusinessMatching
 import models.responsiblepeople.ResponsiblePerson
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.businessmatching.RecoverActivitiesService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.CharacterCountParser.cleanData
 import utils.{AuthAction, ControllerHelper, RepeatingSection}
@@ -32,6 +33,7 @@ import views.html.responsiblepeople.ExperienceTrainingView
 import scala.concurrent.Future
 
 class ExperienceTrainingController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                             val recoverActivitiesService: RecoverActivitiesService,
                                              authAction: AuthAction,
                                              val ds: CommonPlayDependencies,
                                              val cc: MessagesControllerComponents,
@@ -51,6 +53,13 @@ class ExperienceTrainingController @Inject()(val dataCacheConnector: DataCacheCo
                 case _ => NotFound(notFoundView)
               }
             }
+          }
+      } recoverWith {
+        case _: NoSuchElementException =>
+          logger.warn("[ExperienceTrainingController][get] - Business activities list was empty, attempting to recover")
+          recoverActivitiesService.recover(request).map {
+            case true => Redirect(routes.ExperienceTrainingController.get(index, edit, flow))
+            case false => InternalServerError("Unable to determine business types")
           }
       }
   }

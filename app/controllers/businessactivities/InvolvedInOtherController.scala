@@ -22,21 +22,23 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.businessactivities.InvolvedInOtherFormProvider
 import models.businessactivities.{BusinessActivities, _}
 import models.businessmatching._
+import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StatusService
+import services.businessmatching.RecoverActivitiesService
 import utils.AuthAction
 import utils.CharacterCountParser.cleanData
 import views.html.businessactivities.InvolvedInOtherNameView
 
 
-
 class InvolvedInOtherController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                           val recoverActivitiesService: RecoverActivitiesService,
                                            implicit val statusService: StatusService,
                                            val authAction: AuthAction,
                                            val ds: CommonPlayDependencies,
                                            val cc: MessagesControllerComponents,
                                            formProvider: InvolvedInOtherFormProvider,
-                                           view: InvolvedInOtherNameView) extends AmlsBaseController(ds, cc) {
+                                           view: InvolvedInOtherNameView) extends AmlsBaseController(ds, cc) with Logging {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
@@ -52,6 +54,13 @@ class InvolvedInOtherController @Inject() (val dataCacheConnector: DataCacheConn
             } yield Ok(view(formProvider().fill(involvedInOther), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false), formProvider.length)))
               .getOrElse(Ok(view(formProvider(), edit, businessMatching.prefixedAlphabeticalBusinessTypes(false), formProvider.length)))
           }) getOrElse Ok(view(formProvider(), edit, None, formProvider.length))
+      } recoverWith {
+        case _: NoSuchElementException =>
+          logger.warn("[InvolvedInOtherController][get] - Business activities list was empty, attempting to recover")
+          recoverActivitiesService.recover(request).map {
+            case true => Redirect(routes.InvolvedInOtherController.get())
+            case false => InternalServerError("Unable to determine business types")
+          }
       }
   }
 

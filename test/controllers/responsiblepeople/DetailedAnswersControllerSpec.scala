@@ -21,8 +21,8 @@ import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import controllers.declaration
 import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.{LimitedCompany, Partnership}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople._
 import models.status._
@@ -32,9 +32,11 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.Injecting
 import services.StatusService
+import services.businessmatching.RecoverActivitiesService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.responsiblepeople.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
@@ -42,13 +44,15 @@ import views.html.responsiblepeople.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePeopleValues with BusinessMatchingGenerator with OptionValues with Injecting {
+class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePeopleValues
+  with BusinessMatchingGenerator with OptionValues with Injecting {
 
   trait Fixture extends DependencyMocks {
     self => val request = addToken(authRequest)
     lazy val view = inject[CheckYourAnswersView]
     val controller = new DetailedAnswersController (
       dataCacheConnector = mock[DataCacheConnector],
+      recoverActivitiesService = mock[RecoverActivitiesService],
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       statusService = mock[StatusService],
       config = mock[ApplicationConfig],
@@ -56,7 +60,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       cyaHelper = inject[CheckYourAnswersHelper],
       view = view,
       error = errorView
-      )
+    )
 
     val businessMatching = BusinessMatching()
 
@@ -70,7 +74,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
       when {
         mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any())
-      } thenReturn Some(BusinessMatching())
+      } thenReturn Some(businessMatching)
 
       when {
         mockCacheMap.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
@@ -80,7 +84,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
         .thenReturn(Future.successful(Some(Seq(model))))
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
-        .thenReturn(Future.successful(Some(BusinessMatching())))
+        .thenReturn(Future.successful(Some(businessMatching)))
 
       when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(status))
@@ -100,6 +104,31 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
         contentAsString(result) must include(messages("title.cya"))
         contentAsString(result) must include("/anti-money-laundering/responsible-people/check-your-answers")
+      }
+
+      "redirect to itself after performing a successful recovery of missing business types" in new Fixture {
+        override val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessActivities(Set())))
+
+        setupMocksFor(completeResponsiblePerson)
+
+        when(controller.recoverActivitiesService.recover(any())(any(), any(), any()))
+          .thenReturn(Future.successful(true))
+
+        val result: Future[Result] = controller.get(1)(request)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
+      }
+
+      "return an internal server error after failing to recover missing business types" in new Fixture {
+        override val businessMatching: BusinessMatching = BusinessMatching(activities = Some(BusinessActivities(Set())))
+
+        setupMocksFor(completeResponsiblePerson)
+
+        when(controller.recoverActivitiesService.recover(any())(any(), any(), any()))
+          .thenReturn(Future.successful(false))
+
+        val result: Future[Result] = controller.get(1)(request)
+        status(result) must be(INTERNAL_SERVER_ERROR)
       }
     }
 
