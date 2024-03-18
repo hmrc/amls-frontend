@@ -17,7 +17,7 @@
 package views.businessactivities
 
 import forms.businessactivities.IdentifySuspiciousActivityFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
@@ -25,7 +25,7 @@ import views.Fixture
 import views.html.businessactivities.IdentifySuspiciousActivityView
 
 
-class IdentifySuspiciousActivityViewSpec extends AmlsViewSpec with MustMatchers {
+class IdentifySuspiciousActivityViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val activity: IdentifySuspiciousActivityView = inject[IdentifySuspiciousActivityView]
   lazy val formProvider: IdentifySuspiciousActivityFormProvider = inject[IdentifySuspiciousActivityFormProvider]

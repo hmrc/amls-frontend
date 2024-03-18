@@ -21,7 +21,6 @@ import controllers.actions.SuccessfulAuthAction
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
-import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import play.api.mvc.Call
 import utils.AmlsSpec
@@ -30,6 +29,7 @@ import org.scalacheck.Gen
 import uk.gov.hmrc.http.cache.client.CacheMap
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import org.scalactic.anyvals.PosInt
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
@@ -37,7 +37,7 @@ import scala.annotation.tailrec
 import scala.concurrent.Future
 
 class ResponsiblePersonAddControllerSpec extends AmlsSpec
-  with MustMatchers with MockitoSugar with ScalaFutures with ScalaCheckPropertyChecks {
+  with Matchers with MockitoSugar with ScalaFutures with ScalaCheckPropertyChecks {
 
   trait Fixture {
     self => val request = addToken(authRequest)

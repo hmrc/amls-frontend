@@ -17,13 +17,13 @@
 package views.tradingpremises
 
 import forms.tradingpremises.RegisteringAgentPremisesFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tradingpremises.RegisteringAgentPremisesView
 
-class RegisteringAgentPremisesViewSpec extends AmlsViewSpec with MustMatchers {
+class RegisteringAgentPremisesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val registering_agent_premises = inject[RegisteringAgentPremisesView]
   lazy val fp = inject[RegisteringAgentPremisesFormProvider]

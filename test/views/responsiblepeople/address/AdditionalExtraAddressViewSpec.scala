@@ -18,14 +18,14 @@ package views.responsiblepeople.address
 
 import forms.responsiblepeople.address.AdditionalExtraAddressFormProvider
 import models.responsiblepeople.{PersonAddressUK, ResponsiblePersonAddress}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.address.AdditionalExtraAddressView
 
 
-class AdditionalExtraAddressViewSpec extends AmlsViewSpec with MustMatchers {
+class AdditionalExtraAddressViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val extraAddressView = inject[AdditionalExtraAddressView]
   lazy val fp = inject[AdditionalExtraAddressFormProvider]

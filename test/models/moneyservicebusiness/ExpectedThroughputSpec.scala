@@ -16,12 +16,12 @@
 
 package models.moneyservicebusiness
 
-import org.scalatestplus.play.PlaySpec
 import models.renewal.TotalThroughput
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
-class ExpectedThroughputSpec extends PlaySpec with MustMatchers{
+class ExpectedThroughputSpec extends PlaySpec with Matchers{
 
     "JSON validation" must {
 

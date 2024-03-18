@@ -19,24 +19,34 @@ package utils
 import akka.stream.Materializer
 import config.ApplicationConfig
 import controllers.CommonPlayDependencies
-import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
 import play.api.i18n.{Lang, MessagesApi, MessagesImpl, MessagesProvider}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Decrypter, Encrypter}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 
 import scala.concurrent.ExecutionContext
 
 
-trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with MustMatchers with AuthorisedFixture {
+trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with Matchers with AuthorisedFixture {
 
   import play.api.test.CSRFTokenHelper._
+
+  override def fakeApplication(): Application = {
+    new GuiceApplicationBuilder()
+      .configure(
+        "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+      )
+      .build()
+  }
 
   implicit val requestWithToken = CSRFRequest(FakeRequest()).withCSRFToken
   val messagesApi = app.injector.instanceOf[MessagesApi]
@@ -54,7 +64,7 @@ trait AmlsSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with 
 
   // ================================== Encryption/Decryption ==================================
   val applicationCrypto: ApplicationCrypto = app.injector.instanceOf[ApplicationCrypto]
-  implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto
+  implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
   // ===========================================================================================
 
   implicit val headerCarrier: HeaderCarrier = mock[HeaderCarrier]

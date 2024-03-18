@@ -18,14 +18,14 @@ package views.notifications.v5m0
 
 import models.notifications._
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.notifications.v5m0.MindedToRejectView
 
-class MindedToRejectViewSpec extends AmlsViewSpec with MustMatchers {
+class MindedToRejectViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val minded_to_reject: MindedToRejectView = app.injector.instanceOf[MindedToRejectView]

@@ -16,12 +16,12 @@
 
 package views.submission
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.submission.DuplicateEnrolmentView
 
-class DuplicateEnrolmentViewSpec extends AmlsViewSpec with MustMatchers {
+class DuplicateEnrolmentViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val duplicateEnrolmentView = app.injector.instanceOf[DuplicateEnrolmentView]

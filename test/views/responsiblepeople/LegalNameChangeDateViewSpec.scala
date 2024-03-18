@@ -17,13 +17,13 @@
 package views.responsiblepeople
 
 import forms.responsiblepeople.LegalNameChangeDateFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.LegalNameChangeDateView
 
-class LegalNameChangeDateViewSpec extends AmlsViewSpec with MustMatchers {
+class LegalNameChangeDateViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val legal_name_change_date = inject[LegalNameChangeDateView]
   lazy val fp = inject[LegalNameChangeDateFormProvider]

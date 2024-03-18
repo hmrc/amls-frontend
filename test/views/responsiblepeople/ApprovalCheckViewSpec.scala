@@ -17,13 +17,13 @@
 package views.responsiblepeople
 
 import forms.responsiblepeople.ApprovalCheckFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.ApprovalCheckView
 
-class ApprovalCheckViewSpec extends AmlsViewSpec with MustMatchers {
+class ApprovalCheckViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val approval_check = inject[ApprovalCheckView]
   lazy val fp = inject[ApprovalCheckFormProvider]

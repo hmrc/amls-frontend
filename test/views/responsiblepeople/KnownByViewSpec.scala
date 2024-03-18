@@ -17,14 +17,14 @@
 package views.responsiblepeople
 
 import forms.responsiblepeople.KnownByFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.KnownByView
 
-class KnownByViewSpec extends AmlsViewSpec with MustMatchers {
+class KnownByViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val known_by = inject[KnownByView]
   lazy val fp = inject[KnownByFormProvider]

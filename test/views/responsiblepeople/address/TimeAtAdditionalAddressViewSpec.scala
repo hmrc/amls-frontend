@@ -18,13 +18,13 @@ package views.responsiblepeople.address
 
 import forms.responsiblepeople.address.TimeAtAddressFormProvider
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.address.TimeAtAdditionalAddressView
 
-class TimeAtAdditionalAddressViewSpec extends AmlsViewSpec with MustMatchers  {
+class TimeAtAdditionalAddressViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val addressView = inject[TimeAtAdditionalAddressView]
   lazy val fp = inject[TimeAtAddressFormProvider]

@@ -16,14 +16,14 @@
 
 package views.responsiblepeople
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import play.twirl.api.{Html, HtmlFormat}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.FitAndProperNoticeView
 
-class FitAndProperNoticeViewSpec extends AmlsViewSpec with MustMatchers {
+class FitAndProperNoticeViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val noticeView = inject[FitAndProperNoticeView]
 

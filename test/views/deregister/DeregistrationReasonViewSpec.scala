@@ -19,13 +19,13 @@ package views.deregister
 import forms.deregister.DeregistrationReasonFormProvider
 import models.deregister.DeregistrationReason
 import models.deregister.DeregistrationReason.HVDPolicyOfNotAcceptingHighValueCashPayments
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.deregister.DeregistrationReasonView
 
-class DeregistrationReasonViewSpec extends AmlsViewSpec with MustMatchers  {
+class DeregistrationReasonViewSpec extends AmlsViewSpec with Matchers  {
 
   trait TestFixture extends Fixture
 

@@ -18,12 +18,12 @@ package views.renewal
 
 import forms.renewal.AMPTurnoverFormProvider
 import models.renewal.AMPTurnover.{Second, Third}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.AMPTurnoverView
 
-class AMPTurnoverViewSpec extends AmlsViewSpec with MustMatchers  {
+class AMPTurnoverViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val amp_turnover = inject[AMPTurnoverView]
   lazy val fp = inject[AMPTurnoverFormProvider]

@@ -41,6 +41,9 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .overrides(bind[StatusService].to(self.statusService))
+      .configure(
+        "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+      )
       .build()
 
     val controller = app.injector.instanceOf[RegisterResponsiblePersonController]

@@ -18,13 +18,13 @@ package views.responsiblepeople
 
 import forms.responsiblepeople.PositionWithinBusinessFormProvider
 import models.businessmatching.BusinessType
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.PositionWithinBusinessView
 
-class PositionWithinBusinessViewSpec extends AmlsViewSpec with MustMatchers {
+class PositionWithinBusinessViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val businessView = inject[PositionWithinBusinessView]
   lazy val fp = inject[PositionWithinBusinessFormProvider]

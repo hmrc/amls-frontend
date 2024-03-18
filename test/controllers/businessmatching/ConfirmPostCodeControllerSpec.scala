@@ -44,6 +44,9 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
+      .configure(
+        "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+      )
       .overrides(bind[AuthAction].to(SuccessfulAuthAction))
       .build()
 

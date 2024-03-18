@@ -18,13 +18,13 @@ package views.businessmatching
 
 import forms.businessmatching.BusinessTypeFormProvider
 import models.businessmatching.BusinessType.LimitedCompany
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.BusinessTypeView
 
-class BusinessTypeViewSpec extends AmlsViewSpec with MustMatchers {
+class BusinessTypeViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val business_type = inject[BusinessTypeView]
   lazy val fp = inject[BusinessTypeFormProvider]

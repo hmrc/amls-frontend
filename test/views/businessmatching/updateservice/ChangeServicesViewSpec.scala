@@ -18,12 +18,12 @@ package views.businessmatching.updateservice
 
 import forms.businessmatching.updateservice.ChangeBusinessTypesFormProvider
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.ChangeServicesView
 
-class ChangeServicesViewSpec extends AmlsViewSpec with MustMatchers {
+class ChangeServicesViewSpec extends AmlsViewSpec with Matchers {
 
   val allowAdd = true
 

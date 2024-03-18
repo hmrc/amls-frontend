@@ -17,11 +17,11 @@
 package models.deregister
 
 import org.joda.time.LocalDate
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class DeRegisterSubscriptionRequestSpec extends PlaySpec with MustMatchers {
+class DeRegisterSubscriptionRequestSpec extends PlaySpec with Matchers {
 
   "The model" must {
     "deserialise correctly" in {

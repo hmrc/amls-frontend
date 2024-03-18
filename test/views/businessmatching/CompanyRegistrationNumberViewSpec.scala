@@ -18,14 +18,14 @@ package views.businessmatching
 
 import forms.businessmatching.CompanyRegistrationNumberFormProvider
 import models.businessmatching.CompanyRegistrationNumber
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.data.Form
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.CompanyRegistrationNumberView
 
 
-class CompanyRegistrationNumberViewSpec extends AmlsViewSpec with MustMatchers  {
+class CompanyRegistrationNumberViewSpec extends AmlsViewSpec with Matchers  {
 
   trait ViewFixture extends Fixture {
     lazy val viewUnderTest = app.injector.instanceOf[CompanyRegistrationNumberView]

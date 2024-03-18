@@ -20,14 +20,14 @@ import forms.businessdetails.ActivityStartDateFormProvider
 import models.businessdetails.ActivityStartDate
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.data.Form
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.ActivityStartDateView
 
 
-class ActivityStartDateViewSpec extends AmlsViewSpec with MustMatchers {
+class ActivityStartDateViewSpec extends AmlsViewSpec with Matchers {
   trait ViewFixture extends Fixture {
     lazy val date = inject[ActivityStartDateView]
     lazy val formProvider = inject[ActivityStartDateFormProvider]

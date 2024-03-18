@@ -20,14 +20,14 @@ import forms.tradingpremises.MSBServicesFormProvider
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import models.tradingpremises.TradingPremisesMsbService
 import models.tradingpremises.TradingPremisesMsbService._
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.Aliases
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tradingpremises.MSBServicesView
 
-class MSBServicesViewSpec extends AmlsViewSpec with MustMatchers {
+class MSBServicesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val msb_services: MSBServicesView = inject[MSBServicesView]
   lazy val fp: MSBServicesFormProvider = inject[MSBServicesFormProvider]

@@ -19,13 +19,13 @@ package views.businessdetails
 import forms.businessdetails.ConfirmRegisteredOfficeFormProvider
 import models.businessdetails.{ConfirmRegisteredOffice, RegisteredOfficeUK}
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessdetails.ConfirmRegisteredOfficeOrMainPlaceView
 
 
-class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with MustMatchers {
+class ConfirmRegisteredOfficeOrMainPlaceViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val place = app.injector.instanceOf[ConfirmRegisteredOfficeOrMainPlaceView]

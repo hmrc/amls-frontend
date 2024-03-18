@@ -18,12 +18,12 @@ package views.confirmation
 
 import config.ApplicationConfig
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.confirmation.ConfirmationBacsView
 
-class ConfirmationBacsViewSpec extends AmlsViewSpec with MustMatchers {
+class ConfirmationBacsViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val confirmationBacsView = inject[ConfirmationBacsView]

@@ -18,12 +18,12 @@ package views.businessmatching.updateservice.add
 
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add.NewServiceInformationView
 
-class NewServiceInformationViewSpec extends AmlsViewSpec with MustMatchers {
+class NewServiceInformationViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val new_service_information = app.injector.instanceOf[NewServiceInformationView]
   implicit val requestWithToken = addTokenForView()

@@ -16,11 +16,11 @@
 
 package models.payments
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class CreatePaymentResponseSpec extends PlaySpec with MustMatchers {
+class CreatePaymentResponseSpec extends PlaySpec with Matchers {
 
   "The CreatePaymentResponse model" must {
     "round-trip through JSON serialization correctly" in {

@@ -17,11 +17,11 @@
 package models.businessmatching.updateservice
 
 import models.businessmatching.BusinessActivity.HighValueDealing
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
 
-class TradingPremisesNewActivitiesSpec extends PlaySpec with MustMatchers {
+class TradingPremisesNewActivitiesSpec extends PlaySpec with Matchers {
 
   "The TradingPremisesNewActivities model" when {
 

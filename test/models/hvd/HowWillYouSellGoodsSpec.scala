@@ -16,13 +16,13 @@
 
 package models.hvd
 
-import org.scalatest.WordSpec
-import org.scalatest.MustMatchers
 import models.hvd.SalesChannel._
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 
 
-class HowWillYouSellGoodsSpec extends WordSpec with MustMatchers {
+class HowWillYouSellGoodsSpec extends AnyWordSpec with Matchers {
 
   val fullData = HowWillYouSellGoods(Set(Wholesale, Retail, Auction))
 

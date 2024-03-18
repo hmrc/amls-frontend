@@ -21,10 +21,10 @@ import play.api.libs.json.Format
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
-class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory) extends Conversions {
+import scala.concurrent.{ExecutionContext, Future}
+
+class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)(implicit val ec: ExecutionContext) extends Conversions {
 
   lazy val mongoCache: MongoCacheClient = cacheClientFactory.createClient
 
@@ -52,7 +52,12 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
     * Fetches the entire cache from the mongo store
     */
   private def fetchAllByCredId(credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
-    mongoCache.fetchAll(Some(credId)).map(_.map(toCacheMap))
+    mongoCache.fetchAll(Some(credId)).map { optCache =>
+      optCache.map { cacheMap =>
+        val map = toCacheMap(cacheMap)
+        map
+      }
+    }
   }
 
   def fetchAll[T](credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {

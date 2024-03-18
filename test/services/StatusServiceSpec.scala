@@ -28,13 +28,22 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Environment
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.{Application, Environment}
 import play.api.test.Helpers
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with GuiceOneAppPerSuite {
+
+  override def fakeApplication(): Application = {
+    new GuiceApplicationBuilder()
+      .configure(
+        "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+      )
+      .build()
+  }
 
    val service = new StatusService(
     amlsConnector = mock[AmlsConnector],

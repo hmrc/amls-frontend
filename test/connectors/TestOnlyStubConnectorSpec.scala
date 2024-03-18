@@ -19,8 +19,8 @@ package connectors
 import config.ApplicationConfig
 import org.mockito.Matchers.any
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
 import play.api.test.Helpers._
@@ -28,11 +28,10 @@ import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.HttpClient
 import utils.AmlsSpec
 
-
 import scala.concurrent.Future
 
 class TestOnlyStubConnectorSpec extends AmlsSpec
-  with MustMatchers
+  with Matchers
   with ScalaFutures
   with MockitoSugar {
 

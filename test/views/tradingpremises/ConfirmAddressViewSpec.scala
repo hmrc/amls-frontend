@@ -19,13 +19,13 @@ package views.tradingpremises
 import forms.tradingpremises.ConfirmAddressFormProvider
 import models.Country
 import models.businesscustomer.Address
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tradingpremises.ConfirmAddressView
 
-class ConfirmAddressViewSpec extends AmlsViewSpec with MustMatchers {
+class ConfirmAddressViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val confirm_address = inject[ConfirmAddressView]
   lazy val fp = inject[ConfirmAddressFormProvider]

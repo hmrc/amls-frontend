@@ -18,14 +18,14 @@ package views.businessactivities
 
 import forms.businessactivities.BusinessFranchiseFormProvider
 import models.businessactivities.{BusinessFranchiseNo, BusinessFranchiseYes}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import play.api.test.FakeRequest
 import views.Fixture
 import views.html.businessactivities.BusinessFranchiseNameView
 
 
-class BusinessFranchiseNameViewSpec extends AmlsViewSpec with MustMatchers  {
+class BusinessFranchiseNameViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val franchise = inject[BusinessFranchiseNameView]
   lazy val formProvider = inject[BusinessFranchiseFormProvider]

@@ -18,13 +18,13 @@ package views.msb
 
 import forms.msb.FundsTransferFormProvider
 import models.moneyservicebusiness.FundsTransfer
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.msb.FundsTransferView
 
-class FundsTransferViewSpec extends AmlsViewSpec with MustMatchers {
+class FundsTransferViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val funds_transfer = inject[FundsTransferView]
   lazy val fp = inject[FundsTransferFormProvider]

@@ -18,13 +18,13 @@ package views.businessdetails
 
 import forms.businessdetails.RegisteredOfficeIsUKFormProvider
 import models.businessdetails.RegisteredOfficeIsUK
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import play.api.test.FakeRequest
 import views.Fixture
 import views.html.businessdetails.RegisteredOfficeIsUKView
 
-class RegisteredOfficeIsUKViewSpec extends AmlsViewSpec with MustMatchers  {
+class RegisteredOfficeIsUKViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val registered_office_is_uk = app.injector.instanceOf[RegisteredOfficeIsUKView]
   lazy val formProvider = app.injector.instanceOf[RegisteredOfficeIsUKFormProvider]

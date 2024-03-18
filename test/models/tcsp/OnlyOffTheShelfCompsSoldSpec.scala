@@ -16,11 +16,11 @@
 
 package models.tcsp
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class OnlyOffTheShelfCompsSoldSpec extends PlaySpec with MustMatchers {
+class OnlyOffTheShelfCompsSoldSpec extends PlaySpec with Matchers {
 
   "OnlyOffTheShelfCompsSold" must {
 

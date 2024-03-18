@@ -18,12 +18,12 @@ package views.notifications.v5m0
 
 import models.notifications.NotificationParams
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.notifications.v5m0.RejectionReasonsView
 
-class RejectionReasonsViewSpec extends AmlsViewSpec with MustMatchers {
+class RejectionReasonsViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val rejection_reasons = app.injector.instanceOf[RejectionReasonsView]

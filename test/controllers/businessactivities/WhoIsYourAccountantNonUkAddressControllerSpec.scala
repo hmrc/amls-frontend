@@ -24,7 +24,6 @@ import models.businessactivities._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
@@ -38,7 +37,6 @@ import scala.concurrent.Future
 class WhoIsYourAccountantNonUkAddressControllerSpec extends AmlsSpec
   with MockitoSugar
   with ScalaFutures
-  with PrivateMethodTester
   with Injecting {
 
   trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks{

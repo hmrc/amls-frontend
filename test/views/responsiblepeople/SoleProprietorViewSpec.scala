@@ -18,13 +18,13 @@ package views.responsiblepeople
 
 import forms.responsiblepeople.SoleProprietorFormProvider
 import models.responsiblepeople.SoleProprietorOfAnotherBusiness
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.SoleProprietorView
 
-class SoleProprietorViewSpec extends AmlsViewSpec with MustMatchers {
+class SoleProprietorViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val sole_proprietor = inject[SoleProprietorView]
   lazy val fp = inject[SoleProprietorFormProvider]

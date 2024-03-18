@@ -19,11 +19,11 @@ package models.notifications
 import models.notifications.RejectedReason.FailedToPayCharges
 import models.notifications.StatusType.DeRegistered
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
-class NotificationDetailsSpec extends PlaySpec with MustMatchers {
+class NotificationDetailsSpec extends PlaySpec with Matchers {
 
   val dateTime = new DateTime(1479730062573L, DateTimeZone.UTC)
 

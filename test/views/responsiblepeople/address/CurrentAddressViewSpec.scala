@@ -17,13 +17,13 @@
 package views.responsiblepeople.address
 
 import forms.responsiblepeople.address.CurrentAddressFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.address.CurrentAddressView
 
-class CurrentAddressViewSpec extends AmlsViewSpec with MustMatchers {
+class CurrentAddressViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val current_address = inject[CurrentAddressView]
   lazy val fp = inject[CurrentAddressFormProvider]

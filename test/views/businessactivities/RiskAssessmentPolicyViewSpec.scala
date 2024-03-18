@@ -18,14 +18,14 @@ package views.businessactivities
 
 import forms.businessactivities.RiskAssessmentFormProvider
 import models.businessactivities.RiskAssessmentHasPolicy
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import play.api.test.FakeRequest
 import views.Fixture
 import views.html.businessactivities.RiskAssessmentPolicyView
 
 
-class RiskAssessmentPolicyViewSpec extends AmlsViewSpec with MustMatchers {
+class RiskAssessmentPolicyViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val policy: RiskAssessmentPolicyView = inject[RiskAssessmentPolicyView]
   lazy val formProvider: RiskAssessmentFormProvider = inject[RiskAssessmentFormProvider]

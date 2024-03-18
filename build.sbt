@@ -39,12 +39,13 @@ lazy val microservice = Project(appName, file("."))
   .settings(playSettings ++ scoverageSettings : _*)
   .settings(scalaSettings: _*)
   .settings(defaultSettings(): _*)
-  .settings(scalaVersion := "2.12.13")
+  .settings(scalaVersion := "2.13.10")
   .settings(routesImport += "models.notifications.ContactType._")
   .settings(routesImport += "utils.Binders._")
   .settings(Global / lintUnusedKeysOnLoad := false)
   .settings(
     libraryDependencies ++= appDependencies,
+    dependencyOverrides ++= Seq("ch.qos.logback" % "logback-classic" % "1.3.0"),
     retrieveManaged := true,
     PlayKeys.playDefaultPort := 9222,
     update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
@@ -55,8 +56,6 @@ lazy val microservice = Project(appName, file("."))
       "play.twirl.api.HtmlFormat._",
       "uk.gov.hmrc.govukfrontend.views.html.components._",
       "uk.gov.hmrc.hmrcfrontend.views.html.components._",
-//      "views.ViewUtils._",
-//      "models.Mode",
       "controllers.routes._"
     )
   )
@@ -70,10 +69,8 @@ lazy val microservice = Project(appName, file("."))
     IntegrationTest / parallelExecution := false)
  .settings(
     scalacOptions ++= List(
-      "-Ypartial-unification",
       "-Yrangepos",
       "-Xlint:-missing-interpolator,_",
-      "-Yno-adapted-args",
       "-feature",
       "-unchecked",
       "-language:implicitConversions",

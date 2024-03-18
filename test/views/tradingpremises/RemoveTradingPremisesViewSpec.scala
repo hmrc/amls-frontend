@@ -17,13 +17,13 @@
 package views.tradingpremises
 
 import forms.tradingpremises.RemoveTradingPremisesFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.{FakeRequest, Injecting}
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tradingpremises.RemoveTradingPremisesView
 
-class RemoveTradingPremisesViewSpec extends AmlsViewSpec with MustMatchers with Injecting {
+class RemoveTradingPremisesViewSpec extends AmlsViewSpec with Matchers with Injecting {
 
   lazy val remove_trading_premises = inject[RemoveTradingPremisesView]
   lazy val fp = inject[RemoveTradingPremisesFormProvider]

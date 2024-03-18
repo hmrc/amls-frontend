@@ -18,13 +18,13 @@ package views.responsiblepeople.address
 
 import forms.responsiblepeople.address.MovedAddressFormProvider
 import models.responsiblepeople.PersonAddressUK
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.address.MovedAddressView
 
-class MovedAddressViewSpec extends AmlsViewSpec with MustMatchers {
+class MovedAddressViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val moved_address = inject[MovedAddressView]
   lazy val fp = inject[MovedAddressFormProvider]

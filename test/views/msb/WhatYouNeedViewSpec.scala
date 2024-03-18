@@ -19,12 +19,12 @@ package views.msb
 import controllers.msb.routes.ExpectedThroughputController
 import models.businessmatching.BusinessMatchingMsbServices
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.msb.WhatYouNeedView
 
-class WhatYouNeedViewSpec extends AmlsViewSpec with MustMatchers {
+class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
   private val call = ExpectedThroughputController.get()
   lazy val what_you_need = inject[WhatYouNeedView]

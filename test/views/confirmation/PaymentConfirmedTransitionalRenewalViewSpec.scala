@@ -16,12 +16,12 @@
 
 package views.confirmation
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.confirmation.PaymentConfirmationTransitionalRenewalView
 
-class PaymentConfirmedTransitionalRenewalViewSpec extends AmlsViewSpec with MustMatchers {
+class PaymentConfirmedTransitionalRenewalViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val payment_confirmation_transitional_renewal = inject[PaymentConfirmationTransitionalRenewalView]

@@ -17,12 +17,12 @@
 package views.responsiblepeople
 
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.YourResponsiblePeopleView
 
-class YourResponsiblePeopleViewSpec extends AmlsViewSpec with MustMatchers {
+class YourResponsiblePeopleViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val peopleView = inject[YourResponsiblePeopleView]

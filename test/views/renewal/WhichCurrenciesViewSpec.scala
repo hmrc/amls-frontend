@@ -18,13 +18,13 @@ package views.renewal
 
 import forms.renewal.WhichCurrenciesFormProvider
 import models.renewal.WhichCurrencies
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import services.CurrencyAutocompleteService
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.WhichCurrenciesView
 
-class WhichCurrenciesViewSpec extends AmlsViewSpec with MustMatchers {
+class WhichCurrenciesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val which_currencies = inject[WhichCurrenciesView]
   lazy val fp = inject[WhichCurrenciesFormProvider]

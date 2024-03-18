@@ -16,12 +16,12 @@
 
 package views.confirmation
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.confirmation.PaymentConfirmationView
 
-class PaymentConfirmedViewSpec extends AmlsViewSpec with MustMatchers {
+class PaymentConfirmedViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val payment_confirmation = app.injector.instanceOf[PaymentConfirmationView]

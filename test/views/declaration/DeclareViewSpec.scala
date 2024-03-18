@@ -16,13 +16,13 @@
 
 package views.declaration
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.DeclareView
 
-class DeclareViewSpec extends AmlsViewSpec with MustMatchers  {
+class DeclareViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val declare = app.injector.instanceOf[DeclareView]
 

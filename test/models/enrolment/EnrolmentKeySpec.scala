@@ -17,10 +17,10 @@
 package models.enrolment
 
 import generators.AmlsReferenceNumberGenerator
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 
-class EnrolmentKeySpec extends PlaySpec with MustMatchers with AmlsReferenceNumberGenerator {
+class EnrolmentKeySpec extends PlaySpec with Matchers with AmlsReferenceNumberGenerator {
 
   "The enrolment key" must {
     "be in the correct format" in {

@@ -18,13 +18,13 @@ package views.msb
 
 import forms.msb.CurrencyExchangesInNext12MonthsFormProvider
 import models.moneyservicebusiness.CETransactionsInNext12Months
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.msb.CurrencyExchangesInNext12MonthsView
 
-class CurrencyExchangesInNext12MonthsViewSpec extends AmlsViewSpec with MustMatchers {
+class CurrencyExchangesInNext12MonthsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val exchangesView = inject[CurrencyExchangesInNext12MonthsView]
   lazy val fp = inject[CurrencyExchangesInNext12MonthsFormProvider]

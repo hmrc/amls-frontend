@@ -17,12 +17,12 @@
 package views.confirmation
 
 import models.confirmation.Currency
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.confirmation.PaymentFailureView
 
-class PaymentFailureViewSpec extends AmlsViewSpec with MustMatchers {
+class PaymentFailureViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val payment_failure = inject[PaymentFailureView]

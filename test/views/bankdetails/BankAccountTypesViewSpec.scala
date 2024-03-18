@@ -18,14 +18,14 @@ package views.bankdetails
 
 import forms.bankdetails.BankAccountTypeFormProvider
 import models.bankdetails.BankAccountType.{BelongsToBusiness, PersonalAccount}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.bankdetails.BankAccountTypesView
 
-class BankAccountTypesViewSpec extends AmlsViewSpec with MustMatchers  {
+class BankAccountTypesViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val bankTypes = inject[BankAccountTypesView]
   lazy val fp = inject[BankAccountTypeFormProvider]

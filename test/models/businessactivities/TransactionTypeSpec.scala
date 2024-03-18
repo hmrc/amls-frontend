@@ -17,7 +17,7 @@
 package models.businessactivities
 
 import models.businessactivities.TransactionTypes.{DigitalSoftware, DigitalSpreadsheet, Paper}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.libs.json.{JsError, JsPath, Json}
@@ -26,7 +26,7 @@ import play.api.test.Helpers.stubMessagesApi
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 
-class TransactionTypeSpec extends PlaySpec with MustMatchers {
+class TransactionTypeSpec extends PlaySpec with Matchers {
 
   implicit val messages: Messages = stubMessagesApi().preferred(FakeRequest())
 

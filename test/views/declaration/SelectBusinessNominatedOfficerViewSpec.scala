@@ -20,13 +20,13 @@ import cats.implicits._
 import forms.declaration.BusinessNominatedOfficerFormProvider
 import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.SelectBusinessNominatedOfficerView
 
-class SelectBusinessNominatedOfficerViewSpec extends AmlsViewSpec with MustMatchers {
+class SelectBusinessNominatedOfficerViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val officerView = inject[SelectBusinessNominatedOfficerView]
   lazy val fp = inject[BusinessNominatedOfficerFormProvider]

@@ -18,13 +18,13 @@ package views.asp
 
 import forms.asp.OtherBusinessTaxMattersFormProvider
 import models.asp.{OtherBusinessTaxMattersNo, OtherBusinessTaxMattersYes}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.asp.OtherBusinessTaxMattersView
 
-class OtherBusinessTaxMattersViewSpec extends AmlsViewSpec with MustMatchers  {
+class OtherBusinessTaxMattersViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val taxMatters = inject[OtherBusinessTaxMattersView]
   lazy val fp = inject[OtherBusinessTaxMattersFormProvider]

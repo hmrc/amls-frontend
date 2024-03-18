@@ -18,12 +18,12 @@ package views.applicationstatus
 
 import config.ApplicationConfig
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.applicationstatus.HowToPayView
 
-class HowToPayViewSpec extends AmlsViewSpec with MustMatchers {
+class HowToPayViewSpec extends AmlsViewSpec with Matchers {
 
   implicit lazy val config: ApplicationConfig = inject[ApplicationConfig]
 

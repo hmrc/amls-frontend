@@ -17,11 +17,11 @@
 package models.moneyservicebusiness
 
 import models.Country
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 
-class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
+class BranchesOrAgentsSpec extends PlaySpec with Matchers{
 
   "MsbServices" must {
 

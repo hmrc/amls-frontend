@@ -18,13 +18,13 @@ package views.hvd
 
 import forms.hvd.ExpectToReceiveFormProvider
 import models.hvd.PaymentMethods
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.hvd.ExpectToReceiveView
 
-class ExpectToReceiveViewSpec extends AmlsViewSpec with MustMatchers  {
+class ExpectToReceiveViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val receiveView = inject[ExpectToReceiveView]
   lazy val fp = inject[ExpectToReceiveFormProvider]

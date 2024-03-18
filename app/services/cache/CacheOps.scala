@@ -17,7 +17,7 @@
 package services.cache
 
 import play.api.libs.json.{JsError, JsResultException, JsString, JsSuccess, Reads}
-import uk.gov.hmrc.crypto.{CompositeSymmetricCrypto, Protected}
+import uk.gov.hmrc.crypto.{CompositeSymmetricCrypto, Decrypter, Encrypter, Protected}
 import uk.gov.hmrc.crypto.json.JsonDecryptor
 
 import scala.util.{Failure, Success, Try}
@@ -39,7 +39,7 @@ trait CacheOps {
       }
     }
 
-  def catchDoubleEncryption[T](cache: Cache, key: String)(implicit reads: Reads[T], c: CompositeSymmetricCrypto, decryptor: JsonDecryptor[T]): Option[T] = {
+  def catchDoubleEncryption[T](cache: Cache, key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter, decryptor: JsonDecryptor[T]): Option[T] = {
     Try(decryptValue[T](cache, key)(decryptor)) match {
       case Failure(_: JsResultException) => {
         decryptValue[String](cache, key)(new JsonDecryptor[String]())

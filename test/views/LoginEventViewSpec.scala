@@ -16,12 +16,12 @@
 
 package views
 
-import org.scalatest.MustMatchers
-import utils.AmlsViewSpec
+import org.scalatest.matchers.must.Matchers
 import play.api.mvc.Call
+import utils.AmlsViewSpec
 import views.html.LoginEventView
 
-class LoginEventViewSpec extends AmlsViewSpec with MustMatchers {
+class LoginEventViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val login_event = inject[LoginEventView]

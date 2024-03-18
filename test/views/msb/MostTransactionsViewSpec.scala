@@ -19,13 +19,13 @@ package views.msb
 import forms.msb.MostTransactionsFormProvider
 import models.Country
 import models.moneyservicebusiness.MostTransactions
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.msb.MostTransactionsView
 
-class MostTransactionsViewSpec extends AmlsViewSpec with MustMatchers with AutoCompleteServiceMocks {
+class MostTransactionsViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
   lazy val most_transactions = inject[MostTransactionsView]
   lazy val fp = inject[MostTransactionsFormProvider]

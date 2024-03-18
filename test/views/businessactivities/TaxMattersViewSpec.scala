@@ -18,13 +18,13 @@ package views.businessactivities
 
 import forms.businessactivities.TaxMattersFormProvider
 import models.businessactivities.TaxMatters
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessactivities.TaxMattersView
 
-class TaxMattersViewSpec extends AmlsViewSpec with MustMatchers {
+class TaxMattersViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val matters = inject[TaxMattersView]
   lazy val fp = inject[TaxMattersFormProvider]

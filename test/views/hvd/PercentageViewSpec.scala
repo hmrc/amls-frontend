@@ -18,13 +18,13 @@ package views.hvd
 
 import forms.hvd.PercentagePaymentFormProvider
 import models.hvd.PercentageOfCashPaymentOver15000.{Second, Third}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.hvd.PercentageView
 
-class PercentageViewSpec extends AmlsViewSpec with MustMatchers {
+class PercentageViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val percentage = inject[PercentageView]
   lazy val fp = inject[PercentagePaymentFormProvider]

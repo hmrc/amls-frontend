@@ -19,13 +19,13 @@ package views.declaration
 import forms.declaration.WhoIsRegisteringFormProvider
 import models.declaration.WhoIsRegistering
 import models.responsiblepeople.ResponsiblePerson
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.WhoIsRegisteringThisRegistrationView
 
-class WhoIsRegisteringThisRegistrationViewSpec extends AmlsViewSpec with MustMatchers  {
+class WhoIsRegisteringThisRegistrationViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val registrationView = inject[WhoIsRegisteringThisRegistrationView]
   lazy val fp = inject[WhoIsRegisteringFormProvider]

@@ -18,13 +18,13 @@ package views.confirmation
 
 import config.ApplicationConfig
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.confirmation.ConfirmationNoFeeView
 
-class ConfirmationNoFeeViewSpec extends AmlsViewSpec with MustMatchers {
+class ConfirmationNoFeeViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val confirmation_no_fee = inject[ConfirmationNoFeeView]

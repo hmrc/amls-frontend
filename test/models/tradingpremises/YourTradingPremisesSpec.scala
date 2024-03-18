@@ -18,10 +18,11 @@ package models.tradingpremises
 
 import models.DateOfChange
 import org.joda.time.LocalDate
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json._
 
-class YourTradingPremisesSpec extends WordSpec with MustMatchers with JodaWrites with JodaReads {
+class YourTradingPremisesSpec extends AnyWordSpec with Matchers with JodaWrites with JodaReads {
 
   val model = YourTradingPremises(
     "foo",

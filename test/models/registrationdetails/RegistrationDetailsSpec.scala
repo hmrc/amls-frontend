@@ -16,11 +16,11 @@
 
 package models.registrationdetails
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
 
-class RegistrationDetailsSpec extends PlaySpec with MustMatchers {
+class RegistrationDetailsSpec extends PlaySpec with Matchers {
 
   "The RegistrationDetails model" must {
     "deserialize from json" in {

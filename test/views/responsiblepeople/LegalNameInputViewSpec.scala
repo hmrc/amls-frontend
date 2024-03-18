@@ -17,13 +17,13 @@
 package views.responsiblepeople
 
 import forms.responsiblepeople.LegalNameInputFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.LegalNameInputView
 
-class LegalNameInputViewSpec extends AmlsViewSpec with MustMatchers {
+class LegalNameInputViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val legal_name_input = inject[LegalNameInputView]
   lazy val fp = inject[LegalNameInputFormProvider]

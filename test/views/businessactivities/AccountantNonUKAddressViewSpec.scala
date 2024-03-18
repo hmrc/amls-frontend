@@ -19,14 +19,14 @@ package views.businessactivities
 import forms.businessactivities.AccountantNonUKAddressFormProvider
 import models.Country
 import models.businessactivities.{NonUkAccountantsAddress, WhoIsYourAccountantIsUk, WhoIsYourAccountantName}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.{AmlsViewSpec, AutoCompleteServiceMocks}
 import views.Fixture
 import views.html.businessactivities.AccountantNonUKAddressView
 
 
-class AccountantNonUKAddressViewSpec extends AmlsViewSpec with MustMatchers with AutoCompleteServiceMocks {
+class AccountantNonUKAddressViewSpec extends AmlsViewSpec with Matchers with AutoCompleteServiceMocks {
 
   lazy val address = inject[AccountantNonUKAddressView]
   lazy val fp = inject[AccountantNonUKAddressFormProvider]

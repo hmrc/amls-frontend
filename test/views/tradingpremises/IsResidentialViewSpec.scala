@@ -19,13 +19,13 @@ package views.tradingpremises
 import forms.tradingpremises.IsResidentialFormProvider
 import models.Country
 import models.businesscustomer.Address
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tradingpremises.IsResidentialView
 
-class IsResidentialViewSpec extends AmlsViewSpec with MustMatchers {
+class IsResidentialViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val is_residential = inject[IsResidentialView]
   lazy val fp = inject[IsResidentialFormProvider]

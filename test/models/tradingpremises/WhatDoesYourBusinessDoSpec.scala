@@ -17,10 +17,11 @@
 package models.tradingpremises
 
 import models.businessmatching.BusinessActivity.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 
-class WhatDoesYourBusinessDoSpec extends WordSpec with MustMatchers{
+class WhatDoesYourBusinessDoSpec extends AnyWordSpec with Matchers {
   val model = WhatDoesYourBusinessDo(
     Set(
       BillPaymentServices,

@@ -18,12 +18,12 @@ package views.businessmatching.updateservice.remove
 
 import models.businessmatching.BusinessActivity.{AccountancyServices, MoneyServiceBusiness}
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.remove.NeedMoreInformationView
 
-class NeedMoreInformationViewSpec extends AmlsViewSpec with MustMatchers {
+class NeedMoreInformationViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val informationView = app.injector.instanceOf[NeedMoreInformationView]

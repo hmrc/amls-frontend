@@ -19,12 +19,12 @@ package views.tradingpremises
 import generators.tradingpremises.TradingPremisesGenerator
 import models.status.NotCompleted
 import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tradingpremises.YourTradingPremisesView
 
-class YourTradingPremisesViewSpec extends AmlsViewSpec with MustMatchers with TradingPremisesGenerator {
+class YourTradingPremisesViewSpec extends AmlsViewSpec with Matchers with TradingPremisesGenerator {
 
   trait ViewFixture extends Fixture {
     lazy val your_trading_premises = app.injector.instanceOf[YourTradingPremisesView]

@@ -19,8 +19,18 @@ package models
 import config.ApplicationConfig
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 
 class ReturnNameValuePairSpec extends PlaySpec with GuiceOneAppPerSuite {
+
+  override def fakeApplication(): Application = {
+    new GuiceApplicationBuilder()
+      .configure(
+        "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+      )
+      .build()
+  }
 
   "The ReturnLocation model" must {
     "correctly determine the absolute url based on the current request" when {

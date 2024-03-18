@@ -18,13 +18,13 @@ package views.responsiblepeople
 
 import forms.responsiblepeople.ContactDetailsFormProvider
 import models.responsiblepeople.ContactDetails
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.ContactDetailsView
 
-class ContactDetailsViewSpec extends AmlsViewSpec with MustMatchers {
+class ContactDetailsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val contact_details = inject[ContactDetailsView]
   lazy val fp = inject[ContactDetailsFormProvider]

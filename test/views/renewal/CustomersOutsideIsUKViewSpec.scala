@@ -18,12 +18,12 @@ package views.renewal
 
 import forms.renewal.CustomersOutsideIsUKFormProvider
 import models.renewal.CustomersOutsideIsUK
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.CustomersOutsideIsUKView
 
-class CustomersOutsideIsUKViewSpec extends AmlsViewSpec with MustMatchers  {
+class CustomersOutsideIsUKViewSpec extends AmlsViewSpec with Matchers  {
 
   trait ViewFixture extends Fixture
 

@@ -19,12 +19,12 @@ package views.businessmatching.updateservice.add
 import forms.businessmatching.updateservice.add.SelectActivitiesFormProvider
 import models.businessmatching.BusinessActivities
 import models.businessmatching.BusinessActivity._
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add.SelectActivitiesView
 
-class SelectActivitiesViewSpec extends AmlsViewSpec with MustMatchers {
+class SelectActivitiesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val select_activities = inject[SelectActivitiesView]
   lazy val fp = inject[SelectActivitiesFormProvider]

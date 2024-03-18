@@ -20,13 +20,13 @@ import forms.declaration.AddPersonFormProvider
 import models.businessmatching.BusinessType
 import models.declaration.AddPerson
 import models.declaration.release7.{ExternalAccountant, RoleWithinBusinessRelease7}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.AddPersonView
 
-class AddPersonViewSpec extends AmlsViewSpec with MustMatchers  {
+class AddPersonViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val personView = inject[AddPersonView]
   lazy val fp = inject[AddPersonFormProvider]

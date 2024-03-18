@@ -61,6 +61,9 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
+      .configure(
+        "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+      )
       .overrides(bind[ProgressService].to(progressService))
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .bindings(bind[RenewalService].to(renewalService))

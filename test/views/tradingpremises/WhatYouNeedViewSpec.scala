@@ -19,13 +19,13 @@ package views.tradingpremises
 import models.businessmatching.{BusinessActivities, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing, MoneyServiceBusiness}
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tradingpremises.WhatYouNeedView
 
-class WhatYouNeedViewSpec extends AmlsViewSpec with MustMatchers {
+class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val what_you_need = app.injector.instanceOf[WhatYouNeedView]
 

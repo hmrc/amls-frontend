@@ -17,13 +17,13 @@
 package views.responsiblepeople
 
 import forms.responsiblepeople.DateOfBirthFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.DateOfBirthView
 
-class DateOfBirthViewSpec extends AmlsViewSpec with MustMatchers {
+class DateOfBirthViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val date_of_birth = inject[DateOfBirthView]
   lazy val fp = inject[DateOfBirthFormProvider]

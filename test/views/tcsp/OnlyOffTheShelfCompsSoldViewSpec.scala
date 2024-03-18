@@ -17,13 +17,13 @@
 package views.tcsp
 
 import forms.tcsp.OnlyOffTheShelfCompsSoldFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tcsp.OnlyOffTheShelfCompsSoldView
 
-class OnlyOffTheShelfCompsSoldViewSpec extends AmlsViewSpec with MustMatchers {
+class OnlyOffTheShelfCompsSoldViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val only_off_the_shelf_comps_sold = inject[OnlyOffTheShelfCompsSoldView]
   lazy val fp = inject[OnlyOffTheShelfCompsSoldFormProvider]

@@ -17,11 +17,11 @@
 package models
 
 import generators.AmlsReferenceNumberGenerator
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class SubscriptionErrorResponseSpec extends PlaySpec with MustMatchers with AmlsReferenceNumberGenerator {
+class SubscriptionErrorResponseSpec extends PlaySpec with Matchers with AmlsReferenceNumberGenerator {
 
   "Deserializing" must {
     "produce the correct model" in {

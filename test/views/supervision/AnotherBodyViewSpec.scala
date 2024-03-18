@@ -18,14 +18,14 @@ package views.supervision
 
 import forms.supervision.AnotherBodyFormProvider
 import models.supervision.AnotherBodyYes
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.AnotherBodyView
 
-class AnotherBodyViewSpec extends AmlsViewSpec with MustMatchers  {
+class AnotherBodyViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val another_body = inject[AnotherBodyView]
   lazy val fp = inject[AnotherBodyFormProvider]

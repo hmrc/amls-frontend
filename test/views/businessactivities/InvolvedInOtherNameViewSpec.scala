@@ -17,7 +17,7 @@
 package views.businessactivities
 
 import forms.businessactivities.InvolvedInOtherFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.data.FormError
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
@@ -25,7 +25,7 @@ import views.Fixture
 import views.html.businessactivities.InvolvedInOtherNameView
 
 
-class InvolvedInOtherNameViewSpec extends AmlsViewSpec with MustMatchers {
+class InvolvedInOtherNameViewSpec extends AmlsViewSpec with Matchers {
 
 
   lazy val name = inject[InvolvedInOtherNameView]

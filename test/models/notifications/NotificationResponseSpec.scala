@@ -17,11 +17,11 @@
 package models.notifications
 
 import org.joda.time.LocalDateTime
-import org.scalatest.WordSpec
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 
-class NotificationResponseSpec extends WordSpec with MustMatchers {
+class NotificationResponseSpec extends AnyWordSpec with Matchers {
   private val testProcessingDate = new LocalDateTime(2001, 12, 17, 9, 30, 47)
 
   val notificationJson = Json.obj(

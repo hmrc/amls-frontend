@@ -19,12 +19,12 @@ package views.confirmation
 import config.ApplicationConfig
 import models.confirmation.Currency
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.confirmation.ConfirmationNewView
 
-class ConfirmationNewViewSpec extends AmlsViewSpec with MustMatchers {
+class ConfirmationNewViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val newView = app.injector.instanceOf[ConfirmationNewView]

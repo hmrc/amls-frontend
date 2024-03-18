@@ -17,13 +17,13 @@
 package views.tradingpremises
 
 import forms.tradingpremises.TradingAddressFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tradingpremises.WhereAreTradingPremisesView
 
-class WhereAreTradingPremisesViewSpec extends AmlsViewSpec with MustMatchers {
+class WhereAreTradingPremisesViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val where_are_trading_premises = inject[WhereAreTradingPremisesView]
   lazy val fp = inject[TradingAddressFormProvider]

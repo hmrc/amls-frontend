@@ -18,13 +18,13 @@ package views.msb
 
 import forms.msb.ExpectedThroughputFormProvider
 import models.moneyservicebusiness.ExpectedThroughput.First
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.msb.ExpectedThroughputView
 
-class ExpectedThroughputViewSpec extends AmlsViewSpec with MustMatchers {
+class ExpectedThroughputViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val throughputView = inject[ExpectedThroughputView]
   lazy val fp = inject[ExpectedThroughputFormProvider]

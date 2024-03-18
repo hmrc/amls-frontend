@@ -16,14 +16,15 @@
 
 package models.renewal
 
-import models.{Country, SubscriptionRequest}
 import models.businessactivities.BusinessActivities
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Conversions._
-import org.scalatest.{MustMatchers, WordSpec}
+import models.{Country, SubscriptionRequest}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ConversionsSpec extends WordSpec with MustMatchers {
+class ConversionsSpec extends AnyWordSpec with Matchers {
 
   trait Fixture {
     val businessActivities = BusinessActivities()

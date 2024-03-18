@@ -18,12 +18,12 @@ package views.renewal
 
 import forms.renewal.MoneySourcesFormProvider
 import models.renewal.MoneySources
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.MoneySourcesView
 
-class MoneySourcesViewSpec extends AmlsViewSpec with MustMatchers {
+class MoneySourcesViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture
 

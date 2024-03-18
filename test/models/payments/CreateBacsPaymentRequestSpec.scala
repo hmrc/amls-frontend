@@ -17,11 +17,11 @@
 package models.payments
 
 import generators.PaymentGenerator
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
 
-class CreateBacsPaymentRequestSpec extends PlaySpec with MustMatchers with PaymentGenerator {
+class CreateBacsPaymentRequestSpec extends PlaySpec with Matchers with PaymentGenerator {
 
   "CreateBacsPaymentRequest" must {
 

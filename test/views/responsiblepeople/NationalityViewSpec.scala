@@ -17,14 +17,14 @@
 package views.responsiblepeople
 
 import forms.responsiblepeople.NationalityFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.NationalityView
 
-class NationalityViewSpec extends AmlsViewSpec with MustMatchers {
+class NationalityViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val nationality = inject[NationalityView]
   lazy val fp = inject[NationalityFormProvider]

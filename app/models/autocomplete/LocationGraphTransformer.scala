@@ -49,6 +49,6 @@ class LocationGraphTransformer @Inject()(jsonLoader: LocationGraphJsonLoader) {
       }
     }
 
-    filtered map { f => Json.obj(f:_*) }
+    filtered map { f => Json.obj(f.toSeq:_*) }
   }
 }

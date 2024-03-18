@@ -18,14 +18,14 @@ package views.businessactivities
 
 import forms.businessactivities.AccountantForAMLSRegulationsFormProvider
 import models.businessactivities.AccountantForAMLSRegulations
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessactivities.AccountantForAMLSRegulationsView
 
-class AccountantForAMLSRegulationsViewSpec extends AmlsViewSpec with MustMatchers  {
+class AccountantForAMLSRegulationsViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val accountant: AccountantForAMLSRegulationsView = inject[AccountantForAMLSRegulationsView]
   lazy val formProvider: AccountantForAMLSRegulationsFormProvider = inject[AccountantForAMLSRegulationsFormProvider]

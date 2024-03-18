@@ -19,7 +19,7 @@ package views.businessdetails
 import forms.businessdetails.CorrespondenceAddressNonUKFormProvider
 import models.Country
 import models.businessdetails.CorrespondenceAddressNonUk
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 import utils.AmlsViewSpec
@@ -27,7 +27,7 @@ import views.Fixture
 import views.html.businessdetails.CorrespondenceAddressNonUKView
 
 
-class CorrespondenceAddressNonUKViewSpec extends AmlsViewSpec with MustMatchers  {
+class CorrespondenceAddressNonUKViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val correspondence_address_non_uk = app.injector.instanceOf[CorrespondenceAddressNonUKView]
   lazy val formProvider = app.injector.instanceOf[CorrespondenceAddressNonUKFormProvider]

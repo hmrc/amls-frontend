@@ -28,7 +28,7 @@ import utils.businessdetails.CheckYourAnswersHelper
 import views.Fixture
 import views.html.businessdetails.CheckYourAnswersView
 
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters._
 
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks with Injecting {
 
@@ -77,8 +77,8 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
 
       def view = summary(list)
 
-      doc.getElementsByClass("govuk-summary-list__key").toSeq.zip(
-        doc.getElementsByClass("govuk-summary-list__value").toSeq
+      doc.getElementsByClass("govuk-summary-list__key").asScala.zip(
+        doc.getElementsByClass("govuk-summary-list__value").asScala
       ).foreach { case (key, value) =>
 
         val maybeRow = list.rows.find(_.key.content.asHtml.body == key.text()).value

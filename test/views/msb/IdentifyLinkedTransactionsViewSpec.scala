@@ -18,13 +18,13 @@ package views.msb
 
 import forms.msb.IdentifyLinkedTransactionsFormProvider
 import models.moneyservicebusiness.IdentifyLinkedTransactions
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.msb.IdentifyLinkedTransactionsView
 
-class IdentifyLinkedTransactionsViewSpec extends AmlsViewSpec with MustMatchers {
+class IdentifyLinkedTransactionsViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val transactionsView = inject[IdentifyLinkedTransactionsView]
   lazy val fp = inject[IdentifyLinkedTransactionsFormProvider]

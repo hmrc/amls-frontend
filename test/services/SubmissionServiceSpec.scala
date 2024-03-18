@@ -47,7 +47,6 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 import utils.{AmlsSpec, DependencyMocks}
 
-import scala.collection.Seq
 import scala.concurrent.Future
 
 class SubmissionServiceSpec extends AmlsSpec
@@ -56,7 +55,11 @@ class SubmissionServiceSpec extends AmlsSpec
   with ResponsiblePersonGenerator
   with TradingPremisesGenerator {
 
-  override lazy val app = GuiceApplicationBuilder().build()
+  override lazy val app = GuiceApplicationBuilder()
+    .configure(
+      "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+    )
+    .build()
 
   trait Fixture extends DependencyMocks {
 

@@ -16,11 +16,11 @@
 
 package models.renewal
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class TotalThroughputSpec extends PlaySpec with MustMatchers {
+class TotalThroughputSpec extends PlaySpec with Matchers {
 
   "The MsbThroughput model" must {
 

@@ -22,7 +22,7 @@ import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching._
 import org.jsoup.nodes.Element
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.AmlsViewSpec
@@ -30,9 +30,9 @@ import utils.businessmatching.CheckYourAnswersHelper
 import views.Fixture
 import views.html.businessmatching.CheckYourAnswersView
 
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters._
 
-class CheckYourAnswersViewSpec extends AmlsViewSpec with MustMatchers with TableDrivenPropertyChecks {
+class CheckYourAnswersViewSpec extends AmlsViewSpec with Matchers with TableDrivenPropertyChecks {
 
   trait ViewFixture extends Fixture {
     lazy val checkYourAnswersView = app.injector.instanceOf[CheckYourAnswersView]
@@ -71,7 +71,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with MustMatchers with Table
     }
 
     def checkListContainsItems(parent:Element, keysToFind:Set[String]) = {
-      val texts = parent.select("li").toSet.map((el:Element) => el.text())
+      val texts = parent.select("li").asScala.map((el:Element) => el.text())
       texts must be (keysToFind.map(k => messages(k)))
       true
     }
@@ -131,7 +131,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with MustMatchers with Table
       html must not include messages("button.logout")
       html must include(messages("businessmatching.button.confirm.start"))
 
-      val sections = doc.getElementsByTag("section").zipWithIndex
+      val sections = doc.getElementsByTag("section").asScala.zipWithIndex
 
       for((section, index) <- sections) {
         val (key, check, editLink) = sectionChecks(index)
@@ -181,7 +181,7 @@ class CheckYourAnswersViewSpec extends AmlsViewSpec with MustMatchers with Table
 
       html must include(messages("button.logout"))
       html must not include messages("businessmatching.button.confirm.start")
-      val sections = doc.getElementsByTag("section").zipWithIndex
+      val sections = doc.getElementsByTag("section").asScala.zipWithIndex
 
       for((section, index) <- sections) {
         val (key, check, editLink) = sectionChecks(index)

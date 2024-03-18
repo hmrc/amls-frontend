@@ -17,14 +17,14 @@
 package views.responsiblepeople
 
 import forms.responsiblepeople.CountryOfBirthFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.CountryOfBirthView
 
-class CountryOfBirthViewSpec extends AmlsViewSpec with MustMatchers {
+class CountryOfBirthViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val country_of_birth = inject[CountryOfBirthView]
   lazy val fp = inject[CountryOfBirthFormProvider]

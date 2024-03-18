@@ -19,9 +19,9 @@ package services.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import models.asp.Asp
-import models.businessmatching._
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, TransmittingMoney}
+import models.businessmatching._
 import models.businessmatching.updateservice.UpdateService
 import models.eab.Eab
 import models.hvd.Hvd
@@ -29,8 +29,8 @@ import models.moneyservicebusiness.{MoneyServiceBusiness => MsbModel}
 import models.tcsp.Tcsp
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
@@ -40,7 +40,7 @@ import utils.{DependencyMocks, FutureAssertions}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with ScalaFutures with FutureAssertions {
+class ServiceFlowSpec extends PlaySpec with Matchers with MockitoSugar with ScalaFutures with FutureAssertions {
 
   trait Fixture extends DependencyMocks {
 

@@ -17,12 +17,12 @@
 package views.businessmatching.updateservice.add
 
 import forms.businessmatching.updateservice.add.AddMoreActivitiesFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add.AddMoreActivitiesView
 
-class AddMoreActivitiesViewSpec extends AmlsViewSpec with MustMatchers  {
+class AddMoreActivitiesViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val activitiesView = app.injector.instanceOf[AddMoreActivitiesView]
   lazy val fp = app.injector.instanceOf[AddMoreActivitiesFormProvider]

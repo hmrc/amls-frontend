@@ -16,13 +16,13 @@
 
 package views.bankdetails
 
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.bankdetails.RemoveBankDetailsView
 
-class RemoveBankDetailsViewSpec extends AmlsViewSpec with MustMatchers  {
+class RemoveBankDetailsViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val removeBankDetails = inject[RemoveBankDetailsView]
 

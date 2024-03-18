@@ -18,13 +18,13 @@ package views.responsiblepeople
 
 import forms.responsiblepeople.VATRegisteredFormProvider
 import models.responsiblepeople.{VATRegisteredNo, VATRegisteredYes}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.VATRegisteredView
 
-class VATRegisteredViewSpec extends AmlsViewSpec with MustMatchers {
+class VATRegisteredViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val vat_registered = inject[VATRegisteredView]
   lazy val fp = inject[VATRegisteredFormProvider]

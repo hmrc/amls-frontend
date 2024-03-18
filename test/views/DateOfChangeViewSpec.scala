@@ -19,12 +19,12 @@ package views
 import forms.DateOfChangeFormProvider
 import models.DateOfChange
 import org.joda.time.LocalDate
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.html.DateOfChangeView
 
-class DateOfChangeViewSpec extends AmlsViewSpec with MustMatchers {
+class DateOfChangeViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val date_of_change = inject[DateOfChangeView]
   lazy val fp = inject[DateOfChangeFormProvider]

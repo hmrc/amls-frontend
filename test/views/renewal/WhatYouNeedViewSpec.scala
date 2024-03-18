@@ -19,12 +19,12 @@ package views.renewal
 import models.businessmatching.{BusinessActivities, BusinessMatchingMsbServices}
 import models.businessmatching.BusinessActivity.{AccountancyServices, ArtMarketParticipant, HighValueDealing, MoneyServiceBusiness}
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.WhatYouNeedView
 
-class WhatYouNeedViewSpec extends AmlsViewSpec with MustMatchers {
+class WhatYouNeedViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val what_you_need = inject[WhatYouNeedView]
   implicit val requestWithToken = addTokenForView()

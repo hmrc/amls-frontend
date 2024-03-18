@@ -18,12 +18,12 @@ package views.renewal
 
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import org.joda.time.LocalDate
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.renewal.components.ApplicationSubmitView
 
-class ApplicationSubmitViewSpec extends AmlsViewSpec with MustMatchers {
+class ApplicationSubmitViewSpec extends AmlsViewSpec with Matchers {
 
   trait ViewFixture extends Fixture {
     lazy val applicationSubmit = inject[ApplicationSubmitView]

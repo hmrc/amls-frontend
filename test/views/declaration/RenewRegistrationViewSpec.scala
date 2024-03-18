@@ -18,14 +18,14 @@ package views.declaration
 
 import forms.declaration.RenewRegistrationFormProvider
 import org.joda.time.LocalDate
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.declaration.RenewRegistrationView
 
-class RenewRegistrationViewSpec extends AmlsViewSpec with MustMatchers {
+class RenewRegistrationViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val renewView: RenewRegistrationView = inject[RenewRegistrationView]
   lazy val fp: RenewRegistrationFormProvider = inject[RenewRegistrationFormProvider]

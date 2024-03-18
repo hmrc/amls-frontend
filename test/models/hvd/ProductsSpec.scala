@@ -20,9 +20,19 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import models.hvd.Products._
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 
 class ProductsSpec extends PlaySpec with MockitoSugar with GuiceOneAppPerTest {
+
+  override def fakeApplication(): Application = {
+    new GuiceApplicationBuilder()
+      .configure(
+        "play.filters.disabled" -> List("uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCryptoFilter")
+      )
+      .build()
+  }
 
   "Products" must {
     "sort itemtypes alphabetically" when {

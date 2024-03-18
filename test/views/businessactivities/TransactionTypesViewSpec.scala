@@ -19,12 +19,12 @@ package views.businessactivities
 import forms.businessactivities.TransactionTypesFormProvider
 import models.businessactivities.TransactionTypes.{DigitalSoftware, Paper}
 import models.businessactivities.{TransactionType, TransactionTypes}
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.html.businessactivities.TransactionTypesView
 
-class TransactionTypesViewSpec extends AmlsViewSpec with MustMatchers {
+class TransactionTypesViewSpec extends AmlsViewSpec with Matchers {
 
   import views.Fixture
 

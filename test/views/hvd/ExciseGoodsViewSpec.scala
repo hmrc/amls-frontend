@@ -18,13 +18,13 @@ package views.hvd
 
 import forms.hvd.ExciseGoodsFormProvider
 import models.hvd.ExciseGoods
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.hvd.ExciseGoodsView
 
-class ExciseGoodsViewSpec extends AmlsViewSpec with MustMatchers  {
+class ExciseGoodsViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val excise_goods = inject[ExciseGoodsView]
   lazy val fp =inject[ExciseGoodsFormProvider]

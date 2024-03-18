@@ -19,14 +19,14 @@ package views.hvd
 import forms.hvd.CashPaymentFirstDateFormProvider
 import models.hvd.CashPaymentFirstDate
 import org.joda.time.LocalDate
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.hvd.CashPaymentFirstDateView
 
-class CashPaymentFirstDateViewSpec extends AmlsViewSpec with MustMatchers  {
+class CashPaymentFirstDateViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val dateView = app.injector.instanceOf[CashPaymentFirstDateView]
   lazy val fp = app.injector.instanceOf[CashPaymentFirstDateFormProvider]

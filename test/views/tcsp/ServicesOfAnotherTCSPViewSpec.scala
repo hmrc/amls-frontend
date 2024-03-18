@@ -17,14 +17,14 @@
 package views.tcsp
 
 import forms.tcsp.ServicesOfAnotherTCSPFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.tcsp.ServicesOfAnotherTCSPView
 
-class ServicesOfAnotherTCSPViewSpec extends AmlsViewSpec with MustMatchers {
+class ServicesOfAnotherTCSPViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val services_of_another_tcsp = inject[ServicesOfAnotherTCSPView]
   lazy val fp = inject[ServicesOfAnotherTCSPFormProvider]

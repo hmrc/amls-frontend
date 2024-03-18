@@ -17,12 +17,12 @@
 package views.deregister
 
 import generators.AmlsReferenceNumberGenerator
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.deregister.DeregisterApplicationView
 
-class DeregisterApplicationViewSpec extends AmlsViewSpec with MustMatchers with AmlsReferenceNumberGenerator {
+class DeregisterApplicationViewSpec extends AmlsViewSpec with Matchers with AmlsReferenceNumberGenerator {
 
   trait ViewFixture extends Fixture {
     lazy val deregisterView = inject[DeregisterApplicationView]

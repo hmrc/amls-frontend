@@ -17,13 +17,13 @@
 package views.supervision
 
 import forms.supervision.SupervisionEndReasonsFormProvider
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.supervision.SupervisionEndReasonsView
 
-class SupervisionEndReasonsViewSpec extends AmlsViewSpec with MustMatchers  {
+class SupervisionEndReasonsViewSpec extends AmlsViewSpec with Matchers  {
 
   lazy val supervision_end_reasons = inject[SupervisionEndReasonsView]
   lazy val fp = inject[SupervisionEndReasonsFormProvider]

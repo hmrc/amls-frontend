@@ -19,13 +19,13 @@ package views.responsiblepeople
 import forms.responsiblepeople.PositionWithinBusinessStartDateFormProvider
 import models.businessmatching.BusinessType
 import models.responsiblepeople._
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must.Matchers
 import play.api.test.FakeRequest
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.responsiblepeople.PositionWithinBusinessStartDateView
 
-class PositionWithinBusinessStartDateViewSpec extends AmlsViewSpec with MustMatchers {
+class PositionWithinBusinessStartDateViewSpec extends AmlsViewSpec with Matchers {
 
   lazy val dateView = inject[PositionWithinBusinessStartDateView]
   lazy val fp = inject[PositionWithinBusinessStartDateFormProvider]
