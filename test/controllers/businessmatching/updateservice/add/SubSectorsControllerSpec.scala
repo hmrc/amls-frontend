@@ -280,7 +280,7 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
         "update returns None" in new Fixture {
 
-          when(mockCacheConnector.update[AddBusinessTypeFlowModel](any(), any())(any())(any(), any()))
+          when(mockCacheConnector.update[AddBusinessTypeFlowModel](any(), any())(any())(any()))
             .thenReturn(Future.successful(None))
 
           val newRequest = FakeRequest(POST, routes.SubSectorsController.post().url).withFormUrlEncodedBody(

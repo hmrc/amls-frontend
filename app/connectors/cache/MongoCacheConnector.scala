@@ -16,12 +16,12 @@
 
 package connectors.cache
 
-import javax.inject.Inject
 import play.api.libs.json.Format
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)(implicit val ec: ExecutionContext) extends Conversions {
@@ -31,33 +31,28 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
   /**
     * Fetches the data item with the specified key from the mongo store
     */
-  def fetch[T](credId: String, key: String)(implicit hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
+  def fetch[T](credId: String, key: String)(implicit formats: Format[T]): Future[Option[T]] =
     mongoCache.find(credId, key)
 
   /**
     * Saves the data item in the mongo store with the specified key
     */
-  def save[T](credId: String, key: String, data: T)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
+  def save[T](credId: String, key: String, data: T)(implicit format: Format[T]): Future[CacheMap] = {
     mongoCache.createOrUpdate(credId, data, key).map(toCacheMap)
   }
 
   /**
     * Saves the data item in the in-memory cache with the specified key
     */
-  def upsertNewAuth[T](targetCache: CacheMap, key: String, data: T)
-               (implicit hc: HeaderCarrier, format: Format[T]): CacheMap =
+  def upsertNewAuth[T](targetCache: CacheMap, key: String, data: T)(implicit format: Format[T]): CacheMap = {
     mongoCache.upsert(targetCache, data, key)
+  }
 
   /**
     * Fetches the entire cache from the mongo store
     */
-  private def fetchAllByCredId(credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
-    mongoCache.fetchAll(Some(credId)).map { optCache =>
-      optCache.map { cacheMap =>
-        val map = toCacheMap(cacheMap)
-        map
-      }
-    }
+  private def fetchAllByCredId(credId: String): Future[Option[CacheMap]] = {
+    mongoCache.fetchAll(Some(credId)).map(_.map(toCacheMap))
   }
 
   def fetchAll[T](credId: String)(implicit hc: HeaderCarrier): Future[Option[CacheMap]] = {
@@ -68,16 +63,16 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
     * Fetches the entire cache from the mongo store and returns an empty cache where not exists
     */
 
-  def fetchAllWithDefault(credId: String)(implicit hc: HeaderCarrier): Future[CacheMap] = {
+  def fetchAllWithDefault(credId: String): Future[CacheMap] = {
     mongoCache.fetchAllWithDefault(credId).map(toCacheMap)
   }
 
-  def remove(cacheId: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
-        mongoCache.removeById(cacheId)
+  def remove(cacheId: String): Future[Boolean] = {
+    mongoCache.removeById(cacheId)
   }
 
-  def removeByKey[T](credId: String, key: String)(implicit hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
-        mongoCache.removeByKey(credId, key).map(toCacheMap)
+  def removeByKey[T](credId: String, key: String)(implicit format: Format[T]): Future[CacheMap] =
+    mongoCache.removeByKey(credId, key).map(toCacheMap)
 
 
   def saveAll(credId: String, cacheMap: Future[CacheMap]): Future[CacheMap] = {
@@ -93,8 +88,8 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
     * @return The model after it has been transformed
     */
   def update[T](credId: String, key: String)(f: Option[T] => T)(implicit fmt: Format[T]): Future[Option[T]] =
-      mongoCache.find[T](credId, key) flatMap { maybeModel =>
-        val transformed = f(maybeModel)
-        mongoCache.createOrUpdate(credId, transformed, key) map { _ => Some(transformed) }
-      }
+    mongoCache.find[T](credId, key) flatMap { maybeModel =>
+      val transformed = f(maybeModel)
+      mongoCache.createOrUpdate(credId, transformed, key) map { _ => Some(transformed) }
+    }
 }

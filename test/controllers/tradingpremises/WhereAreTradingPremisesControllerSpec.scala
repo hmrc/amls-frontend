@@ -90,7 +90,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         val yourTradingPremises = YourTradingPremises(tradingName = "trading Name", address, Some(true), Some(LocalDate.now()))
         val tradingPremises = TradingPremises(None, Some(yourTradingPremises), None, None)
 
-        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
         val result = controller.get(recordId1, true)(request)
@@ -104,7 +104,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
       "respond with OK and show the empty form when there is no data" in new Fixture {
 
-        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
         val result = controller.get(recordId1, false)(request)
@@ -116,7 +116,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       "respond with NOT_FOUND when there is no data at all at the given index" in new Fixture {
 
         when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
-          (any(), any())).thenReturn(Future.successful(None))
+          (any())).thenReturn(Future.successful(None))
 
         val result = controller.get(recordId1, false)(request)
 
@@ -150,13 +150,13 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
             "postCode" -> "AA1 1AA"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(ytp))))))
 
           val updatedYtp = ytp.copy(tradingName = "Trading Name", tradingPremisesAddress = Address("Address 1", Some("Address 2"), None, None, "AA1 1AA"))
 
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(),
-            meq(Seq(TradingPremises(yourTradingPremises = Some(updatedYtp), hasChanged = true))))(any(), any()))
+            meq(Seq(TradingPremises(yourTradingPremises = Some(updatedYtp), hasChanged = true))))(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(recordId1, false)(newRequest)
@@ -187,10 +187,10 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
             "postCode" -> "AA1 1AA"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(recordId1, false)(newRequest)
@@ -211,10 +211,10 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           val newYtp = Some(YourTradingPremises(tradingName = "Trading Name",
             tradingPremisesAddress = Address("Address 1", Some("Address 2"), None, None, "AA1 1AA")))
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), meq(Seq(TradingPremises(yourTradingPremises = newYtp,  hasChanged = true))))(any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), meq(Seq(TradingPremises(yourTradingPremises = newYtp,  hasChanged = true))))(any()))
             .thenReturn(Future.successful(emptyCache))
 
 
@@ -237,10 +237,10 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
           val oldAddress = Address("Old address 1", Some("Old address 2"), None, None, "Test")
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(YourTradingPremises("Test", oldAddress)))))))
 
-          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(recordId1, true)(newRequest)
@@ -269,10 +269,10 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           .withFormUrlEncodedBody(
             "tradingName" -> "Trading Name"
           )
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(recordId1, true)(newRequest)
@@ -291,10 +291,10 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
             "postCode" -> "AA1 1AA"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(recordId1, false)(newRequest)
@@ -316,10 +316,10 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
             "postCode" -> "AA1 1AA"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
 
@@ -339,10 +339,10 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           "postCode" -> "AA1 1AA"
         )
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse))))
 
-        when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(1)(newRequest)
@@ -356,7 +356,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           meq(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse.copy(
             hasChanged = true,
             yourTradingPremises = Some(YourTradingPremises("Trading Name", TradingPremisesSection.address, Some(true), Some(TradingPremisesSection.date)))
-          ))))(any(), any())
+          ))))(any())
       }
     }
   }
@@ -375,10 +375,10 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       val address = Address("addressLine1", Some("addressLine2"), None, None, "AA1 1AA")
       val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = Some(true), Some(LocalDate.now()))
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises), lineId = Some(1))))))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
@@ -405,10 +405,10 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       val address = Address("addressLine1", Some("addressLine2"), None, None, "AA1 1AA")
       val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = Some(true), Some(LocalDate.now()))
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises), lineId = Some(1))))))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
@@ -436,10 +436,10 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name", address, Some(true), Some(new LocalDate(2007, 2, 1)))
 
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises))))))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(),any(),  any())(any(), any()))
+      when(controller.dataCacheConnector.save[TradingPremises](any(),any(),  any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
 
@@ -466,10 +466,10 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       val address = Address("Address 1", Some("Address 2"), None, None, "AA1 1AA")
       val yourTradingPremises = YourTradingPremises(tradingName = "Trading Name 2", address, isResidential = Some(true), Some(new LocalDate(2007, 2, 1)))
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = Some(yourTradingPremises), lineId = None)))))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
@@ -507,10 +507,10 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         tradingPremisesAddress = address
       )
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(premises))))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), meq(TradingPremises.key), any[TradingPremises])(any(), any())).
+      when(controller.dataCacheConnector.save[TradingPremises](any(), meq(TradingPremises.key), any[TradingPremises])(any())).
         thenReturn(Future.successful(mock[CacheMap]))
 
       val result = controller.saveDateOfChange(1)(postRequest)
@@ -519,7 +519,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
       val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
-      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(TradingPremises.key), captor.capture())(any(), any())
+      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(TradingPremises.key), captor.capture())(any())
 
       captor.getValue.head.yourTradingPremises match {
         case Some(result: YourTradingPremises) => result must be(expectedResult)
@@ -542,7 +542,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           "dateOfChange.year" -> "foo"
         )
 
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any(), any())) thenReturn Future.successful(Some(Seq(tp)))
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any())) thenReturn Future.successful(Some(Seq(tp)))
 
       val result = controller.saveDateOfChange(1)(postRequest)
 
@@ -565,7 +565,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
         "dateOfChange.year" -> LocalDate.now.plusYears(1).getYear.toString
       )
 
-      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any(), any())) thenReturn Future.successful(Some(Seq(tp)))
+      when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any())) thenReturn Future.successful(Some(Seq(tp)))
 
       val result = controller.saveDateOfChange(1)(postRequest)
 
@@ -588,7 +588,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
     val yourPremises = YourTradingPremises("Some name", mock[Address], isResidential = Some(true), Some(date), None)
     val premises = TradingPremises(yourTradingPremises = Some(yourPremises))
 
-    when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+    when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
       .thenReturn(Future.successful(Some(Seq(premises))))
 
     val result = controller.saveDateOfChange(1)(postRequest)

@@ -24,7 +24,7 @@ import play.api.data.Forms.{mapping, seq}
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 
 import javax.inject.Inject
-import scala.collection.convert.ImplicitConversions.`collection asJava`
+import scala.jdk.CollectionConverters._
 
 class MoneySourcesFormProvider @Inject()() extends Mappings {
 
@@ -40,7 +40,7 @@ class MoneySourcesFormProvider @Inject()() extends Mappings {
       "moneySources" -> seq(enumerable[MoneySource](emptyError, emptyError)(MoneySources.enumerable))
         .verifying(nonEmptySeq(emptyError)),
       "bankNames" -> mandatoryIf(
-        _.values.contains(Banks.toString),
+        _.values.asJavaCollection.contains(Banks.toString),
         text(s"$emptyTextPrefix.bankNames").verifying(
           firstError(
             maxLength(length, s"$maxLengthTextPrefix.bankNames"),
@@ -49,7 +49,7 @@ class MoneySourcesFormProvider @Inject()() extends Mappings {
         )
       ),
       "wholesalerNames" -> mandatoryIf(
-        _.values.contains(Wholesalers.toString),
+        _.values.asJavaCollection.contains(Wholesalers.toString),
         text(s"$emptyTextPrefix.wholesalerNames").verifying(
           firstError(
             maxLength(length, s"$maxLengthTextPrefix.wholesaler"),

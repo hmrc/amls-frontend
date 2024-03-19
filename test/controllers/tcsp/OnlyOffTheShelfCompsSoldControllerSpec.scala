@@ -61,10 +61,10 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
       hasAccepted = true
     )
 
-    when(cache.fetch[Tcsp](any(), any())(any(), any()))
+    when(cache.fetch[Tcsp](any(), any())(any()))
       .thenReturn(Future.successful(Some(tcsp)))
 
-    when(cache.save[Tcsp](any(), any(), any())(any(), any()))
+    when(cache.save[Tcsp](any(), any(), any())(any()))
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
 
@@ -129,14 +129,14 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
               hasChanged = true
             )
 
-            when(cache.fetch[Tcsp](any(), any())(any(), any()))
+            when(cache.fetch[Tcsp](any(), any())(any()))
               .thenReturn(Future.successful(Some(companyFormationAgentTcsp)))
 
             val result = controller.post()(FakeRequest(POST, routes.OnlyOffTheShelfCompsSoldController.post().url)
             .withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
 
             status(result) mustBe SEE_OTHER
-            verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
+            verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any())
             redirectLocation(result) mustBe Some(controllers.tcsp.routes.ComplexCorpStructureCreationController.get().url)
           }
         }
@@ -162,7 +162,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
               .withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "true"))
 
               status(result) mustBe SEE_OTHER
-              verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
+              verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get.url)
             }
           }
@@ -186,7 +186,7 @@ class OnlyOffTheShelfCompsSoldControllerSpec extends AmlsSpec with MockitoSugar 
               val result = controller.post(false)(FakeRequest(POST, routes.OnlyOffTheShelfCompsSoldController.post().url)
               .withFormUrlEncodedBody("onlyOffTheShelfCompsSold" -> "false"))
               status(result) mustBe SEE_OTHER
-              verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
+              verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get.url)
             }
           }

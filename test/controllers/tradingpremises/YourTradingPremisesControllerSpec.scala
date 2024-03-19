@@ -172,10 +172,10 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
 
         val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
 
-        when(ytpController.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(ytpController.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel), hasAccepted = true)))))
 
-        when(ytpController.dataCacheConnector.save[Seq[TradingPremises]](any(),any(), any())(any(), any()))
+        when(ytpController.dataCacheConnector.save[Seq[TradingPremises]](any(),any(), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = ytpController.post()(newRequest)

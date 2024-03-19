@@ -51,7 +51,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     "get" must {
       "redirect to InvolvedInOtherController" when {
         "creating a new submission" in new Fixture {
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))))
 
           mockApplicationStatus(SubmissionReadyForReview)
@@ -65,7 +65,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         }
 
         "performing a variation" in new Fixture {
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))))
 
           mockApplicationStatus(SubmissionDecisionApproved)
@@ -79,7 +79,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         }
 
         "in a renewal pending status" in new Fixture {
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))))
 
           mockApplicationStatus(ReadyForRenewal(None))
@@ -93,7 +93,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         }
 
         "in a renewal submitted status" in new Fixture {
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(AccountancyServices))), None, None, None, None))))
 
           mockApplicationStatus(RenewalSubmitted(None))
@@ -108,7 +108,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       }
 
       "throw an error when data cannot be fetched" in new Fixture {
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(None))
           mockApplicationStatus(SubmissionReadyForReview)
 

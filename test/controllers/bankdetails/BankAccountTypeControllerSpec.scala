@@ -253,7 +253,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar with Inje
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
 
-          when(mockCacheConnector.save[Seq[BankDetails]](any(), any(), any())(any(), any())
+          when(mockCacheConnector.save[Seq[BankDetails]](any(), any(), any())(any())
           ).thenThrow(new IndexOutOfBoundsException("error"))
 
           val result = controller.post(1, false)(newRequest)

@@ -71,7 +71,7 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
 
       "display the the Does your business use the services of another Trust or Company Service Provider page with pre populated data" in new Fixture {
         when(controller.dataCacheConnector.fetch[Asp](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes)))))
+          (any())).thenReturn(Future.successful(Some(Asp(otherBusinessTaxMatters = Some(OtherBusinessTaxMattersYes)))))
 
         val result = controller.get()(request)
         status(result) must be(OK)

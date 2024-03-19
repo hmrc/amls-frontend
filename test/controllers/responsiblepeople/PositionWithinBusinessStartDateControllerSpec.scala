@@ -192,7 +192,7 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
               .thenReturn (Some (mockBusinessMatching) )
             when (controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
              .thenReturn (Future.successful (Some (mockCacheMap) ) )
-            when (controller.dataCacheConnector.save[Seq[ResponsiblePerson]] (any(), any(), any()) (any(), any()))
+            when (controller.dataCacheConnector.save[Seq[ResponsiblePerson]] (any(), any(), any()) (any()))
               .thenReturn (Future.successful (mockCacheMap) )
 
             val result = controller.post (RecordId) (newRequest)
@@ -252,12 +252,12 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
             "startDate.month" -> "2",
             "startDate.year" -> "1990")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
 
           val mockCacheMap = mock[CacheMap]
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(RecordId)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -274,9 +274,9 @@ class PositionWithinBusinessStartDateControllerSpec extends AmlsSpec with Mockit
             "startDate.year" -> "1990")
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-            (any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
+            (any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
           val mockCacheMap = mock[CacheMap]
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())).thenReturn(Future.successful(mockCacheMap))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(RecordId, true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)

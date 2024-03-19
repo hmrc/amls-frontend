@@ -62,7 +62,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       mockApplicationStatus(NotCompleted)
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -74,7 +74,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       mockApplicationStatus(NotCompleted)
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(
+        (any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(
         transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963"))))))
 
       val result = controller.get()(request)
@@ -88,7 +88,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
         mockApplicationStatus(SubmissionDecisionApproved)
 
         when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-          (any(), any())).thenReturn(Future.successful(None))
+          (any())).thenReturn(Future.successful(None))
 
         mockIsNewActivityNewAuth(true, Some(MoneyServiceBusinessActivity))
 
@@ -106,10 +106,10 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -125,10 +125,10 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -153,10 +153,10 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))
-        (any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+        (any())).thenReturn(Future.successful(Some(incomingModel)))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -179,10 +179,10 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))
-        (any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+        (any())).thenReturn(Future.successful(Some(incomingModel)))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

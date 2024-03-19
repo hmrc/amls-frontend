@@ -99,7 +99,7 @@ case class Eab(data: JsObject = Json.obj(),
     }
   }
 
-  def services = {
+  def services: Option[List[String]] = {
     get[List[String]](Eab.eabServicesProvided)
   }
 }
@@ -182,8 +182,8 @@ object Eab {
 
   implicit lazy val reads: Reads[Eab] = {
 
-    val servicesTransform = (__ \ 'data ++ eabServicesProvided).json.copyFrom(
-      (__ \ 'services).json.pick.map {
+    val servicesTransform = (__ \ Symbol("data") ++ eabServicesProvided).json.copyFrom(
+      (__ \ Symbol("services")).json.pick.map {
         case JsArray(values) => JsArray(values.map {
           case JsString("01") => JsString("residential")
           case JsString("02") => JsString("commercial")
@@ -200,12 +200,12 @@ object Eab {
         case _ => JsArray()
       })
 
-    val isRedressTransform = (__ \ 'data ++ redressScheme).json.copyFrom(
-      (__ \ 'isRedress).readNullable[JsValue].map {
+    val isRedressTransform = (__ \ Symbol("data") ++ redressScheme).json.copyFrom(
+      (__ \ Symbol("isRedress")).readNullable[JsValue].map {
         case Some(JsBoolean(false)) => Some(JsString("notRegistered"))
         case _ => None
       }.filter(redressScheme => redressScheme.isDefined).orElse(
-        (__ \ 'propertyRedressScheme).readNullable[JsValue].map {
+        (__ \ Symbol("propertyRedressScheme")).readNullable[JsValue].map {
           case Some(JsString("01")) => Some(JsString("propertyOmbudsman"))
           case Some(JsString("02")) => Some(JsString("ombudsmanServices"))
           case Some(JsString("03")) => Some(JsString("propertyRedressScheme"))
@@ -226,14 +226,14 @@ object Eab {
     import scala.language.postfixOps
 
     val oldModelTransformer:Reads[JsObject] = (servicesTransform and isRedressTransform and
-      (__ \ 'data ++ dateOfChange).json.copyFrom(readPathOrReturn(__ \ 'dateOfChange, JsNull)) and
-      (__ \ 'data ++ penalisedEstateAgentsAct).json.copyFrom(readPathOrReturn(__ \ 'penalisedUnderEstateAgentsAct, JsNull)) and
-      (__ \ 'data ++ penalisedEstateAgentsActDetail).json.copyFrom(readPathOrReturn( __ \ 'penalisedUnderEstateAgentsActDetails, JsNull)) and
-      (__ \ 'data ++ penalisedProfessionalBody).json.copyFrom(readPathOrReturn(__ \ 'penalised, JsNull)) and
-      (__ \ 'data ++ penalisedProfessionalBodyDetail).json.copyFrom(readPathOrReturn(__ \ 'professionalBody,JsNull)) and
-      (__ \ 'data ++ clientMoneyProtectionScheme).json.copyFrom(readPathOrReturn(__ \ 'clientMoneyProtection,JsNull)) and
-      (__ \ 'hasAccepted).json.copyFrom((__ \ 'hasAccepted).json.pick) and
-      (__ \ 'hasChanged).json.copyFrom((__ \ 'hasChanged).json.pick)
+      (__ \ Symbol("data") ++ dateOfChange).json.copyFrom(readPathOrReturn(__ \ Symbol("dateOfChange"), JsNull)) and
+      (__ \ Symbol("data") ++ penalisedEstateAgentsAct).json.copyFrom(readPathOrReturn(__ \ Symbol("penalisedUnderEstateAgentsAct"), JsNull)) and
+      (__ \ Symbol("data") ++ penalisedEstateAgentsActDetail).json.copyFrom(readPathOrReturn( __ \ Symbol("penalisedUnderEstateAgentsActDetails"), JsNull)) and
+      (__ \ Symbol("data") ++ penalisedProfessionalBody).json.copyFrom(readPathOrReturn(__ \ Symbol("penalised"), JsNull)) and
+      (__ \ Symbol("data") ++ penalisedProfessionalBodyDetail).json.copyFrom(readPathOrReturn(__ \ Symbol("professionalBody"),JsNull)) and
+      (__ \ Symbol("data") ++ clientMoneyProtectionScheme).json.copyFrom(readPathOrReturn(__ \ Symbol("clientMoneyProtection"),JsNull)) and
+      (__ \ Symbol("hasAccepted")).json.copyFrom((__ \ Symbol("hasAccepted")).json.pick) and
+      (__ \ Symbol("hasChanged")).json.copyFrom((__ \ Symbol("hasChanged")).json.pick)
       ) reduce
 
     val jsonReads = (

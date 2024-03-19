@@ -60,7 +60,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
     "get is called" must {
       "display agent company name Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
         val result = controller.get(1)(request)
@@ -70,7 +70,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
 
       "display saved content" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(agentCompanyDetails = Some(AgentCompanyDetails("test", Some("12345678"))))))))
 
         val result = controller.get(1)(request)
@@ -83,7 +83,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
 
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
           val result = controller.get(1)(request)
@@ -124,7 +124,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesGen.sample.get)))
 
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
@@ -146,7 +146,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(TradingPremises())))
 
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
@@ -196,7 +196,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
         when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save(any(), any(), any())(any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1)(newRequest)
@@ -212,7 +212,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with TradingPremisesGen
             agentName = None,
             agentCompanyDetails = Some(AgentCompanyDetails("text", Some("12345678"))),
             agentPartnership = None
-          ), TradingPremises())))(any(), any())
+          ), TradingPremises())))(any())
       }
     }
   }

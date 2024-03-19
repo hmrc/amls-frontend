@@ -118,11 +118,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       val cache = mock[CacheMap]
 
       when {
-        controller.dataCacheConnector.fetch[Renewal](any(), any())(any(), any())
+        controller.dataCacheConnector.fetch[Renewal](any(), any())(any())
       } thenReturn Future.successful(Some(renewalModel.copy(hasAccepted = false)))
 
       when {
-        controller.dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), eqTo(renewalModel))(any(), any())
+        controller.dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), eqTo(renewalModel))(any())
       } thenReturn Future.successful(cache)
 
       val result = controller.post()(request)
@@ -131,7 +131,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       redirectLocation(result) mustBe Some(controllers.renewal.routes.RenewalProgressController.get.url)
 
       val captor = ArgumentCaptor.forClass(classOf[Renewal])
-      verify(controller.dataCacheConnector).save[Renewal](any(), eqTo(Renewal.key), captor.capture())(any(), any())
+      verify(controller.dataCacheConnector).save[Renewal](any(), eqTo(Renewal.key), captor.capture())(any())
       captor.getValue mustBe renewalModel
       captor.getValue.hasAccepted mustBe true
     }

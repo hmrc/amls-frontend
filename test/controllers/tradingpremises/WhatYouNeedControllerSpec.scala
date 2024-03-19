@@ -49,7 +49,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
   "WhatYouNeedController" must {
 
     "load the what you need page" in new Fixture {
-      when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(
+      when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any())) thenReturn(
         Future.successful(Some(BusinessMatching(None, Some(BusinessActivities(Set(MoneyServiceBusiness))), Some(BusinessMatchingMsbServices(Set(TransmittingMoney))), None, None, None)))
       )
 
@@ -61,7 +61,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
       val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness))
       val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
 
-      when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(bm))
+      when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any())) thenReturn(Future.successful(bm))
       val result = controller.get(1)(request)
       status(result) must be(OK)
       contentAsString(result) must include(messages("tradingpremises.whatyouneed.agents.sub.heading"))
@@ -69,7 +69,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "load the what you need page when msb is not selected" in new Fixture {
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any())) thenReturn {
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())) thenReturn {
         Future.successful(
           Some(
             BusinessMatching(
@@ -91,7 +91,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "throw an error when data cannot be fetched" in new Fixture {
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       a[Exception] must be thrownBy {

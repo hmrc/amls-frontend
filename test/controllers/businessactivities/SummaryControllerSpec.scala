@@ -177,10 +177,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
         val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
 
-        when(controller.dataCache.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(Some(completeModel.copy(hasAccepted = false))))
 
-        when(controller.dataCache.save[BusinessActivities](any(), eqTo(BusinessActivities.key), any())(any(), any()))
+        when(controller.dataCache.save[BusinessActivities](any(), eqTo(BusinessActivities.key), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)

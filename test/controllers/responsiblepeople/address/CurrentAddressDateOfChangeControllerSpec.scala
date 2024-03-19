@@ -62,7 +62,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
         val responsiblePeople = ResponsiblePerson()
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controller.get(0, false)(request)
         status(result) must be(OK)
@@ -87,9 +87,9 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
             personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
             positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2009,1,1))))))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(controller.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(1, false)(postRequest)
@@ -116,9 +116,9 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
             personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
             positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2011,1,1))))))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(controller.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(1, false)(postRequest)
@@ -137,9 +137,9 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
             "dateOfChange.day" -> "01"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
-          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), meq(ResponsiblePerson.key), any())(any(), any()))
+          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), meq(ResponsiblePerson.key), any())(any()))
             .thenReturn(Future.successful(cache))
           when(cache.getEntry[ResponsiblePerson](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(completeResponsiblePerson))
@@ -165,9 +165,9 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
           personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
           positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2009,1,1))))))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-        when(controller.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(1, true)(invalidPostRequest)

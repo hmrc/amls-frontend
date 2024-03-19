@@ -91,7 +91,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
         redirectLocation(result) mustBe Some(controllers.businessactivities.routes.IdentifySuspiciousActivityController.get().url)
 
         val captor = ArgumentCaptor.forClass(classOf[BusinessActivities])
-        verify(mockCacheConnector).save[BusinessActivities](any(), eqTo(BusinessActivities.key), captor.capture())(any(), any())
+        verify(mockCacheConnector).save[BusinessActivities](any(), eqTo(BusinessActivities.key), captor.capture())(any())
 
         captor.getValue.transactionRecordTypes mustBe
           Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("example software"))))
@@ -123,7 +123,7 @@ class TransactionTypesControllerSpec extends AmlsSpec
         status(result) mustBe BAD_REQUEST
         contentAsString(result) must include(messages("businessactivities.do.keep.records"))
 
-        verify(mockCacheConnector, never).save[BusinessActivities](any(), any(), any())(any(), any())
+        verify(mockCacheConnector, never).save[BusinessActivities](any(), any(), any())(any())
       }
     }
   }

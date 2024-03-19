@@ -113,10 +113,10 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
   "accept" must {
     "set accept flag to true and redirect to RegistrationProgressController" in new Fixture {
 
-      when(mockCacheConnector.fetch[Amp](any(), any())(any(), any()))
+      when(mockCacheConnector.fetch[Amp](any(), any())(any()))
         .thenReturn(Future.successful(Some(completeJson.as[Amp])))
 
-      when(mockCacheConnector.save[Amp](any(), any(), any())(any(), any()))
+      when(mockCacheConnector.save[Amp](any(), any(), any())(any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.accept.apply(FakeRequest())
@@ -125,7 +125,7 @@ class AmpControllerSpec extends AmlsSpec with CacheMocks {
       redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get.toString
 
       verify(mockCacheConnector).save[Amp](any(), eqTo(Amp.key),
-        eqTo(completeJson.as[Amp].copy(hasAccepted = true)))(any(), any())
+        eqTo(completeJson.as[Amp].copy(hasAccepted = true)))(any())
     }
   }
 }

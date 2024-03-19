@@ -53,10 +53,10 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
     lazy val view = inject[UsesForeignCurrenciesView]
     implicit val ec = inject[ExecutionContext]
 
-    when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+    when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
       .thenReturn(Future.successful(None))
 
-    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any(), any()))
+    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
     val controller = new UsesForeignCurrenciesController(dataCacheConnector = mockCacheConnector,
@@ -127,7 +127,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
       when(controller.dataCacheConnector.fetchAll(any())(any()))
       .thenReturn(Future.successful(Some(mockCacheMap)))
 
-    when(controller.dataCacheConnector.save(any(), eqTo(MoneyServiceBusiness.key), any())(any(), any()))
+    when(controller.dataCacheConnector.save(any(), eqTo(MoneyServiceBusiness.key), any())(any()))
       .thenReturn(Future.successful(mockCacheMap))
 
     mockCacheGetEntry[ServiceChangeRegister](None, ServiceChangeRegister.key)
@@ -165,7 +165,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
 
         mockApplicationStatus(NotCompleted)
 
-        when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+        when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))
 
         val result = controller.get()(request)
@@ -190,7 +190,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
             status(result) must be(SEE_OTHER)
 
             val captor = ArgumentCaptor.forClass(classOf[MoneyServiceBusiness])
-            verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), captor.capture())(any(), any())
+            verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), captor.capture())(any())
             captor.getValue match {
               case result: MoneyServiceBusiness => result must be(outgoingModel)
             }
@@ -207,7 +207,7 @@ class UsesForeignCurrenciesControllerSpec extends AmlsSpec
             status(result) must be(SEE_OTHER)
 
             val captor = ArgumentCaptor.forClass(classOf[MoneyServiceBusiness])
-            verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), captor.capture())(any(), any())
+            verify(controller.dataCacheConnector).save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), captor.capture())(any())
             captor.getValue match {
               case result: MoneyServiceBusiness => result must be(completeMsb)
             }

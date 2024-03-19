@@ -100,7 +100,7 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec with Injecting {
 
       "return 500 when cache is empty" in new Fixture {
 
-        when(mockCacheConnector.update[AddBusinessTypeFlowModel](any(), any())(any())(any(), any()))
+        when(mockCacheConnector.update[AddBusinessTypeFlowModel](any(), any())(any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -132,7 +132,7 @@ class SelectBusinessTypeControllerSpec extends AmlsSpec with Injecting {
 
         "update returns None" in new Fixture {
 
-          when(mockCacheConnector.update[AddBusinessTypeFlowModel](any(), any())(any())(any(), any()))
+          when(mockCacheConnector.update[AddBusinessTypeFlowModel](any(), any())(any())(any()))
             .thenReturn(Future.successful(None))
 
           val result = controller.post()(FakeRequest(POST, routes.SelectBusinessTypeController.post().url)

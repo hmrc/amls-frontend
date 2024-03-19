@@ -55,7 +55,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
     "get is called" must {
       "load the NCA Registered page with an empty form" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -71,7 +71,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
         val ncaRegistered = Some(NCARegistered(true))
         val activities = BusinessActivities(ncaRegistered = ncaRegistered)
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(Some(activities)))
 
         val result = controller.get()(request)
@@ -89,10 +89,10 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
         val newRequest = FakeRequest(POST, routes.NCARegisteredController.post(false).url)
           .withFormUrlEncodedBody("ncaRegistered" -> "true")
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
@@ -104,10 +104,10 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
         val newRequest = test.FakeRequest(POST, routes.NCARegisteredController.post(false).url)
           .withFormUrlEncodedBody("ncaRegistered" -> "true")
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
@@ -123,10 +123,10 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
         .withFormUrlEncodedBody(
         "ncaRegistered" -> "false"
       )
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
@@ -139,10 +139,10 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
         .withFormUrlEncodedBody(
         "ncaRegistered" -> "false"
       )
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(false)(newRequest)
@@ -155,7 +155,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
       val newRequest = test.FakeRequest(POST, routes.NCARegisteredController.post(false).url)
         .withFormUrlEncodedBody("ncaRegistered" -> "foo")
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
@@ -166,7 +166,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar with Inject
 
       val newRequest = test.FakeRequest(POST, routes.NCARegisteredController.post(false).url)
         .withFormUrlEncodedBody("ncaRegistered" -> "")
-      when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)

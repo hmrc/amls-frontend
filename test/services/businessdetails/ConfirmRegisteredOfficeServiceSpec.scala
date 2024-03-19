@@ -50,7 +50,7 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
 
       "return true if registered office is defined" in {
 
-        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
           .thenReturn(Future.successful(Some(BusinessDetails().registeredOffice(office))))
 
         service.hasRegisteredAddress(credId).futureValue mustBe Some(true)
@@ -58,7 +58,7 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
 
       "return false if registered office is not defined" in {
 
-        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
           .thenReturn(Future.successful(Some(BusinessDetails())))
 
         service.hasRegisteredAddress(credId).futureValue mustBe Some(false)
@@ -66,7 +66,7 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
 
       "return none if business details cannot be retrieved" in {
 
-        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
           .thenReturn(Future.successful(None))
 
         service.hasRegisteredAddress(credId).futureValue mustBe None
@@ -77,7 +77,7 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
 
       "return the address if it is present in the business matching" in {
 
-        when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
           .thenReturn(Future.successful(Some(BusinessMatching().reviewDetails(
             ReviewDetails("Big Corp Inc.", None, address, "12798rg2e8yfg")
           ))))
@@ -89,7 +89,7 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
 
         "review details is empty" in {
 
-          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(Some(BusinessMatching())))
 
           service.getAddress(credId).futureValue mustBe None
@@ -97,7 +97,7 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
 
         "business matching is empty" in {
 
-          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(None))
 
           service.getAddress(credId).futureValue mustBe None
@@ -124,7 +124,7 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
           eqTo(credId),
           eqTo(BusinessDetails.key),
           eqTo(BusinessDetails().registeredOffice(office))
-        )(any(), any()))
+        )(any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         service.updateRegisteredOfficeAddress(credId, ConfirmRegisteredOffice(true)).futureValue mustBe Some(office)
@@ -133,7 +133,7 @@ class ConfirmRegisteredOfficeServiceSpec extends AmlsSpec with BeforeAndAfterEac
           eqTo(credId),
           eqTo(BusinessDetails.key),
           eqTo(BusinessDetails().registeredOffice(office))
-        )(any(), any())
+        )(any())
       }
 
       "not update or save the model" when {

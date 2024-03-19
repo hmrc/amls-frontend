@@ -59,7 +59,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
 
       "display the persons page with blank fields" in new Fixture {
 
-        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
         val result = personNameController.get(RecordId)(request)
@@ -82,7 +82,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
         val responsiblePeople = ResponsiblePerson(Some(addPerson))
 
         when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = personNameController.get(RecordId)(request)
         status(result) must be(OK)
@@ -96,7 +96,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
 
       "display Not Found" when {
         "ResponsiblePeople model cannot be found" in new Fixture {
-          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
           val result = personNameController.get(RecordId)(request)
@@ -118,10 +118,10 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
               "lastName" -> "last"
             )
 
-            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-            when(personNameController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+            when(personNameController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = personNameController.post(RecordId)(requestWithParams)
@@ -139,10 +139,10 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
               "lastName" -> "last"
             )
 
-            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-            when(personNameController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+            when(personNameController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = personNameController.post(RecordId, true)(requestWithParams)
@@ -159,7 +159,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
             "lastName" -> "last"
           )
 
-          when(personNameController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(personNameController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = personNameController.post(RecordId)(firstNameMissingInRequest)
@@ -178,10 +178,10 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar with Injecting
             "lastName" -> "last"
           )
 
-          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-          when(personNameController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(personNameController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = personNameController.post(2)(requestWithParams)

@@ -57,7 +57,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
 
       "load the Accountant For AMLSRegulations page with an empty form" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -73,7 +73,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
         val accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true))
         val activities = BusinessActivities(accountantForAMLSRegulations = accountantForAMLSRegulations)
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(Some(activities)))
 
         val result = controller.get()(request)
@@ -94,10 +94,10 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
             val newRequest = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
             .withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(true)(newRequest)
@@ -111,10 +111,10 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
             .withFormUrlEncodedBody(
               "accountantForAMLSRegulations" -> "false"
             )
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(true)(newRequest)
@@ -128,10 +128,10 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
             val newRequest = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
             .withFormUrlEncodedBody("accountantForAMLSRegulations" -> "true")
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(false)(newRequest)
@@ -144,10 +144,10 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
             .withFormUrlEncodedBody(
               "accountantForAMLSRegulations" -> "false"
             )
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(false)(newRequest)
@@ -163,7 +163,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
           val newRequest = FakeRequest(POST, routes.AccountantForAMLSRegulationsController.post(false).url)
           .withFormUrlEncodedBody("" -> "")
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
           val result = controller.post()(newRequest)
@@ -177,7 +177,7 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
             "WhatYouNeedController" -> ""
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
           val result = controller.post()(newRequest)
@@ -198,17 +198,17 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
             taxMatters = Some(TaxMatters(true))
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(Some(model)))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(true)(newRequest)
           status(result) must be(SEE_OTHER)
 
           val captor = ArgumentCaptor.forClass(classOf[BusinessActivities])
-          verify(controller.dataCacheConnector).save[BusinessActivities](any(), eqTo(BusinessActivities.key), captor.capture())(any(), any())
+          verify(controller.dataCacheConnector).save[BusinessActivities](any(), eqTo(BusinessActivities.key), captor.capture())(any())
 
           captor.getValue.accountantForAMLSRegulations mustBe Some(AccountantForAMLSRegulations(false))
           captor.getValue.whoIsYourAccountant must not be defined

@@ -53,7 +53,7 @@ class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector
 
   def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest.fold(
+      formProvider().bindFromRequest().fold(
         formWithErrors => {
           dataCacheConnector.fetch[BusinessActivities](request.credId, BusinessActivities.key) map { ba =>
             BadRequest(view(formWithErrors, edit, ControllerHelper.accountantName(ba)))

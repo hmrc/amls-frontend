@@ -58,10 +58,10 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
       when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(),any(), any())( any(), any()))
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(),any(), any())( any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.get(true)(request)
@@ -84,10 +84,10 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
       when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[TradingPremises](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.get(false)(request)
@@ -110,10 +110,10 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
       when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[TradingPremises](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.get(false)(request)
@@ -132,10 +132,10 @@ class TradingPremisesAddControllerSpec extends AmlsSpec with ScalaCheckPropertyC
       when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.fetch[TradingPremises](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[TradingPremises](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.get(false)(request)

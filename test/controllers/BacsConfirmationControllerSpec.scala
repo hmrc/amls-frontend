@@ -97,7 +97,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
     } thenReturn Future.successful(RegistrationDetails(companyNameFromRegistration, isIndividual = false))
 
     when {
-      controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(), eqTo(SubmissionRequestStatus.key))(any(), any())
+      controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(), eqTo(SubmissionRequestStatus.key))(any())
     } thenReturn Future.successful(Some(SubmissionRequestStatus(true)))
 
     def feeResponse(responseType: ResponseType) = FeeResponse(
@@ -116,7 +116,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
 
     when {
-      controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
+      controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())
     } thenReturn Future.successful(Some(businessDetails))
 
     val applicationConfig = app.injector.instanceOf[ApplicationConfig]
@@ -132,7 +132,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
       )
 
       when {
-        controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())
+        controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any())
       } thenReturn Future.successful(Some(model))
 
     }
@@ -181,7 +181,7 @@ class BacsConfirmationControllerSpec extends AmlsSpec
         } thenReturn Future.successful(ReadStatusResponse(LocalDateTime.now(), "", None, None, None, None, false))
 
         when {
-          controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
+          controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())
         } thenReturn Future.successful(Some(businessDetailsYes))
 
         val result = controller.bacsConfirmation()(request)

@@ -191,10 +191,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
               "details" -> "test"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
@@ -208,10 +208,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
               "details" -> "test"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(Some(BusinessActivities())))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
@@ -225,10 +225,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
               "involvedInOther" -> "false"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
@@ -242,10 +242,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
               "involvedInOther" -> "false"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(Some(BusinessActivities())))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
@@ -261,10 +261,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
               "details" -> "test"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(true)(newRequest)
@@ -278,10 +278,10 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
               "involvedInOther" -> "false"
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(true)(newRequest)
@@ -294,7 +294,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
           val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
@@ -311,7 +311,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
             activities = Some(BMActivities(Set(AccountancyServices)))
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
           val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(

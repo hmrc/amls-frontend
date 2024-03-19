@@ -54,7 +54,7 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
 
       "load the Cash Payment Over Ten Thousand Euros page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -69,7 +69,7 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
         val firstDate = Some(CashPaymentFirstDate(new LocalDate(1990, 2, 24)))
         val activities = Hvd(cashPayment = Some(CashPayment(CashPaymentOverTenThousandEuros(true), firstDate)))
 
-        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(Some(activities)))
 
         val result = controller.get()(request)
@@ -84,7 +84,7 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
         val cashPayment = Some(CashPayment(CashPaymentOverTenThousandEuros(false), None))
         val activities = Hvd(cashPayment = cashPayment)
 
-        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(Some(activities)))
 
         val result = controller.get()(request)
@@ -102,10 +102,10 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
         val newRequest = FakeRequest(POST, routes.CashPaymentController.post().url)
         .withFormUrlEncodedBody("acceptedAnyPayment" -> "true")
 
-        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
@@ -118,10 +118,10 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
         val newRequest = FakeRequest(POST, routes.CashPaymentController.post().url)
         .withFormUrlEncodedBody("acceptedAnyPayment" -> "true")
 
-        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
@@ -133,10 +133,10 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
         val newRequest = FakeRequest(POST, routes.CashPaymentController.post().url)
         .withFormUrlEncodedBody("acceptedAnyPayment" -> "false")
 
-        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
@@ -148,10 +148,10 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
         val newRequest = FakeRequest(POST, routes.CashPaymentController.post().url)
         .withFormUrlEncodedBody("acceptedAnyPayment" -> "false")
 
-        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
@@ -164,7 +164,7 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar with Injectin
         val newRequest = FakeRequest(POST, routes.CashPaymentController.post().url)
         .withFormUrlEncodedBody("" -> "")
 
-        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.post()(newRequest)

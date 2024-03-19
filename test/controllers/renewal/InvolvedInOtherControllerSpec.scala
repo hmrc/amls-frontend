@@ -290,7 +290,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             activities = Some(BMActivities(Set(AccountancyServices)))
           )
 
-          when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+          when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
           val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
@@ -307,7 +307,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
         "with invalid data without business activities" in new Fixture {
 
-          when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+          when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
           val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(
@@ -327,7 +327,7 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
             activities = Some(BMActivities(Set(AccountancyServices)))
           )
 
-          when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+          when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
           val newRequest = FakeRequest(POST, routes.InvolvedInOtherController.post().url).withFormUrlEncodedBody(

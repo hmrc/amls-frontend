@@ -212,7 +212,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(model)))
 
-        when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save(any(), any(), any())(any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1,edit = true)(newRequest)
@@ -239,7 +239,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(model, model)))
 
-        when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save(any(), any(), any())(any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1,edit = false)(newRequest)
@@ -265,7 +265,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(model)))
 
-        when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save(any(), any(), any())(any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1,edit = false)(newRequest)
@@ -305,7 +305,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse, TradingPremises())))
 
-        when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(1)(newRequest)
@@ -322,7 +322,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
             businessStructure=None,
             agentCompanyDetails=None,
             agentPartnership=None
-          ), TradingPremises())))(any(), any())
+          ), TradingPremises())))(any())
       }
 
     }

@@ -91,7 +91,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
       when(controller.dataCache.fetch[Hvd](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(model)))
+        (any())).thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -103,7 +103,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
 
-      when(controller.dataCache.fetch[Hvd](any(), any())( any(), any()))
+      when(controller.dataCache.fetch[Hvd](any(), any())( any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -114,7 +114,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       "application in variation mode" in new Fixture {
 
         when(controller.dataCache.fetch[Hvd](any(), eqTo(Hvd.key))
-          (any(), any())).thenReturn(Future.successful(Some(completeModel)))
+          (any())).thenReturn(Future.successful(Some(completeModel)))
 
         when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -133,7 +133,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
 
     "show edit link" when {
       "application not in variation mode" in new Fixture {
-        when(controller.dataCache.fetch[Hvd](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[Hvd](any(), any())(any()))
           .thenReturn(Future.successful(Some(completeModel)))
 
         when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
@@ -150,7 +150,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
 
       "in variation mode and also in the new service flow" in new Fixture {
         when(controller.dataCache.fetch[Hvd]( any(), eqTo(Hvd.key))
-          (any(), any())).thenReturn(Future.successful(Some(completeModel)))
+          (any())).thenReturn(Future.successful(Some(completeModel)))
 
         when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -175,11 +175,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       val cache = mock[CacheMap]
 
       when {
-        (controller.dataCache.fetch[Hvd](any(), any())(any(), any()))
+        (controller.dataCache.fetch[Hvd](any(), any())(any()))
       } thenReturn Future.successful(Some(completeModel.copy(hasAccepted = false)))
 
       when {
-        controller.dataCache.save[Hvd](any(), any(), any())(any(), any())
+        controller.dataCache.save[Hvd](any(), any(), any())(any())
       } thenReturn Future.successful(cache)
 
       val result = controller.post()(request)
@@ -188,7 +188,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
 
       val captor = ArgumentCaptor.forClass(classOf[Hvd])
-      verify(controller.dataCache).save[Hvd](any(), eqTo(Hvd.key), captor.capture())(any(), any())
+      verify(controller.dataCache).save[Hvd](any(), eqTo(Hvd.key), captor.capture())(any())
       captor.getValue.hasAccepted mustBe true
     }
   }

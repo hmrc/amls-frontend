@@ -39,7 +39,7 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AmlsSpec
 import views.html.businessdetails.CorrespondenceAddressUKView
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.Future
 
 class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
@@ -78,7 +78,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
         val correspondenceAddress = CorrespondenceAddress(Some(CorrespondenceAddressUk("Name Test", "Test", "Test", Some("Test"), Some("test"), None, "POSTCODE")), None)
         val businessDetails = BusinessDetails(None, None, None, None, None, None,None, None, Some(CorrespondenceAddressIsUk(true)), Some(correspondenceAddress))
 
-        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.get(false)(request)
@@ -97,7 +97,7 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
 
       "no data exists in the keystore" in new Fixture {
 
-        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get(false)(request)
@@ -129,10 +129,10 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
         )
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())
-          (any(), any())).thenReturn(fetchResult)
+          (any())).thenReturn(fetchResult)
 
         when(controller.dataConnector.save[BusinessDetails](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(emptyCache))
+          (any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -167,10 +167,10 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
         )
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())
-          (any(), any())).thenReturn(fetchResult)
+          (any())).thenReturn(fetchResult)
 
         when(controller.dataConnector.save[BusinessDetails](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(emptyCache))
+          (any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(edit = true)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -207,10 +207,10 @@ class CorrespondenceAddressUkControllerSpec extends AmlsSpec with MockitoSugar w
         )
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())
-          (any(), any())).thenReturn(fetchResult)
+          (any())).thenReturn(fetchResult)
 
         when(controller.dataConnector.save[BusinessDetails](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(emptyCache))
+          (any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(BAD_REQUEST)

@@ -41,8 +41,8 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.responsiblepeople.address.AdditionalAddressNonUKView
 
-import scala.collection.JavaConverters._
 import scala.concurrent.Future
+import scala.jdk.CollectionConverters._
 
 class AdditionalAddressNonUKControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
@@ -97,7 +97,7 @@ class AdditionalAddressNonUKControllerSpec extends AmlsSpec with MockitoSugar wi
         val responsiblePeople = ResponsiblePerson(personName)
 
         when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
 
         val result = additionalAddressNonUKController.get(RecordId)(request)
@@ -119,7 +119,7 @@ class AdditionalAddressNonUKControllerSpec extends AmlsSpec with MockitoSugar wi
         val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
         when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = additionalAddressNonUKController.get(RecordId)(request)
         status(result) must be(OK)
@@ -138,7 +138,7 @@ class AdditionalAddressNonUKControllerSpec extends AmlsSpec with MockitoSugar wi
 
           val responsiblePeople = ResponsiblePerson()
 
-          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           val result = additionalAddressNonUKController.get(RecordId)(request)
@@ -162,9 +162,9 @@ class AdditionalAddressNonUKControllerSpec extends AmlsSpec with MockitoSugar wi
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = additionalAddressNonUKController.post(RecordId)(requestWithParams)
@@ -193,7 +193,7 @@ class AdditionalAddressNonUKControllerSpec extends AmlsSpec with MockitoSugar wi
             "country" -> ""
           )
 
-          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = additionalAddressNonUKController.post(RecordId)(requestWithMissingParams)
@@ -214,10 +214,10 @@ class AdditionalAddressNonUKControllerSpec extends AmlsSpec with MockitoSugar wi
 
           val responsiblePeople = ResponsiblePerson(personName = personName)
 
-          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = additionalAddressNonUKController.post(RecordId)(requestWithMissingParams)
@@ -241,9 +241,9 @@ class AdditionalAddressNonUKControllerSpec extends AmlsSpec with MockitoSugar wi
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = additionalAddressNonUKController.post(RecordId)(requestWithParams)
@@ -275,9 +275,9 @@ class AdditionalAddressNonUKControllerSpec extends AmlsSpec with MockitoSugar wi
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(personName, addressHistory = Some(history))
 
-          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = additionalAddressNonUKController.post(RecordId, edit = true, Some(flowFromDeclaration))(requestWithParams)
@@ -315,9 +315,9 @@ class AdditionalAddressNonUKControllerSpec extends AmlsSpec with MockitoSugar wi
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(personName, addressHistory = Some(history))
 
-          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = additionalAddressNonUKController.post(RecordId)(requestWithParams)
@@ -338,9 +338,9 @@ class AdditionalAddressNonUKControllerSpec extends AmlsSpec with MockitoSugar wi
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(personName, addressHistory = Some(history))
 
-          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(additionalAddressNonUKController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = additionalAddressNonUKController.post(RecordId, true)(requestWithParams)

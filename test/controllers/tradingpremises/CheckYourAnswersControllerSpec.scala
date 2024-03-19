@@ -103,10 +103,10 @@ class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Inj
           val newRequest = FakeRequest(POST, routes.CheckYourAnswersController.post(1).url)
             .withFormUrlEncodedBody("hasAccepted" -> "true")
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel), hasAccepted = true)))))
 
-          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(1)(newRequest)

@@ -54,10 +54,10 @@ class MoneySourcesControllerSpec extends AmlsSpec
     self =>
     val request = addToken(authRequest)
 
-    when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+    when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
       .thenReturn(Future.successful(None))
 
-    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any(), any()))
+    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
     lazy val view = inject[MoneySourcesView]
     val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
@@ -98,10 +98,10 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
     val cacheMap = mock[CacheMap]
     lazy val view = inject[MoneySourcesView]
-    when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+    when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
       .thenReturn(Future.successful(Some(completeMsb.copy(whichCurrencies = Some(WhichCurrencies(Seq("USD"), Some(UsesForeignCurrenciesYes), Some(MoneySources(None, None, None))))))))
 
-    when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any(), any()))
+    when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any()))
       .thenReturn(Future.successful(cacheMap))
 
     val controller = new MoneySourcesController(dataCacheConnector = mockCacheConnector,
@@ -116,7 +116,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
     val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
 
-    when(mockCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
+    when(mockCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
       .thenReturn(Future.successful(Some(BusinessMatching(msbServices = msbServices))))
   }
 
@@ -149,7 +149,7 @@ class MoneySourcesControllerSpec extends AmlsSpec
 
         mockApplicationStatus(NotCompleted)
 
-        when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+        when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(WhichCurrencies(Seq(), None, Some(currentModel)))))))
 
         val result = controller.get()(request)

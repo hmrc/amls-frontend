@@ -30,7 +30,7 @@ trait CheckYourAnswersHelperFunctions {
     messages("lbl.no")
   }
 
-  def toBulletList[A](coll: Seq[A])(implicit messages: Messages): Value = Value(
+  def toBulletList[A](coll: Seq[A]): Value = Value(
     HtmlContent(
       Html(
         "<ul class=\"govuk-list govuk-list--bullet\">" +

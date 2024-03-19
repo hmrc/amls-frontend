@@ -66,10 +66,10 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
 
     val cacheMap = CacheMap("", Map.empty)
 
-    when(cache.fetch[Tcsp](any(), any())(any(), any()))
+    when(cache.fetch[Tcsp](any(), any())(any()))
       .thenReturn(Future.successful(Some(model)))
 
-    when(cache.save[Tcsp](any(), any(), any())(any(), any()))
+    when(cache.save[Tcsp](any(), any(), any())(any()))
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
 
@@ -79,7 +79,7 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
 
       "load the what kind of Tcsp are you page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())).thenReturn(Future.successful(None))
 
 
         val result = controller.get()(request)
@@ -90,7 +90,7 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
 
         val tcspTypes = TcspTypes(Set(NomineeShareholdersProvider, TrusteeProvider, CompanyDirectorEtc))
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(Some(Tcsp(Some(tcspTypes)))))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())).thenReturn(Future.successful(Some(Tcsp(Some(tcspTypes)))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -112,8 +112,8 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
           "serviceProviders[2]" -> RegisteredOfficeEtc.toString
         )
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any())).thenReturn(Future.successful(cacheMap))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -128,8 +128,8 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
           "serviceProviders[]" -> NomineeShareholdersProvider.toString
         )
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any())).thenReturn(Future.successful(cacheMap))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -150,7 +150,7 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
 
           val result = controller.post()(newRequest)
           status(result) mustBe SEE_OTHER
-          verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expectedModel))(any(), any())
+          verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expectedModel))(any())
         }
       }
 
@@ -161,8 +161,8 @@ class TcspTypesControllerSpec extends AmlsSpec with Injecting {
           "serviceProviders[]" -> NomineeShareholdersProvider.toString
         )
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any())).thenReturn(Future.successful(cacheMap))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)

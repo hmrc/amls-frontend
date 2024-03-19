@@ -80,7 +80,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
       Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
 
     val emptyCache = CacheMap("", Map.empty)
-    when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any(), any()))
+    when(mockDataCacheConnector.save[Seq[TradingPremises]](any(), any(), any())(any()))
       .thenReturn(Future.successful(emptyCache))
 
     when(mockDataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
@@ -100,7 +100,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           val tradingPremises = TradingPremises()
           val businessActivities = BusinessActivities(involvedInOther = Some(InvolvedInOtherYes("test")))
 
-          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(tradingPremises))))
           when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
             .thenReturn(Some(businessActivities))
@@ -125,7 +125,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
             involvedInOther = Some(InvolvedInOtherYes("test")),
             expectedBusinessTurnover = Some(ExpectedBusinessTurnover.Fifth))
 
-          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(tradingPremises))))
           when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
             .thenReturn(Some(businessActivities))
@@ -152,7 +152,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
             val businessActivity = BusinessMatchingActivities(Set(MoneyServiceBusiness))
 
-            when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+            when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
               .thenReturn(Future.successful(None))
 
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -176,7 +176,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
             val businessActivity = BusinessMatchingActivities(Set(MoneyServiceBusiness))
 
-            when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+            when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -199,7 +199,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
           val businessActivity = BusinessMatchingActivities(Set(AccountancyServices))
 
-          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
@@ -222,7 +222,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(None)
-          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
           val result = whatDoesYourBusinessDoController.get(recordId1)(request)
@@ -240,7 +240,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
           val tradingPremises = TradingPremises(None, None, None)
 
-          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(tradingPremises))))
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremises)))
@@ -264,7 +264,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           val tradingPremises = TradingPremises(None, None, None,None, None,None,Some(wdbd),None)
           val businessMatchingActivitiesSingle = BusinessMatchingActivities(Set(AccountancyServices))
 
-          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(tradingPremises))))
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremises)))
@@ -285,7 +285,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
           val tradingPremises = TradingPremises(None, None, None, None,None,None,Some(wdbd),None)
 
-          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(tradingPremises))))
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremises)))
@@ -312,7 +312,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
             val tradingPremises = TradingPremises(None, None, None, None, None, None, Some(model), None)
             val businessMatchingActivitiesSingle = BusinessMatchingActivities(Set(AccountancyServices))
 
-            when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+            when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(tradingPremises))))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
               .thenReturn(Some(Seq(tradingPremises)))
@@ -342,7 +342,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
             val tradingPremises = TradingPremises(None, None, None, None, None, None, Some(model), None, lineId = Some(1))
             val businessMatchingActivitiesSingle = BusinessMatchingActivities(Set(AccountancyServices))
 
-            when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+            when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(tradingPremises))))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
               .thenReturn(Some(Seq(tradingPremises)))
@@ -373,7 +373,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
             val tradingPremises = TradingPremises(None, None, None, None, None, None, Some(model), None, lineId = Some(1))
             val businessMatchingActivitiesSingle = BusinessMatchingActivities(Set(AccountancyServices))
 
-            when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+            when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(tradingPremises))))
             when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
               .thenReturn(Some(Seq(tradingPremises)))
@@ -397,7 +397,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
           val tradingPremises = TradingPremises(None, None, None, None,None,None,Some(wdbd),None)
 
-          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(tradingPremises))))
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremises)))
@@ -427,10 +427,10 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           "value[3]" -> EstateAgentBusinessService.toString
         )
 
-        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse))))
 
-        when(mockDataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
+        when(mockDataCacheConnector.save[TradingPremises](any(), any(), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -448,7 +448,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
             hasChanged = true,
             whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))),
             msbServices = None
-          ))))(any(), any())
+          ))))(any())
       }
     }
 
@@ -484,11 +484,11 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
         val premises = TradingPremises(yourTradingPremises = Some(yourPremises), whatDoesYourBusinessDoAtThisAddress = Some(data))
 
-        when(whatDoesYourBusinessDoController.dataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any(), any()))
+        when(whatDoesYourBusinessDoController.dataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any()))
           .thenReturn(Future.successful(Some(Seq(premises))))
 
         when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(premises))))
+          (any())).thenReturn(Future.successful(Some(Seq(premises))))
 
         val result = whatDoesYourBusinessDoController.saveDateOfChange(1)(authorisedRequest)
 
@@ -515,13 +515,13 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
         val premises = TradingPremises(yourTradingPremises = Some(yourPremises), whatDoesYourBusinessDoAtThisAddress = Some(data))
 
-        when(whatDoesYourBusinessDoController.dataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any(), any()))
+        when(whatDoesYourBusinessDoController.dataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any()))
           .thenReturn(Future.successful(Some(Seq(premises))))
 
         when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(premises))))
+          (any())).thenReturn(Future.successful(Some(Seq(premises))))
 
-        when(whatDoesYourBusinessDoController.dataCacheConnector.save[TradingPremises](any(), meq(TradingPremises.key), any[TradingPremises])(any(), any())).
+        when(whatDoesYourBusinessDoController.dataCacheConnector.save[TradingPremises](any(), meq(TradingPremises.key), any[TradingPremises])(any())).
           thenReturn(Future.successful(mock[CacheMap]))
 
         val result = whatDoesYourBusinessDoController.saveDateOfChange(1)(authorisedRequest)
@@ -530,7 +530,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
         redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
         val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
-        verify(whatDoesYourBusinessDoController.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(TradingPremises.key), captor.capture())(any(), any())
+        verify(whatDoesYourBusinessDoController.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(TradingPremises.key), captor.capture())(any())
 
         captor.getValue.head.whatDoesYourBusinessDoAtThisAddress match {
           case Some(x) => x must be(expectedData)

@@ -53,7 +53,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
     "get is called" must {
       "display the Identify suspicious activity page with an empty form" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -68,7 +68,7 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
 
       "display the identify suspicious activity page with pre populated data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
             identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true))
           ))))
@@ -91,10 +91,10 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
           "hasWrittenGuidance" -> "true"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
           .thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result = controller.post()(newRequest)
@@ -129,10 +129,10 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
           "hasWrittenGuidance" -> "true"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
           .thenReturn(Future.successful(CacheMap(BusinessActivities.key, Map("" -> Json.obj()))))
 
         val result = controller.post(true)(newRequest)

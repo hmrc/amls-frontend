@@ -51,7 +51,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
 
     "show an empty form on get with no data in store" in new Fixture {
 
-      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -72,7 +72,7 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         ))
       )
 
-      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
@@ -96,10 +96,10 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         "hasCountries" -> "false"
       )
 
-      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Future.successful(Some(model)))
 
-      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any(), any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = false)(newRequest)
@@ -115,10 +115,10 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         "hasCountries" -> "true"
       )
 
-      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Future.successful(None))
 
-      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any(), any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())(any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = false)(newRequest)
@@ -139,10 +139,10 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         "hasCountries" -> "false"
       )
 
-      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Future.successful(Some(model)))
 
-      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key),any())(any(), any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key),any())(any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = true)(newRequest)
@@ -163,10 +163,10 @@ class BranchesOrAgentsHasCountriesControllerSpec extends AmlsSpec with MockitoSu
         "hasCountries" -> "true"
       )
 
-      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Future.successful(Some(model)))
 
-      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key),any())(any(), any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key),any())(any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = true)(newRequest)

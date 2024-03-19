@@ -56,7 +56,7 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
     "get is called" must {
       "display the contact details page" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
         val result = controller.get(1)(request)
@@ -73,7 +73,7 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
         val contact = ContactDetails("07702745869", "test@test.com")
         val res = ResponsiblePerson(personName = personName, contactDetails = Some(contact))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(res))))
 
         val result = controller.get(1)(request)
@@ -89,7 +89,7 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
           val contact = ContactDetails("07000000000", "test@test.com")
           val res = ResponsiblePerson(personName = personName, contactDetails = Some(contact))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(res))))
 
           val result = controller.get(0)(request)
@@ -108,10 +108,10 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
               "emailAddress" -> "test@test.com"
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(), ResponsiblePerson()))))
 
-            when(controller.dataCacheConnector.save[ContactDetails](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[ContactDetails](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(2)(newRequest)
@@ -128,10 +128,10 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
               "emailAddress" -> "test@test.com"
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(), ResponsiblePerson()))))
 
-            when(controller.dataCacheConnector.save[ContactDetails](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[ContactDetails](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(0)(newRequest)
@@ -148,10 +148,10 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
             )
 
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-              (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
+              (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
             when(controller.dataCacheConnector.save[ContactDetails](any(), any(), any())
-              (any(), any())).thenReturn(Future.successful(emptyCache))
+              (any())).thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(1, true,Some(flowFromDeclaration))(newRequest)
             status(result) must be(SEE_OTHER)
@@ -170,10 +170,10 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-            (any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
+            (any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
           when(controller.dataCacheConnector.save[ContactDetails](any(), any(), any())
-            (any(), any())).thenReturn(Future.successful(emptyCache))
+            (any())).thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)

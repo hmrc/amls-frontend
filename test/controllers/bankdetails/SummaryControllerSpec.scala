@@ -131,7 +131,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       status(result) must be(SEE_OTHER)
 
       verify(controller.dataCacheConnector).save[Seq[BankDetails]](any(), any(),
-        meq(Seq(completeModel1, completeModel2)))(any(), any())
+        meq(Seq(completeModel1, completeModel2)))(any())
     }
     "remove the itemIndex from session if there was one present" in new Fixture {
       override val request = addTokenWithSessionParam(authRequest)(("itemIndex" -> "4"))

@@ -45,7 +45,7 @@ class BusinessFranchiseServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
         val businessFranchise = BusinessFranchiseYes("Name of Franchise")
 
-        when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
           .thenReturn(Future.successful(Some(BusinessActivities().businessFranchise(businessFranchise))))
 
         service.getBusinessFranchise(credId).futureValue mustBe Some(businessFranchise)
@@ -55,7 +55,7 @@ class BusinessFranchiseServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
         "Business Franchise is not set" in {
 
-          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
             .thenReturn(Future.successful(Some(BusinessActivities())))
 
           service.getBusinessFranchise(credId).futureValue mustBe None
@@ -63,7 +63,7 @@ class BusinessFranchiseServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
         "Business Activities is not preset" in {
 
-          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
             .thenReturn(Future.successful(None))
 
           service.getBusinessFranchise(credId).futureValue mustBe None
@@ -80,20 +80,20 @@ class BusinessFranchiseServiceSpec extends AmlsSpec with BeforeAndAfterEach {
           val franchise = BusinessFranchiseYes("name")
           val modelWithUpdate = BusinessActivities().businessFranchise(franchise)
 
-          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
             .thenReturn(Future.successful(Some(BusinessActivities())))
 
           when(
             mockCacheConnector.save[BusinessActivities](
-              eqTo(credId), eqTo(BusinessActivities.key), eqTo(modelWithUpdate))(any(), any()
+              eqTo(credId), eqTo(BusinessActivities.key), eqTo(modelWithUpdate))(any()
             )
           ) thenReturn Future.successful(mockCacheMap)
 
           service.updateBusinessFranchise(credId, franchise).futureValue mustBe mockCacheMap
 
-          verify(mockCacheConnector).fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any())
+          verify(mockCacheConnector).fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any())
           verify(mockCacheConnector).save[BusinessActivities](
-            eqTo(credId), eqTo(BusinessActivities.key), eqTo(modelWithUpdate))(any(), any()
+            eqTo(credId), eqTo(BusinessActivities.key), eqTo(modelWithUpdate))(any()
           )
         }
       }

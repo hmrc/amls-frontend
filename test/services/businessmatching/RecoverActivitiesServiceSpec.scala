@@ -71,12 +71,12 @@ class RecoverActivitiesServiceSpec extends AmlsSpec with MockitoSugar {
       val businessMatching = emptyBusinessMatching.copy(activities = Some(businessActivities))
       val desResponse = viewResponse.copy(businessMatchingSection = businessMatching)
 
-      when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+      when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
         .thenReturn(Future.successful(Some(emptyBusinessMatching)))
 
       when(mockAmlsConnector.view(any(), any())(any(), any(), any())).thenReturn(Future.successful(desResponse))
 
-      when(mockDataCacheConnector.save[BusinessMatching](any(), any(), any())(any(), any()))
+      when(mockDataCacheConnector.save[BusinessMatching](any(), any(), any())(any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       service.recover(request).futureValue mustBe true
@@ -86,24 +86,24 @@ class RecoverActivitiesServiceSpec extends AmlsSpec with MockitoSugar {
       val businessMatching = emptyBusinessMatching.copy(activities = Some(emptyBusinessActivities))
       val desResponse = viewResponse.copy(businessMatchingSection = businessMatching)
 
-      when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+      when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
         .thenReturn(Future.successful(Some(emptyBusinessMatching)))
 
       when(mockAmlsConnector.view(any(), any())(any(), any(), any())).thenReturn(Future.successful(desResponse))
 
-      when(mockDataCacheConnector.save[BusinessMatching](any(), any(), any())(any(), any()))
+      when(mockDataCacheConnector.save[BusinessMatching](any(), any(), any())(any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       service.recover(request).futureValue mustBe false
     }
 
     "return false if DES returns an empty BusinessActivities section" in {
-      when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+      when(mockDataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
         .thenReturn(Future.successful(Some(emptyBusinessMatching)))
 
       when(mockAmlsConnector.view(any(), any())(any(), any(), any())).thenReturn(Future.successful(viewResponse))
 
-      when(mockDataCacheConnector.save[BusinessMatching](any(), any(), any())(any(), any()))
+      when(mockDataCacheConnector.save[BusinessMatching](any(), any(), any())(any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       service.recover(request).futureValue mustBe false

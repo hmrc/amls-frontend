@@ -171,7 +171,7 @@ class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar with In
             hasChanged = true,
             hasAccepted = false
           )
-        ))(any(), any())
+        ))(any())
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {

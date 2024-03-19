@@ -52,7 +52,7 @@ class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
     implicit request =>
       (for {
         _ <- updateDataStrict[BankDetails](request.credId, index) { bd => bd.copy(hasAccepted = true) }
-      } yield Redirect(controllers.bankdetails.routes.YourBankAccountsController.get))
+      } yield Redirect(controllers.bankdetails.routes.YourBankAccountsController.get()))
         .map(_.removingFromSession("itemIndex")) recoverWith {
           case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
         }

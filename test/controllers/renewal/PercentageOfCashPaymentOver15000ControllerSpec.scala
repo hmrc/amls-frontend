@@ -64,7 +64,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
       "display the Percentage Of CashPayment Over 15000 page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Renewal](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Renewal](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -75,7 +75,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
       "display the Percentage Of CashPayment Over 15000 page with pre populated data" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[Renewal](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(Renewal(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First)))))
+        (any())).thenReturn(Future.successful(Some(Renewal(percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First)))))
 
         val result = controller.get()(request)
         status(result) must be(OK)

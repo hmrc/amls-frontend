@@ -110,7 +110,7 @@ class SummaryControllerSpec extends AmlsSpec with Injecting {
 
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
 
-        verify(controller.dataCache).save[Tcsp](any(), any(), eqTo(model.copy(hasAccepted = true)))(any(), any())
+        verify(controller.dataCache).save[Tcsp](any(), any(), eqTo(model.copy(hasAccepted = true)))(any())
 
       }
     }

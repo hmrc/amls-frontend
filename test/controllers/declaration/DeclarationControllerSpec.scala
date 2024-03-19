@@ -113,7 +113,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any(), any())).thenReturn(Future.successful(None))
+          (any())).thenReturn(Future.successful(None))
 
         mockApplicationStatus(NotCompleted)
 
@@ -129,7 +129,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(addPerson)))
+          (any())).thenReturn(Future.successful(Some(addPerson)))
 
         mockApplicationStatus(NotCompleted)
 
@@ -148,7 +148,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(addPerson)))
+          (any())).thenReturn(Future.successful(Some(addPerson)))
 
         mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
 
@@ -167,7 +167,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(addPerson)))
+          (any())).thenReturn(Future.successful(Some(addPerson)))
 
         mockApplicationStatus(SubmissionReadyForReview)
 
@@ -186,7 +186,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(addPerson)))
+          (any())).thenReturn(Future.successful(Some(addPerson)))
 
         mockApplicationStatus(NotCompleted)
 
@@ -213,7 +213,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         }.thenReturn(Future.successful(incompleteSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any(), any())).thenReturn(Future.successful(None))
+          (any())).thenReturn(Future.successful(None))
 
         mockApplicationStatus(NotCompleted)
 
@@ -238,7 +238,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(addPerson)))
+          (any())).thenReturn(Future.successful(Some(addPerson)))
 
         val result = declarationController.getWithAmendment()(request)
         status(result) must be(OK)
@@ -256,7 +256,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any(), any())).thenReturn(Future.successful(None))
+          (any())).thenReturn(Future.successful(None))
 
         mockApplicationStatus(NotCompleted)
 
@@ -272,7 +272,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         }.thenReturn(Future.successful(completedSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any(), any())).thenReturn(Future.successful(None))
+          (any())).thenReturn(Future.successful(None))
 
         mockApplicationStatus(SubmissionReadyForReview)
 
@@ -295,7 +295,7 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         }.thenReturn(Future.successful(incompleteSections))
 
         when(declarationController.dataCacheConnector.fetch[AddPerson](any(), any())
-          (any(), any())).thenReturn(Future.successful(None))
+          (any())).thenReturn(Future.successful(None))
 
         mockApplicationStatus(NotCompleted)
 

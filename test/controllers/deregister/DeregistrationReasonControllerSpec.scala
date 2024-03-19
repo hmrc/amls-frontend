@@ -81,7 +81,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
               activities = Some(BusinessActivities(Set(HighValueDealing)))
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(),any()))
+            when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
               .thenReturn(Future.successful(Some(businessMatching)))
 
             val result = controller.get()(request)
@@ -105,7 +105,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
               activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(),any()))
+            when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
               .thenReturn(Future.successful(Some(businessMatching)))
 
             val result = controller.get()(request)
@@ -179,7 +179,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
             activities = Some(BusinessActivities(Set(HighValueDealing)))
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(),any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
           val newRequest = FakeRequest(POST, routes.DeregistrationReasonController.post().url)
@@ -197,7 +197,7 @@ class DeregistrationReasonControllerSpec extends AmlsSpec with Injecting {
             activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(),any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(Some(businessMatching)))
 
           val newRequest = FakeRequest(POST, routes.DeregistrationReasonController.post().url)

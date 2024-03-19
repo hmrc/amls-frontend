@@ -286,7 +286,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
         verify(controller.dataCacheConnector).save[Supervision](any(), any(), eqTo(Supervision(
           professionalBodyMember = Some(ProfessionalBodyMemberNo),
           hasChanged = true
-        )))(any(),any())
+        )))(any())
 
       }
       "ProfessionalBodyMemberNo and professionalBodies is defined" in new Fixture {
@@ -308,7 +308,7 @@ class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar wi
         verify(controller.dataCacheConnector).save[Supervision](any(), any(), eqTo(Supervision(
           professionalBodyMember = Some(ProfessionalBodyMemberNo),
           hasChanged = true
-        )))(any(),any())
+        )))(any())
 
       }
     }

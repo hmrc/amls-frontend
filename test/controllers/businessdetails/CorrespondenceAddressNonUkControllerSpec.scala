@@ -40,7 +40,7 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AmlsSpec
 import views.html.businessdetails.CorrespondenceAddressNonUKView
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.Future
 
 class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
@@ -80,7 +80,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
           Some(CorrespondenceAddressNonUk("Name Test", "Test", "Test", Some("Test"), Some("test"), None, Country("Albania", "AL"))))
         val businessDetails = BusinessDetails(None, None, None, None, None,None, None, None, None, Some(correspondenceAddress))
 
-        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.get(false)(request)
@@ -99,7 +99,7 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
 
       "no data exists in the keystore" in new Fixture {
 
-        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any()))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get(false)(request)
@@ -129,8 +129,8 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
           "country" -> "AL"
         )
 
-        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any(), any())).thenReturn(fetchResult)
-        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataConnector.fetch[BusinessDetails](any(), any())(any())).thenReturn(fetchResult)
+        when(controller.dataConnector.save[BusinessDetails](any(), any(), any())(any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -164,10 +164,10 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
         )
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())
-          (any(), any())).thenReturn(fetchResult)
+          (any())).thenReturn(fetchResult)
 
         when(controller.dataConnector.save[BusinessDetails](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(emptyCache))
+          (any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(edit = true)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -202,10 +202,10 @@ class CorrespondenceAddressNonUkControllerSpec extends AmlsSpec with MockitoSuga
         )
 
         when(controller.dataConnector.fetch[BusinessDetails](any(), any())
-          (any(), any())).thenReturn(fetchResult)
+          (any())).thenReturn(fetchResult)
 
         when(controller.dataConnector.save[BusinessDetails](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(emptyCache))
+          (any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(false)(newRequest)
         status(result) must be(BAD_REQUEST)

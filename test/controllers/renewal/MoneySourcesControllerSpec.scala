@@ -113,7 +113,7 @@ class MoneySourcesControllerSpec extends AmlsSpec with MockitoSugar with Injecti
     when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
       .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
 
-    when(dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), eqTo(expectedRenewal))(any(), any()))
+    when(dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), eqTo(expectedRenewal))(any()))
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
     def setupBusinessMatching(activities: Set[BusinessActivity], msbServices: Set[BusinessMatchingMsbService]) = when {

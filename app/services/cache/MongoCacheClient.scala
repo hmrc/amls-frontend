@@ -165,7 +165,7 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
           Updates.set("data", Codecs.toBson(cache.data - (key))),
           Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))),
         options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
-      ).toFuture
+      ).toFuture()
     }
   }
 
@@ -259,7 +259,7 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
         Updates.set("data",Codecs.toBson(rebuiltCache.data)),
         Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))),
       options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
-    ).toFuture.map(result => true)
+    ).toFuture().map(_ => true)
   }
 
   def saveAll(cache: Cache, credId: String): Future[Boolean] = {
@@ -282,7 +282,7 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
         Updates.set("lastUpdated", LocalDateTime.now(ZoneOffset.UTC))
       ),
       options = FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
-    ).toFuture.map(result => true)
+    ).toFuture().map(_ => true)
   }
 
   /**

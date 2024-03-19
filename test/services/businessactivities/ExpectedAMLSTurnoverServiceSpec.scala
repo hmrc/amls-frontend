@@ -132,7 +132,7 @@ class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach w
 
         val bm = BusinessMatching().copy(hasAccepted = true)
 
-        when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
           .thenReturn(Future.successful(Some(bm)))
 
         service.getBusinessMatching(credId).futureValue mustBe Some(bm)
@@ -140,7 +140,7 @@ class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach w
 
       "return None if business matching is not present in the cache" in {
 
-        when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
           .thenReturn(Future.successful(None))
 
         service.getBusinessMatching(credId).futureValue mustBe None
@@ -153,29 +153,29 @@ class ExpectedAMLSTurnoverServiceSpec extends AmlsSpec with BeforeAndAfterEach w
 
         val ba = BusinessActivities()
 
-        when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
           .thenReturn(Future.successful(Some(ba)))
 
         when(mockCacheConnector.save[BusinessActivities](
-          eqTo(credId), eqTo(BusinessActivities.key), eqTo(ba.expectedAMLSTurnover(First)))(any(), any()))
+          eqTo(credId), eqTo(BusinessActivities.key), eqTo(ba.expectedAMLSTurnover(First)))(any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         service.updateBusinessActivities(credId, First).futureValue mustBe Some(mockCacheMap)
 
         verify(mockCacheConnector).save[BusinessActivities](
-          eqTo(credId), eqTo(BusinessActivities.key), eqTo(ba.expectedAMLSTurnover(First)))(any(), any())
+          eqTo(credId), eqTo(BusinessActivities.key), eqTo(ba.expectedAMLSTurnover(First)))(any())
       }
       
       "not save model if business activities cannot be retrieved from cache" in {
 
-        when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
           .thenReturn(Future.successful(None))
 
         service.updateBusinessActivities(credId, First).foreach {
           _ mustBe None
         }
         verify(mockCacheConnector, times(0))
-          .save[BusinessActivities](any(), any(), any())(any(), any())
+          .save[BusinessActivities](any(), any(), any())(any())
       }
     }
   }

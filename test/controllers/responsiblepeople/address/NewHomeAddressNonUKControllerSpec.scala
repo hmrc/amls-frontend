@@ -65,7 +65,7 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
         val responsiblePeople = ResponsiblePerson()
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controller.get(40)(request)
         status(result) must be(NOT_FOUND)
@@ -76,7 +76,7 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
         val responsiblePeople = ResponsiblePerson(personName)
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controller.get(RecordId)(request)
         status(result) must be(OK)
@@ -97,26 +97,26 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(controller.dataCacheConnector.fetch[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key))(any()))
             .thenReturn(Future.successful(Some(NewHomeDateOfChange(Some(LocalDate.now().minusMonths(13))))))
 
-          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), meq(ResponsiblePerson.key), any())(any(), any()))
+          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), meq(ResponsiblePerson.key), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key), any())
-            (any(), any())).thenReturn(Future.successful(emptyCache))
+            (any())).thenReturn(Future.successful(emptyCache))
 
           when(controller.dataCacheConnector.removeByKey[NewHomeAddress](any(), meq(NewHomeAddress.key))
-            (any(), any())).thenReturn(Future.successful(emptyCache))
+            (any())).thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(responsiblePeople)))(any(), any())
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(responsiblePeople)))(any())
         }
 
         "all the mandatory non-UK parameters are supplied and date of move is more then 6 months" in new Fixture {
@@ -148,26 +148,26 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
           val nResponsiblePeople = ResponsiblePerson(addressHistory = Some(upDatedHistory), hasChanged = true)
 
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(controller.dataCacheConnector.fetch[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key))(any()))
             .thenReturn(Future.successful(Some(NewHomeDateOfChange(Some(LocalDate.now().minusMonths(7))))))
 
-          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), meq(ResponsiblePerson.key), any())(any(), any()))
+          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), meq(ResponsiblePerson.key), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key), any())
-            (any(), any())).thenReturn(Future.successful(emptyCache))
+            (any())).thenReturn(Future.successful(emptyCache))
 
           when(controller.dataCacheConnector.removeByKey[NewHomeAddress](any(), meq(NewHomeAddress.key))
-            (any(), any())).thenReturn(Future.successful(emptyCache))
+            (any())).thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(nResponsiblePeople)))(any(), any())
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(nResponsiblePeople)))(any())
         }
 
         "all the mandatory non-UK parameters are supplied and date of move is more then 3 years" in new Fixture {
@@ -190,27 +190,27 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
           val responsiblePeople1 = ResponsiblePerson(addressHistory = Some(history))
           val updatedHistory = ResponsiblePersonAddressHistory(currentAddress = Some(newCurrentAddress), additionalAddress = None, additionalExtraAddress = None)
 
-          when(controller.dataCacheConnector.fetch[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key))(any()))
             .thenReturn(Future.successful(Some(NewHomeDateOfChange(Some(LocalDate.now().minusMonths(37))))))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople1))))
 
           when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key),
-            any())(any(), any())).thenReturn(Future.successful(emptyCache))
+            any())(any())).thenReturn(Future.successful(emptyCache))
 
           when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), meq(NewHomeDateOfChange.key), any())
-            (any(), any())).thenReturn(Future.successful(emptyCache))
+            (any())).thenReturn(Future.successful(emptyCache))
 
           when(controller.dataCacheConnector.removeByKey[NewHomeAddress](any(), meq(NewHomeAddress.key))
-            (any(), any())).thenReturn(Future.successful(emptyCache))
+            (any())).thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId).url))
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(),
-            meq(Seq(responsiblePeople1.copy(addressHistory = Some(updatedHistory), hasChanged = true))))(any(), any())
+            meq(Seq(responsiblePeople1.copy(addressHistory = Some(updatedHistory), hasChanged = true))))(any())
         }
       }
 
@@ -224,7 +224,7 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
             "addressLine2" -> "Line *2",
             "country" -> "ES"
           )
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
           val result = controller.post(RecordId)(requestWithParams)
@@ -236,10 +236,10 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
           val line1MissingRequest = FakeRequest(POST, routes.NewHomeAddressNonUKController.post(1).url)
           .withFormUrlEncodedBody()
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
           val result = controller.post(RecordId)(line1MissingRequest)
           status(result) must be(BAD_REQUEST)
@@ -253,7 +253,7 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
             "addressLine2" -> "",
             "country" -> ""
           )
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
           val result = controller.post(RecordId)(requestWithMissingParams)
           status(result) must be(BAD_REQUEST)
@@ -274,9 +274,9 @@ class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServic
             val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
             val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
               .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-            when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(outOfBounds)(requestWithParams)

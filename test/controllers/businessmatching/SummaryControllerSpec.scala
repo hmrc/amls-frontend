@@ -60,7 +60,7 @@ class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
       mockStatusService.isPending(any())
     } thenReturn false
 
-    mockCacheConnector.fetch[AddBusinessTypeFlowModel](any(), eqTo(AddBusinessTypeFlowModel.key))(any(), any())
+    mockCacheConnector.fetch[AddBusinessTypeFlowModel](any(), eqTo(AddBusinessTypeFlowModel.key))(any())
 
     mockApplicationStatus(NotCompleted)
 

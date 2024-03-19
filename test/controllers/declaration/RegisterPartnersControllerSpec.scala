@@ -95,7 +95,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
           }.thenReturn(Future.successful(taskRows))
 
           when {
-            dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any())
+            dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())
           } thenReturn Future.successful(Some(Seq(ResponsiblePerson())))
 
           mockApplicationStatus(SubmissionDecisionApproved)
@@ -119,7 +119,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
           }.thenReturn(Future.successful(taskRows))
 
           when {
-            dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any())
+            dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any())
           } thenReturn Future.successful(Some(Seq(ResponsiblePerson())))
 
           mockApplicationStatus(SubmissionDecisionApproved)
@@ -138,7 +138,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
           val newRequest = FakeRequest(POST, routes.RegisterPartnersController.post().url)
           .withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
           mockApplicationStatus(SubmissionReady)
@@ -146,7 +146,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
           val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
             = Set(BeneficialOwner, InternalAccountant, Partner)))), rp2)
 
-          when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePerson]]](any(), any(), meq(Some(updatedList)))(any(), any()))
+          when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePerson]]](any(), any(), meq(Some(updatedList)))(any()))
             .thenReturn(Future.successful(emptyCache))
 
           when(controller.progressService.getSubmitRedirect(Some(any()), any(), any())(any(), any(), any()))
@@ -161,7 +161,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
         "no option is selected on the UI and status is submissionready" in new Fixture {
           val newRequest = FakeRequest(POST, routes.RegisterPartnersController.post().url)
           .withFormUrlEncodedBody("" -> "")
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
           mockApplicationStatus(SubmissionReady)
@@ -175,7 +175,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
         "no option is selected on the UI and status is SubmissionReadyForReview" in new Fixture {
           val newRequest = FakeRequest(POST, routes.RegisterPartnersController.post().url)
           .withFormUrlEncodedBody("" -> "")
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
           mockApplicationStatus(SubmissionReadyForReview)
@@ -189,7 +189,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
         "no option is selected on the UI and status is ReadyForRenewal" in new Fixture {
           val newRequest = FakeRequest(POST, routes.RegisterPartnersController.post().url)
           .withFormUrlEncodedBody("" -> "")
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
           mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
@@ -203,7 +203,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
         "no option is selected on the UI and no responsible people returned" in new Fixture {
           val newRequest = FakeRequest(POST, routes.RegisterPartnersController.post().url)
           .withFormUrlEncodedBody("" -> "")
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
           mockApplicationStatus(SubmissionReadyForReview)

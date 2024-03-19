@@ -57,7 +57,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with
     "get is called" must {
       "load the Risk assessment Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -70,7 +70,7 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with
 
       "pre-populate the Risk assessment Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
             riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased, Digital))))
           ))))
@@ -96,10 +96,10 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(AccountancyServices, MoneyServiceBusiness))))))
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
 
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
@@ -120,10 +120,10 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(AccountancyServices, MoneyServiceBusiness))))))
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
 
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
@@ -145,10 +145,10 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
 
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
@@ -169,10 +169,10 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
 
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
@@ -189,10 +189,10 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with
             val newRequest = FakeRequest(POST, routes.RiskAssessmentController.post(false).url).withFormUrlEncodedBody(
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(),any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(),any())(any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
@@ -205,10 +205,10 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with
               "hasPolicy" -> ""
             )
 
-            when(controller.dataCacheConnector.fetch[BusinessActivities](any(),any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[BusinessActivities](any(),any())(any()))
               .thenReturn(Future.successful(None))
 
-            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val result = controller.post()(newRequest)
@@ -229,10 +229,10 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))))))
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
 
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
@@ -253,10 +253,10 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
 
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))
@@ -277,10 +277,10 @@ class RiskAssessmentPolicyControllerSpec extends AmlsSpec with MockitoSugar with
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicy(RiskAssessmentHasPolicy(false), RiskAssessmentTypes(Set())))))))
 
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           when(controller.dataCacheConnector.fetchAll(any())(any[HeaderCarrier]))

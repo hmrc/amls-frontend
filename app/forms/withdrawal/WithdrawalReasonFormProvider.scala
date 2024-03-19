@@ -24,7 +24,7 @@ import play.api.data.Forms.mapping
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 
 import javax.inject.Inject
-import scala.collection.convert.ImplicitConversions.`collection asJava`
+import scala.jdk.CollectionConverters._
 
 class WithdrawalReasonFormProvider @Inject()() extends Mappings {
 
@@ -34,7 +34,7 @@ class WithdrawalReasonFormProvider @Inject()() extends Mappings {
   def apply(): Form[WithdrawalReason] = Form[WithdrawalReason](
     mapping(
       "withdrawalReason" -> enumerable[WithdrawalReason](error, error),
-      "specifyOtherReason" -> mandatoryIf(_.values.contains(Other("").toString),
+      "specifyOtherReason" -> mandatoryIf(_.values.asJavaCollection.contains(Other("").toString),
         text("error.required.withdrawal.reason.input").verifying(
           firstError(
             maxLength(length, "error.required.withdrawal.reason.length"),

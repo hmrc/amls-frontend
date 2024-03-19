@@ -102,7 +102,7 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
         )
 
         when {
-            controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(),eqTo(SubmissionRequestStatus.key))(any(),any())
+            controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(),eqTo(SubmissionRequestStatus.key))(any())
         } thenReturn Future.successful(Some(SubmissionRequestStatus(true)))
 
         val result = controller.get()(request)

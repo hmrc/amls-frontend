@@ -64,7 +64,7 @@ class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
     "get is called" must {
       "show the who is your accountant page when there is no existing data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -77,7 +77,7 @@ class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
 
       "show the who is your accountant page when there is existing data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
             whoIsYourAccountant = Some(WhoIsYourAccountant(
               Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
@@ -114,10 +114,10 @@ class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
             "tradingName" -> "tradingName"
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(true)(newRequest)
@@ -136,10 +136,10 @@ class WhoIsYourAccountantNameControllerSpec extends AmlsSpec
             "tradingName" -> "tradingName"
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(false)(newRequest)

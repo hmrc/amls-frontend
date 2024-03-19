@@ -68,9 +68,9 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Injecti
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
 
-          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
@@ -95,9 +95,9 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Injecti
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
 
 
-          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           when(timeAtAddressController.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))

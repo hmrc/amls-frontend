@@ -50,7 +50,7 @@ class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach
             RiskAssessmentHasPolicy(true), RiskAssessmentTypes(Set(PaperBased, Digital))
           )
 
-          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
             .thenReturn(Future.successful(Some(BusinessActivities().riskAssessmentPolicy(riskAssessmentPolicy))))
 
           service.getRiskAssessmentPolicy(credId).futureValue mustBe Some(riskAssessmentPolicy)
@@ -61,7 +61,7 @@ class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach
 
         "Risk Assessment Policy is not present in Business Activities model" in {
 
-          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
             .thenReturn(Future.successful(Some(BusinessActivities())))
 
           service.getRiskAssessmentPolicy(credId).futureValue mustBe None
@@ -69,7 +69,7 @@ class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach
 
         "Business Activities model can't be retrieved" in {
 
-          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
             .thenReturn(Future.successful(None))
 
           service.getRiskAssessmentPolicy(credId).futureValue mustBe None
@@ -96,13 +96,13 @@ class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach
 
         when(mockCacheConnector.save[BusinessActivities](
           eqTo(credId), eqTo(BusinessActivities.key), eqTo(ba.riskAssessmentTypes(updateModel)))
-          (any(), any())
+          (any())
         ).thenReturn(Future.successful(mockCacheMap))
 
         service.updateRiskAssessmentType(credId, updateModel).futureValue mustBe Some(bm)
 
         verify(mockCacheConnector).save[BusinessActivities](
-          eqTo(credId), eqTo(BusinessActivities.key), eqTo(ba.riskAssessmentTypes(updateModel)))(any(), any())
+          eqTo(credId), eqTo(BusinessActivities.key), eqTo(ba.riskAssessmentTypes(updateModel)))(any())
       }
 
       "not save Business Activities model" when {
@@ -121,7 +121,7 @@ class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach
           service.updateRiskAssessmentType(credId, updateModel).futureValue mustBe None
 
           verify(mockCacheConnector, times(0))
-            .save[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key), any())(any(), any())
+            .save[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key), any())(any())
         }
 
         "Business Matching is not present in cache" in {
@@ -138,7 +138,7 @@ class DocumentRiskAssessmentServiceSpec extends AmlsSpec with BeforeAndAfterEach
           service.updateRiskAssessmentType(credId, updateModel).futureValue mustBe None
 
           verify(mockCacheConnector, times(0))
-            .save[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key), any())(any(), any())
+            .save[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key), any())(any())
         }
       }
     }

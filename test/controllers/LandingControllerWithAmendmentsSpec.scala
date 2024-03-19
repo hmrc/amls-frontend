@@ -477,7 +477,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             "refresh from API5 and redirect to status controller" in new Fixture {
               setUpMocksForDataExistsInSaveForLater(controller, emptyCacheMap)
 
-              when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
+              when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
                 .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
               when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
@@ -504,7 +504,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
 
             when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(List()))
-            when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
             when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
               .thenReturn(Future.successful((NotCompleted, None)))
@@ -538,7 +538,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
                 setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
 
-                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
@@ -571,7 +571,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
                 setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
 
-                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
@@ -602,7 +602,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
                 setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
 
-                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
@@ -642,7 +642,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
                 setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
 
-                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
                   .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
                 when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
@@ -665,7 +665,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           "refresh from API5 and redirect to status controller" in new Fixture {
             setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(hasChanged = false, includesResponse = false))
 
-            when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))))
 
             when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
@@ -679,7 +679,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           }
 
           "refresh from API5 and redirect to status controller with duplicate submission flag set" in new Fixture {
-            when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", None, Some(true)))))
 
             val testCacheMap = buildTestCacheMap(hasChanged = false, includesResponse = false)
@@ -702,7 +702,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
             val fixedCacheMap = buildTestCacheMap(hasChanged = false, includesResponse = false)
 
-            when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
               .thenReturn(Future.successful(Some(SubscriptionResponse("", "", None))))
 
             when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))
@@ -712,11 +712,11 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
 
             when {
-              controller.cacheConnector.save[TradingPremises](any(), meq(TradingPremises.key), any())(any(), any())
+              controller.cacheConnector.save[TradingPremises](any(), meq(TradingPremises.key), any())(any())
             } thenReturn Future.successful(fixedCacheMap)
 
             when {
-              controller.cacheConnector.save[ResponsiblePerson](any(), meq(ResponsiblePerson.key), any())(any(), any())
+              controller.cacheConnector.save[ResponsiblePerson](any(), meq(ResponsiblePerson.key), any())(any())
             } thenReturn Future.successful(fixedCacheMap)
 
             val result = controller.get()(request)
@@ -733,7 +733,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "refresh from API5 and redirect to status controller" in new Fixture {
           setUpMocksForNoDataInSaveForLater(controller)
 
-          when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any(), any()))
+          when(controller.cacheConnector.fetch[SubscriptionResponse](any(), any())(any()))
             .thenReturn(Future.successful(Some(SubscriptionResponse("", "", None))))
 
           when(controller.statusService.getDetailedStatus(any(), any[(String, String)], any())(any[HeaderCarrier](), any(), any()))

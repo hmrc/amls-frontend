@@ -77,8 +77,8 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
 
     val defaultBM = BusinessMatching(reviewDetails = Some(defaultReviewDetails))
     when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-      (any(), any())).thenReturn(Future.successful(Some(defaultBM)))
-    when(addPersonController.dataCacheConnector.save[AddPerson](any(), any(), any())(any(), any()))
+      (any())).thenReturn(Future.successful(Some(defaultBM)))
+    when(addPersonController.dataCacheConnector.save[AddPerson](any(), any(), any())(any()))
       .thenReturn(Future.successful(emptyCache))
     mockApplicationStatus(SubmissionReady)
   }
@@ -244,7 +244,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
           val rd = defaultReviewDetails.copy(businessType = Some(LimitedCompany))
           val bm = BusinessMatching(reviewDetails = Some(rd))
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any(), any())).thenReturn(Future.successful(Some(bm)))
+            (any())).thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
           .withFormUrlEncodedBody(
@@ -260,7 +260,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
           val rd = defaultReviewDetails.copy(businessType = Some(SoleProprietor))
           val bm = BusinessMatching(reviewDetails = Some(rd))
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any(), any())).thenReturn(Future.successful(Some(bm)))
+            (any())).thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
           .withFormUrlEncodedBody(
@@ -276,7 +276,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
           val rd = defaultReviewDetails.copy(businessType = Some(Partnership))
           val bm = BusinessMatching(reviewDetails = Some(rd))
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any(), any())).thenReturn(Future.successful(Some(bm)))
+            (any())).thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
           .withFormUrlEncodedBody(
@@ -292,7 +292,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
           val rd = defaultReviewDetails.copy(businessType = Some(LPrLLP))
           val bm = BusinessMatching(reviewDetails = Some(rd))
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any(), any())).thenReturn(Future.successful(Some(bm)))
+            (any())).thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
           .withFormUrlEncodedBody(
@@ -308,7 +308,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
           val rd = defaultReviewDetails.copy(businessType = Some(UnincorporatedBody))
           val bm = BusinessMatching(reviewDetails = Some(rd))
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any(), any())).thenReturn(Future.successful(Some(bm)))
+            (any())).thenReturn(Future.successful(Some(bm)))
 
           val roleMissingInRequest = FakeRequest(POST, routes.AddPersonController.post().url)
           .withFormUrlEncodedBody(
@@ -350,7 +350,7 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
         "status is pending" in new Fixture {
 
           when(addPersonController.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any(), any())).thenReturn(Future.successful(None))
+            (any())).thenReturn(Future.successful(None))
 
           mockApplicationStatus(SubmissionReadyForReview)
 

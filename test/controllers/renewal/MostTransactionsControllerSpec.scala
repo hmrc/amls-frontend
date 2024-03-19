@@ -98,7 +98,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
     when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
             .thenReturn(Some(incomingModel))
 
-    when(cache.save[Renewal](any(), eqTo(Renewal.key), eqTo(outgoingModel))(any(), any()))
+    when(cache.save[Renewal](any(), eqTo(Renewal.key), eqTo(outgoingModel))(any()))
             .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
     def setupBusinessMatching(activities: Set[BusinessActivity] = Set(), msbServices: Set[BusinessMatchingMsbService] = Set()) = when {
@@ -110,7 +110,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
 
     "show an empty form on get with no data in store" in new Fixture {
 
-      when(cache.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any()))
+      when(cache.fetch[Renewal](any(), eqTo(Renewal.key))(any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -137,7 +137,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
         )
       )
 
-      when(cache.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any()))
+      when(cache.fetch[Renewal](any(), eqTo(Renewal.key))(any()))
         .thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
@@ -273,7 +273,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar with Inj
         .thenReturn(Some(incomingModel))
 
       when(cache.save[Renewal](any(), eqTo(Renewal.key), any())
-        (any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+        (any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
 
       a[Exception] must be thrownBy {

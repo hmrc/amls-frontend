@@ -66,7 +66,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load ActivityStartDate page" in new Fixture {
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(None))
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -75,7 +75,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load ActivityStartDate with pre-populated data" in new Fixture {
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))
         val result = controller.get()(request)
         val document = Jsoup.parse(contentAsString(result))
@@ -107,7 +107,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
-        when(controller.dataCache.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCache.save(any(), any(), any())(any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -125,7 +125,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
           Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
-        when(controller.dataCache.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCache.save(any(), any(), any())(any())).thenReturn(Future.successful(emptyCache))
 
         override val mockCacheMap = mock[CacheMap]
 
@@ -149,7 +149,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
           "value.month" -> "",
           "value.year" -> ""
         )
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.post()(newRequest)
@@ -165,7 +165,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
           "value.month" -> "12",
           "value.year" -> "1990"
         )
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.post()(newRequest)
@@ -181,7 +181,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
           "value.month" -> "11",
           "value.year" -> ""
         )
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.post()(newRequest)
@@ -196,7 +196,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
           "value.month" -> "3",
           "value.year" -> "16"
         )
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.post()(newRequest)
@@ -210,7 +210,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
           "value.month" -> "3",
           "value.year" -> "19782"
         )
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.post()(newRequest)
@@ -239,7 +239,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
-        when(controller.dataCache.save(any(), any(), any())(any(), any()))
+        when(controller.dataCache.save(any(), any(), any())(any()))
           .thenThrow(new IndexOutOfBoundsException("error"))
 
         val result = controller.post()(newRequest)
@@ -267,7 +267,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         when(controller.dataCache.fetchAll(any())(any[HeaderCarrier]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
-        when(controller.dataCache.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
+        when(controller.dataCache.save(any(), any(), any())(any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)

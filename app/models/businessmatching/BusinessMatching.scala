@@ -152,14 +152,14 @@ case class BusinessMatching(
     val businessActivities = if (estateAgent) {
       alphabeticalBusinessActivitiesLowerCase(estateAgent)
     } else {
-      alphabeticalBusinessTypes
+      alphabeticalBusinessTypes()
     }
 
     businessActivities.map {
       businessType =>
         businessType.map(item => {
           val prefix = if (vowels.exists(item.toLowerCase.startsWith(_))) "an" else "a"
-          s"$prefix ${item(0).toLower + item.substring(1)}"
+          s"$prefix ${item(0).toLower}${item.substring(1)}"
         })
     }
   }

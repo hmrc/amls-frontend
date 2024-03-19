@@ -73,10 +73,10 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
 
       val business = BusinessDetails(registeredOffice = Some(office), activityStartDate = Some(ActivityStartDate(date)))
 
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())).
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())).
         thenReturn(Future.successful(Some(business)))
 
-      when(controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(any(), any())).
+      when(controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(any())).
         thenReturn(Future.successful(mock[CacheMap]))
 
       val result = controller.post()(postRequest)
@@ -85,7 +85,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
       redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
       val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
-      verify(controller.dataCacheConnector).save[BusinessDetails](any(), eqTo(BusinessDetails.key), captor.capture())(any(), any())
+      verify(controller.dataCacheConnector).save[BusinessDetails](any(), eqTo(BusinessDetails.key), captor.capture())(any())
 
       captor.getValue.registeredOffice match {
         case Some(savedOffice: RegisteredOfficeUK) => savedOffice must be(updatedOffice)
@@ -110,10 +110,10 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
 
       val business = BusinessDetails(registeredOffice = Some(office), activityStartDate = Some(ActivityStartDate(date)))
 
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())).
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())).
         thenReturn(Future.successful(Some(business)))
 
-      when(controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(any(), any())).
+      when(controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(any())).
         thenReturn(Future.successful(mock[CacheMap]))
 
       val result = controller.post()(postRequest)
@@ -122,7 +122,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
       redirectLocation(result) must be(Some(routes.SummaryController.get.url))
 
       val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
-      verify(controller.dataCacheConnector).save[BusinessDetails](any(), eqTo(BusinessDetails.key), captor.capture())(any(), any())
+      verify(controller.dataCacheConnector).save[BusinessDetails](any(), eqTo(BusinessDetails.key), captor.capture())(any())
 
       captor.getValue.registeredOffice match {
         case Some(savedOffice: RegisteredOfficeNonUK) => savedOffice must be(updatedOffice)
@@ -133,7 +133,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
   "show the data of change form once again" when {
     "posted with invalid data" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())).
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())).
         thenReturn(Future.successful(Some(BusinessDetails())))
 
       val postRequest = FakeRequest(POST, routes.RegisteredOfficeDateOfChangeController.post.url)
@@ -142,7 +142,7 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
       val result = controller.post(postRequest)
 
       status(result) must be(BAD_REQUEST)
-      verify(controller.dataCacheConnector, never()).save[BusinessDetails](any(), any(), any())(any(), any())
+      verify(controller.dataCacheConnector, never()).save[BusinessDetails](any(), any(), any())(any())
 
     }
     "dateOfChange is earlier than Business Activities Start Date" in new Fixture {
@@ -160,10 +160,10 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with MockitoSu
         registeredOffice = Some(office)
       )
 
-      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())).
+      when(controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())).
         thenReturn(Future.successful(Some(business)))
 
-      when(controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(any(), any())).
+      when(controller.dataCacheConnector.save[BusinessDetails](any(), eqTo(BusinessDetails.key), any[BusinessDetails])(any())).
         thenReturn(Future.successful(mock[CacheMap]))
 
       val result = controller.post()(postRequest)

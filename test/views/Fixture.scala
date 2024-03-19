@@ -23,7 +23,7 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import utils.Strings.TextHelpers
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait ParagraphHelpers extends Matchers {
   def validateParagraphizedContent(messageKey: String)(implicit messages: Messages, doc: Document): Unit = {

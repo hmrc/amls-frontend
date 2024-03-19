@@ -123,7 +123,7 @@ object BankDetails {
       case bds @ _ =>
         TaskRow(
           messageKey,
-          controllers.bankdetails.routes.YourBankAccountsController.get.url,
+          controllers.bankdetails.routes.YourBankAccountsController.get().url,
           anyChanged(bds),
           Started,
           TaskRow.incompleteTag

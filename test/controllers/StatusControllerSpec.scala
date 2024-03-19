@@ -296,7 +296,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           when(controller.landingService.cacheMap(any[String])(any(), any()))
             .thenReturn(Future.successful(Some(cacheMap)))
 
-          when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+          when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
           when(controller.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
@@ -314,7 +314,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
           when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
             .thenReturn(Future.successful(Some(cacheMap)))
 
-          when(controllerNoAmlsNumber.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+          when(controllerNoAmlsNumber.dataCache.fetch[BusinessMatching](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
           when(controllerNoAmlsNumber.statusService.getDetailedStatus(any[Option[String]](), any(), any())(any(), any(), any()))
@@ -334,7 +334,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(controller.landingService.cacheMap(any[String])(any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
 
-        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
           .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
         when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
@@ -635,7 +635,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
         when(statusResponse.safeId).thenReturn(None)
 
-        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
           .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
         when(controller.landingService.cacheMap(any[String])(any(), any()))
@@ -663,7 +663,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(statusResponse.processingDate).thenReturn(LocalDateTime.now)
         when(statusResponse.safeId).thenReturn(None)
 
-        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
           .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
         when(controllerNoAmlsNumber.landingService.cacheMap(any[String])(any(), any()))
@@ -690,7 +690,7 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
         when(statusResponse.safeId).thenReturn(None)
 
-        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[BusinessMatching](any(), any())(any()))
           .thenReturn(Future.successful(Some(BusinessMatching(Some(reviewDetails), Some(BusinessActivities(Set(TelephonePaymentService)))))))
 
         when(controller.landingService.cacheMap(any[String])(any(), any()))

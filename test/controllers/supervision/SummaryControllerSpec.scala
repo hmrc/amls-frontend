@@ -53,7 +53,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
     "load the summary page when section data is available and section is complete" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[Supervision](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(completeModel)))
+        (any())).thenReturn(Future.successful(Some(completeModel)))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -61,7 +61,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     "redirect to the main summary page when section data is available but incomplete" in new Fixture {
       when(controller.dataCacheConnector.fetch[Supervision](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(model)))
+        (any())).thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -69,7 +69,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
       when(controller.dataCacheConnector.fetch[Asp](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -81,11 +81,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       val cache = mock[CacheMap]
 
       when {
-        controller.dataCacheConnector.fetch[Supervision](any(), any())(any(), any())
+        controller.dataCacheConnector.fetch[Supervision](any(), any())(any())
       } thenReturn Future.successful(Some(model.copy(hasAccepted = false)))
 
       when {
-        controller.dataCacheConnector.save[Supervision](any(), eqTo(Supervision.key), any())(any(), any())
+        controller.dataCacheConnector.save[Supervision](any(), eqTo(Supervision.key), any())(any())
       } thenReturn Future.successful(cache)
 
       val result = controller.post()(request)
@@ -94,7 +94,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
       redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
 
       val captor = ArgumentCaptor.forClass(classOf[Supervision])
-      verify(controller.dataCacheConnector).save[Supervision](any(), eqTo(Supervision.key), captor.capture())(any(), any())
+      verify(controller.dataCacheConnector).save[Supervision](any(), eqTo(Supervision.key), captor.capture())(any())
       captor.getValue.hasAccepted mustBe true
     }
   }

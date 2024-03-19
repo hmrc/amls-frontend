@@ -62,7 +62,7 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec {
     )
 
     when {
-      dataCache.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())
+      dataCache.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any())
     } thenReturn Future.successful(BusinessMatching(reviewDetails.some, activities.some).some)
 
     when {

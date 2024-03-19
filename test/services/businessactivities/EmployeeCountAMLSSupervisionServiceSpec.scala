@@ -47,7 +47,7 @@ class EmployeeCountAMLSSupervisionServiceSpec extends AmlsSpec with BeforeAndAft
         "it is present in the cache" in {
           val count = "38"
 
-          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
             .thenReturn(Future.successful(Some(
               BusinessActivities(howManyEmployees = Some(HowManyEmployees(Some("648"), Some(count))))
             )))
@@ -60,7 +60,7 @@ class EmployeeCountAMLSSupervisionServiceSpec extends AmlsSpec with BeforeAndAft
 
         "employeeCountAMLSSupervision is not set in the cache" in {
 
-          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
             .thenReturn(Future.successful(Some(
               BusinessActivities(howManyEmployees = Some(HowManyEmployees(Some("648"), None)))
             )))
@@ -70,7 +70,7 @@ class EmployeeCountAMLSSupervisionServiceSpec extends AmlsSpec with BeforeAndAft
 
         "HowManyEmployees is not set in the cache" in {
 
-          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
             .thenReturn(Future.successful(Some(BusinessActivities())))
 
           service.getEmployeeCountAMLSSupervision(credId).futureValue mustBe None
@@ -78,7 +78,7 @@ class EmployeeCountAMLSSupervisionServiceSpec extends AmlsSpec with BeforeAndAft
 
         "BusinessActivities is not set in the cache" in {
 
-          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
             .thenReturn(Future.successful(None))
 
           service.getEmployeeCountAMLSSupervision(credId).futureValue mustBe None
@@ -94,7 +94,7 @@ class EmployeeCountAMLSSupervisionServiceSpec extends AmlsSpec with BeforeAndAft
 
         val bm = BusinessActivities().howManyEmployees(HowManyEmployees(Some("815"), None))
 
-        when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
           .thenReturn(
             Future.successful(Some(bm))
           )
@@ -103,7 +103,7 @@ class EmployeeCountAMLSSupervisionServiceSpec extends AmlsSpec with BeforeAndAft
           eqTo(credId),
           eqTo(BusinessActivities.key),
           any()
-        )(any(), any()))
+        )(any()))
           .thenReturn(Future.successful(mockCacheMap))
 
 
@@ -113,20 +113,20 @@ class EmployeeCountAMLSSupervisionServiceSpec extends AmlsSpec with BeforeAndAft
           eqTo(credId),
           eqTo(BusinessActivities.key),
           eqTo(bm.howManyEmployees(HowManyEmployees(Some("815"), Some(count))))
-        )(any(), any())
+        )(any())
       }
 
       "fail to update or save the model" when {
 
         "Business Activities is not present in cache" in {
 
-          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key))(any()))
             .thenReturn(Future.successful(None))
 
           service.updateHowManyEmployees(credId, EmployeeCountAMLSSupervision("15")).futureValue mustBe None
 
           verify(mockCacheConnector, times(0))
-            .save[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key), any())(any(), any())
+            .save[BusinessActivities](eqTo(credId), eqTo(BusinessActivities.key), any())(any())
         }
       }
     }

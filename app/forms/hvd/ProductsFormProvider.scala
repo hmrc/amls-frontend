@@ -24,7 +24,7 @@ import play.api.data.Forms.{mapping, seq}
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 
 import javax.inject.Inject
-import scala.collection.convert.ImplicitConversions.`collection asJava`
+import scala.jdk.CollectionConverters._
 
 class ProductsFormProvider @Inject()() extends Mappings {
 
@@ -36,7 +36,7 @@ class ProductsFormProvider @Inject()() extends Mappings {
       "products" -> seq(enumerable[ItemType](checkboxError, checkboxError)(Products.enumerable))
         .verifying(nonEmptySeq(checkboxError)),
       "otherDetails" -> mandatoryIf(
-        _.values.contains(Other("").toString),
+        _.values.asJavaCollection.contains(Other("").toString),
         text("error.required.hvd.business.sell.other.details").verifying(
           firstError(
             maxLength(length, "error.invalid.hvd.business.sell.other.details"),

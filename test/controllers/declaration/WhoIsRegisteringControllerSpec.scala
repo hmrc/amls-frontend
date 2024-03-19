@@ -94,13 +94,13 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
       when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
         .thenReturn(Some(people))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
         .thenReturn(Future.successful(Some(people)))
 
       when(controller.dataCacheConnector.save[AddPerson](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
-      when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[WhoIsRegistering](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       block(())
@@ -260,7 +260,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
           redirectLocation(result) mustBe Some(routes.DeclarationController.get.url)
 
           val expectedAddPersonModel = AddPerson(name.firstName, name.middleName, name.lastName, RoleWithinBusinessRelease7(Set(models.declaration.release7.InternalAccountant)))
-          verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), eqTo(expectedAddPersonModel))(any(), any())
+          verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), eqTo(expectedAddPersonModel))(any())
         }
 
       }
@@ -274,7 +274,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DeclarationController.get.url))
 
-          verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), any())(any(), any())
+          verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), any())(any())
         }
       }
 
@@ -322,7 +322,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
             status(result) must be(SEE_OTHER)
             redirectLocation(result) mustBe Some(routes.DeclarationController.getWithAmendment().url)
 
-            verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), any())(any(), any())
+            verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), any())(any())
           }
         }
 
@@ -335,7 +335,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
             status(result) must be(SEE_OTHER)
             redirectLocation(result) mustBe Some(routes.DeclarationController.get.url)
 
-            verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), any())(any(), any())
+            verify(controller.dataCacheConnector).save[AddPerson](any(), eqTo(AddPerson.key), any())(any())
           }
         }
       }

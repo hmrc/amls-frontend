@@ -59,7 +59,7 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with Injecting {
     "get is called" must {
       "show the who is your accountant page when there is no existing data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -72,7 +72,7 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with Injecting {
 
       "show the who is your accountant page when there is existing data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
             whoIsYourAccountant = Some(WhoIsYourAccountant(
               Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
@@ -95,7 +95,7 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with Injecting {
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(Some(BusinessActivities(
               whoIsYourAccountant = Some(WhoIsYourAccountant(
                 Some(WhoIsYourAccountantName("testname", Some("testtradingName"))),
@@ -117,10 +117,10 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with Injecting {
             "isUK" -> "true"
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(true)(newRequest)
@@ -138,10 +138,10 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with Injecting {
             "isUK" -> "true"
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(false)(newRequest)
@@ -157,10 +157,10 @@ class WhoIsYourAccountantIsUkControllerSpec extends AmlsSpec with Injecting {
             "isUK" -> "false"
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(false)(newRequest)
