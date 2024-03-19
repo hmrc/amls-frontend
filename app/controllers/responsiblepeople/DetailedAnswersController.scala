@@ -77,7 +77,7 @@ class DetailedAnswersController @Inject () (
           recoverActivitiesService.recover(request).map {
             case true => Redirect(routes.DetailedAnswersController.get(index, flow))
             case false =>
-              logger.warn("[InvolvedInOtherController][get] - Unable to determine business types")
+              logger.warn("[DetailedAnswersController][get] - Unable to determine business types")
               InternalServerError(amlsErrorHandler.internalServerErrorTemplate)
           }
       }
