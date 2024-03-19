@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.ApplicationConfig
+import config.{AmlsErrorHandler, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import controllers.declaration
@@ -59,7 +59,8 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
       cc = mockMcc,
       cyaHelper = inject[CheckYourAnswersHelper],
       view = view,
-      error = errorView
+      error = errorView,
+      amlsErrorHandler = inject[AmlsErrorHandler]
     )
 
     val businessMatching = BusinessMatching()

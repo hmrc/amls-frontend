@@ -16,6 +16,7 @@
 
 package controllers.responsiblepeople
 
+import config.AmlsErrorHandler
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.responsiblepeople.ExperienceTrainingFormProvider
@@ -61,7 +62,8 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       cc = mockMcc,
       formProvider = inject[ExperienceTrainingFormProvider],
       view = view,
-      error = errorView)
+      error = errorView,
+      amlsErrorHandler = inject[AmlsErrorHandler])
   }
 
   val emptyCache: CacheMap = CacheMap("", Map.empty)
