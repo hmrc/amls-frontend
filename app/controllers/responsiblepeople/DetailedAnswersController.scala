@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import cats.data.OptionT
 import cats.implicits._
 import com.google.inject.Inject
-import config.ApplicationConfig
+import config.{AmlsErrorHandler, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import models.businessmatching.BusinessMatching
@@ -49,6 +49,7 @@ class DetailedAnswersController @Inject () (
                                              val cc: MessagesControllerComponents,
                                              cyaHelper: CheckYourAnswersHelper,
                                              view: CheckYourAnswersView,
+                                             amlsErrorHandler: AmlsErrorHandler,
                                              implicit val error: views.html.ErrorView)
   extends AmlsBaseController(ds, cc) with RepeatingSection with Logging {
 
@@ -75,7 +76,9 @@ class DetailedAnswersController @Inject () (
           logger.warn("[DetailedAnswersController][get] - Business activities list was empty, attempting to recover")
           recoverActivitiesService.recover(request).map {
             case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-            case false => InternalServerError("Unable to determine business types")
+            case false =>
+              logger.warn("[InvolvedInOtherController][get] - Unable to determine business types")
+              InternalServerError(amlsErrorHandler.internalServerErrorTemplate)
           }
       }
   }

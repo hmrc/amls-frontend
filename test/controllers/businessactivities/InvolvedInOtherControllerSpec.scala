@@ -16,6 +16,7 @@
 
 package controllers.businessactivities
 
+import config.AmlsErrorHandler
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.businessactivities.InvolvedInOtherFormProvider
@@ -52,7 +53,8 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with ScalaFutures with Inje
       statusService = mock[StatusService],
       cc = mockMcc,
       formProvider = inject[InvolvedInOtherFormProvider],
-      view = view
+      view = view,
+      error = inject[AmlsErrorHandler]
     )
   }
 

@@ -16,6 +16,7 @@
 
 package controllers.renewal
 
+import config.AmlsErrorHandler
 import connectors.DataCacheConnector
 import controllers.actions.SuccessfulAuthAction
 import forms.renewal.InvolvedInOtherFormProvider
@@ -59,7 +60,8 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
       authAction = SuccessfulAuthAction, ds = commonDependencies,
       renewalService = mockRenewalService, cc = mockMcc,
       formProvider = inject[InvolvedInOtherFormProvider],
-      view = view
+      view = view,
+      error = inject[AmlsErrorHandler]
     )
   }
 

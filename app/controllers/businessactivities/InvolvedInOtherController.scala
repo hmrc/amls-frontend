@@ -17,6 +17,7 @@
 package controllers.businessactivities
 
 import com.google.inject.Inject
+import config.AmlsErrorHandler
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.businessactivities.InvolvedInOtherFormProvider
@@ -38,6 +39,7 @@ class InvolvedInOtherController @Inject() (val dataCacheConnector: DataCacheConn
                                            val ds: CommonPlayDependencies,
                                            val cc: MessagesControllerComponents,
                                            formProvider: InvolvedInOtherFormProvider,
+                                           error: AmlsErrorHandler,
                                            view: InvolvedInOtherNameView) extends AmlsBaseController(ds, cc) with Logging {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
@@ -59,7 +61,9 @@ class InvolvedInOtherController @Inject() (val dataCacheConnector: DataCacheConn
           logger.warn("[InvolvedInOtherController][get] - Business activities list was empty, attempting to recover")
           recoverActivitiesService.recover(request).map {
             case true => Redirect(routes.InvolvedInOtherController.get())
-            case false => InternalServerError("Unable to determine business types")
+            case false =>
+              logger.warn("[InvolvedInOtherController][get] - Unable to determine business types")
+              InternalServerError(error.internalServerErrorTemplate)
           }
       }
   }

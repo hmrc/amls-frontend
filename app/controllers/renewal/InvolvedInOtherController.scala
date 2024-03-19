@@ -16,6 +16,7 @@
 
 package controllers.renewal
 
+import config.AmlsErrorHandler
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.renewal.InvolvedInOtherFormProvider
@@ -39,6 +40,7 @@ class InvolvedInOtherController @Inject()(val dataCacheConnector: DataCacheConne
                                           val renewalService: RenewalService,
                                           val cc: MessagesControllerComponents,
                                           formProvider: InvolvedInOtherFormProvider,
+                                          error: AmlsErrorHandler,
                                           view: InvolvedInOtherView) extends AmlsBaseController(ds, cc) with Logging {
 
   def get(edit: Boolean = false): Action[AnyContent] = authAction.async {
@@ -61,7 +63,9 @@ class InvolvedInOtherController @Inject()(val dataCacheConnector: DataCacheConne
             logger.warn("[InvolvedInOtherController][get] - Business activities list was empty, attempting to recover")
             recoverActivitiesService.recover(request).map {
               case true => Redirect(routes.InvolvedInOtherController.get())
-              case false => InternalServerError("Unable to determine business types")
+              case false =>
+                logger.warn("[InvolvedInOtherController][get] - Unable to determine business types")
+                InternalServerError(error.internalServerErrorTemplate)
             }
         }
   }
