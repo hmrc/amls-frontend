@@ -146,7 +146,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
           )
 
           when {
-            controller.dataCacheConnector.fetch[BusinessMatching](any(), meq(BusinessMatching.key))(any(), any())
+            controller.dataCacheConnector.fetch[BusinessMatching](any(), meq(BusinessMatching.key))(any())
           } thenReturn Future.successful(Some(model))
 
           when {
@@ -165,7 +165,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
           mockCacheGetEntry(Some(Seq(TradingPremises())), TradingPremises.key)
           mockCacheGetEntry(Some(model), BusinessMatching.key)
 
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
@@ -176,7 +176,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
           verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
             any(),
             any(),
-            meq(Seq(TradingPremises(yourTradingPremises = Some(ytp)))))(any(), any())
+            meq(Seq(TradingPremises(yourTradingPremises = Some(ytp)))))(any())
 
         }
 
@@ -189,7 +189,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
           mockCacheGetEntry(Some(Seq(TradingPremises(yourTradingPremises = Some(mock[YourTradingPremises])))), TradingPremises.key)
           mockCacheGetEntry(Some(bm), BusinessMatching.key)
 
-          when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save(any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)

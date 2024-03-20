@@ -204,7 +204,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
           mockAmlsConnector.savePayment(any(), any(), any(), any())(any(), any())
         } thenThrow new IllegalArgumentException()
 
-        val savePaymentBeforeResponse = PrivateMethod[Future[Unit]]('savePaymentBeforeResponse)
+        val savePaymentBeforeResponse = PrivateMethod[Future[Unit]](Symbol("savePaymentBeforeResponse"))
 
         intercept[IllegalArgumentException] {
           testPaymentService invokePrivate savePaymentBeforeResponse(paymentResponse, "xxx", "zzz", headerCarrier)

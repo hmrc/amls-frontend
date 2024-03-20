@@ -24,7 +24,7 @@ import play.api.data.Forms.{mapping, seq}
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 
 import javax.inject.Inject
-import scala.collection.convert.ImplicitConversions.`collection asJava`
+import scala.jdk.CollectionConverters._
 
 class ProvidedServicesFormProvider @Inject()() extends Mappings {
 
@@ -37,7 +37,7 @@ class ProvidedServicesFormProvider @Inject()() extends Mappings {
       "services" -> seq(enumerable[TcspService](checkboxError, checkboxError)(ProvidedServices.enumerable))
         .verifying(nonEmptySeq(checkboxError)),
       "details" -> mandatoryIf(
-        _.values.contains(Other("").toString),
+        _.values.asJavaCollection.contains(Other("").toString),
         text("error.required.tcsp.provided_services.details").verifying(
           firstError(
             maxLength(length, "error.required.tcsp.provided_services.details.length"),

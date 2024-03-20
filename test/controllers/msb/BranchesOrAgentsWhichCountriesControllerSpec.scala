@@ -81,7 +81,7 @@ class BranchesOrAgentsWhichCountriesControllerSpec extends AmlsSpec with Mockito
     }
 
     "return a Bad request with prefilled form on invalid submission" in new Fixture {
-      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Future.successful(Some(modelBefore)))
 
       val newRequest = FakeRequest(POST, routes.BranchesOrAgentsWhichCountriesController.post().url)

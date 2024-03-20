@@ -342,7 +342,7 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       when(service.amlsConnector.status(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(readStatusResponse.copy(safeId = Some(safeId))))
 
-      when(service.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any()))
+      when(service.dataCacheConnector.fetch[BusinessMatching](any(), any())(any()))
         .thenReturn(Future.successful(Option.empty[BusinessMatching]))
 
       whenReady(service.getSafeIdFromReadStatus("amlsref", accountTypeId, credId)) {

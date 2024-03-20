@@ -19,7 +19,7 @@ package services.businessactivities
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
-import models.businessmatching.{BusinessMatching, BusinessActivities => MatchingActivities}
+import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 

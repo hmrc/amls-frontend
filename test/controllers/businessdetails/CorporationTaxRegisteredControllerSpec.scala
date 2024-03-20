@@ -104,7 +104,7 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
         status(result) must be(SEE_OTHER)
 
         verify(controller.dataCacheConnector).save(eqTo("internalId"), eqTo(BusinessDetails.key),
-          eqTo(data.corporationTaxRegistered(corpTax)))(any(), any())
+          eqTo(data.corporationTaxRegistered(corpTax)))(any())
       }
 
       "business matching UTR NOT exists" in new Fixture {

@@ -111,7 +111,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
         SUT.updateSupervision("internalId").returnsSome(Supervision(hasAccepted = true))
 
-        verify(mockCacheConnector).save(any(), eqTo(Supervision.key), eqTo(Supervision(hasAccepted = true)))(any(), any())
+        verify(mockCacheConnector).save(any(), eqTo(Supervision.key), eqTo(Supervision(hasAccepted = true)))(any())
       }
     }
 
@@ -130,7 +130,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
         SUT.updateSupervision("internalId").returnsSome(supervisionModel)
 
-        verify(mockCacheConnector, never).save(any(),any(), any())(any(), any())
+        verify(mockCacheConnector, never).save(any(),any(), any())(any())
       }
     }
 
@@ -148,7 +148,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
       SUT.updateSupervision("internalId").returnsSome(supervisionModel)
 
-      verify(mockCacheConnector, never).save(any(),any(), any())(any(), any())
+      verify(mockCacheConnector, never).save(any(),any(), any())(any())
     }
   }
 
@@ -252,7 +252,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
       await(SUT.updateHasAcceptedFlag("internalId", AddBusinessTypeFlowModel()).value)
 
-      verify(mockCacheConnector).save[AddBusinessTypeFlowModel](any(), eqTo(AddBusinessTypeFlowModel.key), eqTo(AddBusinessTypeFlowModel(hasAccepted = true)))(any(), any())
+      verify(mockCacheConnector).save[AddBusinessTypeFlowModel](any(), eqTo(AddBusinessTypeFlowModel.key), eqTo(AddBusinessTypeFlowModel(hasAccepted = true)))(any())
     }
   }
 

@@ -116,10 +116,10 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
         .withFormUrlEncodedBody(("value", "12345678"))
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(businessMatching)))
+        (any())).thenReturn(Future.successful(Some(businessMatching)))
 
       when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(validRequest)
       status(result) must be(SEE_OTHER)
@@ -132,10 +132,10 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
         .withFormUrlEncodedBody(("value", "12345678"))
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(businessMatching)))
+        (any())).thenReturn(Future.successful(Some(businessMatching)))
 
       when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(false)(validRequest)
       status(result) must be(SEE_OTHER)

@@ -74,14 +74,14 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
   "ConfirmRegisteredOfficeController" must {
     "Get" must {
       "load register Office" in new Fixture {
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))
         val result = controller.get()(request)
         status(result) must be(OK)
       }
 
       "load Registered office or main place of business when Business Address from mongoCache returns None" in new Fixture {
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -109,7 +109,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(completeBusinessDetails))
 
-        when (controller.dataCache.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
+        when (controller.dataCache.save(any(), any(), any())(any())).thenReturn(Future.successful(emptyCache))
 
 
         val result = controller.post()(newRequest)
@@ -117,7 +117,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.SummaryController.get.url))
 
         val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
-        verify(controller.dataCache).save[BusinessDetails](any(), meq(BusinessDetails.key), captor.capture())(any(), any())
+        verify(controller.dataCache).save[BusinessDetails](any(), meq(BusinessDetails.key), captor.capture())(any())
 
         captor.getValue match {
           case bd: BusinessDetails => bd must be(expectedBusinessDetails)
@@ -135,14 +135,14 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
           .thenReturn(Some(completeBusinessDetails))
 
-        when (controller.dataCache.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
+        when (controller.dataCache.save(any(), any(), any())(any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorrespondenceAddressIsUkController.get().url))
 
         val captor = ArgumentCaptor.forClass(classOf[BusinessDetails])
-        verify(controller.dataCache).save[BusinessDetails](any(), meq(BusinessDetails.key), captor.capture())(any(), any())
+        verify(controller.dataCache).save[BusinessDetails](any(), meq(BusinessDetails.key), captor.capture())(any())
 
         captor.getValue.correspondenceAddressIsUk match {
           case Some(isUk) => isUk mustBe CorrespondenceAddressIsUk(true)
@@ -158,10 +158,10 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
           "lettersAddress" -> ""
         )
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
-        when (controller.dataCache.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
+        when (controller.dataCache.save(any(), any(), any())(any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
@@ -171,10 +171,10 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
         val newRequest = FakeRequest(POST, routes.LettersAddressController.post().url).withFormUrlEncodedBody(
           "lettersAddress" -> ""
         )
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(businessDetails)))
 
-        when (controller.dataCache.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
+        when (controller.dataCache.save(any(), any(), any())(any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
@@ -184,10 +184,10 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar with Scala
         val newRequest = FakeRequest(POST, routes.LettersAddressController.post().url).withFormUrlEncodedBody(
         )
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(),any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
-        when (controller.dataCache.save(any(), any(), any())(any(), any())).thenReturn(Future.successful(emptyCache))
+        when (controller.dataCache.save(any(), any(), any())(any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)

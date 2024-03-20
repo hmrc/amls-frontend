@@ -45,7 +45,7 @@ class BusinessEmailAddressServiceSpec extends AmlsSpec with BeforeAndAfterEach w
 
       "return the email address when it is present in the cache" in {
 
-        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
           .thenReturn(Future.successful(Some(BusinessDetails().contactingYou(ContactingYou(email = Some(email))))))
 
         service.getEmailAddress(credId).futureValue mustBe Some(email)
@@ -55,7 +55,7 @@ class BusinessEmailAddressServiceSpec extends AmlsSpec with BeforeAndAfterEach w
 
         "email is empty" in {
 
-          when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
             .thenReturn(Future.successful(Some(BusinessDetails().contactingYou(ContactingYou()))))
 
           service.getEmailAddress(credId).futureValue mustBe None
@@ -63,7 +63,7 @@ class BusinessEmailAddressServiceSpec extends AmlsSpec with BeforeAndAfterEach w
 
         "contacting you is empty" in {
 
-          when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
             .thenReturn(Future.successful(Some(BusinessDetails())))
 
           service.getEmailAddress(credId).futureValue mustBe None
@@ -71,7 +71,7 @@ class BusinessEmailAddressServiceSpec extends AmlsSpec with BeforeAndAfterEach w
 
         "business details is empty" in {
 
-          when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
             .thenReturn(Future.successful(None))
 
           service.getEmailAddress(credId).futureValue mustBe None
@@ -86,14 +86,14 @@ class BusinessEmailAddressServiceSpec extends AmlsSpec with BeforeAndAfterEach w
         val phone = Some("07123456789")
         val bd = BusinessDetails().contactingYou(ContactingYou(phoneNumber = phone))
 
-        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
           .thenReturn(Future.successful(Some(bd)))
 
         when(mockCacheConnector.save[BusinessDetails](
           eqTo(credId),
           eqTo(BusinessDetails.key),
           eqTo(bd.contactingYou(ContactingYou(phoneNumber = phone, email = Some(email))))
-        )(any(), any())
+        )(any())
         ).thenReturn(Future.successful(mockCacheMap))
 
         service.updateEmailAddress(credId, ContactingYouEmail(email, email)).futureValue mustBe Some(mockCacheMap)
@@ -102,20 +102,20 @@ class BusinessEmailAddressServiceSpec extends AmlsSpec with BeforeAndAfterEach w
           eqTo(credId),
           eqTo(BusinessDetails.key),
           eqTo(bd.contactingYou(ContactingYou(phoneNumber = phone, email = Some(email))))
-        )(any(), any())
+        )(any())
       }
 
       "not update the model" when {
 
         "business details is not present in cache" in {
 
-          when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
             .thenReturn(Future.successful(None))
 
           service.updateEmailAddress(credId, ContactingYouEmail(email, email)).futureValue mustBe None
 
           verify(mockCacheConnector, times(0))
-            .save[BusinessDetails](any(), any(), any())(any(), any())
+            .save[BusinessDetails](any(), any(), any())(any())
         }
       }
     }

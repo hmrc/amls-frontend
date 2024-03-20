@@ -146,7 +146,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar with Inje
       when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
               .thenReturn(Some(incomingModel))
 
-      when(dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), eqTo(outgoingModel))(any(), any()))
+      when(dataCacheConnector.save[Renewal](any(), eqTo(Renewal.key), eqTo(outgoingModel))(any()))
               .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
 

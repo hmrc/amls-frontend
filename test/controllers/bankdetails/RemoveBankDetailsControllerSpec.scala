@@ -100,7 +100,7 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec {
         any(),
         any(),
         meq(Seq(completeModel1, completeModel2,completeModel3,completeModel4))
-      )(any(), any())
+      )(any())
     }
   }
 }

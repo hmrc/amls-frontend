@@ -107,7 +107,7 @@ class ServicesOfBusinessDateOfChangeServiceSpec extends AmlsSpec with BeforeAndA
 
         val updatedAsp = asp.services(ServicesOfBusiness(Service.all.toSet, Some(DateOfChange(date))))
 
-        when(mockCacheConnector.save[Asp](eqTo(cacheId), eqTo(Asp.key), eqTo(updatedAsp))(any(), any()))
+        when(mockCacheConnector.save[Asp](eqTo(cacheId), eqTo(Asp.key), eqTo(updatedAsp))(any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         when(mockCacheMap.getEntry[Asp](eqTo(Asp.key))(any()))

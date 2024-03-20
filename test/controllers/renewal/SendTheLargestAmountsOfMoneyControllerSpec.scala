@@ -84,7 +84,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
     "get is called" must {
       "load the 'Where to Send The Largest Amounts Of Money' page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Renewal](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Renewal](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
@@ -96,7 +96,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec
 
       "pre-populate the 'Where to Send The Largest Amounts Of Money' Page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Renewal](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Renewal](any(), any())(any()))
           .thenReturn(Future.successful(Some(
             Renewal(sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Seq(Country("United Kingdom", "GB")))))
           )))

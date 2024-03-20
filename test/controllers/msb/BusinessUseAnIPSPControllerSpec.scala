@@ -52,7 +52,7 @@ class BusinessUseAnIPSPControllerSpec extends AmlsSpec with Injecting {
     "on get display the Business Use An IPSP page" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -62,7 +62,7 @@ class BusinessUseAnIPSPControllerSpec extends AmlsSpec with Injecting {
     "on get display the Business Use An IPSP page with pre populated data" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(None, Some(BusinessUseAnIPSPYes("test", "123456789123456"))))))
+        (any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(None, Some(BusinessUseAnIPSPYes("test", "123456789123456"))))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -91,10 +91,10 @@ class BusinessUseAnIPSPControllerSpec extends AmlsSpec with Injecting {
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -113,10 +113,10 @@ class BusinessUseAnIPSPControllerSpec extends AmlsSpec with Injecting {
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))
-        (any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+        (any())).thenReturn(Future.successful(Some(incomingModel)))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -131,10 +131,10 @@ class BusinessUseAnIPSPControllerSpec extends AmlsSpec with Injecting {
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

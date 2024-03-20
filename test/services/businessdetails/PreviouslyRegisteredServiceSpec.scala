@@ -43,7 +43,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
       "return the model if present" in {
 
-        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
           .thenReturn(Future.successful(Some(BusinessDetails().previouslyRegistered(PreviouslyRegisteredNo))))
 
         service.getPreviouslyRegistered(credId).futureValue mustBe Some(PreviouslyRegisteredNo)
@@ -53,7 +53,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
         "previously registered is not present" in {
 
-        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
             .thenReturn(Future.successful(Some(BusinessDetails())))
 
           service.getPreviouslyRegistered(credId).futureValue mustBe None
@@ -61,7 +61,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
 
         "business details is not present" in {
 
-        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessDetails](eqTo(credId), eqTo(BusinessDetails.key))(any()))
             .thenReturn(Future.successful(None))
 
           service.getPreviouslyRegistered(credId).futureValue mustBe None
@@ -87,7 +87,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
             eqTo(credId),
             eqTo(BusinessDetails.key),
             eqTo(bd.copy(previouslyRegistered = Some(PreviouslyRegisteredYes(None)), hasChanged = true))
-          )(any(), any()))
+          )(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           service.updatePreviouslyRegistered(credId, PreviouslyRegisteredYes(None)).futureValue mustBe Some(mockCacheMap)
@@ -96,7 +96,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
             eqTo(credId),
             eqTo(BusinessDetails.key),
             eqTo(bd.copy(previouslyRegistered = Some(PreviouslyRegisteredYes(None)), hasChanged = true))
-          )(any(), any())
+          )(any())
         }
 
         "business details is not yet saved in the cache" in {
@@ -111,7 +111,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
             eqTo(credId),
             eqTo(BusinessDetails.key),
             eqTo(BusinessDetails().copy(previouslyRegistered = Some(PreviouslyRegisteredNo), hasChanged = true))
-          )(any(), any()))
+          )(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           service.updatePreviouslyRegistered(credId, PreviouslyRegisteredNo).futureValue mustBe Some(mockCacheMap)
@@ -120,7 +120,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
             eqTo(credId),
             eqTo(BusinessDetails.key),
             eqTo(BusinessDetails().copy(previouslyRegistered = Some(PreviouslyRegisteredNo), hasChanged = true))
-          )(any(), any())
+          )(any())
         }
       }
 
@@ -137,7 +137,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
             eqTo(credId),
             eqTo(BusinessDetails.key),
             eqTo(None)
-          )(any(), any())
+          )(any())
         }
 
         "save throws an exception" in {
@@ -154,7 +154,7 @@ class PreviouslyRegisteredServiceSpec extends AmlsSpec with BeforeAndAfterEach {
             eqTo(credId),
             eqTo(BusinessDetails.key),
             eqTo(bd.copy(previouslyRegistered = Some(PreviouslyRegisteredNo), hasChanged = true))
-          )(any(), any()))
+          )(any()))
             .thenReturn(Future.failed(new Exception("Something went wrong")))
 
           service.updatePreviouslyRegistered(credId, PreviouslyRegisteredNo).futureValue mustBe None

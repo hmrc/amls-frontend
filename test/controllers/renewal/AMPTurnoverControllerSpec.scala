@@ -120,7 +120,7 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           )
 
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any(), any())).thenReturn(Future.successful(None))
+            (any())).thenReturn(Future.successful(None))
 
           when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(None))
@@ -146,7 +146,7 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           )
 
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any(), any())).thenReturn(Future.successful(Some(bMatching)))
+            (any())).thenReturn(Future.successful(Some(bMatching)))
 
           when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(None))
@@ -167,7 +167,7 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           )
 
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any(), any())).thenReturn(Future.successful(Some(bMatching)))
+            (any())).thenReturn(Future.successful(Some(bMatching)))
 
           when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(None))
@@ -188,7 +188,7 @@ class AMPTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
           )
 
           when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-            (any(), any())).thenReturn(Future.successful(Some(bMatching)))
+            (any())).thenReturn(Future.successful(Some(bMatching)))
 
           when(mockRenewalService.getRenewal(any())(any()))
             .thenReturn(Future.successful(None))

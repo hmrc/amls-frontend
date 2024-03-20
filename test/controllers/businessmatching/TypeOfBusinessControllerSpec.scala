@@ -55,7 +55,7 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
     "display business Types Page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(Future.successful(None))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
@@ -67,7 +67,7 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
     "display main Summary Page" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any())).thenReturn(
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())).thenReturn(
         Future.successful(Some(BusinessMatching(typeOfBusiness = Some(TypeOfBusiness("test"))))))
 
       val result = controller.get()(request)
@@ -87,10 +87,10 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
       )
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -104,10 +104,10 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
       )
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -122,10 +122,10 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
       )
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -138,10 +138,10 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
         "typeOfBusiness" -> ""
       )
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

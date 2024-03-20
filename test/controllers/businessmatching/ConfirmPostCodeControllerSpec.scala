@@ -79,17 +79,17 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
       )
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(businessMatching)))
+        (any())).thenReturn(Future.successful(Some(businessMatching)))
 
       val updatedModel = businessMatching.copy(reviewDetails = Some(reviewDtls.copy(businessAddress = businessAddress.copy(postcode = Some("BB1 1BB")))))
       when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), meq(updatedModel))
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(postRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.BusinessTypeController.get.url))
 
-      verify(controller.dataCacheConnector).save[BusinessMatching](any(), meq(BusinessMatching.key), meq(updatedModel))(any(), any())
+      verify(controller.dataCacheConnector).save[BusinessMatching](any(), meq(BusinessMatching.key), meq(updatedModel))(any())
     }
 
     "update ReviewDetails with valid input post code and UK as country" in new Fixture {
@@ -104,17 +104,17 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
             country = Country("", "")))))
 
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(businessMatchingWithEmptyCountry)))
+        (any())).thenReturn(Future.successful(Some(businessMatchingWithEmptyCountry)))
 
       val updatedModel = businessMatching.copy(reviewDetails = Some(reviewDtls.copy(businessAddress = businessAddress.copy(postcode = Some("BB1 1BB")))))
       when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), meq(updatedModel))
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(postRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(routes.BusinessTypeController.get.url))
 
-      verify(controller.dataCacheConnector).save[BusinessMatching](any(), meq(BusinessMatching.key), meq(updatedModel))(any(), any())
+      verify(controller.dataCacheConnector).save[BusinessMatching](any(), meq(BusinessMatching.key), meq(updatedModel))(any())
     }
 
     "update ReviewDetails as none when business matching -> reviewDetails is empty" in new Fixture {
@@ -123,11 +123,11 @@ class ConfirmPostCodeControllerSpec extends AmlsSpec with MockitoSugar with Scal
         "postCode" -> "BB1 1BB"
       )
       when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(businessMatching.copy(reviewDetails = None))))
+        (any())).thenReturn(Future.successful(Some(businessMatching.copy(reviewDetails = None))))
 
       val updatedModel = businessMatching.copy(reviewDetails = None)
       when(controller.dataCacheConnector.save[BusinessMatching](any(), any(), meq(updatedModel))
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(postRequest)
       status(result) must be(SEE_OTHER)

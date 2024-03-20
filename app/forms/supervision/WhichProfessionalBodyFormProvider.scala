@@ -24,7 +24,7 @@ import play.api.data.Forms.{mapping, seq}
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 
 import javax.inject.Inject
-import scala.collection.convert.ImplicitConversions.`collection asJava`
+import scala.jdk.CollectionConverters._
 
 class WhichProfessionalBodyFormProvider @Inject()() extends Mappings {
 
@@ -37,7 +37,7 @@ class WhichProfessionalBodyFormProvider @Inject()() extends Mappings {
       "businessType" -> seq(enumerable[BusinessType](checkboxError, checkboxError)(ProfessionalBodies.enumerable))
         .verifying(nonEmptySeq(checkboxError)),
       "specifyOtherBusiness" -> mandatoryIf(
-        _.values.contains(Other("").toString),
+        _.values.asJavaCollection.contains(Other("").toString),
         text("error.required.supervision.business.details").verifying(
           firstError(
             maxLength(length, "error.invalid.supervision.business.details.length.255"),

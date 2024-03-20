@@ -152,7 +152,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with Mo
       verify(controller.dataCacheConnector).save[Supervision](any(), any(), eqTo(Supervision(
         professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants))),
         hasChanged = true
-      )))(any(),any())
+      )))(any())
     }
   }
 }

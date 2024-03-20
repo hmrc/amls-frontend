@@ -110,7 +110,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
     } thenReturn Future.successful(RegistrationDetails(companyNameFromRegistration, isIndividual = false))
 
     when {
-      controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(), eqTo(SubmissionRequestStatus.key))(any(), any())
+      controller.dataCacheConnector.fetch[SubmissionRequestStatus](any(), eqTo(SubmissionRequestStatus.key))(any())
     } thenReturn Future.successful(Some(SubmissionRequestStatus(true)))
 
     def feeResponse(responseType: ResponseType) = FeeResponse(
@@ -132,7 +132,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
 
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
     when {
-      controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
+      controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())
     } thenReturn Future.successful(Some(businessDetails))
 
     val applicationConfig = inject[ApplicationConfig]
@@ -146,7 +146,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
       )
 
       when {
-        controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())
+        controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any())
       } thenReturn Future.successful(Some(model))
 
     }
@@ -175,7 +175,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReady)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -194,14 +194,14 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReady)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
 
         val businessDetailsYes = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredYes(Some("123456"))))
 
         when {
-          controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any(), any())
+          controller.dataCacheConnector.fetch[BusinessDetails](any(), eqTo(BusinessDetails.key))(any())
         } thenReturn Future.successful(Some(businessDetailsYes))
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -220,7 +220,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReadyForReview)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -241,7 +241,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionDecisionApproved)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -262,7 +262,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(RenewalSubmitted(None))
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -283,7 +283,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(ReadyForRenewal(Some(new LocalDate())))
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         }.thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -304,7 +304,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(ReadyForRenewal(Some(new LocalDate())))
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -325,7 +325,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReadyForReview)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
         val payment = paymentGen.sample.get.copy(status = Failed)
@@ -351,7 +351,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReadyForReview)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
         val payment = paymentGen.sample.get.copy(status = Cancelled)
@@ -375,7 +375,7 @@ class PaymentConfirmationControllerSpec extends AmlsSpec
         setupStatus(SubmissionReadyForReview)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
+          controller.dataCacheConnector.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
         val payment = paymentGen.sample.get.copy(status = Created)

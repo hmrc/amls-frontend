@@ -59,7 +59,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
     "get is called" must {
       "display the Expected Business Turnover page with an empty form when there is no existing data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[ExpectedBusinessTurnover](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[ExpectedBusinessTurnover](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
@@ -81,7 +81,7 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
         when(controller.statusService.getStatus(any(), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
-        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
           .thenReturn(Future.successful(Some(BusinessActivities(expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First)))))
 
         val result = controller.get()(request)
@@ -113,10 +113,10 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
             "expectedBusinessTurnover" -> "zeroPlus"
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(false)(newRequest)
@@ -130,10 +130,10 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
             "expectedBusinessTurnover" -> "zeroPlus"
           )
 
-          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
-          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(true)(newRequest)

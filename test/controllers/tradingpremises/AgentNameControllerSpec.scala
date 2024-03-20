@@ -94,7 +94,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
         val month = "11"
         val day = "28"
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(agentName = Some(
             AgentName("John Doe", agentDateOfBirth = Some(LocalDate.parse(s"$year-$month-$day")))
           ))))))
@@ -116,7 +116,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
           val result = controller.get(1)(request)
@@ -221,7 +221,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
             agentName = Some(AgentName("text",None,Some(new LocalDate(1956,2,15)))),
             agentCompanyDetails = None,
             agentPartnership = None
-          ), TradingPremises())))(any(), any())
+          ), TradingPremises())))(any())
       }
 
       "go to the date of change page in edit mode" when {
@@ -313,7 +313,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
           val premises = TradingPremises(agentName = Some(name), yourTradingPremises = Some(yourPremises))
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any()))
             .thenReturn(Future.successful(Some(Seq(premises))))
 
           val result = controller.saveDateOfChange(1)(postRequest)
@@ -322,7 +322,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           redirectLocation(result) must be(Some(routes.CheckYourAnswersController.get(1).url))
 
           val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
-          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(TradingPremises.key), captor.capture())(any(), any())
+          verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), meq(TradingPremises.key), captor.capture())(any())
 
           captor.getValue.head.agentName match {
             case Some(savedName: AgentName) => savedName must be(updatedName)
@@ -343,7 +343,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
 
           val premises = TradingPremises(agentName = Some(AgentName("Trading Name")), yourTradingPremises = Some(yourPremises))
 
-          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), meq(TradingPremises.key))(any()))
             .thenReturn(Future.successful(Some(Seq(premises))))
 
           val result = controller.saveDateOfChange(1)(postRequest)

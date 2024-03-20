@@ -59,7 +59,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
     } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
 
     def setUpRenewal(renewalModel: Renewal) = when {
-      dataCache.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
+      dataCache.fetch[Renewal](any(), eqTo(Renewal.key))(any())
     } thenReturn Future.successful(Some(renewalModel))
 
     def standardCompleteInvolvedInOtherActivities(): Renewal = {
@@ -79,7 +79,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
       "the renewal hasn't been started" in new Fixture {
         when {
-          dataCache.fetch[Renewal](any(), eqTo(Renewal.key))(any(), any())
+          dataCache.fetch[Renewal](any(), eqTo(Renewal.key))(any())
         } thenReturn Future.successful(None)
 
         val section = await(service.getTaskRow(credId))
@@ -899,7 +899,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
         BusinessActivities.all foreach { activity =>
           when {
-            dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+            dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any())
           } thenReturn Future.successful(
             Some(BusinessMatching(activities = Some(BusinessActivities(Set(activity)))))
           )
@@ -916,7 +916,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "the length of the activities is zero" in new Fixture {
 
         when {
-          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any())
         } thenReturn Future.successful(
           Some(BusinessMatching(activities = Some(BusinessActivities(Set.empty))))
         )
@@ -927,7 +927,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "the length of the activities is longer than 1" in new Fixture {
 
         when {
-          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any())
         } thenReturn Future.successful(
           Some(BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices, ArtMarketParticipant)))))
         )
@@ -938,7 +938,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "no activities are returned" in new Fixture {
 
         when {
-          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any())
         } thenReturn Future.successful(None)
 
         service.getFirstBusinessActivityInLowercase(credId).futureValue mustBe None
@@ -955,7 +955,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         val bm: BusinessMatching = BusinessMatching()
 
         when {
-          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any())
         } thenReturn Future.successful(Some(bm))
 
         service.getBusinessMatching(credId).futureValue mustBe Some(bm)
@@ -967,7 +967,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "cache connector cannot retrieve business matching" in new Fixture {
 
         when {
-          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any())
+          dataCache.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any())
         } thenReturn Future.successful(None)
 
         service.getBusinessMatching(credId).futureValue mustBe None
@@ -984,11 +984,11 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         val model = standardCompleteInvolvedInOtherActivities()
 
         when {
-          dataCache.fetch[Renewal](any(), any())(any(), any())
+          dataCache.fetch[Renewal](any(), any())(any())
         } thenReturn Future.successful(Some(model))
 
         when {
-          dataCache.save(eqTo(credId), eqTo(Renewal.sectionKey), any())(any(), any())
+          dataCache.save(eqTo(credId), eqTo(Renewal.sectionKey), any())(any())
         } thenReturn Future.successful(mockCacheMap)
 
         val result = service.fetchAndUpdateRenewal(
@@ -997,7 +997,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         ).futureValue
 
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
-        verify(dataCache).save(eqTo(credId), eqTo(Renewal.sectionKey), captor.capture())(any(), any())
+        verify(dataCache).save(eqTo(credId), eqTo(Renewal.sectionKey), captor.capture())(any())
 
         result mustBe Some(mockCacheMap)
         captor.getValue mustBe model.copy(hasAccepted = false)
@@ -1009,7 +1009,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "renewal is not present in cache" in new Fixture {
 
         when {
-          dataCache.fetch[Renewal](any(), any())(any(), any())
+          dataCache.fetch[Renewal](any(), any())(any())
         } thenReturn Future.successful(None)
 
         val result = service.fetchAndUpdateRenewal(

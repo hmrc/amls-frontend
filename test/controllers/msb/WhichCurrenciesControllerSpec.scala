@@ -51,10 +51,10 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
     self =>
     val request = addToken(authRequest)
 
-    when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+    when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
       .thenReturn(Future.successful(None))
 
-    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any(), any()))
+    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any(), any())(any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
     lazy val view = inject[WhichCurrenciesView]
     val controller = new WhichCurrenciesController(dataCacheConnector = mockCacheConnector,
@@ -115,7 +115,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec
 
         mockApplicationStatus(NotCompleted)
 
-        when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any(), any()))
+        when(mockCacheConnector.fetch[MoneyServiceBusiness](any(), eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))
 
         val result = controller.get()(request)

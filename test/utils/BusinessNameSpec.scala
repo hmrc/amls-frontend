@@ -63,7 +63,7 @@ class BusinessNameSpec extends AmlsSpec with ScalaFutures {
         when(reviewDetails.businessName) thenReturn "Test Business from the cache"
 
         when {
-          cacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any())
+          cacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any())
         } thenReturn Future.successful(BusinessMatching(reviewDetails = reviewDetails.some).some)
 
         whenReady(BusinessName.getName(credId, None, accountTypeId).value) { result =>

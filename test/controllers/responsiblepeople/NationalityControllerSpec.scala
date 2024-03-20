@@ -75,7 +75,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
       val responsiblePeople = ResponsiblePerson(personName)
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val result = controller.get(1)(request)
@@ -93,7 +93,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
         val responsiblePeople = ResponsiblePerson()
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controller.get(3)(request)
@@ -110,7 +110,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       val pResidenceType = PersonResidenceType(UKResidence(Nino(nextNino)), Some(Country("United Kingdom", "GB")), None)
       val responsiblePeople = ResponsiblePerson(personName, personResidenceType = Some(pResidenceType))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val result = controller.get(1)(request)
@@ -125,7 +125,7 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "pre-populate UI with data from sav4later" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(
           personName,
           personResidenceType = Some(PersonResidenceType(
@@ -146,10 +146,10 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       val newRequest = FakeRequest(POST, routes.NationalityController.post(1).url)
       .withFormUrlEncodedBody("" -> "")
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
@@ -166,10 +166,10 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
       val responsiblePeople = ResponsiblePerson()
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
@@ -187,10 +187,10 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
       val responsiblePeople = ResponsiblePerson()
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
@@ -209,15 +209,15 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       val pResidenceType = PersonResidenceType(UKResidence(Nino(nextNino)), Some(Country("United Kingdom", "GB")), None)
       val responsiblePeople = ResponsiblePerson(None, personResidenceType = Some(pResidenceType))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val responsiblePeople1 = ResponsiblePerson(None, personResidenceType = Some(pResidenceType))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(responsiblePeople1)))(any(), any()))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(responsiblePeople1)))(any()))
         .thenReturn(Future.successful(emptyCache))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
@@ -234,10 +234,10 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
       val responsiblePeople = ResponsiblePerson()
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(10, true)(newRequest)

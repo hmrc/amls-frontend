@@ -61,10 +61,10 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
       hasAccepted = true
     )
 
-    when(cache.fetch[Tcsp](any(), any())(any(), any()))
+    when(cache.fetch[Tcsp](any(), any())(any()))
       .thenReturn(Future.successful(Some(tcsp)))
 
-    when(cache.save[Tcsp](any(), any(), any())(any(), any()))
+    when(cache.save[Tcsp](any(), any(), any())(any()))
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
   }
 
@@ -120,7 +120,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
             .withFormUrlEncodedBody("complexCorpStructureCreation" -> "true"))
 
             status(result) mustBe SEE_OTHER
-            verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
+            verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any())
             redirectLocation(result) mustBe Some(controllers.tcsp.routes.SummaryController.get.url)
           }
         }
@@ -141,7 +141,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
                 hasAccepted = true
               )
 
-              when(cache.fetch[Tcsp](any(), any())(any(), any()))
+              when(cache.fetch[Tcsp](any(), any())(any()))
                 .thenReturn(Future.successful(Some(regOfficeTcsp)))
 
               val expected = Tcsp(
@@ -160,7 +160,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
               val result = controller.post(false)(FakeRequest(POST, routes.ComplexCorpStructureCreationController.post().url)
               .withFormUrlEncodedBody("complexCorpStructureCreation" -> "false"))
               status(result) mustBe SEE_OTHER
-              verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
+              verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.ProvidedServicesController.get().url)
             }
           }
@@ -184,7 +184,7 @@ class ComplexCorpStructureCreationControllerSpec extends AmlsSpec with MockitoSu
               val result = controller.post(false)(FakeRequest(POST, routes.ComplexCorpStructureCreationController.post().url)
               .withFormUrlEncodedBody("complexCorpStructureCreation" -> "false"))
               status(result) mustBe SEE_OTHER
-              verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any(), any())
+              verify(controller.dataCacheConnector).save[Tcsp](any(), any(), eqTo(expected))(any())
               redirectLocation(result) mustBe Some(controllers.tcsp.routes.ServicesOfAnotherTCSPController.get().url)
             }
           }

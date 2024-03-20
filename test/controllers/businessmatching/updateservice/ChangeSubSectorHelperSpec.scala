@@ -197,7 +197,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
 
       await(helper.updateMsb("internalId", model)) mustEqual msb
 
-      verify(mockCacheConnector, never).save(any(), eqTo(MSB.key), any[MSB])(any(), any())
+      verify(mockCacheConnector, never).save(any(), eqTo(MSB.key), any[MSB])(any())
     }
 
     "wipe the psr number when transmitting money isn't set" in new Fixture {
@@ -266,7 +266,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec with ScalaFutures {
 
       await(helper.updateBusinessMatching("internalId", model)) mustBe bm
 
-      verify(mockCacheConnector, never).save(any(), eqTo(BusinessMatching.key), any[BusinessMatching])(any(), any())
+      verify(mockCacheConnector, never).save(any(), eqTo(BusinessMatching.key), any[BusinessMatching])(any())
     }
 
     "update the business matching sub sectors when it has transmitting money" in new Fixture {

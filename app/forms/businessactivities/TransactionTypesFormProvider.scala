@@ -17,14 +17,14 @@
 package forms.businessactivities
 
 import forms.mappings.Mappings
-import models.businessactivities.{TransactionType, TransactionTypes}
 import models.businessactivities.TransactionTypes.{DigitalOther, DigitalSoftware, DigitalSpreadsheet, Paper}
+import models.businessactivities.{TransactionType, TransactionTypes}
 import play.api.data.Form
 import play.api.data.Forms.{mapping, seq}
 import uk.gov.voa.play.form.ConditionalMappings._
 
 import javax.inject.Inject
-import scala.collection.convert.ImplicitConversions.`collection asJava`
+import scala.jdk.CollectionConverters._
 
 class TransactionTypesFormProvider @Inject()() extends Mappings {
 
@@ -36,7 +36,7 @@ class TransactionTypesFormProvider @Inject()() extends Mappings {
         .verifying(
           nonEmptySeq("error.required.ba.atleast.one.transaction.record")
         ),
-      "software" -> mandatoryIf(_.values.contains(DigitalOther.toString),
+      "software" -> mandatoryIf(_.values.asJavaCollection.contains(DigitalOther.toString),
         text("error.required.ba.software.package.name").verifying(
           firstError(
             maxLength(length, "error.max.length.ba.software.package.name"),

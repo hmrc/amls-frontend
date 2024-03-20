@@ -74,7 +74,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
         mockCacheSave(businessMatchingModel)
 
         service.updateModel("internalId", businessMatchingModel) returnsSome mockCacheMap
-        verify(mockCacheConnector).save[BusinessMatching](any(), eqTo(BusinessMatching.key), any())(any(), any())
+        verify(mockCacheConnector).save[BusinessMatching](any(), eqTo(BusinessMatching.key), any())(any())
       }
     }
   }
@@ -283,7 +283,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       verify(mockCacheConnector).removeByKey[Asp](
         eqTo("internalId"), eqTo(Asp.key)
-      )(any(), any())
+      )(any())
 
     }
     "clear data of Hvd given HighValueDealing" in new Fixture {
@@ -294,7 +294,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       verify(mockCacheConnector).removeByKey[Hvd](
         eqTo("internalId"), eqTo(Hvd.key)
-      )(any(), any())
+      )(any())
 
     }
     "clear data of Msb given MoneyServiceBusiness" in new Fixture {
@@ -305,7 +305,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       verify(mockCacheConnector).removeByKey[Msb](
         eqTo("internalId"), eqTo(Msb.key)
-      )(any(), any())
+      )(any())
 
     }
     "clear data of Tcsp given TrustAndCompanyServices" in new Fixture {
@@ -316,7 +316,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       verify(mockCacheConnector).removeByKey[Tcsp](
         eqTo("internalId"), eqTo(Tcsp.key)
-      )(any(), any())
+      )(any())
 
     }
     "clear data of Eab given EstateAgentBusinessService" in new Fixture {
@@ -327,7 +327,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       verify(mockCacheConnector).removeByKey[Eab](
         eqTo("internalId"), eqTo(Eab.key)
-      )(any(), any())
+      )(any())
 
     }
 

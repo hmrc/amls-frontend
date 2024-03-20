@@ -57,7 +57,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
         val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
         val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
 
-        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(bm))
+        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any())) thenReturn(Future.successful(bm))
 
         when {
           renewalService.getTaskRow(any())(any[HeaderCarrier], any(), any())
@@ -78,7 +78,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
         val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
         val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
 
-        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any(),any())) thenReturn(Future.successful(bm))
+        when (controller.dataCacheConnector.fetch[BusinessMatching](any(),any())(any())) thenReturn(Future.successful(bm))
 
         when {
           renewalService.getTaskRow(meq("internalId"))(any(), any(), any())
@@ -91,7 +91,7 @@ class WhatYouNeedControllerSpec extends AmlsSpec {
       }
 
       "throw an error when data cannot be fetched" in new Fixture {
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any(), any())) thenReturn (Future.successful(None))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), any())(any())) thenReturn (Future.successful(None))
 
           when {
             renewalService.getTaskRow(meq("internalId"))(any(), any(), any())

@@ -123,7 +123,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "businessTurnover" -> "zeroPlus"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessTurnover](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessTurnover](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         when(mockRenewalService.updateRenewal(any(), any())(any()))
@@ -140,7 +140,7 @@ class BusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "businessTurnover" -> "tenMillionPlus"
         )
 
-        when(controller.dataCacheConnector.fetch[BusinessTurnover](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[BusinessTurnover](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         when(mockRenewalService.updateRenewal(any(), any())(any()))

@@ -261,7 +261,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           status(result) must be(SEE_OTHER)
 
           val captor = ArgumentCaptor.forClass(classOf[BusinessActivities])
-          verify(controller.dataCacheConnector).save(any(), eqTo(BusinessActivities.key), captor.capture())(any(), any())
+          verify(controller.dataCacheConnector).save(any(), eqTo(BusinessActivities.key), captor.capture())(any())
 
           captor.getValue.accountantForAMLSRegulations mustBe None
           captor.getValue.whoIsYourAccountant mustBe None
@@ -289,7 +289,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           status(result) must be(SEE_OTHER)
 
           verify(controller.dataCacheConnector, times(0))
-            .save(any(), eqTo(BusinessActivities.key), any())(any(), any())
+            .save(any(), eqTo(BusinessActivities.key), any())(any())
 
         }
       }
@@ -338,7 +338,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any())
         }
 
         "ASP added, TCSP not selected" in new Fixture {
@@ -353,7 +353,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any())
         }
 
         "TCSP added, ASP not selected" in new Fixture {
@@ -367,7 +367,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any())
         }
 
         "ASP, TCSP added" in new Fixture {
@@ -383,7 +383,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any())
         }
       }
 
@@ -400,7 +400,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(1)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(1)).save(any(), eqTo(Supervision.key), any())(any())
         }
 
         "TCSP deselected, ASP not selected" in new Fixture {
@@ -415,7 +415,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(1)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(1)).save(any(), eqTo(Supervision.key), any())(any())
 
         }
 
@@ -431,7 +431,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(1)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(1)).save(any(), eqTo(Supervision.key), any())(any())
         }
 
        }
@@ -450,7 +450,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any())
 
         }
 
@@ -467,7 +467,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any())
 
         }
 
@@ -484,7 +484,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any())
 
         }
 
@@ -501,7 +501,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any())
         }
 
         "ASP, TCSP selected" in new Fixture {
@@ -518,7 +518,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any())
 
         }
 
@@ -534,7 +534,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any())
 
         }
 
@@ -551,7 +551,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any(), any())
+          verify(controller.dataCacheConnector, times(0)).save(any(), eqTo(Supervision.key), any())(any())
 
         }
       }
@@ -870,7 +870,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           any(),
           eqTo(ResponsiblePerson.key),
           eqTo(Seq(responsiblePersonNotAccepted, responsiblePersonNotAccepted))
-        )(any(),any())
+        )(any())
 
       }
     }
@@ -890,7 +890,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         status(result) must be(SEE_OTHER)
 
-        verify(mockCacheConnector).fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any())
+        verify(mockCacheConnector).fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any())
 
       }
     }

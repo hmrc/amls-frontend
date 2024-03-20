@@ -81,10 +81,10 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
         mockCacheMap.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
       } thenReturn Some(Seq(model))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
         .thenReturn(Future.successful(Some(Seq(model))))
 
-      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
+      when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
         .thenReturn(Future.successful(Some(businessMatching)))
 
       when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
@@ -250,7 +250,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
           } thenReturn Future.successful(None)
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-            (any(), any())).thenReturn(Future.successful(None))
+            (any())).thenReturn(Future.successful(None))
 
           val result = controller.get(1)(request)
           status(result) must be(SEE_OTHER)
@@ -268,14 +268,14 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
             setupMocksFor(ResponsiblePerson(None, None))
 
             when {
-              controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
+              controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
             } thenReturn Future.successful(CacheMap("", Map.empty))
 
             val result = controller.post(1, None)(request)
 
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
 
-            verify(controller.dataCacheConnector).save(any(), any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any(), any())
+            verify(controller.dataCacheConnector).save(any(), any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any())
           }
         }
       }
@@ -288,7 +288,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
             setupMocksFor(ResponsiblePerson(None, None))
 
             when {
-              controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
+              controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
             } thenReturn Future.successful(CacheMap("", Map.empty))
 
 
@@ -296,7 +296,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get.url))
 
-            verify(controller.dataCacheConnector).save(any(), any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any(),any())
+            verify(controller.dataCacheConnector).save(any(), any(),eqTo(Seq(ResponsiblePerson(hasAccepted = true))))(any())
 
           }
         }
@@ -311,17 +311,17 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
           setupMocksFor(completeResponsiblePerson, SubmissionDecisionApproved)
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
 
           when {
-            controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
+            controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(Partnership)))))))
 
           when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
@@ -341,17 +341,17 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
           setupMocksFor(completeResponsiblePerson, SubmissionDecisionApproved)
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
 
           when {
-            controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
+            controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
 
           when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
@@ -371,17 +371,17 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
           setupMocksFor(completeResponsiblePerson, SubmissionReady)
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
 
           when {
-            controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
+            controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson.copy(positions = Some(Positions(Set(SoleProprietor), Some(PositionStartDate(LocalDate.now().minusMonths(5))))))))))
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
 
           when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))
@@ -401,17 +401,17 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar with Resp
 
           setupMocksFor(completeResponsiblePerson, SubmissionDecisionApproved)
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
 
           when {
-            controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
+            controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key))(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson.copy(positions = Some(Positions(Set(SoleProprietor), Some(PositionStartDate(LocalDate.now().minusMonths(5))))))))))
 
-          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any(), any()))
+          when(controller.dataCacheConnector.fetch[BusinessMatching](any(), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(Some(bm.copy(reviewDetails = Some(rd.copy(businessType = Some(LimitedCompany)))))))
 
           when(controller.statusService.getStatus(Some(any()), any(), any())(any(), any(), any()))

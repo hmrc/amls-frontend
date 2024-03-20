@@ -19,8 +19,6 @@ package services
 import config.ApplicationConfig
 import connectors.{AmlsConnector, BusinessMatchingConnector, DataCacheConnector}
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
-
-import javax.inject.Inject
 import models._
 import models.amp.Amp
 import models.asp.Asp
@@ -43,11 +41,12 @@ import models.tradingpremises.TradingPremises
 import models.tradingpremises.TradingPremises.FilterUtils
 import play.api.http.Status.UNPROCESSABLE_ENTITY
 import play.api.libs.json.Format
+import play.api.mvc.Request
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import utils.StatusConstants
-import play.api.mvc.Request
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
@@ -83,8 +82,7 @@ class SubmissionService @Inject()(val cacheConnector: DataCacheConnector,
     }
   }
 
-  private def createSubscriptionRequest(cache: CacheMap)
-                                              (implicit hc: HeaderCarrier, ec: ExecutionContext): SubscriptionRequest = {
+  private def createSubscriptionRequest(cache: CacheMap): SubscriptionRequest = {
 
     def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
     def filteredTradingPremises     = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)

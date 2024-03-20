@@ -79,10 +79,10 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
           forAll(guidanceOptions(currentCount)) { (guidanceRequested: Boolean, fromDeclaration: Option[String], expectedRedirect: Call) =>
             val testSeq  = buildTestSequence(currentCount)
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
               .thenReturn(Future.successful(Some(testSeq)))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
               .thenReturn(Future.successful(emptyCache))
 
             val resultF = controller.get(guidanceRequested, fromDeclaration)(request)
@@ -91,7 +91,7 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
             redirectLocation(resultF) must be(Some(expectedRedirect.url))
 
             verify(controller.dataCacheConnector)
-              .save[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key), meq(testSeq :+ ResponsiblePerson()))(any(), any())
+              .save[Seq[ResponsiblePerson]](any(), meq(ResponsiblePerson.key), meq(testSeq :+ ResponsiblePerson()))(any())
 
             reset(controller.dataCacheConnector)
           }

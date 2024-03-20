@@ -18,7 +18,6 @@ package utils.businessdetails
 
 import config.ApplicationConfig
 import models.businessdetails._
-import models.businessmatching._
 import play.api.i18n.Messages
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases._

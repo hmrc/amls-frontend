@@ -24,7 +24,7 @@ import play.api.data.Forms.{mapping, optional, seq}
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 
 import javax.inject.Inject
-import scala.collection.convert.ImplicitConversions.`collection asJava`
+import scala.jdk.CollectionConverters._
 
 class AddPersonFormProvider @Inject()() extends Mappings {
 
@@ -57,7 +57,7 @@ class AddPersonFormProvider @Inject()() extends Mappings {
         nonEmptySeq(emptyError)
       ),
       "otherPosition" -> mandatoryIf(
-        _.values.contains(Other("").toString),
+        _.values.asJavaCollection.contains(Other("").toString),
         text("error.required.declaration.specify.role").verifying(
           firstError(
             maxLength(otherLength, "error.invalid.role.in.business.maxlength.255"),

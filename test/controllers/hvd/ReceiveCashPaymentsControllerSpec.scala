@@ -155,7 +155,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar with 
         verify(controller.cacheConnector).save[Hvd](any(), any(), eqTo(Hvd(
           receiveCashPayments = Some(false),
           hasChanged = true
-        )))(any(), any())
+        )))(any())
       }
     }
   }

@@ -56,9 +56,9 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
     def mockFetch(model: Option[Seq[TradingPremises]]) =
       when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())
-        (any(), any())).thenReturn(Future.successful(model))
+        (any())).thenReturn(Future.successful(model))
 
-    when(controller.dataCacheConnector.save( any(), eqTo(TradingPremises.key), any())(any(), any())).
+    when(controller.dataCacheConnector.save( any(), eqTo(TradingPremises.key), any())(any())).
       thenReturn(Future.successful(cache))
 
     mockFetch(Some(Seq(tradingPremises)))
@@ -111,7 +111,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
         await(controller.post(1)(formRequest))
 
         val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
-        verify(controller.dataCacheConnector).save( any(), eqTo(TradingPremises.key), captor.capture())(any(), any())
+        verify(controller.dataCacheConnector).save( any(), eqTo(TradingPremises.key), captor.capture())(any())
 
         captor.getValue match {
           case tp :: tail =>

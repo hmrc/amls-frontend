@@ -47,7 +47,7 @@ class RemoveBankDetailsController @Inject()(val authAction: AuthAction,
           _ <- updateDataStrict[BankDetails](request.credId, index) { ba =>
             ba.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
           }
-        } yield Redirect(routes.YourBankAccountsController.get)
+        } yield Redirect(routes.YourBankAccountsController.get())
       }
   }
 }

@@ -62,7 +62,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
     "on get display the Throughput Expected In next 12 Months page" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       mockApplicationStatus(NotCompleted)
 
@@ -76,7 +76,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
       mockApplicationStatus(NotCompleted)
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(Some(First)))))
+        (any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(Some(First)))))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -87,7 +87,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
     "on get display the Throughput Expected In next 12 Months page when approved and the service has just been added" in new Fixture {
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       mockApplicationStatus(SubmissionDecisionApproved)
 
@@ -105,10 +105,10 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -123,10 +123,10 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -141,10 +141,10 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
       )
 
       when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any(), any())
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)

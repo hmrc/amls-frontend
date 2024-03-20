@@ -63,7 +63,7 @@ class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValue
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any())) thenReturn Some(Seq(ResponsiblePerson()))
 
-          when(mockDataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+          when(mockDataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
@@ -72,7 +72,7 @@ class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValue
 
           result.value.futureValue
 
-          verify(mockDataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), captor.capture())(any(), any())
+          verify(mockDataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), captor.capture())(any())
 
           captor.getValue.head.personResidenceType.value mustBe answer
         }
@@ -93,7 +93,7 @@ class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValue
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any())) thenReturn Some(Seq(ResponsiblePerson()))
 
-          when(mockDataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+          when(mockDataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
@@ -102,7 +102,7 @@ class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValue
 
           result.value.futureValue
 
-          verify(mockDataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), captor.capture())(any(), any())
+          verify(mockDataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), captor.capture())(any())
 
           captor.getValue.head.personResidenceType.value mustBe PersonResidenceType(NonUKResidence, None, None)
         }
@@ -120,7 +120,7 @@ class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValue
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any())) thenReturn None
 
           verify(mockDataCacheConnector, times(0))
-            .save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
+            .save[Seq[ResponsiblePerson]](any(), any(), any())(any())
 
           service.getCache(answer, authorisedRequest.credId, 1).value.futureValue mustBe Some(mockCacheMap)
         }
@@ -137,7 +137,7 @@ class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValue
           verifyZeroInteractions(mockCacheMap)
 
           verify(mockDataCacheConnector, times(0))
-            .save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any())
+            .save[Seq[ResponsiblePerson]](any(), any(), any())(any())
 
           service.getCache(answer, authorisedRequest.credId, 1).value.futureValue mustBe None
         }
@@ -150,7 +150,7 @@ class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValue
 
         "there is a responsible person in the cache" in {
 
-          when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(completeResponsiblePerson))))
 
           service.getResponsiblePerson("1234567890", 1).futureValue mustBe Some(completeResponsiblePerson)
@@ -161,7 +161,7 @@ class PersonResidentTypeServiceSpec extends AmlsSpec with ResponsiblePeopleValue
 
         "there is no responsible person in the cache" in {
 
-          when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(None))
 
           service.getResponsiblePerson("1234567890", 1).futureValue mustBe None

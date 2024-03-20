@@ -33,7 +33,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthAction}
 import views.html.tradingpremises.ActivityStartDateView
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.Future
 
 class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with Injecting {
@@ -67,7 +67,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
       "successfully load activity start page with empty form" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel.copy(startDate = None)))))))
 
         val result = controller.get(1, false)(request)
@@ -76,7 +76,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
       "redirect  to not found page when YourTradingPremises is None" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get(1, false)(request)
@@ -84,7 +84,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
       }
 
       "successfully load activity start page with pre - populated data form" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
 
         val result = controller.get(1, false)(request)
@@ -105,10 +105,10 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
           "startDate.month" -> "5",
           "startDate.year" -> "2014"
         )
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
 
-        when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any(), any()))
+        when(controller.dataCacheConnector.save[TradingPremises](any(), any(), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(1, false)(postRequest)
@@ -128,10 +128,10 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
         val updatedTp = TradingPremises(yourTradingPremises = updatedYtp, hasChanged = true)
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
 
-        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), meq(Seq(updatedTp)))(any(),  any()))
+        when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any(), meq(Seq(updatedTp)))(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(1, true)(postRequest)
@@ -148,7 +148,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
           "startDate.year" -> "2014"
         )
 
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
 
         val result = controller.post(1, false)(postRequest)

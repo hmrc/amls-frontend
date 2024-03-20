@@ -81,7 +81,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
         val responsiblePeople = ResponsiblePerson(personName)
 
         when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
 
         val result = additionalAddressController.get(RecordId)(request)
@@ -101,7 +101,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
         val responsiblePeople = ResponsiblePerson(personName, addressHistory = Some(history))
 
         when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
 
         val result = additionalAddressController.get(RecordId)(request)
@@ -120,7 +120,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
         val responsiblePeople = ResponsiblePerson(personName, addressHistory = Some(history))
 
         when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
 
         val result = additionalAddressController.get(RecordId)(request)
@@ -138,7 +138,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
 
           val responsiblePeople = ResponsiblePerson()
 
-          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           val result = additionalAddressController.get(RecordId)(request)
@@ -156,9 +156,9 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
 
           val responsiblePeople = ResponsiblePerson()
 
-          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = additionalAddressController.post(RecordId)(line1MissingRequest)
@@ -180,9 +180,9 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
           val history = ResponsiblePersonAddressHistory(additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history))
 
-          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = additionalAddressController.post(RecordId, edit = true)(requestWithParams)
@@ -201,9 +201,9 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
 
           val responsiblePeople = ResponsiblePerson()
 
-          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any(), any()))
+          when(additionalAddressController.dataCacheConnector.save[PersonName](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = additionalAddressController.post(RecordId)(requestWithParams)
@@ -226,9 +226,9 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress), additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
-          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(additionalAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+          when(additionalAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = additionalAddressController.post(RecordId)(requestWithParams)
@@ -237,7 +237,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
           redirectLocation(result) must be(Some(routes.AdditionalAddressNonUKController.get(RecordId).url))
 
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
-          verify(additionalAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any(), any())
+          verify(additionalAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any())
           captor.getValue.head.isComplete mustBe false
           captor.getValue.head.addressHistory.value.additionalAddress mustBe Some(ResponsiblePersonAddress(PersonAddressNonUK("", None, None, None, Country("", "")), None))
         }
@@ -256,9 +256,9 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress), additionalAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(personName = personName, addressHistory = Some(history))
 
-          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(additionalAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(additionalAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any(), any()))
+          when(additionalAddressController.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any(), any())(any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = additionalAddressController.post(RecordId)(requestWithParams)
@@ -267,7 +267,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar with Be
           redirectLocation(result) must be(Some(routes.AdditionalAddressUKController.get(RecordId).url))
 
           val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
-          verify(additionalAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any(), any())
+          verify(additionalAddressController.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(ResponsiblePerson.key), captor.capture())(any())
           captor.getValue.head.isComplete mustBe false
           captor.getValue.head.addressHistory.value.additionalAddress mustBe Some(ResponsiblePersonAddress(PersonAddressUK("", None, None, None, ""), None))
         }

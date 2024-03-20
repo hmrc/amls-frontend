@@ -167,10 +167,10 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
   "accept" must {
     "set accept flag to true and redirect to RegistrationProgressController" in new Fixture {
 
-      when(mockCacheConnector.fetch[Eab](any(), any())(any(), any()))
+      when(mockCacheConnector.fetch[Eab](any(), any())(any()))
         .thenReturn(Future.successful(Some(completeEabJson.as[Eab])))
 
-      when(mockCacheConnector.save[Eab](any(), any(), any())(any(), any()))
+      when(mockCacheConnector.save[Eab](any(), any(), any())(any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.accept.apply(FakeRequest())
@@ -179,7 +179,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
       redirectLocation(result).value mustBe controllers.routes.RegistrationProgressController.get.toString
 
       verify(mockCacheConnector).save[Eab](any(), eqTo(Eab.key),
-        eqTo(completeEabJson.as[Eab].copy(hasAccepted = true)))(any(), any())
+        eqTo(completeEabJson.as[Eab].copy(hasAccepted = true)))(any())
     }
   }
 
@@ -210,7 +210,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
 
-      when(mockCacheConnector.fetch[Eab](any(), any())(any(), any())).thenReturn(
+      when(mockCacheConnector.fetch[Eab](any(), any())(any())).thenReturn(
         Future.successful(Some(completeEabModel))
       )
 
@@ -231,7 +231,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
 
-      when(mockCacheConnector.fetch[Eab](any(), any())(any(), any())).thenReturn(
+      when(mockCacheConnector.fetch[Eab](any(), any())(any())).thenReturn(
         Future.successful(Some(updatedEabModel))
       )
 
@@ -252,7 +252,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
 
-      when(mockCacheConnector.fetch[Eab](any(), any())(any(), any())).thenReturn(
+      when(mockCacheConnector.fetch[Eab](any(), any())(any())).thenReturn(
         Future.successful(Some(updatedEabModel))
       )
 
@@ -273,7 +273,7 @@ class EabControllerSpec extends AmlsSpec with CacheMocks {
 
       when(mockServiceFlow.isNewActivity(any(), any())(any(), any())).thenReturn(Future.successful(false))
 
-      when(mockCacheConnector.fetch[Eab](any(), any())(any(), any())).thenReturn(
+      when(mockCacheConnector.fetch[Eab](any(), any())(any())).thenReturn(
         Future.successful(Some(noEabModel))
       )
 

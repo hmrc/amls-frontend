@@ -82,13 +82,13 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Inje
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
       when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
-        (any(), any())).thenReturn(Future.successful(emptyCache))
+        (any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
 
-      verify(controller.dataCacheConnector).save[Hvd](any(), any(), meq(hvd))(any(), any())
+      verify(controller.dataCacheConnector).save[Hvd](any(), any(), meq(hvd))(any())
     }
 
     "submit request" when {
@@ -115,14 +115,14 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Inje
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(emptyCache))
+          (any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
 
         verify(controller.dataCacheConnector).save[Hvd](any(), any(),
-          meq(hvd.copy(dateOfChange = Some(DateOfChange(new LocalDate(1990,1,24))))))(any(), any())
+          meq(hvd.copy(dateOfChange = Some(DateOfChange(new LocalDate(1990,1,24))))))(any())
       }
 
       "dateOfChange is later than that in S4L" in new Fixture with DateOfChangeHelper {
@@ -147,14 +147,14 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Inje
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(emptyCache))
+          (any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.hvd.routes.SummaryController.get.url))
 
         verify(controller.dataCacheConnector).save[Hvd](any(), any(),
-          meq(hvd))(any(), any())
+          meq(hvd))(any())
 
       }
 
@@ -182,7 +182,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Inje
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(emptyCache))
+          (any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(BAD_REQUEST)
@@ -210,7 +210,7 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Inje
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         when(controller.dataCacheConnector.save[Hvd](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(emptyCache))
+          (any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(DateOfChangeRedirect.checkYourAnswers)(newRequest)
         status(result) must be(BAD_REQUEST)

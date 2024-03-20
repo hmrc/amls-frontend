@@ -54,7 +54,7 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
       "load the provided services page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -63,7 +63,7 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
       "load the provided services page with existing data" in new Fixture {
 
         val tcsp = Tcsp(providedServices = Some(ProvidedServices(Set(Other("some other service")))))
-        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())) thenReturn Future.successful(Some(tcsp))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())) thenReturn Future.successful(Some(tcsp))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -85,8 +85,8 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "services[0]" -> PhonecallHandling.toString
         )
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any())).thenReturn(Future.successful(cacheMap))
 
         val result = controller.post()(newRequest)
 
@@ -102,8 +102,8 @@ class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with Sca
           "services[0]" -> PhonecallHandling.toString
         )
 
-        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any(), any())).thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any(), any())).thenReturn(Future.successful(cacheMap))
+        when(controller.dataCacheConnector.fetch[Tcsp](any(), any())(any())).thenReturn(Future.successful(None))
+        when(controller.dataCacheConnector.save[Tcsp](any(), any(), any())(any())).thenReturn(Future.successful(cacheMap))
 
         val result = controller.post(true)(newRequest)
 

@@ -25,7 +25,7 @@ import play.api.data.Forms.{mapping, seq}
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 
 import javax.inject.Inject
-import scala.collection.convert.ImplicitConversions.`collection asJava`
+import scala.jdk.CollectionConverters._
 
 class HowCashPaymentsReceivedFormProvider @Inject()() extends Mappings {
 
@@ -38,7 +38,7 @@ class HowCashPaymentsReceivedFormProvider @Inject()() extends Mappings {
       "paymentMethods" -> seq(enumerable[PaymentMethod](checkboxError, checkboxError)(PaymentMethods.enumerable))
         .verifying(nonEmptySeq(checkboxError)),
       "details" -> mandatoryIf(
-        _.values.contains(Other("").toString),
+        _.values.asJavaCollection.contains(Other("").toString),
         text("error.required.renewal.hvd.describe").verifying(
           firstError(
             maxLength(length, "error.required.renewal.hvd.describe.invalid.length"),

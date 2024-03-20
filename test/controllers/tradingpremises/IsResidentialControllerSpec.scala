@@ -259,7 +259,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
       verify(controller.dataCacheConnector).save[Seq[TradingPremises]](any(), eqTo(TradingPremises.key), eqTo(Seq(TradingPremises(
         yourTradingPremises = Some(ytp.copy(isResidential = Some(true))),
         hasChanged = true
-      ))))(any(), any())
+      ))))(any())
 
     }
 

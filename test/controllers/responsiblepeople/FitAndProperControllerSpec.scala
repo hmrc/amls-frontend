@@ -81,7 +81,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       when(controller.dataCacheConnector.fetchAll(any())(any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save(any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save(any(), any(), any())(any()))
         .thenReturn(Future.successful(mockCacheMap))
     }
 

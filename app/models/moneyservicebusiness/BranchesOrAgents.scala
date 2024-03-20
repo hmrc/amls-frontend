@@ -30,7 +30,7 @@ object BranchesOrAgents {
         case Some(countries) if countries.isEmpty => None
         case Some(countries) => Some(BranchesOrAgentsWhichCountries apply countries)
         case None => None
-      })((hasCountries, countries) => BranchesOrAgents apply (hasCountries, countries))
+      })((hasCountries, countries) => BranchesOrAgents.apply(hasCountries, countries))
   }
 
   implicit val jsonWrites:Writes[BranchesOrAgents] = {

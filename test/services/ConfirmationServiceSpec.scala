@@ -57,7 +57,7 @@ class ConfirmationServiceSpec extends AmlsSpec {
 
         "renewal is retrieved from the cache" in {
 
-          when(mockCacheConnector.fetch[Renewal](eqTo(credId), eqTo(Renewal.key))(any(), any()))
+          when(mockCacheConnector.fetch[Renewal](eqTo(credId), eqTo(Renewal.key))(any()))
             .thenReturn(Future.successful(Some(Renewal())))
 
           service.isRenewalDefined(credId).futureValue mustBe true
@@ -68,7 +68,7 @@ class ConfirmationServiceSpec extends AmlsSpec {
 
         "renewal is NOT retrieved from the cache" in {
 
-          when(mockCacheConnector.fetch[Renewal](eqTo(credId), eqTo(Renewal.key))(any(), any()))
+          when(mockCacheConnector.fetch[Renewal](eqTo(credId), eqTo(Renewal.key))(any()))
             .thenReturn(Future.successful(None))
 
           service.isRenewalDefined(credId).futureValue mustBe false

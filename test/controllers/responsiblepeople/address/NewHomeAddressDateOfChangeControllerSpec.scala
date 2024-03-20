@@ -103,10 +103,10 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec with Injecting {
           "dateOfChange.year" -> "2014"
         )
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+          (any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(cacheMap))
+          (any())).thenReturn(Future.successful(cacheMap))
         val result = controller.post(1)(postRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.responsiblepeople.address.routes.NewHomeAddressController.get(1).url))
@@ -119,9 +119,9 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec with Injecting {
           "dateOfChange.day" -> "01"
         )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
-          when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any(), any())(any(), any()))
+          when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any(), any())(any()))
           .thenReturn(Future.successful(cacheMap))
 
         val result = controller.post(1)(postRequest)

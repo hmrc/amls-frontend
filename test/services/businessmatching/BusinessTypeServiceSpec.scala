@@ -59,7 +59,7 @@ class BusinessTypeServiceSpec extends AmlsSpec
               Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
               "wdvhibsd9vh823fwdj"
             ))
-            when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
+            when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
               .thenReturn(Future.successful(Some(bm)))
 
             service.getBusinessType(credId).futureValue mustBe Some(businessType)
@@ -77,7 +77,7 @@ class BusinessTypeServiceSpec extends AmlsSpec
             Address("line1", Some("line2"), Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
             "wdvhibsd9vh823fwdj"
           ))
-          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(Some(bm)))
 
           service.getBusinessType(credId).futureValue mustBe None
@@ -87,7 +87,7 @@ class BusinessTypeServiceSpec extends AmlsSpec
 
           val bm = BusinessMatching()
 
-          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(Some(bm)))
 
           service.getBusinessType(credId).futureValue mustBe None
@@ -95,7 +95,7 @@ class BusinessTypeServiceSpec extends AmlsSpec
 
         "business matching is not in cache" in {
 
-          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(None))
 
           service.getBusinessType(credId).futureValue mustBe None
@@ -118,16 +118,16 @@ class BusinessTypeServiceSpec extends AmlsSpec
 
         lazy val newModel = oldModel.reviewDetails(reviewDetails.copy(businessType = Some(LPrLLP)))
 
-        when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
+        when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
           .thenReturn(Future.successful(Some(oldModel)))
 
-        when(mockCacheConnector.save[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key), eqTo(newModel))(any(), any()))
+        when(mockCacheConnector.save[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key), eqTo(newModel))(any()))
           .thenReturn(Future.successful(mock[CacheMap]))
 
         service.updateBusinessType(credId, LPrLLP).futureValue mustBe Some(LPrLLP)
 
         verify(mockCacheConnector).save[BusinessMatching](
-          eqTo(credId), eqTo(BusinessMatching.key), eqTo(newModel))(any(), any()
+          eqTo(credId), eqTo(BusinessMatching.key), eqTo(newModel))(any()
         )
       }
 
@@ -137,24 +137,24 @@ class BusinessTypeServiceSpec extends AmlsSpec
 
           val bm = BusinessMatching()
 
-          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(Some(bm)))
 
           service.updateBusinessType(credId, LPrLLP).futureValue mustBe None
 
           verify(mockCacheConnector, times(0))
-            .save[BusinessMatching](any(), any(), any())(any(), any())
+            .save[BusinessMatching](any(), any(), any())(any())
         }
 
         "business matching is not set in cache" in {
 
-          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any(), any()))
+          when(mockCacheConnector.fetch[BusinessMatching](eqTo(credId), eqTo(BusinessMatching.key))(any()))
             .thenReturn(Future.successful(None))
 
           service.updateBusinessType(credId, LPrLLP).futureValue mustBe None
 
           verify(mockCacheConnector, times(0))
-            .save[BusinessMatching](any(), any(), any())(any(), any())
+            .save[BusinessMatching](any(), any(), any())(any())
         }
       }
     }

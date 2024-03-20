@@ -71,10 +71,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
     "load the summary page when section data is available" in new Fixture {
 
       when(controller.dataCache.fetch[BusinessMatching](any(), meq(BusinessMatching.key))
-        (any(), any())).thenReturn(Future.successful(Some(testBusinessMatch)))
+        (any())).thenReturn(Future.successful(Some(testBusinessMatch)))
 
       when(controller.dataCache.fetch[BusinessDetails](any(), meq(BusinessDetails.key))
-        (any(), any())).thenReturn(Future.successful(Some(model)))
+        (any())).thenReturn(Future.successful(Some(model)))
 
       when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReady))
@@ -86,10 +86,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
       when(controller.dataCache.fetch[BusinessDetails](any(), meq(BusinessDetails.key))
-        (any(), any())).thenReturn(Future.successful(None))
+        (any())).thenReturn(Future.successful(None))
 
       when(controller.dataCache.fetch[BusinessMatching](any(), meq(BusinessMatching.key))
-        (any(), any())).thenReturn(Future.successful(Some(testBusinessMatch)))
+        (any())).thenReturn(Future.successful(Some(testBusinessMatch)))
 
       when(controller.statusService.getStatus(any[Option[String]](), any[(String, String)](), any[String]())(any(), any(), any()))
         .thenReturn(Future.successful(SubmissionReady))
@@ -109,10 +109,10 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
 
         val newRequest = requestWithUrlEncodedBody( "hasAccepted" -> "true")
 
-        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any(), any()))
+        when(controller.dataCache.fetch[BusinessDetails](any(), any())(any()))
           .thenReturn(Future.successful(Some(model.copy(hasAccepted = false))))
 
-        when(controller.dataCache.save[BusinessDetails](any(), meq(BusinessDetails.key), any())(any(), any()))
+        when(controller.dataCache.save[BusinessDetails](any(), meq(BusinessDetails.key), any())(any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)

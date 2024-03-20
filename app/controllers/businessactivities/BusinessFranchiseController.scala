@@ -42,7 +42,7 @@ class BusinessFranchiseController @Inject() (val authAction: AuthAction,
 
   def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
-      formProvider().bindFromRequest.fold(
+      formProvider().bindFromRequest().fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, edit))),
         data => service.updateBusinessFranchise(request.credId, data).map(_ => redirectTo(edit))
       )

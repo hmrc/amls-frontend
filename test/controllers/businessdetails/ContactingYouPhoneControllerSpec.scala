@@ -61,7 +61,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
       "load the page" in new Fixture {
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+          (any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -71,7 +71,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
       "load the page with the pre populated data" in new Fixture {
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+          (any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -81,7 +81,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
       "load the page when business details are unavailable" in new Fixture {
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any(), any())).thenReturn(Future.successful(None))
+          (any())).thenReturn(Future.successful(None))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -97,10 +97,10 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
           .withFormUrlEncodedBody("phoneNumber" -> "+44 (0)123 456-7890")
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+          (any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
 
         when(controller.dataCache.save[BusinessDetails](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(emptyCache))
+          (any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -113,10 +113,10 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
           .withFormUrlEncodedBody("phoneNumber" -> "+44 (0)123 456-7890")
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+          (any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
 
         when(controller.dataCache.save[BusinessDetails](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(emptyCache))
+          (any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -129,10 +129,10 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
           .withFormUrlEncodedBody("phoneNumber" -> "+44 (0)123 456-7890")
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any(), any())).thenReturn(Future.successful(None))
+          (any())).thenReturn(Future.successful(None))
 
         when(controller.dataCache.save[BusinessDetails](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(emptyCache))
+          (any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -146,10 +146,10 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
           .withFormUrlEncodedBody("phoneNumber" -> "")
 
         when(controller.dataCache.fetch[BusinessDetails](any(), any())
-          (any(), any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
+          (any())).thenReturn(Future.successful(Some(businessDetailsWithData)))
 
         when(controller.dataCache.save[BusinessDetails](any(), any(), any())
-          (any(), any())).thenReturn(Future.successful(emptyCache))
+          (any())).thenReturn(Future.successful(emptyCache))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)

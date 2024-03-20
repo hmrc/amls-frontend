@@ -63,7 +63,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
         } thenReturn Future.successful(ReadyForRenewal(Some(date)))
 
         when{
-          controller.dataCacheConnector.fetch[RenewRegistration](any(), any())(any(), any())
+          controller.dataCacheConnector.fetch[RenewRegistration](any(), any())(any())
         } thenReturn Future.successful(None)
 
         val result = controller.get()(request)
@@ -80,7 +80,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
         } thenReturn Future.successful(ReadyForRenewal(Some(date)))
 
         when {
-          controller.dataCacheConnector.fetch[RenewRegistration](any(), any())(any(), any())
+          controller.dataCacheConnector.fetch[RenewRegistration](any(), any())(any())
         } thenReturn Future.successful(Some(RenewRegistrationYes))
 
         val result = controller.get()(request)

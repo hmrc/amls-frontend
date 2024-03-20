@@ -64,16 +64,16 @@ object SubscriptionResponse {
 
   val oldFeesStructureTransformer: Reads[JsObject] =
     (
-      (__ \ 'subscriptionFees \ 'paymentReference).json.copyFrom((__ \ 'paymentReference).json.pick) and
-        (__ \ 'subscriptionFees \ 'registrationFee).json.copyFrom((__ \ 'registrationFee).json.pick) and
-        (__ \ 'subscriptionFees \ 'fpFee).json.copyFrom((__ \ 'fpFee).json.pick) and
-        (__ \ 'subscriptionFees \ 'fpFeeRate).json.copyFrom((__ \ 'fpFeeRate).json.pick) and
-        (__ \ 'subscriptionFees \ 'approvalCheckFee).json.copyFrom((__ \ 'approvalCheckFee).json.pick) and
-        (__ \ 'subscriptionFees \ 'approvalCheckFeeRate).json.copyFrom((__ \ 'approvalCheckFeeRate).json.pick) and
-        (__ \ 'subscriptionFees \ 'premiseFee).json.copyFrom((__ \ 'premiseFee).json.pick) and
-        (__ \ 'subscriptionFees \ 'premiseFeeRate).json.copyFrom((__ \ 'premiseFeeRate).json.pick) and
-        (__ \ 'subscriptionFees \ 'totalFees).json.copyFrom((__ \ 'totalFees).json.pick)
-      ).reduce.orElse((__ \ 'subscriptionFees).json.pickBranch).orElse(Reads.pure(Json.obj()))
+      (__ \ Symbol("subscriptionFees") \ Symbol("paymentReference")).json.copyFrom((__ \ Symbol("paymentReference")).json.pick) and
+        (__ \ Symbol("subscriptionFees") \ Symbol("registrationFee")).json.copyFrom((__ \ Symbol("registrationFee")).json.pick) and
+        (__ \ Symbol("subscriptionFees") \ Symbol("fpFee")).json.copyFrom((__ \ Symbol("fpFee")).json.pick) and
+        (__ \ Symbol("subscriptionFees") \ Symbol("fpFeeRate")).json.copyFrom((__ \ Symbol("fpFeeRate")).json.pick) and
+        (__ \ Symbol("subscriptionFees") \ Symbol("approvalCheckFee")).json.copyFrom((__ \ Symbol("approvalCheckFee")).json.pick) and
+        (__ \ Symbol("subscriptionFees") \ Symbol("approvalCheckFeeRate")).json.copyFrom((__ \ Symbol("approvalCheckFeeRate")).json.pick) and
+        (__ \ Symbol("subscriptionFees") \ Symbol("premiseFee")).json.copyFrom((__ \ Symbol("premiseFee")).json.pick) and
+        (__ \ Symbol("subscriptionFees") \ Symbol("premiseFeeRate")).json.copyFrom((__ \ Symbol("premiseFeeRate")).json.pick) and
+        (__ \ Symbol("subscriptionFees") \ Symbol("totalFees")).json.copyFrom((__ \ Symbol("totalFees")).json.pick)
+      ).reduce.orElse((__ \ Symbol("subscriptionFees")).json.pickBranch).orElse(Reads.pure(Json.obj()))
 
   implicit val reads: Reads[SubscriptionResponse] = {
     import play.api.libs.functional.syntax._

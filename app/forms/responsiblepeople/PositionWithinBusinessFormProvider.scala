@@ -23,7 +23,7 @@ import play.api.data.Forms.{mapping, seq}
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 
 import javax.inject.Inject
-import scala.collection.convert.ImplicitConversions.`collection asJava`
+import scala.jdk.CollectionConverters._
 
 class PositionWithinBusinessFormProvider @Inject()() extends Mappings {
 
@@ -36,7 +36,7 @@ class PositionWithinBusinessFormProvider @Inject()() extends Mappings {
       "positions" -> seq(
         enumerable[PositionWithinBusiness](checkboxError, checkboxError)(PositionWithinBusiness.enumerable)
       ).verifying(nonEmptySeq(checkboxError)),
-      "otherPosition" -> mandatoryIf(_.values.contains(Other("").toString),
+      "otherPosition" -> mandatoryIf(_.values.asJavaCollection.contains(Other("").toString),
         text("responsiblepeople.position_within_business.other_position.othermissing").verifying(
           firstError(
             maxLength(length, "error.invalid.rp.position_within_business.other_position.maxlength.255"),

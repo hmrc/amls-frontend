@@ -98,7 +98,7 @@ object ContactType {
 
 
     override def bind(key: String, value: String): Either[String, ContactType] = {
-      stringBinder.bind(key, value).right map {
+      stringBinder.bind(key, value) map {
 
         case "RejectionReasons" => ContactType.RejectionReasons
         case "RevocationReasons" => ContactType.RevocationReasons

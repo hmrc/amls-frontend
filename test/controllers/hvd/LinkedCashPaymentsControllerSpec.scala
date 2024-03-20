@@ -49,7 +49,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec with Injecting {
   "LinkedCashPaymentsController" must {
 
     "successfully load UI for the first time" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       val title = messages("hvd.identify.linked.cash.payment.title") + " - " +
@@ -64,7 +64,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec with Injecting {
 
     "successfully load UI from mongoCache" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
         .thenReturn(Future.successful(Some(Hvd(linkedCashPayment = Some(LinkedCashPayments(true))))))
 
       val title = messages("hvd.identify.linked.cash.payment.title") + " - " +
@@ -84,10 +84,10 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec with Injecting {
       val newRequest = FakeRequest(POST, routes.LinkedCashPaymentsController.post().url)
       .withFormUrlEncodedBody("linkedCashPayments" -> "true")
 
-      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -100,10 +100,10 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec with Injecting {
       val newRequest = FakeRequest(POST, routes.LinkedCashPaymentsController.post().url)
       .withFormUrlEncodedBody("linkedCashPayments" -> "false")
 
-      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
-      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any(), any()))
+      when(controller.dataCacheConnector.save[Hvd](any(), any(), any())(any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
@@ -114,7 +114,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec with Injecting {
     "fail with validation error when mandatory field is missing" in new Fixture {
       val newRequest = FakeRequest(POST, routes.LinkedCashPaymentsController.post().url)
       .withFormUrlEncodedBody()
-      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any(), any()))
+      when(controller.dataCacheConnector.fetch[Hvd](any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.post()(newRequest)
