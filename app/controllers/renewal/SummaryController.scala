@@ -50,9 +50,7 @@ class SummaryController @Inject()(val dataCacheConnector: DataCacheConnector,
             businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
             renewal <- OptionT.fromOption[Future](cache.getEntry[Renewal](Renewal.key))
           } yield {
-            val summaryList = cyaHelper.getSummaryList(
-              renewal, businessMatching.alphabeticalBusinessActivitiesLowerCase(), businessMatching.msbServices
-            )
+            val summaryList = cyaHelper.getSummaryList(renewal, businessMatching)
             Ok(view(summaryList))
           }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get)
       }

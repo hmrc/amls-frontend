@@ -39,13 +39,13 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
   "CheckYourAnswersView" must {
 
     "have correct title" in new ViewFixture {
-      def view = cyaView(cyaHelper.getSummaryList(Renewal(), None, None))
+      def view = cyaView(cyaHelper.getSummaryList(Renewal(), None))
 
       doc.title must startWith(messages("title.cya") + " - " + messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = cyaView(cyaHelper.getSummaryList(Renewal(), None, None))
+      def view = cyaView(cyaHelper.getSummaryList(Renewal(), None))
 
       heading.html must be(messages("title.cya"))
       subHeading.html must include(messages("summary.renewal"))
@@ -99,10 +99,7 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
         msbServices = Some(BusinessMatchingMsbServices(BusinessMatchingMsbServices.all.toSet))
       )
 
-      val bmMsbServices: Option[BusinessMatchingMsbServices] = businessMatching.msbServices
-      val activities: Option[List[String]] = businessMatching.alphabeticalBusinessActivitiesLowerCase()
-
-      val list = cyaHelper.getSummaryList(model,activities, bmMsbServices)
+      val list = cyaHelper.getSummaryList(model, businessMatching)
 
       def view = cyaView(list)
 

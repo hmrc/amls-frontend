@@ -16,8 +16,9 @@
 
 package utils.renewal
 
+import models.businessmatching.BusinessActivity.{AccountancyServices, HighValueDealing}
 import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, ForeignExchange, TransmittingMoney}
-import models.businessmatching.BusinessMatchingMsbServices
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices}
 import models.renewal._
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.{SummaryList, SummaryListRow, Text}
@@ -28,22 +29,26 @@ import javax.inject.Inject
 
 class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions {
 
-  def getSummaryList(model: Renewal, activities: Option[List[String]], bmMsbServices: Option[BusinessMatchingMsbServices])(implicit messages: Messages): SummaryList = {
+  def getSummaryList(model: Renewal, businessMatching: BusinessMatching)(implicit messages: Messages): SummaryList = {
+
+    val containsASPOrHVD = businessMatching.activities.exists { activities =>
+      activities.businessActivities.contains(AccountancyServices) || activities.businessActivities.contains(HighValueDealing)
+    }
 
     SummaryList(
       involvedInOtherActivitiesRows(model).getOrElse(Seq.empty) ++
       Seq(
         businessTurnoverRow(model),
-        turnoverRow(model, activities),
+        turnoverRow(model, businessMatching.alphabeticalBusinessActivitiesLowerCase()),
         ampTurnoverRow(model)
       ).flatten ++
       msbServicesRows(model).getOrElse(Seq.empty) ++
-      bmMsbServices.fold(Seq.empty[SummaryListRow]){ services =>
+        businessMatching.msbServices.fold(Seq.empty[SummaryListRow]){ services =>
         (if (services.msbServices.contains(TransmittingMoney)) getTransmittingMoneyRows(model) else None).getOrElse(Seq.empty) ++
         (if (services.msbServices.contains(CurrencyExchange)) getCurrencyExchangeRows(model) else None).getOrElse(Seq.empty) ++
         (if (services.msbServices.contains(ForeignExchange)) getForeignExchangeRow(model) else None).getOrElse(Seq.empty)
       } ++
-      getCustomersOutsideUKRows(model).getOrElse(Seq.empty) ++
+      getCustomersOutsideUKRows(model, containsASPOrHVD).getOrElse(Seq.empty) ++
       Seq(getPercentageOfCashRow(model)).flatten ++
       getCashPaymentRows(model).getOrElse(Seq.empty)
     )
@@ -301,7 +306,7 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
     }
   }
 
-  private def getCustomersOutsideUKRows(model: Renewal)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
+  private def getCustomersOutsideUKRows(model: Renewal, showOutsideUKRow: Boolean)(implicit messages: Messages): Option[Seq[SummaryListRow]] = {
     val seq = Seq(
       model.customersOutsideIsUK.map { boa =>
         row(
@@ -325,8 +330,8 @@ class CheckYourAnswersHelper @Inject()() extends CheckYourAnswersHelperFunctions
           )
         }
         boa.countries match {
-          case Some(countries) if countries.length == 1 => Some(makeRow(Value(Text(countries.head.name))))
-          case Some(countries) => Some(makeRow(toBulletList(countries.map(_.name))))
+          case Some(countries) if showOutsideUKRow && countries.length == 1 => Some(makeRow(Value(Text(countries.head.name))))
+          case Some(countries) if showOutsideUKRow => Some(makeRow(toBulletList(countries.map(_.name))))
           case _ => None
         }
       }
