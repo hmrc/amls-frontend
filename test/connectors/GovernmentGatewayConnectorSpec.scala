@@ -16,7 +16,6 @@
 
 package connectors
 
-import audit.EnrolEvent
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator, GovernmentGatewayGenerator}
 import models.governmentgateway.EnrolmentRequest
@@ -58,7 +57,6 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
         implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
         val request: EnrolmentRequest = enrolmentRequestGen.sample.get
         val response: HttpResponse = HttpResponse(OK, "")
-        doNothing().when(audit).sendDataEvent(EnrolEvent(request, response))
         mockHttpCall(Future.successful(response))
 
         whenReady(connector.enrol(request)) { result =>

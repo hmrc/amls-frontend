@@ -20,7 +20,6 @@ import config.ApplicationConfig
 import connectors.cache.Conversions
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model._
-import play.api.Logging
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json._
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
@@ -76,7 +75,7 @@ object Cache {
   * @param cache  The cache to wrap.
   * @param crypto The cryptography instance to use to decrypt values
   */
-class CryptoCache(cache: Cache, crypto: Encrypter with Decrypter) extends Cache(cache.id, cache.data) with CacheOps {
+class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(cache.id, cache.data) with CacheOps {
   def getEncryptedEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] = {
     catchDoubleEncryption(cache, key)(fmt, crypto, new JsonDecryptor[T]()(crypto, fmt))
   }
@@ -108,20 +107,9 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
         IndexOptions().name("cacheExpiry").expireAfter( appConfig.cacheExpiryInSeconds, SECONDS))))
     with Conversions
     with CacheOps
-    with Logging
 {
 
-  private val logPrefix = "[MongoCacheClient]"
-
-  // $COVERAGE-OFF$
-  private def debug(msg: String) = logger.debug(s"$logPrefix $msg")
-
-  private def error(msg: String, e: Throwable) = logger.warn(s"$logPrefix $msg", e)
-
-  private def error(msg: String) = logger.warn(s"$logPrefix $msg")
-  // $COVERAGE-ON$
-
-  implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
+  implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto
 
   /**
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.

@@ -1,23 +1,19 @@
 import play.sbt.PlayImport.PlayKeys
-import play.sbt.routes.RoutesKeys._
-import sbt.Keys._
+import play.sbt.routes.RoutesKeys.*
+import sbt.Keys.*
 import sbt.Tests.{Group, SubProcess}
-import sbt._
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
+import sbt.*
 import com.typesafe.sbt.digest.Import.digest
 import com.typesafe.sbt.web.Import.{Assets, pipelineStages}
-import uk.gov.hmrc._
+import uk.gov.hmrc.*
 import DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings}
 import play.twirl.sbt.Import.TwirlKeys
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
-
 val appName: String = "amls-frontend"
 
 lazy val appDependencies: Seq[ModuleID] = AppDependencies()
-lazy val plugins : Seq[Plugins] = Seq(play.sbt.PlayScala)
-lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
 lazy val scoverageSettings = {
   import scoverage.ScoverageKeys
@@ -33,13 +29,13 @@ lazy val scoverageSettings = {
 }
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(Seq(play.sbt.PlayScala, SbtDistributablesPlugin) ++ plugins : _*)
+  .enablePlugins(Seq(play.sbt.PlayScala, SbtDistributablesPlugin) *)
   .settings(libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always))
   .settings(majorVersion := 4)
-  .settings(playSettings ++ scoverageSettings : _*)
-  .settings(scalaSettings: _*)
-  .settings(defaultSettings(): _*)
-  .settings(scalaVersion := "2.13.10")
+  .settings(scoverageSettings)
+  .settings(scalaSettings *)
+  .settings(defaultSettings() *)
+  .settings(scalaVersion := "2.13.12")
   .settings(routesImport += "models.notifications.ContactType._")
   .settings(routesImport += "utils.Binders._")
   .settings(Global / lintUnusedKeysOnLoad := false)
@@ -60,7 +56,7 @@ lazy val microservice = Project(appName, file("."))
     )
   )
   .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
+  .settings(inConfig(IntegrationTest)(Defaults.itSettings) *)
   .settings(
     IntegrationTest / Keys.fork := false,
     IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "it")).value,
@@ -74,7 +70,7 @@ lazy val microservice = Project(appName, file("."))
       "-feature",
       "-unchecked",
       "-language:implicitConversions",
-      "-P:silencer:pathFilters=views;routes;TestStorage"
+      "-Wconf:cat=unused-imports&src=.*routes.*:s"
     )
   )
   .disablePlugins(JUnitXmlReportPlugin)

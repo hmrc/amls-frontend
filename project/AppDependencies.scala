@@ -1,22 +1,22 @@
-import sbt._
+import play.core.PlayVersion
+import play.sbt.PlayImport.ws
+import sbt.*
 
 private object AppDependencies {
 
-  import play.sbt.PlayImport._
-  import play.core.PlayVersion
-
   private val playV = "play-28"
   private val flexmarkVersion = "0.64.8"
-  private val bootstrapV = "7.23.0"
+  private val bootstrapV = "6.0.0"
+  private val hmrcMongoV = "0.71.0"
 
-  val compile = Seq(
+  val compile: Seq[ModuleID] = Seq(
     ws,
     // GOV UK
     "uk.gov.hmrc"           %% "domain"                        % s"8.1.0-$playV",
     "uk.gov.hmrc"           %% "play-partials"                 % s"8.3.0-$playV",
-    "uk.gov.hmrc"           %% s"http-caching-client-$playV"   % "11.2.0",
+    "uk.gov.hmrc"           %% "http-caching-client"           % s"10.0.0-$playV",
     "uk.gov.hmrc"           %% "json-encryption"               % s"5.3.0-$playV",
-    "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-$playV"            % "0.71.0",
+    "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-$playV"            % hmrcMongoV,
     "uk.gov.hmrc"           %% s"bootstrap-frontend-$playV"    % bootstrapV,
     "uk.gov.hmrc"           %% s"play-frontend-hmrc-$playV"    % "8.4.0",
     "uk.gov.hmrc"           %% "play-conditional-form-mapping" % s"1.13.0-$playV",
@@ -28,10 +28,7 @@ private object AppDependencies {
     "commons-codec"          % "commons-codec"                 % "1.15",
     // PLAY
     "com.typesafe.play"     %% "play-json"                     % "2.8.1",
-    "com.typesafe.play"     %% "play-json-joda"                % "2.8.1",
-
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.13" cross CrossVersion.full),
-    "com.github.ghik" % "silencer-lib" % "1.7.13" % Provided cross CrossVersion.full
+    "com.typesafe.play"     %% "play-json-joda"                % "2.8.1"
   )
 
   trait ScopeDependencies {
@@ -40,10 +37,11 @@ private object AppDependencies {
   }
 
   object Test {
-    def apply() = new ScopeDependencies {
-      override val scope = "test"
-      override lazy val dependencies = Seq(
+    def apply(): Seq[sbt.ModuleID] = new ScopeDependencies {
+      override val scope = "test,it"
+      override lazy val dependencies: Seq[sbt.ModuleID] = Seq(
         "uk.gov.hmrc"            %% s"bootstrap-test-$playV"  % bootstrapV          % scope,
+        "uk.gov.hmrc.mongo"      %% s"hmrc-mongo-test-$playV" % hmrcMongoV          % scope,
         "org.scalatestplus.play" %% "scalatestplus-play"      % "7.0.1"             % scope,
         "org.scalatestplus"      %% "scalacheck-1-15"         % "3.2.11.0"          % scope,
         "org.scalacheck"         %% "scalacheck"              % "1.17.0"            % scope,
@@ -55,5 +53,5 @@ private object AppDependencies {
     }.dependencies
   }
 
-  def apply() = compile ++ Test()
+  def apply(): Seq[ModuleID] = compile ++ Test()
 }
