@@ -43,7 +43,7 @@ object PercentageOfCashPaymentOver15000 extends Enumerable.Implicits {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val jsonReads = {
+  implicit val jsonReads: Reads[PercentageOfCashPaymentOver15000] = {
     import play.api.libs.json.Reads.StringReads
     (__ \ "percentage").read[String].flatMap[PercentageOfCashPaymentOver15000] {
       case "01" => First

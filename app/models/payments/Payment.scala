@@ -49,7 +49,7 @@ case class Payment(
                     updatedAt: Option[LocalDateTime] = None)
 
 object Payment {
-  implicit val statusFormat = EnumFormat(PaymentStatuses)
+  implicit val statusFormat: Format[PaymentStatus] = EnumFormat(PaymentStatuses)
 
   implicit val writes: OWrites[Payment] = Json.writes[Payment]
 

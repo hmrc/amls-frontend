@@ -17,7 +17,7 @@
 package models.renewal
 
 import models.Country
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{Json, OWrites, Reads}
 
 case class Renewal(involvedInOtherActivities: Option[InvolvedInOther] = None,
                    businessTurnover: Option[BusinessTurnover] = None,
@@ -156,7 +156,7 @@ object Renewal {
   val key = "renewal"
   val sectionKey = "renewal"
 
-  implicit val format = Json.writes[Renewal]
+  implicit val format: OWrites[Renewal] = Json.writes[Renewal]
 
   implicit val jsonReads: Reads[Renewal] = {
     import play.api.libs.functional.syntax._

@@ -178,7 +178,7 @@ object Products extends Enumerable.Implicits {
       }
     } map Products.apply
 
-  implicit val jsonWrite = Writes[Products] {
+  implicit val jsonWrite: Writes[Products] = Writes[Products] {
     case Products(transactions) =>
       Json.obj(
         "products" -> (transactions map {

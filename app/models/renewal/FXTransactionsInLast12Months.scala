@@ -16,13 +16,13 @@
 
 package models.renewal
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class FXTransactionsInLast12Months(fxTransaction: String)
 
 object FXTransactionsInLast12Months {
 
-  implicit val format = Json.format[FXTransactionsInLast12Months]
+  implicit val format: OFormat[FXTransactionsInLast12Months] = Json.format[FXTransactionsInLast12Months]
 
   implicit def convert(model: FXTransactionsInLast12Months): models.moneyservicebusiness.FXTransactionsInNext12Months = {
     models.moneyservicebusiness.FXTransactionsInNext12Months(model.fxTransaction)
