@@ -38,7 +38,7 @@ object UpdateService{
 
   val key = "updateservice"
 
-  implicit val jsonWrites = Json.writes[UpdateService]
+  implicit val jsonWrites: OWrites[UpdateService] = Json.writes[UpdateService]
 
   implicit val jsonReads: Reads[UpdateService] = {
     (__ \ "areNewActivitiesAtTradingPremises").readNullable[AreNewActivitiesAtTradingPremises] and
@@ -47,6 +47,6 @@ object UpdateService{
       (__ \ "inNewServiceFlow").readNullable[Boolean].map(_.getOrElse(false))
   }.apply(UpdateService.apply _)
 
-  implicit val formatOption = Reads.optionWithNull[UpdateService]
+  implicit val formatOption: Reads[Option[UpdateService]] = Reads.optionWithNull[UpdateService]
 
 }

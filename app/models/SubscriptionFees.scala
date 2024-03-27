@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class SubscriptionFees(paymentReference: String,
                             registrationFee: BigDecimal,
@@ -29,5 +29,5 @@ case class SubscriptionFees(paymentReference: String,
                             totalFees: BigDecimal)
 
 object SubscriptionFees {
-  implicit val format = Json.format[SubscriptionFees]
+  implicit val format: OFormat[SubscriptionFees] = Json.format[SubscriptionFees]
 }

@@ -17,7 +17,7 @@
 package models.deregister
 
 import org.joda.time.LocalDate
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 import play.api.libs.json.JodaReads._
 
 case class DeRegisterSubscriptionRequest(acknowledgementReference: String,

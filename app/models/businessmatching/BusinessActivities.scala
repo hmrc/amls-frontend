@@ -96,7 +96,7 @@ object BusinessActivity extends Enumerable.Implicits {
     case _ => JsError((JsPath \ "businessActivities") -> play.api.libs.json.JsonValidationError("error.invalid"))
   }
 
-  implicit val jsonActivityWrite = Writes[BusinessActivity] {
+  implicit val jsonActivityWrite: Writes[BusinessActivity] = Writes[BusinessActivity] {
     case AccountancyServices => JsString("01")
     case ArtMarketParticipant => JsString("08")
     case BillPaymentServices => JsString("02")
@@ -153,7 +153,7 @@ object BusinessActivities extends Logging {
     }.sortBy(_.content.mkString)
   }
 
-  implicit val format = Json.writes[BusinessActivities]
+  implicit val format: OWrites[BusinessActivities] = Json.writes[BusinessActivities]
 
   implicit val jsonReads: Reads[BusinessActivities] = {
     import play.api.libs.json.Reads.StringReads

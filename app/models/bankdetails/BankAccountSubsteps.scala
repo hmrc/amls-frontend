@@ -46,14 +46,14 @@ object BankAccountIsUk {
 
   implicit val isUkJsonReads: Reads[BankAccountIsUk] = ( __ \ "isUK").read[Boolean] map BankAccountIsUk.apply
 
-  implicit val isUkJsonWrites = Writes[BankAccountIsUk] { data => Json.obj( "isUK" -> data.isUk) }
+  implicit val isUkJsonWrites: Writes[BankAccountIsUk] = Writes[BankAccountIsUk] { data => Json.obj( "isUK" -> data.isUk) }
 }
 
 object BankAccountHasIban {
 
   implicit val hasIbanJsonReads: Reads[BankAccountHasIban] = ( __ \ "isIBAN").read[Boolean] map BankAccountHasIban.apply
 
-  implicit val hasIbanJsonWrites = Writes[BankAccountHasIban] { data => Json.obj("isIBAN" -> data.hasIban ) }
+  implicit val hasIbanJsonWrites: Writes[BankAccountHasIban] = Writes[BankAccountHasIban] { data => Json.obj("isIBAN" -> data.hasIban ) }
 }
 
 object Account {
@@ -83,7 +83,7 @@ object Account {
 
   implicit val accountReads: Reads[Account] = ukJsonReads orElse nonUkIbanJsonReads orElse nonUkAccountJsonReads
 
-  implicit val accountWrites = Writes[Account] {
+  implicit val accountWrites: Writes[Account] = Writes[Account] {
     case account@UKAccount(_, _) => ukJsonWrites.writes(account)
     case account@NonUKIBANNumber(_) => nonUkIbanJsonWrites.writes(account)
     case account@NonUKAccountNumber(_) => nonUkAccountJsonWrites.writes(account)

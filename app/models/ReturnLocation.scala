@@ -32,7 +32,7 @@ object ReturnLocation {
 
   private def publicRedirectUrl(url: String)(implicit appConfig: ApplicationConfig) = s"${appConfig.frontendBaseUrl}$url"
 
-  implicit val locationWrites = new Writes[ReturnLocation] {
+  implicit val locationWrites: Writes[ReturnLocation] = new Writes[ReturnLocation] {
     override def writes(o: ReturnLocation) = JsString(o.absoluteUrl)
   }
 

@@ -16,11 +16,11 @@
 
 package models.responsiblepeople
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class BankAccountRegistered(registerAnotherBank: Boolean)
 
 object BankAccountRegistered {
-  implicit val formats = Json.format[BankAccountRegistered]
+  implicit val formats: OFormat[BankAccountRegistered] = Json.format[BankAccountRegistered]
 }
 

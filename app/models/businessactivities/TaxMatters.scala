@@ -16,10 +16,10 @@
 
 package models.businessactivities
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class TaxMatters(manageYourTaxAffairs: Boolean)
 
 object TaxMatters {
-  implicit val formats = Json.format[TaxMatters]
+  implicit val formats: OFormat[TaxMatters] = Json.format[TaxMatters]
 }

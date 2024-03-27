@@ -18,7 +18,7 @@ package models.businessdetails
 
 import models.registrationprogress._
 import play.api.i18n.Messages
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{Json, OWrites, Reads}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 case class BusinessDetails(
@@ -123,7 +123,7 @@ object BusinessDetails {
 
   val key = "about-the-business"
 
-  implicit val format = Json.writes[BusinessDetails]
+  implicit val format: OWrites[BusinessDetails] = Json.writes[BusinessDetails]
 
   implicit val jsonReads: Reads[BusinessDetails] = {
     import play.api.libs.functional.syntax._

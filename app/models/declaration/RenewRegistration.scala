@@ -33,7 +33,7 @@ object RenewRegistration {
       case false => Reads(_ => JsSuccess(RenewRegistrationNo))
     }
 
-  implicit val jsonWrites = Writes[RenewRegistration] {
+  implicit val jsonWrites: Writes[RenewRegistration] = Writes[RenewRegistration] {
     case RenewRegistrationYes => Json.obj("renewRegistration" -> true)
     case RenewRegistrationNo  => Json.obj("renewRegistration" -> false)
   }

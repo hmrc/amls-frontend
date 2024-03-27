@@ -16,10 +16,10 @@
 
 package models.businessactivities
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class NCARegistered(ncaRegistered: Boolean)
 
 object NCARegistered {
-  implicit val formats = Json.format[NCARegistered]
+  implicit val formats: OFormat[NCARegistered] = Json.format[NCARegistered]
 }

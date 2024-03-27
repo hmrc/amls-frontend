@@ -133,7 +133,7 @@ object BankDetails {
 
   val key = "bank-details"
 
-  implicit val mongoKey = new MongoKey[BankDetails] {
+  implicit val mongoKey: MongoKey[BankDetails] = new MongoKey[BankDetails] {
     override def apply(): String = "bank-details"
   }
 

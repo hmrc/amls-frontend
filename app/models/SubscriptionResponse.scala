@@ -59,8 +59,8 @@ object SubscriptionResponse {
 
   val key = "Subscription"
 
-  implicit val format = Json.format[SubscriptionResponse]
-  implicit val formatOption = Reads.optionNoError[SubscriptionResponse]
+  implicit val format: OFormat[SubscriptionResponse] = Json.format[SubscriptionResponse]
+  implicit val formatOption: Reads[Option[SubscriptionResponse]] = Reads.optionNoError[SubscriptionResponse]
 
   val oldFeesStructureTransformer: Reads[JsObject] =
     (

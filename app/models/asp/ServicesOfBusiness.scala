@@ -93,7 +93,7 @@ object Service extends Enumerable.Implicits {
       case _ => JsError((JsPath \ "services") -> JsonValidationError("error.invalid"))
     }
 
-  implicit val jsonServiceWrites = Writes[Service] {
+  implicit val jsonServiceWrites: Writes[Service] = Writes[Service] {
       case Accountancy => JsString("01")
       case PayrollServices => JsString("02")
       case BookKeeping => JsString("03")
@@ -104,6 +104,6 @@ object Service extends Enumerable.Implicits {
 }
 
 object ServicesOfBusiness {
-  implicit val formats = Json.format[ServicesOfBusiness]
+  implicit val formats: OFormat[ServicesOfBusiness] = Json.format[ServicesOfBusiness]
 }
 

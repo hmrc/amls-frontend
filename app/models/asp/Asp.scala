@@ -86,11 +86,11 @@ object Asp {
 
   val key = "asp"
 
-  implicit val mongoKey = new MongoKey[Asp] {
+  implicit val mongoKey: MongoKey[Asp] = new MongoKey[Asp] {
     override def apply(): String = "asp"
   }
 
-  implicit val jsonWrites = Json.writes[Asp]
+  implicit val jsonWrites: OWrites[Asp] = Json.writes[Asp]
 
   implicit val jsonReads: Reads[Asp] = {
     (__ \ "services").readNullable[ServicesOfBusiness] and
@@ -99,7 +99,7 @@ object Asp {
       (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
   }.apply(Asp.apply _)
 
-  implicit val formatOption = Reads.optionWithNull[Asp]
+  implicit val formatOption: Reads[Option[Asp]] = Reads.optionWithNull[Asp]
 
   implicit def default(details: Option[Asp]): Asp =
     details.getOrElse(Asp())
