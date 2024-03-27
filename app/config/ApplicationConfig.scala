@@ -37,8 +37,7 @@ class ApplicationConfig @Inject()(configuration: Configuration, servicesConfig: 
 
   lazy val feedbackFrontendUrl = getConfigString("feedback-frontend.url")
 
-  lazy val contactFrontendReportUrl = baseUrl("contact-frontend") + getConfigString("contact-frontend.report-url")
-  def reportAProblemNonJSUrl(implicit request: Request[_]): String = {
+  def contactFrontendReportUrl(implicit request: Request[_]): String = {
     getConfigString("contact-frontend.report-problem-url.non-js") +
       "&referrerUrl=" + URLEncoder.encode(frontendBaseUrl + request.uri, "utf-8")
   }

@@ -31,18 +31,18 @@ class SubmissionErrorController @Inject()(authAction: AuthAction,
                                           badRequestView: BadRequestView) extends AmlsBaseController(ds, cc){
 
   def duplicateEnrolment(): Action[AnyContent] = authAction { implicit request =>
-    Ok(duplicateEnrolmentView(appConfig.reportAProblemNonJSUrl))
+    Ok(duplicateEnrolmentView(appConfig.contactFrontendReportUrl))
   }
 
   def duplicateSubmission(): Action[AnyContent] = authAction { implicit request =>
-    Ok(duplicateSubmissionView(appConfig.reportAProblemNonJSUrl))
+    Ok(duplicateSubmissionView(appConfig.contactFrontendReportUrl))
   }
 
   def wrongCredentialType(): Action[AnyContent] = authAction { implicit request =>
-    Ok(wrongCredentialTypeView(appConfig.reportAProblemNonJSUrl))
+    Ok(wrongCredentialTypeView(appConfig.contactFrontendReportUrl))
   }
 
   def badRequest(): Action[AnyContent] = authAction { implicit request =>
-    Ok(badRequestView(appConfig.reportAProblemNonJSUrl))
+    Ok(badRequestView(appConfig.contactFrontendReportUrl))
   }
 }
