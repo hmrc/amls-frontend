@@ -16,10 +16,10 @@
 
 package models.payments
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class UpdateBacsRequest(isBacs: Boolean)
 
 object UpdateBacsRequest {
-  implicit val format = Json.format[UpdateBacsRequest]
+  implicit val format: OFormat[UpdateBacsRequest] = Json.format[UpdateBacsRequest]
 }

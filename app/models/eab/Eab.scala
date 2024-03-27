@@ -176,7 +176,7 @@ object Eab {
     }
   }
 
-  implicit val mongoKey = new MongoKey[Eab] {
+  implicit val mongoKey: MongoKey[Eab] = new MongoKey[Eab] {
     override def apply(): String = key
   }
 
@@ -255,5 +255,5 @@ object Eab {
       ) (unlift(Eab.unapply))
   }
 
-  implicit val formatOption = Reads.optionWithNull[Eab]
+  implicit val formatOption: Reads[Option[Eab]] = Reads.optionWithNull[Eab]
 }

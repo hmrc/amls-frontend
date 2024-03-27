@@ -27,7 +27,7 @@ object NotificationResponse {
 
   val dateTimeFormat = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC
 
-  implicit val readsJodaLocalDateTime = Reads[LocalDateTime](js =>
+  implicit val readsJodaLocalDateTime: Reads[LocalDateTime] = Reads[LocalDateTime](js =>
     js.validate[String].map[LocalDateTime](dtString =>
       LocalDateTime.parse(dtString, dateTimeFormat)
     )
@@ -37,5 +37,5 @@ object NotificationResponse {
     def writes(dateTime: LocalDateTime): JsValue = JsString(dateTimeFormat.print(dateTime.toDateTime(DateTimeZone.UTC)))
   }
   implicit val dateFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat
-  implicit val format = Json.format[NotificationResponse]
+  implicit val format: OFormat[NotificationResponse] = Json.format[NotificationResponse]
 }

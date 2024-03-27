@@ -67,5 +67,5 @@ object Payment {
         (__ \ "updatedAt").readNullable[LocalDateTime]
       ) (Payment(_, _, _, _, _, _, _, _, _, _))
 
-  implicit val format = OFormat(reads,writes)
+  implicit val format: OFormat[Payment] = OFormat(reads,writes)
 }

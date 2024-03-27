@@ -16,11 +16,11 @@
 
 package models.payments
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class RefreshPaymentStatusRequest(paymentReference: String)
 
 object RefreshPaymentStatusRequest {
-  implicit val format = Json.format[RefreshPaymentStatusRequest]
+  implicit val format: OFormat[RefreshPaymentStatusRequest] = Json.format[RefreshPaymentStatusRequest]
 }
 

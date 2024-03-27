@@ -16,7 +16,7 @@
 
 package models.declaration
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class WhoIsRegistering(person: String) {
   val indexValue = """([0-9]+)$""".r.findFirstIn(person) map {_.toInt}
@@ -26,5 +26,5 @@ object WhoIsRegistering {
 
   val key = "who-is-registering"
 
-  implicit val format = Json.format[WhoIsRegistering]
+  implicit val format: OFormat[WhoIsRegistering] = Json.format[WhoIsRegistering]
 }

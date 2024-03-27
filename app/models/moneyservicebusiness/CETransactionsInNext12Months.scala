@@ -16,10 +16,10 @@
 
 package models.moneyservicebusiness
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class CETransactionsInNext12Months (ceTransaction: String)
 
 object CETransactionsInNext12Months {
-  implicit val format = Json.format[CETransactionsInNext12Months]
+  implicit val format: OFormat[CETransactionsInNext12Months] = Json.format[CETransactionsInNext12Months]
 }

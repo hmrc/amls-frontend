@@ -28,7 +28,7 @@ case class DeRegisterSubscriptionRequest(acknowledgementReference: String,
 object DeRegisterSubscriptionRequest {
   val DefaultAckReference = "A" * 32
 
-  implicit val reads = Json.reads[DeRegisterSubscriptionRequest]
+  implicit val reads: Reads[DeRegisterSubscriptionRequest] = Json.reads[DeRegisterSubscriptionRequest]
 
   implicit val writes: Writes[DeRegisterSubscriptionRequest] = {
     import play.api.libs.functional.syntax._

@@ -49,7 +49,7 @@ object BusinessUseAnIPSP {
     }
   }
 
-  implicit val jsonWrites = Writes[BusinessUseAnIPSP] {
+  implicit val jsonWrites: Writes[BusinessUseAnIPSP] = Writes[BusinessUseAnIPSP] {
     case BusinessUseAnIPSPYes(name ,referenceNumber) => Json.obj(
                                           "useAnIPSP" -> true,
                                            "name" -> name,

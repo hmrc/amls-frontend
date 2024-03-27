@@ -67,7 +67,7 @@ object BusinessTurnover extends Enumerable.Implicits {
     }
   }
 
-  implicit val jsonWrites = Writes[BusinessTurnover] {
+  implicit val jsonWrites: Writes[BusinessTurnover] = Writes[BusinessTurnover] {
     case First => Json.obj("businessTurnover" -> "01")
     case Second => Json.obj("businessTurnover" -> "02")
     case Third => Json.obj("businessTurnover" -> "03")

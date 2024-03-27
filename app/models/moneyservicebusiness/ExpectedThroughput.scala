@@ -74,7 +74,7 @@ object ExpectedThroughput extends Enumerable.Implicits {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val jsonReads = {
+  implicit val jsonReads: Reads[ExpectedThroughput] = {
     import play.api.libs.json.Reads.StringReads
     (__ \ "throughput").read[String].flatMap[ExpectedThroughput] {
       case "01" => First
@@ -89,7 +89,7 @@ object ExpectedThroughput extends Enumerable.Implicits {
     }
   }
 
-  implicit val jsonWrites = Writes[ExpectedThroughput] {
+  implicit val jsonWrites: Writes[ExpectedThroughput] = Writes[ExpectedThroughput] {
     case First => Json.obj("throughput" -> "01")
     case Second => Json.obj("throughput" -> "02")
     case Third => Json.obj("throughput" -> "03")

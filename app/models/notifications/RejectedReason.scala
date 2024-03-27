@@ -40,7 +40,7 @@ object RejectedReason {
     }
   }
 
-  implicit val jsonWrites = Writes[RejectedReason] {
+  implicit val jsonWrites: Writes[RejectedReason] = Writes[RejectedReason] {
     case NonCompliant => JsString("01")
     case FailedToRespond => JsString("02")
     case FailedToPayCharges => JsString("03")
