@@ -30,7 +30,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import play.api.libs.json.{JsArray, Json, Writes}
+import play.api.libs.json.{JsArray, Json, OFormat, Writes}
 
 import scala.collection.Seq
 
@@ -65,5 +65,5 @@ object SubscriptionRequest {
     }))
   }
 
-  implicit val format = Json.format[SubscriptionRequest]
+  implicit val format: OFormat[SubscriptionRequest] = Json.format[SubscriptionRequest]
 }

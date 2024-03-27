@@ -16,12 +16,12 @@
 
 package models.enrolment
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OWrites}
 
 case class TaxEnrolment(userId: String, friendlyName: String, `type`: String, verifiers: Seq[EnrolmentIdentifier])
 
 object TaxEnrolment {
-  implicit val format = Json.writes[TaxEnrolment]
+  implicit val format: OWrites[TaxEnrolment] = Json.writes[TaxEnrolment]
 
   def apply(userId: String, postCode: String): TaxEnrolment =
     TaxEnrolment(userId, "AMLS Enrolment", "principal", Seq(

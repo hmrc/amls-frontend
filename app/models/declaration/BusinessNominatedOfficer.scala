@@ -16,7 +16,7 @@
 
 package models.declaration
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class BusinessNominatedOfficer(value: String)
 
@@ -24,5 +24,5 @@ object BusinessNominatedOfficer {
 
   val key = "business-nominated-officer"
 
-  implicit val format = Json.format[BusinessNominatedOfficer]
+  implicit val format: OFormat[BusinessNominatedOfficer] = Json.format[BusinessNominatedOfficer]
 }

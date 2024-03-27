@@ -16,10 +16,10 @@
 
 package models.businessdetails
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class LettersAddress(lettersAddress: Boolean)
 
 object LettersAddress {
-  implicit val formats = Json.format[LettersAddress]
+  implicit val formats: OFormat[LettersAddress] = Json.format[LettersAddress]
 }

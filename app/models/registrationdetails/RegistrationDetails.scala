@@ -16,10 +16,10 @@
 
 package models.registrationdetails
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 
 case class RegistrationDetails(companyName: String, isIndividual: Boolean)
 
 object RegistrationDetails {
-  implicit val reads = Json.reads[RegistrationDetails]
+  implicit val reads: Reads[RegistrationDetails] = Json.reads[RegistrationDetails]
 }

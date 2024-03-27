@@ -34,7 +34,7 @@ object InvolvedInOther {
       case false => Reads(_ => JsSuccess(InvolvedInOtherNo))
     }
 
-  implicit val jsonWrites = Writes[InvolvedInOther] {
+  implicit val jsonWrites: Writes[InvolvedInOther] = Writes[InvolvedInOther] {
     case InvolvedInOtherYes(details) => Json.obj(
       "involvedInOther" -> true,
       "details" -> details

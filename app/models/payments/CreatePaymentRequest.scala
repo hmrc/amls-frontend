@@ -17,10 +17,10 @@
 package models.payments
 
 import models.ReturnLocation
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OWrites}
 
 case class CreatePaymentRequest(taxType: String, reference: String, description: String, amountInPence: Int, returnUrl: ReturnLocation)
 
 object CreatePaymentRequest {
-  implicit val format = Json.writes[CreatePaymentRequest]
+  implicit val format: OWrites[CreatePaymentRequest] = Json.writes[CreatePaymentRequest]
 }

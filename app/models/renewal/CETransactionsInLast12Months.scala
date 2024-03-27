@@ -16,13 +16,13 @@
 
 package models.renewal
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class CETransactionsInLast12Months(ceTransaction: String)
 
 object CETransactionsInLast12Months {
 
-  implicit val format = Json.format[CETransactionsInLast12Months]
+  implicit val format: OFormat[CETransactionsInLast12Months] = Json.format[CETransactionsInLast12Months]
 
   implicit def convert(model: CETransactionsInLast12Months): models.moneyservicebusiness.CETransactionsInNext12Months = {
     models.moneyservicebusiness.CETransactionsInNext12Months(model.ceTransaction)

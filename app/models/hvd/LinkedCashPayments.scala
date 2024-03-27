@@ -16,10 +16,10 @@
 
 package models.hvd
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class LinkedCashPayments(linkedCashPayments: Boolean)
 
 object LinkedCashPayments {
-  implicit val format = Json.format[LinkedCashPayments]
+  implicit val format: OFormat[LinkedCashPayments] = Json.format[LinkedCashPayments]
 }

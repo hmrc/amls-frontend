@@ -42,7 +42,7 @@ object RevokedReason {
     }
   }
 
-  implicit val jsonWrites = Writes[RevokedReason] {
+  implicit val jsonWrites: Writes[RevokedReason] = Writes[RevokedReason] {
     case RevokedMissingTrader =>  JsString("01")
     case RevokedCeasedTrading =>  JsString("02")
     case RevokedNonCompliant =>  JsString("03")

@@ -16,12 +16,12 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class DataImport(filename: String)
 
 object DataImport {
   val key = "data-import"
 
-  implicit val format = Json.format[DataImport]
+  implicit val format: OFormat[DataImport] = Json.format[DataImport]
 }

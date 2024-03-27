@@ -65,7 +65,7 @@ object TransactionTypes extends Enumerable.Implicits {
 
   import utils.MappingUtils.constant
 
-  implicit val jsonReads = new Reads[TransactionTypes] {
+  implicit val jsonReads: Reads[TransactionTypes] = new Reads[TransactionTypes] {
     override def reads(json: JsValue) = {
       val t = (json \ "types").asOpt[Set[String]]
       val n = (json \ "software").asOpt[String]
@@ -110,7 +110,7 @@ object TransactionTypes extends Enumerable.Implicits {
       case false => constant(None)
     }
 
-  implicit val jsonWrites = Writes[TransactionTypes] { t =>
+  implicit val jsonWrites: Writes[TransactionTypes] = Writes[TransactionTypes] { t =>
     Json.obj(
       "types" -> t.types.map(_.value)
     ) ++ (t.types.collectFirst {

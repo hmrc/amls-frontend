@@ -16,12 +16,12 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class SubmissionRequestStatus(hasSubmitted: Boolean, isRenewalAmendment: Option[Boolean] = Some(false))
 
 object SubmissionRequestStatus {
   val key = "submission-request-status"
 
-  implicit val format = Json.format[SubmissionRequestStatus]
+  implicit val format: OFormat[SubmissionRequestStatus] = Json.format[SubmissionRequestStatus]
 }

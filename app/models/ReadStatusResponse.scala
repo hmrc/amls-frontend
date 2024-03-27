@@ -40,7 +40,7 @@ object ReadStatusResponse {
 
   val dateTimeFormat = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC
 
-  implicit val readsJodaLocalDateTime = Reads[LocalDateTime](js =>
+  implicit val readsJodaLocalDateTime: Reads[LocalDateTime] = Reads[LocalDateTime](js =>
     js.validate[String].map[LocalDateTime](dtString =>
       LocalDateTime.parse(dtString, dateTimeFormat)
     )
@@ -50,6 +50,6 @@ object ReadStatusResponse {
     def writes(dateTime: LocalDateTime): JsValue = JsString(dateTimeFormat.print(dateTime.toDateTime(DateTimeZone.UTC)))
   }
 
-  implicit val format = Json.format[ReadStatusResponse]
+  implicit val format: OFormat[ReadStatusResponse] = Json.format[ReadStatusResponse]
 }
 

@@ -174,7 +174,7 @@ object RoleWithinBusinessRelease7 extends Enumerable.Implicits {
     }.orElse(preRelease7JsonRead).orElse(fallback)
       .map(RoleWithinBusinessRelease7.apply)
 
-  implicit val jsonWrite = Writes[RoleWithinBusinessRelease7] {
+  implicit val jsonWrite: Writes[RoleWithinBusinessRelease7] = Writes[RoleWithinBusinessRelease7] {
     case RoleWithinBusinessRelease7(roleTypes) =>
       Json.obj(
         businessRolePathName -> (roleTypes map {

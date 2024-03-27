@@ -32,11 +32,11 @@ case class Country(name: String, code: String) {
 
 object Country {
 
-  implicit val writes = Writes[Country] {
+  implicit val writes: Writes[Country] = Writes[Country] {
     case Country(_, c) => JsString(c)
   }
 
-  implicit val reads = Reads[Country] {
+  implicit val reads: Reads[Country] = Reads[Country] {
     case JsString("") => JsSuccess(Country("",""))
     case JsString(code) =>
       countries collectFirst {

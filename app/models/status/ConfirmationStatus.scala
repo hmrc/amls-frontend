@@ -16,7 +16,7 @@
 
 package models.status
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class ConfirmationStatus(submissionConfirmed: Option[Boolean])
 
@@ -24,5 +24,5 @@ object ConfirmationStatus {
 
   val key = "Submission_Indicator"
 
-  implicit val format = Json.format[ConfirmationStatus]
+  implicit val format: OFormat[ConfirmationStatus] = Json.format[ConfirmationStatus]
 }

@@ -32,7 +32,7 @@ import utils.AuditHelper
 case class AuditAddress(addressLine1: String, addressLine2: Option[String], addressLine3: Option[String], country: String, postCode: Option[String])
 
 object AuditAddress {
-  implicit val format = Json.format[AuditAddress]
+  implicit val format: OFormat[AuditAddress] = Json.format[AuditAddress]
 }
 
 object AddressCreatedEvent {
@@ -48,7 +48,7 @@ case class AddressModifiedEvent(currentAddress: AuditAddress, oldAddress: Option
 
 object AddressModifiedEvent {
 
-  implicit val writes = Writes[AddressModifiedEvent] { event =>
+  implicit val writes: Writes[AddressModifiedEvent] = Writes[AddressModifiedEvent] { event =>
     import play.api.libs.json._
 
     val currentAddressObj = Json.obj(

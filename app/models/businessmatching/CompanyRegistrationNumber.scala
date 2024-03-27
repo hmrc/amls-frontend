@@ -16,11 +16,11 @@
 
 package models.businessmatching
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class CompanyRegistrationNumber(companyRegistrationNumber: String)
 
 
 object CompanyRegistrationNumber {
-  implicit val formats = Json.format[CompanyRegistrationNumber]
+  implicit val formats: OFormat[CompanyRegistrationNumber] = Json.format[CompanyRegistrationNumber]
 }

@@ -16,7 +16,7 @@
 
 package models.declaration
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class BusinessPartners(value: String){
   val indexValue = """([0-9]+)$""".r.findFirstIn(value) map {_.toInt}
@@ -26,5 +26,5 @@ object BusinessPartners {
 
   val key = "business-partners"
 
-  implicit val format = Json.format[BusinessPartners]
+  implicit val format: OFormat[BusinessPartners] = Json.format[BusinessPartners]
 }

@@ -44,7 +44,7 @@ object AMPTurnover extends Enumerable.Implicits {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val jsonReads = {
+  implicit val jsonReads: Reads[AMPTurnover] = {
     import play.api.libs.json.Reads.StringReads
     (__ \ "percentageExpectedTurnover").read[String].flatMap[AMPTurnover] {
       case "01" => First
@@ -57,7 +57,7 @@ object AMPTurnover extends Enumerable.Implicits {
     }
   }
 
-  implicit val jsonWrites = Writes[AMPTurnover] {
+  implicit val jsonWrites: Writes[AMPTurnover] = Writes[AMPTurnover] {
     case First => Json.obj("percentageExpectedTurnover" -> "01")
     case Second => Json.obj("percentageExpectedTurnover" -> "02")
     case Third => Json.obj("percentageExpectedTurnover" -> "03")

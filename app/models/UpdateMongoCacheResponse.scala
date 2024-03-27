@@ -58,7 +58,7 @@ case class UpdateMongoCacheResponse(dataImport: Option[DataImport],
 object UpdateMongoCacheResponse {
 
   import utils.MappingUtils.constant
-  implicit val writes = Json.writes[UpdateMongoCacheResponse]
+  implicit val writes: OWrites[UpdateMongoCacheResponse] = Json.writes[UpdateMongoCacheResponse]
 
   def readLegacyField[T](key: String, oldKey: String)(implicit r: Reads[T]): Reads[Option[T]] =
     {

@@ -86,7 +86,7 @@ object PaymentMethods extends Enumerable.Implicits {
     )
   }
 
-  implicit val jsonW = Writes[PaymentMethods] {x =>
+  implicit val jsonW: Writes[PaymentMethods] = Writes[PaymentMethods] { x =>
     val jsMethods = Json.obj("courier" -> x.courier,
       "direct" -> x.direct,
       "other" -> x.other.isDefined)

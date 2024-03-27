@@ -22,7 +22,7 @@ import connectors.{BusinessMatchingAddress, BusinessMatchingReviewDetails}
 import models.Country
 import models.businessmatching.BusinessType
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership, SoleProprietor, UnincorporatedBody}
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{Json, OWrites, Reads}
 
 case class ReviewDetails(
                           businessName: String,
@@ -58,7 +58,7 @@ object ReviewDetails {
       ) (ReviewDetails.apply _)
   }
 
-  implicit val writes = Json.writes[ReviewDetails]
+  implicit val writes: OWrites[ReviewDetails] = Json.writes[ReviewDetails]
 
   implicit def convert(addr: BusinessMatchingAddress): Address = {
       val country = models.countries collectFirst {

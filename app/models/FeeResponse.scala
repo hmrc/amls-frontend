@@ -31,7 +31,7 @@ object ResponseType {
 
   case object AmendOrVariationResponseType extends ResponseType
 
-  implicit val jsonWrites = Writes[ResponseType] {
+  implicit val jsonWrites: Writes[ResponseType] = Writes[ResponseType] {
     case SubscriptionResponseType => JsString("SubscriptionReponse")
     case AmendOrVariationResponseType => JsString("AmendOrVariationResponse")
   }
@@ -86,5 +86,5 @@ object FeeResponse {
   
   implicit val dateTimeWrite: Writes[DateTime] = (dateTime: DateTime) => Json.obj("$date" -> dateTime.getMillis)
 
-  implicit val format = Json.format[FeeResponse]
+  implicit val format: OFormat[FeeResponse] = Json.format[FeeResponse]
 }

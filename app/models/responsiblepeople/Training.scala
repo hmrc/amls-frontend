@@ -32,7 +32,7 @@ object Training {
       case false => Reads(_ => JsSuccess(TrainingNo))
     }
 
-  implicit val jsonWrites = Writes[Training] {
+  implicit val jsonWrites: Writes[Training] = Writes[Training] {
     case TrainingYes(information) => Json.obj(
       "training" -> true,
       "information" -> information

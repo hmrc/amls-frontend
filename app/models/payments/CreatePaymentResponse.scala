@@ -16,7 +16,7 @@
 
 package models.payments
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Format, Json, OFormat}
 import play.api.libs.functional.syntax._
 
 case class NextUrl(value: String)
@@ -28,5 +28,5 @@ object NextUrl {
 case class CreatePaymentResponse(nextUrl: NextUrl, journeyId: String)
 
 object CreatePaymentResponse {
-  implicit val format = Json.format[CreatePaymentResponse]
+  implicit val format: OFormat[CreatePaymentResponse] = Json.format[CreatePaymentResponse]
 }

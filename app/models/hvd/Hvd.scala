@@ -193,7 +193,7 @@ object Hvd {
 
   implicit val writes: Writes[Hvd] = Json.writes[Hvd]
 
-  implicit val formatOption = Reads.optionWithNull[Hvd]
+  implicit val formatOption: Reads[Option[Hvd]] = Reads.optionWithNull[Hvd]
 
   implicit def default(hvd: Option[Hvd]): Hvd =
     hvd.getOrElse(Hvd())

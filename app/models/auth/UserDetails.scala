@@ -16,7 +16,7 @@
 
 package models.auth
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class UserDetails(name: String,
                        email: Option[String],
@@ -26,5 +26,5 @@ case class UserDetails(name: String,
                       )
 
 object UserDetails {
-  implicit val format = Json.format[UserDetails]
+  implicit val format: OFormat[UserDetails] = Json.format[UserDetails]
 }

@@ -16,12 +16,12 @@
 
 package models.enrolment
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class ErrorResponse(code: String, message: String) {
   override def toString: String = s"$code: $message"
 }
 
 object ErrorResponse {
-  implicit val format = Json.format[ErrorResponse]
+  implicit val format: OFormat[ErrorResponse] = Json.format[ErrorResponse]
 }

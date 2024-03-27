@@ -16,10 +16,10 @@
 
 package models.renewal
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class CustomersOutsideIsUK(isOutside: Boolean)
 
 object CustomersOutsideIsUK {
-  implicit val formats = Json.format[CustomersOutsideIsUK]
+  implicit val formats: OFormat[CustomersOutsideIsUK] = Json.format[CustomersOutsideIsUK]
 }

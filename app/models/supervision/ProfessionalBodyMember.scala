@@ -33,7 +33,7 @@ object ProfessionalBodyMember {
     }
   }
 
-  implicit val jsonWrites = Writes[ProfessionalBodyMember] {
+  implicit val jsonWrites: Writes[ProfessionalBodyMember] = Writes[ProfessionalBodyMember] {
     case ProfessionalBodyMemberYes => Json.obj("isAMember" -> true)
     case ProfessionalBodyMemberNo => Json.obj("isAMember" -> false)
   }

@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.UpstreamErrorResponse
 
 import scala.util.Try
@@ -24,7 +24,7 @@ import scala.util.Try
 case class SubscriptionErrorResponse(amlsRegNumber: String, message: String)
 
 object SubscriptionErrorResponse {
-  implicit val format = Json.format[SubscriptionErrorResponse]
+  implicit val format: OFormat[SubscriptionErrorResponse] = Json.format[SubscriptionErrorResponse]
 
   def from(ex: UpstreamErrorResponse): Option[SubscriptionErrorResponse] = {
     Try {

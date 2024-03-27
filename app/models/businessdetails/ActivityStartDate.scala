@@ -17,12 +17,12 @@
 package models.businessdetails
 
 import org.joda.time.LocalDate
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 import play.api.libs.json.JodaWrites._
 import play.api.libs.json.JodaReads._
 
 case class ActivityStartDate (startDate: LocalDate)
 
 object ActivityStartDate {
-  implicit val format =  Json.format[ActivityStartDate]
+  implicit val format: OFormat[ActivityStartDate] =  Json.format[ActivityStartDate]
 }

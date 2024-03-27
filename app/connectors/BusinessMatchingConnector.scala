@@ -20,7 +20,7 @@ import config.ApplicationConfig
 
 import javax.inject.Inject
 import play.api.Logging
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 import play.api.mvc.Request
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,13 +36,13 @@ case class BusinessMatchingAddress(line_1: String,
 }
 
 object BusinessMatchingAddress {
-  implicit val formats = Json.format[BusinessMatchingAddress]
+  implicit val formats: OFormat[BusinessMatchingAddress] = Json.format[BusinessMatchingAddress]
 }
 
 case class BusinessMatchingIdentification(idNumber: String, issuingInstitution: String, issuingCountryCode: String)
 
 object BusinessMatchingIdentification {
-  implicit val formats = Json.format[BusinessMatchingIdentification]
+  implicit val formats: OFormat[BusinessMatchingIdentification] = Json.format[BusinessMatchingIdentification]
 }
 
 case class BusinessMatchingReviewDetails(businessName: String,
@@ -60,7 +60,7 @@ case class BusinessMatchingReviewDetails(businessName: String,
                                          isBusinessDetailsEditable: Boolean = false)
 
 object BusinessMatchingReviewDetails {
-  implicit val formats = Json.format[BusinessMatchingReviewDetails]
+  implicit val formats: OFormat[BusinessMatchingReviewDetails] = Json.format[BusinessMatchingReviewDetails]
 }
 
 class BusinessMatchingConnector @Inject()(val http: HttpClient,

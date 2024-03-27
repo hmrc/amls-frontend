@@ -16,10 +16,10 @@
 
 package models.hvd
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class ExciseGoods(exciseGoods: Boolean)
 
 object ExciseGoods {
-  implicit val format = Json.format[ExciseGoods]
+  implicit val format: OFormat[ExciseGoods] = Json.format[ExciseGoods]
 }

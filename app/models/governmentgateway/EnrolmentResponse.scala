@@ -16,7 +16,7 @@
 
 package models.governmentgateway
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class EnrolmentResponse(
                        serviceName: String,
@@ -26,5 +26,5 @@ case class EnrolmentResponse(
                        )
 
 object EnrolmentResponse {
-  implicit val format = Json.format[EnrolmentResponse]
+  implicit val format: OFormat[EnrolmentResponse] = Json.format[EnrolmentResponse]
 }

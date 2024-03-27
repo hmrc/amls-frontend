@@ -32,7 +32,7 @@ object ProfessionalBody {
     case false => Reads(_ => JsSuccess(ProfessionalBodyNo))
   }
 
-  implicit val jsonWrites = Writes[ProfessionalBody] {
+  implicit val jsonWrites: Writes[ProfessionalBody] = Writes[ProfessionalBody] {
     case ProfessionalBodyYes(value) => Json.obj(
       "penalised" -> true,
       "professionalBody" -> value

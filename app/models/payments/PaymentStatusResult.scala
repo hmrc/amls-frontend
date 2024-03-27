@@ -16,11 +16,11 @@
 
 package models.payments
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class PaymentStatusResult(amlsRef: String, paymentId: String, currentStatus: PaymentStatus)
 
 object PaymentStatusResult {
   import Payment._
-  implicit val format = Json.format[PaymentStatusResult]
+  implicit val format: OFormat[PaymentStatusResult] = Json.format[PaymentStatusResult]
 }

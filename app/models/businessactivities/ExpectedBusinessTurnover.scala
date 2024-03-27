@@ -50,7 +50,7 @@ object ExpectedBusinessTurnover extends Enumerable.Implicits {
 
   import utils.MappingUtils.Implicits._
 
-  implicit val jsonReads = {
+  implicit val jsonReads: Reads[ExpectedBusinessTurnover] = {
     import play.api.libs.json.Reads.StringReads
     (__ \ "expectedBusinessTurnover").read[String].flatMap[ExpectedBusinessTurnover] {
       case "01" => First
@@ -65,7 +65,7 @@ object ExpectedBusinessTurnover extends Enumerable.Implicits {
     }
   }
 
-  implicit val jsonWrites = Writes[ExpectedBusinessTurnover] {
+  implicit val jsonWrites: Writes[ExpectedBusinessTurnover] = Writes[ExpectedBusinessTurnover] {
     case First => Json.obj("expectedBusinessTurnover" -> "01")
     case Second => Json.obj("expectedBusinessTurnover" -> "02")
     case Third => Json.obj("expectedBusinessTurnover" -> "03")

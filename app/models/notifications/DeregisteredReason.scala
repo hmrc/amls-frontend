@@ -43,7 +43,7 @@ object DeregisteredReason {
       }
    }
 
-  implicit val jsonWrites = Writes[DeregisteredReason] {
+  implicit val jsonWrites: Writes[DeregisteredReason] = Writes[DeregisteredReason] {
     case CeasedTrading => JsString("01")
     case HVDNoCashPayment => JsString("02")
     case OutOfScope => JsString("03")

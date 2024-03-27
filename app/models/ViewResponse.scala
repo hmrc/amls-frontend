@@ -55,7 +55,7 @@ object ViewResponse {
 
   val key = "View"
 
-  implicit val jsonWrites = Json.writes[ViewResponse]
+  implicit val jsonWrites: OWrites[ViewResponse] = Json.writes[ViewResponse]
 
   def constructReads(
                       etmpFormBundleNumber:String,
@@ -122,6 +122,6 @@ object ViewResponse {
       (__ \ "supervisionSection").readNullable[Supervision]
     }.apply(ViewResponse.constructReads _)
 
-  implicit val formatOption = Reads.optionWithNull[ViewResponse]
+  implicit val formatOption: Reads[Option[ViewResponse]] = Reads.optionWithNull[ViewResponse]
 
 }

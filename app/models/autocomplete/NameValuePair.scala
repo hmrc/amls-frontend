@@ -29,7 +29,7 @@ object NameValuePair {
     }
   }
 
-  implicit val jsonWrites = Writes[NameValuePair] { model =>
+  implicit val jsonWrites: Writes[NameValuePair] = Writes[NameValuePair] { model =>
     JsArray(Seq(JsString(model.name), JsString(model.value)))
   }
 }
