@@ -18,6 +18,7 @@ package forms.responsiblepeople
 
 import forms.behaviours.StringFieldBehaviours
 import forms.mappings.Constraints
+import models.Country
 import models.responsiblepeople.CountryOfBirth
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
@@ -36,7 +37,7 @@ class CountryOfBirthFormProviderSpec extends StringFieldBehaviours with Constrai
 
       "false is submitted with a country" in {
 
-        forAll(Gen.oneOf(models.countries)) { country =>
+        forAll(Gen.oneOf(models.countries.filterNot(_ == Country("United Kingdom", "GB")))) { country =>
 
           val result = form.bind(Map(
             booleanFieldName -> "false",

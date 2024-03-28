@@ -1,19 +1,7 @@
 [
   [
-    "Abu Dhabi",
-    "territory:AE-AZ"
-  ],
-  [
     "Afghanistan",
     "country:AF"
-  ],
-  [
-    "Ajman",
-    "territory:AE-AJ"
-  ],
-  [
-    "Akrotiri",
-    "territory:XQZ"
   ],
   [
     "Albania",
@@ -108,12 +96,8 @@
     "country:BT"
   ],
   [
-    "Bolivia, Plurinational State of",
+    "Bolivia",
     "country:BO"
-  ],
-  [
-    "Bonaire, Sint Eustatius and Saba",
-    "territory:BQ"
   ],
   [
     "Bosnia and Herzegovina",
@@ -136,11 +120,11 @@
     "territory:IO"
   ],
   [
-    "Virgin Islands, British",
+    "British Virgin Islands",
     "territory:VG"
   ],
   [
-    "Brunei Darussalam",
+    "Brunei",
     "country:BN"
   ],
   [
@@ -152,7 +136,7 @@
     "country:BF"
   ],
   [
-    "Burma",
+    "Myanmar (Burma)",
     "country:MM"
   ],
   [
@@ -172,7 +156,7 @@
     "country:CA"
   ],
   [
-    "Cabo Verde",
+    "Cape Verde",
     "country:CV"
   ],
   [
@@ -216,7 +200,7 @@
     "country:CG"
   ],
   [
-    "Congo, the Democratic Republic of the",
+    "Congo (Democratic Republic)",
     "country:CD"
   ],
   [
@@ -264,14 +248,6 @@
     "country:DO"
   ],
   [
-    "East Germany",
-    "country:DD"
-  ],
-  [
-    "Timor-Leste",
-    "country:TL"
-  ],
-  [
     "Ecuador",
     "country:EC"
   ],
@@ -296,11 +272,15 @@
     "country:EE"
   ],
   [
+    "Eswatini",
+    "country:SZ"
+  ],
+  [
     "Ethiopia",
     "country:ET"
   ],
   [
-    "Falkland Islands (Malvinas)",
+    "Falkland Islands",
     "territory:FK"
   ],
   [
@@ -424,7 +404,7 @@
     "country:ID"
   ],
   [
-    "Iran, Islamic Republic of",
+    "Iran",
     "country:IR"
   ],
   [
@@ -448,7 +428,7 @@
     "country:IT"
   ],
   [
-    "Côte d'Ivoire",
+    "Ivory Coast",
     "country:CI"
   ],
   [
@@ -488,7 +468,7 @@
     "country:KG"
   ],
   [
-    "Lao People's Democratic Republic",
+    "Laos",
     "country:LA"
   ],
   [
@@ -526,10 +506,6 @@
   [
     "Macao",
     "territory:MO"
-  ],
-  [
-    "Macedonia, the Former Yugoslav Republic of",
-    "country:MK"
   ],
   [
     "Madagascar",
@@ -580,11 +556,11 @@
     "country:MX"
   ],
   [
-    "Micronesia, Federated States of",
+    "Micronesia",
     "country:FM"
   ],
   [
-    "Moldova, Republic of",
+    "Moldova",
     "country:MD"
   ],
   [
@@ -656,8 +632,12 @@
     "territory:NF"
   ],
   [
-    "Korea, Democratic People's Republic of",
+    "North Korea",
     "country:KP"
+  ],
+  [
+    "North Macedonia",
+    "country:MK"
   ],
   [
     "Northern Mariana Islands",
@@ -668,7 +648,7 @@
     "country:NO"
   ],
   [
-    "Palestine, State of",
+    "Occupied Palestinian Territories",
     "territory:PS"
   ],
   [
@@ -704,7 +684,7 @@
     "country:PH"
   ],
   [
-    "Pitcairn",
+    "Pitcairn, Henderson, Ducie and Oeno Islands",
     "territory:PN"
   ],
   [
@@ -728,7 +708,7 @@
     "country:RO"
   ],
   [
-    "Russian Federation",
+    "Russia",
     "country:RU"
   ],
   [
@@ -738,10 +718,6 @@
   [
     "Réunion",
     "territory:RE"
-  ],
-  [
-    "Saint Helena, Ascension and Tristan da Cunha",
-    "territory:SH"
   ],
   [
     "Saint Pierre and Miquelon",
@@ -788,10 +764,6 @@
     "country:SG"
   ],
   [
-    "Sint Eustatius",
-    "territory:BQ-SE"
-  ],
-  [
     "Sint Maarten (Dutch part)",
     "territory:SX"
   ],
@@ -820,7 +792,7 @@
     "territory:GS"
   ],
   [
-    "Korea, Republic of",
+    "South Korea",
     "country:KR"
   ],
   [
@@ -836,15 +808,15 @@
     "country:LK"
   ],
   [
-    "Saint Kitts and Nevis",
+    "St Kitts and Nevis",
     "country:KN"
   ],
   [
-    "Saint Lucia",
+    "St Lucia",
     "country:LC"
   ],
   [
-    "Saint Vincent and the Grenadines",
+    "St Vincent",
     "country:VC"
   ],
   [
@@ -860,10 +832,6 @@
     "territory:SJ"
   ],
   [
-    "Swaziland",
-    "country:SZ"
-  ],
-  [
     "Sweden",
     "country:SE"
   ],
@@ -872,11 +840,11 @@
     "country:CH"
   ],
   [
-    "Syrian Arab Republic",
+    "Syria",
     "country:SY"
   ],
   [
-    "Taiwan, Province of China",
+    "Taiwan",
     "territory:TW"
   ],
   [
@@ -884,7 +852,7 @@
     "country:TJ"
   ],
   [
-    "Tanzania, United Republic of",
+    "Tanzania",
     "country:TZ"
   ],
   [
@@ -892,12 +860,16 @@
     "country:TH"
   ],
   [
-    "Bahamas",
+    "The Bahamas",
     "country:BS"
   ],
   [
-    "Gambia",
+    "The Gambia",
     "country:GM"
+  ],
+  [
+    "Timor-Leste",
+    "country:TL"
   ],
   [
     "Togo",
@@ -952,11 +924,11 @@
     "country:GB"
   ],
   [
-    "United States of America",
+    "United States",
     "country:US"
   ],
   [
-    "Virgin Islands, U.S.",
+    "United States Virgin Islands",
     "territory:VI"
   ],
   [
@@ -972,15 +944,15 @@
     "country:VU"
   ],
   [
-    "Holy See",
+    "Vatican City",
     "country:VA"
   ],
   [
-    "Venezuela, Bolivarian Republic of",
+    "Venezuela",
     "country:VE"
   ],
   [
-    "Viet Nam",
+    "Vietnam",
     "country:VN"
   ],
   [
@@ -1006,33 +978,5 @@
   [
     "Åland Islands",
     "territory:AX"
-  ],
-  [
-    "Virgin Islands, British",
-    "country:VG"
-  ],
-  [
-    "Myanmar",
-    "country:MM"
-  ],
-  [
-    "European Union",
-    "country:EU"
-  ],
-  [
-    "Netherlands Antilles",
-    "country:AN"
-  ],
-  [
-    "Neutral Zone",
-    "country:NT"
-  ],
-  [
-    "United Nations",
-    "country:UN"
-  ],
-  [
-    "United States Minor Outlying Islands",
-    "country:UM"
   ]
 ]

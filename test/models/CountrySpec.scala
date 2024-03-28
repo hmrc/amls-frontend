@@ -18,36 +18,56 @@ package models
 
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
-import play.api.libs.json.JsString
+import play.api.libs.json.{JsString, Json}
 import utils.AmlsSpec
 
 class CountrySpec extends AmlsSpec with ScalaCheckDrivenPropertyChecks {
 
-  "Country" when {
+  "A Country" must {
 
-    "reading json" must {
+    "parse from JSON" when {
 
-      "return an empty country" when {
-
-        "Json String is empty" in {
-
-          JsString("").as[Country] mustBe Country("", "")
-        }
+      "the country code is empty" in {
+        JsString("").as[Country] mustBe Country("", "")
       }
 
-      "return a country" when {
-
-        "a valid code is given" in {
-
-          forAll(Gen.oneOf(countries)) { country =>
-            JsString(country.code).as[Country] mustBe country
-          }
+      "a valid country code is given" in {
+        forAll(Gen.oneOf(countries)) { country =>
+          JsString(country.code).as[Country] mustBe country
         }
       }
+    }
 
-      "return an error when an invalid code is given" in {
+    "fail to parse from JSON" when {
+
+      "an invalid code is given" in {
         JsString("ZZ").validate[Country].isError mustBe true
       }
+    }
+
+    "convert to JSON" in {
+      Json.toJson(Country("China", "CN")) mustBe JsString("CN")
+    }
+
+    "have a code that is supported by the downstream API" in {
+
+      val apiCountryCodeEnum = Seq("AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT",
+        "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BM", "BN", "BO", "BQ", "BR",
+        "BS", "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG", "CH", "CI", "CK", "CL", "CM", "CN", "CO",
+        "CR", "CS", "CU", "CV", "CW", "CX", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG", "EH",
+        "ER", "ES", "ET", "EU", "FI", "FJ", "FK", "FM", "FO", "FR", "GA", "GB", "GD", "GE", "GF", "GG", "GH", "GI",
+        "GL", "GM", "GN", "GP", "GQ", "GR", "GS", "GT", "GU", "GW", "GY", "HK", "HM", "HN", "HR", "HT", "HU", "ID",
+        "IE", "IL", "IM", "IN", "IO", "IQ", "IR", "IS", "IT", "JE", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM",
+        "KN", "KP", "KR", "KW", "KY", "KZ", "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA",
+        "MC", "MD", "ME", "MF", "MG", "MH", "MK", "ML", "MM", "MN", "MO", "MP", "MQ", "MR", "MS", "MT", "MU", "MV",
+        "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NF", "NG", "NI", "NL", "NO", "NP", "NR", "NT", "NU", "NZ", "OM",
+        "OR", "PA", "PE", "PF", "PG", "PH", "PK", "PL", "PM", "PN", "PR", "PS", "PT", "PW", "PY", "QA", "RE", "RO",
+        "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SG", "SH", "SI", "SJ", "SK", "SL", "SM", "SN", "SO", "SR",
+        "SS", "ST", "SV", "SX", "SY", "SZ", "TC", "TD", "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TP",
+        "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "UM", "UN", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN",
+        "VU", "WF", "WS", "YE", "YT", "ZA", "ZM", "ZW")
+
+      countries.foreach(country => apiCountryCodeEnum.contains(country.code) mustBe true)
     }
   }
 }
