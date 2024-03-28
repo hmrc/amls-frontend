@@ -6,7 +6,7 @@ private object AppDependencies {
 
   private val playV = "play-28"
   private val flexmarkVersion = "0.64.8"
-  private val bootstrapV = "6.0.0"
+  private val bootstrapV = "7.0.0"
   private val hmrcMongoV = "0.71.0"
 
   val compile: Seq[ModuleID] = Seq(
@@ -15,7 +15,7 @@ private object AppDependencies {
     "uk.gov.hmrc"           %% "domain"                        % s"8.1.0-$playV",
     "uk.gov.hmrc"           %% "play-partials"                 % s"8.3.0-$playV",
     "uk.gov.hmrc"           %% "http-caching-client"           % s"10.0.0-$playV",
-    "uk.gov.hmrc"           %% "json-encryption"               % s"5.3.0-$playV",
+    "uk.gov.hmrc"           %% s"crypto-json-$playV"           % "7.0.0",
     "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-$playV"            % hmrcMongoV,
     "uk.gov.hmrc"           %% s"bootstrap-frontend-$playV"    % bootstrapV,
     "uk.gov.hmrc"           %% s"play-frontend-hmrc-$playV"    % "8.4.0",
@@ -43,7 +43,7 @@ private object AppDependencies {
         "uk.gov.hmrc"            %% s"bootstrap-test-$playV"  % bootstrapV          % scope,
         "uk.gov.hmrc.mongo"      %% s"hmrc-mongo-test-$playV" % hmrcMongoV          % scope,
         "org.scalatestplus.play" %% "scalatestplus-play"      % "7.0.1"             % scope,
-        "org.scalatestplus"      %% "scalacheck-1-15"         % "3.2.11.0"          % scope,
+        "org.scalatestplus"      %% "scalacheck-1-17"         % "3.2.17.0"          % scope,
         "org.scalacheck"         %% "scalacheck"              % "1.17.0"            % scope,
         "org.jsoup"               % "jsoup"                   % "1.17.2"            % scope,
         "com.typesafe.play"      %% "play-test"               % PlayVersion.current % scope,

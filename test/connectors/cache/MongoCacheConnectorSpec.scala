@@ -153,7 +153,7 @@ class MongoCacheConnectorSpec extends AnyFreeSpec
       val f: Option[Model] => Model = { _ => updatedModel }
 
       when(client.find[Model](any(), meq(key))(any())) thenReturn Future.successful(Some(model))
-      when(client.createOrUpdate(any(), meq(updatedModel), meq(key))(any())) thenReturn Future.successful(Cache.empty)
+      when(client.createOrUpdate(any(), meq(updatedModel), meq(key))(any())) thenReturn Future.successful(Cache("", Map()))
 
       whenReady(connector.update[Model](credId, key)(f)) { _ mustBe Some(updatedModel) }
     }
