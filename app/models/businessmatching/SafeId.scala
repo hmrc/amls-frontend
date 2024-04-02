@@ -16,10 +16,10 @@
 
 package models.businessmatching
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class SafeId(value: String)
 
 object SafeId {
-  implicit val format = Json.format[SafeId]
+  implicit val format: OFormat[SafeId] = Json.format[SafeId]
 }

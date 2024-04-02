@@ -16,10 +16,10 @@
 
 package models.businessactivities
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class IdentifySuspiciousActivity(hasWrittenGuidance: Boolean)
 
 object IdentifySuspiciousActivity {
-  implicit val formats = Json.format[IdentifySuspiciousActivity]
+  implicit val formats: OFormat[IdentifySuspiciousActivity] = Json.format[IdentifySuspiciousActivity]
 }

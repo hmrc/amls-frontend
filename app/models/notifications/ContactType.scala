@@ -73,7 +73,7 @@ object ContactType {
       case _ => JsError((JsPath \ "contact_type") -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
 
-  implicit val jsonWrites =
+  implicit val jsonWrites: Writes[ContactType] =
     Writes[ContactType] {
       case RejectionReasons => JsString("REJR")
       case RevocationReasons => JsString("REVR")

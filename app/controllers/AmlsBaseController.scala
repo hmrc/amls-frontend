@@ -31,7 +31,7 @@ abstract class AmlsBaseController(val cpd: CommonPlayDependencies, override val 
 
   implicit val ec: ExecutionContext = controllerComponents.executionContext
 
-  implicit val appConfig = cpd.amlsConfig
+  implicit val appConfig: ApplicationConfig = cpd.amlsConfig
 
   implicit val lang: Lang = Lang.defaultLang
 

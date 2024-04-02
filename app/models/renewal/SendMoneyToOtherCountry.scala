@@ -16,13 +16,13 @@
 
 package models.renewal
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class SendMoneyToOtherCountry(money: Boolean)
 
 object SendMoneyToOtherCountry {
 
-  implicit val format =  Json.format[SendMoneyToOtherCountry]
+  implicit val format: OFormat[SendMoneyToOtherCountry] =  Json.format[SendMoneyToOtherCountry]
 
   def convert(model: SendMoneyToOtherCountry): models.moneyservicebusiness.SendMoneyToOtherCountry = {
     model match {

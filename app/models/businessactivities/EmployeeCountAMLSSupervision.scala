@@ -16,10 +16,10 @@
 
 package models.businessactivities
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class EmployeeCountAMLSSupervision(employeeCountAMLSSupervision: String)
 
 object EmployeeCountAMLSSupervision {
-  implicit val formats = Json.format[EmployeeCountAMLSSupervision]
+  implicit val formats: OFormat[EmployeeCountAMLSSupervision] = Json.format[EmployeeCountAMLSSupervision]
 }

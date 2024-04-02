@@ -79,7 +79,7 @@ object BusinessMatchingMsbService extends Enumerable.Implicits {
     case _ => JsError((JsPath \ "services") -> play.api.libs.json.JsonValidationError("error.invalid"))
   }
 
-  implicit val jsonW = Writes[BusinessMatchingMsbService] {
+  implicit val jsonW: Writes[BusinessMatchingMsbService] = Writes[BusinessMatchingMsbService] {
     case TransmittingMoney => JsString("01")
     case CurrencyExchange => JsString("02")
     case ChequeCashingNotScrapMetal => JsString("03")
@@ -118,7 +118,7 @@ object BusinessMatchingMsbServices {
     }.sortBy(_.value)
   }
 
-  implicit val formats = Json.format[BusinessMatchingMsbServices]
+  implicit val formats: OFormat[BusinessMatchingMsbServices] = Json.format[BusinessMatchingMsbServices]
 
   def getValue(ba:BusinessMatchingMsbService): String =
     ba match {

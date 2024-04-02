@@ -17,7 +17,7 @@
 package models.businessmatching.updateservice
 
 import models.businessmatching.{BusinessActivity, BusinessMatchingMsbService}
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class ServiceChangeRegister(addedActivities: Option[Set[BusinessActivity]] = None,
                                  addedSubSectors: Option[Set[BusinessMatchingMsbService]] = None)
@@ -25,5 +25,5 @@ case class ServiceChangeRegister(addedActivities: Option[Set[BusinessActivity]] 
 object ServiceChangeRegister {
   val key = "service-change-register"
 
-  implicit val format = Json.format[ServiceChangeRegister]
+  implicit val format: OFormat[ServiceChangeRegister] = Json.format[ServiceChangeRegister]
 }

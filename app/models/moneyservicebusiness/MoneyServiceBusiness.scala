@@ -200,7 +200,7 @@ object MoneyServiceBusiness {
 
   implicit val writes: Writes[MoneyServiceBusiness] = Json.writes[MoneyServiceBusiness]
 
-  implicit val formatOption = Reads.optionWithNull[MoneyServiceBusiness]
+  implicit val formatOption: Reads[Option[MoneyServiceBusiness]] = Reads.optionWithNull[MoneyServiceBusiness]
 
   implicit def default(value: Option[MoneyServiceBusiness]): MoneyServiceBusiness = {
     value.getOrElse(MoneyServiceBusiness())

@@ -32,7 +32,7 @@ object OtherBusinessTaxMatters {
       case false => Reads(__ => JsSuccess(OtherBusinessTaxMattersNo))
     }
 
-  implicit val jsonWrites = Writes[OtherBusinessTaxMatters] {
+  implicit val jsonWrites: Writes[OtherBusinessTaxMatters] = Writes[OtherBusinessTaxMatters] {
     case OtherBusinessTaxMattersYes => Json.obj("otherBusinessTaxMatters" -> true)
     case OtherBusinessTaxMattersNo => Json.obj("otherBusinessTaxMatters" -> false)
   }

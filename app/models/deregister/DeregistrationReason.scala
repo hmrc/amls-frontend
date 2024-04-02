@@ -79,7 +79,7 @@ object DeregistrationReason extends Enumerable.Implicits {
     }
   }
 
-  implicit val jsonRedressWrites = Writes[DeregistrationReason] {
+  implicit val jsonRedressWrites: Writes[DeregistrationReason] = Writes[DeregistrationReason] {
     case OutOfScope => Json.obj("deregistrationReason" -> "Out of scope")
     case NotTradingInOwnRight => Json.obj("deregistrationReason" -> "Not trading in own right")
     case UnderAnotherSupervisor => Json.obj("deregistrationReason" -> "Under another supervisor")

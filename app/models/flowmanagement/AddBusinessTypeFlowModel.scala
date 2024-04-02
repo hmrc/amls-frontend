@@ -20,7 +20,7 @@ import models.businessmatching._
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.BusinessMatchingMsbService.TransmittingMoney
 import play.api.i18n.Messages
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class AddBusinessTypeFlowModel(activity: Option[BusinessActivity] = None,
                                     addMoreActivities: Option[Boolean] = None,
@@ -79,6 +79,6 @@ object AddBusinessTypeFlowModel {
 
   val key = "add-service-flow"
 
-  implicit val addServiceFlowModelFormat = Json.format[AddBusinessTypeFlowModel]
+  implicit val addServiceFlowModelFormat: OFormat[AddBusinessTypeFlowModel] = Json.format[AddBusinessTypeFlowModel]
 
 }

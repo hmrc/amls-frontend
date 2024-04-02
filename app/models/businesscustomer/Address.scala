@@ -17,7 +17,7 @@
 package models.businesscustomer
 
 import models.Country
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class Address(
                   line_1: String,
@@ -40,5 +40,5 @@ case class Address(
 }
 
 object Address {
-  implicit val format = Json.format[Address]
+  implicit val format: OFormat[Address] = Json.format[Address]
 }

@@ -48,7 +48,7 @@ object BusinessAppliedForPSRNumber {
       case false => Reads(_ => JsSuccess(BusinessAppliedForPSRNumberNo))
   }
 
-  implicit val jsonWrites = Writes[BusinessAppliedForPSRNumber] {
+  implicit val jsonWrites: Writes[BusinessAppliedForPSRNumber] = Writes[BusinessAppliedForPSRNumber] {
     case BusinessAppliedForPSRNumberYes(value) => Json.obj(
       "appliedFor" -> true,
       "regNumber" -> value

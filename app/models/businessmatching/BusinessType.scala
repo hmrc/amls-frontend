@@ -80,5 +80,5 @@ object BusinessType extends Enumerable.Implicits {
     }
   }
 
-  implicit val enumerable = Enumerable(all.map(v => v.toString -> v): _*)
+  implicit val enumerable: Enumerable[BusinessType] = Enumerable(all.map(v => v.toString -> v): _*)
 }

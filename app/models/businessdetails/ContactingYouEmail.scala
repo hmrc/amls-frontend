@@ -16,10 +16,10 @@
 
 package models.businessdetails
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class ContactingYouEmail(email: String, confirmEmail: String)
 
 object ContactingYouEmail {
-  implicit val formats = Json.format[ContactingYouEmail]
+  implicit val formats: OFormat[ContactingYouEmail] = Json.format[ContactingYouEmail]
 }

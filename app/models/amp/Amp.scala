@@ -121,7 +121,7 @@ object Amp {
     }
   }
 
-  implicit val mongoKey = new MongoKey[Amp] {
+  implicit val mongoKey: MongoKey[Amp] = new MongoKey[Amp] {
     override def apply(): String = key
   }
 
@@ -147,7 +147,7 @@ object Amp {
       ) (unlift(Amp.unapply))
   }
 
-  implicit val formatOption = Reads.optionWithNull[Amp]
+  implicit val formatOption: Reads[Option[Amp]] = Reads.optionWithNull[Amp]
 
   def convert(model: Amp): AMPTurnover = {
     model.get[JsValue](model.percentageExpectedTurnover) match {

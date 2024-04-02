@@ -18,7 +18,7 @@ package models.renewal
 
 import models.moneyservicebusiness.ExpectedThroughput
 import play.api.i18n.Messages
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class TotalThroughput(throughput: String)
 
@@ -39,7 +39,7 @@ object TotalThroughput {
     case Mapping(model.throughput, label, _) => messages(label)
   }.getOrElse("")
 
-  implicit val format = Json.format[TotalThroughput]
+  implicit val format: OFormat[TotalThroughput] = Json.format[TotalThroughput]
 
   implicit def convert(model: TotalThroughput): ExpectedThroughput = {
     throughputValues.collectFirst {

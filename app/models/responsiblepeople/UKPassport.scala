@@ -32,7 +32,7 @@ object UKPassport {
     }
   }
 
-  implicit val jsonWrites = Writes[UKPassport] {
+  implicit val jsonWrites: Writes[UKPassport] = Writes[UKPassport] {
     case UKPassportYes(value) => Json.obj(
       "ukPassport" -> true,
       "ukPassportNumber" -> value

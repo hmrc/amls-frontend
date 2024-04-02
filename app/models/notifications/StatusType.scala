@@ -38,7 +38,7 @@ object StatusType {
       case _ => JsError(JsPath -> play.api.libs.json.JsonValidationError("error.invalid"))
     }
 
-  implicit val jsonWrites =
+  implicit val jsonWrites: Writes[StatusType] =
     Writes[StatusType] {
       case Approved => JsString("04")
       case Rejected => JsString("06")

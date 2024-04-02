@@ -16,11 +16,11 @@
 
 package models.businessactivities
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class AccountantForAMLSRegulations(accountantForAMLSRegulations: Boolean)
 
 
 object AccountantForAMLSRegulations {
-  implicit val formats = Json.format[AccountantForAMLSRegulations]
+  implicit val formats: OFormat[AccountantForAMLSRegulations] = Json.format[AccountantForAMLSRegulations]
 }

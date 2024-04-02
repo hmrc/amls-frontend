@@ -16,12 +16,12 @@
 
 package models.deregister
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class DeRegisterSubscriptionResponse(processingDate: String)
 
 object DeRegisterSubscriptionResponse {
-  implicit val formats = Json.format[DeRegisterSubscriptionResponse]
+  implicit val formats: OFormat[DeRegisterSubscriptionResponse] = Json.format[DeRegisterSubscriptionResponse]
 }
 
 

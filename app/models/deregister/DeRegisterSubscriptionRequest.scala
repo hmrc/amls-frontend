@@ -17,7 +17,7 @@
 package models.deregister
 
 import org.joda.time.LocalDate
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 import play.api.libs.json.JodaReads._
 
 case class DeRegisterSubscriptionRequest(acknowledgementReference: String,
@@ -28,7 +28,7 @@ case class DeRegisterSubscriptionRequest(acknowledgementReference: String,
 object DeRegisterSubscriptionRequest {
   val DefaultAckReference = "A" * 32
 
-  implicit val reads = Json.reads[DeRegisterSubscriptionRequest]
+  implicit val reads: Reads[DeRegisterSubscriptionRequest] = Json.reads[DeRegisterSubscriptionRequest]
 
   implicit val writes: Writes[DeRegisterSubscriptionRequest] = {
     import play.api.libs.functional.syntax._
