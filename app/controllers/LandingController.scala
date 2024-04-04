@@ -44,7 +44,7 @@ import services.cache.Cache
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.http.cache.client.{CacheMap, KeyStoreEntryValidationException}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AuthAction, ControllerHelper}
@@ -331,6 +331,9 @@ class LandingController @Inject()(val landingService: LandingService,
   }
 
   private def dataHasChanged(cacheMap: CacheMap) = {
+
+    // TODO - Business matching worked, but we have single quotes leading & ending some encyrpted values, write sanitise function to remove them
+
     Seq(
       cacheMap.getEntry[Asp](Asp.key).fold(false) {
         _.hasChanged
@@ -378,6 +381,7 @@ class LandingController @Inject()(val landingService: LandingService,
   }
 
 
+  // TODO we finally figured out what this does, change the name to initialiseEmptyValues
   private def fixEmptyRecords[T](credId: String, cache: CacheMap, key: String)
                                 (implicit hc: HeaderCarrier, f: play.api.libs.json.Format[T]) = {
 
@@ -389,6 +393,8 @@ class LandingController @Inject()(val landingService: LandingService,
       Future.successful(delegateCacheMap)
     } catch {
       case _: JsResultException =>
+        cacheConnector.save[Seq[T]](credId, key, Seq.empty[T])
+      case _: KeyStoreEntryValidationException =>
         cacheConnector.save[Seq[T]](credId, key, Seq.empty[T])
     }
   }
