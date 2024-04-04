@@ -19,6 +19,7 @@ package controllers
 import audit.ServiceEntrantEvent
 import config.ApplicationConfig
 import connectors.DataCacheConnector
+import connectors.cache.Conversions
 import forms.mappings.Constraints
 import models._
 import models.amp.Amp
@@ -39,6 +40,7 @@ import models.tradingpremises.TradingPremises
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
+import services.cache.Cache
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.http.HeaderCarrier
@@ -65,7 +67,7 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val config: ApplicationConfig,
                                   parser: BodyParsers.Default,
                                   start: Start,
-                                  headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper with Logging with Constraints {
+                                  headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper with Logging with Constraints with Conversions {
 
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(appConfig).absoluteUrl, "utf-8")
 
@@ -311,6 +313,7 @@ class LandingController @Inject()(val landingService: LandingService,
         // $COVERAGE-ON$
         landingService.cacheMap(cacheId).map {
           cache =>
+            println(s"\n\n$cache\n\n")
             // $COVERAGE-OFF$
             logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: checking cacheMap for incomplete redress scheme")
             // $COVERAGE-ON$
@@ -381,8 +384,9 @@ class LandingController @Inject()(val landingService: LandingService,
     import play.api.libs.json._
 
     try {
-      cache.getEntry[Seq[T]](key)
-      Future.successful(cache)
+      val delegateCacheMap = toCacheMap(Cache(cache.id, cache.data))
+      delegateCacheMap.getEntry[Seq[T]](key)
+      Future.successful(delegateCacheMap)
     } catch {
       case _: JsResultException =>
         cacheConnector.save[Seq[T]](credId, key, Seq.empty[T])

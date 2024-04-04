@@ -17,9 +17,10 @@
 package services.cache
 
 import crypto.Crypto.SensitiveT
-import play.api.libs.json._
 import play.api.libs.json.Reads._
-import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryption}
+import play.api.libs.json._
+import uk.gov.hmrc.crypto.Sensitive.SensitiveString
+import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
 import scala.util.{Failure, Success, Try}
@@ -32,10 +33,11 @@ trait CacheOps {
     * @param key The cache key
     * @return The decrypted item from the cache as T, or None if the value wasn't present
     */
-  def decryptValue[T](cache: Cache, key: String)(implicit crypto: JsonDecryptor[T], reads: Reads[T], c: Encrypter with Decrypter): Option[T] = {
-    val sensitiveDecrypter = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
+  def decryptValue[T](cache: Cache, key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Option[T] = {
+    val sensitiveDecrypter: Reads[SensitiveT[T]] = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
 
     cache.data.get(key) flatMap { encryptedJson =>
+      println(s"\n\n == decrypting the following encrypted json:$encryptedJson \n\n with key:$key")
       val decryptionResult: JsResult[SensitiveT[T]] = sensitiveDecrypter.reads(encryptedJson)
 
       if (decryptionResult.isSuccess) {
@@ -46,11 +48,11 @@ trait CacheOps {
     }
   }
 
-  def catchDoubleEncryption[T](cache: Cache, key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter , decryptor: JsonDecryptor[T]): Option[T] = {
-    Try(decryptValue[T](cache, key)(decryptor, reads, c)) match {
+  def catchDoubleEncryption[T](cache: Cache, key: String)(implicit reads: Reads[T], c: Encrypter with Decrypter): Option[T] = {
+    Try(decryptValue[T](cache, key)(reads, c)) match {
       case Failure(_: JsResultException) =>
-        decryptValue[String](cache, key)(new JsonDecryptor[String](), StringReads, c)
-          .map(hashedStr => new JsonDecryptor[T]().reads(JsString(hashedStr)))
+        decryptValue[String](cache, key)(StringReads, c)
+          .map(hashedStr => JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply).reads(JsString(hashedStr)))
           .map(result => result.map(protectedObj => protectedObj.decryptedValue))
           .map {
             case JsSuccess(value, _) => Option(value)

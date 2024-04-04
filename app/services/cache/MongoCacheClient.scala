@@ -22,7 +22,7 @@ import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model._
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json._
-import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryption}
+import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.mongo.MongoComponent
@@ -68,7 +68,7 @@ object Cache {
   */
 class CryptoCache(cache: Cache, crypto: Encrypter with Decrypter) extends Cache(cache.id, cache.data) with CacheOps {
   def getEncryptedEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] = {
-    decryptValue(cache, key)(new JsonDecryptor[T]()(crypto, fmt), fmt, crypto)
+    catchDoubleEncryption(cache, key)(fmt, crypto)
   }
 }
 
@@ -163,7 +163,7 @@ class MongoCacheClient @Inject()(appConfig: ApplicationConfig, applicationCrypto
   def find[T](credId: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
     fetchAll(credId) map {
       case Some(cache) => if (appConfig.mongoEncryptionEnabled) {
-        decryptValue[T](cache, key)(new JsonDecryptor[T](), reads, compositeSymmetricCrypto)
+        catchDoubleEncryption[T](cache, key)(reads, compositeSymmetricCrypto)
       } else {
         getValue[T](cache, key)
       }

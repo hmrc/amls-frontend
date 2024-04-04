@@ -43,7 +43,9 @@ import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-import scala.concurrent.{ExecutionContext, Future}
+import java.util.concurrent.TimeUnit
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class LandingService @Inject() (val cacheConnector: DataCacheConnector,
                                 val keyStore: KeystoreConnector,
@@ -51,7 +53,12 @@ class LandingService @Inject() (val cacheConnector: DataCacheConnector,
                                 val statusService: StatusService,
                                 val businessMatchingConnector: BusinessMatchingConnector){
 
-  def cacheMap(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CacheMap]] = cacheConnector.fetchAll(credId)
+  def cacheMap(credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CacheMap]] = {
+    val futureFetched: Future[Option[CacheMap]] = cacheConnector.fetchAll(credId)
+    val fetched: Option[CacheMap] = Await.result(futureFetched, Duration.create(4, TimeUnit.SECONDS))
+    println(s"\n\n====fetched the data for the landing page first event & it is: $fetched")
+    futureFetched
+  }
 
   def setAltCorrespondenceAddress(amlsRefNumber: String, maybeCacheMap: Option[CacheMap], accountTypeId: (String, String), credId: String)
                                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
