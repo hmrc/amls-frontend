@@ -442,6 +442,8 @@ package object models {
     Country("Neutral Zone", "NT"),
     Country("United Nations", "UN"),
     Country("United States Minor Outlying Islands", "UM"),
-    Country("East Timor", "TP")
+    Country("East Timor", "TP"),
+    Country("Bonaire, Sint Eustatius and Saba", "BQ"),
+    Country("Saint Helena, Ascension and Tristan da Cunha", "SH")
   )
 }
