@@ -18,7 +18,7 @@ package forms.tradingpremises
 
 import forms.mappings.Mappings
 import models.tradingpremises.AgentName
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
@@ -35,14 +35,14 @@ class AgentNameFormProvider @Inject()() extends Mappings {
           regexp(basicPunctuationRegex, "error.char.tp.agent.name")
         )
       ),
-      "agentDateOfBirth" -> jodaLocalDate(
+      "agentDateOfBirth" -> localDate(
         invalidKey = "error.invalid.date.tp.not.real",
         allRequiredKey = "error.required.tp.agent.date.all",
         twoRequiredKey = "error.required.tp.agent.date.two",
         requiredKey = "error.required.tp.agent.date.one"
       ).verifying(
-        jodaMinDate(new LocalDate(1900, 1, 1), "error.allowed.start.date"),
-        jodaMaxDate(LocalDate.now(), "error.invalid.date.agent.not.real")
+        minDate(LocalDate.of(1900, 1, 1), "error.allowed.start.date"),
+        maxDate(LocalDate.now(), "error.invalid.date.agent.not.real")
       )
     )((name, date) => AgentName(name, agentDateOfBirth = Some(date)))(x => x.agentDateOfBirth.map(y => (x.agentName, y)))
   )

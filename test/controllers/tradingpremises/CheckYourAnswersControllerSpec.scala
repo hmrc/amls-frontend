@@ -23,7 +23,6 @@ import models.businessmatching.BusinessMatchingMsbService.{CurrencyExchange, Tra
 import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities, _}
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -36,6 +35,7 @@ import utils.AmlsSpec
 import utils.tradingpremises.CheckYourAnswersHelper
 import views.html.tradingpremises.CheckYourAnswersView
 
+import java.time.LocalDate
 import java.util.UUID
 import scala.concurrent.Future
 
@@ -96,7 +96,7 @@ class CheckYourAnswersControllerSpec extends AmlsSpec with MockitoSugar with Inj
       "redirect to YourTradingPremisesController" when {
         "all questions are complete and answers accepted" in new Fixture {
 
-          val ytpModel = YourTradingPremises("foo", Address("1",None,None,None,"AA1 1BB",None), None, Some(new LocalDate(2010, 10, 10)), None)
+          val ytpModel = YourTradingPremises("foo", Address("1",None,None,None,"AA1 1BB",None), None, Some(LocalDate.of(2010, 10, 10)), None)
 
           val emptyCache = CacheMap("", Map.empty)
 

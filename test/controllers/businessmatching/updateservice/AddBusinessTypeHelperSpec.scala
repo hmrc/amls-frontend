@@ -28,12 +28,13 @@ import models.businessmatching.BusinessMatchingMsbService._
 import models.businessmatching.BusinessActivity._
 import models.flowmanagement.AddBusinessTypeFlowModel
 import models.supervision._
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, verify}
 import play.api.test.Helpers._
 import services.{ResponsiblePeopleService, TradingPremisesService}
 import utils._
+
+import java.time.LocalDate
 
 //noinspection ScalaStyle
 class AddBusinessTypeHelperSpec extends AmlsSpec

@@ -18,7 +18,7 @@ package forms.tradingpremises
 
 import forms.mappings.Mappings
 import models.tradingpremises.ActivityEndDate
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.data.Form
 
 import javax.inject.Inject
@@ -26,14 +26,14 @@ import javax.inject.Inject
 class RemoveTradingPremisesFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[ActivityEndDate] = Form[ActivityEndDate](
-    "endDate" -> jodaLocalDate(
-      invalidKey = "error.expected.jodadate.format",
-      allRequiredKey = "error.expected.jodadate.format",
-      twoRequiredKey = "error.expected.jodadate.format",
-      requiredKey = "error.expected.jodadate.format"
+    "endDate" -> localDate(
+      invalidKey = "error.expected.date.format",
+      allRequiredKey = "error.expected.date.format",
+      twoRequiredKey = "error.expected.date.format",
+      requiredKey = "error.expected.date.format"
     ).verifying(
-      jodaMinDate(RemoveTradingPremisesFormProvider.minDate, "error.invalid.year.post1900"),
-      jodaMaxDate(RemoveTradingPremisesFormProvider.maxDate, "error.future.date")
+      minDate(RemoveTradingPremisesFormProvider.minDate, "error.invalid.year.post1900"),
+      maxDate(RemoveTradingPremisesFormProvider.maxDate, "error.future.date")
     ).transform[ActivityEndDate](
       ActivityEndDate(_), _.endDate
     )
@@ -42,6 +42,6 @@ class RemoveTradingPremisesFormProvider @Inject()() extends Mappings {
 }
 
 object RemoveTradingPremisesFormProvider {
-  val minDate: LocalDate = new LocalDate(1900, 1, 1)
+  val minDate: LocalDate = LocalDate.of(1900, 1, 1)
   val maxDate: LocalDate = LocalDate.now()
 }

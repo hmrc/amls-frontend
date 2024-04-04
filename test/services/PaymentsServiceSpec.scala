@@ -23,7 +23,6 @@ import models.FeeResponse
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.confirmation.Currency
 import models.payments._
-import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
@@ -32,6 +31,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
 import utils.AmlsSpec
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerator {
@@ -67,7 +67,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
       totalFees = BigDecimal(100),
       paymentReference = Some("paymentReference"),
       difference = None,
-      createdAt = new DateTime(2018, 1, 1, 0, 0)
+      createdAt = LocalDateTime.of(2018, 1, 1, 0, 0)
     )
 
     val testFeeResponseAmendVariation = FeeResponse(
@@ -80,7 +80,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
       totalFees = BigDecimal(100),
       paymentReference = Some("paymentReference"),
       difference = Some(BigDecimal(100)),
-      createdAt = new DateTime(2018, 1, 1, 0, 0)
+      createdAt = LocalDateTime.of(2018, 1, 1, 0, 0)
     )
 
     val paymentResponse = CreatePaymentResponse(nextUrl = NextUrl("http://return.com"), journeyId = "1234567890")

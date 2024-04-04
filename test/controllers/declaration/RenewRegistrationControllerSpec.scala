@@ -20,7 +20,6 @@ import controllers.actions.SuccessfulAuthAction
 import forms.declaration.RenewRegistrationFormProvider
 import models.declaration.{RenewRegistration, RenewRegistrationNo, RenewRegistrationYes}
 import models.status.ReadyForRenewal
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -33,6 +32,7 @@ import services.{ProgressService, RenewalService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.declaration.RenewRegistrationView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
@@ -56,7 +56,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
   "RenewRegistrationController" when {
     "get is called" must {
       "display the  renew registration question where not previously answered" in new Fixture {
-        val date = new LocalDate()
+        val date = LocalDate.now()
 
         when {
           controller.statusService.getStatus(any(),any(), any())(any(),any(),any())
@@ -73,7 +73,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
       }
 
       "display the renew registration question with pre populated data" in new Fixture {
-        val date = new LocalDate()
+        val date = LocalDate.now()
 
         when {
           controller.statusService.getStatus(any(),any(), any())(any(),any(),any())
@@ -95,7 +95,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
       "with valid data" must {
         "redirect to renewal what you need" when {
           "yes is selected" in new Fixture {
-            val date = new LocalDate()
+            val date = LocalDate.now()
 
             when {
               controller.statusService.getStatus(any(),any(), any())(any(),any(),any())
@@ -116,7 +116,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
           val call = controllers.routes.RegistrationProgressController.get
           val newRequest = FakeRequest(POST, routes.RenewRegistrationController.post().url)
           .withFormUrlEncodedBody("renewRegistration" -> "false")
-          val date = new LocalDate()
+          val date = LocalDate.now()
 
           when {
             controller.statusService.getStatus(any(),any(), any())(any(),any(),any())
@@ -141,7 +141,7 @@ class RenewRegistrationControllerSpec extends AmlsSpec with MockitoSugar with Sc
           .withFormUrlEncodedBody(
             "renewRegistration" -> "1234567890"
           )
-          val date = new LocalDate()
+          val date = LocalDate.now()
 
           when {
             controller.statusService.getStatus(any(),any(), any())(any(),any(),any())

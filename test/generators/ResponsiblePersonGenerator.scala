@@ -16,15 +16,17 @@
 
 package generators
 
+import models.WithName
 import models.responsiblepeople.TimeAtAddress.ThreeYearsPlus
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.scalacheck.Gen
+
+import java.time.LocalDate
 
 // scalastyle:off magic.number
 trait ResponsiblePersonGenerator extends BaseGenerator {
 
-  val positionInBusinessGen =
+  val positionInBusinessGen: Gen[Seq[WithName with PositionWithinBusiness]] =
     Gen.someOf(
       BeneficialOwner,
       InternalAccountant,
@@ -35,9 +37,9 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
       DesignatedMember
     )
 
-  val positionsGen = for {
+  val positionsGen: Gen[Positions] = for {
     positions <- positionInBusinessGen
-  } yield Positions(positions.toSet, Some(PositionStartDate(new LocalDate())))
+  } yield Positions(positions.toSet, Some(PositionStartDate(LocalDate.now())))
 
   private val maxNameTypeLength = 35
 
@@ -120,6 +122,6 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     person <- responsiblePersonGen
   } yield person.copy(positions = positions.fold[Option[Positions]](None)(p => Some(Positions(p, None))))
 
-  def responsiblePeopleGen(i: Int) = Gen.listOfN[ResponsiblePerson](i, responsiblePersonGen)
+  def responsiblePeopleGen(i: Int): Gen[List[ResponsiblePerson]] = Gen.listOfN[ResponsiblePerson](i, responsiblePersonGen)
 
 }

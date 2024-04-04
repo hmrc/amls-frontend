@@ -16,9 +16,10 @@
 
 package models.tradingpremises
 
-import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
+
+import java.time.LocalDate
 
 
 class ActivityEndDateSpec extends PlaySpec {
@@ -29,13 +30,13 @@ class ActivityEndDateSpec extends PlaySpec {
     "Json" should {
 
       "Read and write successfully" in {
-        ActivityEndDate.format.reads(ActivityEndDate.format.writes(ActivityEndDate(new LocalDate(1990, 2, 24)))) must be(
-          JsSuccess(ActivityEndDate(new LocalDate(1990, 2, 24)), JsPath))
+        ActivityEndDate.format.reads(ActivityEndDate.format.writes(ActivityEndDate(LocalDate.of(1990, 2, 24)))) must be(
+          JsSuccess(ActivityEndDate(LocalDate.of(1990, 2, 24)), JsPath))
 
       }
 
       "write successfully" in {
-        ActivityEndDate.format.writes(ActivityEndDate(new LocalDate(1990, 2, 24))) must be(Json.obj("endDate" ->"1990-02-24"))
+        ActivityEndDate.format.writes(ActivityEndDate(LocalDate.of(1990, 2, 24))) must be(Json.obj("endDate" ->"1990-02-24"))
       }
     }
   }

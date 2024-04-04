@@ -16,26 +16,23 @@
 
 package models.notifications
 
-import org.joda.time.format.ISODateTimeFormat
-import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
 import play.api.libs.json._
-import uk.gov.hmrc.mongo.play.json.formats.MongoJodaFormats
+
+import java.time.LocalDateTime
+import java.time.ZoneOffset.UTC
+import java.time.format.DateTimeFormatter
 
 case class NotificationResponse(processingDate: LocalDateTime, secureCommText: String)
 
 object NotificationResponse {
 
-  val dateTimeFormat = ISODateTimeFormat.dateTimeNoMillis().withZoneUTC
+  val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
 
-  implicit val readsJodaLocalDateTime: Reads[LocalDateTime] = Reads[LocalDateTime](js =>
-    js.validate[String].map[LocalDateTime](dtString =>
-      LocalDateTime.parse(dtString, dateTimeFormat)
-    )
-  )
-
-  implicit val localDateTimeWrite: Writes[LocalDateTime] = new Writes[LocalDateTime] {
-    def writes(dateTime: LocalDateTime): JsValue = JsString(dateTimeFormat.print(dateTime.toDateTime(DateTimeZone.UTC)))
+  implicit val readsLocalDateTime: Reads[LocalDateTime] = Reads[LocalDateTime] { js =>
+    js.validate[String].map[LocalDateTime](dtString => LocalDateTime.parse(dtString, dateTimeFormatter))
   }
-  implicit val dateFormat: Format[DateTime] = MongoJodaFormats.dateTimeFormat
+
+  implicit val localDateTimeWrite: Writes[LocalDateTime] = (dateTime: LocalDateTime) => JsString(dateTimeFormatter.format(dateTime.atOffset(UTC)))
+
   implicit val format: OFormat[NotificationResponse] = Json.format[NotificationResponse]
 }

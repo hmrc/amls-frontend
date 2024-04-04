@@ -18,7 +18,7 @@ package forms.tradingpremises
 
 import forms.mappings.Mappings
 import models.tradingpremises.ActivityStartDate
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.data.Form
 
 import javax.inject.Inject
@@ -26,14 +26,14 @@ import javax.inject.Inject
 class ActivityStartDateFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[ActivityStartDate] = Form[ActivityStartDate](
-    "startDate" -> jodaLocalDate(
+    "startDate" -> localDate(
       invalidKey = "error.invalid.date.tp.not.real",
       allRequiredKey = "error.required.tp.address.date.all",
       twoRequiredKey = "error.required.tp.address.date.two",
       requiredKey = "error.required.tp.address.date.one"
     ).verifying(
-      jodaMinDate(ActivityStartDateFormProvider.minDate, "error.invalid.date.tp.after.1700"),
-      jodaMaxDate(ActivityStartDateFormProvider.maxDate, "error.invalid.date.tp.before.2100")
+      minDate(ActivityStartDateFormProvider.minDate, "error.invalid.date.tp.after.1700"),
+      maxDate(ActivityStartDateFormProvider.maxDate, "error.invalid.date.tp.before.2100")
     ).transform[ActivityStartDate](
       ActivityStartDate(_), _.startDate
     )
@@ -43,7 +43,7 @@ class ActivityStartDateFormProvider @Inject()() extends Mappings {
 
 object ActivityStartDateFormProvider {
 
-  val minDate: LocalDate = new LocalDate(1700, 1, 1)
+  val minDate: LocalDate = LocalDate.of(1700, 1, 1)
 
-  val maxDate: LocalDate = new LocalDate(2099, 12, 31)
+  val maxDate: LocalDate = LocalDate.of(2099, 12, 31)
 }

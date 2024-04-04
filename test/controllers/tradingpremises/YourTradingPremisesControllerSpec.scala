@@ -22,7 +22,6 @@ import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessMatching, BusinessActivities => BusinessMatchingActivities}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises._
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
@@ -35,6 +34,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.tradingpremises.YourTradingPremisesView
 
+import java.time.LocalDate
 import java.util.UUID
 import scala.concurrent.Future
 
@@ -166,7 +166,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with 
 
       "all questions are complete" in new Fixture {
 
-        val ytpModel = YourTradingPremises("foo", Address("1",None,None,None,"AA1 1BB",None), None, Some(new LocalDate(2010, 10, 10)), None)
+        val ytpModel = YourTradingPremises("foo", Address("1",None,None,None,"AA1 1BB",None), None, Some(LocalDate.of(2010, 10, 10)), None)
 
         val emptyCache = CacheMap("", Map.empty)
 

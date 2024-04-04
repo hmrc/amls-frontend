@@ -19,14 +19,13 @@ package controllers.supervision
 import connectors.DataCacheConnector
 import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.supervision.SupervisionEndFormProvider
-
-import javax.inject.Inject
 import models.supervision._
-import org.joda.time.LocalDate
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.AuthAction
 import views.html.supervision.SupervisionEndView
 
+import java.time.LocalDate
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -55,7 +54,7 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
     }
   }
 
-  def post(edit : Boolean = false): Action[AnyContent] = authAction.async {
+  def post(edit: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
 
       formProvider().bindFromRequest().fold(

@@ -23,7 +23,6 @@ import models.ReadStatusResponse
 import models.businesscustomer.ReviewDetails
 import models.registrationdetails.RegistrationDetails
 import models.status.SubmissionReadyForReview
-import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
@@ -31,6 +30,7 @@ import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.withdrawal.WithdrawApplicationView
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class WithdrawApplicationControllerSpec extends AmlsSpec {
@@ -60,7 +60,7 @@ class WithdrawApplicationControllerSpec extends AmlsSpec {
     val reviewDetails = mock[ReviewDetails]
 
     //noinspection ScalaStyle
-    val processingDate = new LocalDateTime(2002, 1, 1, 12, 0, 0)
+    val processingDate = LocalDateTime.of(2002, 1, 1, 12, 0, 0)
     val statusResponse = ReadStatusResponse(processingDate, "", None, None, None, None, renewalConFlag = false)
 
     when(reviewDetails.safeId).thenReturn(safeId)

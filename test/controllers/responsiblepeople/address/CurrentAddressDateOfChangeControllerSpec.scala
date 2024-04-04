@@ -22,7 +22,6 @@ import controllers.responsiblepeople.address
 import forms.DateOfChangeFormProvider
 import models.responsiblepeople.TimeAtAddress.{ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
@@ -33,6 +32,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import views.html.DateOfChangeView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
@@ -85,7 +85,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
           val responsiblePeople = ResponsiblePerson(
             addressHistory = Some(history),
             personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
-            positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2009,1,1))))))
+            positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(LocalDate.of(2009,1,1))))))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -114,7 +114,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
           val responsiblePeople = ResponsiblePerson(
             addressHistory = Some(history),
             personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
-            positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2011,1,1))))))
+            positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(LocalDate.of(2011,1,1))))))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -163,7 +163,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
         val responsiblePeople = ResponsiblePerson(
           addressHistory = Some(history),
           personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
-          positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(new LocalDate(2009,1,1))))))
+          positions = Some(Positions(Set(BeneficialOwner),Some(PositionStartDate(LocalDate.of(2009,1,1))))))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))

@@ -49,7 +49,7 @@ class LegalNameChangeDateController @Inject()(val dataCacheConnector: DataCacheC
       }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = authAction.async {
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None): Action[AnyContent] = authAction.async {
     implicit request => {
       formProvider().bindFromRequest().fold(
         formWithErrors =>

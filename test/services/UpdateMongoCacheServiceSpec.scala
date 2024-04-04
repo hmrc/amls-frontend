@@ -43,13 +43,14 @@ import models.tcsp.TcspTypes._
 import models.tcsp.ProvidedServices.{PhonecallHandling, Other => PSOther}
 import models.tradingpremises.TradingPremises
 import models.{DataImport, _}
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.verify
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpClient
 import utils.{AmlsSpec, DependencyMocks}
+
+import java.time.LocalDate
 
 class UpdateMongoCacheServiceSpec extends AmlsSpec
   with BusinessMatchingGenerator
@@ -58,12 +59,12 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
 
   trait Fixture extends DependencyMocks {
 
-    val http = mock[HttpClient]
+    val http: HttpClient = mock[HttpClient]
     val updateMongoCacheService = new UpdateMongoCacheService(http, mockCacheConnector, appConfig)
 
     val credId = "12341234"
 
-    val viewResponse = ViewResponse(
+    val viewResponse: ViewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
       businessMatchingSection = BusinessMatching(),
       eabSection = None,
@@ -81,50 +82,50 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       supervisionSection = None
     )
 
-    val businessMatching = businessMatchingGen.sample.get
+    val businessMatching: BusinessMatching = businessMatchingGen.sample.get
 
-    val completeServiceList = Seq("auctioneering", "residential")
+    val completeServiceList: Seq[String] = Seq("auctioneering", "residential")
 
-    val completeServices = Json.obj("eabServicesProvided" -> completeServiceList )
+    val completeServices: JsObject = Json.obj("eabServicesProvided" -> completeServiceList )
 
-    val completeDateOfChange = Json.obj(
+    val completeDateOfChange: JsObject = Json.obj(
       "dateOfChange" -> "2019-01-01"
     )
 
-    val completeEstateAgencyActPenalty = Json.obj(
+    val completeEstateAgencyActPenalty: JsObject = Json.obj(
       "penalisedEstateAgentsAct" -> true,
       "penalisedEstateAgentsActDetail" -> "details"
     )
 
-    val completePenalisedProfessionalBody = Json.obj(
+    val completePenalisedProfessionalBody: JsObject = Json.obj(
       "penalisedProfessionalBody" -> true,
       "penalisedProfessionalBodyDetail" -> "details"
     )
 
-    val completeRedressScheme = Json.obj(
+    val completeRedressScheme: JsObject = Json.obj(
       "redressScheme" -> "propertyRedressScheme",
       "redressSchemeDetail" -> "null"
     )
 
-    val completeMoneyProtectionScheme = Json.obj(
+    val completeMoneyProtectionScheme: JsObject = Json.obj(
       "clientMoneyProtectionScheme" -> true
     )
 
-    val completeData = completeServices ++
+    val completeData: JsObject = completeServices ++
       completeDateOfChange ++
       completeEstateAgencyActPenalty ++
       completePenalisedProfessionalBody ++
       completeRedressScheme ++
       completeMoneyProtectionScheme
 
-    val estateAgentBusiness = Eab(completeData,  hasAccepted = true)
+    val estateAgentBusiness: Eab = Eab(completeData,  hasAccepted = true)
 
-    val tradingPremises = Seq(tradingPremisesGen.sample.get, tradingPremisesGen.sample.get)
+    val tradingPremises: Seq[TradingPremises] = Seq(tradingPremisesGen.sample.get, tradingPremisesGen.sample.get)
 
 
-    val businessDetails = BusinessDetails(
+    val businessDetails: BusinessDetails = BusinessDetails(
       previouslyRegistered = Some(PreviouslyRegisteredYes(Some("12345678"))),
-      activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))),
+      activityStartDate = Some(ActivityStartDate(LocalDate.of(1990, 2, 24))),
       vatRegistered = Some(VATRegisteredYes("123456789")),
       corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1234567890")),
       contactingYou = Some(ContactingYou(Some("1234567890"), Some("test@test.com"))),
@@ -140,12 +141,12 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       hasAccepted = true
     )
 
-    val ukBankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "00-00-00")))
+    val ukBankAccount: BankAccount = BankAccount(Some(BankAccountIsUk(true)), None, Some(UKAccount("123456", "00-00-00")))
 
-    val bankDetails = BankDetails(Some(PersonalAccount), None, Some(ukBankAccount), false)
-    val addPerson = AddPerson("FirstName", Some("Middle"), "Last name", RoleWithinBusinessRelease7(Set(BeneficialShareholder)))
+    val bankDetails: BankDetails = BankDetails(Some(PersonalAccount), None, Some(ukBankAccount), false)
+    val addPerson: AddPerson = AddPerson("FirstName", Some("Middle"), "Last name", RoleWithinBusinessRelease7(Set(BeneficialShareholder)))
 
-    val businessActivitiesCompleteModel = BusinessActivities(
+    val businessActivitiesCompleteModel: BusinessActivities = BusinessActivities(
       involvedInOther = Some(InvolvedInOtherNo),
       expectedBusinessTurnover = Some(ExpectedBusinessTurnover.First),
       expectedAMLSTurnover = Some(ExpectedAMLSTurnover.First),
@@ -167,9 +168,9 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       hasAccepted = true
     )
 
-    val responsiblePeople = responsiblePersonGen.sample.get
+    val responsiblePeople: ResponsiblePerson = responsiblePersonGen.sample.get
 
-    val tcsp = Tcsp(
+    val tcsp: Tcsp = Tcsp(
       Some(TcspTypes(Set(
         NomineeShareholdersProvider,
         TrusteeProvider))),
@@ -181,9 +182,9 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       hasAccepted = true
     )
 
-    val asp = Asp(Some(ServicesOfBusiness(Set(Accountancy))), Some(OtherBusinessTaxMattersNo), false, false)
+    val asp: Asp = Asp(Some(ServicesOfBusiness(Set(Accountancy))), Some(OtherBusinessTaxMattersNo), false, false)
 
-    val msb = MoneyServiceBusiness(
+    val msb: MoneyServiceBusiness = MoneyServiceBusiness(
       throughput = Some(ExpectedThroughput.Second),
       businessUseAnIPSP = Some(BusinessUseAnIPSPYes("name", "123456789123456")),
       identifyLinkedTransactions = Some(IdentifyLinkedTransactions(true)),
@@ -206,10 +207,10 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       true
     )
 
-    val hvd = Hvd(
+    val hvd: Hvd = Hvd(
       cashPayment = Some(CashPayment(
         CashPaymentOverTenThousandEuros(true),
-        Some(CashPaymentFirstDate(new LocalDate(1956, 2, 15))))),
+        Some(CashPaymentFirstDate(LocalDate.of(1956, 2, 15))))),
       Some(Products(Set(Cars))),
       None,
       Some(HowWillYouSellGoods(Set(Retail))),
@@ -217,9 +218,9 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       Some(true),
       Some(PaymentMethods(courier = true, direct = true, other = Some("foo"))),
       Some(LinkedCashPayments(false)),
-      Some(DateOfChange(new LocalDate("2016-02-24"))))
+      Some(DateOfChange(LocalDate.of(2016,2,24))))
 
-    val ampData = Json.obj(
+    val ampData: JsObject = Json.obj(
       "typeOfParticipant"     -> Seq("artGalleryOwner"),
       "soldOverThreshold"     -> true,
       "dateTransactionOverThreshold"  -> LocalDate.now.toString,
@@ -227,9 +228,9 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       "percentageExpectedTurnover"    -> "fortyOneToSixty"
     )
 
-    val amp = Amp(data = ampData)
+    val amp: Amp = Amp(data = ampData)
 
-    val supervision = Supervision(
+    val supervision: Supervision = Supervision(
       Some(AnotherBodyNo),
       Some(ProfessionalBodyMemberYes),
       Some(ProfessionalBodies(Set(AccountingTechnicians))),
@@ -237,14 +238,14 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       hasAccepted = true
     )
 
-    val subscription = SubscriptionResponse(
+    val subscription: SubscriptionResponse = SubscriptionResponse(
       "bundle",
       "XDML00000000000",
       None,
       Some(true)
     )
 
-    val amendVariationRenewalResponse = AmendVariationRenewalResponse(
+    val amendVariationRenewalResponse: AmendVariationRenewalResponse = AmendVariationRenewalResponse(
       "update",
       "12345",
       115.0,
@@ -259,9 +260,9 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec
       None
     )
 
-    val dataImport = DataImport("test.json")
+    val dataImport: DataImport = DataImport("test.json")
 
-    val updateMongoCacheResponse = UpdateMongoCacheResponse(
+    val updateMongoCacheResponse: UpdateMongoCacheResponse = UpdateMongoCacheResponse(
       Some(dataImport),
       Some(viewResponse),
       Some(businessMatching),

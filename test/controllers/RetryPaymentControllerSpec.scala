@@ -28,7 +28,6 @@ import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.status._
 import models.{status => _, _}
-import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
@@ -37,6 +36,7 @@ import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 // scalastyle:off magic.number
@@ -96,7 +96,7 @@ class RetryPaymentControllerSpec extends AmlsSpec
       200,
       Some(paymentReferenceNumber),
       Some(115),
-      DateTime.now
+      LocalDateTime.now
     )
 
     val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))

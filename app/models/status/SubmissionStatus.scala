@@ -16,7 +16,7 @@
 
 package models.status
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 
 sealed trait SubmissionStatus
 

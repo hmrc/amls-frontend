@@ -18,15 +18,15 @@ package connectors
 
 import config.ApplicationConfig
 import models.notifications._
-import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.{HttpClient, _}
 
+import java.time.ZoneOffset.UTC
+import java.time.{Instant, LocalDateTime}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -35,7 +35,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
   val safeId = "SAFEID"
   val accountTypeId = ("org","id")
   val amlsRegistrationNumber = "amlsRefNumber"
-  val dateTime = new DateTime(1479730062573L, DateTimeZone.UTC)
+  val dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC)
 
   implicit val hc = HeaderCarrier()
 
@@ -48,7 +48,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
       "given amlsRegNo" in new Fixture {
 
         val response = Seq(
-          NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), false, "amlsRefNumber", "1", IDType(""))
+          NotificationRow(None, None, None, true, LocalDateTime.of(1981, 12, 1, 1, 3), false, "amlsRefNumber", "1", IDType(""))
         )
 
         when {
@@ -63,7 +63,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
       "given safeId" in new Fixture {
         val safeId = "AA1234567891234"
         val response = Seq(
-          NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), false, "XJML00000200000", "1", IDType(""))
+          NotificationRow(None, None, None, true, LocalDateTime.of(1981, 12, 1, 1, 3), false, "XJML00000200000", "1", IDType(""))
         )
 
         when {

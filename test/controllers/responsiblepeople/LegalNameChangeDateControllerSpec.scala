@@ -19,13 +19,14 @@ package controllers.responsiblepeople
 import controllers.actions.SuccessfulAuthAction
 import forms.responsiblepeople.LegalNameChangeDateFormProvider
 import models.responsiblepeople.{LegalNameChangeDate, PersonName, ResponsiblePerson}
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.html.responsiblepeople.LegalNameChangeDateView
+
+import java.time.LocalDate
 
 class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures with Injecting {
 
@@ -71,7 +72,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures with 
 
         val responsiblePeople = ResponsiblePerson(
           personName = Some(personName),
-          legalNameChangeDate = Some(new LocalDate(2001,10,14))
+          legalNameChangeDate = Some(LocalDate.of(2001,10,14))
         )
 
         mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePeople)), Some(ResponsiblePerson.key))

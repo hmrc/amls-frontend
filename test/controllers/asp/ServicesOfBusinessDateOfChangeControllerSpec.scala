@@ -20,7 +20,6 @@ import controllers.actions.SuccessfulAuthAction
 import forms.DateOfChangeFormProvider
 import models.asp._
 import models.businessdetails.ActivityStartDate
-import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
@@ -31,6 +30,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DateHelper, DependencyMocks}
 import views.html.DateOfChangeView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
@@ -73,7 +73,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
       )
 
       when(mockService.getModelWithDate(any())(any()))
-        .thenReturn(Future.successful((Asp(), Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
+        .thenReturn(Future.successful((Asp(), Some(ActivityStartDate(LocalDate.of(1990, 2, 24))))))
 
       when(mockService.updateAsp(any(), any(), any())(any()))
         .thenReturn(Future.successful(Some(Asp())))
@@ -106,7 +106,7 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
         "dateOfChange.year" -> "1980"
       )
 
-      val startDate = new LocalDate(1990, 2, 24)
+      val startDate = LocalDate.of(1990, 2, 24)
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)

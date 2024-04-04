@@ -25,7 +25,6 @@ import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -38,6 +37,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, StatusConstants}
 import views.html.responsiblepeople.PositionWithinBusinessView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator with Injecting {
@@ -74,7 +74,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
   val RecordId = 1
 
-  private val startDate: Option[PositionStartDate] = Some(PositionStartDate(new LocalDate()))
+  private val startDate: Option[PositionStartDate] = Some(PositionStartDate(LocalDate.now()))
 
   "PositionWithinBusinessController" when {
 

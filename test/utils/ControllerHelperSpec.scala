@@ -20,11 +20,12 @@ import models.businessactivities._
 import models.eab.Eab
 import models.responsiblepeople._
 import models.supervision._
-import org.joda.time.LocalDate
 import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
+
+import java.time.LocalDate
 
 class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with DependencyMocks {
 
@@ -48,40 +49,43 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
     )
   }
 
-  val completeRedressScheme = Json.obj(
+  val completeRedressScheme: JsObject = Json.obj(
     "redressScheme" -> "propertyOmbudsman"
   )
-  val eabPropertyOmbudsman = Eab(completeRedressScheme,  hasAccepted = true)
+  val eabPropertyOmbudsman: Eab = Eab(completeRedressScheme,  hasAccepted = true)
 
-  val completeRedressSchemePropertyRedress = Json.obj(
+  val completeRedressSchemePropertyRedress: JsObject = Json.obj(
     "redressScheme" -> "propertyRedressScheme"
   )
-  val eabPropertyRedress = Eab(completeRedressSchemePropertyRedress,  hasAccepted = true)
+  val eabPropertyRedress: Eab = Eab(completeRedressSchemePropertyRedress,  hasAccepted = true)
 
-  val completeRedressSchemeOmbudsmanServices = Json.obj(
+  val completeRedressSchemeOmbudsmanServices: JsObject = Json.obj(
     "redressScheme" -> "ombudsmanServices"
   )
-  val eabOmbudsmanServices = Eab(completeRedressSchemeOmbudsmanServices,  hasAccepted = true)
+  val eabOmbudsmanServices: Eab = Eab(completeRedressSchemeOmbudsmanServices,  hasAccepted = true)
 
-  val completeRedressSchemeOther = Json.obj(
+  val completeRedressSchemeOther: JsObject = Json.obj(
     "redressScheme" -> "other"
   )
-  val eabOther = Eab(completeRedressSchemeOther,  hasAccepted = true)
+  val eabOther: Eab = Eab(completeRedressSchemeOther,  hasAccepted = true)
 
-  val eabNoRedress = Eab(Json.obj(),  hasAccepted = true)
+  val eabNoRedress: Eab = Eab(Json.obj(),  hasAccepted = true)
 
-  val accountantNameCompleteModel = Some(BusinessActivities(
+  val accountantNameCompleteModel: Option[BusinessActivities] = Some(BusinessActivities(
     whoIsYourAccountant = Some(WhoIsYourAccountant(
       Some(WhoIsYourAccountantName("Accountant name", None)),
       Some(WhoIsYourAccountantIsUk(true)),
       Some(UkAccountantsAddress("", None, None, None, ""))))))
 
-  val accountantNameInCompleteModel = Some(BusinessActivities(
-    whoIsYourAccountant = None))
+  val accountantNameInCompleteModel: Option[BusinessActivities] = Some(BusinessActivities(whoIsYourAccountant = None))
 
-  val completeRpAndNotNominated = completeResponsiblePerson.copy(positions = Some(Positions(Set(BeneficialOwner), Some(PositionStartDate(LocalDate.now())))))
-  val inCompleteRpAndNominated = completeResponsiblePerson.copy(approvalFlags = ApprovalFlags(None, None))
-  val inCompleteRpAndNotNominated = completeResponsiblePerson.copy(personName = None, positions = Some(Positions(Set(BeneficialOwner), Some(PositionStartDate(LocalDate.now())))))
+  val completeRpAndNotNominated: ResponsiblePerson = completeResponsiblePerson.copy(positions = Some(Positions(Set(BeneficialOwner),
+    Some(PositionStartDate(LocalDate.now())))))
+
+  val inCompleteRpAndNominated: ResponsiblePerson = completeResponsiblePerson.copy(approvalFlags = ApprovalFlags(None, None))
+
+  val inCompleteRpAndNotNominated: ResponsiblePerson = completeResponsiblePerson.copy(
+    personName = None, positions = Some(Positions(Set(BeneficialOwner), Some(PositionStartDate(LocalDate.now())))))
 
   val oneCompleteNominatedOff: Option[Seq[ResponsiblePerson]] = {
     Some(Seq(completeResponsiblePerson,
@@ -174,8 +178,8 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
 
       "return tuple of (is anotherBodyComplete, is anotherBodyYes) for complete AnotherBodyYes " in {
         val supervision = Supervision(Some(AnotherBodyYes("Name",
-          Some(SupervisionStart(new LocalDate(1990, 2, 24))),
-          Some(SupervisionEnd(new LocalDate(1998, 2, 24))),
+          Some(SupervisionStart(LocalDate.of(1990, 2, 24))),
+          Some(SupervisionEnd(LocalDate.of(1998, 2, 24))),
           Some(SupervisionEndReasons("Reason")))))
 
         ControllerHelper.anotherBodyComplete(supervision) mustBe Some((true, true))
@@ -199,8 +203,8 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
     "isAnotherBodyComplete" must {
       "return true if AnotherBodyYes is complete" in {
         val supervision = Supervision(Some(AnotherBodyYes("Name",
-          Some(SupervisionStart(new LocalDate(1990, 2, 24))),
-          Some(SupervisionEnd(new LocalDate(1998, 2, 24))),
+          Some(SupervisionStart(LocalDate.of(1990, 2, 24))),
+          Some(SupervisionEnd(LocalDate.of(1998, 2, 24))),
           Some(SupervisionEndReasons("Reason")))))
 
         ControllerHelper.isAnotherBodyComplete(ControllerHelper.anotherBodyComplete(supervision)) mustBe true
@@ -208,8 +212,8 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
 
       "return false if AnotherBodyYes is incomplete" in {
         val supervision = Supervision(Some(AnotherBodyYes("Name",
-          Some(SupervisionStart(new LocalDate(1990, 2, 24))),
-          Some(SupervisionEnd(new LocalDate(1998, 2, 24))))))
+          Some(SupervisionStart(LocalDate.of(1990, 2, 24))),
+          Some(SupervisionEnd(LocalDate.of(1998, 2, 24))))))
 
         ControllerHelper.isAnotherBodyComplete(ControllerHelper.anotherBodyComplete(supervision)) mustBe false
       }
@@ -259,8 +263,8 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
 
     "isAbComplete" must {
 
-      val start = Some(SupervisionStart(new LocalDate(1990, 2, 24)))  //scalastyle:off magic.number
-      val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24)))//scalastyle:off magic.number
+      val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24)))  //scalastyle:off magic.number
+      val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24)))//scalastyle:off magic.number
       val reason = Some(SupervisionEndReasons("Reason"))
 
       "return true if another body is AnotherBodyNo" in {

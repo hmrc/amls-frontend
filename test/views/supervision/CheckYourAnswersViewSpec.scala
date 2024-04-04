@@ -18,7 +18,6 @@ package views.supervision
 
 import models.supervision.ProfessionalBodies._
 import models.supervision._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.test.FakeRequest
@@ -27,6 +26,7 @@ import utils.supervision.CheckYourAnswersHelper
 import views.Fixture
 import views.html.supervision.CheckYourAnswersView
 
+import java.time.LocalDate
 import scala.jdk.CollectionConverters._
 
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks{
@@ -36,8 +36,8 @@ class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPrope
     lazy val cyaHelper = inject[CheckYourAnswersHelper]
     implicit val requestWithToken = addTokenForView(FakeRequest())
 
-    val start = Some(SupervisionStart(new LocalDate(1990, 2, 24)))  //scalastyle:off magic.number
-    val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24)))//scalastyle:off magic.number
+    val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24)))  //scalastyle:off magic.number
+    val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24)))//scalastyle:off magic.number
     val reason = Some(SupervisionEndReasons("Ending reason"))
   }
 

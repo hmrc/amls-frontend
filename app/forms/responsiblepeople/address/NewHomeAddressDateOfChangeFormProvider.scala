@@ -18,7 +18,7 @@ package forms.responsiblepeople.address
 
 import forms.mappings.Mappings
 import models.responsiblepeople.NewHomeDateOfChange
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
@@ -28,14 +28,14 @@ class NewHomeAddressDateOfChangeFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[NewHomeDateOfChange] = Form[NewHomeDateOfChange](
     mapping(
-      "dateOfChange" -> jodaLocalDate(
+      "dateOfChange" -> localDate(
         invalidKey = "new.home.error.required.date.fake",
         allRequiredKey = "new.home.error.required.date.all",
         twoRequiredKey = "new.home.error.required.date.two",
         requiredKey = "new.home.error.required.date.one"
       ).verifying(
-        jodaMinDate(NewHomeAddressDateOfChangeFormProvider.minDate, "new.home.error.required.date.1900"),
-        jodaMaxDate(NewHomeAddressDateOfChangeFormProvider.maxDate, "new.home.error.required.date.future")
+        minDate(NewHomeAddressDateOfChangeFormProvider.minDate, "new.home.error.required.date.1900"),
+        maxDate(NewHomeAddressDateOfChangeFormProvider.maxDate, "new.home.error.required.date.future")
       )
     )(x => NewHomeDateOfChange(Some(x)))(_.dateOfChange)
   )
@@ -44,7 +44,7 @@ class NewHomeAddressDateOfChangeFormProvider @Inject()() extends Mappings {
 
 object NewHomeAddressDateOfChangeFormProvider {
 
-  val minDate: LocalDate = new LocalDate(1900, 1, 1)
+  val minDate: LocalDate = LocalDate.of(1900, 1, 1)
 
   val maxDate: LocalDate = LocalDate.now()
 }

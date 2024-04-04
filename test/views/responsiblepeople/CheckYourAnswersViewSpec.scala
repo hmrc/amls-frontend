@@ -22,7 +22,6 @@ import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.{Country, DateOfChange}
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.test.FakeRequest
@@ -33,6 +32,7 @@ import utils.responsiblepeople.CheckYourAnswersHelper
 import views.Fixture
 import views.html.responsiblepeople.CheckYourAnswersView
 
+import java.time.LocalDate
 import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
 
 class CheckYourAnswersViewSpec extends AmlsSummaryViewSpec with TableDrivenPropertyChecks with ResponsiblePeopleValues {
@@ -255,7 +255,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val currentAddress = ResponsiblePersonCurrentAddress(
     personAddress = personAddress1,
     timeAtAddress = Some(ZeroToFiveMonths),
-    dateOfChange = Some(DateOfChange(new LocalDate(1990, 2, 24)))
+    dateOfChange = Some(DateOfChange(LocalDate.of(1990, 2, 24)))
   )
 
   val additionalAddress = ResponsiblePersonAddress(
@@ -277,7 +277,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val currentAddressNonUK = ResponsiblePersonCurrentAddress(
     personAddress = nonUKAddress1,
     timeAtAddress = Some(ZeroToFiveMonths),
-    dateOfChange = Some(DateOfChange(new LocalDate(1990, 2, 24)))
+    dateOfChange = Some(DateOfChange(LocalDate.of(1990, 2, 24)))
   )
 
   val additionalAddressNonUK = ResponsiblePersonAddress(
@@ -298,7 +298,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
 
   val positions = Positions(
     positions = Set(BeneficialOwner, NominatedOfficer),
-    startDate = Some(PositionStartDate(new LocalDate(1990, 2, 24)))
+    startDate = Some(PositionStartDate(LocalDate.of(1990, 2, 24)))
   )
 
   val responsiblePeopleModel = ResponsiblePerson(

@@ -23,7 +23,6 @@ import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessdetails._
 import models.businessmatching.{BusinessMatching, BusinessType}
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -35,6 +34,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.businessdetails.ActivityStartDateView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
@@ -55,7 +55,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   // scalastyle:off
-  private val startDate = ActivityStartDate(new LocalDate(2010, 2, 22))
+  private val startDate = ActivityStartDate(LocalDate.of(2010, 2, 22))
   private val businessDetails = BusinessDetails(None, Some(startDate), None, None)
 
   val emptyCache = CacheMap("", Map.empty)

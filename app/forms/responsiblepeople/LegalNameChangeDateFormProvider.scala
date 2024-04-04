@@ -18,7 +18,7 @@ package forms.responsiblepeople
 
 import forms.mappings.Mappings
 import models.responsiblepeople.LegalNameChangeDate
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.data.Form
 
 import javax.inject.Inject
@@ -26,14 +26,14 @@ import javax.inject.Inject
 class LegalNameChangeDateFormProvider @Inject()() extends Mappings {
 
   def apply(): Form[LegalNameChangeDate] = Form[LegalNameChangeDate](
-    "date" -> jodaLocalDate(
+    "date" -> localDate(
       invalidKey = "error.rp.name_change.invalid.date.not.real",
       allRequiredKey = "error.rp.name_change.required.date.all",
       twoRequiredKey = "error.rp.name_change.required.date.two",
       requiredKey = "error.rp.name_change.required.date.one"
     ).verifying(
-      jodaMinDate(LegalNameChangeDateFormProvider.minDate, "error.rp.name_change.invalid.date.after.1900"),
-      jodaMaxDate(LegalNameChangeDateFormProvider.maxDate, "error.rp.name_change.invalid.date.future")
+      minDate(LegalNameChangeDateFormProvider.minDate, "error.rp.name_change.invalid.date.after.1900"),
+      maxDate(LegalNameChangeDateFormProvider.maxDate, "error.rp.name_change.invalid.date.future")
     ).transform[LegalNameChangeDate](
       LegalNameChangeDate(_), _.date
     )
@@ -43,7 +43,7 @@ class LegalNameChangeDateFormProvider @Inject()() extends Mappings {
 
 object LegalNameChangeDateFormProvider {
 
-  val minDate: LocalDate = new LocalDate(1900, 1, 1)
+  val minDate: LocalDate = LocalDate.of(1900, 1, 1)
 
   def maxDate: LocalDate = LocalDate.now()
 }

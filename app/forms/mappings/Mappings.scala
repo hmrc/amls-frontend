@@ -16,12 +16,11 @@
 
 package forms.mappings
 
-import org.joda.time.{LocalDate => JodaLocalDate}
-import java.time.LocalDate
-
+import models.Enumerable
 import play.api.data.FieldMapping
 import play.api.data.Forms.of
-import models.Enumerable
+
+import java.time.LocalDate
 
 trait Mappings extends Formatters with Constraints {
 
@@ -49,12 +48,4 @@ trait Mappings extends Formatters with Constraints {
                            requiredKey: String,
                            args: Seq[String] = Seq.empty): FieldMapping[LocalDate] =
     of(new LocalDateFormatter(invalidKey, allRequiredKey, twoRequiredKey, requiredKey, args))
-
-  protected def jodaLocalDate(
-                           invalidKey: String,
-                           allRequiredKey: String,
-                           twoRequiredKey: String,
-                           requiredKey: String,
-                           args: Seq[String] = Seq.empty): FieldMapping[JodaLocalDate] =
-    of(new JodaLocalDateFormatter(invalidKey, allRequiredKey, twoRequiredKey, requiredKey, args))
 }

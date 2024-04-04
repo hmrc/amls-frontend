@@ -16,7 +16,7 @@
 
 package models.hvd
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 
 case class CashPaymentFirstDate(paymentDate: LocalDate)
 

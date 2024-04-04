@@ -22,6 +22,8 @@ import models.flowmanagement.{AddBusinessTypeFlowModel, ChangeSubSectorFlowModel
 import services.flowmanagement.{Router, Router2}
 import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRouter, ChangeBusinessTypeRouter, ChangeSubSectorRouter, ChangeSubSectorRouter2, RemoveBusinessTypeRouter}
 
+import java.time.Clock
+
 class Module extends AbstractModule {
 
   override def configure() = {
@@ -30,5 +32,6 @@ class Module extends AbstractModule {
     bind(new TypeLiteral[Router[RemoveBusinessTypeFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])
     bind(new TypeLiteral[Router[ChangeSubSectorFlowModel]] {}).to(classOf[ChangeSubSectorRouter])
     bind(new TypeLiteral[Router2[ChangeSubSectorFlowModel]] {}).to(classOf[ChangeSubSectorRouter2])
+    bind(classOf[Clock]).toInstance(Clock.systemDefaultZone())
   }
 }

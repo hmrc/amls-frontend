@@ -18,11 +18,12 @@ package utils.businessdetails
 
 import models.businessdetails._
 import models.{Country, DateOfChange}
-import org.joda.time.LocalDate
 import org.scalatest.Assertion
 import uk.gov.hmrc.govukfrontend.views.Aliases.{SummaryListRow, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions}
 import utils.{AmlsSpec, CheckYourAnswersHelperFunctions, DateHelper}
+
+import java.time.LocalDate
 
 class CheckYourAnswersHelperSpec extends AmlsSpec with CheckYourAnswersHelperFunctions {
 

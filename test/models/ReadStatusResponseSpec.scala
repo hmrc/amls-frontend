@@ -17,15 +17,17 @@
 package models
 
 import java.sql.Timestamp
-
-import org.joda.time.{LocalDate, LocalDateTime}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsObject, JsResult, JsSuccess, Json}
 
+import java.time.{LocalDate, LocalDateTime, ZoneOffset}
+
 class ReadStatusResponseSpec extends PlaySpec with MockitoSugar {
 
-val mandatoryJson: JsObject = Json.obj (
+  private val processingDateTime: LocalDateTime = LocalDateTime.parse("2019-12-30T00:00:00.000").atOffset(ZoneOffset.UTC).toLocalDateTime
+
+  val mandatoryJson: JsObject = Json.obj(
     "processingDate" -> "2019-12-30T00:00:00Z",
     "formBundleStatus" -> "bundle",
     "statusReason" -> "status",
@@ -35,7 +37,7 @@ val mandatoryJson: JsObject = Json.obj (
     "renewalConFlag" -> true
   )
 
-  val fullJson: JsObject = Json.obj (
+  val fullJson: JsObject = Json.obj(
     "processingDate" -> "2019-12-30T00:00:00Z",
     "formBundleStatus" -> "bundle",
     "statusReason" -> "status",
@@ -49,31 +51,29 @@ val mandatoryJson: JsObject = Json.obj (
     "safeId" -> "idNumber"
   )
 
-  val mandatoryResponse = ReadStatusResponse (
-    processingDate = new LocalDateTime(Timestamp.valueOf("2019-12-30 00:00:00.000")),
+  val mandatoryResponse = ReadStatusResponse(
+    processingDate = processingDateTime,
     formBundleStatus = "bundle",
     statusReason = Some("status"),
-    deRegistrationDate = Some(new LocalDate("2017-01-01")),
-    currentRegYearStartDate = Some(new LocalDate("2018-02-02")),
-    currentRegYearEndDate = Some(new LocalDate("2019-03-03")),
+    deRegistrationDate = Some(LocalDate.of(2017, 1, 1)),
+    currentRegYearStartDate = Some(LocalDate.of(2018, 2, 2)),
+    currentRegYearEndDate = Some(LocalDate.of(2019, 3, 3)),
     renewalConFlag = true
   )
 
   val fullResponse = ReadStatusResponse(
-    processingDate = new LocalDateTime(Timestamp.valueOf("2019-12-30 00:00:00.000")),
+    processingDate = processingDateTime,
     formBundleStatus = "bundle",
     statusReason = Some("status"),
-    deRegistrationDate = Some(new LocalDate("2017-01-01")),
-    currentRegYearStartDate = Some(new LocalDate("2018-02-02")),
-    currentRegYearEndDate = Some(new LocalDate("2019-03-03")),
+    deRegistrationDate = Some(LocalDate.of(2017, 1, 1)),
+    currentRegYearStartDate = Some(LocalDate.of(2018, 2, 2)),
+    currentRegYearEndDate = Some(LocalDate.of(2019, 3, 3)),
     renewalConFlag = true,
     renewalSubmissionFlag = Some(true),
     currentAMLSOutstandingBalance = Some("balance"),
     businessContactNumber = Some("number"),
     safeId = Some("idNumber")
   )
-
-
 
   "ReadStatusResponse" must {
     "serialise to json with mandatory fields" in {

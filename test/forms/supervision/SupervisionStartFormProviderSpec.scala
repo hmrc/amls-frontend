@@ -16,16 +16,16 @@
 
 package forms.supervision
 
-import forms.behaviours.JodaDateBehaviours
+import forms.behaviours.DateBehaviours
 import models.supervision.SupervisionStart
-import org.joda.time.LocalDate
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import play.api.test.{FakeRequest, Helpers}
 
+import java.time.LocalDate
 import scala.collection.mutable
 
-class SupervisionStartFormProviderSpec extends JodaDateBehaviours {
+class SupervisionStartFormProviderSpec extends DateBehaviours {
 
   val formProvider: SupervisionStartFormProvider = new SupervisionStartFormProvider
   val form: Form[SupervisionStart] = formProvider()
@@ -41,11 +41,11 @@ class SupervisionStartFormProviderSpec extends JodaDateBehaviours {
 
     "bind valid data" in {
 
-      forAll(jodaDatesBetween(minDate, maxDate)) { date =>
+      forAll(datesBetween(minDate, maxDate)) { date =>
 
         val data = Map(
           s"$formField.day" -> date.getDayOfMonth.toString,
-          s"$formField.month" -> date.getMonthOfYear.toString,
+          s"$formField.month" -> date.getMonthValue.toString,
           s"$formField.year" -> date.getYear.toString
         )
 
@@ -68,11 +68,11 @@ class SupervisionStartFormProviderSpec extends JodaDateBehaviours {
 
         s"$field is blank" in {
 
-          forAll(jodaDatesBetween(minDate, maxDate)) { date =>
+          forAll(datesBetween(minDate, maxDate)) { date =>
 
             val data = mutable.Map(
               s"$formField.day" -> date.getDayOfMonth.toString,
-              s"$formField.month" -> date.getMonthOfYear.toString,
+              s"$formField.month" -> date.getMonthValue.toString,
               s"$formField.year" -> date.getYear.toString
             )
 
@@ -91,11 +91,11 @@ class SupervisionStartFormProviderSpec extends JodaDateBehaviours {
 
         s"${fields._1} and ${fields._2} are blank" in {
 
-          forAll(jodaDatesBetween(minDate, maxDate)) { date =>
+          forAll(datesBetween(minDate, maxDate)) { date =>
 
             val data = mutable.Map(
               s"$formField.day" -> date.getDayOfMonth.toString,
-              s"$formField.month" -> date.getMonthOfYear.toString,
+              s"$formField.month" -> date.getMonthValue.toString,
               s"$formField.year" -> date.getYear.toString
             )
 

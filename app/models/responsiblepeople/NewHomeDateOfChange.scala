@@ -16,10 +16,9 @@
 
 package models.responsiblepeople
 
-import org.joda.time.LocalDate
 import play.api.libs.json._
-import play.api.libs.json.JodaWrites._
-import play.api.libs.json.JodaReads._
+
+import java.time.LocalDate
 
 case class NewHomeDateOfChange(dateOfChange: Option[LocalDate])
 
@@ -27,5 +26,5 @@ object NewHomeDateOfChange {
 
   val key = "new-home-date-of-change"
 
-  implicit val format = Json.format[NewHomeDateOfChange]
+  implicit val format: OFormat[NewHomeDateOfChange] = Json.format[NewHomeDateOfChange]
 }

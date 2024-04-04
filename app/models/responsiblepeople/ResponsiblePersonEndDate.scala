@@ -16,13 +16,11 @@
 
 package models.responsiblepeople
 
-import org.joda.time.LocalDate
-import play.api.libs.json.Json
-import play.api.libs.json.JodaWrites._
-import play.api.libs.json.JodaReads._
+import java.time.LocalDate
+import play.api.libs.json.{Json, OFormat}
 
 case class ResponsiblePersonEndDate(endDate: LocalDate)
 
 object ResponsiblePersonEndDate {
-  implicit val format = Json.format[ResponsiblePersonEndDate]
+  implicit val format: OFormat[ResponsiblePersonEndDate] = Json.format[ResponsiblePersonEndDate]
 }

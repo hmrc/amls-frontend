@@ -17,26 +17,27 @@
 package models.tradingpremises
 
 import models.DateOfChange
-import org.joda.time.LocalDate
 import play.api.libs.json.JsSuccess
 import utils.AmlsSpec
+
+import java.time.LocalDate
 
 class AgentNameSpec extends AmlsSpec {
 
   "Json Validation" must {
     "Successfully read/write Json data" in {
       AgentName.format.reads(AgentName.format.writes(
-        AgentName("test", Some(DateOfChange(new LocalDate(2017, 1, 1)))))) must be(
+        AgentName("test", Some(DateOfChange(LocalDate.of(2017, 1, 1)))))) must be(
         JsSuccess(
-          AgentName("test", Some(DateOfChange(new LocalDate(2017, 1, 1))))))
+          AgentName("test", Some(DateOfChange(LocalDate.of(2017, 1, 1))))))
     }
 
     "Succesfully read/write Json data with agent dob" in {
 
       AgentName.format.reads(AgentName.format.writes(
-        AgentName("test", Some(DateOfChange(new LocalDate(2017, 1, 1))), Some(new LocalDate(2015, 10, 10))))) must be(
+        AgentName("test", Some(DateOfChange(LocalDate.of(2017, 1, 1))), Some(LocalDate.of(2015, 10, 10))))) must be(
         JsSuccess(
-          AgentName("test", Some(DateOfChange(new LocalDate(2017, 1, 1))), Some(new LocalDate(2015, 10, 10)))))
+          AgentName("test", Some(DateOfChange(LocalDate.of(2017, 1, 1))), Some(LocalDate.of(2015, 10, 10)))))
 
     }
 

@@ -19,7 +19,6 @@ package services
 import connectors.AmlsNotificationConnector
 import models.notifications.ContactType._
 import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
-import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
@@ -31,6 +30,8 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AmlsSpec
 
+import java.time.ZoneOffset.UTC
+import java.time.{Instant, LocalDateTime}
 import scala.concurrent.Future
 
 class NotificationServiceSpec extends AmlsSpec with MockitoSugar with ScalaCheckDrivenPropertyChecks {
@@ -52,7 +53,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with ScalaCheck
       contactType = None,
       contactNumber = None,
       variation = false,
-      receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
+      receivedAt = LocalDateTime.of(2017, 12, 1, 1, 3),
       isRead = false,
       amlsRegistrationNumber = "XJML00000200000",
       templatePackageVersion = "1",
@@ -61,26 +62,26 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with ScalaCheck
 
     val accountTypeId = ("org","id")
 
-    val dateTime = new DateTime(1479730062573L, DateTimeZone.UTC)
+    val dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(1479730062573L), UTC)
 
     val testList = Seq(
-      testNotifications.copy(contactType = Some(ApplicationApproval), receivedAt = new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(variation = true, receivedAt = new DateTime(1976, 12, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(RenewalApproval), receivedAt = new DateTime(2016, 12, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(RejectionReasons), receivedAt = new DateTime(2001, 12, 1, 1, 3, DateTimeZone.UTC)),
+      testNotifications.copy(contactType = Some(ApplicationApproval), receivedAt = LocalDateTime.of(1981, 12, 1, 1, 3)),
+      testNotifications.copy(variation = true, receivedAt = LocalDateTime.of(1976, 12, 1, 1, 3)),
+      testNotifications.copy(contactType = Some(RenewalApproval), receivedAt = LocalDateTime.of(2016, 12, 1, 1, 3)),
+      testNotifications.copy(contactType = Some(RejectionReasons), receivedAt = LocalDateTime.of(2001, 12, 1, 1, 3)),
       testNotifications,
-      testNotifications.copy(contactType = Some(RevocationReasons), receivedAt = new DateTime(1998, 12, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(AutoExpiryOfRegistration), receivedAt = new DateTime(2017, 11, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(ReminderToPayForApplication), receivedAt = new DateTime(2012, 12, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(ReminderToPayForVariation), receivedAt = new DateTime(2017, 12, 1, 3, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(ReminderToPayForRenewal), receivedAt = new DateTime(2017, 12, 3, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(ReminderToPayForManualCharges), receivedAt = new DateTime(2007, 12, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(RenewalReminder), receivedAt = new DateTime(1991, 12, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(MindedToReject), receivedAt = new DateTime(1971, 12, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(MindedToRevoke), receivedAt = new DateTime(2017, 10, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(NoLongerMindedToReject), receivedAt = new DateTime(2003, 12, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(NoLongerMindedToRevoke), receivedAt = new DateTime(2002, 12, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(Others), receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
+      testNotifications.copy(contactType = Some(RevocationReasons), receivedAt = LocalDateTime.of(1998, 12, 1, 1, 3)),
+      testNotifications.copy(contactType = Some(AutoExpiryOfRegistration), receivedAt = LocalDateTime.of(2017, 11, 1, 1, 3)),
+      testNotifications.copy(contactType = Some(ReminderToPayForApplication), receivedAt = LocalDateTime.of(2012, 12, 1, 1, 3)),
+      testNotifications.copy(contactType = Some(ReminderToPayForVariation), receivedAt = LocalDateTime.of(2017, 12, 1, 3, 3)),
+      testNotifications.copy(contactType = Some(ReminderToPayForRenewal), receivedAt = LocalDateTime.of(2017, 12, 3, 1, 3)),
+      testNotifications.copy(contactType = Some(ReminderToPayForManualCharges), receivedAt = LocalDateTime.of(2007, 12, 1, 1, 3)),
+      testNotifications.copy(contactType = Some(RenewalReminder), receivedAt = LocalDateTime.of(1991, 12, 1, 1, 3)),
+      testNotifications.copy(contactType = Some(MindedToReject), receivedAt = LocalDateTime.of(1971, 12, 1, 1, 3)),
+      testNotifications.copy(contactType = Some(MindedToRevoke), receivedAt = LocalDateTime.of(2017, 10, 1, 1, 3)),
+      testNotifications.copy(contactType = Some(NoLongerMindedToReject), receivedAt = LocalDateTime.of(2003, 12, 1, 1, 3)),
+      testNotifications.copy(contactType = Some(NoLongerMindedToRevoke), receivedAt = LocalDateTime.of(2002, 12, 1, 1, 3)),
+      testNotifications.copy(contactType = Some(Others), receivedAt = LocalDateTime.of(2017, 12, 1, 1, 3))
     )
 
   }
@@ -118,7 +119,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with ScalaCheck
         .thenReturn(Future.successful(testList))
 
       val result = await(service.getNotifications("testNo", accountTypeId))
-      result.head.receivedAt mustBe new DateTime(2017, 12, 3, 1, 3, DateTimeZone.UTC)
+      result.head.receivedAt mustBe LocalDateTime.of(2017, 12, 3, 1, 3)
     }
 
     "return content of the notification for every type of notification" in new Fixture {
@@ -130,7 +131,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar with ScalaCheck
             contactType = Some(ApplicationApproval),
             status = None,
             variation = false,
-            receivedAt = new DateTime(2017, 12, 3, 1, 3, DateTimeZone.UTC)))))
+            receivedAt = LocalDateTime.of(2017, 12, 3, 1, 3)))))
 
         val result = await(service.getMessageDetails("", "", cType._1,"v1m0", accountTypeId))
         result mustBe defined

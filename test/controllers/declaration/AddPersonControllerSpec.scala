@@ -26,7 +26,6 @@ import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership
 import models.declaration.AddPerson
 import models.declaration.release7.{Director, ExternalAccountant}
 import models.status.{ReadyForRenewal, SubmissionReady, SubmissionReadyForReview}
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -38,6 +37,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.declaration.AddPersonView
 
+import java.time.LocalDate
 import java.util.UUID
 import scala.concurrent.Future
 
@@ -127,7 +127,7 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar with Injecting 
             "roleWithinBusiness[]" -> "ExternalAccountant"
           )
 
-          mockApplicationStatus(ReadyForRenewal(Some(new LocalDate)))
+          mockApplicationStatus(ReadyForRenewal(Some(LocalDate.now())))
 
           val result = addPersonController.get()(requestWithParams)
           status(result) must be(OK)

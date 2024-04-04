@@ -20,7 +20,6 @@ import controllers.actions.SuccessfulAuthAction
 import forms.tradingpremises.IsResidentialFormProvider
 import models.businessmatching.BusinessMatching
 import models.tradingpremises._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -31,13 +30,15 @@ import play.api.test.{FakeRequest, Injecting}
 import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import views.html.tradingpremises.IsResidentialView
 
+import java.time.LocalDate
+
 class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with Injecting {
 
   trait Fixture extends DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
-    val ytp = YourTradingPremises("foo", Address("1st line of address",Some("2nd line of address"),Some("3rd line of address"),Some("4th line of address"),"AA1 1BB",None), Some(true), Some(new LocalDate(2010, 10, 10)), None)
+    val ytp = YourTradingPremises("foo", Address("1st line of address",Some("2nd line of address"),Some("3rd line of address"),Some("4th line of address"),"AA1 1BB",None), Some(true), Some(LocalDate.of(2010, 10, 10)), None)
 
     val pageTitle = messages("tradingpremises.isResidential.title", "firstname lastname") + " - " +
       messages("summary.tradingpremises") + " - " +
@@ -241,7 +242,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
         "foo",
         Address("1",None,None,None,"AA1 1BB",None),
         Some(false),
-        Some(new LocalDate(2010, 10, 10)),
+        Some(LocalDate.of(2010, 10, 10)),
         None
       )
 

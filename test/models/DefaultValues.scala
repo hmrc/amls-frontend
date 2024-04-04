@@ -19,8 +19,9 @@ package models
 import models.businessmatching.BusinessActivity.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.tradingpremises.BusinessStructure.SoleProprietor
 import models.tradingpremises.TradingPremisesMsbService._
-import models.tradingpremises.{RegisteringAgentPremises, TradingPremises, _}
-import org.joda.time.LocalDate
+import models.tradingpremises._
+
+import java.time.LocalDate
 
 object TradingPremisesSection {
 
@@ -28,7 +29,7 @@ object TradingPremisesSection {
   val year = 2010
   val month = 2
   val day = 1
-  val date = new LocalDate(year, month, day)
+  val date = LocalDate.of(year, month, day)
 
   val ytp = YourTradingPremises("tradingName1", address, Some(true), Some(date))
   val ytp1 = YourTradingPremises("tradingName2", address, Some(true), Some(date))

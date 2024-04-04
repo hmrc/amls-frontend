@@ -18,8 +18,10 @@ package models
 
 import models.ResponseType.AmendOrVariationResponseType
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionReadyForReview, SubmissionStatus}
-import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
+
+import java.time.{Instant, LocalDateTime}
+import java.time.ZoneOffset.UTC
 
 sealed trait ResponseType
 
@@ -56,7 +58,7 @@ case class FeeResponse(responseType: ResponseType,
                        totalFees: BigDecimal,
                        paymentReference: Option[String],
                        difference: Option[BigDecimal],
-                       createdAt: DateTime) {
+                       createdAt: LocalDateTime) {
 
   def toPay(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus] = None): BigDecimal = {
     val isRenewalAmendment: Boolean = submissionRequestStatus exists {
@@ -73,18 +75,18 @@ case class FeeResponse(responseType: ResponseType,
 
 object FeeResponse {
 
-  implicit val dateTimeRead: Reads[DateTime] =
+  implicit val dateTimeRead: Reads[LocalDateTime] =
     (__ \ "$date").read[Long].map { dateTime =>
-      new DateTime(dateTime, DateTimeZone.UTC)
+      LocalDateTime.ofInstant(Instant.ofEpochMilli(dateTime), UTC)
     }.orElse {
       (__ \ "$date" \ "$numberLong").read[Long].map { dateTime =>
-        new DateTime(dateTime, DateTimeZone.UTC)
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(dateTime), UTC)
       }
     }.orElse {
-      (__ \ "$date" \ "$numberLong").read[String].map(dateTime => new DateTime(dateTime.toLong))
+      (__ \ "$date" \ "$numberLong").read[String].map(dateTime => LocalDateTime.ofInstant(Instant.ofEpochMilli(dateTime.toLong), UTC))
     }
   
-  implicit val dateTimeWrite: Writes[DateTime] = (dateTime: DateTime) => Json.obj("$date" -> dateTime.getMillis)
+  implicit val dateTimeWrite: Writes[LocalDateTime] = (dateTime: LocalDateTime) => Json.obj("$date" -> dateTime.atZone(UTC).toInstant.toEpochMilli)
 
   implicit val format: OFormat[FeeResponse] = Json.format[FeeResponse]
 }

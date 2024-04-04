@@ -22,7 +22,7 @@ import controllers.declaration
 import models.registrationprogress.{Completed, Updated}
 import models.responsiblepeople.{Partner, ResponsiblePerson}
 import models.status._
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.i18n.Messages
 import play.api.mvc.Call
 import services.{RenewalService, SectionsProvider, StatusService}

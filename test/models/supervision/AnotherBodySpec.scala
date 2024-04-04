@@ -16,17 +16,18 @@
 
 package models.supervision
 
-import org.joda.time.LocalDate
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+
+import java.time.LocalDate
 
 class AnotherBodySpec extends PlaySpec with MockitoSugar {
 
   trait Fixture {
 
-    val start = Some(SupervisionStart(new LocalDate(1990, 2, 24)))  //scalastyle:off magic.number
-    val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24)))//scalastyle:off magic.number
+    val start = Some(SupervisionStart(LocalDate.of(1990, 2, 24)))  //scalastyle:off magic.number
+    val end = Some(SupervisionEnd(LocalDate.of(1998, 2, 24)))//scalastyle:off magic.number
     val reason = Some(SupervisionEndReasons("Reason"))
   }
 

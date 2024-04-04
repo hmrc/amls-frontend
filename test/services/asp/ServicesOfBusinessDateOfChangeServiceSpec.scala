@@ -20,13 +20,13 @@ import connectors.DataCacheConnector
 import models.DateOfChange
 import models.asp.{Asp, Service, ServicesOfBusiness}
 import models.businessdetails.{ActivityStartDate, BusinessDetails}
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{reset, verifyZeroInteractions, when}
 import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class ServicesOfBusinessDateOfChangeServiceSpec extends AmlsSpec with BeforeAndAfterEach {

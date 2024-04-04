@@ -16,9 +16,10 @@
 
 package models.responsiblepeople
 
-import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
+
+import java.time.LocalDate
 
 
 class ResponsiblePersonEndDateSpec extends PlaySpec {
@@ -28,13 +29,13 @@ class ResponsiblePersonEndDateSpec extends PlaySpec {
     "Read and write successfully" in {
 
       ResponsiblePersonEndDate.format.reads(
-        ResponsiblePersonEndDate.format.writes(ResponsiblePersonEndDate(new LocalDate(1990, 2, 24)))) must be(
-        JsSuccess(ResponsiblePersonEndDate(new LocalDate(1990, 2, 24)), JsPath))
+        ResponsiblePersonEndDate.format.writes(ResponsiblePersonEndDate(LocalDate.of(1990, 2, 24)))) must be(
+        JsSuccess(ResponsiblePersonEndDate(LocalDate.of(1990, 2, 24)), JsPath))
 
     }
 
     "write successfully" in {
-      ResponsiblePersonEndDate.format.writes(ResponsiblePersonEndDate(new LocalDate(1990, 2, 24))) must be(Json.obj("endDate" -> "1990-02-24"))
+      ResponsiblePersonEndDate.format.writes(ResponsiblePersonEndDate(LocalDate.of(1990, 2, 24))) must be(Json.obj("endDate" -> "1990-02-24"))
     }
   }
 

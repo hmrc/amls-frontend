@@ -16,13 +16,12 @@
 
 package models.tradingpremises
 
-import org.joda.time.LocalDate
-import play.api.libs.json.Json
-import play.api.libs.json.JodaWrites._
-import play.api.libs.json.JodaReads._
+import play.api.libs.json.{Json, OFormat}
+
+import java.time.LocalDate
 
 case class ActivityEndDate (endDate: LocalDate)
 
 object ActivityEndDate {
-  implicit val format =  Json.format[ActivityEndDate]
+  implicit val format: OFormat[ActivityEndDate] =  Json.format[ActivityEndDate]
 }

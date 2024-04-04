@@ -16,21 +16,22 @@
 
 package models.responsiblepeople
 
-import org.joda.time.LocalDate
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
+
+import java.time.LocalDate
 
 class PositionsSpec extends PlaySpec with MockitoSugar {
 
   "hasNominatedOfficer" must {
     "return true when there is a nominated officer RP" in {
-      val positions = Positions(Set(NominatedOfficer, InternalAccountant), Some(PositionStartDate(new LocalDate())))
+      val positions = Positions(Set(NominatedOfficer, InternalAccountant), Some(PositionStartDate(LocalDate.now())))
       positions.isNominatedOfficer must be(true)
     }
 
     "return false when there is no nominated officer RP" in {
-      val positions = Positions(Set(InternalAccountant), Some(PositionStartDate(new LocalDate())))
+      val positions = Positions(Set(InternalAccountant), Some(PositionStartDate(LocalDate.now())))
       positions.isNominatedOfficer must be(false)
     }
   }
@@ -39,7 +40,7 @@ class PositionsSpec extends PlaySpec with MockitoSugar {
 
     val model = Positions(
       Set(BeneficialOwner, Other("some other role")),
-      Some(PositionStartDate(new LocalDate(1970, 1, 1))))
+      Some(PositionStartDate(LocalDate.of(1970, 1, 1))))
 
     val json = Json.toJson(model)
 
@@ -56,10 +57,10 @@ class PositionsSpec extends PlaySpec with MockitoSugar {
 
     "update successfully" when {
 
-      val positionsWithDate = Positions(Set(InternalAccountant), Some(PositionStartDate(new LocalDate())))
+      val positionsWithDate = Positions(Set(InternalAccountant), Some(PositionStartDate(LocalDate.now())))
       val positionsWithoutDate = Positions(Set(InternalAccountant), None)
       val newPositions = Set(NominatedOfficer, Director ).asInstanceOf[Set[PositionWithinBusiness]]
-      val newStartDate = PositionStartDate(new LocalDate().minusMonths(20))
+      val newStartDate = PositionStartDate(LocalDate.now().minusMonths(20))
 
       "provided with a new set of positions" in  {
         val updated = Positions.update(positionsWithoutDate, newPositions)

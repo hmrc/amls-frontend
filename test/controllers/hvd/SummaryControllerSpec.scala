@@ -23,7 +23,6 @@ import models.hvd.Products._
 import models.hvd.SalesChannel._
 import models.hvd._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.mockito.ArgumentCaptor
@@ -39,6 +38,7 @@ import utils.hvd.CheckYourAnswersHelper
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.hvd.CheckYourAnswersView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with Injecting {
@@ -64,7 +64,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
     val month = 2
     val year = 1956
 
-    val completeModel = Hvd(Some(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(new LocalDate(year, month, day))))),
+    val completeModel = Hvd(Some(CashPayment(CashPaymentOverTenThousandEuros(true), Some(CashPaymentFirstDate(LocalDate.of(year, month, day))))),
       Some(Products(Set(Alcohol, Tobacco, Other("test")))),
       Some(ExciseGoods(true)),
       Some(HowWillYouSellGoods(Set(Wholesale, Retail, Auction))),

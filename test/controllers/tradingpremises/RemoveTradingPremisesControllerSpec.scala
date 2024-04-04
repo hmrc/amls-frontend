@@ -24,7 +24,6 @@ import models.status._
 import models.tradingpremises.BusinessStructure.SoleProprietor
 import models.tradingpremises.TradingPremisesMsbService._
 import models.tradingpremises._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -36,6 +35,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, StatusConstants}
 import views.html.tradingpremises.RemoveTradingPremisesView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
@@ -60,7 +60,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
     val year = 1990
     val month = 2
     val day = 24
-    val date = new LocalDate(year, month, day)
+    val date = LocalDate.of(year, month, day)
 
     val ytp = YourTradingPremises("tradingName1", address, Some(true), Some(date))
 
@@ -286,7 +286,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
             completeTradingPremises1.copy(
               status = Some(StatusConstants.Deleted),
               hasChanged = true,
-              endDate = Some(ActivityEndDate(new LocalDate(2001, 1, 1)))),
+              endDate = Some(ActivityEndDate(LocalDate.of(2001, 1, 1)))),
             completeTradingPremises2,
             completeTradingPremises3
           )))(any())
@@ -416,7 +416,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
       "asdfasdf"
     ),
     Some(true),
-    Some(new LocalDate(1990, 2, 24))
+    Some(LocalDate.of(1990, 2, 24))
   )
 
   val businessStructure = SoleProprietor
@@ -442,7 +442,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
     false,
     Some(123456),
     Some("Added"),
-    Some(ActivityEndDate(new LocalDate(1999, 1, 1)))
+    Some(ActivityEndDate(LocalDate.of(1999, 1, 1)))
   )
   val completeTradingPremises2 = TradingPremises(
     Some(RegisteringAgentPremises(true)),
@@ -456,7 +456,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
     false,
     Some(123456),
     Some("Added"),
-    Some(ActivityEndDate(new LocalDate(1999, 1, 1)))
+    Some(ActivityEndDate(LocalDate.of(1999, 1, 1)))
   )
   val completeTradingPremises3 = TradingPremises(
     Some(RegisteringAgentPremises(true)),
@@ -470,7 +470,7 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar wit
     false,
     Some(123456),
     Some("Added"),
-    Some(ActivityEndDate(new LocalDate(1999, 1, 1)))
+    Some(ActivityEndDate(LocalDate.of(1999, 1, 1)))
   )
 
   val tradingPremisesList = Seq(completeTradingPremises1, completeTradingPremises2, completeTradingPremises3)

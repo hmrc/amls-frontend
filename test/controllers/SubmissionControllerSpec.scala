@@ -24,7 +24,6 @@ import models.registrationprogress.{Completed, Started, TaskRow}
 import models.renewal.Renewal
 import models.status._
 import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionFees, SubscriptionResponse}
-import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -34,6 +33,7 @@ import uk.gov.hmrc.http.{BadRequestException, HttpResponse, UpstreamErrorRespons
 import utils.AmlsSpec
 import views.ParagraphHelpers
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsReferenceNumberGenerator {

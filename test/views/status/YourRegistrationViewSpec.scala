@@ -20,7 +20,6 @@ import generators.AmlsReferenceNumberGenerator
 import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
 import models.status._
-import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.jsoup.nodes.{Document, Element}
 import org.mockito.Mockito.when
 import org.scalatest.matchers.must.Matchers
@@ -30,6 +29,8 @@ import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
 import views.html.status.YourRegistrationView
 import views.html.status.components._
+
+import java.time.{LocalDate, LocalDateTime}
 
 class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsReferenceNumberGenerator {
 
@@ -61,7 +62,7 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
       550.0,
       Some("XA000000000000"),
       None,
-      new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC)
+      LocalDateTime.of(2017, 12, 1, 1, 3)
     )
 
   }

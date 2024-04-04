@@ -16,11 +16,12 @@
 
 package views.withdrawal
 
-import org.joda.time.LocalDateTime
 import org.scalatestplus.mockito.MockitoSugar
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.withdrawal.WithdrawApplicationView
+
+import java.time.LocalDateTime
 
 class WithdrawApplicationViewSpec extends AmlsViewSpec with MockitoSugar {
 
@@ -29,7 +30,7 @@ class WithdrawApplicationViewSpec extends AmlsViewSpec with MockitoSugar {
     implicit val requestWithToken = addTokenForView()
 
     //noinspection ScalaStyle
-    val date = new LocalDateTime(2001, 1, 1, 12, 0, 0)
+    val date = LocalDateTime.of(2001, 1, 1, 12, 0, 0)
 
     def view = withdraw_application("The Business", date)
   }

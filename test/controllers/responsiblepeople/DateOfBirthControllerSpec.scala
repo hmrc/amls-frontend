@@ -22,7 +22,6 @@ import controllers.actions.SuccessfulAuthAction
 import forms.responsiblepeople.DateOfBirthFormProvider
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -33,6 +32,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import views.html.responsiblepeople.DateOfBirthView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
@@ -84,7 +84,7 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar with Injectin
         "data is present" in new Fixture {
           val responsiblePeople = ResponsiblePerson(
             personName = Some(personName),
-            dateOfBirth = Some(DateOfBirth(new LocalDate(2001,12,2)))
+            dateOfBirth = Some(DateOfBirth(LocalDate.of(2001,12,2)))
           )
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))

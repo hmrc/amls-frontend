@@ -17,8 +17,9 @@
 package generators
 
 import models.status._
-import org.joda.time.LocalDate
 import org.scalacheck.Gen
+
+import java.time.LocalDate
 
 trait StatusGenerator extends BaseGenerator {
 

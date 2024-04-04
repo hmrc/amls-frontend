@@ -17,9 +17,10 @@
 package models.renewal
 
 import models.amp.Amp
-import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+
+import java.time.LocalDate
 
 class AMPTurnoverSpec extends PlaySpec {
 

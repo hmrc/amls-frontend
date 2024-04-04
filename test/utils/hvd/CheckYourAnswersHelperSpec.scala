@@ -19,11 +19,12 @@ package utils.hvd
 import models.hvd.Products.{Alcohol, Other => ProductsOther}
 import models.hvd.SalesChannel.Retail
 import models.hvd._
-import org.joda.time.LocalDate
 import org.scalatest.Assertion
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryListRow
 import utils.{AmlsSpec, DateHelper}
+
+import java.time.LocalDate
 
 class CheckYourAnswersHelperSpec extends AmlsSpec {
 

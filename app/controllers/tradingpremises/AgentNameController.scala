@@ -23,7 +23,7 @@ import forms.tradingpremises.AgentNameFormProvider
 import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.data.Form
 import play.api.libs.json.Format
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
@@ -111,7 +111,7 @@ class AgentNameController @Inject()(
 
   def getTradingPremises(result: Option[CacheMap], index: Int)(implicit hc: HeaderCarrier,
                                                                formats: Format[TradingPremises],
-                                                               key: MongoKey[TradingPremises]) =
+                                                               key: MongoKey[TradingPremises]): Option[TradingPremises] =
     result flatMap { cache => getData(cache, index) }
 
   def dateOfChange(index: Int): Action[AnyContent] = authAction {

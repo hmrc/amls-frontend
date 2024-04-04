@@ -22,7 +22,6 @@ import forms.declaration.BusinessPartnersFormProvider
 import models.registrationprogress.{Completed, Started, TaskRow}
 import models.responsiblepeople._
 import models.status._
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
@@ -33,6 +32,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils._
 import views.html.declaration.RegisterPartnersView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 
@@ -62,8 +62,8 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
 
     val personName = PersonName("firstName", Some("middleName"), "lastName")
     val personName1 = PersonName("firstName1", Some("middleName1"), "lastName1")
-    val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(new LocalDate())))
-    val positions1 = Positions(Set(BeneficialOwner, InternalAccountant, Partner), Some(PositionStartDate(new LocalDate())))
+    val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(LocalDate.now())))
+    val positions1 = Positions(Set(BeneficialOwner, InternalAccountant, Partner), Some(PositionStartDate(LocalDate.now())))
     val rp = ResponsiblePerson (
       personName = Some(personName),
       positions = Some(positions),
@@ -192,7 +192,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar with Inj
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any(), any())(any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
-          mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
+          mockApplicationStatus(ReadyForRenewal(Some(LocalDate.now())))
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)

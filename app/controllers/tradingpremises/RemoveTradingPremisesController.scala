@@ -22,11 +22,12 @@ import controllers.{AmlsBaseController, CommonPlayDependencies}
 import forms.tradingpremises.RemoveTradingPremisesFormProvider
 import models.status._
 import models.tradingpremises.{TradingPremises, YourTradingPremises}
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.StatusService
 import utils.{AuthAction, RepeatingSection, StatusConstants}
 import views.html.tradingpremises.RemoveTradingPremisesView
 
+import java.time.format.DateTimeFormatter.ofPattern
 import scala.concurrent.Future
 
 class RemoveTradingPremisesController @Inject () (
@@ -39,7 +40,7 @@ class RemoveTradingPremisesController @Inject () (
                                                    view: RemoveTradingPremisesView,
                                                    implicit val error: views.html.ErrorView) extends AmlsBaseController(ds, cc) with RepeatingSection {
 
-  def get(index: Int, complete: Boolean = false) = authAction.async {
+  def get(index: Int, complete: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
       for {
         tp <- getData[TradingPremises](request.credId, index)
@@ -70,10 +71,10 @@ class RemoveTradingPremisesController @Inject () (
       }
   }
 
-  def remove(index: Int, complete: Boolean = false) = authAction.async {
+  def remove(index: Int, complete: Boolean = false): Action[AnyContent] = authAction.async {
     implicit request =>
 
-      def removeWithoutDate = removeDataStrict[TradingPremises](request.credId, index) map { _ =>
+      def removeWithoutDate(): Future[Result] = removeDataStrict[TradingPremises](request.credId, index) map { _ =>
         Redirect(routes.YourTradingPremisesController.get())
       }
 
@@ -126,7 +127,7 @@ class RemoveTradingPremisesController @Inject () (
                             .withError(
                               "endDate",
                               "error.expected.tp.date.after.start",
-                              startDate.toString("dd-MM-yyyy")
+                              startDate.format(ofPattern("dd-MM-yyyy"))
                             )
 
                           Future.successful(BadRequest(

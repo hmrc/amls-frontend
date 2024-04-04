@@ -22,7 +22,6 @@ import forms.responsiblepeople.address.NewHomeAddressNonUKFormProvider
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.{Country, DateOfChange}
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
@@ -31,6 +30,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
 import views.html.responsiblepeople.address.NewHomeAddressNonUKView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class NewHomeAddressNonUKControllerSpec extends AmlsSpec with AutoCompleteServiceMocks with Injecting {

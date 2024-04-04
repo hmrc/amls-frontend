@@ -24,7 +24,6 @@ import models.Country
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import models.status._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
@@ -41,6 +40,8 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, StatusConstants}
 import views.html.responsiblepeople.RemoveResponsiblePersonView
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import scala.concurrent.Future
 
 class RemoveResponsiblePersonControllerSpec extends AmlsSpec
@@ -381,7 +382,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), any(), meq(Seq(
             CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true,
-              endDate = Some(ResponsiblePersonEndDate(new LocalDate(2006, 1, 1)))),
+              endDate = Some(ResponsiblePersonEndDate(LocalDate.of(2006, 1, 1)))),
             CompleteResponsiblePeople2,
             CompleteResponsiblePeople3
           )))(any())
@@ -464,7 +465,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
         }
 
-        s"removing a responsible person from an application given a year which is below ${RemoveResponsiblePersonFormProvider.minDate.toString("dd-MM-yyyy")}" in new Fixture {
+        s"removing a responsible person from an application given a year which is below ${RemoveResponsiblePersonFormProvider.minDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))}" in new Fixture {
           val emptyCache = CacheMap("", Map.empty)
 
           val belowMinDate = RemoveResponsiblePersonFormProvider.minDate.minusDays(1)
@@ -473,7 +474,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           .withFormUrlEncodedBody(
             "dateRequired" -> "true",
             "endDate.day" -> belowMinDate.getDayOfMonth.toString,
-            "endDate.month" -> belowMinDate.getMonthOfYear.toString,
+            "endDate.month" -> belowMinDate.getMonthValue.toString,
             "endDate.year" -> belowMinDate.getYear.toString
           )
 
@@ -498,7 +499,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           .withFormUrlEncodedBody(
             "dateRequired" -> "true",
             "endDate.day" -> futureDate.getDayOfMonth.toString,
-            "endDate.month" -> futureDate.getMonthOfYear.toString,
+            "endDate.month" -> futureDate.getMonthValue.toString,
             "endDate.year" -> futureDate.getYear.toString
           )
 
@@ -519,7 +520,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val emptyCache = CacheMap("", Map.empty)
 
-          val startDate = new LocalDate(1999, 5, 1)
+          val startDate = LocalDate.of(1999, 5, 1)
 
           val position = Positions(Set(InternalAccountant), Some(PositionStartDate(startDate)))
           val peopleList = Seq(CompleteResponsiblePeople1.copy(positions = Some(position)))
@@ -541,7 +542,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val result = controller.remove(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(messages("error.expected.rp.date.after.start", personName.titleName, startDate.toString("dd-MM-yyyy")))
+          contentAsString(result) must include(messages("error.expected.rp.date.after.start", personName.titleName, startDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
         }
       }
     }
@@ -557,7 +558,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
   //scalastyle:off magic.number
   val personName = PersonName("firstName", Some("middleName"), "lastName")
   val legalName = PreviousName(Some(true), Some("firstName"), Some("middleName"), Some("lastName"))
-  val legalNameChangeDate = new LocalDate(1990, 2, 24)
+  val legalNameChangeDate = LocalDate.of(1990, 2, 24)
   val knownBy = KnownBy(Some(true), Some("knownByName"))
   val personResidenceType = PersonResidenceType(residence, Some(residenceCountry), Some(residenceNationality))
   val saRegistered = SaRegisteredYes("0123456789")
@@ -568,7 +569,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
   val experienceTraining = ExperienceTrainingYes("Some training")
 
   //scalastyle:off magic.number
-  val positions = Positions(Set(BeneficialOwner, InternalAccountant),Some(PositionStartDate(new LocalDate(2005, 3, 15))))
+  val positions = Positions(Set(BeneficialOwner, InternalAccountant),Some(PositionStartDate(LocalDate.of(2005, 3, 15))))
 
   val CompleteResponsiblePeople1 = ResponsiblePerson(
     personName = Some(personName),

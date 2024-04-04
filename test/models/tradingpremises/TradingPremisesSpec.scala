@@ -20,12 +20,13 @@ import models.businessmatching.BusinessActivity._
 import models.registrationprogress._
 import models.tradingpremises.BusinessStructure._
 import models.tradingpremises.TradingPremisesMsbService._
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, StatusConstants}
+
+import java.time.LocalDate
 
 class TradingPremisesSpec extends AmlsSpec {
 
@@ -39,7 +40,7 @@ class TradingPremisesSpec extends AmlsSpec {
       "asdfasdf"
     ),
     Some(true),
-    Some(new LocalDate(1990, 2, 24))
+    Some(LocalDate.of(1990, 2, 24))
   )
   val businessStructure = SoleProprietor
   val agentName = AgentName("test")
@@ -64,7 +65,7 @@ class TradingPremisesSpec extends AmlsSpec {
     false,
     Some(123456),
     Some("Added"),
-    Some(ActivityEndDate(new LocalDate(1999, 1, 1))),
+    Some(ActivityEndDate(LocalDate.of(1999, 1, 1))),
     hasAccepted = true
   )
 

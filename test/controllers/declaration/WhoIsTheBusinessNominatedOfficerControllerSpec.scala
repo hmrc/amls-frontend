@@ -23,7 +23,6 @@ import models.registrationprogress.{Completed, Started, TaskRow}
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import org.joda.time.LocalDate
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -33,6 +32,7 @@ import services.SectionsProvider
 import utils._
 import views.html.declaration.SelectBusinessNominatedOfficerView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar with Injecting {
@@ -59,7 +59,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
 
     val personName = PersonName("firstName", Some("middleName"), "lastName")
     val personName1 = PersonName("firstName1", Some("middleName1"), "lastName1")
-    val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(new LocalDate())))
+    val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(PositionStartDate(LocalDate.now())))
     val rp = ResponsiblePerson (
       personName = Some(personName),
       positions = Some(positions),
@@ -134,7 +134,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
             mockSectionsProvider.taskRows(any[String])(any(), any(), any())
           }.thenReturn(Future.successful(completedSections))
 
-          mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
+          mockApplicationStatus(ReadyForRenewal(Some(LocalDate.now())))
           mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 

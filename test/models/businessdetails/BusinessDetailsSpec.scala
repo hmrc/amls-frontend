@@ -17,12 +17,13 @@
 package models.businessdetails
 
 import models.registrationprogress._
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
 import play.api.libs.json.{JsNull, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
+
+import java.time.LocalDate
 
 class BusinessDetailsSpec extends AmlsSpec {
 
@@ -33,9 +34,9 @@ class BusinessDetailsSpec extends AmlsSpec {
   val regForVAT = VATRegisteredYes("123456789")
 
   // scalastyle:off
-  val  activityStartDate = ActivityStartDate(new LocalDate(1990, 2, 24))
+  val  activityStartDate = ActivityStartDate(LocalDate.of(1990, 2, 24))
 
-  val  newActivityStartDate = ActivityStartDate(new LocalDate(1990, 2, 24))
+  val  newActivityStartDate = ActivityStartDate(LocalDate.of(1990, 2, 24))
 
   val regForCorpTax = CorporationTaxRegisteredYes("1234567890")
 
@@ -272,9 +273,9 @@ class BusinessDetailsSpec extends AmlsSpec {
 
       "is different" must {
         "set the hasChanged & activityStartDate Properties" in {
-          val res = completeModel.activityStartDate(ActivityStartDate(new LocalDate(1344, 12, 1)))
+          val res = completeModel.activityStartDate(ActivityStartDate(LocalDate.of(1344, 12, 1)))
           res.hasChanged must be (true)
-          res.activityStartDate must be (Some(ActivityStartDate(new LocalDate(1344, 12, 1))))
+          res.activityStartDate must be (Some(ActivityStartDate(LocalDate.of(1344, 12, 1))))
         }
       }
     }

@@ -16,7 +16,6 @@
 
 package forms.mappings
 
-import org.joda.time.{LocalDate => JodaLocalDate}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.domain.Nino
 
@@ -131,22 +130,6 @@ trait Constraints {
     }
 
   protected def minDate(minimum: LocalDate, errorKey: String, args: Any*): Constraint[LocalDate] =
-    Constraint {
-      case date if date.isBefore(minimum) =>
-        Invalid(errorKey, args: _*)
-      case _ =>
-        Valid
-    }
-
-  protected def jodaMaxDate(maximum: JodaLocalDate, errorKey: String, args: Any*): Constraint[JodaLocalDate] =
-    Constraint {
-      case date if date.isAfter(maximum) =>
-        Invalid(errorKey, args: _*)
-      case _ =>
-        Valid
-    }
-
-  protected def jodaMinDate(minimum: JodaLocalDate, errorKey: String, args: Any*): Constraint[JodaLocalDate] =
     Constraint {
       case date if date.isBefore(minimum) =>
         Invalid(errorKey, args: _*)

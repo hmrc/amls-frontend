@@ -38,7 +38,6 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{status => _, _}
-import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito
 import org.mockito.Mockito._
@@ -56,6 +55,7 @@ import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import utils.{AmlsSpec, AuthorisedFixture}
 import views.html.Start
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar with Matchers with StatusGenerator {
@@ -74,10 +74,10 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       personResidenceType = Some(PersonResidenceType(NonUKResidence, Some(Country("Antigua and Barbuda", "bb")), Some(Country("United Kingdom", "GB")))),
       ukPassport = Some(UKPassportNo),
       nonUKPassport = Some(NoPassport),
-      dateOfBirth = Some(DateOfBirth(LocalDate.parse("2000-01-01"))),
+      dateOfBirth = Some(DateOfBirth(LocalDate.of(2000,1,1))),
       contactDetails = Some(ContactDetails("0912345678", "TEST@EMAIL.COM")),
       addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", Some("add2"), Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
-      positions = Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(PositionStartDate(new LocalDate(2002, 2, 2))))),
+      positions = Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(PositionStartDate(LocalDate.of(2002, 2, 2))))),
       saRegistered = Some(SaRegisteredNo),
       vatRegistered = Some(VATRegisteredNo),
       experienceTraining = Some(ExperienceTrainingNo),
@@ -243,7 +243,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       dateOfBirth = Some(DateOfBirth(LocalDate.parse("2000-01-01"))),
       contactDetails = Some(ContactDetails("0912345678", "TEST@EMAIL.COM")),
       addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", Some("add2"), Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
-      positions = Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(PositionStartDate(new LocalDate(2002, 2, 2))))),
+      positions = Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(PositionStartDate(LocalDate.of(2002, 2, 2))))),
       saRegistered = Some(SaRegisteredNo),
       vatRegistered = Some(VATRegisteredNo),
       experienceTraining = Some(ExperienceTrainingNo),

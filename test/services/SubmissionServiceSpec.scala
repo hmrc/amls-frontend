@@ -35,7 +35,6 @@ import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal._
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
-import org.joda.time.LocalDate
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -47,6 +46,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 import utils.{AmlsSpec, DependencyMocks}
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class SubmissionServiceSpec extends AmlsSpec

@@ -30,7 +30,6 @@ import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.status.{SubmissionDecisionApproved, _}
 import models.{status => _, _}
-import org.joda.time.DateTime
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -40,8 +39,9 @@ import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, FeeHelper}
-import views.html.confirmation.{ConfirmationAmendmentView, ConfirmationNewView, ConfirmationRenewalView, ConfirmationNoFeeView}
+import views.html.confirmation.{ConfirmationAmendmentView, ConfirmationNewView, ConfirmationNoFeeView, ConfirmationRenewalView}
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 // scalastyle:off magic.number
@@ -119,7 +119,7 @@ class ConfirmationControllerSpec extends AmlsSpec
       totalFees = 200,
       paymentReference = Some(paymentReferenceNumber),
       difference = Some(115),
-      createdAt = DateTime.now
+      createdAt = LocalDateTime.now
     )
 
     when {

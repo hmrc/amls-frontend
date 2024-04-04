@@ -18,8 +18,9 @@ package models
 
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.status._
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
+
+import java.time.LocalDateTime
 
 class FeeResponseSpec extends PlaySpec {
 
@@ -35,7 +36,7 @@ class FeeResponseSpec extends PlaySpec {
             BigDecimal(100),
             None,
             Some(difference),
-            new DateTime(2018, 1, 1, 0, 0)
+            LocalDateTime.of(2018, 1, 1, 0, 0)
         )
         "return difference" when {
             "status is RenewalSubmitted and submissionRequestStatus is renewal amendment" in {
@@ -71,7 +72,7 @@ class FeeResponseSpec extends PlaySpec {
                 BigDecimal(100),
                 None,
                 None,
-                new DateTime(2018, 1, 1, 0, 0)
+                LocalDateTime.of(2018, 1, 1, 0, 0)
             )
             "status is RenewalSubmitted and submissionRequestStatus is renewal amendment and difference is None" in {
                 feeResponse.toPay(
@@ -107,7 +108,7 @@ class FeeResponseSpec extends PlaySpec {
                 total,
                 None,
                 Some(difference),
-                new DateTime(2018, 1, 1, 0, 0)
+                LocalDateTime.of(2018, 1, 1, 0, 0)
             )
 
             "status is RenewalSubmitted and submissionRequestStatus is not renewal amendment" in {
@@ -149,7 +150,7 @@ class FeeResponseSpec extends PlaySpec {
                     total,
                     None,
                     Some(difference),
-                    new DateTime(2018, 1, 1, 0, 0)
+                    LocalDateTime.of(2018, 1, 1, 0, 0)
                 )
                 feeResponse.toPay(
                     SubmissionReadyForReview,

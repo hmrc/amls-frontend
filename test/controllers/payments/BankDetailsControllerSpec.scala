@@ -23,7 +23,6 @@ import models.ResponseType.SubscriptionResponseType
 import models.renewal.{AMLSTurnover, AMPTurnover, BusinessTurnover, CETransactionsInLast12Months, CashPayments, CashPaymentsCustomerNotMet, CustomersOutsideIsUK, CustomersOutsideUK, HowCashPaymentsReceived, InvolvedInOtherYes, MoneySources, MostTransactions, PaymentMethods, PercentageOfCashPaymentOver15000, Renewal, SendTheLargestAmountsOfMoney, TotalThroughput, TransactionsInLast12Months, WhichCurrencies}
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
 import models.{Country, FeeResponse, SubmissionRequestStatus}
-import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import play.api.i18n.Messages
@@ -33,6 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.{AmlsSpec, DependencyMocks}
 import views.html.payments.BankDetailsView
 
+import java.time.LocalDateTime
 import scala.concurrent.{ExecutionContext, Future}
 
 class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
@@ -98,7 +98,7 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
           controller.feeResponseService.getFeeResponse(any(),any())(any(),any())
         } thenReturn Future.successful(Some(FeeResponse(
           SubscriptionResponseType,
-          amlsRegistrationNumber, 100, None, None, 0, 200, Some(paymentReferenceNumber), None, DateTime.now()))
+          amlsRegistrationNumber, 100, None, None, 0, 200, Some(paymentReferenceNumber), None, LocalDateTime.now()))
         )
 
         when {

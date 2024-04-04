@@ -19,12 +19,13 @@ package views.notifications
 import models.notifications.ContactType.RenewalApproval
 import models.notifications.StatusType.{Approved, Rejected}
 import models.notifications._
-import org.joda.time.DateTime
 import org.scalatest.matchers.must.Matchers
 import uk.gov.hmrc.govukfrontend.views.Aliases.Table
 import utils.AmlsViewSpec
 import views.Fixture
 import views.html.notifications.YourMessagesView
+
+import java.time.LocalDateTime
 
 class YourMessagesViewSpec extends AmlsViewSpec with Matchers  {
 
@@ -43,7 +44,7 @@ class YourMessagesViewSpec extends AmlsViewSpec with Matchers  {
                 Some(RenewalApproval),
                 Some("123456789"),
                 false,
-                new DateTime(2018, 4, 1, 0, 0),
+                LocalDateTime.of(2018, 4, 1, 0, 0),
                 false,
                 "XAML00000123456",
                 "v1m0",
@@ -54,7 +55,7 @@ class YourMessagesViewSpec extends AmlsViewSpec with Matchers  {
                 Some(RenewalApproval),
                 Some("123456789"),
                 false,
-                new DateTime(2018, 3, 1, 0, 0),
+                LocalDateTime.of(2018, 3, 1, 0, 0),
                 false,
                 "XAML00000123456",
                 "v1m0",
@@ -65,7 +66,7 @@ class YourMessagesViewSpec extends AmlsViewSpec with Matchers  {
                 Some(RenewalApproval),
                 Some("123456789"),
                 false,
-                new DateTime(2018, 2, 1, 0, 0),
+                LocalDateTime.of(2018, 2, 1, 0, 0),
                 false,
                 "XAML00000123456",
                 "v1m0",

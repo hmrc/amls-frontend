@@ -16,7 +16,7 @@
 
 package models.responsiblepeople
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 
 case class PositionStartDate(startDate: LocalDate)
 

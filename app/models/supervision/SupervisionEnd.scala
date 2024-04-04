@@ -16,26 +16,19 @@
 
 package models.supervision
 
-import org.joda.time.LocalDate
-import play.api.libs.json.JodaWrites._
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json._
+
+import java.time.LocalDate
 
 case class SupervisionEnd(endDate: LocalDate)
 
 object SupervisionEnd {
 
   implicit val jsonReads: Reads[SupervisionEnd] = {
-
-    import play.api.libs.json.JodaReads._
-    import play.api.libs.json._
-
     (__ \ "supervisionEndDate").read[LocalDate].map(SupervisionEnd.apply) map identity[SupervisionEnd]
   }
 
   implicit val jsonWrites = Writes[SupervisionEnd] {
-    case a: SupervisionEnd =>
-      Json.obj(
-        "supervisionEndDate" -> a.endDate
-      )
+    case a: SupervisionEnd => Json.obj("supervisionEndDate" -> a.endDate)
   }
 }

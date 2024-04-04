@@ -16,9 +16,10 @@
 
 package models.businessdetails
 
-import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+
+import java.time.LocalDate
 
 
 class ActivityStartDateSpec extends PlaySpec {
@@ -26,7 +27,7 @@ class ActivityStartDateSpec extends PlaySpec {
 
   "ActivityStartDate" must {
 
-    val date = ActivityStartDate(new LocalDate(1990, 2, 24))
+    val date = ActivityStartDate(LocalDate.of(1990, 2, 24))
 
     "round trip through JSON" in {
       Json.toJson(date).as[ActivityStartDate] mustBe date

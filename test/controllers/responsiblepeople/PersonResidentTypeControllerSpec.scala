@@ -24,7 +24,6 @@ import generators.NinoGen
 import models.Country
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -37,6 +36,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 import views.html.responsiblepeople.PersonResidenceTypeView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with NinoGen with Injecting {
@@ -341,7 +341,7 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
             val countryCode = "GB"
 
-            val dateOfBirth = DateOfBirth(LocalDate.parse("2000-01-01"))
+            val dateOfBirth = DateOfBirth(LocalDate.of(2000,1,1))
 
             val responsiblePeople = ResponsiblePerson(
               personResidenceType = Some(

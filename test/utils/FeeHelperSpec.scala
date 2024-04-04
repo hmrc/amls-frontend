@@ -16,27 +16,26 @@
 
 package utils
 
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-
-import scala.concurrent.{Await, Future}
 import generators.AmlsReferenceNumberGenerator
 import generators.submission.SubscriptionResponseGenerator
 import models.ResponseType.SubscriptionResponseType
 import models.{FeeResponse, ResponseType}
-import org.joda.time.DateTime
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import services.{AuthEnrolmentsService, FeeResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.duration._
-import scala.language.postfixOps
+import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
+import scala.language.postfixOps
 
 class FeeHelperSpec extends PlaySpec with MockitoSugar
   with ScalaFutures
@@ -70,7 +69,7 @@ class FeeHelperSpec extends PlaySpec with MockitoSugar
       totalFees = 200,
       paymentReference = Some(paymentReferenceNumber),
       difference = Some(115),
-      createdAt = DateTime.now
+      createdAt = LocalDateTime.now
     )
 
     val response = feeResponse(SubscriptionResponseType)

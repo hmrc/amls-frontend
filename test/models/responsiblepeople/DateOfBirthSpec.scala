@@ -16,9 +16,10 @@
 
 package models.responsiblepeople
 
-import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
+
+import java.time.LocalDate
 
 class DateOfBirthSpec extends PlaySpec {
 
@@ -31,15 +32,15 @@ class DateOfBirthSpec extends PlaySpec {
     "Read and write successfully" in {
 
       DateOfBirth.format.reads(
-        DateOfBirth.format.writes(DateOfBirth(new LocalDate(validYear, validMonth, validDay)))
+        DateOfBirth.format.writes(DateOfBirth(LocalDate.of(validYear, validMonth, validDay)))
       ) must be(
-        JsSuccess(DateOfBirth(new LocalDate(validYear, validMonth, validDay)), JsPath)
+        JsSuccess(DateOfBirth(LocalDate.of(validYear, validMonth, validDay)), JsPath)
       )
 
     }
 
     "write successfully" in {
-      DateOfBirth.format.writes(DateOfBirth(new LocalDate(validYear, validMonth, validDay))) must be(
+      DateOfBirth.format.writes(DateOfBirth(LocalDate.of(validYear, validMonth, validDay))) must be(
         Json.obj("dateOfBirth" -> "1990-02-24")
       )
     }

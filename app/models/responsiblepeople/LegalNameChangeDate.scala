@@ -16,13 +16,11 @@
 
 package models.responsiblepeople
 
-import org.joda.time.LocalDate
-import play.api.libs.json.JodaReads._
-import play.api.libs.json.JodaWrites._
-import play.api.libs.json.{Json, Writes => _}
+import java.time.LocalDate
+import play.api.libs.json.{Json, OFormat, Writes => _}
 
 case class LegalNameChangeDate(date: LocalDate)
 
 object LegalNameChangeDate {
-  implicit val formats = Json.format[LegalNameChangeDate]
+  implicit val formats: OFormat[LegalNameChangeDate] = Json.format[LegalNameChangeDate]
 }

@@ -16,16 +16,17 @@
 
 package models.supervision
 
-import org.joda.time.LocalDate
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+
+import java.time.LocalDate
 
 class SupervisionEndSpec extends PlaySpec with MockitoSugar {
   trait Fixture {
 
     val startDateField = Map("extraStartDate" -> Seq("2000-01-01"))
-    val end = new LocalDate(2005, 2, 24)//scalastyle:off magic.number
+    val end = LocalDate.of(2005, 2, 24)//scalastyle:off magic.number
   }
 
   "Json read and writes" must {

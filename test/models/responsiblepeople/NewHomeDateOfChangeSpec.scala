@@ -16,21 +16,22 @@
 
 package models.responsiblepeople
 
-import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
+
+import java.time.LocalDate
 
 class NewHomeDateOfChangeSpec extends PlaySpec {
   "NewHomeDateOfChange" must {
 
     "Read and write successfully" in {
-      NewHomeDateOfChange.format.reads(NewHomeDateOfChange.format.writes(NewHomeDateOfChange(Some(new LocalDate(1990, 2, 24))))) must be(
-        JsSuccess(NewHomeDateOfChange(Some(new LocalDate(1990, 2, 24))), JsPath))
+      NewHomeDateOfChange.format.reads(NewHomeDateOfChange.format.writes(NewHomeDateOfChange(Some(LocalDate.of(1990, 2, 24))))) must be(
+        JsSuccess(NewHomeDateOfChange(Some(LocalDate.of(1990, 2, 24))), JsPath))
 
     }
 
     "write successfully" in {
-      NewHomeDateOfChange.format.writes(NewHomeDateOfChange(Some(new LocalDate(1990, 2, 24)))) must be(Json.obj("dateOfChange" ->"1990-02-24"))
+      NewHomeDateOfChange.format.writes(NewHomeDateOfChange(Some(LocalDate.of(1990, 2, 24)))) must be(Json.obj("dateOfChange" ->"1990-02-24"))
     }
   }
 }

@@ -18,7 +18,7 @@ package forms.responsiblepeople
 
 import forms.mappings.Mappings
 import models.responsiblepeople.ResponsiblePersonEndDate
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
@@ -34,14 +34,14 @@ class RemoveResponsiblePersonFormProvider @Inject()() extends Mappings {
       booleanKey -> boolean(),
       "endDate" -> mandatoryIfTrue(
         booleanKey,
-        jodaLocalDate(
+        localDate(
         invalidKey = "error.invalid.tp.date.not.real",
         allRequiredKey = "error.required.tp.all",
         twoRequiredKey = "error.required.tp.two",
         requiredKey = "error.required.tp.one"
         ).verifying(
-          jodaMinDate(RemoveResponsiblePersonFormProvider.minDate, "error.allowed.start.date"),
-          jodaMaxDate(RemoveResponsiblePersonFormProvider.maxDate, "error.future.date")
+          minDate(RemoveResponsiblePersonFormProvider.minDate, "error.allowed.start.date"),
+          maxDate(RemoveResponsiblePersonFormProvider.maxDate, "error.future.date")
         )
       )
     )(apply)(unapply)
@@ -60,7 +60,7 @@ class RemoveResponsiblePersonFormProvider @Inject()() extends Mappings {
 
 object RemoveResponsiblePersonFormProvider {
 
-  val minDate: LocalDate = new LocalDate(1900, 1, 1)
+  val minDate: LocalDate = LocalDate.of(1900, 1, 1)
 
   def maxDate: LocalDate = LocalDate.now()
 }

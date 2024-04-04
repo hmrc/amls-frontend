@@ -16,17 +16,17 @@
 
 package forms.tradingpremises
 
-import forms.behaviours.{JodaDateBehaviours, StringFieldBehaviours}
+import forms.behaviours.{DateBehaviours, StringFieldBehaviours}
 import forms.mappings.Constraints
 import models.tradingpremises.AgentName
-import org.joda.time.LocalDate
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import play.api.test.{FakeRequest, Helpers}
 
+import java.time.LocalDate
 import scala.collection.mutable
 
-class AgentNameFormProviderSpec extends JodaDateBehaviours with StringFieldBehaviours with Constraints {
+class AgentNameFormProviderSpec extends DateBehaviours with StringFieldBehaviours with Constraints {
 
   val formProvider: AgentNameFormProvider = new AgentNameFormProvider()
   val form: Form[AgentName] = formProvider()
@@ -36,8 +36,8 @@ class AgentNameFormProviderSpec extends JodaDateBehaviours with StringFieldBehav
   val nameFieldName = "agentName"
   val dateFieldName = "agentDateOfBirth"
 
-  def maxDate: LocalDate = LocalDate.now()
-  val minDate: LocalDate = new LocalDate(1900, 1, 1)
+  val maxDate: LocalDate = LocalDate.now()
+  val minDate: LocalDate = LocalDate.of(1900, 1, 1)
 
   "AgentNameFormProvider" when {
 
@@ -81,12 +81,12 @@ class AgentNameFormProviderSpec extends JodaDateBehaviours with StringFieldBehav
 
       "bind valid data" in {
 
-        forAll(jodaDatesBetween(minDate, maxDate)) { date =>
+        forAll(datesBetween(minDate, maxDate)) { date =>
 
           val data = Map(
             nameFieldName -> agentName,
             s"$dateFieldName.day" -> date.getDayOfMonth.toString,
-            s"$dateFieldName.month" -> date.getMonthOfYear.toString,
+            s"$dateFieldName.month" -> date.getMonthValue.toString,
             s"$dateFieldName.year" -> date.getYear.toString
           )
 
@@ -109,12 +109,12 @@ class AgentNameFormProviderSpec extends JodaDateBehaviours with StringFieldBehav
 
           s"$field is blank" in {
 
-            forAll(jodaDatesBetween(minDate, maxDate)) { date =>
+            forAll(datesBetween(minDate, maxDate)) { date =>
 
               val data = mutable.Map(
                 nameFieldName -> agentName,
                 s"$dateFieldName.day" -> date.getDayOfMonth.toString,
-                s"$dateFieldName.month" -> date.getMonthOfYear.toString,
+                s"$dateFieldName.month" -> date.getMonthValue.toString,
                 s"$dateFieldName.year" -> date.getYear.toString
               )
 
@@ -133,12 +133,12 @@ class AgentNameFormProviderSpec extends JodaDateBehaviours with StringFieldBehav
 
           s"${fields._1} and ${fields._2} are blank" in {
 
-            forAll(jodaDatesBetween(minDate, maxDate)) { date =>
+            forAll(datesBetween(minDate, maxDate)) { date =>
 
               val data = mutable.Map(
                 nameFieldName -> agentName,
                 s"$dateFieldName.day" -> date.getDayOfMonth.toString,
-                s"$dateFieldName.month" -> date.getMonthOfYear.toString,
+                s"$dateFieldName.month" -> date.getMonthValue.toString,
                 s"$dateFieldName.year" -> date.getYear.toString
               )
 
@@ -163,14 +163,14 @@ class AgentNameFormProviderSpec extends JodaDateBehaviours with StringFieldBehav
           result.errors should contain only FormError(dateFieldName, "error.required.tp.agent.date.all")
         }
 
-        s"date is greater than ${maxDate.getDayOfMonth}/${maxDate.getMonthOfYear}/${maxDate.getYear}" in {
+        s"date is greater than ${maxDate.getDayOfMonth}/${maxDate.getMonthValue}/${maxDate.getYear}" in {
 
-          forAll(jodaDatesBetween(maxDate.plusDays(1), maxDate.plusYears(10))) { date =>
+          forAll(datesBetween(maxDate.plusDays(1), maxDate.plusYears(10))) { date =>
 
             val data = Map(
               nameFieldName -> agentName,
               s"$dateFieldName.day" -> date.getDayOfMonth.toString,
-              s"$dateFieldName.month" -> date.getMonthOfYear.toString,
+              s"$dateFieldName.month" -> date.getMonthValue.toString,
               s"$dateFieldName.year" -> date.getYear.toString
             )
 

@@ -19,12 +19,13 @@ package views.businessmatching.updateservice.remove
 import models.DateOfChange
 import models.businessmatching.BusinessActivities
 import models.flowmanagement.RemoveBusinessTypeFlowModel
-import org.joda.time.LocalDate
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import utils.{AmlsViewSpec, DateHelper}
 import views.Fixture
 import views.html.businessmatching.updateservice.remove.RemoveActivitiesSummaryView
+
+import java.time.LocalDate
 
 class RemoveActivitiesSummaryViewSpec extends AmlsViewSpec {
 

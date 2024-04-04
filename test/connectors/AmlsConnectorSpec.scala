@@ -25,7 +25,6 @@ import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.withdrawal._
 import models.{AmendVariationRenewalResponse, _}
-import org.joda.time.{LocalDate, LocalDateTime}
 import org.mockito.Matchers
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -36,6 +35,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.HttpClient
 
+import java.time.{LocalDate, LocalDateTime}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

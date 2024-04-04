@@ -16,10 +16,12 @@
 
 package models.deregister
 
-import org.joda.time.LocalDate
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class DeRegisterSubscriptionRequestSpec extends PlaySpec with Matchers {
 
@@ -29,7 +31,7 @@ class DeRegisterSubscriptionRequestSpec extends PlaySpec with Matchers {
 
       val expectedJson = Json.obj(
         "acknowledgementReference" -> reference,
-        "deregistrationDate" -> LocalDate.now.toString("yyyy-MM-dd"),
+        "deregistrationDate" -> LocalDate.now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
         "deregistrationReason" -> "Out of scope"
       )
 
