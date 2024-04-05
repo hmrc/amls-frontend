@@ -20,6 +20,10 @@
 
 @()(implicit messages: Messages, appConfig: ApplicationConfig)
 
-<p class="govuk-body">
-    <a href="@appConfig.logoutUrlWithFeedback" class="govuk-link">@messages("survey.satisfaction.beforeyougo")</a> (takes 30 seconds)
-</p>
+<div id="feedback-section" class="govuk-!-margin-bottom-9 govuk-!-padding-top-3">
+    <h2 class="govuk-heading-m">@messages("feedback.title")</h2>
+    <p class="govuk-body">@messages("feedback.p1")</p>
+    <p class="govuk-body">
+        <a class="govuk-link" href="@appConfig.logoutUrlWithFeedback">@messages("feedback.link")</a> @messages("feedback.p2")
+    </p>
+</div>
