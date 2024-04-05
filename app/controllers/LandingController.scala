@@ -39,10 +39,13 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.json._
 import play.api.mvc._
 import services.cache.Cache
+import services.cache.CacheMapOps.RichCacheMap
 import services.{AuthEnrolmentsService, LandingService, StatusService}
 import uk.gov.hmrc.auth.core.User
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{CacheMap, KeyStoreEntryValidationException}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -67,7 +70,10 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val config: ApplicationConfig,
                                   parser: BodyParsers.Default,
                                   start: Start,
-                                  headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper with Logging with Constraints with Conversions {
+                                  headerCarrierForPartialsConverter: HeaderCarrierForPartialsConverter,
+                                  applicationCrypto: ApplicationCrypto) extends AmlsBaseController(ds, mcc) with I18nSupport with MessagesRequestHelper with Logging with Constraints with Conversions {
+
+  implicit val compositeSymmetricCrypto: Encrypter with Decrypter = applicationCrypto.JsonCrypto
 
   private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role)(appConfig).absoluteUrl, "utf-8")
 
@@ -75,7 +81,6 @@ class LandingController @Inject()(val landingService: LandingService,
 
   private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
     headerCarrier.authorization.isDefined
-
 
   /**
     * allowRedirect allows us to configure whether or not the start page is *always* shown,
@@ -90,7 +95,7 @@ class LandingController @Inject()(val landingService: LandingService,
       }
   }
 
-  def get() = authAction.async {
+  def get(): Action[AnyContent] = authAction.async {
     implicit request =>
       request.credentialRole match {
         case Some(User) => getWithAmendments(request.amlsRefNumber, request.credId, request.accountTypeId)
@@ -99,7 +104,7 @@ class LandingController @Inject()(val landingService: LandingService,
   }
 
   def getWithAmendments(amlsRegistrationNumber: Option[String], credId: String, accountTypeId: (String, String))
-                       (implicit request: Request[_]) = {
+                       (implicit request: Request[_]): Future[Result] = {
 
     amlsRegistrationNumber match {
       case Some(mlrNumber) => landingService.cacheMap(credId) flatMap {
@@ -108,29 +113,25 @@ class LandingController @Inject()(val landingService: LandingService,
           // $COVERAGE-OFF$
           logger.debug("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
           // $COVERAGE-ON$
-          lazy val fixEmpties = for {
-            c1 <- fixEmptyRecords[TradingPremises](credId, c, TradingPremises.key)
-            c2 <- fixEmptyRecords[ResponsiblePerson](credId, c1, ResponsiblePerson.key)
-          } yield c2
-
-          //there is data in S4l
-          fixEmpties flatMap { cacheMap =>
-            if (dataHasChanged(cacheMap)) {
-              // $COVERAGE-OFF$
-              logger.debug("Data has changed in getWithAmendments()")
-              // $COVERAGE-ON$
-              cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
-                case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
-              } getOrElse landingService.setAltCorrespondenceAddress(mlrNumber, Some(cacheMap), accountTypeId, credId) flatMap { _ =>
-                preFlightChecksAndRedirect(amlsRegistrationNumber, accountTypeId, credId)
+          insertEmptyRecords[TradingPremises](credId, c, TradingPremises.key)
+            .flatMap(_ => insertEmptyRecords[ResponsiblePerson](credId, c, ResponsiblePerson.key))
+            .flatMap { cacheMap =>
+              if (dataHasChanged(cacheMap)) {
+                // $COVERAGE-OFF$
+                logger.debug("Data has changed in getWithAmendments()")
+                // $COVERAGE-ON$
+                cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
+                  case SubmissionRequestStatus(true, _) => refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
+                } getOrElse landingService.setAltCorrespondenceAddress(mlrNumber, Some(cacheMap), accountTypeId, credId) flatMap { _ =>
+                  preFlightChecksAndRedirect(amlsRegistrationNumber, accountTypeId, credId)
+                }
+              } else {
+                // $COVERAGE-OFF$
+                logger.debug("Data has not changed route in getWithAmendments()")
+                // $COVERAGE-ON$
+                refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
               }
-            } else {
-              // $COVERAGE-OFF$
-              logger.debug("Data has not changed route in getWithAmendments()")
-              // $COVERAGE-ON$
-              refreshAndRedirect(mlrNumber, Some(cacheMap), credId, accountTypeId)
             }
-          }
         case _ => {
           // $COVERAGE-OFF$
           logger.debug("Data with amlsRegistration number route in getWithAmendments()" + amlsRegistrationNumber)
@@ -213,17 +214,17 @@ class LandingController @Inject()(val landingService: LandingService,
               auditConnector.sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
 
               (rd.businessAddress.postcode, rd.businessAddress.country) match {
-                  case (Some(postcode), Country("United Kingdom", "GB")) =>
-                    if (postcode.matches(postcodeRegex)) {
-                      Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
-                    } else {
-                      Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
-                    }
-                  case (_, Country("United Kingdom", "GB")) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
-                  case (_, country) if !country.isUK && !country.isEmpty => Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
-                  case (_, _) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
-                }
+                case (Some(postcode), Country("United Kingdom", "GB")) =>
+                  if (postcode.matches(postcodeRegex)) {
+                    Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
+                  } else {
+                    Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
+                  }
+                case (_, Country("United Kingdom", "GB")) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
+                case (_, country) if !country.isUK && !country.isEmpty => Redirect(controllers.businessmatching.routes.BusinessTypeController.get)
+                case (_, _) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get)
               }
+            }
             }
           case (None, None) =>
             // $COVERAGE-OFF$
@@ -236,7 +237,7 @@ class LandingController @Inject()(val landingService: LandingService,
             // $COVERAGE-ON$
             Future.successful(Redirect(controllers.routes.StatusController.get()))
         }
-        }.flatMap(identity)
+      }.flatMap(identity)
     }
   }
 
@@ -313,7 +314,6 @@ class LandingController @Inject()(val landingService: LandingService,
         // $COVERAGE-ON$
         landingService.cacheMap(cacheId).map {
           cache =>
-            println(s"\n\n$cache\n\n")
             // $COVERAGE-OFF$
             logger.debug("[AMLSLandingController][hasIncompleteRedressScheme]: checking cacheMap for incomplete redress scheme")
             // $COVERAGE-ON$
@@ -331,70 +331,66 @@ class LandingController @Inject()(val landingService: LandingService,
   }
 
   private def dataHasChanged(cacheMap: CacheMap) = {
-
-    // TODO - Business matching worked, but we have single quotes leading & ending some encyrpted values, write sanitise function to remove them
-
     Seq(
-      cacheMap.getEntry[Asp](Asp.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[Asp](Asp.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Amp](Amp.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[Amp](Amp.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[BusinessDetails](BusinessDetails.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[BusinessDetails](BusinessDetails.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Seq[BankDetails]](BankDetails.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[Seq[BankDetails]](BankDetails.key).fold(false) {
         _.exists(_.hasChanged)
       },
-      cacheMap.getEntry[BusinessActivities](BusinessActivities.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[BusinessActivities](BusinessActivities.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[BusinessMatching](BusinessMatching.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[BusinessMatching](BusinessMatching.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Eab](Eab.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[Eab](Eab.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[Seq[ResponsiblePerson]](ResponsiblePerson.key).fold(false) {
         _.exists(_.hasChanged)
       },
-      cacheMap.getEntry[Supervision](Supervision.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[Supervision](Supervision.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Tcsp](Tcsp.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[Tcsp](Tcsp.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Seq[TradingPremises]](TradingPremises.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[Seq[TradingPremises]](TradingPremises.key).fold(false) {
         _.exists(_.hasChanged)
       },
-      cacheMap.getEntry[Hvd](Hvd.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[Hvd](Hvd.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Renewal](Renewal.key).fold(false) {
+      cacheMap.sanitiseDoubleDecrypt[Renewal](Renewal.key).fold(false) {
         _.hasChanged
       }
     ).exists(identity)
   }
 
-
-  // TODO we finally figured out what this does, change the name to initialiseEmptyValues
-  private def fixEmptyRecords[T](credId: String, cache: CacheMap, key: String)
-                                (implicit hc: HeaderCarrier, f: play.api.libs.json.Format[T]) = {
-
-    import play.api.libs.json._
-
+  /**
+    * Try to deserialise a sequence of data from the cache & if unsuccessful then populate the database
+    * with an empty sequence of records for that type, we don't really care about the returned value from getEntry
+    *
+    * @return The unchanged CacheMap
+    */
+  private def insertEmptyRecords[T](credId: String, cache: CacheMap, key: String)
+                                   (implicit hc: HeaderCarrier, f: play.api.libs.json.Format[T]): Future[CacheMap] = {
     try {
       val delegateCacheMap = toCacheMap(Cache(cache.id, cache.data))
       delegateCacheMap.getEntry[Seq[T]](key)
       Future.successful(delegateCacheMap)
     } catch {
-      case _: JsResultException =>
-        cacheConnector.save[Seq[T]](credId, key, Seq.empty[T])
-      case _: KeyStoreEntryValidationException =>
+      case _: JsResultException | _: KeyStoreEntryValidationException =>
         cacheConnector.save[Seq[T]](credId, key, Seq.empty[T])
     }
   }
