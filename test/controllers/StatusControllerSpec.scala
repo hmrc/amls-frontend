@@ -447,8 +447,11 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
-        contentAsString(result) must include(Messages("survey.satisfaction.beforeyougo"))
+        contentAsString(result) must include(messages("status.submissiondecision.not.supervised.heading"))
+        contentAsString(result) must include(messages("feedback.title"))
+        contentAsString(result) must include(messages("feedback.p1"))
+        contentAsString(result) must include(messages("feedback.link"))
+        contentAsString(result) must include(messages("feedback.p2"))
       }
 
       "application status is DeRegistered" in new Fixture {
@@ -470,9 +473,11 @@ class StatusControllerSpec extends AmlsSpec with PaymentGenerator with Injecting
         val result = controller.get()(request)
         status(result) must be(OK)
 
-        contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
-        contentAsString(result) must include(Messages("survey.satisfaction.beforeyougo"))
-
+        contentAsString(result) must include(messages("status.submissiondecision.not.supervised.heading"))
+        contentAsString(result) must include(messages("feedback.title"))
+        contentAsString(result) must include(messages("feedback.p1"))
+        contentAsString(result) must include(messages("feedback.link"))
+        contentAsString(result) must include(messages("feedback.p2"))
       }
 
       "application status is RenewalSubmitted" in new Fixture {

@@ -83,11 +83,15 @@ class ConfirmationNoFeeViewSpec extends AmlsViewSpec with Matchers {
       button.attr("href") mustBe controllers.routes.LandingController.get.url
     }
 
-    "display the correct link" in new ViewFixture {
-      val link: Element = doc.getElementsByClass("govuk-link").get(2)
+    "display the correct feedback section" in new ViewFixture {
+      val feedbackSection: Element = doc.getElementById("feedback-section")
 
-      link.text() mustBe messages("survey.satisfaction.beforeyougo")
-      link.attr("href") mustBe config.logoutUrlWithFeedback
+      feedbackSection.text() must include(messages("feedback.title"))
+      feedbackSection.text() must include(messages("feedback.p1"))
+      feedbackSection.text() must include(messages("feedback.link"))
+      feedbackSection.text() must include(messages("feedback.p2"))
+
+      feedbackSection.getElementsByTag("a").first().attr("href") mustBe config.logoutUrlWithFeedback
     }
   }
 }

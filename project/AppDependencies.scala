@@ -18,7 +18,7 @@ private object AppDependencies {
     "uk.gov.hmrc"           %% "json-encryption"               % s"5.3.0-$playV",
     "uk.gov.hmrc.mongo"     %% s"hmrc-mongo-$playV"            % hmrcMongoV,
     "uk.gov.hmrc"           %% s"bootstrap-frontend-$playV"    % bootstrapV,
-    "uk.gov.hmrc"           %% s"play-frontend-hmrc-$playV"    % "8.4.0",
+    "uk.gov.hmrc"           %% s"play-frontend-hmrc-$playV"    % "8.5.0",
     "uk.gov.hmrc"           %% "play-conditional-form-mapping" % s"1.13.0-$playV",
     // OTHER
     "com.vladsch.flexmark"   % "flexmark-all"                  % flexmarkVersion,

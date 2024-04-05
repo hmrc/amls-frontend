@@ -21,7 +21,7 @@ import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
 import models.status._
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
-import org.jsoup.nodes.Element
+import org.jsoup.nodes.{Document, Element}
 import org.mockito.Mockito.when
 import org.scalatest.matchers.must.Matchers
 import play.api.mvc.Call
@@ -69,6 +69,17 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
   "YourRegistrationView" must {
 
     val pageTitle = "Your registration - " + messages("title.amls") + " - " + messages("title.gov")
+
+    def assertFeedbackSectionExists(doc: Document, expectedUrl: String) = {
+      val feedbackSection: Element = doc.getElementById("feedback-section")
+
+      feedbackSection.text() must include(messages("feedback.title"))
+      feedbackSection.text() must include(messages("feedback.p1"))
+      feedbackSection.text() must include(messages("feedback.link"))
+      feedbackSection.text() must include(messages("feedback.p2"))
+
+      feedbackSection.getElementsByTag("a").first().attr("href") mustBe expectedUrl
+    }
 
     "have correct title, heading and sub heading" in new ViewFixture {
 
@@ -129,7 +140,8 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
       Option(doc.getElementById("update-information")) must be(None)
       doc.getElementById("registration-status").html() must include("Not supervised. Application withdrawn.")
       doc.getElementById("new.application.button").html() must include("Start a new application")
-      doc.getElementsMatchingOwnText("What did you think of this service?").attr("href") must be(feedbackUrl)
+
+      assertFeedbackSectionExists(doc, feedbackUrl)
     }
 
     "contain correct content for status SubmissionDecisionRejected" in new ViewFixture {
@@ -200,7 +212,8 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
       Option(doc.getElementById("update-information")) must be(None)
       doc.getElementById("registration-status").html() must include("Not supervised. Deregistered on " + DateHelper.formatDate(deregistrationDate.value) + ".")
       doc.getElementById("new.application.button").html() must include("Start a new application")
-      doc.getElementsMatchingOwnText("What did you think of this service?").attr("href") must be(feedbackUrl)
+
+      assertFeedbackSectionExists(doc, feedbackUrl)
     }
 
     "contain registration information for status SubmissionReady" in new ViewFixture {
@@ -449,7 +462,9 @@ class YourRegistrationViewSpec extends AmlsViewSpec with Matchers with AmlsRefer
       messagesCell.getElementsByClass("hmrc-notification-badge").first().html() must include("100")
 
       doc.getElementsMatchingOwnText("contact HMRC").attr("href") must be(contactUrl)
-      doc.getElementsMatchingOwnText("What did you think of this service?").attr("href") must be(feedbackUrl)
+
+      assertFeedbackSectionExists(doc, feedbackUrl)
+
       doc.getElementsMatchingOwnText("Print this page")
         .attr("href") must be("javascript:window.print()")
     }
