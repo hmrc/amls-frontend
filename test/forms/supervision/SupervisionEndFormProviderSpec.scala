@@ -35,7 +35,7 @@ class SupervisionEndFormProviderSpec extends JodaDateBehaviours {
   val formField = "endDate"
 
   val minDate: LocalDate = SupervisionEndFormProvider.minDate
-  val maxDate: LocalDate = SupervisionEndFormProvider.maxDate
+  def maxDate: LocalDate = SupervisionEndFormProvider.maxDate
 
   "Supervision End Date form" must {
 

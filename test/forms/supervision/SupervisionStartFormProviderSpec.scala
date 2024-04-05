@@ -35,7 +35,7 @@ class SupervisionStartFormProviderSpec extends JodaDateBehaviours {
   val formField = "startDate"
 
   val minDate: LocalDate = SupervisionStartFormProvider.minDate
-  val maxDate: LocalDate = SupervisionStartFormProvider.maxDate
+  def maxDate: LocalDate = SupervisionStartFormProvider.maxDate
 
   "Supervision Start Date form" must {
 

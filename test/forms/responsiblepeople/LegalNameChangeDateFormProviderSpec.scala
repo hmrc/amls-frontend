@@ -35,7 +35,7 @@ class LegalNameChangeDateFormProviderSpec extends JodaDateBehaviours {
   val formField = "date"
 
   val minDate: LocalDate = LegalNameChangeDateFormProvider.minDate
-  val maxDate: LocalDate = LegalNameChangeDateFormProvider.maxDate
+  def maxDate: LocalDate = LegalNameChangeDateFormProvider.maxDate
 
   "Supervision Start Date form" must {
 

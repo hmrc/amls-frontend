@@ -35,7 +35,7 @@ class CashPaymentFirstDateFormProviderSpec extends JodaDateBehaviours {
   val formField = "paymentDate"
 
   val minDate: LocalDate = CashPaymentFirstDateFormProvider.minDate
-  val maxDate: LocalDate = CashPaymentFirstDateFormProvider.maxDate
+  def maxDate: LocalDate = CashPaymentFirstDateFormProvider.maxDate
 
   "Supervision Start Date form" must {
 

@@ -35,7 +35,7 @@ class DateOfBirthFormProviderSpec extends JodaDateBehaviours {
   val formField = "dateOfBirth"
 
   val minDate: LocalDate = DateOfBirthFormProvider.minDate
-  val maxDate: LocalDate = DateOfBirthFormProvider.maxDate
+  def maxDate: LocalDate = DateOfBirthFormProvider.maxDate
 
   "Supervision Start Date form" must {
 
