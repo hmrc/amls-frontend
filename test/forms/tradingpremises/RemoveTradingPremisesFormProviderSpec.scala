@@ -35,7 +35,7 @@ class RemoveTradingPremisesFormProviderSpec extends JodaDateBehaviours {
   val formField = "endDate"
 
   val minDate: LocalDate = RemoveTradingPremisesFormProvider.minDate
-  val maxDate: LocalDate = RemoveTradingPremisesFormProvider.maxDate
+  def maxDate: LocalDate = RemoveTradingPremisesFormProvider.maxDate
 
   "Activity Start Date form" must {
 

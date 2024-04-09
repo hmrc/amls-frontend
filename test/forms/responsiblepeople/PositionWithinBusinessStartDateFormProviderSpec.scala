@@ -35,7 +35,7 @@ class PositionWithinBusinessStartDateFormProviderSpec extends JodaDateBehaviours
   val formField = "startDate"
 
   val minDate: LocalDate = PositionWithinBusinessStartDateFormProvider.minDate
-  val maxDate: LocalDate = PositionWithinBusinessStartDateFormProvider.maxDate
+  def maxDate: LocalDate = PositionWithinBusinessStartDateFormProvider.maxDate
 
   "Supervision Start Date form" must {
 

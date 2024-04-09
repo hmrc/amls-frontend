@@ -62,5 +62,5 @@ object RemoveResponsiblePersonFormProvider {
 
   val minDate: LocalDate = new LocalDate(1900, 1, 1)
 
-  val maxDate: LocalDate = LocalDate.now()
+  def maxDate: LocalDate = LocalDate.now()
 }

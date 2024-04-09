@@ -35,7 +35,7 @@ class DateOfChangeFormProviderSpec extends JodaDateBehaviours {
   val formField = "dateOfChange"
 
   val minDate: LocalDate = DateOfChangeFormProvider.minDate
-  val maxDate: LocalDate = DateOfChangeFormProvider.maxDate
+  def maxDate: LocalDate = DateOfChangeFormProvider.maxDate
 
   "Date Of Change form" must {
 
