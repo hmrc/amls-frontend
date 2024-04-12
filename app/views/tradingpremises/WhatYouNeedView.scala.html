@@ -36,13 +36,7 @@
 ) {
     <p class="govuk-body">
         @messages("tradingpremises.virtualoffice.text_1.1")
-        @hmrcNewTabLink(
-            NewTabLink(
-                classList = Some("govuk-link"),
-                href = Some(appConfig.tradingPremisesVirtualOfficeLink),
-                text = messages("tradingpremises.virtualoffice.text_1.1.link.text")
-            )
-        )
+        <a href = "@appConfig.tradingPremisesVirtualOfficeLink" class="govuk-link"> @messages("tradingpremises.virtualoffice.text_1.1.link.text")</a>
         @messages("tradingpremises.virtualoffice.text_1.2")
     </p>
     <p class="govuk-body">@messages("tradingpremises.virtualoffice.text_2")</p>
