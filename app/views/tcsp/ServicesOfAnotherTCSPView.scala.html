@@ -44,13 +44,7 @@
 
     <p class="govuk-body">
         @messages("tcsp.servicesOfAnotherTcsp.hint.1")
-        @hmrcNewTabLink(
-            NewTabLink(
-                classList = Some("govuk-link"),
-                href = Some(appConfig.tcspWhoNeedsToRegisterLink),
-                text = messages("tcsp.servicesOfAnotherTcsp.hint.1.link.text")
-            )
-        )
+        <a href = "@appConfig.tcspWhoNeedsToRegisterLink" class="govuk-link"> @messages("tcsp.servicesOfAnotherTcsp.hint.1.link.text")</a>
         @messages("tcsp.servicesOfAnotherTcsp.hint.2")
     </p>
 
